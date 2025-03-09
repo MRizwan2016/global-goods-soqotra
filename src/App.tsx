@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import DataEntry from "./pages/DataEntry";
 import NotFound from "./pages/NotFound";
+import InvoiceList from "./pages/invoicing/InvoiceList";
+import InvoiceForm from "./pages/invoicing/InvoiceForm";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +21,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/data-entry" element={<DataEntry />} />
+          <Route path="/data-entry/invoicing" element={<InvoiceList />} />
+          <Route path="/data-entry/invoicing/new" element={<InvoiceForm />} />
+          <Route path="/data-entry/invoicing/edit/:id" element={<InvoiceForm />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
