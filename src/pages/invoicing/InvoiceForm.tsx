@@ -1,10 +1,10 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 import { 
   Table, 
   TableBody, 
@@ -13,8 +13,13 @@ import {
   InvoiceTableHead,
   InvoiceTableCell
 } from "@/components/ui/table";
-import { Edit, Trash } from "lucide-react";
+import { Edit, Trash, BookOpen } from "lucide-react";
 import { mockInvoiceData } from "@/data/mockData";
+
+const mockInvoiceBooks = [
+  { bookNumber: "722", startPage: "13136051", endPage: "13136100", available: ["13136051", "13136052", "13136053"] },
+  { bookNumber: "723", startPage: "13136101", endPage: "13136150", available: ["13136101", "13136102"] },
+];
 
 const InvoiceForm = () => {
   const { id } = useParams();
@@ -68,6 +73,22 @@ const InvoiceForm = () => {
     existingInvoice?.packageDetails || []
   );
   
+  const [showInvoiceSelector, setShowInvoiceSelector] = useState(false);
+  const [availableInvoices, setAvailableInvoices] = useState<any[]>([]);
+  
+  useEffect(() => {
+    if (isEditing) return;
+    
+    const allInvoices = mockInvoiceBooks.flatMap(book => 
+      book.available.map(num => ({
+        bookNumber: book.bookNumber,
+        invoiceNumber: num
+      }))
+    );
+    
+    setAvailableInvoices(allInvoices);
+  }, [isEditing]);
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormState(prev => ({
@@ -78,7 +99,7 @@ const InvoiceForm = () => {
   
   const handleAddPackage = () => {
     if (!formState.packagesName || !formState.length || !formState.width || !formState.height) {
-      alert("Please fill all package details");
+      toast.error("Please fill all package details");
       return;
     }
     
@@ -100,7 +121,6 @@ const InvoiceForm = () => {
     
     setPackageItems([...packageItems, newPackage]);
     
-    // Reset package form fields
     setFormState(prev => ({
       ...prev,
       packagesName: "",
@@ -117,11 +137,24 @@ const InvoiceForm = () => {
     setPackageItems(packageItems.filter(item => item.id !== id));
   };
   
+  const handleSelectInvoice = (invoiceNumber: string) => {
+    setFormState(prev => ({
+      ...prev,
+      invoiceNumber
+    }));
+    setShowInvoiceSelector(false);
+    toast.success(`Invoice number ${invoiceNumber} selected`);
+  };
+  
   const handleSave = () => {
-    // In a real app, this would send data to a backend
-    console.log("Saving invoice:", { ...formState, packageItems });
+    if (!formState.invoiceNumber) {
+      toast.error("Please select an invoice number");
+      return;
+    }
     
-    // Redirect back to invoice list
+    console.log("Saving invoice:", { ...formState, packageItems });
+    toast.success("Invoice saved successfully");
+    
     navigate("/data-entry/invoicing");
   };
   
@@ -293,12 +326,47 @@ const InvoiceForm = () => {
             
             <div className="flex flex-col">
               <label className="text-sm font-medium mb-1">INVOICE NUMBER:</label>
-              <Input 
-                name="invoiceNumber"
-                value={formState.invoiceNumber}
-                onChange={handleInputChange}
-                className="border border-gray-300"
-              />
+              <div className="flex gap-2">
+                <Input 
+                  name="invoiceNumber"
+                  value={formState.invoiceNumber}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  readOnly={!isEditing}
+                  placeholder="Select an invoice number"
+                />
+                {!isEditing && (
+                  <Button 
+                    type="button"
+                    onClick={() => setShowInvoiceSelector(!showInvoiceSelector)}
+                    className="bg-blue-500 hover:bg-blue-600 px-2"
+                  >
+                    <BookOpen size={18} />
+                  </Button>
+                )}
+              </div>
+              
+              {showInvoiceSelector && (
+                <div className="mt-2 bg-white border border-gray-200 rounded shadow-lg p-2 max-h-60 overflow-y-auto absolute z-10">
+                  <h4 className="font-medium text-sm mb-2 px-2">Select an Invoice Number</h4>
+                  {availableInvoices.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-1">
+                      {availableInvoices.map((inv) => (
+                        <div 
+                          key={inv.invoiceNumber}
+                          onClick={() => handleSelectInvoice(inv.invoiceNumber)}
+                          className="text-sm py-1 px-2 hover:bg-blue-50 cursor-pointer rounded flex justify-between"
+                        >
+                          <span>{inv.invoiceNumber}</span>
+                          <span className="text-gray-500">(Book {inv.bookNumber})</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500 p-2">No available invoice numbers</p>
+                  )}
+                </div>
+              )}
             </div>
             
             <div className="flex flex-col md:col-span-2">
@@ -349,7 +417,6 @@ const InvoiceForm = () => {
             </div>
           </div>
           
-          {/* Package Details Section */}
           <div className="mt-8">
             <div className="bg-soqotra-blue text-white py-2 px-4 font-medium">
               PACKAGES DETAILS
@@ -458,7 +525,6 @@ const InvoiceForm = () => {
               </div>
             </div>
             
-            {/* Package List Table */}
             <div className="overflow-x-auto border border-gray-200 mb-6">
               <Table>
                 <TableHeader>
@@ -512,7 +578,6 @@ const InvoiceForm = () => {
               </Table>
             </div>
             
-            {/* Shipping Details Section */}
             <div className="mt-8">
               <div className="bg-soqotra-blue text-white py-2 px-4 font-medium">
                 SHIPPING DETAILS

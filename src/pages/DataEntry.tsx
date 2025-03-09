@@ -1,95 +1,94 @@
 
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { FileText, DollarSign, Ship, Plane, Package } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { 
+  FileText, 
+  Package, 
+  Users, 
+  Truck, 
+  ShoppingBag,
+  BookOpen
+} from "lucide-react";
 
 const DataEntry = () => {
   return (
     <Layout title="Data Entry">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-xl font-semibold text-gray-800 mb-4">Data Entry Module</h2>
-        <p className="text-gray-600 mb-6">
-          Please select a specific data entry option to proceed with cargo management operations.
-        </p>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <Link to="/data-entry/invoicing" className="block">
-            <div className="border border-gray-200 rounded-md p-5 hover:border-soqotra-blue hover:shadow-md transition-all">
-              <div className="flex items-center gap-2 mb-2">
-                <FileText className="text-soqotra-blue" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Link to="/data-entry/invoicing">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+            <div className="flex items-center gap-4">
+              <div className="bg-blue-100 p-3 rounded-full">
+                <FileText className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
                 <h3 className="font-medium text-lg">Invoicing</h3>
+                <p className="text-gray-500 text-sm">Manage customer invoices</p>
               </div>
-              <p className="text-gray-600 text-sm mb-4">Create and manage customer invoices for shipments</p>
-              <span className="text-soqotra-blue hover:underline text-sm font-medium">
-                Go to Invoicing →
-              </span>
             </div>
-          </Link>
-          
-          <Link to="/data-entry/payment" className="block">
-            <div className="border border-gray-200 rounded-md p-5 hover:border-soqotra-blue hover:shadow-md transition-all">
-              <div className="flex items-center gap-2 mb-2">
-                <DollarSign className="text-soqotra-blue" />
-                <h3 className="font-medium text-lg">Payment Receivable</h3>
+          </div>
+        </Link>
+        
+        <Link to="/data-entry/booking-form-stock">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+            <div className="flex items-center gap-4">
+              <div className="bg-green-100 p-3 rounded-full">
+                <BookOpen className="h-6 w-6 text-green-600" />
               </div>
-              <p className="text-gray-600 text-sm mb-4">Record and track payments from customers</p>
-              <span className="text-soqotra-blue hover:underline text-sm font-medium">
-                Go to Payment Receivable →
-              </span>
-            </div>
-          </Link>
-          
-          <Link to="/data-entry/container" className="block">
-            <div className="border border-gray-200 rounded-md p-5 hover:border-soqotra-blue hover:shadow-md transition-all">
-              <div className="flex items-center gap-2 mb-2">
-                <Ship className="text-soqotra-blue" />
-                <h3 className="font-medium text-lg">Load Container</h3>
+              <div>
+                <h3 className="font-medium text-lg">Booking Form Stock</h3>
+                <p className="text-gray-500 text-sm">Manage invoice book stock</p>
               </div>
-              <p className="text-gray-600 text-sm mb-4">Manage cargo loading into shipping containers</p>
-              <span className="text-soqotra-blue hover:underline text-sm font-medium">
-                Go to Load Container →
-              </span>
             </div>
-          </Link>
-          
-          <Link to="/data-entry/vessel" className="block">
-            <div className="border border-gray-200 rounded-md p-5 hover:border-soqotra-blue hover:shadow-md transition-all">
-              <div className="flex items-center gap-2 mb-2">
-                <Ship className="text-soqotra-blue" />
-                <h3 className="font-medium text-lg">Load Vessel</h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">Manage vessel loading schedules and cargo</p>
-              <span className="text-soqotra-blue hover:underline text-sm font-medium">
-                Go to Load Vessel →
-              </span>
+          </div>
+        </Link>
+        
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+          <div className="flex items-center gap-4">
+            <div className="bg-purple-100 p-3 rounded-full">
+              <Package className="h-6 w-6 text-purple-600" />
             </div>
-          </Link>
-          
-          <Link to="/data-entry/air-cargo" className="block">
-            <div className="border border-gray-200 rounded-md p-5 hover:border-soqotra-blue hover:shadow-md transition-all">
-              <div className="flex items-center gap-2 mb-2">
-                <Plane className="text-soqotra-blue" />
-                <h3 className="font-medium text-lg">Load Air Cargo</h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">Manage air freight shipments and scheduling</p>
-              <span className="text-soqotra-blue hover:underline text-sm font-medium">
-                Go to Load Air Cargo →
-              </span>
+            <div>
+              <h3 className="font-medium text-lg">Cargo Management</h3>
+              <p className="text-gray-500 text-sm">Track and manage cargo</p>
             </div>
-          </Link>
-          
-          <Link to="/data-entry/packing-list" className="block">
-            <div className="border border-gray-200 rounded-md p-5 hover:border-soqotra-blue hover:shadow-md transition-all">
-              <div className="flex items-center gap-2 mb-2">
-                <Package className="text-soqotra-blue" />
-                <h3 className="font-medium text-lg">Packing List</h3>
-              </div>
-              <p className="text-gray-600 text-sm mb-4">Create and manage packing lists for shipments</p>
-              <span className="text-soqotra-blue hover:underline text-sm font-medium">
-                Go to Packing List →
-              </span>
+          </div>
+        </div>
+        
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+          <div className="flex items-center gap-4">
+            <div className="bg-amber-100 p-3 rounded-full">
+              <Users className="h-6 w-6 text-amber-600" />
             </div>
-          </Link>
+            <div>
+              <h3 className="font-medium text-lg">Customer Data</h3>
+              <p className="text-gray-500 text-sm">Customer information</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+          <div className="flex items-center gap-4">
+            <div className="bg-cyan-100 p-3 rounded-full">
+              <Truck className="h-6 w-6 text-cyan-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-lg">Shipping</h3>
+              <p className="text-gray-500 text-sm">Manage shipping details</p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+          <div className="flex items-center gap-4">
+            <div className="bg-rose-100 p-3 rounded-full">
+              <ShoppingBag className="h-6 w-6 text-rose-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-lg">Inventory</h3>
+              <p className="text-gray-500 text-sm">Manage product inventory</p>
+            </div>
+          </div>
         </div>
       </div>
     </Layout>
