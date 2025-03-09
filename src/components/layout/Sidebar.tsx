@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -84,7 +83,7 @@ const Sidebar = () => {
           alt="SOQOTRA Logo" 
           className="h-12 object-contain mb-2"
         />
-        <h2 className="text-white font-bold">LOGISTICS SYSTEM</h2>
+        <h2 className="text-white font-bold text-sm">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</h2>
       </div>
       
       <div className="flex flex-col gap-1 p-2 overflow-y-auto flex-1">
