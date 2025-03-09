@@ -14,9 +14,9 @@ import {
 const DataEntry = () => {
   return (
     <Layout title="Data Entry">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
         <Link to="/data-entry/invoicing">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
             <div className="flex items-center gap-4">
               <div className="bg-blue-100 p-3 rounded-full">
                 <FileText className="h-6 w-6 text-blue-600" />
@@ -30,7 +30,7 @@ const DataEntry = () => {
         </Link>
         
         <Link to="/data-entry/booking-form-stock">
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-green-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
             <div className="flex items-center gap-4">
               <div className="bg-green-100 p-3 rounded-full">
                 <BookOpen className="h-6 w-6 text-green-600" />
@@ -43,7 +43,7 @@ const DataEntry = () => {
           </div>
         </Link>
         
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-purple-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
           <div className="flex items-center gap-4">
             <div className="bg-purple-100 p-3 rounded-full">
               <Package className="h-6 w-6 text-purple-600" />
@@ -55,7 +55,7 @@ const DataEntry = () => {
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-amber-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
           <div className="flex items-center gap-4">
             <div className="bg-amber-100 p-3 rounded-full">
               <Users className="h-6 w-6 text-amber-600" />
@@ -67,7 +67,7 @@ const DataEntry = () => {
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-cyan-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
           <div className="flex items-center gap-4">
             <div className="bg-cyan-100 p-3 rounded-full">
               <Truck className="h-6 w-6 text-cyan-600" />
@@ -79,7 +79,7 @@ const DataEntry = () => {
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-blue-300 transition-colors">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-rose-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
           <div className="flex items-center gap-4">
             <div className="bg-rose-100 p-3 rounded-full">
               <ShoppingBag className="h-6 w-6 text-rose-600" />

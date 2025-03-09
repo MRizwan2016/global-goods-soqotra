@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
@@ -21,7 +22,7 @@ const SidebarItem = ({ icon, title, to, children, isOpen, onClick }: SidebarItem
   
   const content = (
     <>
-      <div className="flex items-center gap-2 py-2 px-3 rounded-md w-full text-white hover:bg-white/10">
+      <div className="flex items-center gap-2 py-2 px-3 rounded-md w-full text-white hover:bg-white/10 transition-colors duration-200">
         <span className="w-5">{icon}</span>
         <span>{title}</span>
         {hasChildren && (
@@ -46,10 +47,10 @@ const SidebarItem = ({ icon, title, to, children, isOpen, onClick }: SidebarItem
       )}
       
       {hasChildren && isOpen && (
-        <div className="pl-4 ml-2 border-l border-soqotra-lightBlue/30">
+        <div className="pl-4 ml-2 border-l border-soqotra-lightBlue/30 animate-fade-in">
           {children?.map((child, index) => (
             <Link key={index} to={child.to || "#"} className="w-full">
-              <div className="flex items-center gap-2 py-2 px-3 text-white hover:bg-white/10 rounded-md">
+              <div className="flex items-center gap-2 py-2 px-3 text-white hover:bg-white/10 rounded-md transition-colors duration-200">
                 <span className="w-5">{child.icon}</span>
                 <span>{child.title}</span>
               </div>

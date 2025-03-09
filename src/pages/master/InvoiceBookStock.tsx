@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/table";
 import { PenLine } from "lucide-react";
 
-// Mock data for booking forms
-const mockBookingData = Array.from({ length: 10 }, (_, i) => ({
+// Mock data for invoice books
+const mockBookData = Array.from({ length: 10 }, (_, i) => ({
   id: (i + 1).toString(),
   bookNumber: (722 + i).toString(),
   startPage: (13136051 + (i * 50)).toString(),
@@ -24,12 +24,12 @@ const mockBookingData = Array.from({ length: 10 }, (_, i) => ({
   isActivated: false,
 }));
 
-const BookingFormStock = () => {
+const InvoiceBookStock = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [bookingData, setBookingData] = useState(mockBookingData);
+  const [bookData, setBookData] = useState(mockBookData);
   
   // Filter booking data based on search term
-  const filteredData = bookingData.filter(item => {
+  const filteredData = bookData.filter(item => {
     if (!searchTerm) return true;
     return (
       item.bookNumber.includes(searchTerm) || 
@@ -39,13 +39,13 @@ const BookingFormStock = () => {
   });
   
   return (
-    <Layout title="Booking Form Stock">
+    <Layout title="Invoice Book Stock">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 animate-fade-in">
-        <div className="p-4 bg-green-50 border-b border-green-100">
-          <h3 className="text-lg font-medium text-green-800">
-            View Booking Form Stock List
+        <div className="p-4 bg-blue-50 border-b border-blue-100">
+          <h3 className="text-lg font-medium text-blue-800">
+            Manage Invoice Book Stock
           </h3>
-          <p className="text-sm text-green-600">Records Listed</p>
+          <p className="text-sm text-blue-600">Master Records</p>
         </div>
         
         <div className="p-4">
@@ -61,14 +61,9 @@ const BookingFormStock = () => {
             </div>
             
             <div className="flex gap-3">
-              <Link to="/data-entry/booking-form-stock/activate">
+              <Link to="/master/invoice-book/add">
                 <Button className="bg-blue-500 hover:bg-blue-600 transition-colors hover:scale-105 transform duration-200">
-                  Activate Booking Form
-                </Button>
-              </Link>
-              <Link to="/data-entry/booking-form-stock/issue">
-                <Button className="bg-green-500 hover:bg-green-600 transition-colors hover:scale-105 transform duration-200">
-                  Issue Booking Form
+                  Add New Book
                 </Button>
               </Link>
               <div className="flex items-center gap-2">
@@ -83,7 +78,7 @@ const BookingFormStock = () => {
             </div>
           </div>
           
-          <div className="border border-gray-200 rounded overflow-hidden">
+          <div className="border border-gray-200 rounded overflow-hidden hover-scale transition-transform duration-300">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -91,21 +86,28 @@ const BookingFormStock = () => {
                   <BookingTableHead>BOOK NUMBER</BookingTableHead>
                   <BookingTableHead>START PAGE</BookingTableHead>
                   <BookingTableHead>END PAGE</BookingTableHead>
-                  <BookingTableHead>ISSUE</BookingTableHead>
-                  <BookingTableHead>ACTIVATE</BookingTableHead>
+                  <BookingTableHead>STATUS</BookingTableHead>
+                  <BookingTableHead>ACTIONS</BookingTableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredData.map((item) => (
-                  <TableRow key={item.id} className="hover:bg-green-50/50 transition-colors duration-200">
+                  <TableRow key={item.id} className="hover:bg-blue-50/50 transition-colors">
                     <BookingTableCell className="text-center">{item.id}</BookingTableCell>
                     <BookingTableCell>{item.bookNumber}</BookingTableCell>
                     <BookingTableCell>{item.startPage}</BookingTableCell>
                     <BookingTableCell>{item.endPage}</BookingTableCell>
                     <BookingTableCell className="text-center">
-                      <PenLine size={16} className="inline text-blue-500 hover:scale-125 transition-transform cursor-pointer" />
+                      {item.isActivated ? 
+                        <span className="text-green-600 font-medium">Activated</span> : 
+                        <span className="text-gray-600">Inactive</span>
+                      }
                     </BookingTableCell>
-                    <BookingTableCell className="text-center">{item.bookNumber}</BookingTableCell>
+                    <BookingTableCell className="text-center">
+                      <Button variant="ghost" size="sm" className="hover:bg-blue-100 transition-colors">
+                        <PenLine size={16} className="inline text-blue-500" />
+                      </Button>
+                    </BookingTableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -118,7 +120,7 @@ const BookingFormStock = () => {
             </div>
             <div className="flex gap-1">
               <Button variant="outline" size="sm" disabled>Previous</Button>
-              <Button variant="outline" size="sm" className="bg-blue-500 text-white hover:bg-blue-600 transition-colors">1</Button>
+              <Button variant="outline" size="sm" className="bg-blue-500 text-white">1</Button>
               <Button variant="outline" size="sm" disabled>Next</Button>
             </div>
           </div>
@@ -128,4 +130,4 @@ const BookingFormStock = () => {
   );
 };
 
-export default BookingFormStock;
+export default InvoiceBookStock;
