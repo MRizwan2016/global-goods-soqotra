@@ -18,6 +18,11 @@ import SalesRepList from "./pages/master/SalesRepList";
 import SalesRepForm from "./pages/master/SalesRepForm";
 import TownList from "./pages/master/TownList";
 import TownForm from "./pages/master/TownForm";
+import SellingRatesList from "./pages/selling-rates/SellingRatesList";
+import SellingRatesForm from "./pages/selling-rates/SellingRatesForm";
+import BillOfLadingList from "./pages/bill-of-lading/BillOfLadingList";
+import BillOfLadingForm from "./pages/bill-of-lading/BillOfLadingForm";
+import PrintDocuments from "./pages/print-documents/PrintDocuments";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +43,13 @@ const App = () => (
           <Route path="/data-entry/booking-form-stock" element={<BookingFormStock />} />
           <Route path="/data-entry/booking-form-stock/activate" element={<BookingFormActivate />} />
           <Route path="/data-entry/booking-form-stock/issue" element={<BookingFormIssue />} />
+          <Route path="/data-entry/selling-rates" element={<SellingRatesList />} />
+          <Route path="/data-entry/selling-rates/new" element={<SellingRatesForm />} />
+          <Route path="/data-entry/selling-rates/edit/:id" element={<SellingRatesForm />} />
+          <Route path="/data-entry/bill-of-lading" element={<BillOfLadingList />} />
+          <Route path="/data-entry/bill-of-lading/new" element={<BillOfLadingForm />} />
+          <Route path="/data-entry/bill-of-lading/edit/:id" element={<BillOfLadingForm />} />
+          <Route path="/data-entry/print-documents" element={<PrintDocuments />} />
           
           {/* Master Data Routes */}
           <Route path="/master/invoice-book" element={<InvoiceBookStock />} />

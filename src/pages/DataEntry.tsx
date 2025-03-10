@@ -8,7 +8,10 @@ import {
   Users, 
   Truck, 
   ShoppingBag,
-  BookOpen
+  BookOpen,
+  Ship,
+  FilePen,
+  Printer
 } from "lucide-react";
 
 const DataEntry = () => {
@@ -38,6 +41,20 @@ const DataEntry = () => {
               <div>
                 <h3 className="font-medium text-lg">Booking Form Stock</h3>
                 <p className="text-gray-500 text-sm">Manage invoice book stock</p>
+              </div>
+            </div>
+          </div>
+        </Link>
+        
+        <Link to="/data-entry/bill-of-lading">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-indigo-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
+            <div className="flex items-center gap-4">
+              <div className="bg-indigo-100 p-3 rounded-full">
+                <Ship className="h-6 w-6 text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="font-medium text-lg">Bill of Lading</h3>
+                <p className="text-gray-500 text-sm">Manage BL for shipments</p>
               </div>
             </div>
           </div>
@@ -79,6 +96,20 @@ const DataEntry = () => {
           </div>
         </div>
         
+        <Link to="/data-entry/selling-rates">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-orange-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
+            <div className="flex items-center gap-4">
+              <div className="bg-orange-100 p-3 rounded-full">
+                <FilePen className="h-6 w-6 text-orange-600" />
+              </div>
+              <div>
+                <h3 className="font-medium text-lg">Selling Rates</h3>
+                <p className="text-gray-500 text-sm">Manage selling tariffs</p>
+              </div>
+            </div>
+          </div>
+        </Link>
+        
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-rose-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
           <div className="flex items-center gap-4">
             <div className="bg-rose-100 p-3 rounded-full">
@@ -90,6 +121,20 @@ const DataEntry = () => {
             </div>
           </div>
         </div>
+
+        <Link to="/data-entry/print-documents">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-emerald-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
+            <div className="flex items-center gap-4">
+              <div className="bg-emerald-100 p-3 rounded-full">
+                <Printer className="h-6 w-6 text-emerald-600" />
+              </div>
+              <div>
+                <h3 className="font-medium text-lg">Print Documents</h3>
+                <p className="text-gray-500 text-sm">Print invoices and BLs</p>
+              </div>
+            </div>
+          </div>
+        </Link>
       </div>
     </Layout>
   );
