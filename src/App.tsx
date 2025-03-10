@@ -14,6 +14,8 @@ import BookingFormActivate from "./pages/invoicing/BookingFormActivate";
 import BookingFormIssue from "./pages/invoicing/BookingFormIssue";
 import InvoiceBookStock from "./pages/master/InvoiceBookStock";
 import InvoiceBookForm from "./pages/master/InvoiceBookForm";
+import SalesRepList from "./pages/master/SalesRepList";
+import SalesRepForm from "./pages/master/SalesRepForm";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +40,9 @@ const App = () => (
           {/* Master Data Routes */}
           <Route path="/master/invoice-book" element={<InvoiceBookStock />} />
           <Route path="/master/invoice-book/add" element={<InvoiceBookForm />} />
+          <Route path="/master/sales-rep" element={<SalesRepList />} />
+          <Route path="/master/sales-rep/add" element={<SalesRepForm />} />
+          <Route path="/master/sales-rep/edit/:id" element={<SalesRepForm />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
