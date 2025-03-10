@@ -1,62 +1,41 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { 
-  Table, 
-  TableBody, 
-  TableHeader, 
-  TableRow,
-  InvoiceTableHead,
-  InvoiceTableCell
-} from "@/components/ui/table";
 
-// Mock data for districts by country
-const mockDistrictsByCountry = {
-  "Sri Lanka": [
-    "AMPARA", "BATTICOLA", "COLOMBO", "GAMPAHA", "JAFFNA", 
-    "KALUTARA", "KILINOCHCHI", "MANNAR", "MULATIV", "RATNAPURA",
-    "POLONNARUWA", "CHILAW", "TRINCOMALLE", "VAUNIYA"
-  ],
-  "Kenya": ["NAIROBI", "MOMBASA", "KISUMU", "NAKURU", "ELDORET"],
-  "Eritrea": ["ASMARA", "KEREN", "MASSAWA", "ASSAB", "BARENTU"],
-  "Sudan": ["KHARTOUM", "PORT SUDAN", "OMDURMAN", "NYALA", "KASSALA"],
-  "Saudi Arabia": ["RIYADH", "JEDDAH", "MECCA", "MEDINA", "DAMMAM"],
-  "United Arab Emirates": ["DUBAI", "ABU DHABI", "SHARJAH", "AJMAN", "RAS AL KHAIMAH"],
-  "Somalia": ["MOGADISHU", "HARGEISA", "KISMAYO", "BERBERA", "MARKA"],
-  "Tunisia": ["TUNIS", "SFAX", "SOUSSE", "KAIROUAN", "BIZERTE"]
-};
-
-// Mock rate boxes by country
-const mockRateBoxes = {
-  "Sri Lanka": [
-    { id: "box1", name: "CARTON BOX - MEDIUM [ 19 X 19 X 29=0.176 ]" },
-    { id: "box2", name: "WOODEN BOX - (4M) - BLACK [ 96 X 48 X 48=3.71 ]" }
-  ],
-  "Kenya": [
-    { id: "box1", name: "CARTON BOX - MEDIUM [ 19 X 19 X 29=0.176 ]" },
-    { id: "box2", name: "WOODEN BOX - (4M) - BLACK [ 96 X 48 X 48=3.71 ]" }
-  ],
-  "default": [
-    { id: "box1", name: "CARTON BOX - SMALL [ 19 X 19 X 19=0.176 ]" },
-    { id: "box2", name: "CARTON BOX - MEDIUM [ 19 X 19 X 29=0.176 ]" },
-    { id: "box3", name: "WOODEN BOX - (4M) - BLACK [ 96 X 48 X 48=3.71 ]" },
-    { id: "box4", name: "CAR" },
-    { id: "box5", name: "TRUCK" },
-    { id: "box6", name: "PERSONAL EFFECTS" },
-    { id: "box7", name: "HOUSEHOLD GOODS" }
-  ]
-};
-
-// Mock data for existing selling rates
+// Mock data for selling rates
 const mockSellingRates = [
-  { id: "1", freightType: "S", tariffNumber: "1", effectiveFrom: "01/01/2021", district: "POLONNARUWA", country: "Sri Lanka" },
-  { id: "2", freightType: "S", tariffNumber: "1", effectiveFrom: "01/01/2021", district: "CHILAW", country: "Sri Lanka" },
-  { id: "3", freightType: "S", tariffNumber: "1", effectiveFrom: "01/01/2021", district: "AMPARA", country: "Sri Lanka" },
-  { id: "4", freightType: "S", tariffNumber: "2", effectiveFrom: "01/01/2022", district: "NAIROBI", country: "Kenya" },
+  {
+    id: "1",
+    freightType: "SEA",
+    tariffNumber: "SL-001",
+    effectiveFrom: "2023-09-01",
+    district: "COLOMBO",
+    country: "Sri Lanka",
+  },
+  {
+    id: "2",
+    freightType: "AIR",
+    tariffNumber: "SL-002",
+    effectiveFrom: "2023-10-15",
+    district: "KANDY",
+    country: "Sri Lanka",
+  },
+];
+
+const countries = [
+  "Sri Lanka",
+  "Kenya",
+  "Eritrea",
+  "Sudan",
+  "Saudi Arabia",
+  "United Arab Emirates",
+  "Somalia",
+  "Tunisia"
 ];
 
 const SellingRatesForm = () => {
@@ -69,36 +48,23 @@ const SellingRatesForm = () => {
     : null;
     
   const [formState, setFormState] = useState({
+    freightType: existingRate?.freightType || "SEA",
     tariffNumber: existingRate?.tariffNumber || "",
-    freightType: existingRate?.freightType || "S",
-    sector: existingRate?.sector || "COLOMBO : C",
     effectiveFrom: existingRate?.effectiveFrom || "",
+    district: existingRate?.district || "",
     country: existingRate?.country || "Sri Lanka",
+    remark: "",
+    cargoType: "General Cargo",
+    
+    // Rate values
+    rate1: "0",
+    rate2: "0",
+    rate3: "0",
+    rate4: "0",
+    rate5: "0"
   });
   
-  const [districts, setDistricts] = useState<string[]>([]);
-  const [rateBoxes, setRateBoxes] = useState<any[]>([]);
-  const [districtRates, setDistrictRates] = useState<{[key: string]: {[key: string]: string}}>({});
-  
-  useEffect(() => {
-    // Set districts based on selected country
-    setDistricts(mockDistrictsByCountry[formState.country as keyof typeof mockDistrictsByCountry] || []);
-    
-    // Set rate boxes based on selected country
-    setRateBoxes(mockRateBoxes[formState.country as keyof typeof mockRateBoxes] || mockRateBoxes.default);
-    
-    // Initialize district rates
-    const newDistrictRates: {[key: string]: {[key: string]: string}} = {};
-    (mockDistrictsByCountry[formState.country as keyof typeof mockDistrictsByCountry] || []).forEach(district => {
-      newDistrictRates[district] = {};
-      (mockRateBoxes[formState.country as keyof typeof mockRateBoxes] || mockRateBoxes.default).forEach(box => {
-        newDistrictRates[district][box.id] = "0";
-      });
-    });
-    setDistrictRates(newDistrictRates);
-  }, [formState.country]);
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormState(prev => ({
       ...prev,
@@ -106,48 +72,45 @@ const SellingRatesForm = () => {
     }));
   };
   
-  const handleRateChange = (district: string, boxId: string, value: string) => {
-    setDistrictRates(prev => ({
-      ...prev,
-      [district]: {
-        ...prev[district],
-        [boxId]: value
-      }
-    }));
-  };
-  
   const handleSave = () => {
-    if (!formState.tariffNumber) {
-      toast.error("Please enter a tariff number");
+    if (!formState.tariffNumber || !formState.effectiveFrom || !formState.district) {
+      toast.error("Please fill all required fields");
       return;
     }
     
-    if (!formState.effectiveFrom) {
-      toast.error("Please select an effective date");
-      return;
-    }
-    
-    console.log("Saving selling rates:", { ...formState, districtRates });
-    toast.success("Selling rates saved successfully");
+    console.log("Saving selling rate:", formState);
+    toast.success("Selling rate saved successfully");
     
     navigate("/data-entry/selling-rates");
   };
   
   return (
-    <Layout title={isEditing ? "Update Selling Tariff" : "Add Selling Tariff"}>
+    <Layout title={isEditing ? "Update Selling Rate" : "Add Selling Rate"}>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-4 bg-green-50 border-b border-green-100">
-          <h3 className="text-lg font-medium text-green-800">
-            {isEditing 
-              ? `Update Selling Tariff - ${formState.country}` 
-              : `Add Selling Tariff - ${formState.country}`}
+        <div className="p-4 bg-orange-50 border-b border-orange-100">
+          <h3 className="text-lg font-medium text-orange-800">
+            {isEditing ? "Update Selling Rate" : "Add Selling Rate"}
           </h3>
         </div>
         
         <div className="p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">TARIFF NUMBER:</label>
+              <label className="text-sm font-medium mb-1">Freight Type:</label>
+              <select
+                name="freightType"
+                value={formState.freightType}
+                onChange={handleInputChange}
+                className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+              >
+                <option value="SEA">SEA</option>
+                <option value="AIR">AIR</option>
+                <option value="LAND">LAND</option>
+              </select>
+            </div>
+            
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Tariff Number:</label>
               <Input 
                 name="tariffNumber"
                 value={formState.tariffNumber}
@@ -157,35 +120,7 @@ const SellingRatesForm = () => {
             </div>
             
             <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">FREIGHT TYPE:</label>
-              <select
-                name="freightType"
-                value={formState.freightType}
-                onChange={handleInputChange}
-                className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
-              >
-                <option value="S">S</option>
-                <option value="A">A</option>
-                <option value="L">L</option>
-              </select>
-            </div>
-            
-            <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">SECTOR:</label>
-              <select
-                name="sector"
-                value={formState.sector}
-                onChange={handleInputChange}
-                className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
-              >
-                <option value="COLOMBO : C">COLOMBO : C</option>
-                <option value="DOHA : D">DOHA : D</option>
-                <option value="MANILA : M">MANILA : M</option>
-              </select>
-            </div>
-            
-            <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">EFFECTIVE FROM:</label>
+              <label className="text-sm font-medium mb-1">Effective From:</label>
               <Input 
                 type="date"
                 name="effectiveFrom"
@@ -196,69 +131,129 @@ const SellingRatesForm = () => {
             </div>
             
             <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">COUNTRY:</label>
+              <label className="text-sm font-medium mb-1">Country:</label>
               <select
                 name="country"
                 value={formState.country}
                 onChange={handleInputChange}
                 className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
               >
-                <option value="Sri Lanka">SRI LANKA</option>
-                <option value="Kenya">KENYA</option>
-                <option value="Eritrea">ERITREA</option>
-                <option value="Sudan">SUDAN</option>
-                <option value="Saudi Arabia">SAUDI ARABIA</option>
-                <option value="United Arab Emirates">UNITED ARAB EMIRATES</option>
-                <option value="Somalia">SOMALIA</option>
-                <option value="Tunisia">TUNISIA</option>
+                {countries.map(country => (
+                  <option key={country} value={country}>{country}</option>
+                ))}
+              </select>
+            </div>
+            
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">District/City:</label>
+              <Input 
+                name="district"
+                value={formState.district}
+                onChange={handleInputChange}
+                className="border border-gray-300"
+              />
+            </div>
+            
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Cargo Type:</label>
+              <select
+                name="cargoType"
+                value={formState.cargoType}
+                onChange={handleInputChange}
+                className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+              >
+                <option value="General Cargo">General Cargo</option>
+                <option value="Personal Effects">Personal Effects</option>
+                <option value="Household Goods">Household Goods</option>
+                <option value="Car">Car</option>
+                <option value="Truck">Truck</option>
               </select>
             </div>
           </div>
           
-          <div className="mt-8 overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-blue-600 hover:bg-blue-600">
-                  <InvoiceTableHead className="w-48">DISTRICT/ZONE</InvoiceTableHead>
-                  {rateBoxes.map(box => (
-                    <InvoiceTableHead key={box.id}>
-                      {box.name}
-                    </InvoiceTableHead>
-                  ))}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {districts.map(district => (
-                  <TableRow key={district}>
-                    <InvoiceTableCell className="font-medium">{district}</InvoiceTableCell>
-                    {rateBoxes.map(box => (
-                      <InvoiceTableCell key={box.id}>
-                        <Input
-                          type="number"
-                          value={districtRates[district]?.[box.id] || "0"}
-                          onChange={(e) => handleRateChange(district, box.id, e.target.value)}
-                          className="border border-gray-300 w-full"
-                        />
-                      </InvoiceTableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div className="bg-orange-100 p-4 rounded mb-6">
+            <h4 className="font-medium mb-3">Rate Settings</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">0 - 10 kg Rate:</label>
+                <Input 
+                  name="rate1"
+                  type="number"
+                  value={formState.rate1}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">11 - 20 kg Rate:</label>
+                <Input 
+                  name="rate2"
+                  type="number"
+                  value={formState.rate2}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">21 - 30 kg Rate:</label>
+                <Input 
+                  name="rate3"
+                  type="number"
+                  value={formState.rate3}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">31 - 40 kg Rate:</label>
+                <Input 
+                  name="rate4"
+                  type="number"
+                  value={formState.rate4}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">Above 40 kg Rate:</label>
+                <Input 
+                  name="rate5"
+                  type="number"
+                  value={formState.rate5}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                />
+              </div>
+            </div>
           </div>
           
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="mb-6">
+            <label className="text-sm font-medium mb-1">Remarks:</label>
+            <Textarea 
+              name="remark"
+              value={formState.remark}
+              onChange={handleInputChange}
+              className="border border-gray-300 w-full h-24"
+              placeholder="Enter any additional notes about this rate"
+            />
+          </div>
+          
+          <div className="flex justify-end gap-3">
             <Button 
               onClick={handleSave}
-              className="bg-blue-500 hover:bg-blue-600"
+              className="bg-orange-500 hover:bg-orange-600"
             >
-              Save
+              Save Rate
             </Button>
             <Button 
               onClick={() => navigate("/data-entry/selling-rates")}
               variant="outline"
             >
-              Go Back
+              Cancel
             </Button>
           </div>
         </div>
