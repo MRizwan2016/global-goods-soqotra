@@ -101,6 +101,7 @@ const Sidebar = () => {
           onClick={() => toggleSection('masterData')}
           children={[
             { icon: <Users size={18} />, title: "Sales Rep", to: "/master/sales-rep" },
+            { icon: <FileText size={18} />, title: "Town", to: "/master/town" },
             { icon: <Package2 size={18} />, title: "Item", to: "/master/item" },
             { icon: <DollarSign size={18} />, title: "Selling Rates", to: "/master/selling-rates" },
             { icon: <Ship size={18} />, title: "Container", to: "/master/container" },

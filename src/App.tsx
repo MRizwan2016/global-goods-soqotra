@@ -16,6 +16,8 @@ import InvoiceBookStock from "./pages/master/InvoiceBookStock";
 import InvoiceBookForm from "./pages/master/InvoiceBookForm";
 import SalesRepList from "./pages/master/SalesRepList";
 import SalesRepForm from "./pages/master/SalesRepForm";
+import TownList from "./pages/master/TownList";
+import TownForm from "./pages/master/TownForm";
 
 const queryClient = new QueryClient();
 
@@ -43,6 +45,9 @@ const App = () => (
           <Route path="/master/sales-rep" element={<SalesRepList />} />
           <Route path="/master/sales-rep/add" element={<SalesRepForm />} />
           <Route path="/master/sales-rep/edit/:id" element={<SalesRepForm />} />
+          <Route path="/master/town" element={<TownList />} />
+          <Route path="/master/town/add" element={<TownForm />} />
+          <Route path="/master/town/edit/:id" element={<TownForm />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
