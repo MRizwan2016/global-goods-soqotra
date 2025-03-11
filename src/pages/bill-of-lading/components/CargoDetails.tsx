@@ -1,5 +1,6 @@
 
-import { Input, Textarea } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface CargoDetailsProps {
   formState: any;
