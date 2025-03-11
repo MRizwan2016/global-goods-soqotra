@@ -40,6 +40,37 @@ const mockBLData = [
     placeOfIssue: "Doha, Qatar",
     dateOfIssue: "2023-05-08",
   },
+  { 
+    id: "2", 
+    blNumber: "BL002", 
+    date: "2023-06-15", 
+    shipper: "Mohammed Ali", 
+    shipperAddress: "P.O. Box 456, Doha, Qatar",
+    consignee: "Tunisian Cargo Services", 
+    consigneeAddress: "25 Port Avenue, Tunis, Tunisia",
+    notifyParty: "Tunisian Customs Authority",
+    notifyPartyAddress: "12 Harbor Road, Tunis, Tunisia",
+    origin: "Doha", 
+    destination: "Tunis",
+    cargoType: "Car",
+    vessel: "CMA CGM Antoine",
+    voyageNo: "QT127",
+    loadingPort: "Doha Port",
+    dischargePort: "Tunis Port",
+    grossWeight: "1250",
+    netWeight: "1150",
+    measurement: "15.0",
+    packages: "1",
+    marksAndNumbers: "TNCS001",
+    goodsDescription: "Toyota Land Cruiser 2020, White, VIN: JT3DJ81W0Y420",
+    containerNo: "CMAU1987654",
+    sealNo: "TN7654321",
+    status: "In Transit",
+    shippingMarks: "Vehicle - Fragile",
+    freightCharges: "Prepaid",
+    placeOfIssue: "Doha, Qatar",
+    dateOfIssue: "2023-06-10",
+  },
 ];
 
 const BillOfLadingForm = () => {
@@ -81,13 +112,59 @@ const BillOfLadingForm = () => {
     placeOfIssue: existingBL?.placeOfIssue || "",
     dateOfIssue: existingBL?.dateOfIssue || "",
   });
+
+  // Destination countries
+  const destinations = [
+    "Colombo", 
+    "Nairobi", 
+    "Asmara", // Eritrea
+    "Khartoum", // Sudan
+    "Riyadh", // Saudi Arabia
+    "Dubai", // UAE
+    "Abu Dhabi", // UAE
+    "Mogadishu", // Somalia
+    "Tunis", // Tunisia - Added Tunisia
+    "Manila", // Philippines
+    "Other"
+  ];
+
+  // Define cargo types based on destination
+  const getCargoTypes = (destination: string) => {
+    if (destination === "Tunis") {
+      return [
+        "Personal Effects",
+        "Household Goods",
+        "Car",
+        "Truck"
+      ];
+    }
+    
+    return [
+      "Personal Effects",
+      "Household Goods",
+      "Car",
+      "Truck",
+      "Commercial Goods",
+      "Other"
+    ];
+  };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormState(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Special handling for destination to reset cargo type when destination changes
+    if (name === 'destination') {
+      setFormState(prev => ({
+        ...prev,
+        [name]: value,
+        cargoType: "Personal Effects" // Reset to default
+      }));
+    } else {
+      setFormState(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
   
   const handleSave = () => {
@@ -263,12 +340,17 @@ const BillOfLadingForm = () => {
               
               <div className="flex flex-col">
                 <label className="text-sm font-medium mb-1">DESTINATION:</label>
-                <Input 
+                <select
                   name="destination"
                   value={formState.destination}
                   onChange={handleInputChange}
-                  className="border border-gray-300"
-                />
+                  className="border border-gray-300 py-2 px-3 rounded"
+                >
+                  <option value="">Select Destination</option>
+                  {destinations.map((dest, idx) => (
+                    <option key={idx} value={dest}>{dest}</option>
+                  ))}
+                </select>
               </div>
               
               <div className="flex flex-col">
@@ -279,10 +361,9 @@ const BillOfLadingForm = () => {
                   onChange={handleInputChange}
                   className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
                 >
-                  <option value="Personal Effects">PERSONAL EFFECTS</option>
-                  <option value="Household Goods">HOUSEHOLD GOODS</option>
-                  <option value="Car">CAR</option>
-                  <option value="Truck">TRUCK</option>
+                  {getCargoTypes(formState.destination).map((type, idx) => (
+                    <option key={idx} value={type}>{type.toUpperCase()}</option>
+                  ))}
                 </select>
               </div>
               
@@ -468,3 +549,4 @@ const BillOfLadingForm = () => {
 };
 
 export default BillOfLadingForm;
+
