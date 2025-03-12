@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -119,7 +118,7 @@ const InvoiceForm = () => {
       setFormState(prev => ({
         ...prev,
         gross: value,
-        net: calculateNet(value, prev.discount)
+        net: calculateNet(String(value), prev.discount)
       }));
     }
     
@@ -127,7 +126,7 @@ const InvoiceForm = () => {
     if (name === 'discount') {
       setFormState(prev => ({
         ...prev,
-        net: calculateNet(prev.gross, value)
+        net: calculateNet(prev.gross, String(value))
       }));
     }
   };
