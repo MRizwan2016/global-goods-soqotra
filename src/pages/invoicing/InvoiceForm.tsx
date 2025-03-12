@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -10,10 +11,9 @@ import {
   TableBody, 
   TableHeader, 
   TableRow,
-  InvoiceTableHead,
-  InvoiceTableCell
+  TableCell,
 } from "@/components/ui/table";
-import { Edit, Trash, BookOpen } from "lucide-react";
+import { Edit, Trash, BookOpen, Plus } from "lucide-react";
 import { mockInvoiceData } from "@/data/mockData";
 import { packageOptions, PackageOption } from "@/data/packageOptions";
 
@@ -897,3 +897,100 @@ const InvoiceForm = () => {
               </div>
               
               <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">BOX NUMBER:</label>
+                <Input 
+                  name="boxNumber"
+                  value={formState.boxNumber}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">VOLUME WEIGHT:</label>
+                <Input 
+                  name="volumeWeight"
+                  value={formState.volumeWeight}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                />
+              </div>
+              
+              <div className="md:col-span-1 flex items-end">
+                <Button
+                  type="button"
+                  onClick={handleAddPackage}
+                  className="bg-green-500 hover:bg-green-600 px-4 py-2 w-full"
+                >
+                  <Plus size={18} className="mr-2" />
+                  Add Package
+                </Button>
+              </div>
+            </div>
+            
+            {/* Package Items List */}
+            {packageItems.length > 0 && (
+              <div className="mt-4 border border-gray-200 rounded overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableCell className="font-medium">Package</TableCell>
+                      <TableCell className="font-medium">Dimensions (L×W×H)</TableCell>
+                      <TableCell className="font-medium">Volume</TableCell>
+                      <TableCell className="font-medium">Weight</TableCell>
+                      <TableCell className="font-medium">Price</TableCell>
+                      <TableCell className="font-medium">Docs Fee</TableCell>
+                      <TableCell className="font-medium">Total</TableCell>
+                      <TableCell className="font-medium">Action</TableCell>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {packageItems.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{item.name}</TableCell>
+                        <TableCell>{`${item.length}×${item.width}×${item.height}`}</TableCell>
+                        <TableCell>{item.volume}</TableCell>
+                        <TableCell>{item.weight}</TableCell>
+                        <TableCell>{item.price}</TableCell>
+                        <TableCell>{item.documentsFee}</TableCell>
+                        <TableCell className="font-bold">{item.total}</TableCell>
+                        <TableCell>
+                          <Button
+                            type="button"
+                            onClick={() => handleRemovePackage(item.id)}
+                            className="bg-red-500 hover:bg-red-600 p-1 h-8 w-8"
+                          >
+                            <Trash size={16} />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </div>
+          
+          <div className="mt-8 flex justify-end gap-4">
+            <Button 
+              type="button"
+              onClick={() => navigate("/data-entry/invoicing")}
+              className="bg-gray-500 hover:bg-gray-600"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="button"
+              onClick={handleSave}
+              className="bg-green-500 hover:bg-green-600"
+            >
+              {isEditing ? "Update" : "Save"}
+            </Button>
+          </div>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default InvoiceForm;
