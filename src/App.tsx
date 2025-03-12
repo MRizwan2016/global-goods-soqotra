@@ -18,6 +18,8 @@ import SalesRepList from "./pages/master/SalesRepList";
 import SalesRepForm from "./pages/master/SalesRepForm";
 import TownList from "./pages/master/TownList";
 import TownForm from "./pages/master/TownForm";
+import PackageOptionsList from "./pages/master/PackageOptionsList";
+import PackageOptionForm from "./pages/master/PackageOptionForm";
 import SellingRatesList from "./pages/selling-rates/SellingRatesList";
 import SellingRatesForm from "./pages/selling-rates/SellingRatesForm";
 import BillOfLadingList from "./pages/bill-of-lading/BillOfLadingList";
@@ -60,6 +62,9 @@ const App = () => (
           <Route path="/master/town" element={<TownList />} />
           <Route path="/master/town/add" element={<TownForm />} />
           <Route path="/master/town/edit/:id" element={<TownForm />} />
+          <Route path="/master/package-options" element={<PackageOptionsList />} />
+          <Route path="/master/package-options/add" element={<PackageOptionForm />} />
+          <Route path="/master/package-options/edit/:id" element={<PackageOptionForm />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>
