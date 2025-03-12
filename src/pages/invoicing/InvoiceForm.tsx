@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { Edit, Trash, BookOpen } from "lucide-react";
 import { mockInvoiceData } from "@/data/mockData";
+import { packageOptions, PackageOption } from "@/data/packageOptions";
 
 const mockInvoiceBooks = [
   { bookNumber: "722", startPage: "13136051", endPage: "13136100", available: ["13136051", "13136052", "13136053"] },
@@ -51,6 +52,7 @@ const InvoiceForm = () => {
     
     // Package details
     packagesName: "",
+    selectedPackage: null as PackageOption | null,
     length: "",
     width: "",
     height: "",
@@ -59,6 +61,9 @@ const InvoiceForm = () => {
     packageWeight: "0",
     boxNumber: "0",
     volumeWeight: "0",
+    price: "0",
+    documentsFee: "0",
+    total: "0",
     
     // Shipping details
     handOverBy: existingInvoice?.handOverBy || "",
@@ -136,10 +141,28 @@ const InvoiceForm = () => {
     const discountValue = parseFloat(discount) || 0;
     return String(grossValue - discountValue);
   };
+
+  const handlePackageSelect = (description: string) => {
+    const selectedPackage = packageOptions.find(pkg => pkg.description === description);
+    if (selectedPackage) {
+      setFormState(prev => ({
+        ...prev,
+        packagesName: description,
+        selectedPackage,
+        length: String(selectedPackage.dimensions.length),
+        width: String(selectedPackage.dimensions.width),
+        height: String(selectedPackage.dimensions.height),
+        cubicMetre: String(selectedPackage.volumeInMeters),
+        price: String(selectedPackage.price),
+        documentsFee: String(selectedPackage.documentsFee),
+        total: String(selectedPackage.total)
+      }));
+    }
+  };
   
   const handleAddPackage = () => {
-    if (!formState.packagesName || !formState.length || !formState.width || !formState.height) {
-      toast.error("Please fill all package details");
+    if (!formState.packagesName) {
+      toast.error("Please select a package");
       return;
     }
     
@@ -149,24 +172,29 @@ const InvoiceForm = () => {
       length: formState.length,
       width: formState.width,
       height: formState.height,
-      volume: (
-        parseFloat(formState.length) * 
-        parseFloat(formState.width) * 
-        parseFloat(formState.height) / 1000000
-      ).toFixed(3),
+      volume: formState.cubicMetre,
       weight: formState.packageWeight,
       boxNumber: formState.boxNumber,
       volumeWeight: formState.volumeWeight,
+      price: formState.price,
+      documentsFee: formState.documentsFee,
+      total: formState.total
     };
     
     setPackageItems([...packageItems, newPackage]);
     
+    // Reset form
     setFormState(prev => ({
       ...prev,
       packagesName: "",
+      selectedPackage: null,
       length: "",
       width: "",
       height: "",
+      cubicMetre: "",
+      price: "0",
+      documentsFee: "0",
+      total: "0",
       packageWeight: "0",
       boxNumber: "0",
       volumeWeight: "0",
@@ -761,14 +789,51 @@ const InvoiceForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
               <div className="flex flex-col">
                 <label className="text-sm font-medium mb-1">PACKAGES NAME:</label>
-                <Input 
+                <select
                   name="packagesName"
                   value={formState.packagesName}
-                  onChange={handleInputChange}
-                  className="border border-gray-300"
+                  onChange={(e) => handlePackageSelect(e.target.value)}
+                  className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+                >
+                  <option value="">Select a package</option>
+                  {packageOptions.map(pkg => (
+                    <option key={pkg.id} value={pkg.description}>
+                      {pkg.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">PRICE:</label>
+                <Input 
+                  name="price"
+                  value={formState.price}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
                 />
               </div>
               
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">DOCUMENTS FEE:</label>
+                <Input 
+                  name="documentsFee"
+                  value={formState.documentsFee}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">TOTAL:</label>
+                <Input 
+                  name="total"
+                  value={formState.total}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50 font-bold"
+                />
+              </div>
+
               <div className="flex flex-col">
                 <label className="text-sm font-medium mb-1">CUBIC METRE:</label>
                 <Input 
@@ -832,175 +897,3 @@ const InvoiceForm = () => {
               </div>
               
               <div className="flex flex-col">
-                <label className="text-sm font-medium mb-1">BOX NUMBER:</label>
-                <Input 
-                  name="boxNumber"
-                  value={formState.boxNumber}
-                  onChange={handleInputChange}
-                  className="border border-gray-300"
-                />
-              </div>
-              
-              <div className="flex items-end">
-                <Button 
-                  onClick={handleAddPackage}
-                  className="bg-blue-500 hover:bg-blue-600"
-                >
-                  Insert
-                </Button>
-              </div>
-              
-              <div className="flex flex-col">
-                <label className="text-sm font-medium mb-1">VOLUME WEIGHT:</label>
-                <Input 
-                  name="volumeWeight"
-                  value={formState.volumeWeight}
-                  onChange={handleInputChange}
-                  className="border border-gray-300"
-                />
-              </div>
-            </div>
-            
-            <div className="overflow-x-auto border border-gray-200 mb-6">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-soqotra-blue hover:bg-soqotra-blue">
-                    <InvoiceTableHead className="w-16">Num</InvoiceTableHead>
-                    <InvoiceTableHead>PACKAGE</InvoiceTableHead>
-                    <InvoiceTableHead>LENGTH</InvoiceTableHead>
-                    <InvoiceTableHead>WIDTH</InvoiceTableHead>
-                    <InvoiceTableHead>HEIGHT</InvoiceTableHead>
-                    <InvoiceTableHead>VOLUME</InvoiceTableHead>
-                    <InvoiceTableHead>WEIGHT</InvoiceTableHead>
-                    <InvoiceTableHead>BOX Num</InvoiceTableHead>
-                    <InvoiceTableHead>VOL. WGHT</InvoiceTableHead>
-                    <InvoiceTableHead className="w-16">MODIFY</InvoiceTableHead>
-                    <InvoiceTableHead className="w-16">REMOVE</InvoiceTableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {packageItems.length > 0 ? (
-                    packageItems.map((item, index) => (
-                      <TableRow key={item.id} className="hover:bg-gray-50">
-                        <InvoiceTableCell className="text-center">{index + 1}</InvoiceTableCell>
-                        <InvoiceTableCell>{item.name}</InvoiceTableCell>
-                        <InvoiceTableCell className="text-right">{item.length}</InvoiceTableCell>
-                        <InvoiceTableCell className="text-right">{item.width}</InvoiceTableCell>
-                        <InvoiceTableCell className="text-right">{item.height}</InvoiceTableCell>
-                        <InvoiceTableCell className="text-right">{item.volume}</InvoiceTableCell>
-                        <InvoiceTableCell className="text-right">{item.weight}</InvoiceTableCell>
-                        <InvoiceTableCell className="text-center">{item.boxNumber}</InvoiceTableCell>
-                        <InvoiceTableCell className="text-right">{item.volumeWeight}</InvoiceTableCell>
-                        <InvoiceTableCell className="text-center">
-                          <Edit size={16} className="text-blue-500 inline-block cursor-pointer" />
-                        </InvoiceTableCell>
-                        <InvoiceTableCell className="text-center">
-                          <Trash 
-                            size={16} 
-                            className="text-red-500 inline-block cursor-pointer"
-                            onClick={() => handleRemovePackage(item.id)}
-                          />
-                        </InvoiceTableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <InvoiceTableCell colSpan={11} className="text-center py-4">
-                        No packages added yet
-                      </InvoiceTableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-            
-            <div className="mt-8">
-              <div className="bg-soqotra-blue text-white py-2 px-4 font-medium">
-                SHIPPING DETAILS
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium mb-1">HAND-OVER BY:</label>
-                  <Input 
-                    name="handOverBy"
-                    value={formState.handOverBy}
-                    onChange={handleInputChange}
-                    className="border border-gray-300"
-                  />
-                </div>
-                
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium mb-1">CONSIGNEE 1:</label>
-                  <Input 
-                    name="consignee1"
-                    value={formState.consignee1}
-                    onChange={handleInputChange}
-                    className="border border-gray-300"
-                  />
-                </div>
-                
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium mb-1">SHIPPER 1:</label>
-                  <Input 
-                    name="shipper1"
-                    value={formState.shipper1}
-                    onChange={handleInputChange}
-                    className="border border-gray-300"
-                  />
-                </div>
-                
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium mb-1">CONSIGNEE 2:</label>
-                  <Input 
-                    name="consignee2"
-                    value={formState.consignee2}
-                    onChange={handleInputChange}
-                    className="border border-gray-300"
-                  />
-                </div>
-                
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium mb-1">SHIPPER 2:</label>
-                  <Input 
-                    name="shipper2"
-                    value={formState.shipper2}
-                    onChange={handleInputChange}
-                    className="border border-gray-300"
-                  />
-                </div>
-                
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium mb-1">ADDRESS:</label>
-                  <Input 
-                    name="address"
-                    value={formState.address}
-                    onChange={handleInputChange}
-                    className="border border-gray-300"
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex justify-end gap-3 mt-6">
-              <Button 
-                onClick={handleSave}
-                className="bg-blue-500 hover:bg-blue-600"
-              >
-                Save
-              </Button>
-              <Button 
-                onClick={() => navigate("/data-entry/invoicing")}
-                variant="outline"
-              >
-                Go Back
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </Layout>
-  );
-};
-
-export default InvoiceForm;
