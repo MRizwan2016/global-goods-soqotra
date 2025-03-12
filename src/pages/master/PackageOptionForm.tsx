@@ -22,7 +22,7 @@ const PackageOptionForm = () => {
     width: existingPackage?.dimensions.width.toString() || "",
     height: existingPackage?.dimensions.height.toString() || "",
     price: existingPackage?.price.toString() || "",
-    documentsFee: existingPackage?.documentsFee.toString() || "",
+    documentsFee: existingPackage?.documentsFee.toString() || "0",
   });
   
   const [volumeInMeters, setVolumeInMeters] = useState(existingPackage?.volumeInMeters.toString() || "0");
@@ -71,14 +71,25 @@ const PackageOptionForm = () => {
       return;
     }
     
-    // In a real app, this would make an API call to save the data
-    toast.success(`Package option ${isEditing ? "updated" : "added"} successfully (Simulated)`);
-    console.log("Saving package option:", {
-      ...formState,
-      volumeInMeters,
-      total,
-    });
+    // Create new package object
+    const newPackage: Omit<PackageOption, "id"> = {
+      description: formState.description,
+      dimensions: {
+        length: parseFloat(formState.length),
+        width: parseFloat(formState.width),
+        height: parseFloat(formState.height),
+      },
+      volumeInMeters: parseFloat(volumeInMeters),
+      price: parseFloat(formState.price),
+      documentsFee: parseFloat(formState.documentsFee) || 0,
+      total: parseFloat(total),
+    };
     
+    // In a real app, this would make an API call to save the data
+    // For now, we'll just log it and show a success message
+    console.log("Package to save:", isEditing ? { id: Number(id), ...newPackage } : newPackage);
+    
+    toast.success(`Package option ${isEditing ? "updated" : "added"} successfully (Simulated)`);
     navigate("/master/package-options");
   };
   
@@ -89,6 +100,9 @@ const PackageOptionForm = () => {
           <h3 className="text-lg font-medium text-green-800">
             {isEditing ? "Edit Package Option" : "Add Package Option"}
           </h3>
+          <p className="text-sm text-green-600 mt-1">
+            {isEditing ? "Update package option details" : "Create a new package option for your shipment needs"}
+          </p>
         </div>
         
         <div className="p-4">
@@ -100,7 +114,7 @@ const PackageOptionForm = () => {
                 value={formState.description}
                 onChange={handleInputChange}
                 className="border border-gray-300"
-                placeholder="e.g., 1 METER WOODEN BOX"
+                placeholder="e.g., WOODEN BOX or CARTON BOX"
               />
             </div>
             

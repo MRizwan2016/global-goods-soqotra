@@ -42,13 +42,17 @@ const PackageOptionsList = () => {
     setFilteredPackages(filteredPackages.filter(pkg => pkg.id !== id));
   };
 
+  const handleAddNew = () => {
+    navigate("/master/package-options/add");
+  };
+
   return (
     <Layout title="Package Options">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-4 bg-green-50 border-b border-green-100 flex justify-between items-center">
           <h3 className="text-lg font-medium text-green-800">Package Options</h3>
           <Button
-            onClick={() => navigate("/master/package-options/add")}
+            onClick={handleAddNew}
             className="bg-green-500 hover:bg-green-600"
           >
             <Plus size={18} className="mr-2" />
