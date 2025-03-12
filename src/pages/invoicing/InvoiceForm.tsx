@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -67,6 +68,23 @@ const InvoiceForm = () => {
     consignee1: existingInvoice?.consignee1 || "",
     consignee2: existingInvoice?.consignee2 || "",
     address: existingInvoice?.address || "",
+    
+    // Payment details
+    freight: existingInvoice?.gross || "0",
+    destinationTransport: "0",
+    document: "0",
+    localTransport: "0",
+    packing: "0",
+    storage: "0",
+    destinationClearing: "0",
+    destinationDoorDelivery: "0",
+    other: "0",
+    gross: existingInvoice?.gross || "0",
+    discount: existingInvoice?.discount || "0",
+    net: existingInvoice?.net || "0",
+    agentName: "",
+    agentNumber: "0",
+    subZone: "1 : Colombo",
   });
   
   const [packageItems, setPackageItems] = useState<any[]>(
@@ -95,6 +113,29 @@ const InvoiceForm = () => {
       ...prev,
       [name]: value
     }));
+    
+    // Update gross and net when freight changes
+    if (name === 'freight') {
+      setFormState(prev => ({
+        ...prev,
+        gross: value,
+        net: calculateNet(value, prev.discount)
+      }));
+    }
+    
+    // Update net when discount changes
+    if (name === 'discount') {
+      setFormState(prev => ({
+        ...prev,
+        net: calculateNet(prev.gross, value)
+      }));
+    }
+  };
+  
+  const calculateNet = (gross: string, discount: string) => {
+    const grossValue = parseFloat(gross) || 0;
+    const discountValue = parseFloat(discount) || 0;
+    return String(grossValue - discountValue);
   };
   
   const handleAddPackage = () => {
@@ -263,6 +304,7 @@ const InvoiceForm = () => {
                 <option value="COLOMBO : C - C">COLOMBO : C - C</option>
                 <option value="DOHA : D - D">DOHA : D - D</option>
                 <option value="MANILA : M - M">MANILA : M - M</option>
+                <option value="ANURADHAPURA : K - K">ANURADHAPURA : K - K</option>
               </select>
             </div>
             
@@ -414,6 +456,301 @@ const InvoiceForm = () => {
                 <option value="NO">NO</option>
                 <option value="YES">YES</option>
               </select>
+            </div>
+            
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">SUB ZONE:</label>
+              <select
+                name="subZone"
+                value={formState.subZone}
+                onChange={handleInputChange}
+                className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+              >
+                <option value="1 : Colombo">1 : Colombo</option>
+                <option value="2 : Kandy">2 : Kandy</option>
+                <option value="3 : Galle">3 : Galle</option>
+              </select>
+            </div>
+          </div>
+          
+          {/* Payment Section */}
+          <div className="mt-8">
+            <div className="bg-soqotra-blue text-white py-2 px-4 font-medium">
+              PAYMENT DETAILS
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">FREIGHT:</label>
+                <Input 
+                  name="freight"
+                  value={formState.freight}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">AGENT NAME:</label>
+                <Input 
+                  name="agentName"
+                  value={formState.agentName}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">DESTINATION TRANSPORT:</label>
+                <Input 
+                  name="destinationTransport"
+                  value={formState.destinationTransport}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">AGENT NUMBER:</label>
+                <Input 
+                  name="agentNumber"
+                  value={formState.agentNumber}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">DOCUMENT:</label>
+                <Input 
+                  name="document"
+                  value={formState.document}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">INVOICE NUMBER:</label>
+                <Input 
+                  name="invoiceNumber"
+                  value={formState.invoiceNumber}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">LOCAL TRANSPORT:</label>
+                <Input 
+                  name="localTransport"
+                  value={formState.localTransport}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">INVOICE DATE:</label>
+                <Input 
+                  name="invoiceDate"
+                  value={formState.invoiceDate}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">PACKING:</label>
+                <Input 
+                  name="packing"
+                  value={formState.packing}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">BRANCH:</label>
+                <Input 
+                  name="branchDisplay"
+                  value={formState.branch}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">STORAGE:</label>
+                <Input 
+                  name="storage"
+                  value={formState.storage}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">SECTOR:</label>
+                <Input 
+                  name="sectorDisplay"
+                  value={formState.sector}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">DESTINATION CLEARING:</label>
+                <Input 
+                  name="destinationClearing"
+                  value={formState.destinationClearing}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">WAREHOUSE:</label>
+                <Input 
+                  name="warehouseDisplay"
+                  value={formState.warehouse}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">DESTINATION DOOR DELIVERY:</label>
+                <Input 
+                  name="destinationDoorDelivery"
+                  value={formState.destinationDoorDelivery}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">FREIGHT BY:</label>
+                <Input 
+                  name="freightByDisplay"
+                  value={formState.freightBy}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">OTHER:</label>
+                <Input 
+                  name="other"
+                  value={formState.other}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">VOLUME:</label>
+                <Input 
+                  name="volumeDisplay"
+                  value={formState.volume}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">GROSS:</label>
+                <Input 
+                  name="gross"
+                  value={formState.gross}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">WEIGHT:</label>
+                <Input 
+                  name="weightDisplay"
+                  value={formState.weight}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">DISCOUNT:</label>
+                <Input 
+                  name="discount"
+                  value={formState.discount}
+                  onChange={handleInputChange}
+                  className="border border-gray-300"
+                  type="number"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">PACKAGES:</label>
+                <Input 
+                  name="packagesDisplay"
+                  value={formState.packages}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">NET:</label>
+                <Input 
+                  name="net"
+                  value={formState.net}
+                  readOnly
+                  className="border border-gray-300 bg-gray-100 font-bold"
+                />
+              </div>
+              
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">DOOR TO DOOR:</label>
+                <Input 
+                  name="doorToDoorDisplay"
+                  value={formState.doorToDoor}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col md:col-span-2">
+                <label className="text-sm font-medium mb-1">CAT/ ZONE:</label>
+                <Input 
+                  name="catZoneDisplay"
+                  value={formState.catZone}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
+              
+              <div className="flex flex-col md:col-span-2">
+                <label className="text-sm font-medium mb-1">DISTRICT:</label>
+                <Input 
+                  name="districtDisplay"
+                  value={formState.district}
+                  readOnly
+                  className="border border-gray-300 bg-gray-50"
+                />
+              </div>
             </div>
           </div>
           
