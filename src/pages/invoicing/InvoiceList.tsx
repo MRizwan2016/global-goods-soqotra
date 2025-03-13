@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -17,7 +16,8 @@ import {
   Edit, 
   Trash, 
   Eye, 
-  Plus 
+  Plus,
+  Printer
 } from "lucide-react";
 import { mockInvoiceData } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,10 @@ const InvoiceList = () => {
   const [transport, setTransport] = useState("ALL");
   const [door, setDoor] = useState("ALL");
   const [invoiceNumber, setInvoiceNumber] = useState("");
+
+  const handlePrintInvoice = (invoiceId: string) => {
+    window.open(`/data-entry/invoicing/print/${invoiceId}`, '_blank');
+  };
 
   const filteredData = mockInvoiceData.filter(
     (item) =>
@@ -144,6 +148,8 @@ const InvoiceList = () => {
                   <InvoiceTableHead className="w-20">Modify</InvoiceTableHead>
                   <InvoiceTableHead className="w-28">Inv. Date</InvoiceTableHead>
                   <InvoiceTableHead>Customer</InvoiceTableHead>
+                  <InvoiceTableHead>Shipper</InvoiceTableHead>
+                  <InvoiceTableHead>Consignee</InvoiceTableHead>
                   <InvoiceTableHead className="w-16">S/A</InvoiceTableHead>
                   <InvoiceTableHead className="w-20">W/H</InvoiceTableHead>
                   <InvoiceTableHead className="w-16">D2D</InvoiceTableHead>
@@ -158,7 +164,8 @@ const InvoiceList = () => {
                   <InvoiceTableHead className="w-20">Sta Chg</InvoiceTableHead>
                   <InvoiceTableHead className="w-20">Offer Disc</InvoiceTableHead>
                   <InvoiceTableHead className="w-16">Delete</InvoiceTableHead>
-                  <InvoiceTableHead className="w-16">Display</InvoiceTableHead>
+                  <InvoiceTableHead className="w-16">View</InvoiceTableHead>
+                  <InvoiceTableHead className="w-16">Print</InvoiceTableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -173,6 +180,8 @@ const InvoiceList = () => {
                       </InvoiceTableCell>
                       <InvoiceTableCell>{item.date}</InvoiceTableCell>
                       <InvoiceTableCell>{item.customer}</InvoiceTableCell>
+                      <InvoiceTableCell>{item.shipper1}</InvoiceTableCell>
+                      <InvoiceTableCell>{item.consignee1}</InvoiceTableCell>
                       <InvoiceTableCell className="text-center">{item.salesAgent}</InvoiceTableCell>
                       <InvoiceTableCell className="text-center">{item.warehouse}</InvoiceTableCell>
                       <InvoiceTableCell className="text-center">{item.doorToDoor ? "Yes" : "No"}</InvoiceTableCell>
@@ -192,11 +201,18 @@ const InvoiceList = () => {
                       <InvoiceTableCell className="text-center">
                         <Eye size={16} className="text-green-500 inline-block cursor-pointer" />
                       </InvoiceTableCell>
+                      <InvoiceTableCell className="text-center">
+                        <Printer 
+                          size={16} 
+                          className="text-blue-500 inline-block cursor-pointer" 
+                          onClick={() => handlePrintInvoice(item.id)}
+                        />
+                      </InvoiceTableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <InvoiceTableCell colSpan={19} className="text-center py-4">
+                    <InvoiceTableCell colSpan={22} className="text-center py-4">
                       No data available in table
                     </InvoiceTableCell>
                   </TableRow>

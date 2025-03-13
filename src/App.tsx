@@ -9,6 +9,7 @@ import DataEntry from "./pages/DataEntry";
 import NotFound from "./pages/NotFound";
 import InvoiceList from "./pages/invoicing/InvoiceList";
 import InvoiceForm from "./pages/invoicing/InvoiceForm";
+import InvoicePrint from "./pages/invoicing/InvoicePrint";
 import BookingFormStock from "./pages/invoicing/BookingFormStock";
 import BookingFormActivate from "./pages/invoicing/BookingFormActivate";
 import BookingFormIssue from "./pages/invoicing/BookingFormIssue";
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/data-entry/invoicing" element={<InvoiceList />} />
           <Route path="/data-entry/invoicing/new" element={<InvoiceForm />} />
           <Route path="/data-entry/invoicing/edit/:id" element={<InvoiceForm />} />
+          <Route path="/data-entry/invoicing/print/:id" element={<InvoicePrint />} />
           <Route path="/data-entry/booking-form-stock" element={<BookingFormStock />} />
           <Route path="/data-entry/booking-form-stock/activate" element={<BookingFormActivate />} />
           <Route path="/data-entry/booking-form-stock/issue" element={<BookingFormIssue />} />
