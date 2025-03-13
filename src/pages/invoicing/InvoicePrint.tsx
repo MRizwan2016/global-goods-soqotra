@@ -302,27 +302,27 @@ const InvoicePrint = () => {
             
             <div className="flex justify-between mt-1">
               <div>Freight @____per Cu.M</div>
-              <div className="text-right border-b border-black w-32">{invoice.freight || invoice.gross}</div>
+              <div className="text-right border-b border-black w-32">{invoice.gross}</div>
             </div>
             
             <div className="flex justify-between mt-1">
               <div>Documents</div>
-              <div className="text-right border-b border-black w-32">{invoice.document || 0}</div>
+              <div className="text-right border-b border-black w-32">0</div>
             </div>
             
             <div className="flex justify-between mt-1">
               <div>Collection</div>
-              <div className="text-right border-b border-black w-32">{invoice.localTransport || 0}</div>
+              <div className="text-right border-b border-black w-32">0</div>
             </div>
             
             <div className="flex justify-between mt-1">
               <div>Storage</div>
-              <div className="text-right border-b border-black w-32">{invoice.storage || 0}</div>
+              <div className="text-right border-b border-black w-32">0</div>
             </div>
             
             <div className="flex justify-between mt-1">
               <div>Packing</div>
-              <div className="text-right border-b border-black w-32">{invoice.packing || 0}</div>
+              <div className="text-right border-b border-black w-32">0</div>
             </div>
             
             <div className="flex justify-between mt-1">
