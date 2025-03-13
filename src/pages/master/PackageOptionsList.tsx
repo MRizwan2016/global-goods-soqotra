@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit, Trash, Plus, Search } from "lucide-react";
+import { Edit, Trash, Plus, Search, FileUp } from "lucide-react";
 import { packageOptions, PackageOption } from "@/data/packageOptions";
 import { toast } from "sonner";
 
@@ -46,18 +46,31 @@ const PackageOptionsList = () => {
     navigate("/master/package-options/add");
   };
 
+  const handleImportPackages = () => {
+    navigate("/master/package-options/import");
+  };
+
   return (
     <Layout title="Package Options">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-4 bg-green-50 border-b border-green-100 flex justify-between items-center">
           <h3 className="text-lg font-medium text-green-800">Package Options</h3>
-          <Button
-            onClick={handleAddNew}
-            className="bg-green-500 hover:bg-green-600"
-          >
-            <Plus size={18} className="mr-2" />
-            Add Package Option
-          </Button>
+          <div className="flex space-x-2">
+            <Button
+              onClick={handleImportPackages}
+              className="bg-blue-500 hover:bg-blue-600"
+            >
+              <FileUp size={18} className="mr-2" />
+              Import Packages
+            </Button>
+            <Button
+              onClick={handleAddNew}
+              className="bg-green-500 hover:bg-green-600"
+            >
+              <Plus size={18} className="mr-2" />
+              Add Package Option
+            </Button>
+          </div>
         </div>
 
         <div className="p-4">
