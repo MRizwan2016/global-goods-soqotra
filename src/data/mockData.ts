@@ -92,6 +92,7 @@ export const mockInvoiceData = [
     paid: true,
     statusCharge: 0,
     offerDiscount: 0,
+    country: "Sri Lanka",
     packageDetails: [
       {
         id: "PKG-001",
@@ -145,6 +146,7 @@ export const mockInvoiceData = [
     paid: false,
     statusCharge: 0,
     offerDiscount: 0,
+    country: "Qatar",
     packageDetails: [
       {
         id: "PKG-002",
@@ -208,6 +210,7 @@ export const mockInvoiceData = [
     paid: true,
     statusCharge: 5,
     offerDiscount: 0,
+    country: "Philippines",
     packageDetails: [
       {
         id: "PKG-004",

@@ -21,6 +21,22 @@ const mockInvoiceBooks = [
   { bookNumber: "723", startPage: "13136101", endPage: "13136150", available: ["13136101", "13136102"] },
 ];
 
+// Country to sector mapping
+const countrySectorMap = {
+  "Sri Lanka": "COLOMBO : C",
+  "Philippines": "MANILA : M",
+  "Kenya": "NAIROBI : N",
+  "Saudi Arabia": "RIYADH : R",
+  "United Arab Emirates": "DUBAI : U",
+  "Eritrea": "ASMARA : A",
+  "Sudan": "KHARTOUM : K",
+  "Tunisia": "TUNIS : T",
+  "Uganda": "KAMPALA : K",
+  "Kuwait": "KUWAIT : K",
+  "Oman": "MUSCAT : M",
+  "Qatar": "DOHA : D"
+};
+
 const InvoiceForm = () => {
   const { id } = useParams();
   const isEditing = Boolean(id);
@@ -47,6 +63,7 @@ const InvoiceForm = () => {
     invoiceDate: existingInvoice?.date || "",
     giftCargo: "NO",
     prePaid: "NO",
+    country: existingInvoice?.country || "Sri Lanka", // Add country field with default
     
     // Package details
     packagesName: "",
@@ -139,6 +156,17 @@ const InvoiceForm = () => {
         net: calculateNet(String(prev.gross), String(value))
       }));
     }
+    
+    // If country changes, update the sector
+    if (name === 'country') {
+      const sectorForCountry = countrySectorMap[value as keyof typeof countrySectorMap];
+      if (sectorForCountry) {
+        setFormState(prev => ({
+          ...prev,
+          sector: sectorForCountry
+        }));
+      }
+    }
   };
   
   const handleSelectChange = (name: string, value: string) => {
@@ -146,6 +174,17 @@ const InvoiceForm = () => {
       ...prev,
       [name]: value
     }));
+
+    // If country changes through select, update the sector
+    if (name === 'country') {
+      const sectorForCountry = countrySectorMap[value as keyof typeof countrySectorMap];
+      if (sectorForCountry) {
+        setFormState(prev => ({
+          ...prev,
+          sector: sectorForCountry
+        }));
+      }
+    }
   };
   
   const calculateNet = (gross: string, discount: string) => {
@@ -246,11 +285,13 @@ const InvoiceForm = () => {
           <BasicInformation 
             formState={formState}
             handleInputChange={handleInputChange}
+            handleSelectChange={handleSelectChange}
             showInvoiceSelector={showInvoiceSelector}
             setShowInvoiceSelector={setShowInvoiceSelector}
             availableInvoices={availableInvoices}
             handleSelectInvoice={handleSelectInvoice}
             isEditing={isEditing}
+            countrySectorMap={countrySectorMap}
           />
           
           <ShipperConsigneeDetails

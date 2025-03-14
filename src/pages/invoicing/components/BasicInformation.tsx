@@ -1,28 +1,46 @@
-import React from "react";
+
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { BookOpen } from "lucide-react";
+import { BookOpen, Globe } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface BasicInformationProps {
   formState: any;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  handleSelectChange: (name: string, value: string) => void;
   showInvoiceSelector: boolean;
   setShowInvoiceSelector: React.Dispatch<React.SetStateAction<boolean>>;
   availableInvoices: any[];
   handleSelectInvoice: (invoiceNumber: string) => void;
   isEditing: boolean;
+  countrySectorMap: Record<string, string>;
 }
 
 const BasicInformation: React.FC<BasicInformationProps> = ({
   formState,
   handleInputChange,
+  handleSelectChange,
   showInvoiceSelector,
   setShowInvoiceSelector,
   availableInvoices,
   handleSelectInvoice,
   isEditing,
+  countrySectorMap,
 }) => {
+  const [showCountrySelector, setShowCountrySelector] = useState(false);
+  const countries = Object.keys(countrySectorMap);
+
+  const handleCountrySelect = (country: string) => {
+    handleSelectChange('country', country);
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
       <div className="flex flex-col">
@@ -36,6 +54,15 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
           <option value="COLOMBO : C">COLOMBO : C</option>
           <option value="DOHA : D">DOHA : D</option>
           <option value="MANILA : M">MANILA : M</option>
+          <option value="NAIROBI : N">NAIROBI : N</option>
+          <option value="RIYADH : R">RIYADH : R</option>
+          <option value="DUBAI : U">DUBAI : U</option>
+          <option value="ASMARA : A">ASMARA : A</option>
+          <option value="KHARTOUM : K">KHARTOUM : K</option>
+          <option value="TUNIS : T">TUNIS : T</option>
+          <option value="KAMPALA : K">KAMPALA : K</option>
+          <option value="KUWAIT : K">KUWAIT : K</option>
+          <option value="MUSCAT : M">MUSCAT : M</option>
         </select>
       </div>
       
@@ -224,6 +251,41 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
             )}
           </div>
         )}
+      </div>
+
+      <div className="flex flex-col">
+        <label className="text-sm font-medium mb-1">COUNTRY:</label>
+        <div className="flex gap-2">
+          <Input 
+            name="country"
+            value={formState.country}
+            onChange={handleInputChange}
+            className="border border-gray-300"
+            readOnly
+            placeholder="Select a country"
+          />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                className="bg-blue-500 hover:bg-blue-600 px-2"
+              >
+                <Globe size={18} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-white border border-gray-200 p-1 w-48 max-h-60 overflow-y-auto" align="end">
+              {countries.map((country) => (
+                <DropdownMenuItem
+                  key={country}
+                  onClick={() => handleCountrySelect(country)}
+                  className="cursor-pointer text-sm py-1 px-2 hover:bg-blue-50 rounded"
+                >
+                  {country}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       </div>
       
       <div className="flex flex-col md:col-span-2">
