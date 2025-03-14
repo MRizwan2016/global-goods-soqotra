@@ -67,9 +67,18 @@ const InvoiceForm = () => {
     handOverBy: existingInvoice?.handOverBy || "",
     shipper1: existingInvoice?.shipper1 || "",
     shipper2: existingInvoice?.shipper2 || "",
+    shipperMobile: existingInvoice?.shipperMobile || "",
+    shipperIdNumber: existingInvoice?.shipperIdNumber || "",
+    collectionAddress: existingInvoice?.collectionAddress || "",
+    shipperCity: existingInvoice?.shipperCity || "",
+    
     consignee1: existingInvoice?.consignee1 || "",
     consignee2: existingInvoice?.consignee2 || "",
     address: existingInvoice?.address || "",
+    consigneeCity: existingInvoice?.consigneeCity || "",
+    consigneeMobile: existingInvoice?.consigneeMobile || "",
+    consigneeLandline: existingInvoice?.consigneeLandline || "",
+    consigneeIdNumber: existingInvoice?.consigneeIdNumber || "",
     
     // Payment details
     freight: existingInvoice?.gross || "0",
@@ -116,7 +125,6 @@ const InvoiceForm = () => {
       [name]: value
     }));
     
-    // Update gross and net when freight changes
     if (name === 'freight') {
       setFormState(prev => ({
         ...prev,
@@ -125,13 +133,19 @@ const InvoiceForm = () => {
       }));
     }
     
-    // Update net when discount changes
     if (name === 'discount') {
       setFormState(prev => ({
         ...prev,
         net: calculateNet(String(prev.gross), String(value))
       }));
     }
+  };
+  
+  const handleSelectChange = (name: string, value: string) => {
+    setFormState(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
   
   const calculateNet = (gross: string, discount: string) => {
@@ -181,7 +195,6 @@ const InvoiceForm = () => {
     
     setPackageItems([...packageItems, newPackage]);
     
-    // Reset form
     setFormState(prev => ({
       ...prev,
       packagesName: "",
@@ -243,6 +256,7 @@ const InvoiceForm = () => {
           <ShipperConsigneeDetails
             formState={formState}
             handleInputChange={handleInputChange}
+            handleSelectChange={handleSelectChange}
           />
           
           <PaymentDetails 
