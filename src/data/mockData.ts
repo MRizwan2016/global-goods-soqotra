@@ -114,9 +114,17 @@ export const mockInvoiceData = [
     remarks: "",
     shipper1: "INSAF M M M",
     shipper2: "AZHAR A S M",
+    shipperMobile: "+94771234567",
+    shipperIdNumber: "982765431V",
+    collectionAddress: "NO 38 MUSLIM COLONY",
+    shipperCity: "Colombo",
     consignee1: "INSAF M M M",
     consignee2: "AZHAR A S M",
     address: "NO 38 MUSLIM",
+    consigneeCity: "Doha",
+    consigneeMobile: "+97455123456",
+    consigneeLandline: "44123456",
+    consigneeIdNumber: "29876543210",
     handOverBy: "ALI"
   },
   {
@@ -170,8 +178,16 @@ export const mockInvoiceData = [
     remarks: "Handle with care",
     shipper1: "SARA ABDULLAH",
     shipper2: "",
+    shipperMobile: "+94777654321",
+    shipperIdNumber: "905432198V",
+    collectionAddress: "123 PALM GROVE",
+    shipperCity: "Colombo",
     consignee1: "FATIMA ABDULLAH",
     consignee2: "",
+    consigneeCity: "Doha",
+    consigneeMobile: "+97450987654",
+    consigneeLandline: "44987654",
+    consigneeIdNumber: "28765432109",
     address: "15 AL SADD STREET"
   },
   {
@@ -236,8 +252,16 @@ export const mockInvoiceData = [
     remarks: "Priority delivery",
     shipper1: "JOHN SMITH",
     shipper2: "",
+    shipperMobile: "+639123456789",
+    shipperIdNumber: "PH12345678",
+    collectionAddress: "456 MAKATI BLVD",
+    shipperCity: "Manila",
     consignee1: "MARIA SANTOS",
     consignee2: "PEDRO SANTOS",
+    consigneeCity: "Manila",
+    consigneeMobile: "+639987654321",
+    consigneeLandline: "8123456",
+    consigneeIdNumber: "PH87654321",
     address: "123 MAKATI AVENUE"
   }
 ];
