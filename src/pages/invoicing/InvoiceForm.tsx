@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -14,6 +13,7 @@ import InvoiceFormHeader from "./components/InvoiceFormHeader";
 import BasicInformation from "./components/BasicInformation";
 import PaymentDetails from "./components/PaymentDetails";
 import PackageDetailsSection from "./components/PackageDetailsSection";
+import ShipperConsigneeDetails from "./components/ShipperConsigneeDetails";
 import FormActions from "./components/FormActions";
 
 const mockInvoiceBooks = [
@@ -238,6 +238,11 @@ const InvoiceForm = () => {
             availableInvoices={availableInvoices}
             handleSelectInvoice={handleSelectInvoice}
             isEditing={isEditing}
+          />
+          
+          <ShipperConsigneeDetails
+            formState={formState}
+            handleInputChange={handleInputChange}
           />
           
           <PaymentDetails 
