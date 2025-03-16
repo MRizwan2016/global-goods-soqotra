@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, User } from "@/contexts/AuthContext";
@@ -22,13 +21,15 @@ import {
   Shield, 
   UserPlus, 
   Calendar, 
-  Globe 
+  Globe,
+  Loader
 } from "lucide-react";
 
 const ControlPanel = () => {
   const { users, toggleUserStatus, currentUser, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [nonAdminUsers, setNonAdminUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     // Check if user is logged in and is admin
@@ -66,8 +67,13 @@ const ControlPanel = () => {
     });
   };
 
-  const handleToggleStatus = (userId: string) => {
-    toggleUserStatus(userId);
+  const handleToggleStatus = async (userId: string) => {
+    setLoading(prev => ({ ...prev, [userId]: true }));
+    try {
+      await toggleUserStatus(userId);
+    } finally {
+      setLoading(prev => ({ ...prev, [userId]: false }));
+    }
   };
 
   return (
@@ -188,8 +194,14 @@ const ControlPanel = () => {
                           variant={user.isActive ? "destructive" : "default"}
                           size="sm"
                           onClick={() => handleToggleStatus(user.id)}
+                          disabled={loading[user.id]}
                         >
-                          {user.isActive ? (
+                          {loading[user.id] ? (
+                            <>
+                              <Loader className="mr-1 h-4 w-4 animate-spin" />
+                              Processing...
+                            </>
+                          ) : user.isActive ? (
                             <>
                               <XCircle className="mr-1 h-4 w-4" />
                               Deactivate

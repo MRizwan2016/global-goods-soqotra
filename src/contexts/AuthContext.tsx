@@ -20,7 +20,8 @@ interface AuthContextType {
   logout: () => void;
   register: (userData: Omit<User, "id" | "isActive" | "isAdmin" | "createdAt"> & { password: string }) => Promise<boolean>;
   users: User[];
-  toggleUserStatus: (userId: string) => void;
+  toggleUserStatus: (userId: string) => Promise<void>;
+  sendActivationEmail: (user: User) => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,6 +29,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Default admin user
 const ADMIN_EMAIL = "admin@soqotra.com";
 const ADMIN_PASSWORD = "admin123";
+
+// Email service configuration - using EmailJS
+const EMAIL_SERVICE_URL = "https://api.emailjs.com/api/v1.0/email/send";
+const EMAIL_SERVICE_ID = "service_demo"; // Replace with your EmailJS service ID
+const EMAIL_TEMPLATE_ID = "template_activation"; // Replace with your EmailJS template ID
+const EMAIL_USER_ID = "user_demo"; // Replace with your EmailJS user ID
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -175,24 +182,79 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true;
   };
 
-  const toggleUserStatus = (userId: string) => {
+  const sendActivationEmail = async (user: User): Promise<boolean> => {
+    try {
+      // Using EmailJS service to send email
+      const response = await fetch(EMAIL_SERVICE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          service_id: EMAIL_SERVICE_ID,
+          template_id: EMAIL_TEMPLATE_ID,
+          user_id: EMAIL_USER_ID,
+          template_params: {
+            to_name: user.fullName,
+            to_email: user.email,
+            status: user.isActive ? "activated" : "deactivated",
+            login_url: window.location.origin + "/login",
+          },
+        }),
+      });
+
+      if (response.ok) {
+        console.log(`Email sent to ${user.email} notifying them that their account is now ${user.isActive ? "active" : "inactive"}`);
+        return true;
+      } else {
+        console.error("Failed to send email:", await response.text());
+        return false;
+      }
+    } catch (error) {
+      console.error("Error sending email:", error);
+      return false;
+    }
+  };
+
+  const toggleUserStatus = async (userId: string) => {
+    // Find the user first so we can get their current status
+    const userToUpdate = users.find(u => u.id === userId);
+    if (!userToUpdate) return;
+
+    // New status will be the opposite of current status
+    const newStatus = !userToUpdate.isActive;
+    
+    // Update the users array
     setUsers(prevUsers => 
       prevUsers.map(user => 
         user.id === userId 
-          ? { ...user, isActive: !user.isActive } 
+          ? { ...user, isActive: newStatus } 
           : user
       )
     );
 
-    const user = users.find(u => u.id === userId);
-    if (user) {
-      toast({
-        title: `User ${user.isActive ? "Deactivated" : "Activated"}`,
-        description: `${user.fullName}'s account has been ${user.isActive ? "deactivated" : "activated"}.`,
-      });
+    // Show toast notification
+    toast({
+      title: `User ${newStatus ? "Activated" : "Deactivated"}`,
+      description: `${userToUpdate.fullName}'s account has been ${newStatus ? "activated" : "deactivated"}.`,
+    });
+    
+    // If the user is being activated, send an email
+    if (newStatus) {
+      const emailSent = await sendActivationEmail({...userToUpdate, isActive: newStatus});
       
-      // In a real app, this would trigger an email to the user
-      console.log(`Email sent to ${user.email} notifying them that their account is now ${!user.isActive ? "active" : "inactive"}`);
+      if (emailSent) {
+        toast({
+          title: "Email Notification Sent",
+          description: `An email has been sent to ${userToUpdate.email} regarding their account activation.`,
+        });
+      } else {
+        toast({
+          title: "Email Notification Failed",
+          description: "Could not send email notification. Please try again later.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -204,7 +266,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     logout,
     register,
     users,
-    toggleUserStatus
+    toggleUserStatus,
+    sendActivationEmail
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
