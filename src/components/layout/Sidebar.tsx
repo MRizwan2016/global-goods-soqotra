@@ -5,7 +5,7 @@ import {
   LayoutDashboard, Package2, Database, FileInput, 
   FileText, Download, ChevronDown, ChevronRight, 
   Users, Truck, Plane, Ship, BarChart4, DollarSign,
-  Settings
+  Settings, CreditCard, Receipt, Calculator, LineChart
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -67,7 +67,8 @@ const Sidebar = () => {
   const [openSections, setOpenSections] = useState<{[key: string]: boolean}>({
     masterData: false,
     dataEntry: false,
-    reports: false
+    reports: false,
+    accounting: false
   });
 
   const toggleSection = (section: string) => {
@@ -125,6 +126,19 @@ const Sidebar = () => {
             { icon: <Ship size={18} />, title: "Load Vessel", to: "/data-entry/vessel" },
             { icon: <Plane size={18} />, title: "Load Air Cargo", to: "/data-entry/air-cargo" },
             { icon: <FileText size={18} />, title: "Packing List", to: "/data-entry/packing-list" },
+          ]}
+        />
+        
+        <SidebarItem 
+          icon={<DollarSign size={18} />} 
+          title="ACCOUNTS" 
+          isOpen={openSections.accounting}
+          onClick={() => toggleSection('accounting')}
+          children={[
+            { icon: <CreditCard size={18} />, title: "Payment Methods", to: "/accounts/payment-methods" },
+            { icon: <Receipt size={18} />, title: "Reconciliation", to: "/accounts/reconciliation" },
+            { icon: <Calculator size={18} />, title: "Profit & Loss", to: "/accounts/profit-loss" },
+            { icon: <LineChart size={18} />, title: "Financial Reports", to: "/accounts/financial-reports" },
           ]}
         />
         

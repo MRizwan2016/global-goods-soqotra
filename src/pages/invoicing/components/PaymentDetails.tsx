@@ -1,6 +1,11 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Calendar } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 
 interface PaymentDetailsProps {
   formState: any;
@@ -11,6 +16,40 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
   formState,
   handleInputChange,
 }) => {
+  // Mock payment methods
+  const paymentMethods = [
+    { id: "bank", name: "Bank Transfer" },
+    { id: "cash", name: "Cash" },
+    { id: "card", name: "Credit Card" },
+    { id: "check", name: "Check" },
+  ];
+
+  // Handle date selection
+  const handleDateChange = (date: Date | undefined, fieldName: string) => {
+    if (date) {
+      const event = {
+        target: {
+          name: fieldName,
+          value: format(date, "yyyy-MM-dd"),
+        },
+      } as React.ChangeEvent<HTMLInputElement>;
+      
+      handleInputChange(event);
+    }
+  };
+
+  // Handle payment method selection
+  const handlePaymentMethodChange = (value: string) => {
+    const event = {
+      target: {
+        name: "paymentMethod",
+        value,
+      },
+    } as React.ChangeEvent<HTMLSelectElement>;
+    
+    handleInputChange(event);
+  };
+
   return (
     <div className="mt-8">
       <div className="bg-soqotra-blue text-white py-2 px-4 font-medium">
@@ -18,6 +57,92 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
+        {/* First row with Payment Method */}
+        <div className="flex flex-col">
+          <label className="text-sm font-medium mb-1">PAYMENT METHOD:</label>
+          <Select 
+            value={formState.paymentMethod || ""} 
+            onValueChange={handlePaymentMethodChange}
+          >
+            <SelectTrigger className="w-full border border-gray-300">
+              <SelectValue placeholder="Select payment method" />
+            </SelectTrigger>
+            <SelectContent>
+              {paymentMethods.map(method => (
+                <SelectItem key={method.id} value={method.id}>{method.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm font-medium mb-1">PAYMENT STATUS:</label>
+          <Select 
+            value={formState.paymentStatus || ""} 
+            onValueChange={(value) => {
+              const event = {
+                target: {
+                  name: "paymentStatus",
+                  value,
+                },
+              } as React.ChangeEvent<HTMLSelectElement>;
+              handleInputChange(event);
+            }}
+          >
+            <SelectTrigger className="w-full border border-gray-300">
+              <SelectValue placeholder="Select payment status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="partial">Partially Paid</SelectItem>
+              <SelectItem value="paid">Paid</SelectItem>
+              <SelectItem value="overdue">Overdue</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Payment Dates */}
+        <div className="flex flex-col">
+          <label className="text-sm font-medium mb-1">PAYMENT DATE:</label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full justify-start text-left font-normal border border-gray-300">
+                <Calendar className="mr-2 h-4 w-4" />
+                {formState.paymentDate ? format(new Date(formState.paymentDate), "PPP") : "Select date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <CalendarComponent
+                mode="single"
+                selected={formState.paymentDate ? new Date(formState.paymentDate) : undefined}
+                onSelect={(date) => handleDateChange(date, "paymentDate")}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm font-medium mb-1">BANKING DATE:</label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full justify-start text-left font-normal border border-gray-300">
+                <Calendar className="mr-2 h-4 w-4" />
+                {formState.bankingDate ? format(new Date(formState.bankingDate), "PPP") : "Select date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <CalendarComponent
+                mode="single"
+                selected={formState.bankingDate ? new Date(formState.bankingDate) : undefined}
+                onSelect={(date) => handleDateChange(date, "bankingDate")}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {/* Original fields */}
         <div className="flex flex-col">
           <label className="text-sm font-medium mb-1">FREIGHT:</label>
           <Input 
@@ -295,3 +420,4 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
 };
 
 export default PaymentDetails;
+
