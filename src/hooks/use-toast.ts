@@ -1,4 +1,3 @@
-
 import {
   Toast,
   ToastActionElement,
@@ -9,19 +8,25 @@ import {
   useToast as useToastOriginal,
 } from "@/components/ui/use-toast"
 
-// Fix #1: Use React.ComponentProps instead of ComponentPropsWithoutRef with a type
-export type ToastActionProps = React.ComponentProps<typeof ToastActionElement>
+// Fix #1: Define ToastActionProps properly without trying to use ToastActionElement as a value
+export type ToastActionProps = React.ComponentProps<typeof Toast.Action>
 
-// Fix #2: Add description property to accommodate how it's being used
+// Fix #2: Keep the description property as it's being used
 type ToastPropsWithoutId = Omit<ToastProps, "id"> & {
   description?: React.ReactNode
 }
 
+// Fix #3: Define UseToastProps without circular reference
 interface UseToastProps {
   toast: (props: ToastPropsWithoutId) => void
   dismiss: (toastId?: string) => void
-  // Fix #3: Use the correct type for toasts array
-  toasts: ReturnType<typeof useToastOriginal>["toasts"]
+  toasts: Array<{
+    id: string;
+    title?: React.ReactNode;
+    description?: React.ReactNode;
+    action?: ToastActionElement;
+    open: boolean;
+  }>
 }
 
 export const toast = (props: ToastPropsWithoutId) => {
