@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import { 
   LayoutDashboard, Package2, Database, FileInput, 
   FileText, Download, ChevronDown, ChevronRight, 
-  Users, Truck, Plane, Ship, BarChart4, DollarSign
+  Users, Truck, Plane, Ship, BarChart4, DollarSign,
+  Settings
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -125,6 +126,12 @@ const Sidebar = () => {
             { icon: <Plane size={18} />, title: "Load Air Cargo", to: "/data-entry/air-cargo" },
             { icon: <FileText size={18} />, title: "Packing List", to: "/data-entry/packing-list" },
           ]}
+        />
+        
+        <SidebarItem 
+          icon={<Settings size={18} />} 
+          title="CONTROL PANEL" 
+          to="/admin/control-panel"
         />
         
         <SidebarItem 
