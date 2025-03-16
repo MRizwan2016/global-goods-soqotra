@@ -9,15 +9,15 @@ import {
   useToast as useToastOriginal,
 } from "@/components/ui/use-toast"
 
-// Fix #1: Define ToastActionProps properly using the ToastAction component
+// Define ToastActionProps properly using the ToastAction component
 export type ToastActionProps = React.ComponentProps<typeof ToastAction>
 
-// Fix #2: Keep the description property as it's being used
+// Keep the description property as it's being used
 type ToastPropsWithoutId = Omit<ToastProps, "id"> & {
   description?: React.ReactNode
 }
 
-// Fix #3: Define UseToastProps without circular reference
+// Define UseToastProps with explicit type structure to avoid circular references
 interface UseToastProps {
   toast: (props: ToastPropsWithoutId) => void
   dismiss: (toastId?: string) => void
@@ -30,11 +30,13 @@ interface UseToastProps {
   }>
 }
 
+// Use a separate function for toast outside of useToast
 export const toast = (props: ToastPropsWithoutId) => {
-  const { toast } = useToastOriginal()
-  toast(props)
+  const { toast: originalToast } = useToastOriginal()
+  originalToast(props)
 }
 
+// Fix the useToast function to properly return the original hook
 export const useToast = (): UseToastProps => {
   return useToastOriginal()
 }

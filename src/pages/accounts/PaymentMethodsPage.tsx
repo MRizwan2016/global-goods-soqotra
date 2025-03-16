@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -80,12 +81,13 @@ const paymentMethods = [
 const PaymentMethodsPage = () => {
   const [activeTab, setActiveTab] = useState("methods");
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
-
-  // We'll just assume the user has permission since we're using requiredPermission
-  const hasPermission = true;
+  
+  // Handle the case where authentication context might not be available
+  const auth = useAuth();
+  const currentUser = auth?.currentUser || { permissions: { files: {} } };
 
   return (
+    // Make sure the requiredPermission prop is passed correctly
     <PrivateRoute requiredPermission="paymentMethods">
       <Layout title="Payment Methods">
         <div className="space-y-6">
