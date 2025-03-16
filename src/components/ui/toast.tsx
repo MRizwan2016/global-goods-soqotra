@@ -115,10 +115,10 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
 
-// Add toast context definition
+// Export the ToastContext and ToastContextType
 export type ToastContextType = {
   toasts: ToastProps[];
-  addToast: (toast: ToastProps) => void;
+  addToast: (toast: Omit<ToastProps, "id">) => void;
   dismissToast: (id: string) => void;
   removeToast: (id: string) => void;
 };

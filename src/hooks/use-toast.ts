@@ -6,7 +6,7 @@ import {
   ToastContext, 
   ToastContextType 
 } from "@/components/ui/toast";
-import { createContext } from "react";
+import React from "react";
 
 // Define a unique id generator for toasts
 let toastCount = 0;
@@ -50,12 +50,7 @@ export const ToastProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 // Export the useToast hook
-export function useToast(): {
-  toast: (props: Omit<ToastProps, "id">) => void;
-  toasts: ToastProps[];
-  dismissToast: (id: string) => void;
-  removeToast: (id: string) => void;
-} {
+export function useToast() {
   const context = useContext(ToastContext);
 
   if (context === undefined) {
@@ -78,6 +73,6 @@ export const toast = (props: Omit<ToastProps, "id">) => {
   console.warn("Toast used outside of provider context");
 };
 
-export { ToastAction, type ToastActionElement } from "@/components/ui/toast";
+export { ToastAction } from "@/components/ui/toast";
 
 export type Toast = ToastProps;
