@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -11,9 +11,15 @@ import {
   User,
   Building,
   FileText,
-  LineChart
+  LineChart,
+  Check,
+  Search,
+  ArrowUpDown,
+  ExternalLink
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import {
   Table,
   TableBody,
@@ -22,8 +28,103 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Input } from "@/components/ui/input";
+import { toast } from "@/components/ui/use-toast";
 
 const AccountingPanel = () => {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  
+  const handleViewReconciliation = () => {
+    navigate("/accounts/reconciliation");
+  };
+  
+  const handleNewReconciliation = () => {
+    navigate("/accounts/reconciliation?mode=new");
+    toast({
+      title: "New Reconciliation",
+      description: "Started a new reconciliation process.",
+    });
+  };
+  
+  const toggleSort = () => {
+    setSortDirection(prev => prev === "asc" ? "desc" : "asc");
+  };
+  
+  const reconciliationData = [
+    {
+      id: "REC-2023-001",
+      invoiceNumber: "INV-2023-001",
+      customer: "Global Shipping Co.",
+      amount: 4750.00,
+      paymentDate: "2023-06-12",
+      bankingDate: "2023-06-15",
+      status: "Reconciled",
+      difference: 0,
+    },
+    {
+      id: "REC-2023-002",
+      invoiceNumber: "INV-2023-002",
+      customer: "TransWorld Logistics",
+      amount: 2340.00,
+      paymentDate: "2023-06-18",
+      bankingDate: "2023-06-20",
+      status: "Reconciled",
+      difference: 0,
+    },
+    {
+      id: "REC-2023-003",
+      invoiceNumber: "INV-2023-003",
+      customer: "Premium Cargo Ltd.",
+      amount: 5120.00,
+      paymentDate: "2023-06-25",
+      bankingDate: "Pending",
+      status: "Pending",
+      difference: null,
+    },
+    {
+      id: "REC-2023-004",
+      invoiceNumber: "INV-2023-004",
+      customer: "East-West Freights",
+      amount: 3840.00,
+      paymentDate: "2023-07-02",
+      bankingDate: "2023-07-05",
+      status: "Reconciled",
+      difference: -25.00,
+    },
+    {
+      id: "REC-2023-005",
+      invoiceNumber: "INV-2023-005",
+      customer: "Cross Seas Transport",
+      amount: 6150.00,
+      paymentDate: "2023-07-10",
+      bankingDate: "2023-07-12",
+      status: "Variance",
+      difference: 150.00,
+    }
+  ];
+
+  // Filter by search term
+  const filteredReconciliations = reconciliationData.filter(rec => 
+    rec.invoiceNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    rec.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    rec.status.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // Sort by payment date
+  const sortedReconciliations = [...filteredReconciliations].sort((a, b) => {
+    if (a.paymentDate === "Pending") return 1;
+    if (b.paymentDate === "Pending") return -1;
+    
+    const dateA = new Date(a.paymentDate);
+    const dateB = new Date(b.paymentDate);
+    
+    return sortDirection === "asc" 
+      ? dateA.getTime() - dateB.getTime()
+      : dateB.getTime() - dateA.getTime();
+  });
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -114,70 +215,103 @@ const AccountingPanel = () => {
             </Table>
           </TabsContent>
 
-          {/* Reconciliation Tab */}
+          {/* Reconciliation Tab - Enhanced */}
           <TabsContent value="reconciliation" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h3 className="text-lg font-medium">Payment Reconciliation</h3>
-              <Button size="sm" className="flex items-center gap-1">
-                <Receipt className="h-4 w-4" />
-                New Reconciliation
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h3 className="text-lg font-medium">Payment Reconciliation</h3>
+                <p className="text-sm text-muted-foreground">Match invoice payments with bank statements</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button variant="outline" size="sm" className="flex items-center gap-1" onClick={handleViewReconciliation}>
+                  <Search className="h-4 w-4" />
+                  View All
+                </Button>
+                <Button size="sm" className="flex items-center gap-1" onClick={handleNewReconciliation}>
+                  <Receipt className="h-4 w-4" />
+                  New Reconciliation
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 mb-4">
+              <Input 
+                placeholder="Search by invoice number, customer, or status..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-md"
+              />
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={toggleSort} 
+                title={`Sort by date ${sortDirection === 'asc' ? 'ascending' : 'descending'}`}
+              >
+                <ArrowUpDown className="h-4 w-4" />
               </Button>
             </div>
             
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Invoice #</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Payment Date</TableHead>
-                  <TableHead>Banking Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">INV-2023-001</TableCell>
-                  <TableCell>Global Shipping Co.</TableCell>
-                  <TableCell>$4,750.00</TableCell>
-                  <TableCell>2023-06-12</TableCell>
-                  <TableCell>2023-06-15</TableCell>
-                  <TableCell>
-                    <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Reconciled</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="sm">View</Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">INV-2023-002</TableCell>
-                  <TableCell>TransWorld Logistics</TableCell>
-                  <TableCell>$2,340.00</TableCell>
-                  <TableCell>2023-06-18</TableCell>
-                  <TableCell>2023-06-20</TableCell>
-                  <TableCell>
-                    <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Reconciled</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="sm">View</Button>
-                  </TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">INV-2023-003</TableCell>
-                  <TableCell>Premium Cargo Ltd.</TableCell>
-                  <TableCell>$5,120.00</TableCell>
-                  <TableCell>2023-06-25</TableCell>
-                  <TableCell>Pending</TableCell>
-                  <TableCell>
-                    <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">Pending</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="sm">Process</Button>
-                  </TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+            <div className="bg-white rounded-md border overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-slate-50">
+                    <TableHead>Invoice #</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Payment Date</TableHead>
+                    <TableHead>Banking Date</TableHead>
+                    <TableHead>Difference</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedReconciliations.map((record, index) => (
+                    <motion.tr
+                      key={record.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.05 }}
+                      className="border-b hover:bg-gray-50"
+                    >
+                      <TableCell className="font-medium">{record.invoiceNumber}</TableCell>
+                      <TableCell>{record.customer}</TableCell>
+                      <TableCell>${record.amount.toFixed(2)}</TableCell>
+                      <TableCell>{record.paymentDate}</TableCell>
+                      <TableCell>{record.bankingDate}</TableCell>
+                      <TableCell>
+                        {record.difference === null ? (
+                          '—'
+                        ) : record.difference === 0 ? (
+                          <span className="text-green-600 font-medium">$0.00</span>
+                        ) : record.difference < 0 ? (
+                          <span className="text-red-600 font-medium">-${Math.abs(record.difference).toFixed(2)}</span>
+                        ) : (
+                          <span className="text-blue-600 font-medium">+${record.difference.toFixed(2)}</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {record.status === "Reconciled" ? (
+                          <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800 flex items-center gap-1 w-fit">
+                            <Check className="h-3 w-3" />Reconciled
+                          </span>
+                        ) : record.status === "Pending" ? (
+                          <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800 w-fit">Pending</span>
+                        ) : (
+                          <span className="px-2 py-1 rounded-full text-xs bg-orange-100 text-orange-800 w-fit">Variance</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="outline" size="sm" className="flex items-center gap-1" onClick={handleViewReconciliation}>
+                          {record.status === "Reconciled" ? "View" : "Process"}
+                          <ExternalLink className="h-3 w-3 ml-1" />
+                        </Button>
+                      </TableCell>
+                    </motion.tr>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           </TabsContent>
 
           {/* Profit & Loss Tab */}
