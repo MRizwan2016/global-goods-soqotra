@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 
@@ -53,58 +54,83 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const storedUsers = localStorage.getItem("users");
 
     if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        // Ensure current user has permissions field
+        if (!parsedUser.permissions) {
+          parsedUser.permissions = {
+            masterData: parsedUser.isAdmin ? true : false,
+            dataEntry: parsedUser.isAdmin ? true : false,
+            reports: parsedUser.isAdmin ? true : false,
+            downloads: parsedUser.isAdmin ? true : false
+          };
+        }
+        setCurrentUser(parsedUser);
+      } catch (error) {
+        console.error("Failed to parse current user:", error);
+        localStorage.removeItem("currentUser");
+      }
     }
     
     if (storedUsers) {
-      const parsedUsers = JSON.parse(storedUsers);
-      
-      // Ensure all users have the permissions property correctly set
-      const updatedUsers = parsedUsers.map((user: any) => {
-        if (!user.permissions) {
-          return {
-            ...user,
-            permissions: {
-              masterData: false,
-              dataEntry: false,
-              reports: false,
-              downloads: false
-            }
-          };
-        }
-        return user;
-      });
-      
-      setUsers(updatedUsers);
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
-      console.log("Loaded users from localStorage:", updatedUsers);
+      try {
+        const parsedUsers = JSON.parse(storedUsers);
+        
+        // Ensure all users have the permissions property correctly set
+        const updatedUsers = parsedUsers.map((user: any) => {
+          if (!user.permissions) {
+            return {
+              ...user,
+              permissions: {
+                masterData: user.isAdmin ? true : false,
+                dataEntry: user.isAdmin ? true : false,
+                reports: user.isAdmin ? true : false,
+                downloads: user.isAdmin ? true : false
+              }
+            };
+          }
+          return user;
+        });
+        
+        setUsers(updatedUsers);
+        localStorage.setItem("users", JSON.stringify(updatedUsers));
+        console.log("Loaded users from localStorage:", updatedUsers);
+      } catch (error) {
+        console.error("Failed to parse users:", error);
+        initializeDefaultAdmin();
+      }
     } else {
-      // Initialize with admin user if no users exist
-      const adminUser: User = {
-        id: "admin-1",
-        fullName: "System Administrator",
-        email: ADMIN_EMAIL,
-        mobileNumber: "+974 5555 5555",
-        country: "Qatar",
-        isActive: true,
-        isAdmin: true,
-        createdAt: new Date().toISOString(),
-        permissions: {
-          masterData: true,
-          dataEntry: true,
-          reports: true,
-          downloads: true
-        }
-      };
-      
-      setUsers([adminUser]);
-      localStorage.setItem("users", JSON.stringify([adminUser]));
-      console.log("Initialized with admin user:", [adminUser]);
-      
-      // Also store admin password separately
-      localStorage.setItem("admin-password", ADMIN_PASSWORD);
+      initializeDefaultAdmin();
     }
   }, []);
+
+  // Function to initialize the default admin user
+  const initializeDefaultAdmin = () => {
+    // Initialize with admin user if no users exist
+    const adminUser: User = {
+      id: "admin-1",
+      fullName: "System Administrator",
+      email: ADMIN_EMAIL,
+      mobileNumber: "+974 5555 5555",
+      country: "Qatar",
+      isActive: true,
+      isAdmin: true,
+      createdAt: new Date().toISOString(),
+      permissions: {
+        masterData: true,
+        dataEntry: true,
+        reports: true,
+        downloads: true
+      }
+    };
+    
+    setUsers([adminUser]);
+    localStorage.setItem("users", JSON.stringify([adminUser]));
+    console.log("Initialized with admin user:", [adminUser]);
+    
+    // Also store admin password separately
+    localStorage.setItem("admin-password", ADMIN_PASSWORD);
+  };
 
   // Save users to localStorage whenever they change
   useEffect(() => {
@@ -123,12 +149,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [currentUser]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
+    console.log("Login attempt:", email);
+    
     // Special case for admin
     if (email === ADMIN_EMAIL) {
       const adminPassword = localStorage.getItem("admin-password") || ADMIN_PASSWORD;
       if (password === adminPassword) {
         const adminUser = users.find(user => user.email === ADMIN_EMAIL);
         if (adminUser) {
+          console.log("Admin login successful");
           setCurrentUser(adminUser);
           toast({
             title: "Login Successful",
@@ -139,10 +168,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    // Regular user login - in a real app, this would be an API call
-    // Here we're simulating by checking against our users array
+    // Regular user login
     const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
     const user = users.find(u => u.email === email && u.isActive);
+    
+    console.log("Found user:", user);
+    console.log("Password check:", user ? userPasswords[user.id] === password : false);
     
     if (user && userPasswords[user.id] === password) {
       setCurrentUser(user);
@@ -257,7 +288,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const toggleUserStatus = async (userId: string) => {
     // Find the user first so we can get their current status
     const userToUpdate = users.find(u => u.id === userId);
-    if (!userToUpdate) return;
+    if (!userToUpdate) {
+      console.error("User not found:", userId);
+      toast({
+        title: "Error",
+        description: "User not found",
+        variant: "destructive"
+      });
+      return;
+    }
 
     // New status will be the opposite of current status
     const newStatus = !userToUpdate.isActive;
@@ -299,16 +338,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const toggleUserPermission = (userId: string, permissionType: keyof User['permissions']) => {
     // Find the user
     const userToUpdate = users.find(u => u.id === userId);
-    if (!userToUpdate) return;
+    if (!userToUpdate) {
+      console.error("User not found for permission toggle:", userId);
+      return;
+    }
+
+    console.log(`Toggling permission ${permissionType} for user`, userToUpdate);
 
     // Update the user's permissions
     setUsers(prevUsers => 
       prevUsers.map(user => {
         if (user.id === userId) {
-          const updatedPermissions = {
-            ...user.permissions,
-            [permissionType]: !user.permissions[permissionType]
+          // Ensure permissions object exists
+          const currentPermissions = user.permissions || {
+            masterData: false,
+            dataEntry: false,
+            reports: false,
+            downloads: false
           };
+          
+          const updatedPermissions = {
+            ...currentPermissions,
+            [permissionType]: !currentPermissions[permissionType]
+          };
+          
+          console.log("Updated permissions:", updatedPermissions);
+          
           return {
             ...user,
             permissions: updatedPermissions
@@ -321,7 +376,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Show toast notification
     toast({
       title: `Permission Updated`,
-      description: `${userToUpdate.fullName}'s access to ${permissionType} has been ${!userToUpdate.permissions[permissionType] ? 'granted' : 'revoked'}.`,
+      description: `${userToUpdate.fullName}'s access to ${permissionType} has been ${
+        !userToUpdate.permissions?.[permissionType] ? 'granted' : 'revoked'
+      }.`,
     });
   };
 

@@ -48,6 +48,7 @@ const ControlPanel = () => {
   useEffect(() => {
     // Check if user is logged in and is admin
     if (!currentUser) {
+      console.log("No current user found");
       toast({
         title: "Authentication Required",
         description: "Please log in to access this page.",
@@ -58,6 +59,7 @@ const ControlPanel = () => {
     }
 
     if (!isAdmin) {
+      console.log("User is not admin:", currentUser);
       toast({
         title: "Access Denied",
         description: "You do not have permission to access the Control Panel.",
@@ -73,13 +75,14 @@ const ControlPanel = () => {
     // Ensure each user has a valid permissions object
     const usersWithPermissions = users.map(user => {
       if (!user.permissions) {
+        console.log("User missing permissions:", user.email);
         return {
           ...user,
           permissions: {
-            masterData: false,
-            dataEntry: false,
-            reports: false,
-            downloads: false
+            masterData: user.isAdmin ? true : false,
+            dataEntry: user.isAdmin ? true : false,
+            reports: user.isAdmin ? true : false,
+            downloads: user.isAdmin ? true : false
           }
         };
       }
@@ -121,7 +124,15 @@ const ControlPanel = () => {
 
   const renderPermissionButton = (user: User, permissionType: keyof User['permissions'], icon: React.ReactNode, label: string) => {
     // Ensure permissions exist before accessing them
-    const isActive = user.permissions ? user.permissions[permissionType] : false;
+    const permissions = user.permissions || {
+      masterData: false,
+      dataEntry: false, 
+      reports: false,
+      downloads: false
+    };
+    
+    const isActive = permissions[permissionType];
+    
     return (
       <Button
         variant={isActive ? "default" : "outline"}
@@ -130,10 +141,22 @@ const ControlPanel = () => {
         onClick={() => handleTogglePermission(user.id, permissionType)}
       >
         {icon}
-        <span>{label}</span>
+        <span className="ml-1">{label}</span>
       </Button>
     );
   };
+
+  // Early return with loading state if needed
+  if (!currentUser || !isAdmin) {
+    return (
+      <Layout title="Loading...">
+        <div className="flex items-center justify-center h-screen">
+          <Loader className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2">Loading admin panel...</span>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout title="Admin Control Panel">
@@ -216,8 +239,8 @@ const ControlPanel = () => {
                   </TableRow>
                 ) : (
                   nonAdminUsers.map((user) => (
-                    <>
-                      <TableRow key={user.id}>
+                    <React.Fragment key={user.id}>
+                      <TableRow>
                         <TableCell className="font-medium">
                           <div className="flex items-center gap-2">
                             <UserIcon className="h-4 w-4 text-muted-foreground" />
@@ -338,7 +361,7 @@ const ControlPanel = () => {
                           </TableCell>
                         </TableRow>
                       )}
-                    </>
+                    </React.Fragment>
                   ))
                 )}
               </TableBody>

@@ -73,11 +73,7 @@ const App = () => (
           <Route path="/master/package-options/edit/:id" element={<PackageOptionForm />} />
           
           {/* Admin Routes */}
-          <Route path="/admin/control-panel" element={
-            <PrivateRoute requireAdmin={true}>
-              <ControlPanel />
-            </PrivateRoute>
-          } />
+          <Route path="/admin/control-panel" element={<ControlPanel />} />
           <Route path="/admin/register" element={<UserRegistration />} />
           <Route path="/admin/login" element={<Login />} />
           
