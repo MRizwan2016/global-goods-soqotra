@@ -1,42 +1,21 @@
+
+import { useContext } from "react";
+import { ToastActionElement, type ToastProps } from "@/components/ui/toast";
 import {
-  Toast,
-  ToastActionElement,
-  ToastProps,
-  ToastAction,
-} from "@/components/ui/toast"
+  ToastContext,
+  ToastContextType
+} from "@/components/ui/toast";
 
-import {
-  useToast as useToastOriginal,
-} from "@/components/ui/use-toast"
+export function useToast(): ToastContextType {
+  const context = useContext(ToastContext);
 
-// Define ToastActionProps properly using the ToastAction component
-export type ToastActionProps = React.ComponentProps<typeof ToastAction>
+  if (context === undefined) {
+    throw new Error("useToast must be used within a ToastProvider");
+  }
 
-// Keep the description property as it's being used
-type ToastPropsWithoutId = Omit<ToastProps, "id"> & {
-  description?: React.ReactNode
+  return context;
 }
 
-// Define UseToastProps with explicit type structure to avoid circular references
-interface UseToastProps {
-  toast: (props: ToastPropsWithoutId) => void
-  dismiss: (toastId?: string) => void
-  toasts: Array<{
-    id: string;
-    title?: React.ReactNode;
-    description?: React.ReactNode;
-    action?: ToastActionElement;
-    open: boolean;
-  }>
-}
+export { ToastAction, type ToastActionElement } from "@/components/ui/toast";
 
-// Use a separate function for toast outside of useToast
-export const toast = (props: ToastPropsWithoutId) => {
-  const { toast: originalToast } = useToastOriginal()
-  originalToast(props)
-}
-
-// Fix the useToast function to properly return the original hook
-export const useToast = (): UseToastProps => {
-  return useToastOriginal()
-}
+export type Toast = ToastProps;

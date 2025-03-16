@@ -12,6 +12,8 @@ import {
 } from "@/data/mockData";
 
 const Dashboard = () => {
+  console.log("Rendering Dashboard component");
+  
   return (
     <Layout title="Dashboard">
       <div className="mb-6">

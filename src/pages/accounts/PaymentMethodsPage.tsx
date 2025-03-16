@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DollarSign, Plus } from "lucide-react";
+import { DollarSign } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,10 +15,8 @@ const PaymentMethodsPage = () => {
   const [activeTab, setActiveTab] = useState("methods");
   const navigate = useNavigate();
   
-  // Handle the case where authentication context might not be available
-  const auth = useAuth();
-  const currentUser = auth?.currentUser || { permissions: { files: {} } };
-
+  console.log("Rendering PaymentMethodsPage");
+  
   return (
     <PrivateRoute requiredPermission="paymentMethods">
       <Layout title="Payment Methods">

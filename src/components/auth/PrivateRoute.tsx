@@ -2,7 +2,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { ReactNode, useEffect } from "react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/components/ui/use-toast";
 
 interface PrivateRouteProps {
   children?: ReactNode;
@@ -14,7 +14,14 @@ interface PrivateRouteProps {
 const PrivateRoute = ({ children, requireAdmin = false, requiredFile, requiredPermission }: PrivateRouteProps) => {
   // Use try/catch to handle potential errors with useAuth
   try {
-    const { isAuthenticated, isAdmin, currentUser, hasFilePermission } = useAuth();
+    const auth = useAuth();
+    
+    if (!auth) {
+      console.error("Auth context is undefined");
+      return <Navigate to="/admin/login" replace />;
+    }
+    
+    const { isAuthenticated, isAdmin, currentUser, hasFilePermission } = auth;
 
     useEffect(() => {
       console.log("PrivateRoute: Authentication status", { 
@@ -47,7 +54,7 @@ const PrivateRoute = ({ children, requireAdmin = false, requiredFile, requiredPe
     }
 
     // Check if specific file permission is required
-    if (requiredFile && !isAdmin && !hasFilePermission(currentUser, requiredFile)) {
+    if (requiredFile && !isAdmin && currentUser && !hasFilePermission(currentUser, requiredFile)) {
       console.log(`File permission ${requiredFile} required but user doesn't have access, redirecting to home`);
       toast({
         title: "Access Denied",
@@ -57,10 +64,19 @@ const PrivateRoute = ({ children, requireAdmin = false, requiredFile, requiredPe
     }
 
     // Simple checking for string permissions (e.g., "paymentMethods")
-    if (requiredPermission && !isAdmin) {
+    if (requiredPermission && !isAdmin && currentUser) {
       // This is a simplified check - in a real app, you'd check against user permissions
       console.log(`Permission ${requiredPermission} required`);
-      // For now, we'll just let them through since we don't have a permission check function
+      if (currentUser && currentUser.permissions && currentUser.permissions.files) {
+        const hasPermission = requiredPermission in currentUser.permissions.files;
+        if (!hasPermission) {
+          toast({
+            title: "Access Denied",
+            description: "You do not have permission to access this page."
+          });
+          return <Navigate to="/" replace />;
+        }
+      }
     }
 
     // Render children
