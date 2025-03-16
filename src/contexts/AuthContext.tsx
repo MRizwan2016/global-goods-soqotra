@@ -10,6 +10,12 @@ export interface User {
   isActive: boolean;
   isAdmin: boolean;
   createdAt: string;
+  permissions: {
+    masterData: boolean;
+    dataEntry: boolean;
+    reports: boolean;
+    downloads: boolean;
+  };
 }
 
 interface AuthContextType {
@@ -18,10 +24,11 @@ interface AuthContextType {
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
-  register: (userData: Omit<User, "id" | "isActive" | "isAdmin" | "createdAt"> & { password: string }) => Promise<boolean>;
+  register: (userData: Omit<User, "id" | "isActive" | "isAdmin" | "createdAt" | "permissions"> & { password: string }) => Promise<boolean>;
   users: User[];
   toggleUserStatus: (userId: string) => Promise<void>;
   sendActivationEmail: (user: User) => Promise<boolean>;
+  toggleUserPermission: (userId: string, permissionType: keyof User['permissions']) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -62,7 +69,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         country: "Qatar",
         isActive: true,
         isAdmin: true,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        permissions: {
+          masterData: true,
+          dataEntry: true,
+          reports: true,
+          downloads: true
+        }
       };
       
       setUsers([adminUser]);
@@ -138,7 +151,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
-  const register = async (userData: Omit<User, "id" | "isActive" | "isAdmin" | "createdAt"> & { password: string }): Promise<boolean> => {
+  const register = async (userData: Omit<User, "id" | "isActive" | "isAdmin" | "createdAt" | "permissions"> & { password: string }): Promise<boolean> => {
     // Check if email already exists
     if (users.some(user => user.email === userData.email)) {
       toast({
@@ -158,7 +171,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       country: userData.country,
       isActive: false, // Users start inactive until approved by admin
       isAdmin: false,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      permissions: {
+        masterData: false,
+        dataEntry: false,
+        reports: false,
+        downloads: false
+      }
     };
 
     // Store user password separately (in real app, would be hashed)
@@ -258,6 +277,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const toggleUserPermission = (userId: string, permissionType: keyof User['permissions']) => {
+    // Find the user
+    const userToUpdate = users.find(u => u.id === userId);
+    if (!userToUpdate) return;
+
+    // Update the user's permissions
+    setUsers(prevUsers => 
+      prevUsers.map(user => {
+        if (user.id === userId) {
+          const updatedPermissions = {
+            ...user.permissions,
+            [permissionType]: !user.permissions[permissionType]
+          };
+          return {
+            ...user,
+            permissions: updatedPermissions
+          };
+        }
+        return user;
+      })
+    );
+
+    // Show toast notification
+    toast({
+      title: `Permission Updated`,
+      description: `${userToUpdate.fullName}'s access to ${permissionType} has been ${!userToUpdate.permissions[permissionType] ? 'granted' : 'revoked'}.`,
+    });
+  };
+
   const value = {
     currentUser,
     isAuthenticated: !!currentUser,
@@ -267,7 +315,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     register,
     users,
     toggleUserStatus,
-    sendActivationEmail
+    sendActivationEmail,
+    toggleUserPermission
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, User } from "@/contexts/AuthContext";
@@ -22,14 +23,27 @@ import {
   UserPlus, 
   Calendar, 
   Globe,
-  Loader
+  Loader,
+  Database,
+  FileInput,
+  BarChart4,
+  Download
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 
 const ControlPanel = () => {
-  const { users, toggleUserStatus, currentUser, isAdmin } = useAuth();
+  const { users, toggleUserStatus, toggleUserPermission, currentUser, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [nonAdminUsers, setNonAdminUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<Record<string, boolean>>({});
+  const [expandedUsers, setExpandedUsers] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     // Check if user is logged in and is admin
@@ -74,6 +88,32 @@ const ControlPanel = () => {
     } finally {
       setLoading(prev => ({ ...prev, [userId]: false }));
     }
+  };
+
+  const toggleExpand = (userId: string) => {
+    setExpandedUsers(prev => ({
+      ...prev,
+      [userId]: !prev[userId]
+    }));
+  };
+
+  const handleTogglePermission = (userId: string, permissionType: keyof User['permissions']) => {
+    toggleUserPermission(userId, permissionType);
+  };
+
+  const renderPermissionButton = (user: User, permissionType: keyof User['permissions'], icon: React.ReactNode, label: string) => {
+    const isActive = user.permissions[permissionType];
+    return (
+      <Button
+        variant={isActive ? "default" : "outline"}
+        size="sm"
+        className={`mr-2 mb-2 ${isActive ? "" : "opacity-70"}`}
+        onClick={() => handleTogglePermission(user.id, permissionType)}
+      >
+        {icon}
+        <span>{label}</span>
+      </Button>
+    );
   };
 
   return (
@@ -157,64 +197,129 @@ const ControlPanel = () => {
                   </TableRow>
                 ) : (
                   nonAdminUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="font-medium">
-                        <div className="flex items-center gap-2">
-                          <UserIcon className="h-4 w-4 text-muted-foreground" />
-                          {user.fullName}
-                        </div>
-                      </TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>{user.mobileNumber}</TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Globe className="h-4 w-4 text-muted-foreground" />
-                          {user.country}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                          {formatDate(user.createdAt)}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {user.isActive ? (
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
-                            Active
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-yellow-300">
-                            Pending
-                          </Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant={user.isActive ? "destructive" : "default"}
-                          size="sm"
-                          onClick={() => handleToggleStatus(user.id)}
-                          disabled={loading[user.id]}
-                        >
-                          {loading[user.id] ? (
-                            <>
-                              <Loader className="mr-1 h-4 w-4 animate-spin" />
-                              Processing...
-                            </>
-                          ) : user.isActive ? (
-                            <>
-                              <XCircle className="mr-1 h-4 w-4" />
-                              Deactivate
-                            </>
+                    <>
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2">
+                            <UserIcon className="h-4 w-4 text-muted-foreground" />
+                            {user.fullName}
+                          </div>
+                        </TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.mobileNumber}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Globe className="h-4 w-4 text-muted-foreground" />
+                            {user.country}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-muted-foreground" />
+                            {formatDate(user.createdAt)}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          {user.isActive ? (
+                            <Badge className="bg-green-100 text-green-800 hover:bg-green-200">
+                              Active
+                            </Badge>
                           ) : (
-                            <>
-                              <CheckCircle className="mr-1 h-4 w-4" />
-                              Activate
-                            </>
+                            <Badge variant="outline" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border-yellow-300">
+                              Pending
+                            </Badge>
                           )}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end space-x-2">
+                            <Button
+                              variant={user.isActive ? "destructive" : "default"}
+                              size="sm"
+                              onClick={() => handleToggleStatus(user.id)}
+                              disabled={loading[user.id]}
+                            >
+                              {loading[user.id] ? (
+                                <>
+                                  <Loader className="mr-1 h-4 w-4 animate-spin" />
+                                  Processing...
+                                </>
+                              ) : user.isActive ? (
+                                <>
+                                  <XCircle className="mr-1 h-4 w-4" />
+                                  Deactivate
+                                </>
+                              ) : (
+                                <>
+                                  <CheckCircle className="mr-1 h-4 w-4" />
+                                  Activate
+                                </>
+                              )}
+                            </Button>
+                            
+                            {user.isActive && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button variant="outline" size="sm">
+                                    Permissions
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-56">
+                                  <DropdownMenuLabel>User Permissions</DropdownMenuLabel>
+                                  <DropdownMenuSeparator />
+                                  <DropdownMenuItem 
+                                    onClick={() => handleTogglePermission(user.id, "masterData")}
+                                    className={user.permissions.masterData ? "bg-green-50" : ""}
+                                  >
+                                    <Database className="mr-2 h-4 w-4" />
+                                    <span>Master Data</span>
+                                    {user.permissions.masterData && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => handleTogglePermission(user.id, "dataEntry")}
+                                    className={user.permissions.dataEntry ? "bg-green-50" : ""}
+                                  >
+                                    <FileInput className="mr-2 h-4 w-4" />
+                                    <span>Data Entry</span>
+                                    {user.permissions.dataEntry && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => handleTogglePermission(user.id, "reports")}
+                                    className={user.permissions.reports ? "bg-green-50" : ""}
+                                  >
+                                    <BarChart4 className="mr-2 h-4 w-4" />
+                                    <span>Reports</span>
+                                    {user.permissions.reports && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem 
+                                    onClick={() => handleTogglePermission(user.id, "downloads")}
+                                    className={user.permissions.downloads ? "bg-green-50" : ""}
+                                  >
+                                    <Download className="mr-2 h-4 w-4" />
+                                    <span>Downloads</span>
+                                    {user.permissions.downloads && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                      {user.isActive && expandedUsers[user.id] && (
+                        <TableRow>
+                          <TableCell colSpan={7} className="bg-slate-50">
+                            <div className="p-2">
+                              <h4 className="font-medium mb-2">User Permissions</h4>
+                              <div className="flex flex-wrap">
+                                {renderPermissionButton(user, "masterData", <Database className="h-4 w-4 mr-1" />, "Master Data")}
+                                {renderPermissionButton(user, "dataEntry", <FileInput className="h-4 w-4 mr-1" />, "Data Entry")}
+                                {renderPermissionButton(user, "reports", <BarChart4 className="h-4 w-4 mr-1" />, "Reports")}
+                                {renderPermissionButton(user, "downloads", <Download className="h-4 w-4 mr-1" />, "Downloads")}
+                              </div>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </>
                   ))
                 )}
               </TableBody>
