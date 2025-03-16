@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import * as ToastPrimitives from "@radix-ui/react-toast"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -114,16 +113,6 @@ ToastDescription.displayName = ToastPrimitives.Description.displayName
 type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
-
-// Export the ToastContext and ToastContextType
-export type ToastContextType = {
-  toasts: ToastProps[];
-  addToast: (toast: Omit<ToastProps, "id">) => void;
-  dismissToast: (id: string) => void;
-  removeToast: (id: string) => void;
-};
-
-export const ToastContext = React.createContext<ToastContextType | undefined>(undefined);
 
 export {
   type ToastProps,

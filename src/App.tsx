@@ -29,9 +29,6 @@ import PrintDocuments from "./pages/print-documents/PrintDocuments";
 import ControlPanel from "./pages/admin/ControlPanel";
 import UserRegistration from "./pages/admin/UserRegistration";
 import Login from "./pages/admin/Login";
-import PaymentMethodsPage from "./pages/accounts/PaymentMethodsPage";
-import AddInvoicePayment from "./pages/accounts/AddInvoicePayment";
-import InvoicePaymentList from "./pages/accounts/InvoicePaymentList";
 import PrivateRoute from "./components/auth/PrivateRoute";
 
 const queryClient = new QueryClient();
@@ -74,11 +71,6 @@ const App = () => (
           <Route path="/master/package-options" element={<PackageOptionsList />} />
           <Route path="/master/package-options/add" element={<PackageOptionForm />} />
           <Route path="/master/package-options/edit/:id" element={<PackageOptionForm />} />
-          
-          {/* Accounts Routes */}
-          <Route path="/accounts/payment-methods" element={<PaymentMethodsPage />} />
-          <Route path="/accounts/add-payment" element={<AddInvoicePayment />} />
-          <Route path="/accounts/invoice-payments" element={<InvoicePaymentList />} />
           
           {/* Admin Routes */}
           <Route path="/admin/control-panel" element={<ControlPanel />} />
