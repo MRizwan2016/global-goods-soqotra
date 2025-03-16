@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/hooks/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   CheckCircle, 
   XCircle, 
@@ -27,7 +28,9 @@ import {
   Database,
   FileInput,
   BarChart4,
-  Download
+  Download,
+  ChevronDown,
+  ChevronRight
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -37,13 +40,60 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+// File permission configuration
+const filePermissions = {
+  masterData: {
+    label: "Master Data",
+    icon: <Database className="h-4 w-4" />,
+    files: {
+      salesRep: { label: "Sales Rep", path: "/master/sales-rep" },
+      town: { label: "Town", path: "/master/town" },
+      item: { label: "Item", path: "/master/item" },
+      packageOptions: { label: "Package Options", path: "/master/package-options" },
+      sellingRates: { label: "Selling Rates", path: "/master/selling-rates" },
+      container: { label: "Container", path: "/master/container" },
+      vessel: { label: "Vessel", path: "/master/vessel" },
+      invoiceBook: { label: "Invoice Book", path: "/master/invoice-book" },
+      driverHelper: { label: "Driver/Helper", path: "/master/driver-helper" },
+    }
+  },
+  dataEntry: {
+    label: "Data Entry",
+    icon: <FileInput className="h-4 w-4" />,
+    files: {
+      invoicing: { label: "Invoicing", path: "/data-entry/invoicing" },
+      paymentReceivable: { label: "Payment Receivable", path: "/data-entry/payment" },
+      loadContainer: { label: "Load Container", path: "/data-entry/container" },
+      loadVessel: { label: "Load Vessel", path: "/data-entry/vessel" },
+      loadAirCargo: { label: "Load Air Cargo", path: "/data-entry/air-cargo" },
+      packingList: { label: "Packing List", path: "/data-entry/packing-list" },
+    }
+  },
+  reports: {
+    label: "Reports",
+    icon: <BarChart4 className="h-4 w-4" />,
+    files: {
+      cargoReports: { label: "Cargo Reports", path: "/reports/cargo" },
+      financialReports: { label: "Financial Reports", path: "/reports/financial" },
+      shippingReports: { label: "Shipping Reports", path: "/reports/shipping" },
+    }
+  }
+};
 
 const ControlPanel = () => {
-  const { users, toggleUserStatus, toggleUserPermission, currentUser, isAdmin } = useAuth();
+  const { users, toggleUserStatus, toggleUserPermission, toggleFilePermission, currentUser, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [nonAdminUsers, setNonAdminUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState<Record<string, boolean>>({});
   const [expandedUsers, setExpandedUsers] = useState<Record<string, boolean>>({});
+  const [expandedSections, setExpandedSections] = useState<Record<string, Record<string, boolean>>>({});
 
   useEffect(() => {
     // Check if user is logged in and is admin
@@ -72,7 +122,7 @@ const ControlPanel = () => {
     // Filter out admin users for the display and ensure all users have permissions
     console.log("All users:", users); // Debug: Log all users
     
-    // Ensure each user has a valid permissions object
+    // Ensure each user has valid permissions object with files
     const usersWithPermissions = users.map(user => {
       if (!user.permissions) {
         console.log("User missing permissions:", user.email);
@@ -82,7 +132,17 @@ const ControlPanel = () => {
             masterData: user.isAdmin ? true : false,
             dataEntry: user.isAdmin ? true : false,
             reports: user.isAdmin ? true : false,
-            downloads: user.isAdmin ? true : false
+            downloads: user.isAdmin ? true : false,
+            files: {}
+          }
+        };
+      } else if (!user.permissions.files) {
+        console.log("User missing file permissions:", user.email);
+        return {
+          ...user,
+          permissions: {
+            ...user.permissions,
+            files: {}
           }
         };
       }
@@ -91,6 +151,18 @@ const ControlPanel = () => {
     
     const filteredUsers = usersWithPermissions.filter(user => !user.isAdmin);
     setNonAdminUsers(filteredUsers);
+    
+    // Initialize expanded sections state for each user
+    const initialExpandedSections: Record<string, Record<string, boolean>> = {};
+    filteredUsers.forEach(user => {
+      initialExpandedSections[user.id] = {
+        masterData: false,
+        dataEntry: false,
+        reports: false
+      };
+    });
+    setExpandedSections(initialExpandedSections);
+    
     console.log("Non-admin users:", filteredUsers); // Debug: Log filtered users
   }, [currentUser, isAdmin, navigate, users]);
 
@@ -118,8 +190,22 @@ const ControlPanel = () => {
     }));
   };
 
+  const toggleSection = (userId: string, section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [userId]: {
+        ...(prev[userId] || {}),
+        [section]: !(prev[userId]?.[section] || false)
+      }
+    }));
+  };
+
   const handleTogglePermission = (userId: string, permissionType: keyof User['permissions']) => {
     toggleUserPermission(userId, permissionType);
+  };
+
+  const handleToggleFilePermission = (userId: string, fileKey: keyof User['permissions']['files']) => {
+    toggleFilePermission(userId, fileKey);
   };
 
   const renderPermissionButton = (user: User, permissionType: keyof User['permissions'], icon: React.ReactNode, label: string) => {
@@ -128,7 +214,8 @@ const ControlPanel = () => {
       masterData: false,
       dataEntry: false, 
       reports: false,
-      downloads: false
+      downloads: false,
+      files: {}
     };
     
     const isActive = permissions[permissionType];
@@ -143,6 +230,30 @@ const ControlPanel = () => {
         {icon}
         <span className="ml-1">{label}</span>
       </Button>
+    );
+  };
+
+  const renderFilePermissionToggle = (
+    user: User, 
+    fileKey: keyof User['permissions']['files'], 
+    label: string
+  ) => {
+    const isChecked = !!user.permissions?.files?.[fileKey];
+    
+    return (
+      <div className="flex items-center space-x-2 py-1">
+        <Checkbox 
+          id={`${user.id}-${String(fileKey)}`}
+          checked={isChecked}
+          onCheckedChange={() => handleToggleFilePermission(user.id, fileKey)}
+        />
+        <label 
+          htmlFor={`${user.id}-${String(fileKey)}`}
+          className="text-sm cursor-pointer"
+        >
+          {label}
+        </label>
+      </div>
     );
   };
 
@@ -299,63 +410,235 @@ const ControlPanel = () => {
                             </Button>
                             
                             {user.isActive && (
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="outline" size="sm">
-                                    Permissions
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-56">
-                                  <DropdownMenuLabel>User Permissions</DropdownMenuLabel>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem 
-                                    onClick={() => handleTogglePermission(user.id, "masterData")}
-                                    className={user.permissions && user.permissions.masterData ? "bg-green-50" : ""}
-                                  >
-                                    <Database className="mr-2 h-4 w-4" />
-                                    <span>Master Data</span>
-                                    {user.permissions && user.permissions.masterData && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem 
-                                    onClick={() => handleTogglePermission(user.id, "dataEntry")}
-                                    className={user.permissions && user.permissions.dataEntry ? "bg-green-50" : ""}
-                                  >
-                                    <FileInput className="mr-2 h-4 w-4" />
-                                    <span>Data Entry</span>
-                                    {user.permissions && user.permissions.dataEntry && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem 
-                                    onClick={() => handleTogglePermission(user.id, "reports")}
-                                    className={user.permissions && user.permissions.reports ? "bg-green-50" : ""}
-                                  >
-                                    <BarChart4 className="mr-2 h-4 w-4" />
-                                    <span>Reports</span>
-                                    {user.permissions && user.permissions.reports && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem 
-                                    onClick={() => handleTogglePermission(user.id, "downloads")}
-                                    className={user.permissions && user.permissions.downloads ? "bg-green-50" : ""}
-                                  >
-                                    <Download className="mr-2 h-4 w-4" />
-                                    <span>Downloads</span>
-                                    {user.permissions && user.permissions.downloads && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => toggleExpand(user.id)}
+                              >
+                                {expandedUsers[user.id] ? "Hide" : "Manage"} Permissions
+                                {expandedUsers[user.id] ? 
+                                  <ChevronDown className="ml-1 h-4 w-4" /> : 
+                                  <ChevronRight className="ml-1 h-4 w-4" />
+                                }
+                              </Button>
                             )}
                           </div>
                         </TableCell>
                       </TableRow>
                       {user.isActive && expandedUsers[user.id] && (
                         <TableRow>
-                          <TableCell colSpan={7} className="bg-slate-50">
-                            <div className="p-2">
-                              <h4 className="font-medium mb-2">User Permissions</h4>
-                              <div className="flex flex-wrap">
-                                {renderPermissionButton(user, "masterData", <Database className="h-4 w-4 mr-1" />, "Master Data")}
-                                {renderPermissionButton(user, "dataEntry", <FileInput className="h-4 w-4 mr-1" />, "Data Entry")}
-                                {renderPermissionButton(user, "reports", <BarChart4 className="h-4 w-4 mr-1" />, "Reports")}
-                                {renderPermissionButton(user, "downloads", <Download className="h-4 w-4 mr-1" />, "Downloads")}
+                          <TableCell colSpan={7} className="bg-slate-50 p-4">
+                            <div className="space-y-4">
+                              <h4 className="font-medium text-lg mb-2">Permissions for {user.fullName}</h4>
+                              
+                              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                                <Card>
+                                  <CardHeader className="py-2">
+                                    <CardTitle className="text-sm flex items-center">
+                                      <Database className="h-4 w-4 mr-2" />
+                                      Master Data Access
+                                    </CardTitle>
+                                  </CardHeader>
+                                  <CardContent className="py-2">
+                                    <div className="flex items-center mb-2">
+                                      <Switch 
+                                        checked={!!user.permissions?.masterData}
+                                        onCheckedChange={() => handleTogglePermission(user.id, "masterData")}
+                                        id={`${user.id}-masterData`}
+                                      />
+                                      <label htmlFor={`${user.id}-masterData`} className="ml-2 text-sm font-medium">
+                                        {user.permissions?.masterData ? "Enabled" : "Disabled"}
+                                      </label>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                                
+                                <Card>
+                                  <CardHeader className="py-2">
+                                    <CardTitle className="text-sm flex items-center">
+                                      <FileInput className="h-4 w-4 mr-2" />
+                                      Data Entry Access
+                                    </CardTitle>
+                                  </CardHeader>
+                                  <CardContent className="py-2">
+                                    <div className="flex items-center mb-2">
+                                      <Switch 
+                                        checked={!!user.permissions?.dataEntry}
+                                        onCheckedChange={() => handleTogglePermission(user.id, "dataEntry")}
+                                        id={`${user.id}-dataEntry`}
+                                      />
+                                      <label htmlFor={`${user.id}-dataEntry`} className="ml-2 text-sm font-medium">
+                                        {user.permissions?.dataEntry ? "Enabled" : "Disabled"}
+                                      </label>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                                
+                                <Card>
+                                  <CardHeader className="py-2">
+                                    <CardTitle className="text-sm flex items-center">
+                                      <BarChart4 className="h-4 w-4 mr-2" />
+                                      Reports Access
+                                    </CardTitle>
+                                  </CardHeader>
+                                  <CardContent className="py-2">
+                                    <div className="flex items-center mb-2">
+                                      <Switch 
+                                        checked={!!user.permissions?.reports}
+                                        onCheckedChange={() => handleTogglePermission(user.id, "reports")}
+                                        id={`${user.id}-reports`}
+                                      />
+                                      <label htmlFor={`${user.id}-reports`} className="ml-2 text-sm font-medium">
+                                        {user.permissions?.reports ? "Enabled" : "Disabled"}
+                                      </label>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                                
+                                <Card>
+                                  <CardHeader className="py-2">
+                                    <CardTitle className="text-sm flex items-center">
+                                      <Download className="h-4 w-4 mr-2" />
+                                      Downloads Access
+                                    </CardTitle>
+                                  </CardHeader>
+                                  <CardContent className="py-2">
+                                    <div className="flex items-center mb-2">
+                                      <Switch 
+                                        checked={!!user.permissions?.downloads}
+                                        onCheckedChange={() => handleTogglePermission(user.id, "downloads")}
+                                        id={`${user.id}-downloads`}
+                                      />
+                                      <label htmlFor={`${user.id}-downloads`} className="ml-2 text-sm font-medium">
+                                        {user.permissions?.downloads ? "Enabled" : "Disabled"}
+                                      </label>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </div>
+                              
+                              <div className="mt-4">
+                                <h5 className="font-medium mb-2">File-Level Permissions</h5>
+                                <p className="text-sm text-muted-foreground mb-4">
+                                  Configure access to specific files within each category. Users need both category-level permission
+                                  and file-level permission to access a file.
+                                </p>
+                                
+                                <Accordion type="multiple" className="w-full">
+                                  {/* Master Data Files */}
+                                  <AccordionItem value="masterData">
+                                    <AccordionTrigger className="py-2">
+                                      <div className="flex items-center">
+                                        <Database className="h-4 w-4 mr-2" />
+                                        <span>Master Data Files</span>
+                                        {user.permissions?.masterData ? (
+                                          <Badge className="ml-2 bg-green-100 text-green-800">Category Enabled</Badge>
+                                        ) : (
+                                          <Badge className="ml-2 bg-gray-100 text-gray-800" variant="outline">Category Disabled</Badge>
+                                        )}
+                                      </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-6 py-2">
+                                        {Object.entries(filePermissions.masterData.files).map(([key, value]) => (
+                                          <div key={key} className="flex items-center space-x-2 py-1">
+                                            <Checkbox 
+                                              id={`${user.id}-${key}`}
+                                              checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
+                                              onCheckedChange={() => handleToggleFilePermission(
+                                                user.id, 
+                                                key as keyof User['permissions']['files']
+                                              )}
+                                              disabled={!user.permissions?.masterData}
+                                            />
+                                            <label 
+                                              htmlFor={`${user.id}-${key}`}
+                                              className={`text-sm cursor-pointer ${!user.permissions?.masterData ? 'text-gray-400' : ''}`}
+                                            >
+                                              {value.label}
+                                            </label>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </AccordionContent>
+                                  </AccordionItem>
+                                  
+                                  {/* Data Entry Files */}
+                                  <AccordionItem value="dataEntry">
+                                    <AccordionTrigger className="py-2">
+                                      <div className="flex items-center">
+                                        <FileInput className="h-4 w-4 mr-2" />
+                                        <span>Data Entry Files</span>
+                                        {user.permissions?.dataEntry ? (
+                                          <Badge className="ml-2 bg-green-100 text-green-800">Category Enabled</Badge>
+                                        ) : (
+                                          <Badge className="ml-2 bg-gray-100 text-gray-800" variant="outline">Category Disabled</Badge>
+                                        )}
+                                      </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-6 py-2">
+                                        {Object.entries(filePermissions.dataEntry.files).map(([key, value]) => (
+                                          <div key={key} className="flex items-center space-x-2 py-1">
+                                            <Checkbox 
+                                              id={`${user.id}-${key}`}
+                                              checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
+                                              onCheckedChange={() => handleToggleFilePermission(
+                                                user.id, 
+                                                key as keyof User['permissions']['files']
+                                              )}
+                                              disabled={!user.permissions?.dataEntry}
+                                            />
+                                            <label 
+                                              htmlFor={`${user.id}-${key}`}
+                                              className={`text-sm cursor-pointer ${!user.permissions?.dataEntry ? 'text-gray-400' : ''}`}
+                                            >
+                                              {value.label}
+                                            </label>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </AccordionContent>
+                                  </AccordionItem>
+                                  
+                                  {/* Reports Files */}
+                                  <AccordionItem value="reports">
+                                    <AccordionTrigger className="py-2">
+                                      <div className="flex items-center">
+                                        <BarChart4 className="h-4 w-4 mr-2" />
+                                        <span>Reports Files</span>
+                                        {user.permissions?.reports ? (
+                                          <Badge className="ml-2 bg-green-100 text-green-800">Category Enabled</Badge>
+                                        ) : (
+                                          <Badge className="ml-2 bg-gray-100 text-gray-800" variant="outline">Category Disabled</Badge>
+                                        )}
+                                      </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-6 py-2">
+                                        {Object.entries(filePermissions.reports.files).map(([key, value]) => (
+                                          <div key={key} className="flex items-center space-x-2 py-1">
+                                            <Checkbox 
+                                              id={`${user.id}-${key}`}
+                                              checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
+                                              onCheckedChange={() => handleToggleFilePermission(
+                                                user.id, 
+                                                key as keyof User['permissions']['files']
+                                              )}
+                                              disabled={!user.permissions?.reports}
+                                            />
+                                            <label 
+                                              htmlFor={`${user.id}-${key}`}
+                                              className={`text-sm cursor-pointer ${!user.permissions?.reports ? 'text-gray-400' : ''}`}
+                                            >
+                                              {value.label}
+                                            </label>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </AccordionContent>
+                                  </AccordionItem>
+                                </Accordion>
                               </div>
                             </div>
                           </TableCell>

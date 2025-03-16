@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 
@@ -16,6 +15,26 @@ export interface User {
     dataEntry: boolean;
     reports: boolean;
     downloads: boolean;
+    files: {
+      salesRep?: boolean;
+      town?: boolean;
+      item?: boolean;
+      packageOptions?: boolean;
+      sellingRates?: boolean;
+      container?: boolean;
+      vessel?: boolean;
+      invoiceBook?: boolean;
+      driverHelper?: boolean;
+      invoicing?: boolean;
+      paymentReceivable?: boolean;
+      loadContainer?: boolean;
+      loadVessel?: boolean;
+      loadAirCargo?: boolean;
+      packingList?: boolean;
+      cargoReports?: boolean;
+      financialReports?: boolean;
+      shippingReports?: boolean;
+    };
   };
 }
 
@@ -30,6 +49,8 @@ interface AuthContextType {
   toggleUserStatus: (userId: string) => Promise<void>;
   sendActivationEmail: (user: User) => Promise<boolean>;
   toggleUserPermission: (userId: string, permissionType: keyof User['permissions']) => void;
+  toggleFilePermission: (userId: string, fileKey: keyof User['permissions']['files']) => void;
+  hasFilePermission: (user: User | null, fileKey: keyof User['permissions']['files']) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -56,14 +77,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
-        // Ensure current user has permissions field
+        // Ensure current user has permissions field with files
         if (!parsedUser.permissions) {
           parsedUser.permissions = {
             masterData: parsedUser.isAdmin ? true : false,
             dataEntry: parsedUser.isAdmin ? true : false,
             reports: parsedUser.isAdmin ? true : false,
-            downloads: parsedUser.isAdmin ? true : false
+            downloads: parsedUser.isAdmin ? true : false,
+            files: {}
           };
+        } else if (!parsedUser.permissions.files) {
+          parsedUser.permissions.files = {};
         }
         setCurrentUser(parsedUser);
       } catch (error) {
@@ -76,7 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const parsedUsers = JSON.parse(storedUsers);
         
-        // Ensure all users have the permissions property correctly set
+        // Ensure all users have the permissions property correctly set with files
         const updatedUsers = parsedUsers.map((user: any) => {
           if (!user.permissions) {
             return {
@@ -85,7 +109,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 masterData: user.isAdmin ? true : false,
                 dataEntry: user.isAdmin ? true : false,
                 reports: user.isAdmin ? true : false,
-                downloads: user.isAdmin ? true : false
+                downloads: user.isAdmin ? true : false,
+                files: {}
+              }
+            };
+          } else if (!user.permissions.files) {
+            return {
+              ...user,
+              permissions: {
+                ...user.permissions,
+                files: {}
               }
             };
           }
@@ -120,7 +153,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         masterData: true,
         dataEntry: true,
         reports: true,
-        downloads: true
+        downloads: true,
+        files: {
+          salesRep: true,
+          town: true,
+          item: true,
+          packageOptions: true,
+          sellingRates: true,
+          container: true,
+          vessel: true,
+          invoiceBook: true,
+          driverHelper: true,
+          invoicing: true,
+          paymentReceivable: true,
+          loadContainer: true,
+          loadVessel: true,
+          loadAirCargo: true,
+          packingList: true,
+          cargoReports: true,
+          financialReports: true,
+          shippingReports: true
+        }
       }
     };
     
@@ -226,7 +279,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         masterData: false,
         dataEntry: false,
         reports: false,
-        downloads: false
+        downloads: false,
+        files: {}
       }
     };
 
@@ -354,7 +408,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             masterData: false,
             dataEntry: false,
             reports: false,
-            downloads: false
+            downloads: false,
+            files: {}
           };
           
           const updatedPermissions = {
@@ -382,6 +437,66 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  const toggleFilePermission = (userId: string, fileKey: keyof User['permissions']['files']) => {
+    // Find the user
+    const userToUpdate = users.find(u => u.id === userId);
+    if (!userToUpdate) {
+      console.error("User not found for file permission toggle:", userId);
+      return;
+    }
+
+    console.log(`Toggling file permission ${fileKey} for user`, userToUpdate);
+
+    // Update the user's file permissions
+    setUsers(prevUsers => 
+      prevUsers.map(user => {
+        if (user.id === userId) {
+          // Ensure permissions and files objects exist
+          const currentPermissions = user.permissions || {
+            masterData: false,
+            dataEntry: false,
+            reports: false,
+            downloads: false,
+            files: {}
+          };
+          
+          const currentFiles = currentPermissions.files || {};
+          
+          const updatedFiles = {
+            ...currentFiles,
+            [fileKey]: !currentFiles[fileKey]
+          };
+          
+          console.log("Updated file permissions:", updatedFiles);
+          
+          return {
+            ...user,
+            permissions: {
+              ...currentPermissions,
+              files: updatedFiles
+            }
+          };
+        }
+        return user;
+      })
+    );
+
+    // Show toast notification
+    toast({
+      title: `File Permission Updated`,
+      description: `${userToUpdate.fullName}'s access to ${fileKey} has been ${
+        !userToUpdate.permissions?.files?.[fileKey] ? 'granted' : 'revoked'
+      }.`,
+    });
+  };
+
+  const hasFilePermission = (user: User | null, fileKey: keyof User['permissions']['files']): boolean => {
+    if (!user) return false;
+    if (user.isAdmin) return true; // Admins have access to everything
+    
+    return !!user.permissions?.files?.[fileKey];
+  };
+
   const value = {
     currentUser,
     isAuthenticated: !!currentUser,
@@ -392,7 +507,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     users,
     toggleUserStatus,
     sendActivationEmail,
-    toggleUserPermission
+    toggleUserPermission,
+    toggleFilePermission,
+    hasFilePermission
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
