@@ -9,8 +9,10 @@ import {
   useToast as useToastOriginal,
 } from "@/components/ui/use-toast"
 
-export type ToastActionProps = React.ComponentPropsWithoutRef<typeof ToastActionElement>
+// Fix #1: Use React.ComponentProps instead of ComponentPropsWithoutRef with a type
+export type ToastActionProps = React.ComponentProps<typeof ToastActionElement>
 
+// Fix #2: Add description property to accommodate how it's being used
 type ToastPropsWithoutId = Omit<ToastProps, "id"> & {
   description?: React.ReactNode
 }
@@ -18,7 +20,8 @@ type ToastPropsWithoutId = Omit<ToastProps, "id"> & {
 interface UseToastProps {
   toast: (props: ToastPropsWithoutId) => void
   dismiss: (toastId?: string) => void
-  toasts: Toast[]
+  // Fix #3: Use the correct type for toasts array
+  toasts: ReturnType<typeof useToastOriginal>["toasts"]
 }
 
 export const toast = (props: ToastPropsWithoutId) => {
