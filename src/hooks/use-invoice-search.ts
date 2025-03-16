@@ -42,10 +42,10 @@ export const useInvoiceSearch = () => {
     // In a real app, this would be an API call
     // For now, we'll use the mockInvoiceData
     setTimeout(() => {
-      // Ensure mockInvoiceData matches our Invoice interface
+      // Cast the mockInvoiceData to ensure it matches our Invoice interface
       const results = mockInvoiceData.filter(invoice => 
         invoice.invoiceNumber.toLowerCase().startsWith(prefix.toLowerCase())
-      ) as Invoice[];
+      ) as unknown as Invoice[];
       
       setSearchResults(results);
       setLoading(false);

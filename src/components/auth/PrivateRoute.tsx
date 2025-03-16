@@ -29,8 +29,7 @@ const PrivateRoute = ({ children, requireAdmin = false, requiredFile, requiredPe
     console.log("User not authenticated, redirecting to login");
     toast({
       title: "Authentication Required",
-      description: "Please log in to access this page.",
-      variant: "destructive",
+      description: "Please log in to access this page."
     });
     return <Navigate to="/admin/login" replace />;
   }
@@ -40,8 +39,7 @@ const PrivateRoute = ({ children, requireAdmin = false, requiredFile, requiredPe
     console.log("Admin access required but user is not admin, redirecting to home");
     toast({
       title: "Access Denied",
-      description: "You do not have permission to access this page.",
-      variant: "destructive",
+      description: "You do not have permission to access this page."
     });
     return <Navigate to="/" replace />;
   }
@@ -51,8 +49,7 @@ const PrivateRoute = ({ children, requireAdmin = false, requiredFile, requiredPe
     console.log(`File permission ${requiredFile} required but user doesn't have access, redirecting to home`);
     toast({
       title: "Access Denied",
-      description: "You do not have permission to access this page.",
-      variant: "destructive",
+      description: "You do not have permission to access this page."
     });
     return <Navigate to="/" replace />;
   }

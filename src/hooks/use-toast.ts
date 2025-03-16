@@ -11,7 +11,9 @@ import {
 
 export type ToastActionProps = React.ComponentPropsWithoutRef<typeof ToastActionElement>
 
-type ToastPropsWithoutId = Omit<ToastProps, "id">
+type ToastPropsWithoutId = Omit<ToastProps, "id"> & {
+  description?: React.ReactNode
+}
 
 interface UseToastProps {
   toast: (props: ToastPropsWithoutId) => void
