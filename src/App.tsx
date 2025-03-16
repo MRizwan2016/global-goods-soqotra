@@ -29,6 +29,7 @@ import PrintDocuments from "./pages/print-documents/PrintDocuments";
 import ControlPanel from "./pages/admin/ControlPanel";
 import UserRegistration from "./pages/admin/UserRegistration";
 import Login from "./pages/admin/Login";
+import PaymentMethodsPage from "./pages/accounts/PaymentMethodsPage";
 import PrivateRoute from "./components/auth/PrivateRoute";
 
 const queryClient = new QueryClient();
@@ -58,6 +59,9 @@ const App = () => (
           <Route path="/data-entry/bill-of-lading/new" element={<BillOfLadingForm />} />
           <Route path="/data-entry/bill-of-lading/edit/:id" element={<BillOfLadingForm />} />
           <Route path="/data-entry/print-documents" element={<PrintDocuments />} />
+          
+          {/* Accounts Routes */}
+          <Route path="/accounts/payment-methods" element={<PaymentMethodsPage />} />
           
           {/* Master Data Routes */}
           <Route path="/master/invoice-book" element={<InvoiceBookStock />} />
