@@ -34,6 +34,7 @@ export interface User {
       cargoReports?: boolean;
       financialReports?: boolean;
       shippingReports?: boolean;
+      paymentMethods?: boolean;
     };
   };
 }
@@ -172,7 +173,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           packingList: true,
           cargoReports: true,
           financialReports: true,
-          shippingReports: true
+          shippingReports: true,
+          paymentMethods: true
         }
       }
     };
