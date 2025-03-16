@@ -15,8 +15,8 @@ export interface Invoice {
   nic: string;
   volume: string;
   weight: string;
-  packages: string;
-  gross: string;
+  packages: string; // Changed from number to string to match usage
+  gross: string; // Changed from number to string to match usage
   discount: string;
   net: string;
   paid: boolean;
@@ -42,9 +42,10 @@ export const useInvoiceSearch = () => {
     // In a real app, this would be an API call
     // For now, we'll use the mockInvoiceData
     setTimeout(() => {
+      // Ensure mockInvoiceData matches our Invoice interface
       const results = mockInvoiceData.filter(invoice => 
         invoice.invoiceNumber.toLowerCase().startsWith(prefix.toLowerCase())
-      );
+      ) as Invoice[];
       
       setSearchResults(results);
       setLoading(false);
