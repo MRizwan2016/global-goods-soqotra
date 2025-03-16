@@ -32,6 +32,7 @@ import Login from "./pages/admin/Login";
 import PaymentMethodsPage from "./pages/accounts/PaymentMethodsPage";
 import AddInvoicePayment from "./pages/accounts/AddInvoicePayment";
 import ReconciliationPage from "./pages/accounts/ReconciliationPage";
+import FinancialReportsPage from "./pages/reports/FinancialReportsPage";
 import PrivateRoute from "./components/auth/PrivateRoute";
 
 const queryClient = new QueryClient();
@@ -68,6 +69,9 @@ const App = () => (
           <Route path="/accounts/payments" element={<PaymentMethodsPage />} />
           <Route path="/accounts/payments/add" element={<AddInvoicePayment />} />
           <Route path="/accounts/reconciliation" element={<ReconciliationPage />} />
+          
+          {/* Reports Routes */}
+          <Route path="/reports/financial" element={<FinancialReportsPage />} />
           
           {/* Master Data Routes */}
           <Route path="/master/invoice-book" element={<InvoiceBookStock />} />

@@ -130,6 +130,18 @@ const Sidebar = () => {
         />
         
         <SidebarItem 
+          icon={<BarChart4 size={18} />} 
+          title="REPORTS" 
+          isOpen={openSections.reports}
+          onClick={() => toggleSection('reports')}
+          children={[
+            { icon: <FileText size={18} />, title: "Cargo Reports", to: "/reports/cargo" },
+            { icon: <LineChart size={18} />, title: "Financial Reports", to: "/reports/financial" },
+            { icon: <FileText size={18} />, title: "Shipping Reports", to: "/reports/shipping" },
+          ]}
+        />
+        
+        <SidebarItem 
           icon={<DollarSign size={18} />} 
           title="ACCOUNTS" 
           isOpen={openSections.accounting}
@@ -138,7 +150,6 @@ const Sidebar = () => {
             { icon: <CreditCard size={18} />, title: "Payment Methods", to: "/accounts/payment-methods" },
             { icon: <Receipt size={18} />, title: "Reconciliation", to: "/accounts/reconciliation" },
             { icon: <Calculator size={18} />, title: "Profit & Loss", to: "/accounts/profit-loss" },
-            { icon: <LineChart size={18} />, title: "Financial Reports", to: "/accounts/financial-reports" },
           ]}
         />
         
@@ -146,18 +157,6 @@ const Sidebar = () => {
           icon={<Settings size={18} />} 
           title="CONTROL PANEL" 
           to="/admin/control-panel"
-        />
-        
-        <SidebarItem 
-          icon={<BarChart4 size={18} />} 
-          title="REPORTS" 
-          isOpen={openSections.reports}
-          onClick={() => toggleSection('reports')}
-          children={[
-            { icon: <FileText size={18} />, title: "Cargo Reports", to: "/reports/cargo" },
-            { icon: <FileText size={18} />, title: "Financial Reports", to: "/reports/financial" },
-            { icon: <FileText size={18} />, title: "Shipping Reports", to: "/reports/shipping" },
-          ]}
         />
         
         <SidebarItem 

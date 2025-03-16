@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, User } from "@/contexts/AuthContext";
@@ -48,7 +47,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import AccountingPanel from "@/components/accounting/AccountingPanel";
 import {
   Tabs,
   TabsContent,
@@ -307,14 +305,10 @@ const ControlPanel = () => {
         </div>
 
         <Tabs defaultValue="users">
-          <TabsList className="grid grid-cols-2 w-[400px]">
+          <TabsList className="grid grid-cols-1 w-[200px]">
             <TabsTrigger value="users" className="flex items-center gap-1">
               <UserIcon className="mr-1 h-4 w-4" />
               User Management
-            </TabsTrigger>
-            <TabsTrigger value="accounting" className="flex items-center gap-1">
-              <DollarSign className="mr-1 h-4 w-4" />
-              Accounting
             </TabsTrigger>
           </TabsList>
 
@@ -716,10 +710,6 @@ const ControlPanel = () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
-
-          <TabsContent value="accounting" className="mt-4">
-            <AccountingPanel />
           </TabsContent>
         </Tabs>
       </div>
