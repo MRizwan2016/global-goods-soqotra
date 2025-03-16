@@ -29,6 +29,7 @@ import PrintDocuments from "./pages/print-documents/PrintDocuments";
 import ControlPanel from "./pages/admin/ControlPanel";
 import UserRegistration from "./pages/admin/UserRegistration";
 import Login from "./pages/admin/Login";
+import PrivateRoute from "./components/auth/PrivateRoute";
 
 const queryClient = new QueryClient();
 
@@ -72,7 +73,11 @@ const App = () => (
           <Route path="/master/package-options/edit/:id" element={<PackageOptionForm />} />
           
           {/* Admin Routes */}
-          <Route path="/admin/control-panel" element={<ControlPanel />} />
+          <Route path="/admin/control-panel" element={
+            <PrivateRoute requireAdmin={true}>
+              <ControlPanel />
+            </PrivateRoute>
+          } />
           <Route path="/admin/register" element={<UserRegistration />} />
           <Route path="/admin/login" element={<Login />} />
           

@@ -57,8 +57,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     if (storedUsers) {
-      setUsers(JSON.parse(storedUsers));
-      console.log("Loaded users from localStorage:", JSON.parse(storedUsers)); // Debug log
+      const parsedUsers = JSON.parse(storedUsers);
+      
+      // Ensure all users have the permissions property correctly set
+      const updatedUsers = parsedUsers.map((user: any) => {
+        if (!user.permissions) {
+          return {
+            ...user,
+            permissions: {
+              masterData: false,
+              dataEntry: false,
+              reports: false,
+              downloads: false
+            }
+          };
+        }
+        return user;
+      });
+      
+      setUsers(updatedUsers);
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+      console.log("Loaded users from localStorage:", updatedUsers);
     } else {
       // Initialize with admin user if no users exist
       const adminUser: User = {
@@ -80,7 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUsers([adminUser]);
       localStorage.setItem("users", JSON.stringify([adminUser]));
-      console.log("Initialized with admin user:", [adminUser]); // Debug log
+      console.log("Initialized with admin user:", [adminUser]);
       
       // Also store admin password separately
       localStorage.setItem("admin-password", ADMIN_PASSWORD);

@@ -67,10 +67,28 @@ const ControlPanel = () => {
       return;
     }
 
-    // Filter out admin users for the display
+    // Filter out admin users for the display and ensure all users have permissions
     console.log("All users:", users); // Debug: Log all users
-    setNonAdminUsers(users.filter(user => !user.isAdmin));
-    console.log("Non-admin users:", users.filter(user => !user.isAdmin)); // Debug: Log filtered users
+    
+    // Ensure each user has a valid permissions object
+    const usersWithPermissions = users.map(user => {
+      if (!user.permissions) {
+        return {
+          ...user,
+          permissions: {
+            masterData: false,
+            dataEntry: false,
+            reports: false,
+            downloads: false
+          }
+        };
+      }
+      return user;
+    });
+    
+    const filteredUsers = usersWithPermissions.filter(user => !user.isAdmin);
+    setNonAdminUsers(filteredUsers);
+    console.log("Non-admin users:", filteredUsers); // Debug: Log filtered users
   }, [currentUser, isAdmin, navigate, users]);
 
   const formatDate = (dateString: string) => {
@@ -102,7 +120,8 @@ const ControlPanel = () => {
   };
 
   const renderPermissionButton = (user: User, permissionType: keyof User['permissions'], icon: React.ReactNode, label: string) => {
-    const isActive = user.permissions[permissionType];
+    // Ensure permissions exist before accessing them
+    const isActive = user.permissions ? user.permissions[permissionType] : false;
     return (
       <Button
         variant={isActive ? "default" : "outline"}
@@ -268,35 +287,35 @@ const ControlPanel = () => {
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem 
                                     onClick={() => handleTogglePermission(user.id, "masterData")}
-                                    className={user.permissions.masterData ? "bg-green-50" : ""}
+                                    className={user.permissions && user.permissions.masterData ? "bg-green-50" : ""}
                                   >
                                     <Database className="mr-2 h-4 w-4" />
                                     <span>Master Data</span>
-                                    {user.permissions.masterData && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
+                                    {user.permissions && user.permissions.masterData && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem 
                                     onClick={() => handleTogglePermission(user.id, "dataEntry")}
-                                    className={user.permissions.dataEntry ? "bg-green-50" : ""}
+                                    className={user.permissions && user.permissions.dataEntry ? "bg-green-50" : ""}
                                   >
                                     <FileInput className="mr-2 h-4 w-4" />
                                     <span>Data Entry</span>
-                                    {user.permissions.dataEntry && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
+                                    {user.permissions && user.permissions.dataEntry && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem 
                                     onClick={() => handleTogglePermission(user.id, "reports")}
-                                    className={user.permissions.reports ? "bg-green-50" : ""}
+                                    className={user.permissions && user.permissions.reports ? "bg-green-50" : ""}
                                   >
                                     <BarChart4 className="mr-2 h-4 w-4" />
                                     <span>Reports</span>
-                                    {user.permissions.reports && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
+                                    {user.permissions && user.permissions.reports && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem 
                                     onClick={() => handleTogglePermission(user.id, "downloads")}
-                                    className={user.permissions.downloads ? "bg-green-50" : ""}
+                                    className={user.permissions && user.permissions.downloads ? "bg-green-50" : ""}
                                   >
                                     <Download className="mr-2 h-4 w-4" />
                                     <span>Downloads</span>
-                                    {user.permissions.downloads && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
+                                    {user.permissions && user.permissions.downloads && <CheckCircle className="ml-auto h-4 w-4 text-green-600" />}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
