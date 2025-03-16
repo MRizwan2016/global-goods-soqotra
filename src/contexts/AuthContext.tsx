@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 
@@ -45,6 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     if (storedUsers) {
       setUsers(JSON.parse(storedUsers));
+      console.log("Loaded users from localStorage:", JSON.parse(storedUsers)); // Debug log
     } else {
       // Initialize with admin user if no users exist
       const adminUser: User = {
@@ -60,6 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       setUsers([adminUser]);
       localStorage.setItem("users", JSON.stringify([adminUser]));
+      console.log("Initialized with admin user:", [adminUser]); // Debug log
       
       // Also store admin password separately
       localStorage.setItem("admin-password", ADMIN_PASSWORD);
@@ -158,8 +159,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     userPasswords[newUser.id] = userData.password;
     localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
 
-    // Add to users list
-    setUsers(prev => [...prev, newUser]);
+    // Add to users list and update localStorage
+    const updatedUsers = [...users, newUser];
+    setUsers(updatedUsers);
+    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    
+    console.log("User registered:", newUser); // Debug log
+    console.log("Updated users list:", updatedUsers); // Debug log
     
     toast({
       title: "Registration Successful",

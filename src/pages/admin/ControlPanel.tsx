@@ -53,7 +53,9 @@ const ControlPanel = () => {
     }
 
     // Filter out admin users for the display
+    console.log("All users:", users); // Debug: Log all users
     setNonAdminUsers(users.filter(user => !user.isAdmin));
+    console.log("Non-admin users:", users.filter(user => !user.isAdmin)); // Debug: Log filtered users
   }, [currentUser, isAdmin, navigate, users]);
 
   const formatDate = (dateString: string) => {
