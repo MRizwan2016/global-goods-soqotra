@@ -5,12 +5,12 @@ import { RouteConfig } from "./types";
 
 export const adminRoutes: RouteConfig[] = [
   {
-    path: "/admin/control-panel",
+    path: "/admin/panel",
     element: <ControlPanel />,
     private: true
   },
   {
-    path: "/admin/user-registration",
+    path: "/admin/register",
     element: <UserRegistration />,
     private: true
   }

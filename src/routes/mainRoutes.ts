@@ -1,15 +1,15 @@
 
-import Index from "@/pages/Index";
 import Dashboard from "@/pages/Dashboard";
 import DataEntry from "@/pages/DataEntry";
 import NotFound from "@/pages/NotFound";
+import Index from "@/pages/Index";
 import { RouteConfig } from "./types";
 
 export const mainRoutes: RouteConfig[] = [
   {
     path: "/",
     element: <Index />,
-    private: true
+    private: false
   },
   {
     path: "/dashboard",

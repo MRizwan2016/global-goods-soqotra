@@ -15,7 +15,7 @@ export const sellingRatesRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/selling-rates/edit/:id",
+    path: "/selling-rates/edit",
     element: <SellingRatesForm />,
     private: true
   }

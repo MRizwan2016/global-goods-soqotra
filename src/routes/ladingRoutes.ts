@@ -5,17 +5,17 @@ import { RouteConfig } from "./types";
 
 export const ladingRoutes: RouteConfig[] = [
   {
-    path: "/data-entry/bill-of-lading",
+    path: "/bill-of-lading",
     element: <BillOfLadingList />,
     private: true
   },
   {
-    path: "/data-entry/bill-of-lading/new",
+    path: "/bill-of-lading/new",
     element: <BillOfLadingForm />,
     private: true
   },
   {
-    path: "/data-entry/bill-of-lading/edit/:id",
+    path: "/bill-of-lading/edit",
     element: <BillOfLadingForm />,
     private: true
   }
