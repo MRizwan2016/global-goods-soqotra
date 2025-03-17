@@ -2,14 +2,16 @@
 import { Search } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 interface HeaderProps {
   title: string;
-  username?: string;
 }
 
-const Header = ({ title, username = "Admin User" }: HeaderProps) => {
+const Header = ({ title }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { currentUser } = useAuth();
+  const username = currentUser?.fullName || "Guest";
 
   return (
     <header className="bg-white border-b border-gray-200 shadow-sm transition-all duration-300">
