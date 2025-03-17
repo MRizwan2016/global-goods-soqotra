@@ -1,7 +1,6 @@
 
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
 import { 
   FileText, 
   Package, 
@@ -11,7 +10,8 @@ import {
   BookOpen,
   Ship,
   FilePen,
-  Printer
+  Printer,
+  CreditCard
 } from "lucide-react";
 
 const DataEntry = () => {
@@ -27,6 +27,20 @@ const DataEntry = () => {
               <div>
                 <h3 className="font-medium text-lg">Invoicing</h3>
                 <p className="text-gray-500 text-sm">Manage customer invoices</p>
+              </div>
+            </div>
+          </div>
+        </Link>
+        
+        <Link to="/data-entry/invoice-method">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-teal-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
+            <div className="flex items-center gap-4">
+              <div className="bg-teal-100 p-3 rounded-full">
+                <CreditCard className="h-6 w-6 text-teal-600" />
+              </div>
+              <div>
+                <h3 className="font-medium text-lg">Invoice Method</h3>
+                <p className="text-gray-500 text-sm">Record invoice payments</p>
               </div>
             </div>
           </div>

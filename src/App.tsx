@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,6 +33,7 @@ import AddInvoicePayment from "./pages/accounts/AddInvoicePayment";
 import ReconciliationPage from "./pages/accounts/ReconciliationPage";
 import FinancialReportsPage from "./pages/reports/FinancialReportsPage";
 import CargoReportsPage from "./pages/reports/CargoReportsPage";
+import InvoiceMethod from "./pages/invoice-method/InvoiceMethod";
 import PrivateRoute from "./components/auth/PrivateRoute";
 
 const queryClient = new QueryClient();
@@ -71,6 +71,11 @@ const App = () => (
           <Route path="/data-entry/invoicing/print/:id" element={
             <PrivateRoute requiredFile="invoicing">
               <InvoicePrint />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/invoice-method" element={
+            <PrivateRoute requiredFile="paymentReceivable">
+              <InvoiceMethod />
             </PrivateRoute>
           } />
           <Route path="/data-entry/booking-form-stock" element={
