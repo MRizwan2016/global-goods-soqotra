@@ -6,38 +6,20 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
   BarChart3,
-  BookText,
-  Building2,
   ChevronDown,
-  CircleDollarSign,
   ClipboardList,
-  FileText,
-  Home,
-  LayoutDashboard,
-  LogOut,
-  Package,
-  Receipt,
+  Building2,
   Settings,
-  Ship,
-  ShoppingCart,
-  Truck,
-  User,
-  Users,
+  LogOut,
+  LayoutDashboard,
   Wallet,
-  CreditCard,
-  Leaf,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useToast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/use-permissions";
-import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const SidebarWrapper = () => {
   const location = useLocation();
   const { currentUser, logout } = useAuth();
-  const { toast } = useToast();
   const { hasPermission, isAdmin } = usePermissions();
   const [open, setOpen] = useState(true);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
@@ -65,10 +47,6 @@ const SidebarWrapper = () => {
 
   const handleLogout = () => {
     logout();
-    toast({
-      title: "Logged out successfully",
-      description: "You have been logged out of your account.",
-    });
   };
 
   const isActive = (path: string) => {
@@ -80,17 +58,17 @@ const SidebarWrapper = () => {
   };
 
   return (
-    <div className="w-64 min-h-screen bg-white border-r border-gray-200">
+    <div className="w-64 min-h-screen bg-white border-r border-gray-200 shadow-sm">
       <div className="flex flex-col h-full">
         {/* Sidebar Header with Logo */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200 animate-fade-in">
           <div className="flex flex-col items-center">
             <img 
-              src="/soqotra-logo.png" 
+              src="/lovable-uploads/b78f92a0-94aa-4227-9b43-6cf95864ad2f.png" 
               alt="Soqotra Logo" 
-              className="h-14 mb-2"
+              className="h-14 mb-2 hover-scale"
             />
-            <div className="text-center">
+            <div className="text-center mt-2">
               <h1 className="text-lg font-bold tracking-tight text-black">SOQOTRA</h1>
               <p className="text-xs text-gray-600">LOGISTICS SERVICES AND TRADING</p>
             </div>
@@ -100,11 +78,11 @@ const SidebarWrapper = () => {
         {/* Sidebar Menu */}
         <ScrollArea className="flex-1">
           <div className="p-2">
-            <nav className="space-y-1">
+            <nav className="space-y-1 animate-fade-in">
               <Link 
                 to="/" 
                 className={cn(
-                  "flex items-center px-3 py-2 text-sm font-medium rounded-md",
+                  "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
                   isActive("/") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 )}
               >
@@ -117,7 +95,7 @@ const SidebarWrapper = () => {
                 <button
                   onClick={() => toggleSubmenu("data-entry")}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md",
+                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
                     isSubActive("/data-entry") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   )}
                 >
@@ -127,7 +105,7 @@ const SidebarWrapper = () => {
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform",
+                      "h-4 w-4 transition-transform duration-200",
                       activeSubmenu === "data-entry" ? "rotate-180" : ""
                     )}
                   />
@@ -135,7 +113,7 @@ const SidebarWrapper = () => {
                 
                 {/* Data Entry subitems */}
                 {activeSubmenu === "data-entry" && (
-                  <div className="pl-10 mt-1 space-y-1">
+                  <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
                       to="/data-entry/invoicing"
                       className={cn(
@@ -199,7 +177,7 @@ const SidebarWrapper = () => {
                 <button
                   onClick={() => toggleSubmenu("accounts")}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md",
+                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
                     isSubActive("/accounts") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   )}
                 >
@@ -209,7 +187,7 @@ const SidebarWrapper = () => {
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform",
+                      "h-4 w-4 transition-transform duration-200",
                       activeSubmenu === "accounts" ? "rotate-180" : ""
                     )}
                   />
@@ -217,7 +195,7 @@ const SidebarWrapper = () => {
                 
                 {/* Accounts subitems */}
                 {activeSubmenu === "accounts" && (
-                  <div className="pl-10 mt-1 space-y-1">
+                  <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
                       to="/accounts/payments"
                       className={cn(
@@ -245,7 +223,7 @@ const SidebarWrapper = () => {
                 <button
                   onClick={() => toggleSubmenu("reports")}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md",
+                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
                     isSubActive("/reports") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   )}
                 >
@@ -255,7 +233,7 @@ const SidebarWrapper = () => {
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform",
+                      "h-4 w-4 transition-transform duration-200",
                       activeSubmenu === "reports" ? "rotate-180" : ""
                     )}
                   />
@@ -263,7 +241,7 @@ const SidebarWrapper = () => {
                 
                 {/* Reports subitems */}
                 {activeSubmenu === "reports" && (
-                  <div className="pl-10 mt-1 space-y-1">
+                  <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
                       to="/reports/financial"
                       className={cn(
@@ -291,7 +269,7 @@ const SidebarWrapper = () => {
                 <button
                   onClick={() => toggleSubmenu("master")}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md",
+                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
                     isSubActive("/master") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   )}
                 >
@@ -301,7 +279,7 @@ const SidebarWrapper = () => {
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform",
+                      "h-4 w-4 transition-transform duration-200",
                       activeSubmenu === "master" ? "rotate-180" : ""
                     )}
                   />
@@ -309,7 +287,7 @@ const SidebarWrapper = () => {
                 
                 {/* Master Data subitems */}
                 {activeSubmenu === "master" && (
-                  <div className="pl-10 mt-1 space-y-1">
+                  <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
                       to="/master/invoice-book"
                       className={cn(
@@ -355,7 +333,7 @@ const SidebarWrapper = () => {
                 <button
                   onClick={() => toggleSubmenu("admin")}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md",
+                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
                     isSubActive("/admin") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   )}
                 >
@@ -365,7 +343,7 @@ const SidebarWrapper = () => {
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform",
+                      "h-4 w-4 transition-transform duration-200",
                       activeSubmenu === "admin" ? "rotate-180" : ""
                     )}
                   />
@@ -373,7 +351,7 @@ const SidebarWrapper = () => {
                 
                 {/* Admin subitems */}
                 {activeSubmenu === "admin" && (
-                  <div className="pl-10 mt-1 space-y-1">
+                  <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
                       to="/admin/control-panel"
                       className={cn(
@@ -402,9 +380,9 @@ const SidebarWrapper = () => {
         {/* User Info & Logout */}
         <div className="p-4 border-t border-gray-200">
           {currentUser ? (
-            <div className="flex flex-col space-y-3">
+            <div className="flex flex-col space-y-3 animate-fade-in">
               <div className="flex items-center">
-                <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-medium mr-3">
+                <div className="h-8 w-8 rounded-full bg-soqotra-green flex items-center justify-center text-white font-medium mr-3 hover-scale">
                   {currentUser.fullName ? currentUser.fullName.charAt(0) : 'U'}
                 </div>
                 <div className="flex flex-col">
@@ -414,7 +392,7 @@ const SidebarWrapper = () => {
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center text-sm text-gray-600 hover:text-gray-900"
+                className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200 hover-scale"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Log out
@@ -423,9 +401,9 @@ const SidebarWrapper = () => {
           ) : (
             <Link
               to="/admin/login"
-              className="flex items-center text-sm text-gray-600 hover:text-gray-900"
+              className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200 hover-scale"
             >
-              <User className="mr-2 h-4 w-4" />
+              <LogOut className="mr-2 h-4 w-4" />
               Log in
             </Link>
           )}
