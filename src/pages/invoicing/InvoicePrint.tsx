@@ -88,7 +88,7 @@ const InvoicePrint = () => {
             <div>NO 47/2</div>
             <div>KOTADENIYA</div>
             <div>DANOWITA, SRI LANKA</div>
-            <div>PASSPORT NO : {invoice.passport || "OL7449595"}</div>
+            <div>PASSPORT NO : {invoice.consigneeIdNumber || "OL7449595"}</div>
           </div>
         </div>
         
@@ -174,19 +174,19 @@ const InvoicePrint = () => {
               <tbody>
                 <tr>
                   <td className="border-b border-black p-1">Freight</td>
-                  <td className="border-b border-black p-1 text-right">{parseFloat(invoice.gross).toFixed(2)}</td>
+                  <td className="border-b border-black p-1 text-right">{parseFloat(String(invoice.gross)).toFixed(2)}</td>
                 </tr>
                 <tr>
                   <td className="border-b border-black p-1">Discount</td>
-                  <td className="border-b border-black p-1 text-right">({parseFloat(invoice.discount).toFixed(2)})</td>
+                  <td className="border-b border-black p-1 text-right">({parseFloat(String(invoice.discount)).toFixed(2)})</td>
                 </tr>
                 <tr>
                   <td className="border-b border-black p-1 font-bold">Total</td>
-                  <td className="border-b border-black p-1 text-right font-bold">{parseFloat(invoice.net).toFixed(2)}</td>
+                  <td className="border-b border-black p-1 text-right font-bold">{parseFloat(String(invoice.net)).toFixed(2)}</td>
                 </tr>
                 <tr>
                   <td className="border-b border-black p-1 font-bold">Total Due</td>
-                  <td className="border-b border-black p-1 text-right font-bold">{parseFloat(invoice.due || invoice.net).toFixed(2)}</td>
+                  <td className="border-b border-black p-1 text-right font-bold">{parseFloat(String(invoice.net)).toFixed(2)}</td>
                 </tr>
                 <tr>
                   <td colSpan={2} className="h-28 border-b border-black p-1">
