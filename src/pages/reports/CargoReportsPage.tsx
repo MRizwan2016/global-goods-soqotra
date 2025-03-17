@@ -15,7 +15,8 @@ import {
   ChevronRight, 
   Search, 
   Eye,
-  Filter
+  Filter,
+  Maximize2
 } from "lucide-react";
 import { mockInvoiceData } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ const CargoReportsPage = () => {
   const [warehouses, setWarehouses] = useState("ALL");
   const [zones, setZones] = useState("ALL");
   const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [isFullScreen, setIsFullScreen] = useState(false);
   
   // For invoice details dialog
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
@@ -61,6 +63,20 @@ const CargoReportsPage = () => {
   const handleViewInvoice = (invoice: any) => {
     setSelectedInvoice(invoice);
     setIsDetailsOpen(true);
+  };
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.log(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+      setIsFullScreen(true);
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+        setIsFullScreen(false);
+      }
+    }
   };
 
   const filteredData = cargoData.filter((item) => {
@@ -109,19 +125,37 @@ const CargoReportsPage = () => {
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
   const currentEntries = filteredData.slice(indexOfFirstEntry, indexOfLastEntry);
 
+  // Apply fullscreen-specific styles
+  const containerClasses = isFullScreen 
+    ? "fixed inset-0 z-50 bg-white p-4 overflow-y-auto animate-fade-in" 
+    : "bg-white rounded-lg shadow-sm border border-gray-200";
+
+  const headerClasses = isFullScreen 
+    ? "p-4 bg-[#F2FCE2] border-b border-green-100 flex justify-between items-center" 
+    : "p-4 bg-green-50 border-b border-green-100";
+
   return (
     <Layout title="Cargo Reports">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-4 bg-green-50 border-b border-green-100">
+      <div className={containerClasses}>
+        <div className={headerClasses}>
           <h3 className="text-lg font-medium text-green-800">View Invoice Record Listed</h3>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="ml-auto flex items-center gap-1 text-blue-600 hover:bg-blue-50"
+            onClick={toggleFullScreen}
+          >
+            <Maximize2 size={16} />
+            {isFullScreen ? "Exit Full Screen" : "Full Screen"}
+          </Button>
         </div>
         
-        <div className="p-4 flex flex-col gap-4">
+        <div className={`p-4 flex flex-col gap-4 ${isFullScreen ? 'animate-fade-in' : ''}`}>
           <div className="flex flex-wrap gap-2 w-full">
             <select 
               value={sector}
               onChange={(e) => setSector(e.target.value)}
-              className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+              className="bg-[#33C3F0] text-white py-2 px-3 rounded text-sm hover:bg-[#1EA5E9] transition-colors animate-fade-in"
             >
               <option value="ALL">ALL SECTORS</option>
               <option value="COLOMBO : C">COLOMBO : C</option>
@@ -131,7 +165,7 @@ const CargoReportsPage = () => {
             <select 
               value={branch}
               onChange={(e) => setBranch(e.target.value)}
-              className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+              className="bg-[#33C3F0] text-white py-2 px-3 rounded text-sm hover:bg-[#1EA5E9] transition-colors animate-fade-in"
             >
               <option value="ALL">ALL BRANCHES</option>
               <option value="MAIN">MAIN</option>
@@ -141,7 +175,7 @@ const CargoReportsPage = () => {
             <select 
               value={transport}
               onChange={(e) => setTransport(e.target.value)}
-              className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+              className="bg-[#33C3F0] text-white py-2 px-3 rounded text-sm hover:bg-[#1EA5E9] transition-colors animate-fade-in"
             >
               <option value="ALL">ALL</option>
               <option value="SEA">SEA</option>
@@ -151,7 +185,7 @@ const CargoReportsPage = () => {
             <select 
               value={warehouses}
               onChange={(e) => setWarehouses(e.target.value)}
-              className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+              className="bg-[#33C3F0] text-white py-2 px-3 rounded text-sm hover:bg-[#1EA5E9] transition-colors animate-fade-in"
             >
               <option value="ALL">ALL</option>
               <option value="Galle">Galle</option>
@@ -163,7 +197,7 @@ const CargoReportsPage = () => {
             <select 
               value={zones}
               onChange={(e) => setZones(e.target.value)}
-              className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+              className="bg-[#33C3F0] text-white py-2 px-3 rounded text-sm hover:bg-[#1EA5E9] transition-colors animate-fade-in"
             >
               <option value="ALL">ALL</option>
               <option value="Normal Rate">Normal Rate</option>
@@ -174,7 +208,7 @@ const CargoReportsPage = () => {
             <select 
               value={invoiceNumber}
               onChange={(e) => setInvoiceNumber(e.target.value)}
-              className="bg-blue-500 text-white py-2 px-3 rounded text-sm min-w-[150px]"
+              className="bg-[#33C3F0] text-white py-2 px-3 rounded text-sm hover:bg-[#1EA5E9] transition-colors animate-fade-in min-w-[150px]"
             >
               <option value="">INVOICE NUMBER</option>
               {[...new Set(mockInvoiceData.map(i => i.invoiceNumber))].map(num => (
@@ -186,7 +220,7 @@ const CargoReportsPage = () => {
               <input
                 type="text"
                 placeholder="BARCODE"
-                className="border border-gray-300 rounded px-2 py-1 text-sm"
+                className="border border-gray-300 rounded px-2 py-1 text-sm hover:border-blue-400 transition-colors focus:ring-2 focus:ring-blue-200 focus:border-blue-400"
               />
             </div>
           </div>
@@ -194,7 +228,7 @@ const CargoReportsPage = () => {
           <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500">Show</span>
-              <select className="border border-gray-300 rounded px-2 py-1 text-sm">
+              <select className="border border-gray-300 rounded px-2 py-1 text-sm hover:border-blue-400 transition-colors">
                 <option>50</option>
                 <option>100</option>
                 <option>200</option>
@@ -206,7 +240,7 @@ const CargoReportsPage = () => {
               <select
                 value={searchField}
                 onChange={(e) => setSearchField(e.target.value)}
-                className="border border-gray-300 rounded px-2 py-1 text-sm"
+                className="border border-gray-300 rounded px-2 py-1 text-sm hover:border-blue-400 transition-colors"
               >
                 <option value="all">All Fields</option>
                 <option value="invoiceNumber">Invoice Number</option>
@@ -222,17 +256,17 @@ const CargoReportsPage = () => {
                   placeholder="Search..."
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
-                  className="pl-9 pr-3 py-1 h-8 text-sm w-full"
+                  className="pl-9 pr-3 py-1 h-8 text-sm w-full focus:ring-2 focus:ring-blue-200"
                 />
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={14} />
               </div>
             </div>
           </div>
           
-          <div className="overflow-x-auto border border-gray-200">
+          <div className="overflow-x-auto border border-gray-200 shadow-sm rounded-md">
             <Table>
               <TableHeader>
-                <TableRow className="bg-blue-600 hover:bg-blue-600">
+                <TableRow className="bg-[#33C3F0] hover:bg-[#1EA5E9]">
                   <InvoiceTableHead className="w-16">Num</InvoiceTableHead>
                   <InvoiceTableHead className="w-28">INV. Num</InvoiceTableHead>
                   <InvoiceTableHead className="w-28">INV. DATE</InvoiceTableHead>
@@ -258,7 +292,7 @@ const CargoReportsPage = () => {
               <TableBody>
                 {currentEntries.length > 0 ? (
                   currentEntries.map((item, index) => (
-                    <TableRow key={item.id} className="hover:bg-gray-50">
+                    <TableRow key={item.id} className="hover:bg-[#F2FCE2] transition-colors">
                       <InvoiceTableCell className="text-center">{indexOfFirstEntry + index + 1}</InvoiceTableCell>
                       <InvoiceTableCell>{item.invoiceNumber}</InvoiceTableCell>
                       <InvoiceTableCell>{item.date}</InvoiceTableCell>
@@ -281,7 +315,7 @@ const CargoReportsPage = () => {
                       <InvoiceTableCell className="text-center">
                         <Button 
                           variant="ghost" 
-                          className="text-blue-500 p-0 h-auto hover:bg-blue-50"
+                          className="text-blue-500 p-0 h-auto hover:bg-blue-50 hover:scale-105 transition-transform"
                           onClick={() => handleViewInvoice(item)}
                         >
                           DISPLAY
@@ -308,14 +342,14 @@ const CargoReportsPage = () => {
             
             <div className="flex gap-2">
               <button
-                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
+                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-[#33C3F0] hover:text-white hover:border-[#33C3F0] transition-colors"
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
               >
                 <ChevronLeft size={14} />
               </button>
               <button
-                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
+                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-[#33C3F0] hover:text-white hover:border-[#33C3F0] transition-colors"
                 onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                 disabled={currentPage === totalPages || totalPages === 0}
               >
