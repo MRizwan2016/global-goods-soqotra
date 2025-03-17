@@ -33,6 +33,7 @@ import PaymentMethodsPage from "./pages/accounts/PaymentMethodsPage";
 import AddInvoicePayment from "./pages/accounts/AddInvoicePayment";
 import ReconciliationPage from "./pages/accounts/ReconciliationPage";
 import FinancialReportsPage from "./pages/reports/FinancialReportsPage";
+import CargoReportsPage from "./pages/reports/CargoReportsPage";
 import PrivateRoute from "./components/auth/PrivateRoute";
 
 const queryClient = new QueryClient();
@@ -154,6 +155,11 @@ const App = () => (
           <Route path="/reports/financial" element={
             <PrivateRoute requiredFile="financialReports">
               <FinancialReportsPage />
+            </PrivateRoute>
+          } />
+          <Route path="/reports/cargo" element={
+            <PrivateRoute requiredFile="cargoReports">
+              <CargoReportsPage />
             </PrivateRoute>
           } />
           
