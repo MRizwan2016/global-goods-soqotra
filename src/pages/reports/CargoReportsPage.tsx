@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -63,6 +62,11 @@ const CargoReportsPage = () => {
   const handleViewInvoice = (invoice: any) => {
     setSelectedInvoice(invoice);
     setIsDetailsOpen(true);
+  };
+
+  const handleCloseDetails = () => {
+    setIsDetailsOpen(false);
+    setSelectedInvoice(null);
   };
 
   const toggleFullScreen = () => {
@@ -360,13 +364,9 @@ const CargoReportsPage = () => {
         </div>
       </div>
 
-      {/* Invoice Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Display Invoice</DialogTitle>
-          </DialogHeader>
-          {selectedInvoice && <InvoiceDetailsView invoice={selectedInvoice} />}
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          {selectedInvoice && <InvoiceDetailsView invoice={selectedInvoice} onClose={handleCloseDetails} />}
         </DialogContent>
       </Dialog>
     </Layout>
