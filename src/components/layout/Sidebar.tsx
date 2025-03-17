@@ -50,13 +50,12 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 const SidebarWrapper = () => {
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { currentUser, logout } = useAuth();
   const { toast } = useToast();
-  const { hasPermission } = usePermissions();
+  const { hasPermission, isAdmin } = usePermissions();
   const [open, setOpen] = useState(true);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
 
-  // Determine which submenu should be open based on the current path
   useEffect(() => {
     const path = location.pathname;
     if (path.includes("/data-entry")) {
@@ -121,7 +120,6 @@ const SidebarWrapper = () => {
               </SidebarMenuButton>
             </SidebarMenuItem>
 
-            {/* DATA ENTRY SECTION */}
             <SidebarMenuItem>
               <SidebarMenuButton
                 onClick={() => toggleSubmenu("data-entry")}
@@ -226,7 +224,6 @@ const SidebarWrapper = () => {
               )}
             </SidebarMenuItem>
 
-            {/* ACCOUNTS SECTION */}
             {(hasPermission("paymentMethods") || hasPermission("reconciliation")) && (
               <SidebarMenuItem>
                 <SidebarMenuButton
@@ -281,7 +278,6 @@ const SidebarWrapper = () => {
               </SidebarMenuItem>
             )}
 
-            {/* REPORTS SECTION */}
             {(hasPermission("financialReports") || hasPermission("cargoReports")) && (
               <SidebarMenuItem>
                 <SidebarMenuButton
@@ -336,7 +332,6 @@ const SidebarWrapper = () => {
               </SidebarMenuItem>
             )}
 
-            {/* MASTER DATA SECTION */}
             {(hasPermission("invoiceBook") ||
               hasPermission("salesRep") ||
               hasPermission("town") ||
@@ -422,8 +417,7 @@ const SidebarWrapper = () => {
               </SidebarMenuItem>
             )}
 
-            {/* ADMIN SECTION */}
-            {user?.isAdmin && (
+            {isAdmin && (
               <SidebarMenuItem>
                 <SidebarMenuButton
                   onClick={() => toggleSubmenu("admin")}
@@ -474,17 +468,17 @@ const SidebarWrapper = () => {
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter className="border-t border-border/40 p-4">
-          {user ? (
+          {currentUser ? (
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarImage src="" alt={currentUser.fullName} />
+                  <AvatarFallback>{currentUser.fullName.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium">{user.name}</span>
+                  <span className="text-sm font-medium">{currentUser.fullName}</span>
                   <span className="text-xs text-muted-foreground">
-                    {user.isAdmin ? "Administrator" : "User"}
+                    {isAdmin ? "Administrator" : "User"}
                   </span>
                 </div>
               </div>
