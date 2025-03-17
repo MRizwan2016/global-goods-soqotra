@@ -1,11 +1,11 @@
 
 import React from "react";
-import PaymentMethodSelector from "./payment-details/PaymentMethodSelector";
-import PaymentStatusSelector from "./payment-details/PaymentStatusSelector";
-import DatePicker from "./payment-details/DatePicker";
-import PaymentAmounts from "./payment-details/PaymentAmounts";
-import InvoiceDetails from "./payment-details/InvoiceDetails";
-import AdditionalDetails from "./payment-details/AdditionalDetails";
+import PaymentMethodSelector from "./PaymentMethodSelector";
+import PaymentStatusSelector from "./PaymentStatusSelector";
+import DatePicker from "./DatePicker";
+import PaymentAmounts from "./PaymentAmounts";
+import InvoiceDetails from "./InvoiceDetails";
+import AdditionalDetails from "./AdditionalDetails";
 
 interface PaymentDetailsProps {
   formState: any;

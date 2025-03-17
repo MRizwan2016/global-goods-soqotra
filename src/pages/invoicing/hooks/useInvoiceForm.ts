@@ -6,7 +6,7 @@ import { countrySectorMap } from "../constants/countrySectorMap";
 import { useFormHandling } from "./useFormHandling";
 import { usePackageHandling } from "./usePackageHandling";
 import { useInvoiceSelection } from "./useInvoiceSelection";
-import { FormState, InvoiceFormReturnType } from "../types/invoiceForm";
+import { FormState, InvoiceFormReturnType, PackageItem } from "../types/invoiceForm";
 
 // Create the main hook that combines all the modules
 export const useInvoiceForm = (id?: string): InvoiceFormReturnType => {
@@ -102,7 +102,8 @@ export const useInvoiceForm = (id?: string): InvoiceFormReturnType => {
   // Initialize packageItems with existing invoice data if editing
   useState(() => {
     if (existingInvoice?.packageDetails) {
-      setPackageItems(existingInvoice.packageDetails);
+      const packageDetails = existingInvoice.packageDetails as PackageItem[];
+      setPackageItems(packageDetails);
     }
   });
   
