@@ -2,10 +2,10 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DeliveryData } from "../../types/deliveryTracking";
+import { CargoDelivery } from "../../types/deliveryTracking";
 
 interface RecentDeliveriesProps {
-  deliveries: DeliveryData[];
+  deliveries: CargoDelivery[];
 }
 
 const RecentDeliveries = ({ deliveries }: RecentDeliveriesProps) => {
