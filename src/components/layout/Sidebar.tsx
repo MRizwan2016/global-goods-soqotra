@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -387,7 +388,7 @@ const SidebarWrapper = () => {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{currentUser.fullName || 'User'}</span>
-                  <span className="text-xs text-gray-500">Administrator</span>
+                  <span className="text-xs text-gray-500">{currentUser.isAdmin ? 'Administrator' : 'User'}</span>
                 </div>
               </div>
               <button

@@ -7,7 +7,7 @@ export type { User } from "@/contexts/AuthContext";
 // Re-export AuthProvider for convenience
 export const AuthProvider = AuthContextProvider;
 
-// This is a wrapper around the context's useAuth to maintain compatibility
+// Use the direct import from the context file
 export function useAuth() {
   const context = useContext(AuthContext);
   
