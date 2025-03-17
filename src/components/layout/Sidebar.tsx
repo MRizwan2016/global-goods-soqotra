@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -94,425 +95,349 @@ const SidebarWrapper = () => {
   };
 
   return (
-    <SidebarProvider defaultOpen={true}>
-      <Sidebar>
-        <SidebarHeader className="border-b border-border/40 px-4 py-3">
-          <div className="flex flex-col items-center gap-2">
+    <div className="w-64 min-h-screen bg-white border-r border-gray-200">
+      <div className="flex flex-col h-full">
+        {/* Sidebar Header with Logo */}
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex flex-col items-center">
             <img 
               src="/soqotra-logo.png" 
               alt="Soqotra Logo" 
-              className="h-16 transition-all duration-300 hover:scale-105"
+              className="h-14 mb-2"
             />
-            <div className="flex flex-col items-center text-center">
-              <span className="text-lg font-bold tracking-tight text-black">SOQOTRA</span>
-              <span className="text-xs font-medium text-muted-foreground">LOGISTICS SERVICES AND TRADING</span>
+            <div className="text-center">
+              <h1 className="text-lg font-bold tracking-tight text-black">SOQOTRA</h1>
+              <p className="text-xs text-gray-600">LOGISTICS SERVICES AND TRADING</p>
             </div>
           </div>
-        </SidebarHeader>
-        <SidebarContent>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                isActive={isActive("/")}
-                tooltip="Dashboard"
-                className="transition-colors duration-300 hover:text-soqotra-green"
+        </div>
+        
+        {/* Sidebar Menu */}
+        <ScrollArea className="flex-1">
+          <div className="p-2">
+            <nav className="space-y-1">
+              <Link 
+                to="/" 
+                className={cn(
+                  "flex items-center px-3 py-2 text-sm font-medium rounded-md",
+                  isActive("/") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                )}
               >
-                <Link to="/">
-                  <LayoutDashboard className="mr-2" />
-                  <span>Dashboard</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                onClick={() => toggleSubmenu("data-entry")}
-                isActive={isSubActive("/data-entry")}
-                tooltip="Data Entry"
-                className="justify-between transition-colors duration-300 hover:text-soqotra-green"
-              >
-                <div className="flex items-center">
-                  <ClipboardList className="mr-2" />
-                  <span>Data Entry</span>
-                </div>
-                <ChevronDown
+                <LayoutDashboard className="mr-3 h-5 w-5" />
+                Dashboard
+              </Link>
+              
+              <div>
+                <button
+                  onClick={() => toggleSubmenu("data-entry")}
                   className={cn(
-                    "h-4 w-4 transition-transform duration-200",
-                    activeSubmenu === "data-entry" ? "rotate-180" : ""
+                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md",
+                    isSubActive("/data-entry") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   )}
-                />
-              </SidebarMenuButton>
-
-              {activeSubmenu === "data-entry" && (
-                <SidebarMenuSub>
-                  {hasPermission("invoicing") && (
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton
-                        asChild
-                        isActive={isActive("/data-entry/invoicing")}
-                      >
-                        <Link to="/data-entry/invoicing">
-                          <Receipt className="mr-2 h-4 w-4" />
-                          <span>Invoicing</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  )}
-
-                  {hasPermission("paymentReceivable") && (
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton
-                        asChild
-                        isActive={isActive("/data-entry/payment-receivable")}
-                      >
-                        <Link to="/data-entry/payment-receivable">
-                          <CreditCard className="mr-2 h-4 w-4" />
-                          <span>Payment Receivable</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  )}
-
-                  {hasPermission("invoiceBook") && (
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton
-                        asChild
-                        isActive={isActive("/data-entry/booking-form-stock")}
-                      >
-                        <Link to="/data-entry/booking-form-stock">
-                          <BookText className="mr-2 h-4 w-4" />
-                          <span>Booking Form Stock</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  )}
-
-                  {hasPermission("sellingRates") && (
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton
-                        asChild
-                        isActive={isActive("/data-entry/selling-rates")}
-                      >
-                        <Link to="/data-entry/selling-rates">
-                          <CircleDollarSign className="mr-2 h-4 w-4" />
-                          <span>Selling Rates</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  )}
-
-                  <SidebarMenuSubItem>
-                    <SidebarMenuSubButton
-                      asChild
-                      isActive={isActive("/data-entry/bill-of-lading")}
-                    >
-                      <Link to="/data-entry/bill-of-lading">
-                        <FileText className="mr-2 h-4 w-4" />
-                        <span>Bill of Lading</span>
-                      </Link>
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
-
-                  <SidebarMenuSubItem>
-                    <SidebarMenuSubButton
-                      asChild
-                      isActive={isActive("/data-entry/print-documents")}
-                    >
-                      <Link to="/data-entry/print-documents">
-                        <Truck className="mr-2 h-4 w-4" />
-                        <span>Print Documents</span>
-                      </Link>
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
-                </SidebarMenuSub>
-              )}
-            </SidebarMenuItem>
-
-            {(hasPermission("paymentMethods") || hasPermission("reconciliation")) && (
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={() => toggleSubmenu("accounts")}
-                  isActive={isSubActive("/accounts")}
-                  tooltip="Accounts"
-                  className="justify-between transition-colors duration-300 hover:text-soqotra-green"
                 >
                   <div className="flex items-center">
-                    <Wallet className="mr-2" />
-                    <span>Accounts</span>
+                    <ClipboardList className="mr-3 h-5 w-5" />
+                    Data Entry
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-4 w-4 transition-transform",
+                      activeSubmenu === "data-entry" ? "rotate-180" : ""
+                    )}
+                  />
+                </button>
+                
+                {activeSubmenu === "data-entry" && (
+                  <div className="pl-10 mt-1 space-y-1">
+                    <Link
+                      to="/data-entry/invoicing"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/data-entry/invoicing") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Invoicing
+                    </Link>
+                    <Link
+                      to="/data-entry/payment-receivable"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/data-entry/payment-receivable") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Payment Receivable
+                    </Link>
+                    <Link
+                      to="/data-entry/booking-form-stock"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/data-entry/booking-form-stock") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Booking Form Stock
+                    </Link>
+                    <Link
+                      to="/data-entry/selling-rates"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/data-entry/selling-rates") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Selling Rates
+                    </Link>
+                    <Link
+                      to="/data-entry/bill-of-lading"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/data-entry/bill-of-lading") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Bill of Lading
+                    </Link>
+                    <Link
+                      to="/data-entry/print-documents"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/data-entry/print-documents") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Print Documents
+                    </Link>
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <button
+                  onClick={() => toggleSubmenu("accounts")}
+                  className={cn(
+                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md",
+                    isSubActive("/accounts") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  )}
+                >
+                  <div className="flex items-center">
+                    <Wallet className="mr-3 h-5 w-5" />
+                    Accounts
+                  </div>
+                  <ChevronDown
+                    className={cn(
+                      "h-4 w-4 transition-transform",
                       activeSubmenu === "accounts" ? "rotate-180" : ""
                     )}
                   />
-                </SidebarMenuButton>
-
+                </button>
+                
                 {activeSubmenu === "accounts" && (
-                  <SidebarMenuSub>
-                    {hasPermission("paymentMethods") && (
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={isActive("/accounts/payments")}
-                        >
-                          <Link to="/accounts/payments">
-                            <CircleDollarSign className="mr-2 h-4 w-4" />
-                            <span>Payments</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    )}
-
-                    {hasPermission("reconciliation") && (
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={isActive("/accounts/reconciliation")}
-                        >
-                          <Link to="/accounts/reconciliation">
-                            <Receipt className="mr-2 h-4 w-4" />
-                            <span>Reconciliation</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    )}
-                  </SidebarMenuSub>
+                  <div className="pl-10 mt-1 space-y-1">
+                    <Link
+                      to="/accounts/payments"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/accounts/payments") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Payments
+                    </Link>
+                    <Link
+                      to="/accounts/reconciliation"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/accounts/reconciliation") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Reconciliation
+                    </Link>
+                  </div>
                 )}
-              </SidebarMenuItem>
-            )}
-
-            {(hasPermission("financialReports") || hasPermission("cargoReports")) && (
-              <SidebarMenuItem>
-                <SidebarMenuButton
+              </div>
+              
+              <div>
+                <button
                   onClick={() => toggleSubmenu("reports")}
-                  isActive={isSubActive("/reports")}
-                  tooltip="Reports"
-                  className="justify-between transition-colors duration-300 hover:text-soqotra-green"
+                  className={cn(
+                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md",
+                    isSubActive("/reports") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  )}
                 >
                   <div className="flex items-center">
-                    <BarChart3 className="mr-2" />
-                    <span>Reports</span>
+                    <BarChart3 className="mr-3 h-5 w-5" />
+                    Reports
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-4 w-4 transition-transform",
                       activeSubmenu === "reports" ? "rotate-180" : ""
                     )}
                   />
-                </SidebarMenuButton>
-
+                </button>
+                
                 {activeSubmenu === "reports" && (
-                  <SidebarMenuSub>
-                    {hasPermission("financialReports") && (
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={isActive("/reports/financial")}
-                        >
-                          <Link to="/reports/financial">
-                            <CircleDollarSign className="mr-2 h-4 w-4" />
-                            <span>Financial Reports</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    )}
-
-                    {hasPermission("cargoReports") && (
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={isActive("/reports/cargo")}
-                        >
-                          <Link to="/reports/cargo">
-                            <Package className="mr-2 h-4 w-4" />
-                            <span>Cargo Reports</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    )}
-                  </SidebarMenuSub>
+                  <div className="pl-10 mt-1 space-y-1">
+                    <Link
+                      to="/reports/financial"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/reports/financial") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Financial Reports
+                    </Link>
+                    <Link
+                      to="/reports/cargo"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/reports/cargo") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Cargo Reports
+                    </Link>
+                  </div>
                 )}
-              </SidebarMenuItem>
-            )}
-
-            {(hasPermission("invoiceBook") ||
-              hasPermission("salesRep") ||
-              hasPermission("town") ||
-              hasPermission("packageOptions")) && (
-              <SidebarMenuItem>
-                <SidebarMenuButton
+              </div>
+              
+              <div>
+                <button
                   onClick={() => toggleSubmenu("master")}
-                  isActive={isSubActive("/master")}
-                  tooltip="Master Data"
-                  className="justify-between transition-colors duration-300 hover:text-soqotra-green"
+                  className={cn(
+                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md",
+                    isSubActive("/master") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  )}
                 >
                   <div className="flex items-center">
-                    <Building2 className="mr-2" />
-                    <span>Master Data</span>
+                    <Building2 className="mr-3 h-5 w-5" />
+                    Master Data
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-4 w-4 transition-transform",
                       activeSubmenu === "master" ? "rotate-180" : ""
                     )}
                   />
-                </SidebarMenuButton>
-
+                </button>
+                
                 {activeSubmenu === "master" && (
-                  <SidebarMenuSub>
-                    {hasPermission("invoiceBook") && (
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={isActive("/master/invoice-book")}
-                        >
-                          <Link to="/master/invoice-book">
-                            <BookText className="mr-2 h-4 w-4" />
-                            <span>Invoice Book</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    )}
-
-                    {hasPermission("salesRep") && (
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={isActive("/master/sales-rep")}
-                        >
-                          <Link to="/master/sales-rep">
-                            <Users className="mr-2 h-4 w-4" />
-                            <span>Sales Rep</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    )}
-
-                    {hasPermission("town") && (
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={isActive("/master/town")}
-                        >
-                          <Link to="/master/town">
-                            <Home className="mr-2 h-4 w-4" />
-                            <span>Town</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    )}
-
-                    {hasPermission("packageOptions") && (
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={isActive("/master/package-options")}
-                        >
-                          <Link to="/master/package-options">
-                            <Package className="mr-2 h-4 w-4" />
-                            <span>Package Options</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    )}
-                  </SidebarMenuSub>
+                  <div className="pl-10 mt-1 space-y-1">
+                    {/* Master Data subitems */}
+                    <Link
+                      to="/master/invoice-book"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/master/invoice-book") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Invoice Book
+                    </Link>
+                    <Link
+                      to="/master/sales-rep"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/master/sales-rep") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Sales Rep
+                    </Link>
+                    <Link
+                      to="/master/town"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/master/town") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Town
+                    </Link>
+                    <Link
+                      to="/master/package-options"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/master/package-options") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Package Options
+                    </Link>
+                  </div>
                 )}
-              </SidebarMenuItem>
-            )}
-
-            {isAdmin && (
-              <SidebarMenuItem>
-                <SidebarMenuButton
+              </div>
+              
+              <div>
+                <button
                   onClick={() => toggleSubmenu("admin")}
-                  isActive={isSubActive("/admin")}
-                  tooltip="Admin"
-                  className="justify-between transition-colors duration-300 hover:text-soqotra-green"
+                  className={cn(
+                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md",
+                    isSubActive("/admin") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  )}
                 >
                   <div className="flex items-center">
-                    <Settings className="mr-2" />
-                    <span>Admin</span>
+                    <Settings className="mr-3 h-5 w-5" />
+                    Admin
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-4 w-4 transition-transform",
                       activeSubmenu === "admin" ? "rotate-180" : ""
                     )}
                   />
-                </SidebarMenuButton>
-
+                </button>
+                
                 {activeSubmenu === "admin" && (
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton
-                        asChild
-                        isActive={isActive("/admin/control-panel")}
-                      >
-                        <Link to="/admin/control-panel">
-                          <Settings className="mr-2 h-4 w-4" />
-                          <span>Control Panel</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton
-                        asChild
-                        isActive={isActive("/admin/register")}
-                      >
-                        <Link to="/admin/register">
-                          <User className="mr-2 h-4 w-4" />
-                          <span>Register User</span>
-                        </Link>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
+                  <div className="pl-10 mt-1 space-y-1">
+                    <Link
+                      to="/admin/control-panel"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/admin/control-panel") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Control Panel
+                    </Link>
+                    <Link
+                      to="/admin/register"
+                      className={cn(
+                        "block px-3 py-2 text-sm rounded-md",
+                        isActive("/admin/register") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      )}
+                    >
+                      Register User
+                    </Link>
+                  </div>
                 )}
-              </SidebarMenuItem>
-            )}
-          </SidebarMenu>
-        </SidebarContent>
-        <SidebarFooter className="border-t border-border/40 p-4">
+              </div>
+            </nav>
+          </div>
+        </ScrollArea>
+        
+        {/* User Info & Logout */}
+        <div className="p-4 border-t border-gray-200">
           {currentUser ? (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8 ring-2 ring-soqotra-green/30 transition-all duration-300 hover:ring-soqotra-green">
-                  <AvatarImage src="" alt={currentUser.fullName} />
-                  <AvatarFallback>{currentUser.fullName.charAt(0)}</AvatarFallback>
-                </Avatar>
+            <div className="flex flex-col space-y-3">
+              <div className="flex items-center">
+                <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center text-gray-700 font-medium mr-3">
+                  {currentUser.fullName ? currentUser.fullName.charAt(0) : 'U'}
+                </div>
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium">{currentUser.fullName}</span>
-                  <span className="text-xs text-muted-foreground">
-                    {isAdmin ? "Administrator" : "User"}
-                  </span>
+                  <span className="text-sm font-medium">{currentUser.fullName || 'User'}</span>
+                  <span className="text-xs text-gray-500">Administrator</span>
                 </div>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                className="w-full justify-start transition-colors duration-300 hover:bg-soqotra-green hover:text-white"
+              <button
                 onClick={handleLogout}
+                className="flex items-center text-sm text-gray-600 hover:text-gray-900"
               >
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-              </Button>
+                Log out
+              </button>
             </div>
           ) : (
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full justify-start transition-colors duration-300 hover:bg-soqotra-green hover:text-white"
-              asChild
+            <Link
+              to="/admin/login"
+              className="flex items-center text-sm text-gray-600 hover:text-gray-900"
             >
-              <Link to="/admin/login">
-                <User className="mr-2 h-4 w-4" />
-                <span>Log in</span>
-              </Link>
-            </Button>
+              <User className="mr-2 h-4 w-4" />
+              Log in
+            </Link>
           )}
-        </SidebarFooter>
-      </Sidebar>
-    </SidebarProvider>
+        </div>
+      </div>
+    </div>
   );
 };
 

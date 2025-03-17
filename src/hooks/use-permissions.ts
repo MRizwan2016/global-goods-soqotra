@@ -1,18 +1,28 @@
 
 import { useAuth } from "./use-auth";
-import type { User } from "@/contexts/AuthContext";
 
 export function usePermissions() {
-  const { currentUser, isAdmin, hasFilePermission } = useAuth();
-
-  const hasPermission = (fileKey: keyof User['permissions']['files']) => {
+  const { currentUser } = useAuth();
+  
+  const isAdmin = currentUser?.isAdmin || false;
+  
+  const hasPermission = (permission: string) => {
     if (!currentUser) return false;
-    if (isAdmin) return true;
-    return hasFilePermission(currentUser, fileKey);
+    
+    if (currentUser.isAdmin) return true;
+    
+    if (!currentUser.permissions?.files) return false;
+    
+    return (currentUser.permissions.files as any)[permission] === true;
   };
-
+  
+  const hasFilePermission = (filePermission: string) => {
+    return hasPermission(filePermission);
+  };
+  
   return {
-    hasPermission,
     isAdmin,
+    hasPermission,
+    hasFilePermission
   };
 }
