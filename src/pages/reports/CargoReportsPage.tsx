@@ -14,14 +14,23 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Search, 
-  Eye
+  Eye,
+  Filter
 } from "lucide-react";
 import { mockInvoiceData } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
-import { Pagination, PaginationContent, PaginationItem, PaginationLink } from "@/components/ui/pagination";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { InvoiceDetailsView } from "@/components/reports/InvoiceDetailsView";
 
 const CargoReportsPage = () => {
   const [searchText, setSearchText] = useState("");
+  const [searchField, setSearchField] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const entriesPerPage = 50;
   const [branch, setBranch] = useState("ALL");
@@ -30,6 +39,10 @@ const CargoReportsPage = () => {
   const [warehouses, setWarehouses] = useState("ALL");
   const [zones, setZones] = useState("ALL");
   const [invoiceNumber, setInvoiceNumber] = useState("");
+  
+  // For invoice details dialog
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   // Mock data transformed for cargo reports with transport property added
   const cargoData = mockInvoiceData.map(item => ({
@@ -39,16 +52,57 @@ const CargoReportsPage = () => {
     entryBy: `alihq#${item.date.split('/').join('')}`,
     payStatus: ["Un-Settle", "Settled", "Partial"][Math.floor(Math.random() * 3)],
     due: item.paid ? 0 : item.net,
-    transport: ["SEA", "AIR"][Math.floor(Math.random() * 2)] // Added transport property
+    transport: ["SEA", "AIR"][Math.floor(Math.random() * 2)], // Added transport property
+    shipperMobile: `${Math.floor(10000000 + Math.random() * 90000000)}`,
+    consigneeMobile: `${Math.floor(10000000 + Math.random() * 90000000)}`,
+    passport: `N${Math.floor(1000000 + Math.random() * 9000000)}`
   }));
 
-  const filteredData = cargoData.filter(
-    (item) =>
-      (searchText === "" || 
-        item.id.toLowerCase().includes(searchText.toLowerCase()) || 
-        item.invoiceNumber.toLowerCase().includes(searchText.toLowerCase()) || 
-        item.customer.toLowerCase().includes(searchText.toLowerCase()))
-  );
+  const handleViewInvoice = (invoice: any) => {
+    setSelectedInvoice(invoice);
+    setIsDetailsOpen(true);
+  };
+
+  const filteredData = cargoData.filter((item) => {
+    // First apply dropdown filters
+    if (branch !== "ALL" && item.branch !== branch) return false;
+    if (sector !== "ALL" && item.sector !== sector) return false;
+    if (transport !== "ALL" && item.transport !== transport) return false;
+    if (warehouses !== "ALL" && item.warehouse !== warehouses) return false;
+    if (zones !== "ALL" && item.zone !== zones) return false;
+    if (invoiceNumber && item.invoiceNumber !== invoiceNumber) return false;
+
+    // If no search text, return all items that passed the filters
+    if (searchText === "") return true;
+
+    const searchLower = searchText.toLowerCase();
+
+    // Then apply text search based on selected field
+    switch (searchField) {
+      case "invoiceNumber":
+        return item.invoiceNumber.toLowerCase().includes(searchLower);
+      case "shipperName":
+        return item.shipper1?.toLowerCase().includes(searchLower);
+      case "shipperMobile":
+        return item.shipperMobile?.toLowerCase().includes(searchLower);
+      case "consigneeName":
+        return item.consignee1?.toLowerCase().includes(searchLower);
+      case "consigneeMobile":
+        return item.consigneeMobile?.toLowerCase().includes(searchLower);
+      case "all":
+      default:
+        return (
+          item.id.toLowerCase().includes(searchLower) ||
+          item.invoiceNumber.toLowerCase().includes(searchLower) ||
+          item.customer.toLowerCase().includes(searchLower) ||
+          item.shipper1?.toLowerCase().includes(searchLower) ||
+          item.shipperMobile?.toLowerCase().includes(searchLower) ||
+          item.consignee1?.toLowerCase().includes(searchLower) ||
+          item.consigneeMobile?.toLowerCase().includes(searchLower) ||
+          item.passport?.toLowerCase().includes(searchLower)
+        );
+    }
+  });
 
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
   const indexOfLastEntry = currentPage * entriesPerPage;
@@ -137,7 +191,7 @@ const CargoReportsPage = () => {
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-500">Show</span>
               <select className="border border-gray-300 rounded px-2 py-1 text-sm">
@@ -148,15 +202,30 @@ const CargoReportsPage = () => {
               <span className="text-sm text-gray-500">entries</span>
             </div>
             
-            <div className="relative ml-auto">
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchText}
-                onChange={(e) => setSearchText(e.target.value)}
-                className="pl-9 pr-3 py-1 border border-gray-300 rounded text-sm"
-              />
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={14} />
+            <div className="flex grow items-center gap-2 ml-auto">
+              <select
+                value={searchField}
+                onChange={(e) => setSearchField(e.target.value)}
+                className="border border-gray-300 rounded px-2 py-1 text-sm"
+              >
+                <option value="all">All Fields</option>
+                <option value="invoiceNumber">Invoice Number</option>
+                <option value="shipperName">Shipper Name</option>
+                <option value="shipperMobile">Shipper Mobile</option>
+                <option value="consigneeName">Consignee Name</option>
+                <option value="consigneeMobile">Consignee Mobile</option>
+              </select>
+              
+              <div className="relative grow">
+                <Input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  className="pl-9 pr-3 py-1 h-8 text-sm w-full"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={14} />
+              </div>
             </div>
           </div>
           
@@ -168,6 +237,8 @@ const CargoReportsPage = () => {
                   <InvoiceTableHead className="w-28">INV. Num</InvoiceTableHead>
                   <InvoiceTableHead className="w-28">INV. DATE</InvoiceTableHead>
                   <InvoiceTableHead>CUSTOMER</InvoiceTableHead>
+                  <InvoiceTableHead>SHIPPER</InvoiceTableHead>
+                  <InvoiceTableHead>CONSIGNEE</InvoiceTableHead>
                   <InvoiceTableHead className="w-16">SEA/AIR</InvoiceTableHead>
                   <InvoiceTableHead>ZONE</InvoiceTableHead>
                   <InvoiceTableHead>WAREHOUSE</InvoiceTableHead>
@@ -192,7 +263,9 @@ const CargoReportsPage = () => {
                       <InvoiceTableCell>{item.invoiceNumber}</InvoiceTableCell>
                       <InvoiceTableCell>{item.date}</InvoiceTableCell>
                       <InvoiceTableCell>{item.customer}</InvoiceTableCell>
-                      <InvoiceTableCell className="text-center">{item.transport || "S"}</InvoiceTableCell>
+                      <InvoiceTableCell>{item.shipper1}</InvoiceTableCell>
+                      <InvoiceTableCell>{item.consignee1}</InvoiceTableCell>
+                      <InvoiceTableCell className="text-center">{item.transport}</InvoiceTableCell>
                       <InvoiceTableCell>{item.zone}</InvoiceTableCell>
                       <InvoiceTableCell>{item.warehouse}</InvoiceTableCell>
                       <InvoiceTableCell className="text-right">{item.volume}</InvoiceTableCell>
@@ -206,7 +279,11 @@ const CargoReportsPage = () => {
                       <InvoiceTableCell>{item.entryBy}</InvoiceTableCell>
                       <InvoiceTableCell>{item.payStatus}</InvoiceTableCell>
                       <InvoiceTableCell className="text-center">
-                        <Button variant="link" className="text-blue-500 p-0 h-auto">
+                        <Button 
+                          variant="ghost" 
+                          className="text-blue-500 p-0 h-auto hover:bg-blue-50"
+                          onClick={() => handleViewInvoice(item)}
+                        >
                           DISPLAY
                         </Button>
                       </InvoiceTableCell>
@@ -214,7 +291,7 @@ const CargoReportsPage = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <InvoiceTableCell colSpan={18} className="text-center py-4">
+                    <InvoiceTableCell colSpan={20} className="text-center py-4">
                       No data available in table
                     </InvoiceTableCell>
                   </TableRow>
@@ -248,6 +325,16 @@ const CargoReportsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Invoice Details Dialog */}
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Display Invoice</DialogTitle>
+          </DialogHeader>
+          {selectedInvoice && <InvoiceDetailsView invoice={selectedInvoice} />}
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
