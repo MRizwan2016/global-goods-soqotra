@@ -382,7 +382,7 @@ const DeliveryDetails = () => {
                       </div>
                       <div className="mt-2">
                         {delivery.paymentStatus !== 'completed' ? (
-                          <Link to={`/accounts/payments/${delivery.invoiceId}`}>
+                          <Link to={`/accounts/add-payment/${delivery.invoiceId}`}>
                             <Button size="sm" variant="outline" className="h-7 text-xs">View Payment Details</Button>
                           </Link>
                         ) : (
