@@ -59,10 +59,10 @@ const SidebarWrapper = () => {
   };
 
   return (
-    <div className="w-64 min-h-screen bg-white border-r border-gray-200 shadow-sm">
+    <div className="w-64 min-h-screen bg-sky-50 border-r border-sky-100 shadow-sm">
       <div className="flex flex-col h-full">
         {/* Sidebar Header with Logo */}
-        <div className="p-4 border-b border-gray-200 animate-fade-in">
+        <div className="p-4 border-b border-sky-200 animate-fade-in">
           <div className="flex flex-col items-center">
             <img 
               src="/lovable-uploads/056bd63a-3806-4e08-9360-0e3edff62199.png" 
@@ -83,12 +83,14 @@ const SidebarWrapper = () => {
               <Link 
                 to="/" 
                 className={cn(
-                  "flex items-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
-                  isActive("/") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  "flex items-center px-3 py-2.5 text-sm font-bold rounded-md transition-all duration-300 hover:scale-105 transform",
+                  isActive("/") 
+                    ? "bg-gradient-to-r from-green-200 to-green-100 text-green-800 shadow-sm" 
+                    : "text-gray-700 hover:bg-green-50 hover:text-green-700"
                 )}
               >
-                <LayoutDashboard className="mr-3 h-5 w-5" />
-                Dashboard
+                <LayoutDashboard className={cn("mr-3 h-5 w-5 animate-pulse", isActive("/") ? "text-green-700" : "text-gray-500")} />
+                <span className="uppercase tracking-wide">Dashboard</span>
               </Link>
               
               {/* Data Entry submenu */}
@@ -96,17 +98,19 @@ const SidebarWrapper = () => {
                 <button
                   onClick={() => toggleSubmenu("data-entry")}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
-                    isSubActive("/data-entry") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    "w-full flex items-center justify-between px-3 py-2.5 text-sm font-bold rounded-md transition-all duration-300 hover:scale-105 transform",
+                    isSubActive("/data-entry") 
+                      ? "bg-gradient-to-r from-blue-200 to-sky-100 text-blue-800 shadow-sm" 
+                      : "text-gray-700 hover:bg-sky-50 hover:text-blue-700"
                   )}
                 >
                   <div className="flex items-center">
-                    <ClipboardList className="mr-3 h-5 w-5" />
-                    Data Entry
+                    <ClipboardList className={cn("mr-3 h-5 w-5", isSubActive("/data-entry") ? "text-blue-700" : "text-gray-500")} />
+                    <span className="uppercase tracking-wide">Data Entry</span>
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-4 w-4 transition-transform duration-500",
                       activeSubmenu === "data-entry" ? "rotate-180" : ""
                     )}
                   />
@@ -178,17 +182,19 @@ const SidebarWrapper = () => {
                 <button
                   onClick={() => toggleSubmenu("accounts")}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
-                    isSubActive("/accounts") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    "w-full flex items-center justify-between px-3 py-2.5 text-sm font-bold rounded-md transition-all duration-300 hover:scale-105 transform",
+                    isSubActive("/accounts") 
+                      ? "bg-gradient-to-r from-purple-200 to-purple-100 text-purple-800 shadow-sm" 
+                      : "text-gray-700 hover:bg-purple-50 hover:text-purple-700"
                   )}
                 >
                   <div className="flex items-center">
-                    <Wallet className="mr-3 h-5 w-5" />
-                    Accounts
+                    <Wallet className={cn("mr-3 h-5 w-5", isSubActive("/accounts") ? "text-purple-700" : "text-gray-500")} />
+                    <span className="uppercase tracking-wide">Accounts</span>
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-4 w-4 transition-transform duration-500",
                       activeSubmenu === "accounts" ? "rotate-180" : ""
                     )}
                   />
@@ -224,17 +230,19 @@ const SidebarWrapper = () => {
                 <button
                   onClick={() => toggleSubmenu("reports")}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
-                    isSubActive("/reports") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    "w-full flex items-center justify-between px-3 py-2.5 text-sm font-bold rounded-md transition-all duration-300 hover:scale-105 transform",
+                    isSubActive("/reports") 
+                      ? "bg-gradient-to-r from-amber-200 to-amber-100 text-amber-800 shadow-sm" 
+                      : "text-gray-700 hover:bg-amber-50 hover:text-amber-700"
                   )}
                 >
                   <div className="flex items-center">
-                    <BarChart3 className="mr-3 h-5 w-5" />
-                    Reports
+                    <BarChart3 className={cn("mr-3 h-5 w-5", isSubActive("/reports") ? "text-amber-700" : "text-gray-500")} />
+                    <span className="uppercase tracking-wide">Reports</span>
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-4 w-4 transition-transform duration-500",
                       activeSubmenu === "reports" ? "rotate-180" : ""
                     )}
                   />
@@ -270,17 +278,19 @@ const SidebarWrapper = () => {
                 <button
                   onClick={() => toggleSubmenu("master")}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
-                    isSubActive("/master") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    "w-full flex items-center justify-between px-3 py-2.5 text-sm font-bold rounded-md transition-all duration-300 hover:scale-105 transform",
+                    isSubActive("/master") 
+                      ? "bg-gradient-to-r from-teal-200 to-teal-100 text-teal-800 shadow-sm" 
+                      : "text-gray-700 hover:bg-teal-50 hover:text-teal-700"
                   )}
                 >
                   <div className="flex items-center">
-                    <Building2 className="mr-3 h-5 w-5" />
-                    Master Data
+                    <Building2 className={cn("mr-3 h-5 w-5", isSubActive("/master") ? "text-teal-700" : "text-gray-500")} />
+                    <span className="uppercase tracking-wide">Master Data</span>
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-4 w-4 transition-transform duration-500",
                       activeSubmenu === "master" ? "rotate-180" : ""
                     )}
                   />
@@ -334,17 +344,19 @@ const SidebarWrapper = () => {
                 <button
                   onClick={() => toggleSubmenu("admin")}
                   className={cn(
-                    "w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-200 hover-scale",
-                    isSubActive("/admin") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    "w-full flex items-center justify-between px-3 py-2.5 text-sm font-bold rounded-md transition-all duration-300 hover:scale-105 transform",
+                    isSubActive("/admin") 
+                      ? "bg-gradient-to-r from-rose-200 to-rose-100 text-rose-800 shadow-sm" 
+                      : "text-gray-700 hover:bg-rose-50 hover:text-rose-700"
                   )}
                 >
                   <div className="flex items-center">
-                    <Settings className="mr-3 h-5 w-5" />
-                    Admin
+                    <Settings className={cn("mr-3 h-5 w-5", isSubActive("/admin") ? "text-rose-700" : "text-gray-500")} />
+                    <span className="uppercase tracking-wide">Admin</span>
                   </div>
                   <ChevronDown
                     className={cn(
-                      "h-4 w-4 transition-transform duration-200",
+                      "h-4 w-4 transition-transform duration-500",
                       activeSubmenu === "admin" ? "rotate-180" : ""
                     )}
                   />
@@ -379,11 +391,11 @@ const SidebarWrapper = () => {
         </ScrollArea>
         
         {/* User Info & Logout */}
-        <div className="p-4 border-t border-gray-200">
+        <div className="p-4 border-t border-sky-200 bg-gradient-to-r from-sky-50 to-green-50">
           {currentUser ? (
             <div className="flex flex-col space-y-3 animate-fade-in">
               <div className="flex items-center">
-                <div className="h-8 w-8 rounded-full bg-soqotra-green flex items-center justify-center text-white font-medium mr-3 hover-scale">
+                <div className="h-8 w-8 rounded-full bg-soqotra-green flex items-center justify-center text-white font-medium mr-3 hover-scale shadow-sm">
                   {currentUser.fullName ? currentUser.fullName.charAt(0) : 'U'}
                 </div>
                 <div className="flex flex-col">
@@ -393,18 +405,18 @@ const SidebarWrapper = () => {
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200 hover-scale"
+                className="flex items-center text-sm text-gray-600 hover:text-rose-600 transition-colors duration-300 hover-scale group"
               >
-                <LogOut className="mr-2 h-4 w-4" />
+                <LogOut className="mr-2 h-4 w-4 group-hover:rotate-[-15deg] transition-transform duration-300" />
                 Log out
               </button>
             </div>
           ) : (
             <Link
               to="/admin/login"
-              className="flex items-center text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200 hover-scale"
+              className="flex items-center text-sm text-gray-600 hover:text-green-600 transition-colors duration-300 hover-scale group"
             >
-              <LogOut className="mr-2 h-4 w-4" />
+              <LogOut className="mr-2 h-4 w-4 group-hover:rotate-[-15deg] transition-transform duration-300" />
               Log in
             </Link>
           )}
