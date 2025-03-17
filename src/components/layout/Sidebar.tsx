@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -41,6 +40,7 @@ import {
   Users,
   Wallet,
   CreditCard,
+  Leaf,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -98,11 +98,15 @@ const SidebarWrapper = () => {
     <SidebarProvider defaultOpen={true}>
       <Sidebar>
         <SidebarHeader className="border-b border-border/40 px-4 py-3">
-          <div className="flex items-center gap-2">
-            <Ship className="h-6 w-6 text-primary" />
-            <div className="flex flex-col">
-              <span className="text-lg font-bold tracking-tight">GY Shipping</span>
-              <span className="text-xs text-muted-foreground">Cargo Management</span>
+          <div className="flex flex-col items-center gap-2">
+            <img 
+              src="/soqotra-logo.png" 
+              alt="Soqotra Logo" 
+              className="h-16 transition-all duration-300 hover:scale-105"
+            />
+            <div className="flex flex-col items-center text-center">
+              <span className="text-lg font-bold tracking-tight text-black">SOQOTRA</span>
+              <span className="text-xs font-medium text-muted-foreground">LOGISTICS SERVICES AND TRADING</span>
             </div>
           </div>
         </SidebarHeader>
@@ -113,6 +117,7 @@ const SidebarWrapper = () => {
                 asChild
                 isActive={isActive("/")}
                 tooltip="Dashboard"
+                className="transition-colors duration-300 hover:text-soqotra-green"
               >
                 <Link to="/">
                   <LayoutDashboard className="mr-2" />
@@ -126,7 +131,7 @@ const SidebarWrapper = () => {
                 onClick={() => toggleSubmenu("data-entry")}
                 isActive={isSubActive("/data-entry")}
                 tooltip="Data Entry"
-                className="justify-between"
+                className="justify-between transition-colors duration-300 hover:text-soqotra-green"
               >
                 <div className="flex items-center">
                   <ClipboardList className="mr-2" />
@@ -231,7 +236,7 @@ const SidebarWrapper = () => {
                   onClick={() => toggleSubmenu("accounts")}
                   isActive={isSubActive("/accounts")}
                   tooltip="Accounts"
-                  className="justify-between"
+                  className="justify-between transition-colors duration-300 hover:text-soqotra-green"
                 >
                   <div className="flex items-center">
                     <Wallet className="mr-2" />
@@ -285,7 +290,7 @@ const SidebarWrapper = () => {
                   onClick={() => toggleSubmenu("reports")}
                   isActive={isSubActive("/reports")}
                   tooltip="Reports"
-                  className="justify-between"
+                  className="justify-between transition-colors duration-300 hover:text-soqotra-green"
                 >
                   <div className="flex items-center">
                     <BarChart3 className="mr-2" />
@@ -342,7 +347,7 @@ const SidebarWrapper = () => {
                   onClick={() => toggleSubmenu("master")}
                   isActive={isSubActive("/master")}
                   tooltip="Master Data"
-                  className="justify-between"
+                  className="justify-between transition-colors duration-300 hover:text-soqotra-green"
                 >
                   <div className="flex items-center">
                     <Building2 className="mr-2" />
@@ -424,7 +429,7 @@ const SidebarWrapper = () => {
                   onClick={() => toggleSubmenu("admin")}
                   isActive={isSubActive("/admin")}
                   tooltip="Admin"
-                  className="justify-between"
+                  className="justify-between transition-colors duration-300 hover:text-soqotra-green"
                 >
                   <div className="flex items-center">
                     <Settings className="mr-2" />
@@ -472,7 +477,7 @@ const SidebarWrapper = () => {
           {currentUser ? (
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-8 w-8 ring-2 ring-soqotra-green/30 transition-all duration-300 hover:ring-soqotra-green">
                   <AvatarImage src="" alt={currentUser.fullName} />
                   <AvatarFallback>{currentUser.fullName.charAt(0)}</AvatarFallback>
                 </Avatar>
@@ -486,7 +491,7 @@ const SidebarWrapper = () => {
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full justify-start"
+                className="w-full justify-start transition-colors duration-300 hover:bg-soqotra-green hover:text-white"
                 onClick={handleLogout}
               >
                 <LogOut className="mr-2 h-4 w-4" />
@@ -497,7 +502,7 @@ const SidebarWrapper = () => {
             <Button
               variant="outline"
               size="sm"
-              className="w-full justify-start"
+              className="w-full justify-start transition-colors duration-300 hover:bg-soqotra-green hover:text-white"
               asChild
             >
               <Link to="/admin/login">

@@ -64,10 +64,11 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				soqotra: {
-					blue: '#0a2463',
-					green: '#41A949',
-					lightBlue: '#3e92cc',
-					gray: '#f1f1f1'
+					DEFAULT: '#000000',
+					green: '#41A949',  // The green color from the logo
+					light: '#f1f1f1',
+					gray: '#f1f1f1',
+					dark: '#222222'
 				}
 			},
 			borderRadius: {
@@ -91,11 +92,25 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					from: {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					to: {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.5s ease-out'
+			},
+			fontFamily: {
+				sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
 			}
 		}
 	},
