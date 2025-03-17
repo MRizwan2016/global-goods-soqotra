@@ -22,7 +22,8 @@ import {
   Users, 
   DollarSign,
   Map,
-  CircleAlert
+  CircleAlert,
+  CheckCircle
 } from "lucide-react";
 import { mockDeliveries } from "./data/mockDeliveryData";
 import DestinationCard from "@/components/dashboard/DestinationCard";
