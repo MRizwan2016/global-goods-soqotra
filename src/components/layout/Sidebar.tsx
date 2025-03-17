@@ -1,24 +1,9 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar";
 import {
   BarChart3,
   BookText,
@@ -127,6 +112,7 @@ const SidebarWrapper = () => {
                 Dashboard
               </Link>
               
+              {/* Data Entry submenu */}
               <div>
                 <button
                   onClick={() => toggleSubmenu("data-entry")}
@@ -147,6 +133,7 @@ const SidebarWrapper = () => {
                   />
                 </button>
                 
+                {/* Data Entry subitems */}
                 {activeSubmenu === "data-entry" && (
                   <div className="pl-10 mt-1 space-y-1">
                     <Link
@@ -207,6 +194,7 @@ const SidebarWrapper = () => {
                 )}
               </div>
               
+              {/* Accounts submenu */}
               <div>
                 <button
                   onClick={() => toggleSubmenu("accounts")}
@@ -227,6 +215,7 @@ const SidebarWrapper = () => {
                   />
                 </button>
                 
+                {/* Accounts subitems */}
                 {activeSubmenu === "accounts" && (
                   <div className="pl-10 mt-1 space-y-1">
                     <Link
@@ -251,6 +240,7 @@ const SidebarWrapper = () => {
                 )}
               </div>
               
+              {/* Reports submenu */}
               <div>
                 <button
                   onClick={() => toggleSubmenu("reports")}
@@ -271,6 +261,7 @@ const SidebarWrapper = () => {
                   />
                 </button>
                 
+                {/* Reports subitems */}
                 {activeSubmenu === "reports" && (
                   <div className="pl-10 mt-1 space-y-1">
                     <Link
@@ -295,6 +286,7 @@ const SidebarWrapper = () => {
                 )}
               </div>
               
+              {/* Master Data submenu */}
               <div>
                 <button
                   onClick={() => toggleSubmenu("master")}
@@ -315,9 +307,9 @@ const SidebarWrapper = () => {
                   />
                 </button>
                 
+                {/* Master Data subitems */}
                 {activeSubmenu === "master" && (
                   <div className="pl-10 mt-1 space-y-1">
-                    {/* Master Data subitems */}
                     <Link
                       to="/master/invoice-book"
                       className={cn(
@@ -358,6 +350,7 @@ const SidebarWrapper = () => {
                 )}
               </div>
               
+              {/* Admin submenu */}
               <div>
                 <button
                   onClick={() => toggleSubmenu("admin")}
@@ -378,6 +371,7 @@ const SidebarWrapper = () => {
                   />
                 </button>
                 
+                {/* Admin subitems */}
                 {activeSubmenu === "admin" && (
                   <div className="pl-10 mt-1 space-y-1">
                     <Link
