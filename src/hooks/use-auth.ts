@@ -1,11 +1,10 @@
 
-import { useContext } from "react";
-import { AuthProvider, useAuth as useAuthInternal } from "@/contexts/AuthContext";
+import { useAuth as useAuthInternal, AuthProvider as AuthProviderContext } from "@/contexts/AuthContext";
 
 export type { User } from "@/contexts/AuthContext";
 
 // Re-export AuthProvider for convenience
-export const AuthProvider = AuthProvider;
+export const AuthProvider = AuthProviderContext;
 
 // Export the hook directly from the context file
 export function useAuth() {
