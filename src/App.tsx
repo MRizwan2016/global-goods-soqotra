@@ -47,48 +47,184 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           
           {/* Data Entry Routes */}
-          <Route path="/data-entry" element={<DataEntry />} />
-          <Route path="/data-entry/invoicing" element={<InvoiceList />} />
-          <Route path="/data-entry/invoicing/new" element={<InvoiceForm />} />
-          <Route path="/data-entry/invoicing/edit/:id" element={<InvoiceForm />} />
-          <Route path="/data-entry/invoicing/print/:id" element={<InvoicePrint />} />
-          <Route path="/data-entry/booking-form-stock" element={<BookingFormStock />} />
-          <Route path="/data-entry/booking-form-stock/activate" element={<BookingFormActivate />} />
-          <Route path="/data-entry/booking-form-stock/issue" element={<BookingFormIssue />} />
-          <Route path="/data-entry/selling-rates" element={<SellingRatesList />} />
-          <Route path="/data-entry/selling-rates/new" element={<SellingRatesForm />} />
-          <Route path="/data-entry/selling-rates/edit/:id" element={<SellingRatesForm />} />
-          <Route path="/data-entry/bill-of-lading" element={<BillOfLadingList />} />
-          <Route path="/data-entry/bill-of-lading/new" element={<BillOfLadingForm />} />
-          <Route path="/data-entry/bill-of-lading/edit/:id" element={<BillOfLadingForm />} />
-          <Route path="/data-entry/print-documents" element={<PrintDocuments />} />
+          <Route path="/data-entry" element={
+            <PrivateRoute requiredFile="invoicing">
+              <DataEntry />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/invoicing" element={
+            <PrivateRoute requiredFile="invoicing">
+              <InvoiceList />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/invoicing/new" element={
+            <PrivateRoute requiredFile="invoicing">
+              <InvoiceForm />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/invoicing/edit/:id" element={
+            <PrivateRoute requiredFile="invoicing">
+              <InvoiceForm />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/invoicing/print/:id" element={
+            <PrivateRoute requiredFile="invoicing">
+              <InvoicePrint />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/booking-form-stock" element={
+            <PrivateRoute requiredFile="invoiceBook">
+              <BookingFormStock />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/booking-form-stock/activate" element={
+            <PrivateRoute requiredFile="invoiceBook">
+              <BookingFormActivate />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/booking-form-stock/issue" element={
+            <PrivateRoute requiredFile="invoiceBook">
+              <BookingFormIssue />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/selling-rates" element={
+            <PrivateRoute requiredFile="sellingRates">
+              <SellingRatesList />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/selling-rates/new" element={
+            <PrivateRoute requiredFile="sellingRates">
+              <SellingRatesForm />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/selling-rates/edit/:id" element={
+            <PrivateRoute requiredFile="sellingRates">
+              <SellingRatesForm />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/bill-of-lading" element={
+            <PrivateRoute>
+              <BillOfLadingList />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/bill-of-lading/new" element={
+            <PrivateRoute>
+              <BillOfLadingForm />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/bill-of-lading/edit/:id" element={
+            <PrivateRoute>
+              <BillOfLadingForm />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/print-documents" element={
+            <PrivateRoute>
+              <PrintDocuments />
+            </PrivateRoute>
+          } />
           
           {/* Accounts Routes */}
-          <Route path="/accounts/payment-methods" element={<PaymentMethodsPage />} />
-          <Route path="/accounts/payment-methods/add" element={<AddInvoicePayment />} />
-          <Route path="/accounts/payments" element={<PaymentMethodsPage />} />
-          <Route path="/accounts/payments/add" element={<AddInvoicePayment />} />
-          <Route path="/accounts/reconciliation" element={<ReconciliationPage />} />
+          <Route path="/accounts/payment-methods" element={
+            <PrivateRoute requiredFile="paymentMethods">
+              <PaymentMethodsPage />
+            </PrivateRoute>
+          } />
+          <Route path="/accounts/payment-methods/add" element={
+            <PrivateRoute requiredFile="paymentMethods">
+              <AddInvoicePayment />
+            </PrivateRoute>
+          } />
+          <Route path="/accounts/payments" element={
+            <PrivateRoute requiredFile="paymentMethods">
+              <PaymentMethodsPage />
+            </PrivateRoute>
+          } />
+          <Route path="/accounts/payments/add" element={
+            <PrivateRoute requiredFile="paymentMethods">
+              <AddInvoicePayment />
+            </PrivateRoute>
+          } />
+          <Route path="/accounts/reconciliation" element={
+            <PrivateRoute requiredFile="reconciliation">
+              <ReconciliationPage />
+            </PrivateRoute>
+          } />
           
           {/* Reports Routes */}
-          <Route path="/reports/financial" element={<FinancialReportsPage />} />
+          <Route path="/reports/financial" element={
+            <PrivateRoute requiredFile="financialReports">
+              <FinancialReportsPage />
+            </PrivateRoute>
+          } />
           
           {/* Master Data Routes */}
-          <Route path="/master/invoice-book" element={<InvoiceBookStock />} />
-          <Route path="/master/invoice-book/add" element={<InvoiceBookForm />} />
-          <Route path="/master/sales-rep" element={<SalesRepList />} />
-          <Route path="/master/sales-rep/add" element={<SalesRepForm />} />
-          <Route path="/master/sales-rep/edit/:id" element={<SalesRepForm />} />
-          <Route path="/master/town" element={<TownList />} />
-          <Route path="/master/town/add" element={<TownForm />} />
-          <Route path="/master/town/edit/:id" element={<TownForm />} />
-          <Route path="/master/package-options" element={<PackageOptionsList />} />
-          <Route path="/master/package-options/add" element={<PackageOptionForm />} />
-          <Route path="/master/package-options/edit/:id" element={<PackageOptionForm />} />
+          <Route path="/master/invoice-book" element={
+            <PrivateRoute requiredFile="invoiceBook">
+              <InvoiceBookStock />
+            </PrivateRoute>
+          } />
+          <Route path="/master/invoice-book/add" element={
+            <PrivateRoute requiredFile="invoiceBook">
+              <InvoiceBookForm />
+            </PrivateRoute>
+          } />
+          <Route path="/master/sales-rep" element={
+            <PrivateRoute requiredFile="salesRep">
+              <SalesRepList />
+            </PrivateRoute>
+          } />
+          <Route path="/master/sales-rep/add" element={
+            <PrivateRoute requiredFile="salesRep">
+              <SalesRepForm />
+            </PrivateRoute>
+          } />
+          <Route path="/master/sales-rep/edit/:id" element={
+            <PrivateRoute requiredFile="salesRep">
+              <SalesRepForm />
+            </PrivateRoute>
+          } />
+          <Route path="/master/town" element={
+            <PrivateRoute requiredFile="town">
+              <TownList />
+            </PrivateRoute>
+          } />
+          <Route path="/master/town/add" element={
+            <PrivateRoute requiredFile="town">
+              <TownForm />
+            </PrivateRoute>
+          } />
+          <Route path="/master/town/edit/:id" element={
+            <PrivateRoute requiredFile="town">
+              <TownForm />
+            </PrivateRoute>
+          } />
+          <Route path="/master/package-options" element={
+            <PrivateRoute requiredFile="packageOptions">
+              <PackageOptionsList />
+            </PrivateRoute>
+          } />
+          <Route path="/master/package-options/add" element={
+            <PrivateRoute requiredFile="packageOptions">
+              <PackageOptionForm />
+            </PrivateRoute>
+          } />
+          <Route path="/master/package-options/edit/:id" element={
+            <PrivateRoute requiredFile="packageOptions">
+              <PackageOptionForm />
+            </PrivateRoute>
+          } />
           
           {/* Admin Routes */}
-          <Route path="/admin/control-panel" element={<ControlPanel />} />
-          <Route path="/admin/register" element={<UserRegistration />} />
+          <Route path="/admin/control-panel" element={
+            <PrivateRoute requireAdmin>
+              <ControlPanel />
+            </PrivateRoute>
+          } />
+          <Route path="/admin/register" element={
+            <PrivateRoute requireAdmin>
+              <UserRegistration />
+            </PrivateRoute>
+          } />
           <Route path="/admin/login" element={<Login />} />
           
           <Route path="*" element={<NotFound />} />

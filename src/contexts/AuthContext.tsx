@@ -15,6 +15,8 @@ export interface User {
     dataEntry: boolean;
     reports: boolean;
     downloads: boolean;
+    accounting: boolean;
+    controlPanel: boolean;
     files: {
       salesRep?: boolean;
       town?: boolean;
@@ -35,6 +37,8 @@ export interface User {
       financialReports?: boolean;
       shippingReports?: boolean;
       paymentMethods?: boolean;
+      reconciliation?: boolean;
+      profitLoss?: boolean;
     };
   };
 }
@@ -85,10 +89,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             dataEntry: parsedUser.isAdmin ? true : false,
             reports: parsedUser.isAdmin ? true : false,
             downloads: parsedUser.isAdmin ? true : false,
+            accounting: parsedUser.isAdmin ? true : false,
+            controlPanel: parsedUser.isAdmin ? true : false,
             files: {}
           };
         } else if (!parsedUser.permissions.files) {
           parsedUser.permissions.files = {};
+        } else {
+          // Ensure new permissions exist
+          parsedUser.permissions.accounting = parsedUser.permissions.accounting ?? parsedUser.isAdmin;
+          parsedUser.permissions.controlPanel = parsedUser.permissions.controlPanel ?? parsedUser.isAdmin;
         }
         setCurrentUser(parsedUser);
       } catch (error) {
@@ -111,6 +121,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 dataEntry: user.isAdmin ? true : false,
                 reports: user.isAdmin ? true : false,
                 downloads: user.isAdmin ? true : false,
+                accounting: user.isAdmin ? true : false,
+                controlPanel: user.isAdmin ? true : false,
                 files: {}
               }
             };
@@ -119,11 +131,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               ...user,
               permissions: {
                 ...user.permissions,
+                accounting: user.permissions.accounting ?? user.isAdmin,
+                controlPanel: user.permissions.controlPanel ?? user.isAdmin,
                 files: {}
               }
             };
+          } else {
+            // Ensure new permissions exist
+            return {
+              ...user,
+              permissions: {
+                ...user.permissions,
+                accounting: user.permissions.accounting ?? user.isAdmin,
+                controlPanel: user.permissions.controlPanel ?? user.isAdmin,
+              }
+            };
           }
-          return user;
         });
         
         setUsers(updatedUsers);
@@ -155,6 +178,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dataEntry: true,
         reports: true,
         downloads: true,
+        accounting: true,
+        controlPanel: true,
         files: {
           salesRep: true,
           town: true,
@@ -174,7 +199,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           cargoReports: true,
           financialReports: true,
           shippingReports: true,
-          paymentMethods: true
+          paymentMethods: true,
+          reconciliation: true,
+          profitLoss: true
         }
       }
     };
@@ -274,7 +301,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       email: userData.email,
       mobileNumber: userData.mobileNumber,
       country: userData.country,
-      isActive: false, // Users start inactive until approved by admin
+      isActive: false,
       isAdmin: false,
       createdAt: new Date().toISOString(),
       permissions: {
@@ -282,6 +309,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dataEntry: false,
         reports: false,
         downloads: false,
+        accounting: false,
+        controlPanel: false,
         files: {}
       }
     };
@@ -411,6 +440,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             dataEntry: false,
             reports: false,
             downloads: false,
+            accounting: false,
+            controlPanel: false,
             files: {}
           };
           
@@ -459,6 +490,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             dataEntry: false,
             reports: false,
             downloads: false,
+            accounting: false,
+            controlPanel: false,
             files: {}
           };
           

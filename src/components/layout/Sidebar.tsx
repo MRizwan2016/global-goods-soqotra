@@ -8,6 +8,7 @@ import {
   Settings, CreditCard, Receipt, Calculator, LineChart
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface SidebarItemProps {
   icon: React.ReactNode;
@@ -16,10 +17,41 @@ interface SidebarItemProps {
   children?: SidebarItemProps[];
   isOpen?: boolean;
   onClick?: () => void;
+  requiredPermission?: keyof ReturnType<typeof useAuth>['currentUser']['permissions'];
+  requiredFile?: keyof ReturnType<typeof useAuth>['currentUser']['permissions']['files'];
 }
 
-const SidebarItem = ({ icon, title, to, children, isOpen, onClick }: SidebarItemProps) => {
+const SidebarItem = ({ 
+  icon, 
+  title, 
+  to, 
+  children, 
+  isOpen, 
+  onClick, 
+  requiredPermission,
+  requiredFile
+}: SidebarItemProps) => {
+  const { currentUser, isAdmin, hasFilePermission } = useAuth();
   const hasChildren = Boolean(children && children.length > 0);
+  
+  // Check if user has permission to see this item
+  const hasPermission = () => {
+    if (!currentUser) return false;
+    if (isAdmin) return true;
+    
+    if (requiredPermission && !currentUser.permissions[requiredPermission]) {
+      return false;
+    }
+    
+    if (requiredFile && !hasFilePermission(currentUser, requiredFile)) {
+      return false;
+    }
+    
+    return true;
+  };
+  
+  // If user doesn't have permission, don't render the item
+  if (!hasPermission()) return null;
   
   const content = (
     <>
@@ -50,12 +82,15 @@ const SidebarItem = ({ icon, title, to, children, isOpen, onClick }: SidebarItem
       {hasChildren && isOpen && (
         <div className="pl-4 ml-2 border-l border-soqotra-lightBlue/30 animate-fade-in">
           {children?.map((child, index) => (
-            <Link key={index} to={child.to || "#"} className="w-full">
-              <div className="flex items-center gap-2 py-2 px-3 text-white hover:bg-white/10 rounded-md transition-colors duration-200">
-                <span className="w-5">{child.icon}</span>
-                <span>{child.title}</span>
-              </div>
-            </Link>
+            // Don't render children items that the user doesn't have permission for
+            hasFilePermission(currentUser, child.requiredFile as any) || isAdmin ? (
+              <Link key={index} to={child.to || "#"} className="w-full">
+                <div className="flex items-center gap-2 py-2 px-3 text-white hover:bg-white/10 rounded-md transition-colors duration-200">
+                  <span className="w-5">{child.icon}</span>
+                  <span>{child.title}</span>
+                </div>
+              </Link>
+            ) : null
           ))}
         </div>
       )}
@@ -101,16 +136,17 @@ const Sidebar = () => {
           title="MASTER DATA" 
           isOpen={openSections.masterData}
           onClick={() => toggleSection('masterData')}
+          requiredPermission="masterData"
           children={[
-            { icon: <Users size={18} />, title: "Sales Rep", to: "/master/sales-rep" },
-            { icon: <FileText size={18} />, title: "Town", to: "/master/town" },
-            { icon: <Package2 size={18} />, title: "Item", to: "/master/item" },
-            { icon: <Package2 size={18} />, title: "Package Options", to: "/master/package-options" },
-            { icon: <DollarSign size={18} />, title: "Selling Rates", to: "/master/selling-rates" },
-            { icon: <Ship size={18} />, title: "Container", to: "/master/container" },
-            { icon: <Ship size={18} />, title: "Vessel", to: "/master/vessel" },
-            { icon: <FileText size={18} />, title: "Invoice Book", to: "/master/invoice-book" },
-            { icon: <Truck size={18} />, title: "Driver/Helper", to: "/master/driver-helper" },
+            { icon: <Users size={18} />, title: "Sales Rep", to: "/master/sales-rep", requiredFile: "salesRep" },
+            { icon: <FileText size={18} />, title: "Town", to: "/master/town", requiredFile: "town" },
+            { icon: <Package2 size={18} />, title: "Item", to: "/master/item", requiredFile: "item" },
+            { icon: <Package2 size={18} />, title: "Package Options", to: "/master/package-options", requiredFile: "packageOptions" },
+            { icon: <DollarSign size={18} />, title: "Selling Rates", to: "/master/selling-rates", requiredFile: "sellingRates" },
+            { icon: <Ship size={18} />, title: "Container", to: "/master/container", requiredFile: "container" },
+            { icon: <Ship size={18} />, title: "Vessel", to: "/master/vessel", requiredFile: "vessel" },
+            { icon: <FileText size={18} />, title: "Invoice Book", to: "/master/invoice-book", requiredFile: "invoiceBook" },
+            { icon: <Truck size={18} />, title: "Driver/Helper", to: "/master/driver-helper", requiredFile: "driverHelper" },
           ]}
         />
         
@@ -119,13 +155,14 @@ const Sidebar = () => {
           title="DATA ENTRY" 
           isOpen={openSections.dataEntry}
           onClick={() => toggleSection('dataEntry')}
+          requiredPermission="dataEntry"
           children={[
-            { icon: <FileText size={18} />, title: "Invoicing", to: "/data-entry/invoicing" },
-            { icon: <DollarSign size={18} />, title: "Payment Receivable", to: "/data-entry/payment" },
-            { icon: <Ship size={18} />, title: "Load Container", to: "/data-entry/container" },
-            { icon: <Ship size={18} />, title: "Load Vessel", to: "/data-entry/vessel" },
-            { icon: <Plane size={18} />, title: "Load Air Cargo", to: "/data-entry/air-cargo" },
-            { icon: <FileText size={18} />, title: "Packing List", to: "/data-entry/packing-list" },
+            { icon: <FileText size={18} />, title: "Invoicing", to: "/data-entry/invoicing", requiredFile: "invoicing" },
+            { icon: <DollarSign size={18} />, title: "Payment Receivable", to: "/data-entry/payment", requiredFile: "paymentReceivable" },
+            { icon: <Ship size={18} />, title: "Load Container", to: "/data-entry/container", requiredFile: "loadContainer" },
+            { icon: <Ship size={18} />, title: "Load Vessel", to: "/data-entry/vessel", requiredFile: "loadVessel" },
+            { icon: <Plane size={18} />, title: "Load Air Cargo", to: "/data-entry/air-cargo", requiredFile: "loadAirCargo" },
+            { icon: <FileText size={18} />, title: "Packing List", to: "/data-entry/packing-list", requiredFile: "packingList" },
           ]}
         />
         
@@ -134,10 +171,11 @@ const Sidebar = () => {
           title="REPORTS" 
           isOpen={openSections.reports}
           onClick={() => toggleSection('reports')}
+          requiredPermission="reports"
           children={[
-            { icon: <FileText size={18} />, title: "Cargo Reports", to: "/reports/cargo" },
-            { icon: <LineChart size={18} />, title: "Financial Reports", to: "/reports/financial" },
-            { icon: <FileText size={18} />, title: "Shipping Reports", to: "/reports/shipping" },
+            { icon: <FileText size={18} />, title: "Cargo Reports", to: "/reports/cargo", requiredFile: "cargoReports" },
+            { icon: <LineChart size={18} />, title: "Financial Reports", to: "/reports/financial", requiredFile: "financialReports" },
+            { icon: <FileText size={18} />, title: "Shipping Reports", to: "/reports/shipping", requiredFile: "shippingReports" },
           ]}
         />
         
@@ -146,10 +184,11 @@ const Sidebar = () => {
           title="ACCOUNTS" 
           isOpen={openSections.accounting}
           onClick={() => toggleSection('accounting')}
+          requiredPermission="accounting"
           children={[
-            { icon: <CreditCard size={18} />, title: "Payment Methods", to: "/accounts/payment-methods" },
-            { icon: <Receipt size={18} />, title: "Reconciliation", to: "/accounts/reconciliation" },
-            { icon: <Calculator size={18} />, title: "Profit & Loss", to: "/accounts/profit-loss" },
+            { icon: <CreditCard size={18} />, title: "Payment Methods", to: "/accounts/payment-methods", requiredFile: "paymentMethods" },
+            { icon: <Receipt size={18} />, title: "Reconciliation", to: "/accounts/reconciliation", requiredFile: "reconciliation" },
+            { icon: <Calculator size={18} />, title: "Profit & Loss", to: "/accounts/profit-loss", requiredFile: "profitLoss" },
           ]}
         />
         
@@ -157,12 +196,14 @@ const Sidebar = () => {
           icon={<Settings size={18} />} 
           title="CONTROL PANEL" 
           to="/admin/control-panel"
+          requiredPermission="controlPanel"
         />
         
         <SidebarItem 
           icon={<Download size={18} />} 
           title="DOWNLOADS" 
           to="/downloads"
+          requiredPermission="downloads"
         />
       </div>
       

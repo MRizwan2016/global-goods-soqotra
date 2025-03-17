@@ -31,7 +31,8 @@ import {
   Download,
   ChevronDown,
   ChevronRight,
-  DollarSign
+  DollarSign,
+  Settings
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -113,7 +114,6 @@ const ControlPanel = () => {
   const [expandedSections, setExpandedSections] = useState<Record<string, Record<string, boolean>>>({});
 
   useEffect(() => {
-    // Check if user is logged in and is admin
     if (!currentUser) {
       console.log("No current user found");
       toast({
@@ -136,10 +136,8 @@ const ControlPanel = () => {
       return;
     }
 
-    // Filter out admin users for the display and ensure all users have permissions
-    console.log("All users:", users); // Debug: Log all users
-    
-    // Ensure each user has valid permissions object with files
+    console.log("All users:", users);
+
     const usersWithPermissions = users.map(user => {
       if (!user.permissions) {
         console.log("User missing permissions:", user.email);
@@ -170,7 +168,6 @@ const ControlPanel = () => {
     const filteredUsers = usersWithPermissions.filter(user => !user.isAdmin);
     setNonAdminUsers(filteredUsers);
     
-    // Initialize expanded sections state for each user
     const initialExpandedSections: Record<string, Record<string, boolean>> = {};
     filteredUsers.forEach(user => {
       initialExpandedSections[user.id] = {
@@ -181,7 +178,7 @@ const ControlPanel = () => {
     });
     setExpandedSections(initialExpandedSections);
     
-    console.log("Non-admin users:", filteredUsers); // Debug: Log filtered users
+    console.log("Non-admin users:", filteredUsers);
   }, [currentUser, isAdmin, navigate, users]);
 
   const formatDate = (dateString: string) => {
@@ -227,7 +224,6 @@ const ControlPanel = () => {
   };
 
   const renderPermissionButton = (user: User, permissionType: keyof User['permissions'], icon: React.ReactNode, label: string) => {
-    // Ensure permissions exist before accessing them
     const permissions = user.permissions || {
       masterData: false,
       dataEntry: false, 
@@ -276,7 +272,6 @@ const ControlPanel = () => {
     );
   };
 
-  // Early return with loading state if needed
   if (!currentUser || !isAdmin) {
     return (
       <Layout title="Loading...">
@@ -459,7 +454,7 @@ const ControlPanel = () => {
                                 <div className="space-y-4">
                                   <h4 className="font-medium text-lg mb-2">Permissions for {user.fullName}</h4>
                                   
-                                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
                                     <Card>
                                       <CardHeader className="py-2">
                                         <CardTitle className="text-sm flex items-center">
@@ -543,6 +538,48 @@ const ControlPanel = () => {
                                         </div>
                                       </CardContent>
                                     </Card>
+                                    
+                                    <Card>
+                                      <CardHeader className="py-2">
+                                        <CardTitle className="text-sm flex items-center">
+                                          <DollarSign className="h-4 w-4 mr-2" />
+                                          Accounting Access
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent className="py-2">
+                                        <div className="flex items-center mb-2">
+                                          <Switch 
+                                            checked={!!user.permissions?.accounting}
+                                            onCheckedChange={() => handleTogglePermission(user.id, "accounting")}
+                                            id={`${user.id}-accounting`}
+                                          />
+                                          <label htmlFor={`${user.id}-accounting`} className="ml-2 text-sm font-medium">
+                                            {user.permissions?.accounting ? "Enabled" : "Disabled"}
+                                          </label>
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                    
+                                    <Card>
+                                      <CardHeader className="py-2">
+                                        <CardTitle className="text-sm flex items-center">
+                                          <Settings className="h-4 w-4 mr-2" />
+                                          Control Panel Access
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent className="py-2">
+                                        <div className="flex items-center mb-2">
+                                          <Switch 
+                                            checked={!!user.permissions?.controlPanel}
+                                            onCheckedChange={() => handleTogglePermission(user.id, "controlPanel")}
+                                            id={`${user.id}-controlPanel`}
+                                          />
+                                          <label htmlFor={`${user.id}-controlPanel`} className="ml-2 text-sm font-medium">
+                                            {user.permissions?.controlPanel ? "Enabled" : "Disabled"}
+                                          </label>
+                                        </div>
+                                      </CardContent>
+                                    </Card>
                                   </div>
                                   
                                   <div className="mt-4">
@@ -553,7 +590,6 @@ const ControlPanel = () => {
                                     </p>
                                     
                                     <Accordion type="multiple" className="w-full">
-                                      {/* Master Data Files */}
                                       <AccordionItem value="masterData">
                                         <AccordionTrigger className="py-2">
                                           <div className="flex items-center">
@@ -591,7 +627,6 @@ const ControlPanel = () => {
                                         </AccordionContent>
                                       </AccordionItem>
                                       
-                                      {/* Data Entry Files */}
                                       <AccordionItem value="dataEntry">
                                         <AccordionTrigger className="py-2">
                                           <div className="flex items-center">
@@ -629,7 +664,6 @@ const ControlPanel = () => {
                                         </AccordionContent>
                                       </AccordionItem>
                                       
-                                      {/* Reports Files */}
                                       <AccordionItem value="reports">
                                         <AccordionTrigger className="py-2">
                                           <div className="flex items-center">
@@ -658,6 +692,43 @@ const ControlPanel = () => {
                                                 <label 
                                                   htmlFor={`${user.id}-${key}`}
                                                   className={`text-sm cursor-pointer ${!user.permissions?.reports ? 'text-gray-400' : ''}`}
+                                                >
+                                                  {value.label}
+                                                </label>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </AccordionContent>
+                                      </AccordionItem>
+                                      
+                                      <AccordionItem value="accounting">
+                                        <AccordionTrigger className="py-2">
+                                          <div className="flex items-center">
+                                            <DollarSign className="h-4 w-4 mr-2" />
+                                            <span>Accounting Files</span>
+                                            {user.permissions?.accounting ? (
+                                              <Badge className="ml-2 bg-green-100 text-green-800">Category Enabled</Badge>
+                                            ) : (
+                                              <Badge className="ml-2 bg-gray-100 text-gray-800" variant="outline">Category Disabled</Badge>
+                                            )}
+                                          </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-6 py-2">
+                                            {Object.entries(filePermissions.accounting.files).map(([key, value]) => (
+                                              <div key={key} className="flex items-center space-x-2 py-1">
+                                                <Checkbox 
+                                                  id={`${user.id}-${key}`}
+                                                  checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
+                                                  onCheckedChange={() => handleToggleFilePermission(
+                                                    user.id, 
+                                                    key as keyof User['permissions']['files']
+                                                  )}
+                                                  disabled={!user.permissions?.accounting}
+                                                />
+                                                <label 
+                                                  htmlFor={`${user.id}-${key}`}
+                                                  className={`text-sm cursor-pointer ${!user.permissions?.accounting ? 'text-gray-400' : ''}`}
                                                 >
                                                   {value.label}
                                                 </label>
