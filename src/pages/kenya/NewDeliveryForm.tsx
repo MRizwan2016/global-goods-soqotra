@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { ArrowLeft, Plus, Truck, User, Package, DollarSign } from "lucide-react";
+import { ArrowLeft, Plus, Truck, User, Package, DollarSign, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";

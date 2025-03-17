@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -22,7 +21,8 @@ import {
   Users, 
   DollarSign,
   Map,
-  CircleAlert
+  CircleAlert,
+  CheckCircle
 } from "lucide-react";
 import { mockDeliveries } from "./data/mockDeliveryData";
 import DestinationCard from "@/components/dashboard/DestinationCard";

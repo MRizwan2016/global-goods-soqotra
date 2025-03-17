@@ -75,185 +75,349 @@ function App() {
         {/* Protected routes */}
         <Route
           path="/"
-          element={<PrivateRoute element={<Index />} />}
+          element={
+            <PrivateRoute>
+              <Index />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/dashboard"
-          element={<PrivateRoute element={<Dashboard />} />}
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/data-entry"
-          element={<PrivateRoute element={<DataEntry />} />}
+          element={
+            <PrivateRoute>
+              <DataEntry />
+            </PrivateRoute>
+          }
         />
         
         {/* Admin Routes */}
         <Route
           path="/admin/control-panel"
-          element={<PrivateRoute element={<ControlPanel />} />}
+          element={
+            <PrivateRoute>
+              <ControlPanel />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/admin/user-registration"
-          element={<PrivateRoute element={<UserRegistration />} />}
+          element={
+            <PrivateRoute>
+              <UserRegistration />
+            </PrivateRoute>
+          }
         />
         
         {/* Invoice Routes */}
         <Route
           path="/data-entry/invoicing"
-          element={<PrivateRoute element={<InvoiceList />} />}
+          element={
+            <PrivateRoute>
+              <InvoiceList />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/data-entry/invoicing/new"
-          element={<PrivateRoute element={<InvoiceForm />} />}
+          element={
+            <PrivateRoute>
+              <InvoiceForm />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/data-entry/invoicing/edit/:id"
-          element={<PrivateRoute element={<InvoiceForm />} />}
+          element={
+            <PrivateRoute>
+              <InvoiceForm />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/data-entry/invoicing/print/:id"
-          element={<PrivateRoute element={<InvoicePrint />} />}
+          element={
+            <PrivateRoute>
+              <InvoicePrint />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/data-entry/invoicing/book/activate"
-          element={<PrivateRoute element={<BookingFormActivate />} />}
+          element={
+            <PrivateRoute>
+              <BookingFormActivate />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/data-entry/invoicing/book/issue"
-          element={<PrivateRoute element={<BookingFormIssue />} />}
+          element={
+            <PrivateRoute>
+              <BookingFormIssue />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/data-entry/invoicing/book/stock"
-          element={<PrivateRoute element={<BookingFormStock />} />}
+          element={
+            <PrivateRoute>
+              <BookingFormStock />
+            </PrivateRoute>
+          }
         />
         
         {/* Kenya Delivery Tracking Routes */}
         <Route
           path="/kenya"
-          element={<PrivateRoute element={<KenyaDashboard />} />}
+          element={
+            <PrivateRoute>
+              <KenyaDashboard />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/kenya/deliveries"
-          element={<PrivateRoute element={<KenyaDeliveryTracking />} />}
+          element={
+            <PrivateRoute>
+              <KenyaDeliveryTracking />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/kenya/delivery/:id"
-          element={<PrivateRoute element={<DeliveryDetails />} />}
+          element={
+            <PrivateRoute>
+              <DeliveryDetails />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/kenya/delivery/new"
-          element={<PrivateRoute element={<NewDeliveryForm />} />}
+          element={
+            <PrivateRoute>
+              <NewDeliveryForm />
+            </PrivateRoute>
+          }
         />
         
         {/* Bill of Lading Routes */}
         <Route
           path="/data-entry/bill-of-lading"
-          element={<PrivateRoute element={<BillOfLadingList />} />}
+          element={
+            <PrivateRoute>
+              <BillOfLadingList />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/data-entry/bill-of-lading/new"
-          element={<PrivateRoute element={<BillOfLadingForm />} />}
+          element={
+            <PrivateRoute>
+              <BillOfLadingForm />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/data-entry/bill-of-lading/edit/:id"
-          element={<PrivateRoute element={<BillOfLadingForm />} />}
+          element={
+            <PrivateRoute>
+              <BillOfLadingForm />
+            </PrivateRoute>
+          }
         />
         
         {/* Reports Routes */}
         <Route
           path="/reports/cargo"
-          element={<PrivateRoute element={<CargoReportsPage />} />}
+          element={
+            <PrivateRoute>
+              <CargoReportsPage />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/reports/financial"
-          element={<PrivateRoute element={<FinancialReportsPage />} />}
+          element={
+            <PrivateRoute>
+              <FinancialReportsPage />
+            </PrivateRoute>
+          }
         />
         
         {/* Accounts Routes */}
         <Route
           path="/accounts/add-payment/:id"
-          element={<PrivateRoute element={<AddInvoicePayment />} />}
+          element={
+            <PrivateRoute>
+              <AddInvoicePayment />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/accounts/payment-methods"
-          element={<PrivateRoute element={<PaymentMethodsPage />} />}
+          element={
+            <PrivateRoute>
+              <PaymentMethodsPage />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/accounts/reconciliation"
-          element={<PrivateRoute element={<ReconciliationPage />} />}
+          element={
+            <PrivateRoute>
+              <ReconciliationPage />
+            </PrivateRoute>
+          }
         />
         
         {/* Master Routes */}
         <Route
           path="/master/sales-rep"
-          element={<PrivateRoute element={<SalesRepList />} />}
+          element={
+            <PrivateRoute>
+              <SalesRepList />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/sales-rep/new"
-          element={<PrivateRoute element={<SalesRepForm />} />}
+          element={
+            <PrivateRoute>
+              <SalesRepForm />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/sales-rep/edit/:id"
-          element={<PrivateRoute element={<SalesRepForm />} />}
+          element={
+            <PrivateRoute>
+              <SalesRepForm />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/town"
-          element={<PrivateRoute element={<TownList />} />}
+          element={
+            <PrivateRoute>
+              <TownList />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/town/new"
-          element={<PrivateRoute element={<TownForm />} />}
+          element={
+            <PrivateRoute>
+              <TownForm />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/town/edit/:id"
-          element={<PrivateRoute element={<TownForm />} />}
+          element={
+            <PrivateRoute>
+              <TownForm />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/package-options"
-          element={<PrivateRoute element={<PackageOptionsList />} />}
+          element={
+            <PrivateRoute>
+              <PackageOptionsList />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/package-options/new"
-          element={<PrivateRoute element={<PackageOptionForm />} />}
+          element={
+            <PrivateRoute>
+              <PackageOptionForm />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/package-options/edit/:id"
-          element={<PrivateRoute element={<PackageOptionForm />} />}
+          element={
+            <PrivateRoute>
+              <PackageOptionForm />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/package-options/import"
-          element={<PrivateRoute element={<PackageOptionsImport />} />}
+          element={
+            <PrivateRoute>
+              <PackageOptionsImport />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/invoice-book/stock"
-          element={<PrivateRoute element={<InvoiceBookStock />} />}
+          element={
+            <PrivateRoute>
+              <InvoiceBookStock />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/invoice-book/new"
-          element={<PrivateRoute element={<InvoiceBookForm />} />}
+          element={
+            <PrivateRoute>
+              <InvoiceBookForm />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/master/invoice-book/edit/:id"
-          element={<PrivateRoute element={<InvoiceBookForm />} />}
+          element={
+            <PrivateRoute>
+              <InvoiceBookForm />
+            </PrivateRoute>
+          }
         />
         
         {/* Selling Rates Routes */}
         <Route
           path="/selling-rates"
-          element={<PrivateRoute element={<SellingRatesList />} />}
+          element={
+            <PrivateRoute>
+              <SellingRatesList />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/selling-rates/new"
-          element={<PrivateRoute element={<SellingRatesForm />} />}
+          element={
+            <PrivateRoute>
+              <SellingRatesForm />
+            </PrivateRoute>
+          }
         />
         <Route
           path="/selling-rates/edit/:id"
-          element={<PrivateRoute element={<SellingRatesForm />} />}
+          element={
+            <PrivateRoute>
+              <SellingRatesForm />
+            </PrivateRoute>
+          }
         />
         
         {/* Print Documents */}
         <Route
           path="/print-documents"
-          element={<PrivateRoute element={<PrintDocuments />} />}
+          element={
+            <PrivateRoute>
+              <PrintDocuments />
+            </PrivateRoute>
+          }
         />
         
         {/* Catch-all route for 404 */}
