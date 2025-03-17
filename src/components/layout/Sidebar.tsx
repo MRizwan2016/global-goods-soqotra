@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -68,6 +69,10 @@ const SidebarWrapper = () => {
               alt="Soqotra Logo" 
               className="h-14 mb-2 hover-scale"
             />
+            <div className="text-center mt-1">
+              <p className="text-xs font-semibold text-gray-800 leading-tight">SOQOTRA LOGISTICS SERVICES,</p>
+              <p className="text-xs font-semibold text-gray-800 leading-tight">TRANSPORTATION & TRADING WLL</p>
+            </div>
           </div>
         </div>
         
