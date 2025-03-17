@@ -64,14 +64,10 @@ const SidebarWrapper = () => {
         <div className="p-4 border-b border-gray-200 animate-fade-in">
           <div className="flex flex-col items-center">
             <img 
-              src="/lovable-uploads/b78f92a0-94aa-4227-9b43-6cf95864ad2f.png" 
+              src="/lovable-uploads/056bd63a-3806-4e08-9360-0e3edff62199.png" 
               alt="Soqotra Logo" 
               className="h-14 mb-2 hover-scale"
             />
-            <div className="text-center mt-2">
-              <h1 className="text-lg font-bold tracking-tight text-black">SOQOTRA</h1>
-              <p className="text-xs text-gray-600">LOGISTICS SERVICES AND TRADING</p>
-            </div>
           </div>
         </div>
         
