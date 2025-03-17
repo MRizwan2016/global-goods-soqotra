@@ -1,43 +1,23 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { mockInvoiceData } from "@/data/mockData";
+import { countrySectorMap } from "../constants/countrySectorMap";
+import { useFormHandling } from "./useFormHandling";
+import { usePackageHandling } from "./usePackageHandling";
+import { useInvoiceSelection } from "./useInvoiceSelection";
+import { FormState, InvoiceFormReturnType } from "../types/invoiceForm";
 
-// Country to sector mapping
-export const countrySectorMap = {
-  "Sri Lanka": "COLOMBO : C",
-  "Philippines": "MANILA : M",
-  "Kenya": "NAIROBI : N",
-  "Saudi Arabia": "RIYADH : R",
-  "United Arab Emirates": "DUBAI : U",
-  "Eritrea": "ASMARA : A",
-  "Sudan": "KHARTOUM : K",
-  "Tunisia": "TUNIS : T",
-  "Uganda": "KAMPALA : K",
-  "Kuwait": "KUWAIT : K",
-  "Oman": "MUSCAT : M",
-  "Qatar": "DOHA : D"
-};
-
-export const mockInvoiceBooks = [
-  { bookNumber: "722", startPage: "13136051", endPage: "13136100", available: ["13136051", "13136052", "13136053"] },
-  { bookNumber: "723", startPage: "13136101", endPage: "13136150", available: ["13136101", "13136102"] },
-];
-
-export const calculateNet = (gross: string, discount: string) => {
-  const grossValue = parseFloat(gross) || 0;
-  const discountValue = parseFloat(discount) || 0;
-  return String(grossValue - discountValue);
-};
-
-export const useInvoiceForm = (id?: string) => {
+// Create the main hook that combines all the modules
+export const useInvoiceForm = (id?: string): InvoiceFormReturnType => {
   const isEditing = Boolean(id);
   
   const existingInvoice = isEditing 
     ? mockInvoiceData.find(inv => inv.id === id) 
     : null;
     
-  const [formState, setFormState] = useState({
+  // Initialize the form state
+  const initialState: FormState = {
     sector: existingInvoice?.sector || "COLOMBO : C",
     branch: existingInvoice?.branch || "DOHA : HOF",
     warehouse: existingInvoice?.warehouse || "Colombo : C",
@@ -109,152 +89,33 @@ export const useInvoiceForm = (id?: string) => {
     paymentStatus: "",
     paymentDate: "",
     bankingDate: "",
+  };
+
+  // Use the form handling module
+  const { formState, setFormState, handleInputChange, handleSelectChange } = 
+    useFormHandling(initialState);
+  
+  // Use the package handling module
+  const { packageItems, setPackageItems, handlePackageSelect, handleAddPackage, handleRemovePackage } = 
+    usePackageHandling(formState, setFormState);
+  
+  // Initialize packageItems with existing invoice data if editing
+  useState(() => {
+    if (existingInvoice?.packageDetails) {
+      setPackageItems(existingInvoice.packageDetails);
+    }
   });
   
-  const [packageItems, setPackageItems] = useState<any[]>(
-    existingInvoice?.packageDetails || []
-  );
+  // Use the invoice selection module
+  const { showInvoiceSelector, setShowInvoiceSelector, availableInvoices, handleSelectInvoice: baseHandleSelectInvoice } = 
+    useInvoiceSelection(isEditing);
   
-  const [showInvoiceSelector, setShowInvoiceSelector] = useState(false);
-  const [availableInvoices, setAvailableInvoices] = useState<any[]>([]);
-  
-  useEffect(() => {
-    if (isEditing) return;
-    
-    const allInvoices = mockInvoiceBooks.flatMap(book => 
-      book.available.map(num => ({
-        bookNumber: book.bookNumber,
-        invoiceNumber: num
-      }))
-    );
-    
-    setAvailableInvoices(allInvoices);
-  }, [isEditing]);
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormState(prev => ({
-      ...prev,
-      [name]: value
-    }));
-    
-    if (name === 'freight') {
-      setFormState(prev => ({
-        ...prev,
-        gross: value,
-        net: calculateNet(String(value), String(prev.discount))
-      }));
-    }
-    
-    if (name === 'discount') {
-      setFormState(prev => ({
-        ...prev,
-        net: calculateNet(String(prev.gross), String(value))
-      }));
-    }
-    
-    // If country changes, update the sector
-    if (name === 'country') {
-      const sectorForCountry = countrySectorMap[value as keyof typeof countrySectorMap];
-      if (sectorForCountry) {
-        setFormState(prev => ({
-          ...prev,
-          sector: sectorForCountry
-        }));
-      }
-    }
-  };
-  
-  const handleSelectChange = (name: string, value: string) => {
-    setFormState(prev => ({
-      ...prev,
-      [name]: value
-    }));
-
-    // If country changes through select, update the sector
-    if (name === 'country') {
-      const sectorForCountry = countrySectorMap[value as keyof typeof countrySectorMap];
-      if (sectorForCountry) {
-        setFormState(prev => ({
-          ...prev,
-          sector: sectorForCountry
-        }));
-      }
-    }
-  };
-
-  const handlePackageSelect = (description: string) => {
-    const packageOptions = require('@/data/packageOptions').packageOptions;
-    const selectedPackage = packageOptions.find((pkg: any) => pkg.description === description);
-    if (selectedPackage) {
-      setFormState(prev => ({
-        ...prev,
-        packagesName: description,
-        selectedPackage,
-        length: String(selectedPackage.dimensions.length),
-        width: String(selectedPackage.dimensions.width),
-        height: String(selectedPackage.dimensions.height),
-        cubicMetre: String(selectedPackage.volumeInMeters),
-        price: String(selectedPackage.price),
-        documentsFee: String(selectedPackage.documentsFee),
-        total: String(selectedPackage.total)
-      }));
-    }
-  };
-  
-  const handleAddPackage = () => {
-    if (!formState.packagesName) {
-      toast.error("Please select a package");
-      return;
-    }
-    
-    const newPackage = {
-      id: Date.now().toString(),
-      name: formState.packagesName,
-      length: formState.length,
-      width: formState.width,
-      height: formState.height,
-      volume: formState.cubicMetre,
-      weight: formState.packageWeight,
-      boxNumber: formState.boxNumber,
-      volumeWeight: formState.volumeWeight,
-      price: formState.price,
-      documentsFee: formState.documentsFee,
-      total: formState.total
-    };
-    
-    setPackageItems([...packageItems, newPackage]);
-    
-    setFormState(prev => ({
-      ...prev,
-      packagesName: "",
-      selectedPackage: null,
-      length: "",
-      width: "",
-      height: "",
-      cubicMetre: "",
-      price: "0",
-      documentsFee: "0",
-      total: "0",
-      packageWeight: "0",
-      boxNumber: "0",
-      volumeWeight: "0",
-    }));
-  };
-  
-  const handleRemovePackage = (id: string) => {
-    setPackageItems(packageItems.filter(item => item.id !== id));
-  };
-  
+  // Create a wrapper for handleSelectInvoice that includes setFormState
   const handleSelectInvoice = (invoiceNumber: string) => {
-    setFormState(prev => ({
-      ...prev,
-      invoiceNumber
-    }));
-    setShowInvoiceSelector(false);
-    toast.success(`Invoice number ${invoiceNumber} selected`);
+    baseHandleSelectInvoice(invoiceNumber, setFormState);
   };
   
+  // Handle form submission
   const handleSave = () => {
     if (!formState.invoiceNumber) {
       toast.error("Please select an invoice number");
@@ -284,3 +145,8 @@ export const useInvoiceForm = (id?: string) => {
     countrySectorMap
   };
 };
+
+// Re-export countrySectorMap for backwards compatibility
+export { countrySectorMap } from "../constants/countrySectorMap";
+export { mockInvoiceBooks } from "../constants/mockInvoiceBooks";
+export { calculateNet } from "../utils/invoiceCalculations";

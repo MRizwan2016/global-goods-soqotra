@@ -1,8 +1,9 @@
 
 import { useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
-import { useInvoiceForm, countrySectorMap } from "./hooks/useInvoiceForm";
+import { useInvoiceForm } from "./hooks/useInvoiceForm";
 import { packageOptions } from "@/data/packageOptions";
+import { countrySectorMap } from "./constants/countrySectorMap";
 
 // Import components
 import InvoiceFormHeader from "./components/InvoiceFormHeader";

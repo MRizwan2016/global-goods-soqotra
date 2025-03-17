@@ -1,11 +1,11 @@
+
 import React from "react";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Calendar } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import PaymentMethodSelector from "./payment-details/PaymentMethodSelector";
+import PaymentStatusSelector from "./payment-details/PaymentStatusSelector";
+import DatePicker from "./payment-details/DatePicker";
+import PaymentAmounts from "./payment-details/PaymentAmounts";
+import InvoiceDetails from "./payment-details/InvoiceDetails";
+import AdditionalDetails from "./payment-details/AdditionalDetails";
 
 interface PaymentDetailsProps {
   formState: any;
@@ -16,38 +16,18 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
   formState,
   handleInputChange,
 }) => {
-  // Mock payment methods
-  const paymentMethods = [
-    { id: "bank", name: "Bank Transfer" },
-    { id: "cash", name: "Cash" },
-    { id: "card", name: "Credit Card" },
-    { id: "check", name: "Check" },
-  ];
-
   // Handle date selection
   const handleDateChange = (date: Date | undefined, fieldName: string) => {
     if (date) {
       const event = {
         target: {
           name: fieldName,
-          value: format(date, "yyyy-MM-dd"),
+          value: date.toISOString().split('T')[0],
         },
       } as React.ChangeEvent<HTMLInputElement>;
       
       handleInputChange(event);
     }
-  };
-
-  // Handle payment method selection
-  const handlePaymentMethodChange = (value: string) => {
-    const event = {
-      target: {
-        name: "paymentMethod",
-        value,
-      },
-    } as React.ChangeEvent<HTMLSelectElement>;
-    
-    handleInputChange(event);
   };
 
   return (
@@ -57,367 +37,35 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 my-4">
-        {/* First row with Payment Method */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">PAYMENT METHOD:</label>
-          <Select 
-            value={formState.paymentMethod || ""} 
-            onValueChange={handlePaymentMethodChange}
-          >
-            <SelectTrigger className="w-full border border-gray-300">
-              <SelectValue placeholder="Select payment method" />
-            </SelectTrigger>
-            <SelectContent>
-              {paymentMethods.map(method => (
-                <SelectItem key={method.id} value={method.id}>{method.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">PAYMENT STATUS:</label>
-          <Select 
-            value={formState.paymentStatus || ""} 
-            onValueChange={(value) => {
-              const event = {
-                target: {
-                  name: "paymentStatus",
-                  value,
-                },
-              } as React.ChangeEvent<HTMLSelectElement>;
-              handleInputChange(event);
-            }}
-          >
-            <SelectTrigger className="w-full border border-gray-300">
-              <SelectValue placeholder="Select payment status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="partial">Partially Paid</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="overdue">Overdue</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {/* First row with Payment Method and Status */}
+        <PaymentMethodSelector formState={formState} handleInputChange={handleInputChange} />
+        <PaymentStatusSelector formState={formState} handleInputChange={handleInputChange} />
 
         {/* Payment Dates */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">PAYMENT DATE:</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-left font-normal border border-gray-300">
-                <Calendar className="mr-2 h-4 w-4" />
-                {formState.paymentDate ? format(new Date(formState.paymentDate), "PPP") : "Select date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <CalendarComponent
-                mode="single"
-                selected={formState.paymentDate ? new Date(formState.paymentDate) : undefined}
-                onSelect={(date) => handleDateChange(date, "paymentDate")}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+        <DatePicker 
+          label="PAYMENT DATE"
+          name="paymentDate"
+          value={formState.paymentDate}
+          handleDateChange={handleDateChange}
+        />
+        <DatePicker 
+          label="BANKING DATE"
+          name="bankingDate"
+          value={formState.bankingDate}
+          handleDateChange={handleDateChange}
+        />
 
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">BANKING DATE:</label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-start text-left font-normal border border-gray-300">
-                <Calendar className="mr-2 h-4 w-4" />
-                {formState.bankingDate ? format(new Date(formState.bankingDate), "PPP") : "Select date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <CalendarComponent
-                mode="single"
-                selected={formState.bankingDate ? new Date(formState.bankingDate) : undefined}
-                onSelect={(date) => handleDateChange(date, "bankingDate")}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        {/* Original fields */}
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">FREIGHT:</label>
-          <Input 
-            name="freight"
-            value={formState.freight}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
+        {/* Payment Amounts */}
+        <PaymentAmounts formState={formState} handleInputChange={handleInputChange} />
         
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">AGENT NAME:</label>
-          <Input 
-            name="agentName"
-            value={formState.agentName}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-          />
-        </div>
+        {/* Invoice Details */}
+        <InvoiceDetails formState={formState} />
         
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">DESTINATION TRANSPORT:</label>
-          <Input 
-            name="destinationTransport"
-            value={formState.destinationTransport}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">AGENT NUMBER:</label>
-          <Input 
-            name="agentNumber"
-            value={formState.agentNumber}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">DOCUMENT:</label>
-          <Input 
-            name="document"
-            value={formState.document}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">INVOICE NUMBER:</label>
-          <Input 
-            name="invoiceNumber"
-            value={formState.invoiceNumber}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">LOCAL TRANSPORT:</label>
-          <Input 
-            name="localTransport"
-            value={formState.localTransport}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">INVOICE DATE:</label>
-          <Input 
-            name="invoiceDate"
-            value={formState.invoiceDate}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">PACKING:</label>
-          <Input 
-            name="packing"
-            value={formState.packing}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">BRANCH:</label>
-          <Input 
-            name="branchDisplay"
-            value={formState.branch}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">STORAGE:</label>
-          <Input 
-            name="storage"
-            value={formState.storage}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">SECTOR:</label>
-          <Input 
-            name="sectorDisplay"
-            value={formState.sector}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">DESTINATION CLEARING:</label>
-          <Input 
-            name="destinationClearing"
-            value={formState.destinationClearing}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">WAREHOUSE:</label>
-          <Input 
-            name="warehouseDisplay"
-            value={formState.warehouse}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">DESTINATION DOOR DELIVERY:</label>
-          <Input 
-            name="destinationDoorDelivery"
-            value={formState.destinationDoorDelivery}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">FREIGHT BY:</label>
-          <Input 
-            name="freightByDisplay"
-            value={formState.freightBy}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">OTHER:</label>
-          <Input 
-            name="other"
-            value={formState.other}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">VOLUME:</label>
-          <Input 
-            name="volumeDisplay"
-            value={formState.volume}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">GROSS:</label>
-          <Input 
-            name="gross"
-            value={formState.gross}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">WEIGHT:</label>
-          <Input 
-            name="weightDisplay"
-            value={formState.weight}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">DISCOUNT:</label>
-          <Input 
-            name="discount"
-            value={formState.discount}
-            onChange={handleInputChange}
-            className="border border-gray-300"
-            type="number"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">PACKAGES:</label>
-          <Input 
-            name="packagesDisplay"
-            value={formState.packages}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">NET:</label>
-          <Input 
-            name="net"
-            value={formState.net}
-            readOnly
-            className="border border-gray-300 bg-gray-100 font-bold"
-          />
-        </div>
-        
-        <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">DOOR TO DOOR:</label>
-          <Input 
-            name="doorToDoorDisplay"
-            value={formState.doorToDoor}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
-        
-        <div className="flex flex-col md:col-span-2">
-          <label className="text-sm font-medium mb-1">CAT/ ZONE:</label>
-          <Input 
-            name="catZoneDisplay"
-            value={formState.catZone}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
-        
-        <div className="flex flex-col md:col-span-2">
-          <label className="text-sm font-medium mb-1">DISTRICT:</label>
-          <Input 
-            name="districtDisplay"
-            value={formState.district}
-            readOnly
-            className="border border-gray-300 bg-gray-50"
-          />
-        </div>
+        {/* Additional Details */}
+        <AdditionalDetails formState={formState} />
       </div>
     </div>
   );
 };
 
 export default PaymentDetails;
-
