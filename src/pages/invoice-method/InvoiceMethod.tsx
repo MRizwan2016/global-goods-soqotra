@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CreditCard, FileText, Printer, Save } from "lucide-react";
+import { CreditCard, FileText, Printer, Save, CheckCircle } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 
 // Form validation schema
 const formSchema = z.object({
@@ -29,6 +30,8 @@ type FormValues = z.infer<typeof formSchema>;
 const InvoiceMethod = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [paymentData, setPaymentData] = useState<FormValues | null>(null);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -48,16 +51,8 @@ const InvoiceMethod = () => {
     
     try {
       console.log("Invoice payment recorded:", data);
-      
-      // In a real app, you would save this data to your backend
-      // For now, we'll just show a success message
-      
-      toast({
-        title: "Payment Recorded",
-        description: `Payment of QAR ${data.amount} for invoice ${data.invoiceNumber} has been recorded.`,
-      });
-      
-      form.reset();
+      setPaymentData(data);
+      setShowConfirmation(true);
     } catch (error) {
       console.error("Error recording payment:", error);
       toast({
@@ -68,6 +63,27 @@ const InvoiceMethod = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleConfirmPayment = () => {
+    if (!paymentData) return;
+    
+    // In a real app, you would finalize the payment here
+    toast({
+      title: "Payment Confirmed",
+      description: `Payment of QAR ${paymentData.amount} for invoice ${paymentData.invoiceNumber} has been confirmed.`,
+    });
+    
+    setShowConfirmation(false);
+    form.reset();
+  };
+
+  const handlePrintReceipt = () => {
+    // In a real app, you would trigger printing here
+    toast({
+      title: "Printing Receipt",
+      description: "The payment receipt is being sent to the printer.",
+    });
   };
 
   return (
@@ -237,6 +253,77 @@ const InvoiceMethod = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Payment Confirmation Dialog */}
+      <Dialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+        <DialogContent className="sm:max-w-md animate-fade-in">
+          <DialogHeader>
+            <DialogTitle className="text-center text-2xl text-teal-600 font-bold flex items-center justify-center gap-2">
+              <CheckCircle className="h-6 w-6 text-teal-500" />
+              Payment Confirmation
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              Please confirm the payment details before finalizing.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {paymentData && (
+            <div className="space-y-4 my-4">
+              <div className="bg-gradient-to-r from-teal-50 to-blue-50 p-4 rounded-lg border border-teal-100 shadow-sm">
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="font-semibold text-gray-600">Invoice Number:</div>
+                  <div className="text-gray-800">{paymentData.invoiceNumber}</div>
+                  
+                  <div className="font-semibold text-gray-600">Amount:</div>
+                  <div className="text-gray-800 font-bold">QAR {paymentData.amount}</div>
+                  
+                  <div className="font-semibold text-gray-600">Payment Method:</div>
+                  <div className="text-gray-800 capitalize">{paymentData.paymentMethod}</div>
+                  
+                  {paymentData.referenceNumber && (
+                    <>
+                      <div className="font-semibold text-gray-600">Reference Number:</div>
+                      <div className="text-gray-800">{paymentData.referenceNumber}</div>
+                    </>
+                  )}
+                  
+                  <div className="font-semibold text-gray-600">Received By:</div>
+                  <div className="text-gray-800">{paymentData.receivedBy}</div>
+                  
+                  <div className="font-semibold text-gray-600">Payment Date:</div>
+                  <div className="text-gray-800">{new Date(paymentData.paymentDate).toLocaleDateString()}</div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter className="flex flex-col sm:flex-row sm:justify-center gap-2">
+            <Button 
+              type="button"
+              variant="outline"
+              onClick={() => setShowConfirmation(false)}
+              className="w-full sm:w-auto"
+            >
+              Edit Details
+            </Button>
+            <Button 
+              onClick={handleConfirmPayment}
+              className="w-full sm:w-auto bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 transition-all duration-300 transform hover:scale-105 shadow-md"
+            >
+              <CheckCircle className="mr-2 h-4 w-4" />
+              Confirm Payment
+            </Button>
+            <Button 
+              variant="outline"
+              onClick={handlePrintReceipt}
+              className="w-full sm:w-auto"
+            >
+              <Printer className="mr-2 h-4 w-4" />
+              Print Receipt
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
