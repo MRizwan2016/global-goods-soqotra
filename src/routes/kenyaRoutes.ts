@@ -8,22 +8,22 @@ import { RouteConfig } from "./types";
 export const kenyaRoutes: RouteConfig[] = [
   {
     path: "/kenya",
-    element: <KenyaDashboard />,
+    element: KenyaDashboard,
     private: true
   },
   {
     path: "/kenya/deliveries",
-    element: <KenyaDeliveryTracking />,
+    element: KenyaDeliveryTracking,
     private: true
   },
   {
     path: "/kenya/delivery/:id",
-    element: <DeliveryDetails />,
+    element: DeliveryDetails,
     private: true
   },
   {
     path: "/kenya/delivery/new",
-    element: <NewDeliveryForm />,
+    element: NewDeliveryForm,
     private: true
   }
 ];

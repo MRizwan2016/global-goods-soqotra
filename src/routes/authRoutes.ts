@@ -5,7 +5,7 @@ import { RouteConfig } from "./types";
 export const authRoutes: RouteConfig[] = [
   {
     path: "/admin/login",
-    element: <Login />,
+    element: Login,
     private: false
   }
 ];

@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Route, Routes } from "react-router-dom";
 import PrivateRoute from "@/components/auth/PrivateRoute";
 import { routes } from "@/routes";
@@ -7,6 +8,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       {routes.map((route, index) => {
+        const RouteElement = route.element;
+        
         if (route.private) {
           return (
             <Route
@@ -14,7 +17,7 @@ const AppRoutes = () => {
               path={route.path}
               element={
                 <PrivateRoute>
-                  {route.element}
+                  <RouteElement />
                 </PrivateRoute>
               }
             />
@@ -24,7 +27,7 @@ const AppRoutes = () => {
             <Route
               key={index}
               path={route.path}
-              element={route.element}
+              element={<RouteElement />}
             />
           );
         }

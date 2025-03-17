@@ -6,17 +6,17 @@ import { RouteConfig } from "./types";
 export const sellingRatesRoutes: RouteConfig[] = [
   {
     path: "/selling-rates",
-    element: <SellingRatesList />,
+    element: SellingRatesList,
     private: true
   },
   {
     path: "/selling-rates/new",
-    element: <SellingRatesForm />,
+    element: SellingRatesForm,
     private: true
   },
   {
     path: "/selling-rates/edit",
-    element: <SellingRatesForm />,
+    element: SellingRatesForm,
     private: true
   }
 ];

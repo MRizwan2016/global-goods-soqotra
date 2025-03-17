@@ -5,7 +5,7 @@ import { RouteConfig } from "./types";
 export const printDocumentsRoutes: RouteConfig[] = [
   {
     path: "/print-documents",
-    element: <PrintDocuments />,
+    element: PrintDocuments,
     private: true
   }
 ];

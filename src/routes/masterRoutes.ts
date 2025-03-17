@@ -13,62 +13,62 @@ import { RouteConfig } from "./types";
 export const masterRoutes: RouteConfig[] = [
   {
     path: "/master/book/new",
-    element: <InvoiceBookForm />,
+    element: InvoiceBookForm,
     private: true
   },
   {
     path: "/master/book/edit",
-    element: <InvoiceBookForm />,
+    element: InvoiceBookForm,
     private: true
   },
   {
     path: "/master/book/stock",
-    element: <InvoiceBookStock />,
+    element: InvoiceBookStock,
     private: true
   },
   {
     path: "/master/town",
-    element: <TownList />,
+    element: TownList,
     private: true
   },
   {
     path: "/master/town/new",
-    element: <TownForm />,
+    element: TownForm,
     private: true
   },
   {
     path: "/master/town/edit",
-    element: <TownForm />,
+    element: TownForm,
     private: true
   },
   {
     path: "/master/package/import",
-    element: <PackageOptionsImport />,
+    element: PackageOptionsImport,
     private: true
   },
   {
     path: "/master/package/new",
-    element: <PackageOptionForm />,
+    element: PackageOptionForm,
     private: true
   },
   {
     path: "/master/package/edit",
-    element: <PackageOptionForm />,
+    element: PackageOptionForm,
     private: true
   },
   {
     path: "/master/package/list",
-    element: <PackageOptionsList />,
+    element: PackageOptionsList,
     private: true
   },
   {
     path: "/master/salesrep/new",
-    element: <SalesRepForm />,
+    element: SalesRepForm,
     private: true
   },
   {
     path: "/master/salesrep/list",
-    element: <SalesRepList />,
+    element: SalesRepList,
     private: true
   }
 ];

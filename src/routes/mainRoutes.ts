@@ -8,22 +8,22 @@ import { RouteConfig } from "./types";
 export const mainRoutes: RouteConfig[] = [
   {
     path: "/",
-    element: <Index />,
+    element: Index,
     private: false
   },
   {
     path: "/dashboard",
-    element: <Dashboard />,
+    element: Dashboard,
     private: true
   },
   {
     path: "/data-entry",
-    element: <DataEntry />,
+    element: DataEntry,
     private: true
   },
   {
     path: "*",
-    element: <NotFound />,
+    element: NotFound,
     private: false
   }
 ];

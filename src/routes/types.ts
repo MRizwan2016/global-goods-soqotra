@@ -1,8 +1,8 @@
 
-import { ReactNode } from "react";
+import { ComponentType } from "react";
 
 export interface RouteConfig {
   path: string;
-  element: ReactNode;
+  element: ComponentType<any>;
   private?: boolean;
 }

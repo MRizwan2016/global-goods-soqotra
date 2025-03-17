@@ -6,12 +6,12 @@ import { RouteConfig } from "./types";
 export const reportsRoutes: RouteConfig[] = [
   {
     path: "/reports/cargo",
-    element: <CargoReportsPage />,
+    element: CargoReportsPage,
     private: true
   },
   {
     path: "/reports/financial",
-    element: <FinancialReportsPage />,
+    element: FinancialReportsPage,
     private: true
   }
 ];

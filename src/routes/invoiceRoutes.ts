@@ -11,37 +11,37 @@ import { RouteConfig } from "./types";
 export const invoiceRoutes: RouteConfig[] = [
   {
     path: "/invoice",
-    element: <InvoiceList />,
+    element: InvoiceList,
     private: true
   },
   {
     path: "/invoice/new",
-    element: <InvoiceForm />,
+    element: InvoiceForm,
     private: true
   },
   {
     path: "/invoice/edit",
-    element: <InvoiceForm />,
+    element: InvoiceForm,
     private: true
   },
   {
     path: "/invoice/print",
-    element: <InvoicePrint />,
+    element: InvoicePrint,
     private: true
   },
   {
     path: "/invoice/method/select",
-    element: <InvoiceMethod />,
+    element: InvoiceMethod,
     private: true
   },
   {
     path: "/invoice/book/stock",
-    element: <BookingFormStock />,
+    element: BookingFormStock,
     private: true
   },
   {
     path: "/invoice/book/issue",
-    element: <BookingFormIssue />,
+    element: BookingFormIssue,
     private: true
   }
 ];
