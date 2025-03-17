@@ -31,14 +31,15 @@ const CargoReportsPage = () => {
   const [zones, setZones] = useState("ALL");
   const [invoiceNumber, setInvoiceNumber] = useState("");
 
-  // Mock data transformed for cargo reports
+  // Mock data transformed for cargo reports with transport property added
   const cargoData = mockInvoiceData.map(item => ({
     ...item,
     zone: ["Normal Rate", "Special Rate", "Corporate Rate"][Math.floor(Math.random() * 3)],
     warehouse: ["Galle", "Kurunegala", "Colombo", "Kandy"][Math.floor(Math.random() * 4)],
     entryBy: `alihq#${item.date.split('/').join('')}`,
     payStatus: ["Un-Settle", "Settled", "Partial"][Math.floor(Math.random() * 3)],
-    due: item.paid ? 0 : item.net
+    due: item.paid ? 0 : item.net,
+    transport: ["SEA", "AIR"][Math.floor(Math.random() * 2)] // Added transport property
   }));
 
   const filteredData = cargoData.filter(

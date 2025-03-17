@@ -55,7 +55,6 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 
-// File permission configuration
 const filePermissions = {
   masterData: {
     label: "Master Data",
@@ -149,6 +148,7 @@ const ControlPanel = () => {
             reports: user.isAdmin ? true : false,
             downloads: user.isAdmin ? true : false,
             accounting: user.isAdmin ? true : false,
+            controlPanel: user.isAdmin ? true : false,
             files: {}
           }
         };
@@ -158,6 +158,7 @@ const ControlPanel = () => {
           ...user,
           permissions: {
             ...user.permissions,
+            controlPanel: user.permissions.controlPanel ?? user.isAdmin,
             files: {}
           }
         };
@@ -230,6 +231,7 @@ const ControlPanel = () => {
       reports: false,
       downloads: false,
       accounting: false,
+      controlPanel: false,
       files: {}
     };
     
