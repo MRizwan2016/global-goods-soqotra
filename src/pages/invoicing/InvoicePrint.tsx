@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { mockInvoiceData } from "@/data/mockData";
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
+import { QRCodeSVG } from "qrcode.react";
 
 const InvoicePrint = () => {
   const { id } = useParams();
@@ -22,353 +22,184 @@ const InvoicePrint = () => {
   if (!invoice) {
     return <div className="p-8 text-center">Invoice not found</div>;
   }
+
+  // Calculate totals
+  const totalVolume = invoice.packageDetails.reduce((sum, pkg) => sum + parseFloat(pkg.volume), 0).toFixed(3);
+  const totalWeight = (parseFloat(invoice.weight) || 397.8).toFixed(2);
   
   return (
     <div 
       ref={printRef} 
-      className="p-4 max-w-[210mm] mx-auto bg-white"
+      className="p-4 max-w-[210mm] mx-auto bg-white text-black text-sm"
       style={{ minHeight: '297mm' }}
     >
-      {/* Header with Logo and Company Info */}
-      <div className="flex mb-4">
-        <div className="w-1/3 text-left text-xs leading-tight">
-          <div className="uppercase font-semibold">International</div>
-          <div className="uppercase font-semibold">Freight Forwarding</div>
-          <div className="uppercase font-semibold">Relocation</div>
-          <div className="uppercase font-semibold">Specialize in Handling</div>
-          <div className="uppercase font-semibold">Personal Effects</div>
+      {/* Header Section */}
+      <div className="border border-black">
+        <div className="flex p-2">
+          {/* Logo section */}
+          <div className="w-1/4 flex items-center justify-center">
+            <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-20 w-20" />
+          </div>
           
-          <div className="mt-3 text-[10px]">
-            <p>Office 3, 1st Floor, Building: 53,</p>
-            <p>Street 76, Azizta Commercial Street,</p>
-            <p>Zone 53, Doha, State of Qatar.</p>
-            
+          {/* QR Code section */}
+          <div className="w-1/4 flex items-center justify-center">
+            <QRCodeSVG 
+              value={`INVOICE:${invoice.invoiceNumber}\nDATE:${invoice.date}\nAMOUNT:${invoice.net} QAR`} 
+              size={100} 
+              level="M"
+            />
+          </div>
+          
+          {/* Company info section */}
+          <div className="w-2/4 text-right">
+            <h2 className="text-base font-bold">ALMARAAM LOGISTICS SERVICES & TRADING W.L.L</h2>
+            <p className="text-xs">P.O.Box: 55861, Manthithu, Doha, Qatar</p>
+            <p className="text-xs">Tele:+974 - 44832508</p>
+            <p className="text-xs">Fax:+974 - 44832508</p>
+            <p className="text-xs">email: ops@almaraam.com</p>
+            <p className="text-xs">Print Date: {new Date().toLocaleDateString('en-GB')}</p>
+            <p className="text-xs">Print by: Mohammed Rizwan</p>
             <div className="mt-1">
-              <p>Tel: +974 4441 9187</p>
-              <p>Mobile: +974 5037 4111</p>
-              <p>+974 3335 3390</p>
-              <p>+974 5080 5560</p>
-              <p>+974 3080 3377</p>
+              <span className="font-bold text-lg">INVOICE: </span>
+              <span className="font-bold text-lg">{invoice.invoiceNumber}</span>
             </div>
-            
-            <div className="mt-1 font-semibold">
-              <p>Warehouse</p>
-              <p>Building 25, Street 47,</p>
-              <p>Zone 57, Doha, State of Qatar.</p>
-              <p>Tel: +974 4441 2770</p>
-              <p>+974 4441 2773</p>
-            </div>
-            
-            <div className="mt-1 font-semibold">
-              <p>ERITREA</p>
-              <p>DHL EXPRESS</p>
-              <p>- ASMARA BRANCH</p>
-              <p>Mr. Amanuel Akole</p>
-              <p>Mobile: +291 1126595</p>
-              <p>Tel: +291 120210</p>
-              <p>Fax: +291 1123882</p>
-              <p>Email:</p>
-              <p>amanuelakole@dhlexpress.com</p>
-              <p>aakole@gmail.com</p>
-            </div>
-            
-            <div className="mt-1 font-semibold">
-              <p>DHL EXPRESS</p>
-              <p>- MUSSAWA BRANCH</p>
-              <p>Mr. Idries Omar Idries</p>
-              <p>Mobile: +291 7159848</p>
-            </div>
-            
-            <div className="mt-1 font-semibold">
-              <p>PORT SUDAN</p>
-              <p>JAMEL CLEARANCE</p>
-              <p>CUSTOMS AND TRANSPORT</p>
-              <p>Mr. Ossama Mohamed Nor</p>
-              <p>Mobile: +249 117214361</p>
-              <p>+249 960 637999</p>
-              <p>+249 920 080385</p>
-              <p>Email:</p>
-              <p>osamagami13@gmail.com</p>
+            <div>
+              <span className="font-bold">DATE: </span>
+              <span className="font-bold">{invoice.date}</span>
             </div>
           </div>
         </div>
         
-        <div className="w-2/3 flex flex-col items-center">
-          <div className="text-4xl font-bold mb-1">SO<span className="text-green-600">Q</span>OTRA</div>
-          <div className="text-xl uppercase font-semibold mb-1">Logistics Services and Trading</div>
-          <div className="text-xs">A Member of</div>
-          <div className="text-sm font-medium">Al Maraam Logistics Services & Trading W.L.L.</div>
-          
-          <div className="w-full mt-4">
-            <div className="flex justify-end mb-2">
-              <div className="border border-black grid grid-cols-2 w-60">
-                <div className="border-r border-black px-2 text-center font-semibold">ERITREA</div>
-                <div className="px-2 text-center font-semibold">SUDAN</div>
-              </div>
-            </div>
-            
-            <div className="flex justify-end mb-2">
-              <div className="border border-black w-60">
-                <div className="px-2 text-xs">GY No:</div>
-              </div>
-            </div>
-            
-            <div className="flex mb-2">
-              <div className="text-sm">Date: {invoice.date}</div>
-            </div>
-            
-            {/* Shipper & Consignee Section */}
-            <div className="grid grid-cols-2 gap-4 border border-black">
-              <div className="border-r border-black p-2">
-                <div className="font-semibold bg-gray-100 mb-1 px-1">SHIPPER</div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">Name1</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1">{invoice.shipper1}</div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">Name 2</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1">{invoice.shipper2 || ''}</div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">Name 3</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1"></div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-start">
-                    <div className="w-16 text-sm">Address</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1 h-12"></div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">Tel:</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1"></div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">QID No</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1"></div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">ID Card No</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1"></div>
-                  </div>
-                </div>
-              </div>
-              <div className="p-2">
-                <div className="font-semibold bg-gray-100 mb-1 px-1">CONSIGNEE</div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">Name1</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1">{invoice.consignee1}</div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">Name 2</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1">{invoice.consignee2 || ''}</div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">Name 3</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1"></div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-start">
-                    <div className="w-16 text-sm">Address</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1 h-12">{invoice.address}</div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">Tel:</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1"></div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">Passport No</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1"></div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-16 text-sm">ID Card No</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1"></div>
-                  </div>
-                </div>
-                <div className="mb-1">
-                  <div className="flex items-center">
-                    <div className="w-24 text-[10px]">Value for Customs Purposes</div>
-                    <div className="flex-1 border-b border-gray-400 ml-1"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Cargo Details Table */}
-      <div className="mt-2 w-full">
-        <table className="w-full border border-black text-sm">
-          <thead>
-            <tr>
-              <th className="border border-black p-1 text-center w-16">QTY</th>
-              <th className="border border-black p-1 text-center">Cargo Type and Description</th>
-              <th className="border border-black p-1 text-center w-12">L</th>
-              <th className="border border-black p-1 text-center w-12">W</th>
-              <th className="border border-black p-1 text-center w-12">H</th>
-              <th className="border border-black p-1 text-center w-24">Volume</th>
-            </tr>
-          </thead>
-          <tbody>
-            {invoice.packageDetails.map((pkg, index) => (
-              <tr key={pkg.id}>
-                <td className="border border-black p-1 text-center">{index + 1}</td>
-                <td className="border border-black p-1">{pkg.name}</td>
-                <td className="border border-black p-1 text-center">{pkg.length}</td>
-                <td className="border border-black p-1 text-center">{pkg.width}</td>
-                <td className="border border-black p-1 text-center">{pkg.height}</td>
-                <td className="border border-black p-1 text-center">{pkg.volume}</td>
-              </tr>
-            ))}
-            {/* Add empty rows to match template */}
-            {Array.from({ length: Math.max(10 - invoice.packageDetails.length, 0) }).map((_, i) => (
-              <tr key={`empty-${i}`}>
-                <td className="border border-black p-1 h-7"></td>
-                <td className="border border-black p-1"></td>
-                <td className="border border-black p-1"></td>
-                <td className="border border-black p-1"></td>
-                <td className="border border-black p-1"></td>
-                <td className="border border-black p-1"></td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      
-      {/* Additional Info Section */}
-      <div className="mt-2 border border-black">
-        <div className="border-b border-black p-1">
-          <div className="flex items-center">
-            <div className="mr-2">Packing not in good condition</div>
-            <div className="ml-auto flex items-center">
-              <div className="mr-2">Item:</div>
-              <div className="border border-black w-64 h-6"></div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="border-b border-black p-1">
-          <div>Client have to settle the final destination chargers</div>
-        </div>
-        
-        <div className="flex">
+        {/* Shipper/Consignee Section */}
+        <div className="flex border-t border-black">
+          {/* Shipper */}
           <div className="w-1/2 border-r border-black p-2">
-            <div className="mb-1">HANDLED BY</div>
-            <div className="h-16"></div>
-            <div className="font-semibold">I/We declare these details are true and correct.</div>
-            <div className="text-xs">
-              Company is not liable to any damages or losses on transit, unless customer require Marine Insurance Cover.
-            </div>
+            <div className="font-bold underline">SHIPPER:</div>
+            <div>{invoice.shipper1 || "DISSANAYAKE D P C"}</div>
+            <div>{invoice.shipper2 || "-"}</div>
+            <div>-</div>
+            <div>THUMAMA, DOHA</div>
+          </div>
+          
+          {/* Consignee */}
+          <div className="w-1/2 p-2">
+            <div className="font-bold underline">CONSIGNEE:</div>
+            <div>{invoice.consignee1 || "DISSANAYAKE D P C"}</div>
+            <div>NO 47/2</div>
+            <div>KOTADENIYA</div>
+            <div>DANOWITA, SRI LANKA</div>
+            <div>PASSPORT NO : {invoice.passport || "OL7449595"}</div>
+          </div>
+        </div>
+        
+        {/* Destination Info Section */}
+        <div className="border-t border-black p-2 flex">
+          <div className="font-bold">Destination Warehouse: {invoice.warehouse || "Colombo"}</div>
+          <div className="mx-4 font-bold">(WAREHOUSE COLLECT)</div>
+          <div className="ml-auto font-bold">SEACARGO</div>
+        </div>
+        
+        {/* Cargo Table Section */}
+        <div className="border-t border-black">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr>
+                <th className="w-16 border border-black p-1 text-center">SL</th>
+                <th className="border border-black p-1 text-center">CARGO DESCRIPTION</th>
+                <th className="w-12 border border-black p-1 text-center">L</th>
+                <th className="w-12 border border-black p-1 text-center">W</th>
+                <th className="w-12 border border-black p-1 text-center">H</th>
+                <th className="w-24 border border-black p-1 text-center">CBF</th>
+                <th className="w-24 border border-black p-1 text-center">CBM</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoice.packageDetails.map((pkg, index) => (
+                <tr key={pkg.id}>
+                  <td className="border border-black p-1 text-center">({index + 1})</td>
+                  <td className="border border-black p-1">{pkg.name} (P/E)</td>
+                  <td className="border border-black p-1 text-center">{pkg.length}</td>
+                  <td className="border border-black p-1 text-center">{pkg.width}</td>
+                  <td className="border border-black p-1 text-center">{pkg.height}</td>
+                  <td className="border border-black p-1 text-right">
+                    {(parseFloat(pkg.length) * parseFloat(pkg.width) * parseFloat(pkg.height) / 1000).toFixed(3)}
+                  </td>
+                  <td className="border border-black p-1 text-right">{pkg.volume}</td>
+                </tr>
+              ))}
+              
+              {/* Add empty rows to match template */}
+              {Array.from({ length: Math.max(10 - invoice.packageDetails.length, 0) }).map((_, i) => (
+                <tr key={`empty-${i}`}>
+                  <td className="border border-black p-1 h-7"></td>
+                  <td className="border border-black p-1"></td>
+                  <td className="border border-black p-1"></td>
+                  <td className="border border-black p-1"></td>
+                  <td className="border border-black p-1"></td>
+                  <td className="border border-black p-1"></td>
+                  <td className="border border-black p-1"></td>
+                </tr>
+              ))}
+              
+              {/* Totals Row */}
+              <tr>
+                <td colSpan={2} className="border border-black p-1 font-bold">TOTAL</td>
+                <td colSpan={3} className="border border-black p-1 text-center font-bold">WEIGHT {totalWeight} KG</td>
+                <td className="border border-black p-1 text-right font-bold">VOLUME (CBM)</td>
+                <td className="border border-black p-1 text-right font-bold">{totalVolume}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Footer Section */}
+        <div className="border-t border-black flex">
+          <div className="w-2/3 p-2 text-xs">
+            <p className="uppercase font-bold">In case of dispute over any charges on this invoice please email:</p>
+            <p>manager@soqotra@almaraam.com TO US WITHIN SEVEN DAYS FROM THE DATE OF INVOICE.</p>
+            <p className="uppercase">Otherwise charges would be deemed as correct and payable to</p>
+            <p className="uppercase">without further delay.</p>
             
-            <div className="mt-2">
-              <div className="font-semibold">Shipper's Declaration:</div>
-              <div className="text-[8px] mt-1">
-                I/We hereby declare that the container doesn't contain liquid mercury, weapons, ammunition, alcohol, narcotics, tobacco nor currency. This shipment doesn't contain illegal items, cash, jewellery or dangerous goods. Perishable & breakable items are shipped at my own risk. "Soqotra Logistics Services, Transportation and Trading W.L.L." is not liable for any lost, damaged or undeclared items. Shipper / Consignee is responsible for destination charges. I/We understand that the delivery time is just estimated and it may be subject to change, such schedule may be advanced, delayed or cancelled with or without prior notice.
-                I/We hereby confirm that the above information is true and accurate.
-                I/We undertake to comply with the above-mentioned terms and conditions.
-              </div>
+            <div className="mt-4">
+              <p>This invoice must be settle in full within seven days of the above date. Payment method /</p>
+              <p>Bank transfer details please contact the office.</p>
+              <p>If there is outstanding balance your goods will not be released from the destination port.</p>
+              <p>Your goods are not insured through Thos Freight, Thos Freight accept no liability whatsoever</p>
+              <p>for any damages or loss incurred during shipping. Thank you for your business.</p>
             </div>
           </div>
           
-          <div className="w-1/2 p-2">
-            <div className="flex justify-between">
-              <div>Total Volume</div>
-              <div className="text-right">{invoice.volume} m³</div>
-            </div>
-            
-            <div className="flex justify-between mt-1">
-              <div>Freight @____per Cu.M</div>
-              <div className="text-right border-b border-black w-32">{invoice.gross}</div>
-            </div>
-            
-            <div className="flex justify-between mt-1">
-              <div>Documents</div>
-              <div className="text-right border-b border-black w-32">0</div>
-            </div>
-            
-            <div className="flex justify-between mt-1">
-              <div>Collection</div>
-              <div className="text-right border-b border-black w-32">0</div>
-            </div>
-            
-            <div className="flex justify-between mt-1">
-              <div>Storage</div>
-              <div className="text-right border-b border-black w-32">0</div>
-            </div>
-            
-            <div className="flex justify-between mt-1">
-              <div>Packing</div>
-              <div className="text-right border-b border-black w-32">0</div>
-            </div>
-            
-            <div className="flex justify-between mt-1">
-              <div>Insurance</div>
-              <div className="text-right border-b border-black w-32"></div>
-            </div>
-            
-            <div className="flex justify-between mt-1">
-              <div>Total</div>
-              <div className="text-right border-b border-black w-32">{invoice.gross}</div>
-            </div>
-            
-            <div className="flex justify-between mt-1">
-              <div>Discount</div>
-              <div className="text-right border-b border-black w-32">{invoice.discount}</div>
-            </div>
-            
-            <div className="flex justify-between mt-2">
-              <div className="font-semibold">Net Amount</div>
-              <div className="border border-black p-1 w-32 text-right font-semibold">{invoice.net}</div>
-            </div>
+          <div className="w-1/3 border-l border-black">
+            <table className="w-full">
+              <tbody>
+                <tr>
+                  <td className="border-b border-black p-1">Freight</td>
+                  <td className="border-b border-black p-1 text-right">{parseFloat(invoice.gross).toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td className="border-b border-black p-1">Discount</td>
+                  <td className="border-b border-black p-1 text-right">({parseFloat(invoice.discount).toFixed(2)})</td>
+                </tr>
+                <tr>
+                  <td className="border-b border-black p-1 font-bold">Total</td>
+                  <td className="border-b border-black p-1 text-right font-bold">{parseFloat(invoice.net).toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td className="border-b border-black p-1 font-bold">Total Due</td>
+                  <td className="border-b border-black p-1 text-right font-bold">{parseFloat(invoice.due || invoice.net).toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td colSpan={2} className="h-28 border-b border-black p-1">
+                    <div className="h-full flex items-center justify-center">
+                      <div className="border border-black p-2 w-32 text-center font-bold text-lg">
+                        {invoice.paid ? "PAID" : "UNPAID"}
+                      </div>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
-      </div>
-      
-      {/* Footer Section */}
-      <div className="mt-4 pt-3 flex justify-between text-sm">
-        <div>
-          <div className="border-t border-black w-64 mx-auto mt-16"></div>
-          <div className="text-center">Signature - Customer/Shipper</div>
-        </div>
-        
-        <div>
-          <div className="border-t border-black w-64 mx-auto mt-16"></div>
-          <div className="text-center">Full Payment Received - Signature & Date</div>
-        </div>
-      </div>
-      
-      {/* Bottom Country Section */}
-      <div className="mt-4 flex">
-        <div className="border border-black grid grid-cols-2 w-60">
-          <div className="border-r border-black px-2 text-center font-semibold">ERITREA</div>
-          <div className="px-2 text-center font-semibold">SUDAN</div>
-        </div>
-        <div className="border border-black ml-2 w-28">
-          <div className="px-2 text-xs">GY No:</div>
         </div>
       </div>
       
@@ -376,12 +207,15 @@ const InvoicePrint = () => {
       <style type="text/css" media="print">
         {`
           @page {
-            size: A4;
-            margin: 5mm;
+            size: A4 portrait;
+            margin: 10mm;
           }
           body {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+          }
+          .no-print {
+            display: none;
           }
         `}
       </style>
