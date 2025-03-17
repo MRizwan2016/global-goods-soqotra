@@ -25,6 +25,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { InvoiceDetailsView } from "@/components/reports/InvoiceDetailsView";
 
@@ -366,6 +367,9 @@ const CargoReportsPage = () => {
 
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0">
+          <DialogDescription className="sr-only">
+            View invoice details and manage them
+          </DialogDescription>
           {selectedInvoice && <InvoiceDetailsView invoice={selectedInvoice} onClose={handleCloseDetails} />}
         </DialogContent>
       </Dialog>
