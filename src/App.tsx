@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -74,6 +75,11 @@ const App = () => (
             </PrivateRoute>
           } />
           <Route path="/data-entry/invoice-method" element={
+            <PrivateRoute requiredFile="paymentReceivable">
+              <InvoiceMethod />
+            </PrivateRoute>
+          } />
+          <Route path="/data-entry/payment-receivable" element={
             <PrivateRoute requiredFile="paymentReceivable">
               <InvoiceMethod />
             </PrivateRoute>

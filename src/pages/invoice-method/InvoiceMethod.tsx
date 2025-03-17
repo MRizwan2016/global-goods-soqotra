@@ -242,7 +242,7 @@ const InvoiceMethod = () => {
                       <Save className="mr-2 h-4 w-4" />
                       {loading ? "Saving..." : "Save Payment"}
                     </Button>
-                    <Button type="button" variant="outline">
+                    <Button type="button" variant="outline" onClick={handlePrintReceipt}>
                       <Printer className="mr-2 h-4 w-4" />
                       Print Receipt
                     </Button>
