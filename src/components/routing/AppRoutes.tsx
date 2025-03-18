@@ -18,7 +18,7 @@ const AppRoutes = () => {
               element={
                 <PrivateRoute 
                   requireAdmin={route.path.includes('/admin')} 
-                  requiredFile={route.requiredFile}
+                  requiredFile={route.requiredFile as any}
                 >
                   <RouteElement />
                 </PrivateRoute>
