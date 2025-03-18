@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { mockInvoiceBooks } from "../constants/mockInvoiceBooks";
+import { FormState } from "../types/invoiceForm";
 
 export const useInvoiceSelection = (isEditing: boolean) => {
   const [showInvoiceSelector, setShowInvoiceSelector] = useState(false);
@@ -20,7 +21,7 @@ export const useInvoiceSelection = (isEditing: boolean) => {
     setAvailableInvoices(allInvoices);
   }, [isEditing]);
   
-  const handleSelectInvoice = (invoiceNumber: string, setFormState: React.Dispatch<React.SetStateAction<any>>) => {
+  const handleSelectInvoice = (invoiceNumber: string, setFormState: React.Dispatch<React.SetStateAction<FormState>>) => {
     setFormState(prev => ({
       ...prev,
       invoiceNumber

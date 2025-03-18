@@ -1,95 +1,22 @@
 
-import { useState } from "react";
-import { toast } from "sonner";
-import { mockInvoiceData } from "@/data/mockData";
+import { useState, useEffect } from "react";
+import { FormState, InvoiceFormReturnType, PackageItem } from "../types/invoiceForm";
 import { countrySectorMap } from "../constants/countrySectorMap";
 import { useFormHandling } from "./useFormHandling";
 import { usePackageHandling } from "./usePackageHandling";
 import { useInvoiceSelection } from "./useInvoiceSelection";
-import { FormState, InvoiceFormReturnType, PackageItem } from "../types/invoiceForm";
+import { useInvoiceSubmit } from "./useInvoiceSubmit";
+import { findExistingInvoice, initializeFormState, initializePackageItems } from "../utils/invoiceUtils";
 
 // Create the main hook that combines all the modules
 export const useInvoiceForm = (id?: string): InvoiceFormReturnType => {
   const isEditing = Boolean(id);
   
-  const existingInvoice = isEditing 
-    ? mockInvoiceData.find(inv => inv.id === id) 
-    : null;
+  // Find existing invoice if editing
+  const existingInvoice = findExistingInvoice(id);
     
   // Initialize the form state
-  const initialState: FormState = {
-    sector: existingInvoice?.sector || "COLOMBO : C",
-    branch: existingInvoice?.branch || "DOHA : HOF",
-    warehouse: existingInvoice?.warehouse || "Colombo : C",
-    salesRep: existingInvoice?.salesAgent || "",
-    doorToDoor: existingInvoice?.doorToDoor ? "YES" : "NO",
-    driver: existingInvoice?.driver || "",
-    district: existingInvoice?.district || "COLOMBO : C - C",
-    volume: existingInvoice?.volume?.toString() || "0",
-    catZone: existingInvoice?.catZone || "Normal Rate : 0",
-    weight: existingInvoice?.weight?.toString() || "0",
-    freightBy: existingInvoice?.freightBy || "SEA",
-    packages: existingInvoice?.packages?.toString() || "0",
-    invoiceNumber: existingInvoice?.invoiceNumber || "",
-    remarks: existingInvoice?.remarks || "",
-    invoiceDate: existingInvoice?.date || "",
-    giftCargo: "NO",
-    prePaid: "NO",
-    country: existingInvoice?.country || "Sri Lanka",
-    
-    // Package details
-    packagesName: "",
-    selectedPackage: null,
-    length: "",
-    width: "",
-    height: "",
-    cubicMetre: "",
-    cubicFeet: "",
-    packageWeight: "0",
-    boxNumber: "0",
-    volumeWeight: "0",
-    price: "0",
-    documentsFee: "0",
-    total: "0",
-    
-    // Shipping details
-    handOverBy: existingInvoice?.handOverBy || "",
-    shipper1: existingInvoice?.shipper1 || "",
-    shipper2: existingInvoice?.shipper2 || "",
-    shipperMobile: existingInvoice?.shipperMobile || "",
-    shipperIdNumber: existingInvoice?.shipperIdNumber || "",
-    collectionAddress: existingInvoice?.collectionAddress || "",
-    shipperCity: existingInvoice?.shipperCity || "",
-    
-    consignee1: existingInvoice?.consignee1 || "",
-    consignee2: existingInvoice?.consignee2 || "",
-    address: existingInvoice?.address || "",
-    consigneeCity: existingInvoice?.consigneeCity || "",
-    consigneeMobile: existingInvoice?.consigneeMobile || "",
-    consigneeLandline: existingInvoice?.consigneeLandline || "",
-    consigneeIdNumber: existingInvoice?.consigneeIdNumber || "",
-    
-    // Payment details
-    freight: existingInvoice?.gross?.toString() || "0",
-    destinationTransport: "0",
-    document: "0",
-    localTransport: "0",
-    packing: "0",
-    storage: "0",
-    destinationClearing: "0",
-    destinationDoorDelivery: "0",
-    other: "0",
-    gross: existingInvoice?.gross?.toString() || "0",
-    discount: existingInvoice?.discount?.toString() || "0",
-    net: existingInvoice?.net?.toString() || "0",
-    agentName: "",
-    agentNumber: "0",
-    subZone: "1 : Colombo",
-    paymentMethod: "",
-    paymentStatus: "",
-    paymentDate: "",
-    bankingDate: "",
-  };
+  const initialState = initializeFormState(existingInvoice);
 
   // Use the form handling module
   const { formState, setFormState, handleInputChange, handleSelectChange } = 
@@ -100,33 +27,28 @@ export const useInvoiceForm = (id?: string): InvoiceFormReturnType => {
     usePackageHandling(formState, setFormState);
   
   // Initialize packageItems with existing invoice data if editing
-  useState(() => {
-    if (existingInvoice?.packageDetails) {
-      const packageDetails = existingInvoice.packageDetails as PackageItem[];
-      setPackageItems(packageDetails);
+  useEffect(() => {
+    if (existingInvoice) {
+      const initialPackages = initializePackageItems(existingInvoice);
+      setPackageItems(initialPackages);
     }
-  });
+  }, [existingInvoice, setPackageItems]);
   
   // Use the invoice selection module
   const { showInvoiceSelector, setShowInvoiceSelector, availableInvoices, handleSelectInvoice: baseHandleSelectInvoice } = 
     useInvoiceSelection(isEditing);
+  
+  // Use the invoice submission module
+  const { handleSave: baseHandleSave } = useInvoiceSubmit();
   
   // Create a wrapper for handleSelectInvoice that includes setFormState
   const handleSelectInvoice = (invoiceNumber: string) => {
     baseHandleSelectInvoice(invoiceNumber, setFormState);
   };
   
-  // Handle form submission
+  // Create a wrapper for handleSave that passes the required state
   const handleSave = () => {
-    if (!formState.invoiceNumber) {
-      toast.error("Please select an invoice number");
-      return;
-    }
-    
-    console.log("Saving invoice:", { ...formState, packageItems });
-    toast.success("Invoice saved successfully");
-    
-    window.location.href = "/data-entry/invoicing";
+    baseHandleSave(formState, packageItems);
   };
 
   return {
@@ -147,7 +69,5 @@ export const useInvoiceForm = (id?: string): InvoiceFormReturnType => {
   };
 };
 
-// Re-export countrySectorMap for backwards compatibility
-export { countrySectorMap } from "../constants/countrySectorMap";
-export { mockInvoiceBooks } from "../constants/mockInvoiceBooks";
+// Re-export calculations function from the utils file
 export { calculateNet } from "../utils/invoiceCalculations";
