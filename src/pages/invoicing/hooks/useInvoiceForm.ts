@@ -133,8 +133,9 @@ export const useInvoiceForm = (id?: string) => {
           ...invoice,
           // Ensure these boolean fields are strings as expected by FormState
           doorToDoor: invoice.doorToDoor === true ? "Yes" : "No",
-          giftCargo: invoice.giftCargo === true ? "Yes" : "No",
-          prePaid: invoice.prePaid === true ? "Yes" : "No",
+          // Handle potentially missing properties by using default values
+          giftCargo: (invoice as any).giftCargo === true ? "Yes" : "No",
+          prePaid: (invoice as any).prePaid === true ? "Yes" : "No",
           // Ensure numeric fields are converted to strings
           packages: String(invoice.packages || ""),
           volume: String(invoice.volume || ""),
@@ -159,9 +160,9 @@ export const useInvoiceForm = (id?: string) => {
             weight: pkg.weight || '',
             boxNumber: pkg.boxNumber || '',
             volumeWeight: pkg.volumeWeight || '',
-            price: pkg.price || '0',
-            documentsFee: pkg.documentsFee || '0',
-            total: pkg.total || '0'
+            price: (pkg as any).price || '0',
+            documentsFee: (pkg as any).documentsFee || '0',
+            total: (pkg as any).total || '0'
           }));
           
           setPackageItems(formattedPackageItems);
