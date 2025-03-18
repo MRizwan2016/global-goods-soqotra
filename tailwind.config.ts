@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -68,7 +67,11 @@ export default {
 					green: '#41A949',  // The green color from the logo
 					light: '#f1f1f1',
 					gray: '#f1f1f1',
-					dark: '#222222'
+					dark: '#222222',
+					blue: '#2563eb',   // Professional blue color
+					navy: '#1e3a8a',   // Darker blue for contrast
+					sky: '#93c5fd',    // Light blue for highlights
+					slate: '#475569'   // Neutral slate color for text
 				}
 			},
 			borderRadius: {

@@ -28,10 +28,10 @@ const RatesTable: React.FC<RatesTableProps> = ({
     <div className="mt-8 overflow-x-auto">
       <Table>
         <TableHeader>
-          <TableRow className="bg-blue-600 hover:bg-blue-600">
-            <InvoiceTableHead className="w-48">DISTRICT/ZONE</InvoiceTableHead>
+          <TableRow className="bg-soqotra-navy text-white hover:bg-soqotra-navy/90">
+            <InvoiceTableHead className="w-48 text-white">DISTRICT/ZONE</InvoiceTableHead>
             {rateBoxes.map(box => (
-              <InvoiceTableHead key={box.id}>
+              <InvoiceTableHead key={box.id} className="text-white">
                 {box.name}
               </InvoiceTableHead>
             ))}
@@ -39,15 +39,15 @@ const RatesTable: React.FC<RatesTableProps> = ({
         </TableHeader>
         <TableBody>
           {districts.map(district => (
-            <TableRow key={district}>
-              <InvoiceTableCell className="font-medium">{district}</InvoiceTableCell>
+            <TableRow key={district} className="hover:bg-blue-50">
+              <InvoiceTableCell className="font-medium text-soqotra-slate">{district}</InvoiceTableCell>
               {rateBoxes.map(box => (
                 <InvoiceTableCell key={box.id}>
                   <Input
                     type="number"
                     value={districtRates[district]?.[box.id] || "0"}
                     onChange={(e) => handleRateChange(district, box.id, e.target.value)}
-                    className="border border-gray-300 w-full"
+                    className="border border-gray-300 w-full focus:border-soqotra-blue focus:ring-1 focus:ring-soqotra-blue"
                   />
                 </InvoiceTableCell>
               ))}

@@ -20,22 +20,22 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
       <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">TARIFF NUMBER:</label>
+        <label className="text-sm font-medium mb-1 text-soqotra-slate">TARIFF NUMBER:</label>
         <Input 
           name="tariffNumber"
           value={formState.tariffNumber}
           onChange={handleInputChange}
-          className="border border-gray-300"
+          className="border border-gray-300 focus:border-soqotra-blue focus:ring-1 focus:ring-soqotra-blue"
         />
       </div>
       
       <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">FREIGHT TYPE:</label>
+        <label className="text-sm font-medium mb-1 text-soqotra-slate">FREIGHT TYPE:</label>
         <select
           name="freightType"
           value={formState.freightType}
           onChange={handleInputChange}
-          className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+          className="bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors"
         >
           <option value="S">S</option>
           <option value="A">A</option>
@@ -44,12 +44,12 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
       </div>
       
       <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">SECTOR:</label>
+        <label className="text-sm font-medium mb-1 text-soqotra-slate">SECTOR:</label>
         <select
           name="sector"
           value={formState.sector}
           onChange={handleInputChange}
-          className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+          className="bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors"
         >
           <option value="COLOMBO : C">COLOMBO : C</option>
           <option value="DOHA : D">DOHA : D</option>
@@ -58,23 +58,23 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
       </div>
       
       <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">EFFECTIVE FROM:</label>
+        <label className="text-sm font-medium mb-1 text-soqotra-slate">EFFECTIVE FROM:</label>
         <Input 
           type="date"
           name="effectiveFrom"
           value={formState.effectiveFrom}
           onChange={handleInputChange}
-          className="border border-gray-300"
+          className="border border-gray-300 focus:border-soqotra-blue focus:ring-1 focus:ring-soqotra-blue"
         />
       </div>
       
       <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">COUNTRY:</label>
+        <label className="text-sm font-medium mb-1 text-soqotra-slate">COUNTRY:</label>
         <select
           name="country"
           value={formState.country}
           onChange={handleInputChange}
-          className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+          className="bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors"
         >
           <option value="Sri Lanka">SRI LANKA</option>
           <option value="Kenya">KENYA</option>

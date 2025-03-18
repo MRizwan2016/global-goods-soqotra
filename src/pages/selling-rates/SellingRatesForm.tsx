@@ -22,13 +22,13 @@ const SellingRatesForm = () => {
   
   return (
     <Layout title={isEditing ? "Update Selling Tariff" : "Add Selling Tariff"}>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <FormHeader 
           isEditing={isEditing} 
           country={formState.country} 
         />
         
-        <div className="p-4">
+        <div className="p-6">
           <TariffDetailsForm 
             formState={formState}
             handleInputChange={handleInputChange}
