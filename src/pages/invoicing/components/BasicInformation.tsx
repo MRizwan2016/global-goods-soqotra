@@ -1,11 +1,9 @@
 
 import React, { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { warehouseOptions } from "../constants/locationData";
+import InvoiceNumberSelector from "./basic-information/InvoiceNumberSelector";
+import LocationFields from "./basic-information/LocationFields";
+import StaffFields from "./basic-information/StaffFields";
+import AdditionalFields from "./basic-information/AdditionalFields";
 
 interface BasicInformationProps {
   formState: any;
@@ -19,30 +17,7 @@ interface BasicInformationProps {
   countrySectorMap: { [key: string]: string };
 }
 
-// List of drivers
-const DRIVERS = [
-  "Mr. Abdullah",
-  "Mr. Johny Venakdy",
-  "Mr. Salih",
-  "Mr. Kanaya",
-  "Mr. Ashoka",
-  "Mr. Idris Karar"
-];
-
-// List of sales representatives
-const SALES_REPS = [
-  "Mr. Lahiru Chathuranga",
-  "Mr. Ali Hussain",
-  "Mr. Paolo Fernando",
-  "Mr. Evans",
-  "Mr. Paul Onchano",
-  "Mr. Edwin Mbugua",
-  "Mr. Zacharia",
-  "Mr. Jun Jun Santos",
-  "Mr. Raymond"
-];
-
-const BasicInformation = ({
+const BasicInformation: React.FC<BasicInformationProps> = ({
   formState,
   handleInputChange,
   handleSelectChange,
@@ -52,15 +27,11 @@ const BasicInformation = ({
   handleSelectInvoice,
   isEditing,
   countrySectorMap
-}: BasicInformationProps) => {
+}) => {
   const [activeInvoiceUser, setActiveInvoiceUser] = useState<string>("");
-  
-  // Get warehouse options based on selected country
-  const countryWarehouses = formState.country ? warehouseOptions[formState.country] || [] : [];
   
   useEffect(() => {
     if (formState.invoiceNumber) {
-      // Check active books to find the user for this invoice
       const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
       const bookWithInvoice = activeBooks.find((book: any) => 
         book.availablePages.includes(formState.invoiceNumber)
@@ -78,269 +49,35 @@ const BasicInformation = ({
       <p className="text-sm text-gray-500">Enter the basic details for this invoice.</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <Label>Invoice Number</Label>
-          <div className="flex gap-2 items-center">
-            <Input
-              name="invoiceNumber"
-              value={formState.invoiceNumber}
-              onChange={handleInputChange}
-              className="w-full"
-              readOnly={isEditing}
-              onClick={() => !isEditing && setShowInvoiceSelector(true)}
-            />
-            {activeInvoiceUser && (
-              <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
-                {activeInvoiceUser}
-              </div>
-            )}
-          </div>
-        </div>
+        <InvoiceNumberSelector
+          formState={formState}
+          handleInputChange={handleInputChange}
+          showInvoiceSelector={showInvoiceSelector}
+          setShowInvoiceSelector={setShowInvoiceSelector}
+          availableInvoices={availableInvoices}
+          handleSelectInvoice={handleSelectInvoice}
+          isEditing={isEditing}
+          activeInvoiceUser={activeInvoiceUser}
+        />
         
-        <div className="space-y-2">
-          <Label>Sector</Label>
-          <Input
-            name="sector"
-            value={formState.sector}
-            onChange={handleInputChange}
-            className="w-full"
-            readOnly
-          />
-        </div>
+        <LocationFields
+          formState={formState}
+          handleInputChange={handleInputChange}
+          handleSelectChange={handleSelectChange}
+          countrySectorMap={countrySectorMap}
+        />
         
-        <div className="space-y-2">
-          <Label>Branch</Label>
-          <Input
-            name="branch"
-            value={formState.branch}
-            onChange={handleInputChange}
-            className="w-full"
-          />
-        </div>
+        <StaffFields
+          formState={formState}
+          handleSelectChange={handleSelectChange}
+        />
         
-        <div className="space-y-2">
-          <Label>Warehouse</Label>
-          <Select 
-            onValueChange={(value) => handleSelectChange("warehouse", value)}
-            value={formState.warehouse || ""}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Warehouse" />
-            </SelectTrigger>
-            <SelectContent>
-              {countryWarehouses.map((warehouse) => (
-                <SelectItem key={warehouse} value={warehouse}>{warehouse}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Sales Rep</Label>
-          <Select 
-            onValueChange={(value) => handleSelectChange("salesRep", value)}
-            value={formState.salesRep || ""}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Sales Rep" />
-            </SelectTrigger>
-            <SelectContent>
-              {SALES_REPS.map((rep) => (
-                <SelectItem key={rep} value={rep}>{rep}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Door to Door</Label>
-          <Select 
-            onValueChange={(value) => handleSelectChange("doorToDoor", value)}
-            value={formState.doorToDoor || ""}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="YES">YES</SelectItem>
-              <SelectItem value="NO">NO</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Driver</Label>
-          <Select 
-            onValueChange={(value) => handleSelectChange("driver", value)}
-            value={formState.driver || ""}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Driver" />
-            </SelectTrigger>
-            <SelectContent>
-              {DRIVERS.map((driver) => (
-                <SelectItem key={driver} value={driver}>{driver}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>District</Label>
-          <Input
-            name="district"
-            value={formState.district}
-            onChange={handleInputChange}
-            className="w-full"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Volume</Label>
-          <Input
-            name="volume"
-            value={formState.volume}
-            onChange={handleInputChange}
-            className="w-full"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Cat Zone</Label>
-          <Input
-            name="catZone"
-            value={formState.catZone}
-            onChange={handleInputChange}
-            className="w-full"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Weight</Label>
-          <Input
-            name="weight"
-            value={formState.weight}
-            onChange={handleInputChange}
-            className="w-full"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Freight By</Label>
-          <Select 
-            onValueChange={(value) => handleSelectChange("freightBy", value)}
-            value={formState.freightBy || ""}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="SEA">SEA</SelectItem>
-              <SelectItem value="AIR">AIR</SelectItem>
-              <SelectItem value="LAND">LAND</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Packages</Label>
-          <Input
-            name="packages"
-            value={formState.packages}
-            onChange={handleInputChange}
-            className="w-full"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Remarks</Label>
-          <Input
-            name="remarks"
-            value={formState.remarks}
-            onChange={handleInputChange}
-            className="w-full"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Invoice Date</Label>
-          <Input
-            name="invoiceDate"
-            type="date"
-            value={formState.invoiceDate}
-            onChange={handleInputChange}
-            className="w-full"
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Gift Cargo</Label>
-          <Select 
-            onValueChange={(value) => handleSelectChange("giftCargo", value)}
-            value={formState.giftCargo || ""}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="YES">YES</SelectItem>
-              <SelectItem value="NO">NO</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Pre Paid</Label>
-          <Select 
-            onValueChange={(value) => handleSelectChange("prePaid", value)}
-            value={formState.prePaid || ""}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="YES">YES</SelectItem>
-              <SelectItem value="NO">NO</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <Label>Country</Label>
-          <Select 
-            onValueChange={(value) => handleSelectChange("country", value)}
-            value={formState.country || ""}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a country" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.keys(countrySectorMap).map((country) => (
-                <SelectItem key={country} value={country}>{country}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        <AdditionalFields
+          formState={formState}
+          handleInputChange={handleInputChange}
+          handleSelectChange={handleSelectChange}
+        />
       </div>
-      
-      <Dialog open={showInvoiceSelector} onOpenChange={setShowInvoiceSelector}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Select Invoice Number</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            {availableInvoices.map(invoice => (
-              <Button 
-                key={invoice.invoiceNumber}
-                variant="outline"
-                onClick={() => handleSelectInvoice(invoice.invoiceNumber)}
-              >
-                {invoice.invoiceNumber} (Book {invoice.bookNumber})
-              </Button>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
