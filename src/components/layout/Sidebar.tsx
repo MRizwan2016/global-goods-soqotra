@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -19,6 +19,7 @@ import { usePermissions } from "@/hooks/use-permissions";
 
 const SidebarWrapper = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const { hasPermission, isAdmin } = usePermissions();
   const [open, setOpen] = useState(true);
@@ -47,6 +48,7 @@ const SidebarWrapper = () => {
 
   const handleLogout = () => {
     logout();
+    navigate("/admin/login");
   };
 
   const isActive = (path: string) => {
@@ -60,7 +62,6 @@ const SidebarWrapper = () => {
   return (
     <div className="w-64 min-h-screen bg-sky-50 border-r border-sky-100 shadow-sm">
       <div className="flex flex-col h-full">
-        {/* Sidebar Header with Logo */}
         <div className="p-4 border-b border-sky-200 animate-fade-in">
           <div className="flex flex-col items-center">
             <img 
@@ -75,7 +76,6 @@ const SidebarWrapper = () => {
           </div>
         </div>
         
-        {/* Sidebar Menu */}
         <ScrollArea className="flex-1">
           <div className="p-2">
             <nav className="space-y-1 animate-fade-in">
@@ -92,7 +92,6 @@ const SidebarWrapper = () => {
                 <span className="uppercase tracking-wide">Dashboard</span>
               </Link>
               
-              {/* Data Entry submenu */}
               <div>
                 <button
                   onClick={() => toggleSubmenu("data-entry")}
@@ -115,7 +114,6 @@ const SidebarWrapper = () => {
                   />
                 </button>
                 
-                {/* Data Entry subitems */}
                 {activeSubmenu === "data-entry" && (
                   <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
@@ -176,7 +174,6 @@ const SidebarWrapper = () => {
                 )}
               </div>
               
-              {/* Accounts submenu */}
               <div>
                 <button
                   onClick={() => toggleSubmenu("accounts")}
@@ -199,7 +196,6 @@ const SidebarWrapper = () => {
                   />
                 </button>
                 
-                {/* Accounts subitems */}
                 {activeSubmenu === "accounts" && (
                   <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
@@ -224,7 +220,6 @@ const SidebarWrapper = () => {
                 )}
               </div>
               
-              {/* Reports submenu */}
               <div>
                 <button
                   onClick={() => toggleSubmenu("reports")}
@@ -247,7 +242,6 @@ const SidebarWrapper = () => {
                   />
                 </button>
                 
-                {/* Reports subitems */}
                 {activeSubmenu === "reports" && (
                   <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
@@ -272,7 +266,6 @@ const SidebarWrapper = () => {
                 )}
               </div>
               
-              {/* Master Data submenu */}
               <div>
                 <button
                   onClick={() => toggleSubmenu("master")}
@@ -295,7 +288,6 @@ const SidebarWrapper = () => {
                   />
                 </button>
                 
-                {/* Master Data subitems */}
                 {activeSubmenu === "master" && (
                   <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
@@ -338,7 +330,6 @@ const SidebarWrapper = () => {
                 )}
               </div>
               
-              {/* Admin submenu */}
               <div>
                 <button
                   onClick={() => toggleSubmenu("admin")}
@@ -361,7 +352,6 @@ const SidebarWrapper = () => {
                   />
                 </button>
                 
-                {/* Admin subitems */}
                 {activeSubmenu === "admin" && (
                   <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
@@ -389,7 +379,6 @@ const SidebarWrapper = () => {
           </div>
         </ScrollArea>
         
-        {/* User Info & Logout */}
         <div className="p-4 border-t border-sky-200 bg-gradient-to-r from-sky-50 to-green-50">
           {currentUser ? (
             <div className="flex flex-col space-y-3 animate-fade-in">

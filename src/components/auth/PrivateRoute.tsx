@@ -7,7 +7,7 @@ import { toast } from "@/hooks/use-toast";
 interface PrivateRouteProps {
   children?: ReactNode;
   requireAdmin?: boolean;
-  requiredFile?: keyof ReturnType<typeof useAuth>['currentUser']['permissions']['files'];
+  requiredFile?: string;
 }
 
 const PrivateRoute = ({ children, requireAdmin = false, requiredFile }: PrivateRouteProps) => {
@@ -46,7 +46,7 @@ const PrivateRoute = ({ children, requireAdmin = false, requiredFile }: PrivateR
 
   // Check if specific file permission is required
   if (requiredFile && !isAdmin) {
-    const hasPermission = hasFilePermission(currentUser, requiredFile);
+    const hasPermission = hasFilePermission(currentUser, requiredFile as any);
     console.log(`File permission ${requiredFile} required, user has access: ${hasPermission}`);
     
     if (!hasPermission) {

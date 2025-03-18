@@ -20,6 +20,7 @@ export function useAuthOperations(
         if (adminUser) {
           console.log("Admin login successful");
           setCurrentUser(adminUser);
+          localStorage.setItem("currentUser", JSON.stringify(adminUser));
           toast({
             title: "Login Successful",
             description: "Welcome, Administrator!",
@@ -38,6 +39,7 @@ export function useAuthOperations(
     
     if (user && userPasswords[user.id] === password) {
       setCurrentUser(user);
+      localStorage.setItem("currentUser", JSON.stringify(user));
       toast({
         title: "Login Successful",
         description: `Welcome back, ${user.fullName}!`,
@@ -54,6 +56,7 @@ export function useAuthOperations(
   };
 
   const logout = () => {
+    console.log("Logging out user");
     setCurrentUser(null);
     localStorage.removeItem("currentUser");
     toast({
