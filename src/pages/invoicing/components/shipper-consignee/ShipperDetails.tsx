@@ -1,8 +1,9 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Phone, IdCard, MapPin } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import InputFieldWithIcon from "./InputFieldWithIcon";
+import { COUNTRY_CODES } from "../../constants/locationData";
 
 interface ShipperDetailsProps {
   formState: any;
@@ -17,6 +18,54 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
   handleSelectChange,
   availableCities
 }) => {
+  // Handle country code prefix for phone numbers
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const countryCode = COUNTRY_CODES[formState.country] || "";
+    
+    // If user is typing a new number and it doesn't start with the country code
+    if (value && !value.startsWith(countryCode)) {
+      // If value starts with a different country code, replace it
+      const numericValue = value.replace(/\D+/g, '');
+      const newValue = countryCode + numericValue;
+      
+      const event = {
+        ...e,
+        target: {
+          ...e.target,
+          name,
+          value: newValue
+        }
+      };
+      
+      handleInputChange(event);
+    } else {
+      handleInputChange(e);
+    }
+  };
+  
+  // If country changes, update the phone number prefix
+  useEffect(() => {
+    if (formState.country && formState.shipperMobile) {
+      const countryCode = COUNTRY_CODES[formState.country] || "";
+      if (!formState.shipperMobile.startsWith(countryCode)) {
+        // Strip any existing country code or non-numeric characters
+        const numericValue = formState.shipperMobile.replace(/\D+/g, '');
+        const newValue = countryCode + numericValue;
+        
+        // Update the form state with the new value
+        const event = {
+          target: {
+            name: "shipperMobile",
+            value: newValue
+          }
+        } as React.ChangeEvent<HTMLInputElement>;
+        
+        handleInputChange(event);
+      }
+    }
+  }, [formState.country]);
+
   return (
     <div>
       <h4 className="font-medium text-sm mb-3 text-gray-600">Shipper Information</h4>
@@ -42,9 +91,9 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
           label="Mobile Number"
           name="shipperMobile"
           value={formState.shipperMobile}
-          onChange={handleInputChange}
+          onChange={handlePhoneChange}
           icon={Phone}
-          placeholder="Shipper's mobile number"
+          placeholder={`${COUNTRY_CODES[formState.country] || "+xxx "} mobile number`}
         />
         
         <InputFieldWithIcon 

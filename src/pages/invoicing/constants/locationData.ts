@@ -18,17 +18,39 @@ export const warehouseOptions: Record<string, string[]> = {
 // City options by country
 export const cityOptions: Record<string, string[]> = {
   "Kenya": ["Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret"],
-  "Sri Lanka": ["Colombo", "Kandy", "Galle"],
+  "Sri Lanka": ["Colombo", "Kandy", "Galle", "Kurunegala"],
   "Philippines": ["Manila", "Cebu", "Davao"],
   "Saudi Arabia": ["Riyadh", "Jeddah", "Mecca", "Medina", "Dammam"],
   "United Arab Emirates": ["Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Jabel Ali"],
-  "Eritrea": ["Asmara", "Keren", "Massawa"],
+  "Eritrea": ["Asmara", "Keren", "Massawa", "Kassara"],
   "Sudan": ["Khartoum", "Omdurman", "Port Sudan"],
-  "Tunisia": ["Tunis", "Sfax", "Sousse"],
+  "Tunisia": ["Tunis", "Sfax", "Sousse", "La Marsa"],
   "Uganda": ["Kampala", "Entebbe", "Jinja"],
   "Kuwait": ["Kuwait City", "Hawalli", "Salmiya"],
   "Oman": ["Muscat", "Salalah", "Sohar"],
-  "Qatar": ["Doha", "Al Wakrah", "Al Khor", "Al Rayyan", "Al Saad"]
+  "Qatar": ["Doha", "Al Wakrah", "Al Khor", "Al Rayyan", "Al Saad"],
+  "India": ["Mumbai", "Chennai", "Delhi", "Kolkata"],
+  "Singapore": ["Singapore"],
+  "Bahrain": ["Manama", "Riffa", "Muharraq"]
+};
+
+// Country codes for phone numbers
+export const COUNTRY_CODES: Record<string, string> = {
+  "Kenya": "+254 ",
+  "Sri Lanka": "+94 ",
+  "Philippines": "+63 ",
+  "Saudi Arabia": "+966 ",
+  "United Arab Emirates": "+971 ",
+  "Eritrea": "+291 ",
+  "Sudan": "+249 ",
+  "Tunisia": "+216 ",
+  "Uganda": "+256 ",
+  "Kuwait": "+965 ",
+  "Oman": "+968 ",
+  "Qatar": "+974 ",
+  "India": "+91 ",
+  "Singapore": "+65 ",
+  "Bahrain": "+973 "
 };
 
 // Default country and city

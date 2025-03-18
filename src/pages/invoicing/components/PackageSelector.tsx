@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit } from "lucide-react";
@@ -27,6 +26,42 @@ const PackageSelector: React.FC<PackageSelectorProps> = ({
   const [showManualDialog, setShowManualDialog] = useState(false);
   const [manualPackageName, setManualPackageName] = useState("");
   const [manualPrice, setManualPrice] = useState("");
+
+  useEffect(() => {
+    if (formState.length && formState.width && formState.height) {
+      const length = parseFloat(formState.length) || 0;
+      const width = parseFloat(formState.width) || 0;
+      const height = parseFloat(formState.height) || 0;
+      
+      if (length > 0 && width > 0 && height > 0) {
+        const cubicMetre = ((length * width * height) / 1000000).toFixed(3);
+        
+        const event = {
+          target: {
+            name: "cubicMetre",
+            value: cubicMetre
+          }
+        } as React.ChangeEvent<HTMLInputElement>;
+        
+        handleInputChange(event);
+      }
+    }
+  }, [formState.length, formState.width, formState.height]);
+
+  useEffect(() => {
+    const price = parseFloat(formState.price) || 0;
+    const documentsFee = parseFloat(formState.documentsFee) || 0;
+    const total = (price + documentsFee).toFixed(2);
+    
+    const event = {
+      target: {
+        name: "total",
+        value: total
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    handleInputChange(event);
+  }, [formState.price, formState.documentsFee]);
 
   const submitManualPackage = () => {
     if (handleManualPackage) {
@@ -102,7 +137,8 @@ const PackageSelector: React.FC<PackageSelectorProps> = ({
           name="cubicMetre"
           value={formState.cubicMetre}
           onChange={handleInputChange}
-          className="border border-gray-300"
+          className="border border-gray-300 bg-gray-50"
+          readOnly
         />
       </div>
       
@@ -187,7 +223,6 @@ const PackageSelector: React.FC<PackageSelectorProps> = ({
         </Button>
       </div>
 
-      {/* Manual Package Dialog */}
       <Dialog open={showManualDialog} onOpenChange={setShowManualDialog}>
         <DialogContent>
           <DialogHeader>

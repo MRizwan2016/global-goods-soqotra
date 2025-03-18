@@ -1,10 +1,10 @@
 
 import React from "react";
 import { format } from "date-fns";
-import { Calendar } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { Calendar } from "@/components/ui/calendar";
 
 interface DatePickerProps {
   label: string;
@@ -25,16 +25,17 @@ const DatePicker: React.FC<DatePickerProps> = ({
       <Popover>
         <PopoverTrigger asChild>
           <Button variant="outline" className="w-full justify-start text-left font-normal border border-gray-300">
-            <Calendar className="mr-2 h-4 w-4" />
+            <CalendarIcon className="mr-2 h-4 w-4" />
             {value ? format(new Date(value), "PPP") : "Select date"}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0">
-          <CalendarComponent
+          <Calendar
             mode="single"
             selected={value ? new Date(value) : undefined}
             onSelect={(date) => handleDateChange(date, name)}
             initialFocus
+            className="p-3 pointer-events-auto"
           />
         </PopoverContent>
       </Popover>

@@ -1,52 +1,53 @@
 
 import React from "react";
-import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
+import { Save, Printer } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface FormActionsProps {
   handleSave: () => void;
+  isValid?: boolean;
+  invoiceId?: string;
 }
 
-const FormActions: React.FC<FormActionsProps> = ({
-  handleSave,
+const FormActions: React.FC<FormActionsProps> = ({ 
+  handleSave, 
+  isValid = true,
+  invoiceId
 }) => {
   const navigate = useNavigate();
-  const { id } = useParams();
-
-  const handlePrint = () => {
-    if (id) {
-      window.open(`/data-entry/invoicing/print/${id}`, '_blank');
+  
+  const handlePrintPreview = () => {
+    // If we have an invoice ID, navigate to the print view
+    if (invoiceId) {
+      window.open(`/data-entry/invoicing/print/${invoiceId}`, '_blank');
+    } else {
+      // If no ID yet, we need to save first
+      alert("Please save the invoice first to preview or print it");
     }
   };
 
   return (
-    <div className="mt-8 flex justify-end gap-4">
-      <Button 
+    <div className="flex justify-end gap-3 mt-8 mb-4">
+      <Button
         type="button"
-        onClick={() => navigate("/data-entry/invoicing")}
-        className="bg-gray-500 hover:bg-gray-600"
+        variant="default"
+        disabled={!isValid}
+        onClick={handleSave}
+        className="bg-green-600 hover:bg-green-700"
       >
-        Cancel
+        <Save className="mr-2 h-4 w-4" />
+        Save Invoice
       </Button>
       
-      {id && (
-        <Button
-          type="button"
-          onClick={handlePrint}
-          className="bg-blue-500 hover:bg-blue-600"
-        >
-          <Printer size={16} className="mr-2" />
-          Print
-        </Button>
-      )}
-      
-      <Button 
+      <Button
         type="button"
-        onClick={handleSave}
-        className="bg-green-500 hover:bg-green-600"
+        variant="outline"
+        onClick={handlePrintPreview}
+        className="border-gray-300"
       >
-        Save
+        <Printer className="mr-2 h-4 w-4" />
+        Preview Invoice
       </Button>
     </div>
   );

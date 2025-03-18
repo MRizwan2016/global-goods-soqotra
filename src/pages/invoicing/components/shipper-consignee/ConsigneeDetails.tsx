@@ -1,8 +1,9 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Phone, IdCard, MapPin } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import InputFieldWithIcon from "./InputFieldWithIcon";
+import { COUNTRY_CODES } from "../../constants/locationData";
 
 interface ConsigneeDetailsProps {
   formState: any;
@@ -17,6 +18,69 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
   handleSelectChange,
   availableCities
 }) => {
+  // Handle country code prefix for phone numbers
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const countryCode = COUNTRY_CODES[formState.country] || "";
+    
+    // If user is typing a new number and it doesn't start with the country code
+    if (value && !value.startsWith(countryCode)) {
+      // If value starts with a different country code, replace it
+      const numericValue = value.replace(/\D+/g, '');
+      const newValue = countryCode + numericValue;
+      
+      const event = {
+        ...e,
+        target: {
+          ...e.target,
+          name,
+          value: newValue
+        }
+      };
+      
+      handleInputChange(event);
+    } else {
+      handleInputChange(e);
+    }
+  };
+  
+  // If country changes, update the phone number prefixes
+  useEffect(() => {
+    if (formState.country) {
+      const countryCode = COUNTRY_CODES[formState.country] || "";
+      
+      // Update mobile number if it exists
+      if (formState.consigneeMobile && !formState.consigneeMobile.startsWith(countryCode)) {
+        const numericMobile = formState.consigneeMobile.replace(/\D+/g, '');
+        const newMobileValue = countryCode + numericMobile;
+        
+        const mobileEvent = {
+          target: {
+            name: "consigneeMobile",
+            value: newMobileValue
+          }
+        } as React.ChangeEvent<HTMLInputElement>;
+        
+        handleInputChange(mobileEvent);
+      }
+      
+      // Update landline number if it exists
+      if (formState.consigneeLandline && !formState.consigneeLandline.startsWith(countryCode)) {
+        const numericLandline = formState.consigneeLandline.replace(/\D+/g, '');
+        const newLandlineValue = countryCode + numericLandline;
+        
+        const landlineEvent = {
+          target: {
+            name: "consigneeLandline",
+            value: newLandlineValue
+          }
+        } as React.ChangeEvent<HTMLInputElement>;
+        
+        handleInputChange(landlineEvent);
+      }
+    }
+  }, [formState.country]);
+
   return (
     <div>
       <h4 className="font-medium text-sm mb-3 text-gray-600">Consignee Information</h4>
@@ -68,18 +132,18 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
           label="Mobile Number"
           name="consigneeMobile"
           value={formState.consigneeMobile}
-          onChange={handleInputChange}
+          onChange={handlePhoneChange}
           icon={Phone}
-          placeholder="Consignee's mobile number"
+          placeholder={`${COUNTRY_CODES[formState.country] || "+xxx "} mobile number`}
         />
         
         <InputFieldWithIcon 
           label="Landline Number"
           name="consigneeLandline"
           value={formState.consigneeLandline}
-          onChange={handleInputChange}
+          onChange={handlePhoneChange}
           icon={Phone}
-          placeholder="Consignee's landline number"
+          placeholder={`${COUNTRY_CODES[formState.country] || "+xxx "} landline number`}
         />
         
         <InputFieldWithIcon 

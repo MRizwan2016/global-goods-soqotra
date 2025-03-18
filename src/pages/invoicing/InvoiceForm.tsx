@@ -30,6 +30,7 @@ const InvoiceForm = () => {
     handleRemovePackage,
     handleSelectInvoice,
     handleSave,
+    savedInvoiceId,
   } = useInvoiceForm(id);
   
   return (
@@ -72,7 +73,10 @@ const InvoiceForm = () => {
             handleRemovePackage={handleRemovePackage}
           />
           
-          <FormActions handleSave={handleSave} />
+          <FormActions 
+            handleSave={handleSave} 
+            invoiceId={id || savedInvoiceId}
+          />
         </div>
       </div>
     </Layout>

@@ -31,9 +31,17 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
       
       if (bookWithInvoice) {
         setActiveInvoiceUser(bookWithInvoice.assignedTo);
+      } else {
+        // Check for invoice in the availableInvoices array
+        const selectedInvoice = availableInvoices.find(
+          invoice => invoice.invoiceNumber === formState.invoiceNumber
+        );
+        if (selectedInvoice && selectedInvoice.assignedTo) {
+          setActiveInvoiceUser(selectedInvoice.assignedTo);
+        }
       }
     }
-  }, [formState.invoiceNumber]);
+  }, [formState.invoiceNumber, availableInvoices]);
 
   return (
     <div className="space-y-2">
@@ -59,6 +67,7 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
               {availableInvoices.map(invoice => (
                 <SelectItem key={invoice.invoiceNumber} value={invoice.invoiceNumber}>
                   {invoice.invoiceNumber} (Book {invoice.bookNumber})
+                  {invoice.assignedTo && ` - ${invoice.assignedTo}`}
                 </SelectItem>
               ))}
             </SelectContent>

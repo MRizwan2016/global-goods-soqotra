@@ -29,7 +29,8 @@ export const useInvoiceSelection = (isEditing: boolean) => {
       const allInvoices = mockInvoiceBooks.flatMap(book => 
         book.available.map(num => ({
           bookNumber: book.bookNumber,
-          invoiceNumber: num
+          invoiceNumber: num,
+          assignedTo: book.assignedTo || 'Default User'
         }))
       );
       setAvailableInvoices(allInvoices);
@@ -37,12 +38,24 @@ export const useInvoiceSelection = (isEditing: boolean) => {
   }, [isEditing]);
   
   const handleSelectInvoice = (invoiceNumber: string, setFormState: React.Dispatch<React.SetStateAction<FormState>>) => {
+    // Find the selected invoice in our available invoices
+    const selectedInvoice = availableInvoices.find(
+      invoice => invoice.invoiceNumber === invoiceNumber
+    );
+    
     setFormState(prev => ({
       ...prev,
       invoiceNumber
     }));
+    
+    // Show toast with user assignment if available
+    if (selectedInvoice && selectedInvoice.assignedTo) {
+      toast.success(`Invoice number ${invoiceNumber} selected (assigned to ${selectedInvoice.assignedTo})`);
+    } else {
+      toast.success(`Invoice number ${invoiceNumber} selected`);
+    }
+    
     setShowInvoiceSelector(false);
-    toast.success(`Invoice number ${invoiceNumber} selected`);
   };
   
   return {
