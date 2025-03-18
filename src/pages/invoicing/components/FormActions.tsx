@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Save, Printer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface FormActionsProps {
   handleSave: () => void;
@@ -23,7 +24,7 @@ const FormActions: React.FC<FormActionsProps> = ({
       window.open(`/data-entry/invoicing/print/${invoiceId}`, '_blank');
     } else {
       // If no ID yet, we need to save first
-      alert("Please save the invoice first to preview or print it");
+      toast.info("Please save the invoice first to preview or print it");
     }
   };
 

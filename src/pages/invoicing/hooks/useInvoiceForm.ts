@@ -6,7 +6,7 @@ import { useFormHandling } from "./useFormHandling";
 import { usePackageHandling } from "./usePackageHandling";
 import { useInvoiceSelection } from "./useInvoiceSelection";
 import { useInvoiceSubmit } from "./useInvoiceSubmit";
-import { FormState } from "../types/invoiceForm";
+import { FormState, PackageItem } from "../types/invoiceForm";
 import { mockInvoiceData } from "@/data/mockData";
 import { DEFAULT_COUNTRY, DEFAULT_WAREHOUSE } from "../constants/locationData";
 import { countrySectorMap } from "../constants/countrySectorMap";
@@ -127,21 +127,44 @@ export const useInvoiceForm = (id?: string) => {
       const invoice = mockInvoiceData.find(inv => inv.id === id);
       
       if (invoice) {
-        setFormState({
+        // Convert boolean values to strings since our form state uses strings
+        const formattedInvoice: FormState = {
           ...initialFormState,
           ...invoice,
-        });
+          // Ensure these boolean fields are strings as expected by FormState
+          doorToDoor: invoice.doorToDoor === true ? "YES" : "NO",
+          giftCargo: invoice.giftCargo === true ? "YES" : "NO",
+          prePaid: invoice.prePaid === true ? "YES" : "NO",
+        };
+        
+        setFormState(formattedInvoice);
         
         // Set package items if available
         if (invoice.packageDetails && Array.isArray(invoice.packageDetails)) {
-          setPackageItems(invoice.packageDetails);
+          // Ensure all required fields are present in the package items
+          const formattedPackageItems: PackageItem[] = invoice.packageDetails.map(pkg => ({
+            id: pkg.id || `pkg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            name: pkg.name || '',
+            length: pkg.length || '',
+            width: pkg.width || '',
+            height: pkg.height || '',
+            volume: pkg.volume || '',
+            weight: pkg.weight || '',
+            boxNumber: pkg.boxNumber || '',
+            volumeWeight: pkg.volumeWeight || '',
+            price: pkg.price || '0',
+            documentsFee: pkg.documentsFee || '0',
+            total: pkg.total || '0'
+          }));
+          
+          setPackageItems(formattedPackageItems);
         }
       } else {
         toast.error("Invoice not found");
         navigate("/data-entry/invoicing");
       }
     }
-  }, [id, isEditing]);
+  }, [id, isEditing, navigate]);
   
   // Handle saving the invoice
   const handleSave = async () => {
