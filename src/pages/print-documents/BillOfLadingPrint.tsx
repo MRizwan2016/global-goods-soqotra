@@ -1,201 +1,31 @@
 
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer } from "lucide-react";
-import { toast } from "sonner";
+import React from "react";
+import LoadingSpinner from "./components/LoadingSpinner";
+import PrintControls from "./components/PrintControls";
+import BillOfLadingDocument from "./components/BillOfLadingDocument";
+import PrintStyles from "./components/PrintStyles";
+import { useBillOfLadingData } from "./hooks/useBillOfLadingData";
 
-const BillOfLadingPrint = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [blData, setBlData] = useState<any>(null);
-
-  useEffect(() => {
-    // In a real app, fetch the BL data from an API
-    // For now, we'll simulate loading data
-    const fetchBillOfLading = async () => {
-      try {
-        // Mock data for the Bill of Lading
-        const mockBillOfLading = {
-          id,
-          blNumber: `BL${id}`,
-          date: new Date().toISOString().split('T')[0],
-          shipper: "Example Shipping Company",
-          shipperAddress: "123 Shipping Lane, Port City",
-          consignee: "Global Receiving Ltd.",
-          consigneeAddress: "456 Receiving Road, Destination City",
-          notifyParty: "Logistics Department",
-          vessel: "MV Ocean Explorer",
-          voyage: "VOY-2023-45",
-          portOfLoading: "Mogadishu, Somalia",
-          portOfDischarge: "Mombasa, Kenya",
-          finalDestination: "Nairobi, Kenya",
-          packages: 12,
-          weight: "2,500 KG",
-          volume: "15 CBM",
-          description: "Mixed general merchandise",
-          marks: "Handle with care, This side up",
-          specialInstructions: "Keep dry, Temperature controlled"
-        };
-
-        setBlData(mockBillOfLading);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching Bill of Lading:", error);
-        toast.error("Failed to load Bill of Lading data");
-        setLoading(false);
-      }
-    };
-
-    fetchBillOfLading();
-  }, [id]);
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const handleBack = () => {
-    navigate(-1);
-  };
+const BillOfLadingPrint: React.FC = () => {
+  const { loading, blData, handlePrint, handleBack } = useBillOfLadingData();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent mb-4"></div>
-          <p>Loading Bill of Lading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading Bill of Lading..." />;
   }
 
   return (
     <div>
+      <PrintStyles />
+      
       {/* Non-printable controls */}
-      <div className="print:hidden p-4 bg-white shadow-md mb-4 sticky top-0 z-10 flex items-center justify-between">
-        <Button
-          variant="outline"
-          onClick={handleBack}
-          className="flex items-center"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        <div className="text-xl font-bold flex-1 text-center">Bill of Lading #{blData.blNumber}</div>
-        <Button
-          onClick={handlePrint}
-          className="flex items-center bg-blue-500 hover:bg-blue-600"
-        >
-          <Printer className="mr-2 h-4 w-4" />
-          Print
-        </Button>
-      </div>
+      <PrintControls 
+        handleBack={handleBack}
+        handlePrint={handlePrint}
+        title={`Bill of Lading #${blData.blNumber}`}
+      />
 
       {/* Document to print */}
-      <div className="max-w-[210mm] mx-auto bg-white p-8 shadow-md">
-        <div className="border-b-2 border-gray-800 pb-4 mb-6">
-          <h1 className="text-2xl font-bold text-center mb-2">HOUSE BILL OF LADING</h1>
-          <p className="text-sm text-center mb-1">SOQOTRA SHIPPING & LOGISTICS</p>
-          <p className="text-sm text-center">Not Negotiable Unless Consigned to Order</p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="border p-3">
-            <h2 className="font-bold mb-1">Shipper:</h2>
-            <p>{blData.shipper}</p>
-            <p className="text-sm">{blData.shipperAddress}</p>
-          </div>
-          <div className="border p-3">
-            <h2 className="font-bold mb-1">Bill of Lading Number:</h2>
-            <p>{blData.blNumber}</p>
-            <h2 className="font-bold mt-2 mb-1">Date:</h2>
-            <p>{blData.date}</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="border p-3">
-            <h2 className="font-bold mb-1">Consignee:</h2>
-            <p>{blData.consignee}</p>
-            <p className="text-sm">{blData.consigneeAddress}</p>
-          </div>
-          <div className="border p-3">
-            <h2 className="font-bold mb-1">Notify Party:</h2>
-            <p>{blData.notifyParty}</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="border p-3">
-            <h2 className="font-bold mb-1">Vessel / Voyage:</h2>
-            <p>{blData.vessel} / {blData.voyage}</p>
-          </div>
-          <div className="border p-3">
-            <h2 className="font-bold mb-1">Port of Loading:</h2>
-            <p>{blData.portOfLoading}</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="border p-3">
-            <h2 className="font-bold mb-1">Port of Discharge:</h2>
-            <p>{blData.portOfDischarge}</p>
-          </div>
-          <div className="border p-3">
-            <h2 className="font-bold mb-1">Final Destination:</h2>
-            <p>{blData.finalDestination}</p>
-          </div>
-        </div>
-
-        <div className="border p-3 mb-6">
-          <h2 className="font-bold mb-2">Cargo Details:</h2>
-          <div className="grid grid-cols-4 gap-2 mb-3">
-            <div className="col-span-1">
-              <p className="font-semibold">Packages:</p>
-              <p>{blData.packages}</p>
-            </div>
-            <div className="col-span-1">
-              <p className="font-semibold">Weight:</p>
-              <p>{blData.weight}</p>
-            </div>
-            <div className="col-span-1">
-              <p className="font-semibold">Volume:</p>
-              <p>{blData.volume}</p>
-            </div>
-            <div className="col-span-1">
-              <p className="font-semibold">Marks:</p>
-              <p>{blData.marks}</p>
-            </div>
-          </div>
-          <div>
-            <p className="font-semibold">Description of Goods:</p>
-            <p>{blData.description}</p>
-          </div>
-        </div>
-
-        <div className="border p-3 mb-6">
-          <h2 className="font-bold mb-2">Special Instructions:</h2>
-          <p>{blData.specialInstructions}</p>
-        </div>
-
-        <div className="mt-10 grid grid-cols-2 gap-4">
-          <div className="text-center">
-            <div className="border-t border-gray-400 pt-2">
-              <p className="font-bold">Shipper's Signature</p>
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="border-t border-gray-400 pt-2">
-              <p className="font-bold">Carrier's Signature</p>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 text-xs text-center">
-          <p>This Bill of Lading is subject to the standard terms and conditions of SOQOTRA SHIPPING & LOGISTICS</p>
-        </div>
-      </div>
+      <BillOfLadingDocument blData={blData} />
     </div>
   );
 };
