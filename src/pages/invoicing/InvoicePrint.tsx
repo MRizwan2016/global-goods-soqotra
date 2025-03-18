@@ -1,6 +1,6 @@
 
 import { useEffect, useRef, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import { mockInvoiceData } from "@/data/mockData";
 import { Button } from "@/components/ui/button";
@@ -14,9 +14,14 @@ import PrintInvoiceFooter from "./components/PrintInvoiceFooter";
 const InvoicePrint = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const printRef = useRef<HTMLDivElement>(null);
   const { isAuthenticated } = useAuth();
-  const [mode, setMode] = useState<"invoice" | "bl" | "certificate">("invoice");
+  
+  // Parse the mode from URL query parameters
+  const queryParams = new URLSearchParams(location.search);
+  const initialMode = (queryParams.get('mode') as "invoice" | "bl" | "certificate") || "invoice";
+  const [mode, setMode] = useState<"invoice" | "bl" | "certificate">(initialMode);
   
   // First try to get from localStorage for real data
   const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');

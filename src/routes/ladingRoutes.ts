@@ -10,7 +10,7 @@ export const ladingRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/data-entry/bill-of-lading", // Add this route
+    path: "/data-entry/bill-of-lading",
     element: BillOfLadingList,
     private: true
   },
@@ -20,7 +20,17 @@ export const ladingRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/bill-of-lading/edit",
+    path: "/data-entry/bill-of-lading/new",
+    element: BillOfLadingForm,
+    private: true
+  },
+  {
+    path: "/bill-of-lading/edit/:id",
+    element: BillOfLadingForm,
+    private: true
+  },
+  {
+    path: "/data-entry/bill-of-lading/edit/:id",
     element: BillOfLadingForm,
     private: true
   }

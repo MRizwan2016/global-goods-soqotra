@@ -1,5 +1,5 @@
-
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { 
   Table, 
@@ -20,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
 
 // Mock data for Invoices
 const mockInvoiceData = [
@@ -38,6 +39,7 @@ const mockBLData = [
 ];
 
 const PrintDocuments = () => {
+  const navigate = useNavigate();
   const [searchInvoice, setSearchInvoice] = useState("");
   const [searchBL, setSearchBL] = useState("");
   const [currentInvoicePage, setCurrentInvoicePage] = useState(1);
@@ -71,12 +73,13 @@ const PrintDocuments = () => {
   
   const handlePrintInvoice = (id: string) => {
     console.log("Printing invoice ID:", id);
-    window.open(`/data-entry/print-documents/invoice-print/${id}`, "_blank");
+    window.open(`/data-entry/invoicing/print/${id}`, "_blank");
   };
   
   const handlePrintBL = (id: string) => {
     console.log("Printing BL ID:", id);
-    window.open(`/data-entry/print-documents/bl-print/${id}`, "_blank");
+    window.open(`/data-entry/invoicing/print/${id}?mode=bl`, "_blank");
+    toast.info("Bill of Lading print view being developed");
   };
   
   return (
