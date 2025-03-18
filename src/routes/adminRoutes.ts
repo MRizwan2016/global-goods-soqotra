@@ -10,6 +10,11 @@ export const adminRoutes: RouteConfig[] = [
     private: true
   },
   {
+    path: "/admin/control-panel", // Added this route
+    element: ControlPanel,
+    private: true
+  },
+  {
     path: "/admin/register",
     element: UserRegistration,
     private: true
