@@ -1,7 +1,7 @@
 
 import { useAuth as useAuthInternal, AuthProvider as AuthProviderContext } from "@/contexts/AuthContext";
 
-export type { User } from "@/contexts/AuthContext";
+export type { User } from "@/types/auth";
 
 // Re-export AuthProvider for convenience
 export const AuthProvider = AuthProviderContext;
