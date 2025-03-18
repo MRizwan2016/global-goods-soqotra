@@ -98,6 +98,7 @@ export interface InvoiceFormReturnType {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
   handlePackageSelect: (description: string) => void;
+  handleManualPackage: (packageName: string, price: string) => void;
   handleAddPackage: () => void;
   handleRemovePackage: (id: string) => void;
   handleSelectInvoice: (invoiceNumber: string) => void;

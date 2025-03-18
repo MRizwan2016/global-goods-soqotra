@@ -9,6 +9,7 @@ interface PackageDetailsSectionProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   packageOptions: PackageOption[];
   handlePackageSelect: (description: string) => void;
+  handleManualPackage?: (packageName: string, price: string) => void;
   handleAddPackage: () => void;
   packageItems: any[];
   handleRemovePackage: (id: string) => void;
@@ -19,6 +20,7 @@ const PackageDetailsSection: React.FC<PackageDetailsSectionProps> = ({
   handleInputChange,
   packageOptions,
   handlePackageSelect,
+  handleManualPackage,
   handleAddPackage,
   packageItems,
   handleRemovePackage,
@@ -34,6 +36,7 @@ const PackageDetailsSection: React.FC<PackageDetailsSectionProps> = ({
         handleInputChange={handleInputChange}
         packageOptions={packageOptions}
         handlePackageSelect={handlePackageSelect}
+        handleManualPackage={handleManualPackage}
         handleAddPackage={handleAddPackage}
       />
       

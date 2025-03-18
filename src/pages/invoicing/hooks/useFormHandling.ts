@@ -21,6 +21,21 @@ export const useFormHandling = (initialState: FormState) => {
     }
   }, [formState.country]);
   
+  // Update district based on warehouse for Kenya
+  useEffect(() => {
+    if (formState.country === "Kenya" && formState.warehouse) {
+      // Set district based on warehouse location
+      const district = formState.warehouse.includes("Nairobi") ? "Nairobi" : 
+                       formState.warehouse.includes("Mombasa") ? "Mombasa" : 
+                       formState.district;
+                       
+      setFormState(prev => ({
+        ...prev,
+        district: district
+      }));
+    }
+  }, [formState.country, formState.warehouse]);
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormState(prev => ({
@@ -63,6 +78,18 @@ export const useFormHandling = (initialState: FormState) => {
         // Reset city selections when country changes
         shipperCity: "",
         consigneeCity: ""
+      }));
+    }
+    
+    // If warehouse changes for Kenya, update district
+    if (name === 'warehouse' && formState.country === "Kenya") {
+      const district = value.includes("Nairobi") ? "Nairobi" : 
+                      value.includes("Mombasa") ? "Mombasa" : 
+                      formState.district;
+                      
+      setFormState(prev => ({
+        ...prev,
+        district: district
       }));
     }
   };

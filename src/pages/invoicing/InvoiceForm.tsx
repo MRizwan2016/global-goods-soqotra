@@ -25,6 +25,7 @@ const InvoiceForm = () => {
     handleInputChange,
     handleSelectChange,
     handlePackageSelect,
+    handleManualPackage,
     handleAddPackage,
     handleRemovePackage,
     handleSelectInvoice,
@@ -65,6 +66,7 @@ const InvoiceForm = () => {
             handleInputChange={handleInputChange}
             packageOptions={packageOptions}
             handlePackageSelect={handlePackageSelect}
+            handleManualPackage={handleManualPackage}
             handleAddPackage={handleAddPackage}
             packageItems={packageItems}
             handleRemovePackage={handleRemovePackage}

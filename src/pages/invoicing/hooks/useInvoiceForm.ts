@@ -23,7 +23,7 @@ export const useInvoiceForm = (id?: string): InvoiceFormReturnType => {
     useFormHandling(initialState);
   
   // Use the package handling module
-  const { packageItems, setPackageItems, handlePackageSelect, handleAddPackage, handleRemovePackage } = 
+  const { packageItems, setPackageItems, handlePackageSelect, handleManualPackage, handleAddPackage, handleRemovePackage } = 
     usePackageHandling(formState, setFormState);
   
   // Initialize packageItems with existing invoice data if editing
@@ -61,6 +61,7 @@ export const useInvoiceForm = (id?: string): InvoiceFormReturnType => {
     handleInputChange,
     handleSelectChange,
     handlePackageSelect,
+    handleManualPackage,
     handleAddPackage,
     handleRemovePackage,
     handleSelectInvoice,
