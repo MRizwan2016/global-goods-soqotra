@@ -7,5 +7,10 @@ export const printDocumentsRoutes: RouteConfig[] = [
     path: "/print-documents",
     element: PrintDocuments,
     private: true
+  },
+  {
+    path: "/data-entry/print-documents", // Add this route
+    element: PrintDocuments,
+    private: true
   }
 ];

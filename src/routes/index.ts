@@ -11,6 +11,7 @@ import { accountsRoutes } from "./accountsRoutes";
 import { masterRoutes } from "./masterRoutes";
 import { sellingRatesRoutes } from "./sellingRatesRoutes";
 import { printDocumentsRoutes } from "./printDocumentsRoutes";
+import { paymentReceivableRoutes } from "./paymentReceivableRoutes";
 
 // Combine all routes into a single array
 export const routes: RouteConfig[] = [
@@ -24,5 +25,6 @@ export const routes: RouteConfig[] = [
   ...accountsRoutes,
   ...masterRoutes,
   ...sellingRatesRoutes,
-  ...printDocumentsRoutes
+  ...printDocumentsRoutes,
+  ...paymentReceivableRoutes
 ];

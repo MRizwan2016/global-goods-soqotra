@@ -10,6 +10,11 @@ export const ladingRoutes: RouteConfig[] = [
     private: true
   },
   {
+    path: "/data-entry/bill-of-lading", // Add this route
+    element: BillOfLadingList,
+    private: true
+  },
+  {
     path: "/bill-of-lading/new",
     element: BillOfLadingForm,
     private: true

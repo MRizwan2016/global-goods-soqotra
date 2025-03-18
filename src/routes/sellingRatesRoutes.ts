@@ -10,6 +10,11 @@ export const sellingRatesRoutes: RouteConfig[] = [
     private: true
   },
   {
+    path: "/data-entry/selling-rates", // Add this route
+    element: SellingRatesList,
+    private: true
+  },
+  {
     path: "/selling-rates/new",
     element: SellingRatesForm,
     private: true

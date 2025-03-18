@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -204,10 +203,10 @@ const SidebarWrapper = () => {
                 {activeSubmenu === "accounts" && (
                   <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
-                      to="/accounts/payments"
+                      to="/accounts/payment"
                       className={cn(
                         "block px-3 py-2 text-sm rounded-md",
-                        isActive("/accounts/payments") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        isActive("/accounts/payment") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                       )}
                     >
                       Payments
@@ -300,19 +299,19 @@ const SidebarWrapper = () => {
                 {activeSubmenu === "master" && (
                   <div className="pl-10 mt-1 space-y-1 animate-accordion-down">
                     <Link
-                      to="/master/invoice-book"
+                      to="/master/book/stock"
                       className={cn(
                         "block px-3 py-2 text-sm rounded-md",
-                        isActive("/master/invoice-book") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        isActive("/master/book/stock") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                       )}
                     >
                       Invoice Book
                     </Link>
                     <Link
-                      to="/master/sales-rep"
+                      to="/master/salesrep/list"
                       className={cn(
                         "block px-3 py-2 text-sm rounded-md",
-                        isActive("/master/sales-rep") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        isActive("/master/salesrep/list") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                       )}
                     >
                       Sales Rep
@@ -327,10 +326,10 @@ const SidebarWrapper = () => {
                       Town
                     </Link>
                     <Link
-                      to="/master/package-options"
+                      to="/master/package/list"
                       className={cn(
                         "block px-3 py-2 text-sm rounded-md",
-                        isActive("/master/package-options") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        isActive("/master/package/list") ? "bg-gray-100 text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                       )}
                     >
                       Package Options

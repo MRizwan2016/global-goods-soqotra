@@ -32,14 +32,14 @@ const DataEntry = () => {
           </div>
         </Link>
         
-        <Link to="/data-entry/invoice-method">
+        <Link to="/data-entry/payment-receivable">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-teal-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
             <div className="flex items-center gap-4">
               <div className="bg-teal-100 p-3 rounded-full">
                 <CreditCard className="h-6 w-6 text-teal-600" />
               </div>
               <div>
-                <h3 className="font-medium text-lg">Invoice Method</h3>
+                <h3 className="font-medium text-lg">Payment Receivable</h3>
                 <p className="text-gray-500 text-sm">Record invoice payments</p>
               </div>
             </div>
