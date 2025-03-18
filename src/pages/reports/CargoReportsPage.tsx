@@ -37,6 +37,7 @@ const CargoReportsPage = () => {
     isFullScreen,
     selectedInvoice,
     isDetailsOpen,
+    setIsDetailsOpen,
     
     // Computed values
     filteredData,

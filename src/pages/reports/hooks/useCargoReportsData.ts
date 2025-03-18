@@ -129,6 +129,7 @@ export const useCargoReportsData = () => {
     isFullScreen,
     selectedInvoice,
     isDetailsOpen,
+    setIsDetailsOpen, // Added this to explicitly expose the setter
     
     // Computed values
     filteredData,
