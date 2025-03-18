@@ -1,6 +1,6 @@
 
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/use-auth";
 import { ReactNode, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 
@@ -45,14 +45,18 @@ const PrivateRoute = ({ children, requireAdmin = false, requiredFile }: PrivateR
   }
 
   // Check if specific file permission is required
-  if (requiredFile && !isAdmin && !hasFilePermission(currentUser, requiredFile)) {
-    console.log(`File permission ${requiredFile} required but user doesn't have access, redirecting to home`);
-    toast({
-      title: "Access Denied",
-      description: "You do not have permission to access this page.",
-      variant: "destructive",
-    });
-    return <Navigate to="/" replace />;
+  if (requiredFile && !isAdmin) {
+    const hasPermission = hasFilePermission(currentUser, requiredFile);
+    console.log(`File permission ${requiredFile} required, user has access: ${hasPermission}`);
+    
+    if (!hasPermission) {
+      toast({
+        title: "Access Denied",
+        description: "You do not have permission to access this page.",
+        variant: "destructive",
+      });
+      return <Navigate to="/" replace />;
+    }
   }
 
   // Render children

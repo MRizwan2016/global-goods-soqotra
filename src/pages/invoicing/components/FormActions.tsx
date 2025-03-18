@@ -21,7 +21,14 @@ const FormActions: React.FC<FormActionsProps> = ({
   const handlePrintPreview = () => {
     // If we have an invoice ID, navigate to the print view
     if (invoiceId) {
-      window.open(`/data-entry/invoicing/print/${invoiceId}`, '_blank');
+      // Open in new tab but stay within the same session
+      const printUrl = `/data-entry/invoicing/print/${invoiceId}`;
+      const newWindow = window.open(printUrl, '_blank');
+      
+      // If popup blocked or failed to open, navigate in same window
+      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+        navigate(printUrl);
+      }
     } else {
       // If no ID yet, we need to save first
       toast.info("Please save the invoice first to preview or print it");

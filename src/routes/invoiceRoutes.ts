@@ -8,21 +8,25 @@ export const invoiceRoutes: RouteConfig[] = [
   {
     path: "/data-entry/invoicing",
     element: InvoiceList,
-    private: true
+    private: true,
+    requiredFile: "invoicing"
   },
   {
     path: "/data-entry/invoicing/new",
     element: InvoiceForm,
-    private: true
+    private: true,
+    requiredFile: "invoicing"
   },
   {
     path: "/data-entry/invoicing/edit/:id",
     element: InvoiceForm,
-    private: true
+    private: true,
+    requiredFile: "invoicing"
   },
   {
     path: "/data-entry/invoicing/print/:id",
     element: InvoicePrint,
-    private: true
+    private: true,
+    requiredFile: "invoicing"
   }
 ];

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import PrivateRoute from "@/components/auth/PrivateRoute";
 import { routes } from "@/routes";
 
@@ -16,12 +16,12 @@ const AppRoutes = () => {
               key={index}
               path={route.path}
               element={
-                <PrivateRoute 
+                <PrivateRouteWrapper
                   requireAdmin={route.path.includes('/admin')} 
                   requiredFile={route.requiredFile as any}
                 >
                   <RouteElement />
-                </PrivateRoute>
+                </PrivateRouteWrapper>
               }
             />
           );
@@ -36,6 +36,28 @@ const AppRoutes = () => {
         }
       })}
     </Routes>
+  );
+};
+
+// This wrapper helps us capture the current location for redirects
+const PrivateRouteWrapper = ({ 
+  children, 
+  requireAdmin, 
+  requiredFile 
+}: { 
+  children: React.ReactNode; 
+  requireAdmin?: boolean; 
+  requiredFile?: any;
+}) => {
+  const location = useLocation();
+  
+  return (
+    <PrivateRoute 
+      requireAdmin={requireAdmin} 
+      requiredFile={requiredFile}
+    >
+      {children}
+    </PrivateRoute>
   );
 };
 
