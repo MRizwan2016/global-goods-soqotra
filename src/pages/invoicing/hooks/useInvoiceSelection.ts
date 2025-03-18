@@ -4,7 +4,10 @@ import { toast } from "sonner";
 import { mockInvoiceBooks } from "../constants/mockInvoiceBooks";
 import { FormState } from "../types/invoiceForm";
 
-export const useInvoiceSelection = (isEditing: boolean) => {
+export const useInvoiceSelection = (
+  isEditing: boolean,
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>
+) => {
   const [showInvoiceSelector, setShowInvoiceSelector] = useState(false);
   const [availableInvoices, setAvailableInvoices] = useState<any[]>([]);
   
@@ -37,7 +40,7 @@ export const useInvoiceSelection = (isEditing: boolean) => {
     }
   }, [isEditing]);
   
-  const handleSelectInvoice = (invoiceNumber: string, setFormState: React.Dispatch<React.SetStateAction<FormState>>) => {
+  const handleSelectInvoice = (invoiceNumber: string) => {
     // Find the selected invoice in our available invoices
     const selectedInvoice = availableInvoices.find(
       invoice => invoice.invoiceNumber === invoiceNumber

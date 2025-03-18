@@ -1,13 +1,14 @@
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { calculateNet } from "../utils/invoiceCalculations";
 import { countrySectorMap } from "../constants/countrySectorMap";
 import { FormState } from "../types/invoiceForm";
-import { warehouseOptions, cityOptions, DEFAULT_WAREHOUSE } from "../constants/locationData";
+import { warehouseOptions, cityOptions } from "../constants/locationData";
 
-export const useFormHandling = (initialState: FormState) => {
-  const [formState, setFormState] = useState<FormState>(initialState);
-  
+export const useFormHandling = (
+  formState: FormState,
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>
+) => {
   // Initialize warehouse based on country if not already set
   useEffect(() => {
     if (formState.country && !formState.warehouse) {
@@ -19,7 +20,7 @@ export const useFormHandling = (initialState: FormState) => {
         }));
       }
     }
-  }, [formState.country]);
+  }, [formState.country, formState.warehouse]);
   
   // Update district based on warehouse for Kenya
   useEffect(() => {
@@ -34,7 +35,7 @@ export const useFormHandling = (initialState: FormState) => {
         district: district
       }));
     }
-  }, [formState.country, formState.warehouse]);
+  }, [formState.country, formState.warehouse, formState.district]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -100,8 +101,6 @@ export const useFormHandling = (initialState: FormState) => {
   };
 
   return {
-    formState,
-    setFormState,
     handleInputChange,
     handleSelectChange,
     getAvailableCities

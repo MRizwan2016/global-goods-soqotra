@@ -1,12 +1,16 @@
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { FormState, PackageItem } from "../types/invoiceForm";
 import { packageOptions, PackageOption } from "@/data/packageOptions";
 import { KENYA_PRICING } from "../constants/locationData";
 
-export const usePackageHandling = (formState: FormState, setFormState: React.Dispatch<React.SetStateAction<FormState>>) => {
-  const [packageItems, setPackageItems] = useState<PackageItem[]>([]);
+export const usePackageHandling = (
+  formState: FormState, 
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>,
+  packageItems: PackageItem[],
+  setPackageItems: React.Dispatch<React.SetStateAction<PackageItem[]>>
+) => {
   
   // Effect to handle Kenya-specific pricing when warehouse changes
   useEffect(() => {
@@ -142,8 +146,6 @@ export const usePackageHandling = (formState: FormState, setFormState: React.Dis
   };
 
   return {
-    packageItems,
-    setPackageItems,
     handlePackageSelect,
     handleManualPackage,
     handleAddPackage,

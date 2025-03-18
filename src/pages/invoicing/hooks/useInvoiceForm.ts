@@ -1,15 +1,13 @@
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+import { useState } from "react";
+import { FormState } from "../types/invoiceForm";
 import { useFormHandling } from "./useFormHandling";
 import { usePackageHandling } from "./usePackageHandling";
 import { useInvoiceSelection } from "./useInvoiceSelection";
-import { useInvoiceSubmit } from "./useInvoiceSubmit";
-import { FormState, PackageItem } from "../types/invoiceForm";
-import { mockInvoiceData } from "@/data/mockData";
-import { DEFAULT_COUNTRY, DEFAULT_WAREHOUSE } from "../constants/locationData";
+import { useInvoiceLoader } from "./useInvoiceLoader";
+import { useSaveInvoice } from "./useSaveInvoice";
 import { countrySectorMap } from "../constants/countrySectorMap";
+import { DEFAULT_COUNTRY, DEFAULT_WAREHOUSE } from "../constants/locationData";
 
 // Initialize default form state
 const initialFormState: FormState = {
@@ -88,122 +86,36 @@ const initialFormState: FormState = {
 };
 
 export const useInvoiceForm = (id?: string) => {
-  const navigate = useNavigate();
-  const isEditing = !!id;
-  const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(null);
+  // Load invoice data if editing
+  const {
+    formState,
+    setFormState,
+    packageItems,
+    setPackageItems,
+    isEditing
+  } = useInvoiceLoader(id, initialFormState);
   
   // Get form state and handlers
-  const { formState, setFormState, handleInputChange, handleSelectChange } = useFormHandling(initialFormState);
+  const { handleInputChange, handleSelectChange } = useFormHandling(formState, setFormState);
   
   // Get package handlers
   const { 
-    packageItems, 
-    setPackageItems,
     handlePackageSelect, 
     handleManualPackage, 
     handleAddPackage, 
     handleRemovePackage
-  } = usePackageHandling(formState, setFormState);
+  } = usePackageHandling(formState, setFormState, packageItems, setPackageItems);
   
   // Get invoice selection handlers
   const {
     showInvoiceSelector,
     setShowInvoiceSelector,
     availableInvoices,
-    handleSelectInvoice: selectInvoice
-  } = useInvoiceSelection(isEditing);
+    handleSelectInvoice
+  } = useInvoiceSelection(isEditing, setFormState);
   
-  // Get submit handler
-  const { handleSubmit } = useInvoiceSubmit();
-  
-  // Combine handlers
-  const handleSelectInvoice = (invoiceNumber: string) => selectInvoice(invoiceNumber, setFormState);
-  
-  // Load invoice data for editing
-  useEffect(() => {
-    if (isEditing) {
-      // In a real app, fetch invoice by ID from API
-      // For now, use mock data
-      const invoice = mockInvoiceData.find(inv => inv.id === id);
-      
-      if (invoice) {
-        // Convert boolean values to strings and number to strings since our form state uses strings
-        const formattedInvoice: FormState = {
-          ...initialFormState,
-          ...invoice,
-          // Ensure these boolean fields are strings as expected by FormState
-          doorToDoor: invoice.doorToDoor === true ? "Yes" : "No",
-          // Handle potentially missing properties by using default values
-          giftCargo: (invoice as any).giftCargo === true ? "Yes" : "No",
-          prePaid: (invoice as any).prePaid === true ? "Yes" : "No",
-          // Ensure numeric fields are converted to strings
-          packages: String(invoice.packages || ""),
-          volume: String(invoice.volume || ""),
-          weight: String(invoice.weight || ""),
-          gross: String(invoice.gross || "0"),
-          discount: String(invoice.discount || "0"),
-          net: String(invoice.net || "0"),
-        };
-        
-        setFormState(formattedInvoice);
-        
-        // Set package items if available
-        if (invoice.packageDetails && Array.isArray(invoice.packageDetails)) {
-          // Ensure all required fields are present in the package items
-          const formattedPackageItems: PackageItem[] = invoice.packageDetails.map(pkg => ({
-            id: pkg.id || `pkg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-            name: pkg.name || '',
-            length: pkg.length || '',
-            width: pkg.width || '',
-            height: pkg.height || '',
-            volume: pkg.volume || '',
-            weight: pkg.weight || '',
-            boxNumber: pkg.boxNumber || '',
-            volumeWeight: pkg.volumeWeight || '',
-            price: (pkg as any).price || '0',
-            documentsFee: (pkg as any).documentsFee || '0',
-            total: (pkg as any).total || '0'
-          }));
-          
-          setPackageItems(formattedPackageItems);
-        }
-      } else {
-        toast.error("Invoice not found");
-        navigate("/data-entry/invoicing");
-      }
-    }
-  }, [id, isEditing, navigate]);
-  
-  // Handle saving the invoice
-  const handleSave = async () => {
-    // Validate required fields
-    if (!formState.invoiceNumber) {
-      toast.error("Please select an invoice number");
-      return;
-    }
-    
-    if (!formState.consignee1) {
-      toast.error("Please enter a consignee name");
-      return;
-    }
-    
-    try {
-      // In a real app, this would be an API call
-      const savedId = await handleSubmit(formState, packageItems, isEditing, id);
-      
-      // Store the saved invoice ID
-      setSavedInvoiceId(savedId);
-      
-      toast.success(`Invoice ${isEditing ? 'updated' : 'created'} successfully`);
-      
-      if (!isEditing) {
-        // If creating a new invoice, either redirect or reset form
-        navigate(`/data-entry/invoicing/edit/${savedId}`);
-      }
-    } catch (error) {
-      toast.error(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  };
+  // Get save invoice handlers
+  const { handleSave, savedInvoiceId } = useSaveInvoice(formState, packageItems, isEditing, id);
   
   return {
     formState,
@@ -220,6 +132,6 @@ export const useInvoiceForm = (id?: string) => {
     handleRemovePackage,
     handleSelectInvoice,
     handleSave,
-    savedInvoiceId: savedInvoiceId || id,
+    savedInvoiceId,
   };
 };
