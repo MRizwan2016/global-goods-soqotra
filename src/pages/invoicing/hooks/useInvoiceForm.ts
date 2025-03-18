@@ -127,14 +127,21 @@ export const useInvoiceForm = (id?: string) => {
       const invoice = mockInvoiceData.find(inv => inv.id === id);
       
       if (invoice) {
-        // Convert boolean values to strings since our form state uses strings
+        // Convert boolean values to strings and number to strings since our form state uses strings
         const formattedInvoice: FormState = {
           ...initialFormState,
           ...invoice,
           // Ensure these boolean fields are strings as expected by FormState
-          doorToDoor: invoice.doorToDoor === true ? "YES" : "NO",
-          giftCargo: invoice.giftCargo === true ? "YES" : "NO",
-          prePaid: invoice.prePaid === true ? "YES" : "NO",
+          doorToDoor: invoice.doorToDoor === true ? "Yes" : "No",
+          giftCargo: invoice.giftCargo === true ? "Yes" : "No",
+          prePaid: invoice.prePaid === true ? "Yes" : "No",
+          // Ensure numeric fields are converted to strings
+          packages: String(invoice.packages || ""),
+          volume: String(invoice.volume || ""),
+          weight: String(invoice.weight || ""),
+          gross: String(invoice.gross || "0"),
+          discount: String(invoice.discount || "0"),
+          net: String(invoice.net || "0"),
         };
         
         setFormState(formattedInvoice);
