@@ -1,5 +1,8 @@
 
 import { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { sellingRateSchema, SellingRateFormValues, districtRateSchema } from "../schema/sellingRateSchema";
 
 // Mock data for districts by country
 const mockDistrictsByCountry = {
@@ -46,14 +49,6 @@ const mockSellingRates = [
   { id: "4", freightType: "S", tariffNumber: "2", effectiveFrom: "01/01/2022", district: "NAIROBI", country: "Kenya", sector: "DOHA : D" },
 ];
 
-interface SellingRateFormState {
-  tariffNumber: string;
-  freightType: string;
-  sector: string;
-  effectiveFrom: string;
-  country: string;
-}
-
 export interface BoxType {
   id: string;
   name: string;
@@ -65,46 +60,61 @@ export const useSellingRateForm = (rateId?: string) => {
   const existingRate = isEditing 
     ? mockSellingRates.find(rate => rate.id === rateId) 
     : null;
-    
-  const [formState, setFormState] = useState<SellingRateFormState>({
-    tariffNumber: existingRate?.tariffNumber || "",
-    freightType: existingRate?.freightType || "S",
-    sector: existingRate?.sector || "COLOMBO : C",
-    effectiveFrom: existingRate?.effectiveFrom || "",
-    country: existingRate?.country || "Sri Lanka",
+  
+  // React Hook Form setup with Zod validation
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+    reset
+  } = useForm<SellingRateFormValues>({
+    resolver: zodResolver(sellingRateSchema),
+    defaultValues: {
+      tariffNumber: existingRate?.tariffNumber || "",
+      freightType: (existingRate?.freightType as "S" | "A" | "L") || "S",
+      sector: existingRate?.sector || "COLOMBO : C",
+      effectiveFrom: existingRate?.effectiveFrom || "",
+      country: existingRate?.country || "Sri Lanka",
+    }
   });
+  
+  // Watch for country changes to update districts and rate boxes
+  const watchedCountry = watch("country");
   
   const [districts, setDistricts] = useState<string[]>([]);
   const [rateBoxes, setRateBoxes] = useState<BoxType[]>([]);
   const [districtRates, setDistrictRates] = useState<{[key: string]: {[key: string]: string}}>({});
+  const [isDistrictRatesValid, setIsDistrictRatesValid] = useState(true);
   
   useEffect(() => {
     // Set districts based on selected country
-    setDistricts(mockDistrictsByCountry[formState.country as keyof typeof mockDistrictsByCountry] || []);
+    setDistricts(mockDistrictsByCountry[watchedCountry as keyof typeof mockDistrictsByCountry] || []);
     
     // Set rate boxes based on selected country
-    setRateBoxes(mockRateBoxes[formState.country as keyof typeof mockRateBoxes] || mockRateBoxes.default);
+    setRateBoxes(mockRateBoxes[watchedCountry as keyof typeof mockRateBoxes] || mockRateBoxes.default);
     
     // Initialize district rates
     const newDistrictRates: {[key: string]: {[key: string]: string}} = {};
-    (mockDistrictsByCountry[formState.country as keyof typeof mockDistrictsByCountry] || []).forEach(district => {
+    (mockDistrictsByCountry[watchedCountry as keyof typeof mockDistrictsByCountry] || []).forEach(district => {
       newDistrictRates[district] = {};
-      (mockRateBoxes[formState.country as keyof typeof mockRateBoxes] || mockRateBoxes.default).forEach(box => {
+      (mockRateBoxes[watchedCountry as keyof typeof mockRateBoxes] || mockRateBoxes.default).forEach(box => {
         newDistrictRates[district][box.id] = "0";
       });
     });
     setDistrictRates(newDistrictRates);
-  }, [formState.country]);
+  }, [watchedCountry]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormState(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setValue(name as keyof SellingRateFormValues, value);
   };
   
   const handleRateChange = (district: string, boxId: string, value: string) => {
+    // Validate the input value (should be a positive number or empty)
+    const isValid = value === "" || (!isNaN(Number(value)) && Number(value) >= 0);
+    
     setDistrictRates(prev => ({
       ...prev,
       [district]: {
@@ -112,15 +122,50 @@ export const useSellingRateForm = (rateId?: string) => {
         [boxId]: value
       }
     }));
+    
+    // Validate all district rates
+    validateDistrictRates();
+  };
+  
+  const validateDistrictRates = () => {
+    try {
+      districtRateSchema.parse(districtRates);
+      setIsDistrictRatesValid(true);
+      return true;
+    } catch (error) {
+      setIsDistrictRatesValid(false);
+      return false;
+    }
+  };
+
+  const onSubmit = (data: SellingRateFormValues) => {
+    // Validate district rates before submission
+    if (!validateDistrictRates()) {
+      return false;
+    }
+    
+    // Combine form data with district rates
+    const formData = {
+      ...data,
+      districtRates
+    };
+    
+    console.log("Form data to submit:", formData);
+    return formData;
   };
 
   return {
     isEditing,
-    formState,
+    register,
+    handleSubmit,
+    errors,
+    isSubmitting,
     districts,
     rateBoxes,
     districtRates,
+    isDistrictRatesValid,
     handleInputChange,
     handleRateChange,
+    onSubmit,
   };
 };

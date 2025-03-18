@@ -2,6 +2,7 @@
 import { useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { useSellingRateForm } from "./hooks/useSellingRateForm";
+import { Form } from "@/components/ui/form";
 import FormHeader from "./components/FormHeader";
 import TariffDetailsForm from "./components/TariffDetailsForm";
 import RatesTable from "./components/RatesTable";
@@ -12,12 +13,17 @@ const SellingRatesForm = () => {
   
   const {
     isEditing,
-    formState,
+    register,
+    handleSubmit,
+    errors,
+    isSubmitting,
     districts,
     rateBoxes,
     districtRates,
+    isDistrictRatesValid,
     handleInputChange,
     handleRateChange,
+    onSubmit,
   } = useSellingRateForm(id);
   
   return (
@@ -25,27 +31,33 @@ const SellingRatesForm = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <FormHeader 
           isEditing={isEditing} 
-          country={formState.country} 
+          country={register("country").value}
         />
         
-        <div className="p-6">
-          <TariffDetailsForm 
-            formState={formState}
-            handleInputChange={handleInputChange}
-          />
-          
-          <RatesTable 
-            districts={districts}
-            rateBoxes={rateBoxes}
-            districtRates={districtRates}
-            handleRateChange={handleRateChange}
-          />
-          
-          <FormActions 
-            formState={formState}
-            districtRates={districtRates}
-          />
-        </div>
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <div className="p-6">
+            <TariffDetailsForm 
+              register={register}
+              errors={errors}
+              handleInputChange={handleInputChange}
+            />
+            
+            <RatesTable 
+              districts={districts}
+              rateBoxes={rateBoxes}
+              districtRates={districtRates}
+              handleRateChange={handleRateChange}
+              isDistrictRatesValid={isDistrictRatesValid}
+            />
+            
+            <FormActions 
+              isSubmitting={isSubmitting}
+              isDistrictRatesValid={isDistrictRatesValid}
+              handleSubmit={handleSubmit}
+              onSubmit={onSubmit}
+            />
+          </div>
+        </Form>
       </div>
     </Layout>
   );
