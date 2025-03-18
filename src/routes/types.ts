@@ -7,4 +7,5 @@ export interface RouteConfig {
   private?: boolean;
   title?: string;  // Optional title for the route
   requiredFile?: string; // Optional file permission requirement
+  requiredPermission?: string; // Added this property to fix the type error
 }

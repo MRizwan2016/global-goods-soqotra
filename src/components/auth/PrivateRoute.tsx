@@ -8,9 +8,15 @@ interface PrivateRouteProps {
   children?: ReactNode;
   requireAdmin?: boolean;
   requiredFile?: string;
+  requiredPermission?: string;
 }
 
-const PrivateRoute = ({ children, requireAdmin = false, requiredFile }: PrivateRouteProps) => {
+const PrivateRoute = ({ 
+  children, 
+  requireAdmin = false, 
+  requiredFile,
+  requiredPermission
+}: PrivateRouteProps) => {
   const { isAuthenticated, isAdmin, currentUser, hasFilePermission } = useAuth();
 
   useEffect(() => {
@@ -18,9 +24,10 @@ const PrivateRoute = ({ children, requireAdmin = false, requiredFile }: PrivateR
       isAuthenticated, 
       isAdmin, 
       currentUser: currentUser ? `${currentUser.fullName} (${currentUser.email})` : 'none',
-      requiredFile
+      requiredFile,
+      requiredPermission
     });
-  }, [isAuthenticated, isAdmin, currentUser, requiredFile]);
+  }, [isAuthenticated, isAdmin, currentUser, requiredFile, requiredPermission]);
 
   // Check if user is authenticated
   if (!isAuthenticated) {
@@ -42,6 +49,21 @@ const PrivateRoute = ({ children, requireAdmin = false, requiredFile }: PrivateR
       variant: "destructive",
     });
     return <Navigate to="/" replace />;
+  }
+
+  // Check if specific permission is required
+  if (requiredPermission && !isAdmin && currentUser) {
+    const hasPermission = currentUser.permissions[requiredPermission as keyof typeof currentUser.permissions];
+    console.log(`Permission ${requiredPermission} required, user has access: ${hasPermission}`);
+    
+    if (!hasPermission) {
+      toast({
+        title: "Access Denied",
+        description: "You do not have permission to access this page.",
+        variant: "destructive",
+      });
+      return <Navigate to="/" replace />;
+    }
   }
 
   // Check if specific file permission is required
