@@ -3,17 +3,20 @@ import React from 'react';
 
 interface FormHeaderProps {
   isEditing: boolean;
-  country: string;
+  country: string; // Changed from an object with value to just a string
 }
 
 const FormHeader: React.FC<FormHeaderProps> = ({ isEditing, country }) => {
   return (
-    <div className="p-4 bg-blue-50 border-b border-blue-100">
-      <h3 className="text-lg font-medium text-blue-800">
-        {isEditing 
-          ? `Update Selling Tariff - ${country}` 
-          : `Add Selling Tariff - ${country}`}
-      </h3>
+    <div className="bg-soqotra-navy text-white px-6 py-4">
+      <h2 className="text-xl font-semibold">
+        {isEditing ? "Update Selling Tariff" : "Add Selling Tariff"}
+      </h2>
+      {country && (
+        <p className="text-sm opacity-80 mt-1">
+          Country: {country}
+        </p>
+      )}
     </div>
   );
 };

@@ -167,5 +167,6 @@ export const useSellingRateForm = (rateId?: string) => {
     handleInputChange,
     handleRateChange,
     onSubmit,
+    watch, // Add watch to the returned object
   };
 };

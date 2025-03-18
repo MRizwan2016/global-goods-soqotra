@@ -24,17 +24,22 @@ const SellingRatesForm = () => {
     handleInputChange,
     handleRateChange,
     onSubmit,
+    watch,
   } = useSellingRateForm(id);
+  
+  // Watch the country value to pass to FormHeader
+  const country = watch("country");
   
   return (
     <Layout title={isEditing ? "Update Selling Tariff" : "Add Selling Tariff"}>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <FormHeader 
           isEditing={isEditing} 
-          country={register("country").value}
+          country={country}
         />
         
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        {/* Form tag with native onSubmit handler */}
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="p-6">
             <TariffDetailsForm 
               register={register}
@@ -57,7 +62,7 @@ const SellingRatesForm = () => {
               onSubmit={onSubmit}
             />
           </div>
-        </Form>
+        </form>
       </div>
     </Layout>
   );
