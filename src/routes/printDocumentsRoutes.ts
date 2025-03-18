@@ -17,7 +17,7 @@ export const printDocumentsRoutes: RouteConfig[] = [
   },
   {
     path: "/data-entry/print-documents/bl-print/:id",
-    element: InvoicePrint, // Reusing InvoicePrint for now as a fallback
+    element: BillOfLadingPrint,
     private: true
   }
 ];

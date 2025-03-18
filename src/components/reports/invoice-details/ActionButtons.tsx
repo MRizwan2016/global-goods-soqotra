@@ -20,7 +20,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   
   const handlePrintInvoice = () => {
     if (invoiceId) {
-      window.open(`/data-entry/invoicing/print/${invoiceId}`, '_blank');
+      window.open(`/data-entry/print-documents/invoice-print/${invoiceId}`, '_blank');
     } else {
       toast.info("Invoice ID not available for printing");
     }
@@ -28,7 +28,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   
   const handlePrintCertificate = () => {
     if (invoiceId) {
-      window.open(`/data-entry/invoicing/print/${invoiceId}?mode=certificate`, '_blank');
+      window.open(`/data-entry/print-documents/invoice-print/${invoiceId}?mode=certificate`, '_blank');
     } else {
       toast.info("Invoice ID not available for printing");
     }
@@ -36,7 +36,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   
   const handlePrintHBL = () => {
     if (invoiceId) {
-      window.open(`/data-entry/invoicing/print/${invoiceId}?mode=bl`, '_blank');
+      window.open(`/data-entry/print-documents/bl-print/${invoiceId}`, '_blank');
     } else {
       toast.info("Invoice ID not available for printing");
     }

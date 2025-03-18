@@ -73,13 +73,12 @@ const PrintDocuments = () => {
   
   const handlePrintInvoice = (id: string) => {
     console.log("Printing invoice ID:", id);
-    window.open(`/data-entry/invoicing/print/${id}`, "_blank");
+    window.open(`/data-entry/print-documents/invoice-print/${id}`, "_blank");
   };
   
   const handlePrintBL = (id: string) => {
     console.log("Printing BL ID:", id);
-    window.open(`/data-entry/invoicing/print/${id}?mode=bl`, "_blank");
-    toast.info("Bill of Lading print view being developed");
+    window.open(`/data-entry/print-documents/bl-print/${id}`, "_blank");
   };
   
   return (
