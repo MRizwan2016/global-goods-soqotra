@@ -7,8 +7,11 @@ export const usePackageHandling = (formState: FormState, setFormState: React.Dis
   const [packageItems, setPackageItems] = useState<PackageItem[]>([]);
   
   const handlePackageSelect = (description: string) => {
+    if (!description) return;
+    
     const packageOptions = require('@/data/packageOptions').packageOptions;
     const selectedPackage = packageOptions.find((pkg: any) => pkg.description === description);
+    
     if (selectedPackage) {
       setFormState(prev => ({
         ...prev,
@@ -38,9 +41,9 @@ export const usePackageHandling = (formState: FormState, setFormState: React.Dis
       width: formState.width,
       height: formState.height,
       volume: formState.cubicMetre,
-      weight: formState.packageWeight,
-      boxNumber: formState.boxNumber,
-      volumeWeight: formState.volumeWeight,
+      weight: formState.packageWeight || "0",
+      boxNumber: formState.boxNumber || "0",
+      volumeWeight: formState.volumeWeight || "0",
       price: formState.price,
       documentsFee: formState.documentsFee,
       total: formState.total

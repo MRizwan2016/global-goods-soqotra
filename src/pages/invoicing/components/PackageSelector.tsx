@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { PackageOption } from "@/data/packageOptions";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PackageSelectorProps {
   formState: any;
@@ -24,19 +25,21 @@ const PackageSelector: React.FC<PackageSelectorProps> = ({
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-4">
       <div className="flex flex-col">
         <label className="text-sm font-medium mb-1">PACKAGES NAME:</label>
-        <select
-          name="packagesName"
-          value={formState.packagesName}
-          onChange={(e) => handlePackageSelect(e.target.value)}
-          className="bg-blue-500 text-white py-2 px-3 rounded text-sm"
+        <Select 
+          onValueChange={handlePackageSelect}
+          value={formState.packagesName || ""}
         >
-          <option value="">Select a package</option>
-          {packageOptions.map(pkg => (
-            <option key={pkg.id} value={pkg.description}>
-              {pkg.description}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger className="bg-blue-500 text-white py-2 px-3 rounded text-sm w-full">
+            <SelectValue placeholder="Select a package" />
+          </SelectTrigger>
+          <SelectContent>
+            {packageOptions.map(pkg => (
+              <SelectItem key={pkg.id} value={pkg.description}>
+                {pkg.description}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       
       <div className="flex flex-col">

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,6 +17,29 @@ interface BasicInformationProps {
   isEditing: boolean;
   countrySectorMap: { [key: string]: string };
 }
+
+// List of drivers
+const DRIVERS = [
+  "Mr. Abdullah",
+  "Mr. Johny Venakdy",
+  "Mr. Salih",
+  "Mr. Kanaya",
+  "Mr. Ashoka",
+  "Mr. Idris Karar"
+];
+
+// List of sales representatives
+const SALES_REPS = [
+  "Mr. Lahiru Chathuranga",
+  "Mr. Ali Hussain",
+  "Mr. Paolo Fernando",
+  "Mr. Evans",
+  "Mr. Paul Onchano",
+  "Mr. Edwin Mbugua",
+  "Mr. Zacharia",
+  "Mr. Jun Jun Santos",
+  "Mr. Raymond"
+];
 
 const BasicInformation = ({
   formState,
@@ -102,19 +126,29 @@ const BasicInformation = ({
         
         <div className="space-y-2">
           <Label>Sales Rep</Label>
-          <Input
-            name="salesRep"
-            value={formState.salesRep}
-            onChange={handleInputChange}
-            className="w-full"
-          />
+          <Select 
+            onValueChange={(value) => handleSelectChange("salesRep", value)}
+            value={formState.salesRep || ""}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Sales Rep" />
+            </SelectTrigger>
+            <SelectContent>
+              {SALES_REPS.map((rep) => (
+                <SelectItem key={rep} value={rep}>{rep}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         
         <div className="space-y-2">
           <Label>Door to Door</Label>
-          <Select onValueChange={(value) => handleSelectChange("doorToDoor", value)}>
+          <Select 
+            onValueChange={(value) => handleSelectChange("doorToDoor", value)}
+            value={formState.doorToDoor || ""}
+          >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={formState.doorToDoor || "Select"} />
+              <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="YES">YES</SelectItem>
@@ -125,12 +159,19 @@ const BasicInformation = ({
         
         <div className="space-y-2">
           <Label>Driver</Label>
-          <Input
-            name="driver"
-            value={formState.driver}
-            onChange={handleInputChange}
-            className="w-full"
-          />
+          <Select 
+            onValueChange={(value) => handleSelectChange("driver", value)}
+            value={formState.driver || ""}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Driver" />
+            </SelectTrigger>
+            <SelectContent>
+              {DRIVERS.map((driver) => (
+                <SelectItem key={driver} value={driver}>{driver}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         
         <div className="space-y-2">
@@ -175,9 +216,12 @@ const BasicInformation = ({
         
         <div className="space-y-2">
           <Label>Freight By</Label>
-          <Select onValueChange={(value) => handleSelectChange("freightBy", value)}>
+          <Select 
+            onValueChange={(value) => handleSelectChange("freightBy", value)}
+            value={formState.freightBy || ""}
+          >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={formState.freightBy || "Select"} />
+              <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="SEA">SEA</SelectItem>
@@ -220,9 +264,12 @@ const BasicInformation = ({
         
         <div className="space-y-2">
           <Label>Gift Cargo</Label>
-          <Select onValueChange={(value) => handleSelectChange("giftCargo", value)}>
+          <Select 
+            onValueChange={(value) => handleSelectChange("giftCargo", value)}
+            value={formState.giftCargo || ""}
+          >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={formState.giftCargo || "Select"} />
+              <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="YES">YES</SelectItem>
@@ -233,9 +280,12 @@ const BasicInformation = ({
         
         <div className="space-y-2">
           <Label>Pre Paid</Label>
-          <Select onValueChange={(value) => handleSelectChange("prePaid", value)}>
+          <Select 
+            onValueChange={(value) => handleSelectChange("prePaid", value)}
+            value={formState.prePaid || ""}
+          >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={formState.prePaid || "Select"} />
+              <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="YES">YES</SelectItem>
@@ -246,9 +296,12 @@ const BasicInformation = ({
         
         <div className="space-y-2">
           <Label>Country</Label>
-          <Select onValueChange={(value) => handleSelectChange("country", value)}>
+          <Select 
+            onValueChange={(value) => handleSelectChange("country", value)}
+            value={formState.country || ""}
+          >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={formState.country || "Select a country"} />
+              <SelectValue placeholder="Select a country" />
             </SelectTrigger>
             <SelectContent>
               {Object.keys(countrySectorMap).map((country) => (
