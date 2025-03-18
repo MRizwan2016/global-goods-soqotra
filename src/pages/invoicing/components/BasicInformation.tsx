@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import InvoiceNumberSelector from "./basic-information/InvoiceNumberSelector";
 import LocationFields from "./basic-information/LocationFields";
 import StaffFields from "./basic-information/StaffFields";
@@ -28,21 +28,6 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
   isEditing,
   countrySectorMap
 }) => {
-  const [activeInvoiceUser, setActiveInvoiceUser] = useState<string>("");
-  
-  useEffect(() => {
-    if (formState.invoiceNumber) {
-      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
-      const bookWithInvoice = activeBooks.find((book: any) => 
-        book.availablePages.includes(formState.invoiceNumber)
-      );
-      
-      if (bookWithInvoice) {
-        setActiveInvoiceUser(bookWithInvoice.assignedTo);
-      }
-    }
-  }, [formState.invoiceNumber]);
-
   return (
     <div className="space-y-4 p-4 border rounded-lg bg-gray-50">
       <h2 className="text-lg font-semibold">Basic Information</h2>
@@ -57,7 +42,6 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
           availableInvoices={availableInvoices}
           handleSelectInvoice={handleSelectInvoice}
           isEditing={isEditing}
-          activeInvoiceUser={activeInvoiceUser}
         />
         
         <LocationFields

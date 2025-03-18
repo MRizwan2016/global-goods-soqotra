@@ -1,9 +1,8 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface InvoiceNumberSelectorProps {
   formState: any;
@@ -13,56 +12,64 @@ interface InvoiceNumberSelectorProps {
   availableInvoices: any[];
   handleSelectInvoice: (invoiceNumber: string) => void;
   isEditing: boolean;
-  activeInvoiceUser: string;
 }
 
 const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
   formState,
-  handleInputChange,
-  showInvoiceSelector,
-  setShowInvoiceSelector,
-  availableInvoices,
   handleSelectInvoice,
-  isEditing,
-  activeInvoiceUser,
+  availableInvoices,
+  isEditing
 }) => {
+  const [activeInvoiceUser, setActiveInvoiceUser] = useState<string>("");
+  
+  useEffect(() => {
+    if (formState.invoiceNumber) {
+      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+      const bookWithInvoice = activeBooks.find((book: any) => 
+        book.availablePages.includes(formState.invoiceNumber)
+      );
+      
+      if (bookWithInvoice) {
+        setActiveInvoiceUser(bookWithInvoice.assignedTo);
+      }
+    }
+  }, [formState.invoiceNumber]);
+
   return (
     <div className="space-y-2">
       <Label>Invoice Number</Label>
       <div className="flex gap-2 items-center">
-        <Input
-          name="invoiceNumber"
-          value={formState.invoiceNumber}
-          onChange={handleInputChange}
-          className="w-full"
-          readOnly={isEditing}
-          onClick={() => !isEditing && setShowInvoiceSelector(true)}
-        />
+        {isEditing ? (
+          <Input
+            name="invoiceNumber"
+            value={formState.invoiceNumber}
+            readOnly={true}
+            className="w-full"
+          />
+        ) : (
+          <Select
+            value={formState.invoiceNumber || ""}
+            onValueChange={handleSelectInvoice}
+            disabled={isEditing}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select invoice number" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableInvoices.map(invoice => (
+                <SelectItem key={invoice.invoiceNumber} value={invoice.invoiceNumber}>
+                  {invoice.invoiceNumber} (Book {invoice.bookNumber})
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
         {activeInvoiceUser && (
-          <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+          <div className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs md:text-sm whitespace-nowrap">
             {activeInvoiceUser}
           </div>
         )}
       </div>
-
-      <Dialog open={showInvoiceSelector} onOpenChange={setShowInvoiceSelector}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Select Invoice Number</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            {availableInvoices.map(invoice => (
-              <Button 
-                key={invoice.invoiceNumber}
-                variant="outline"
-                onClick={() => handleSelectInvoice(invoice.invoiceNumber)}
-              >
-                {invoice.invoiceNumber} (Book {invoice.bookNumber})
-              </Button>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
