@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, User } from "@/hooks/use-auth";
 import Layout from "@/components/layout/Layout";
-import { Loader } from "lucide-react";
+import { Loader, UserIcon } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import {
   Tabs,
@@ -106,7 +106,7 @@ const ControlPanel = () => {
         <Tabs defaultValue="users">
           <TabsList className="grid grid-cols-1 w-[200px]">
             <TabsTrigger value="users" className="flex items-center gap-1">
-              <Loader className="mr-1 h-4 w-4" />
+              <UserIcon className="mr-1 h-4 w-4" />
               User Management
             </TabsTrigger>
           </TabsList>
