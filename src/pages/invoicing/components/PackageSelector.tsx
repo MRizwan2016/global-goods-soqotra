@@ -32,7 +32,7 @@ const PackageSelector: React.FC<PackageSelectorProps> = ({
           <SelectTrigger className="bg-blue-500 text-white py-2 px-3 rounded text-sm w-full">
             <SelectValue placeholder="Select a package" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white">
             {packageOptions.map(pkg => (
               <SelectItem key={pkg.id} value={pkg.description}>
                 {pkg.description}

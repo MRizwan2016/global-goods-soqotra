@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { warehouseOptions } from "../constants/locationData";
 
 interface BasicInformationProps {
   formState: any;
@@ -53,6 +54,9 @@ const BasicInformation = ({
   countrySectorMap
 }: BasicInformationProps) => {
   const [activeInvoiceUser, setActiveInvoiceUser] = useState<string>("");
+  
+  // Get warehouse options based on selected country
+  const countryWarehouses = formState.country ? warehouseOptions[formState.country] || [] : [];
   
   useEffect(() => {
     if (formState.invoiceNumber) {
@@ -116,12 +120,19 @@ const BasicInformation = ({
         
         <div className="space-y-2">
           <Label>Warehouse</Label>
-          <Input
-            name="warehouse"
-            value={formState.warehouse}
-            onChange={handleInputChange}
-            className="w-full"
-          />
+          <Select 
+            onValueChange={(value) => handleSelectChange("warehouse", value)}
+            value={formState.warehouse || ""}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Warehouse" />
+            </SelectTrigger>
+            <SelectContent>
+              {countryWarehouses.map((warehouse) => (
+                <SelectItem key={warehouse} value={warehouse}>{warehouse}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         
         <div className="space-y-2">

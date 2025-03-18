@@ -9,23 +9,13 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { User, MapPin, Phone, IdCard } from "lucide-react";
+import { cityOptions } from "../constants/locationData";
 
 interface ShipperConsigneeDetailsProps {
   formState: any;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   handleSelectChange?: (name: string, value: string) => void;
 }
-
-// Mock cities data - In a real app, this would come from an API or database
-const CITIES = [
-  "Colombo",
-  "Doha",
-  "Dubai",
-  "Abu Dhabi",
-  "Sharjah",
-  "Riyadh",
-  "Jeddah"
-];
 
 const ShipperConsigneeDetails: React.FC<ShipperConsigneeDetailsProps> = ({
   formState,
@@ -38,6 +28,9 @@ const ShipperConsigneeDetails: React.FC<ShipperConsigneeDetailsProps> = ({
       handleSelectChange(name, value);
     }
   };
+
+  // Get available cities based on selected country
+  const availableCities = formState.country ? cityOptions[formState.country] || [] : [];
 
   return (
     <div className="mt-8 border border-gray-200 rounded-md p-4">
@@ -127,7 +120,7 @@ const ShipperConsigneeDetails: React.FC<ShipperConsigneeDetailsProps> = ({
                   <SelectValue placeholder="Select city" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CITIES.map((city) => (
+                  {availableCities.map((city) => (
                     <SelectItem key={city} value={city}>{city}</SelectItem>
                   ))}
                 </SelectContent>
@@ -188,7 +181,7 @@ const ShipperConsigneeDetails: React.FC<ShipperConsigneeDetailsProps> = ({
                   <SelectValue placeholder="Select city" />
                 </SelectTrigger>
                 <SelectContent>
-                  {CITIES.map((city) => (
+                  {availableCities.map((city) => (
                     <SelectItem key={city} value={city}>{city}</SelectItem>
                   ))}
                 </SelectContent>
@@ -242,18 +235,46 @@ const ShipperConsigneeDetails: React.FC<ShipperConsigneeDetailsProps> = ({
         <div>
           <div className="flex flex-col">
             <label className="text-sm font-medium mb-1">Handover By:</label>
-            <Input 
-              name="handOverBy"
-              value={formState.handOverBy}
-              onChange={handleInputChange}
-              className="border border-gray-300"
-              placeholder="Person handling the handover"
-            />
+            <Select 
+              onValueChange={(value) => onSelectChange("handOverBy", value)}
+              value={formState.handOverBy || ""}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select Sales Rep" />
+              </SelectTrigger>
+              <SelectContent>
+                {[...SALES_REPS, ...DRIVERS].map((person) => (
+                  <SelectItem key={person} value={person}>{person}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
     </div>
   );
 };
+
+// Includes both Sales Reps and Drivers for handover selection
+const SALES_REPS = [
+  "Mr. Lahiru Chathuranga",
+  "Mr. Ali Hussain",
+  "Mr. Paolo Fernando",
+  "Mr. Evans",
+  "Mr. Paul Onchano",
+  "Mr. Edwin Mbugua",
+  "Mr. Zacharia",
+  "Mr. Jun Jun Santos",
+  "Mr. Raymond"
+];
+
+const DRIVERS = [
+  "Mr. Abdullah",
+  "Mr. Johny Venakdy",
+  "Mr. Salih",
+  "Mr. Kanaya",
+  "Mr. Ashoka",
+  "Mr. Idris Karar"
+];
 
 export default ShipperConsigneeDetails;

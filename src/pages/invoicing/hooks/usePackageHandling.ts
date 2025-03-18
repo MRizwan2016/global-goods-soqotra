@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { FormState, PackageItem } from "../types/invoiceForm";
+import { packageOptions, PackageOption } from "@/data/packageOptions";
 
 export const usePackageHandling = (formState: FormState, setFormState: React.Dispatch<React.SetStateAction<FormState>>) => {
   const [packageItems, setPackageItems] = useState<PackageItem[]>([]);
@@ -9,8 +10,7 @@ export const usePackageHandling = (formState: FormState, setFormState: React.Dis
   const handlePackageSelect = (description: string) => {
     if (!description) return;
     
-    const packageOptions = require('@/data/packageOptions').packageOptions;
-    const selectedPackage = packageOptions.find((pkg: any) => pkg.description === description);
+    const selectedPackage = packageOptions.find((pkg: PackageOption) => pkg.description === description);
     
     if (selectedPackage) {
       setFormState(prev => ({

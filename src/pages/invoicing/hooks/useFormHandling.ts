@@ -1,11 +1,25 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { calculateNet } from "../utils/invoiceCalculations";
 import { countrySectorMap } from "../constants/countrySectorMap";
 import { FormState } from "../types/invoiceForm";
+import { warehouseOptions, cityOptions, DEFAULT_WAREHOUSE } from "../constants/locationData";
 
 export const useFormHandling = (initialState: FormState) => {
   const [formState, setFormState] = useState<FormState>(initialState);
+  
+  // Initialize warehouse based on country if not already set
+  useEffect(() => {
+    if (formState.country && !formState.warehouse) {
+      const countryWarehouses = warehouseOptions[formState.country] || [];
+      if (countryWarehouses.length > 0) {
+        setFormState(prev => ({
+          ...prev,
+          warehouse: countryWarehouses[0]
+        }));
+      }
+    }
+  }, [formState.country]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -28,17 +42,6 @@ export const useFormHandling = (initialState: FormState) => {
         net: calculateNet(String(prev.gross), String(value))
       }));
     }
-    
-    // If country changes, update the sector
-    if (name === 'country') {
-      const sectorForCountry = countrySectorMap[value as keyof typeof countrySectorMap];
-      if (sectorForCountry) {
-        setFormState(prev => ({
-          ...prev,
-          sector: sectorForCountry
-        }));
-      }
-    }
   };
   
   const handleSelectChange = (name: string, value: string) => {
@@ -47,22 +50,33 @@ export const useFormHandling = (initialState: FormState) => {
       [name]: value
     }));
 
-    // If country changes through select, update the sector
+    // If country changes, update the sector and warehouse
     if (name === 'country') {
       const sectorForCountry = countrySectorMap[value as keyof typeof countrySectorMap];
-      if (sectorForCountry) {
-        setFormState(prev => ({
-          ...prev,
-          sector: sectorForCountry
-        }));
-      }
+      const countryWarehouses = warehouseOptions[value] || [];
+      const defaultWarehouse = countryWarehouses.length > 0 ? countryWarehouses[0] : "";
+      
+      setFormState(prev => ({
+        ...prev,
+        sector: sectorForCountry || "",
+        warehouse: defaultWarehouse,
+        // Reset city selections when country changes
+        shipperCity: "",
+        consigneeCity: ""
+      }));
     }
+  };
+
+  // Get available cities based on country
+  const getAvailableCities = (country: string) => {
+    return cityOptions[country] || [];
   };
 
   return {
     formState,
     setFormState,
     handleInputChange,
-    handleSelectChange
+    handleSelectChange,
+    getAvailableCities
   };
 };
