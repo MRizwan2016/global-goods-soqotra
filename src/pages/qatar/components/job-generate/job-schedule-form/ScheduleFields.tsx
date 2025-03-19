@@ -1,10 +1,10 @@
 
 import React, { useEffect } from "react";
-import { QatarJob } from "../../../types/jobTypes";
 import { mockVehicles } from "../../../data/mockVehicles";
 import { mockSalesReps, mockDrivers, mockHelpers } from "../../../data/mockSalesReps";
 import { cityVehicleMapping } from "../../../data/cityVehicleMapping";
 import { filterVehicles, extractUniqueCities } from "./utils/vehicleUtils";
+import { ScheduleFieldsProps } from "./types";
 import {
   ScheduleNumberField,
   VehicleSelector,
@@ -12,14 +12,6 @@ import {
   DateSelector,
   CityDisplay
 } from "./components";
-
-interface ScheduleFieldsProps {
-  formData: any;
-  selectedJobs: QatarJob[];
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleSelectChange: (name: string, value: string) => void;
-  handleDateChange: (date: Date | undefined) => void;
-}
 
 const ScheduleFields: React.FC<ScheduleFieldsProps> = ({ 
   formData, 

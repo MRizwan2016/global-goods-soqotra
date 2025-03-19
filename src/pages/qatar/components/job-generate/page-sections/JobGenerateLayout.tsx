@@ -3,11 +3,12 @@ import React from "react";
 import { QatarJob } from "../../../types/jobTypes";
 import JobScheduleForm from "../job-schedule-form";
 import JobSelectionTable from "../JobSelectionTable";
+import { JobScheduleFormData } from "../job-schedule-form/types";
 
 interface JobGenerateLayoutProps {
-  scheduleData: any;
-  setScheduleData: React.Dispatch<React.SetStateAction<any>>;
-  handleScheduleSubmit: (data: any) => void;
+  scheduleData: JobScheduleFormData;
+  setScheduleData: React.Dispatch<React.SetStateAction<JobScheduleFormData>>;
+  handleScheduleSubmit: (data: JobScheduleFormData) => void;
   jobsForSchedule: QatarJob[];
   filteredJobs: QatarJob[];
   selectedJobs: QatarJob[];

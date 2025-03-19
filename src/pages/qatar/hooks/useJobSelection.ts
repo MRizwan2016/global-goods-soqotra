@@ -3,11 +3,12 @@ import { useState, useEffect } from "react";
 import { QatarJob } from "../types/jobTypes";
 import { toast } from "sonner";
 import { cityVehicleMapping } from "../data/cityVehicleMapping";
+import { JobScheduleFormData } from "../components/job-generate/job-schedule-form/types";
 
 export const useJobSelection = () => {
   const [selectedJobs, setSelectedJobs] = useState<QatarJob[]>([]);
   const [isPrintMode, setIsPrintMode] = useState(false);
-  const [scheduleData, setScheduleData] = useState({
+  const [scheduleData, setScheduleData] = useState<JobScheduleFormData>({
     scheduleNumber: "5352",
     vehicle: "",
     salesRep: "",
@@ -50,7 +51,7 @@ export const useJobSelection = () => {
     }
   };
   
-  const handleScheduleSubmit = (data: any) => {
+  const handleScheduleSubmit = (data: JobScheduleFormData) => {
     // Validate required data
     if (!data.vehicle) {
       toast.error("Please select a vehicle before generating schedule");
