@@ -1,7 +1,7 @@
 
 import React from "react";
 import { mockJobs } from "./data/mockJobData";
-import JobScheduleForm from "./components/job-generate/JobScheduleForm";
+import JobScheduleForm from "./components/job-generate/job-schedule-form";
 import JobSelectionTable from "./components/job-generate/JobSelectionTable";
 import PrintJobSchedule from "./components/print/PrintJobSchedule";
 import JobFilters from "./components/job-generate/JobFilters";
