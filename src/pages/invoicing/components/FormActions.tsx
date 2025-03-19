@@ -19,19 +19,27 @@ const FormActions: React.FC<FormActionsProps> = ({
   const navigate = useNavigate();
   
   const handlePrintPreview = () => {
-    // If we have an invoice ID, navigate to the print view
-    if (invoiceId) {
-      // Open in new tab but stay within the same session
-      const printUrl = `/data-entry/invoicing/print/${invoiceId}`;
-      const newWindow = window.open(printUrl, '_blank');
-      
-      // If popup blocked or failed to open, navigate in same window
-      if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-        navigate(printUrl);
-      }
-    } else {
-      // If no ID yet, we need to save first
+    if (!invoiceId) {
       toast.info("Please save the invoice first to preview or print it");
+      return;
+    }
+    
+    // Check if the invoice exists in localStorage
+    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const invoiceExists = invoices.some((inv: any) => inv.id === invoiceId);
+    
+    if (!invoiceExists) {
+      toast.error("Invoice not found. Please save the invoice again before printing.");
+      return;
+    }
+    
+    // Open in new tab but stay within the same session
+    const printUrl = `/data-entry/invoicing/print/${invoiceId}`;
+    const newWindow = window.open(printUrl, '_blank');
+    
+    // If popup blocked or failed to open, navigate in same window
+    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+      navigate(printUrl);
     }
   };
 

@@ -12,7 +12,7 @@ export const useSaveInvoice = (
   id?: string
 ) => {
   const navigate = useNavigate();
-  const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(null);
+  const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(id || null);
   const { handleSubmit } = useInvoiceSubmit();
   
   // Handle saving the invoice
@@ -38,8 +38,10 @@ export const useSaveInvoice = (
       toast.success(`Invoice ${isEditing ? 'updated' : 'created'} successfully`);
       
       if (!isEditing) {
-        // If creating a new invoice, either redirect or reset form
-        navigate(`/data-entry/invoicing/edit/${savedId}`);
+        // If creating a new invoice, redirect to edit page
+        setTimeout(() => {
+          navigate(`/data-entry/invoicing/edit/${savedId}`);
+        }, 500);
       }
     } catch (error) {
       toast.error(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -48,6 +50,6 @@ export const useSaveInvoice = (
 
   return {
     handleSave,
-    savedInvoiceId: savedInvoiceId || id,
+    savedInvoiceId,
   };
 };
