@@ -1,7 +1,7 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
-import { mockJobs, mockVehicles } from "./data/mockJobData";
+import { mockJobs } from "./data/mockJobs";
+import { mockVehicles } from "./data/mockVehicles";
 import { VehicleStats, DailyJobForecast, JobStats, JobTotals } from "./types/vehicleTypes";
 
 // Import components

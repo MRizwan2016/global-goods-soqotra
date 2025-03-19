@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Edit2 } from "lucide-react";
-import { mockVehicles } from "../../data/mockJobData";
+import { mockVehicles } from "../../data/mockVehicles";
 import { QatarVehicle } from "../../types/vehicleTypes";
 
 const VehicleList: React.FC = () => {

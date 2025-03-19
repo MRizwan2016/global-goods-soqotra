@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -15,7 +14,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockVehicles, mockSalesReps, mockDrivers } from "../../../data/mockJobData";
+import { mockVehicles } from "../../../data/mockVehicles";
+import { mockSalesReps } from "../../../data/mockSalesReps";
+import { mockDrivers } from "../../../data/mockVehicles";
 import { QatarJob } from "../../../types/jobTypes";
 
 interface ScheduleFieldsProps {

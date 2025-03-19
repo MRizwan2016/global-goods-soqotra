@@ -1,4 +1,3 @@
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockBranches, mockSectors } from "../../data/mockJobData";
+import { mockBranches, mockSectors } from "../../data/mockLocations";
 
 interface CustomerInfoSectionProps {
   jobData: any;
