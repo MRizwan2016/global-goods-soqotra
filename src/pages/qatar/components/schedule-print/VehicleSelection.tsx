@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { QatarJob } from "../../types/jobTypes";
-import { mockVehicles } from "../../data/mockVehicles";
+import { Truck } from "lucide-react";
 
 interface VehicleSelectionProps {
   jobsByVehicle: Record<string, QatarJob[]>;
@@ -29,22 +29,17 @@ const VehicleSelection: React.FC<VehicleSelectionProps> = ({
       <h3 className="text-lg font-medium mb-2">Select Vehicle:</h3>
       <div className="flex flex-wrap gap-2">
         {vehicleJobCounts.length > 0 ? (
-          vehicleJobCounts.map(({ vehicle, jobCount }) => {
-            // Find vehicle details to show vehicle type
-            const vehicleDetails = mockVehicles.find(v => v.number === vehicle);
-            const vehicleType = vehicleDetails?.type || "VEHICLE";
-            
-            return (
-              <Button
-                key={vehicle}
-                variant={selectedVehicle === vehicle ? "default" : "outline"}
-                onClick={() => setSelectedVehicle(vehicle)}
-                className="mb-2"
-              >
-                {vehicle} - {vehicleType} ({jobCount} jobs)
-              </Button>
-            );
-          })
+          vehicleJobCounts.map(({ vehicle, jobCount }) => (
+            <Button
+              key={vehicle}
+              variant={selectedVehicle === vehicle ? "default" : "outline"}
+              onClick={() => setSelectedVehicle(vehicle)}
+              className="mb-2"
+            >
+              <Truck className="mr-2 h-4 w-4" />
+              {vehicle} ({jobCount} jobs)
+            </Button>
+          ))
         ) : (
           <p>No vehicles with assigned jobs found</p>
         )}

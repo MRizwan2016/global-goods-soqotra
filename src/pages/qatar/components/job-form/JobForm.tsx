@@ -26,6 +26,7 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
     customer: "",
     mobileNumber: "",
     landNumber: "",
+    country: "",  // New field
     sector: "",
     branch: "",
     city: "",

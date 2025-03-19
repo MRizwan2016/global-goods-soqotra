@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,7 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockBranches, mockSectors } from "../../data/mockLocations";
+import { countrySectorMap } from "@/pages/invoicing/constants/countrySectorMap";
+import { warehouseOptions } from "@/pages/invoicing/constants/locationData";
 
 interface CustomerInfoSectionProps {
   jobData: any;
@@ -22,6 +24,19 @@ const CustomerInfoSection = ({
   handleInputChange, 
   handleSelectChange 
 }: CustomerInfoSectionProps) => {
+  // Get list of countries from countrySectorMap
+  const countries = Object.keys(countrySectorMap);
+  
+  // Get branches for selected country if any
+  const getBranchesForCountry = (country: string) => {
+    if (!country) return [];
+    
+    // Use warehouse options as branches for simplicity
+    return warehouseOptions[country] || [];
+  };
+  
+  const branches = jobData.country ? getBranchesForCountry(jobData.country) : [];
+
   return (
     <Card>
       <CardHeader className="bg-gray-50 pb-2">
@@ -75,18 +90,22 @@ const CustomerInfoSection = ({
         </div>
         
         <div>
-          <Label htmlFor="sector">SECTOR:</Label>
+          <Label htmlFor="country">COUNTRY:</Label>
           <Select 
-            value={jobData.sector} 
-            onValueChange={(value) => handleSelectChange("sector", value)}
+            value={jobData.country || ""} 
+            onValueChange={(value) => {
+              // Update country and associated sector
+              handleSelectChange("country", value);
+              handleSelectChange("sector", countrySectorMap[value]);
+            }}
           >
-            <SelectTrigger id="sector" className="bg-blue-600 text-white">
-              <SelectValue placeholder="SELECT SECTOR" />
+            <SelectTrigger id="country" className="bg-blue-600 text-white">
+              <SelectValue placeholder="SELECT COUNTRY" />
             </SelectTrigger>
             <SelectContent>
-              {mockSectors.map(sector => (
-                <SelectItem key={sector.id} value={sector.code}>
-                  {sector.name} - {sector.code}
+              {countries.map(country => (
+                <SelectItem key={country} value={country}>
+                  {country}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -94,18 +113,30 @@ const CustomerInfoSection = ({
         </div>
         
         <div>
+          <Label htmlFor="sector">SECTOR:</Label>
+          <Input 
+            id="sector"
+            name="sector"
+            value={jobData.sector}
+            onChange={handleInputChange}
+            readOnly={true}
+            className="bg-gray-100"
+          />
+        </div>
+        
+        <div>
           <Label htmlFor="branch">BRANCH:</Label>
           <Select 
-            value={jobData.branch} 
+            value={jobData.branch || ""} 
             onValueChange={(value) => handleSelectChange("branch", value)}
           >
             <SelectTrigger id="branch" className="bg-blue-600 text-white">
               <SelectValue placeholder="SELECT BRANCH" />
             </SelectTrigger>
             <SelectContent>
-              {mockBranches.map(branch => (
-                <SelectItem key={branch.id} value={branch.code}>
-                  {branch.name} - {branch.code}
+              {branches.map(branch => (
+                <SelectItem key={branch} value={branch}>
+                  {branch}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -119,7 +150,7 @@ const CustomerInfoSection = ({
             name="remarks"
             value={jobData.remarks}
             onChange={handleInputChange}
-            placeholder="ENTER ANY ADDITIONAL INFORMATION"
+            placeholder="ENTER ANY ADDITIONAL INFORMATION ABOUT PERSONAL EFFECTS OR HOUSEHOLD GOODS"
             rows={3}
           />
         </div>

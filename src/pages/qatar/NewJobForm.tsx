@@ -30,7 +30,7 @@ const NewJobForm = () => {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold">ADD NEW JOB</h1>
-            <p className="text-gray-500">CREATE A NEW COLLECTION OR DELIVERY JOB</p>
+            <p className="text-gray-500">CREATE A NEW COLLECTION OR DELIVERY OF PERSONAL EFFECTS & HOUSEHOLD GOODS</p>
           </div>
           <div className="flex gap-2">
             <Button 
