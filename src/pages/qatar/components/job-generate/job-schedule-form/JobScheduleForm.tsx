@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { QatarJob } from "../../../types/jobTypes";
 import ScheduleFields from "./ScheduleFields";
-import FormActions from "./FormActions";
+import FormActions from "./form-actions";
 
 interface JobScheduleFormProps {
   onSubmit: (data: any) => void;
