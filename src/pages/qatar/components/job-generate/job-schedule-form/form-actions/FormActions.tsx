@@ -1,6 +1,6 @@
 
 import React from "react";
-import { QatarJob } from "../../../../../types/jobTypes";
+import { QatarJob } from "../../../../types/jobTypes";
 import JobCounter from "./JobCounter";
 import GenerateButton from "./GenerateButton";
 
