@@ -49,6 +49,10 @@ const PrintStyles: React.FC = () => {
             margin: 0 !important;
             padding: 0 !important;
           }
+          img {
+            display: block !important;
+            visibility: visible !important;
+          }
         }
       `}
     </style>

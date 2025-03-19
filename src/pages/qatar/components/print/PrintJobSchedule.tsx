@@ -50,7 +50,7 @@ const PrintJobSchedule: React.FC<PrintJobScheduleProps> = ({
   const { userName, formattedDate, formattedTime } = useUserInfo();
   
   return (
-    <div>
+    <div className="min-h-screen bg-white">
       <PrintStyles />
       
       <PrintControls 
@@ -59,7 +59,7 @@ const PrintJobSchedule: React.FC<PrintJobScheduleProps> = ({
         title="JOB SCHEDULE PRINT"
       />
       
-      <div className="p-4 max-w-[1200px] mx-auto" ref={printRef}>
+      <div className="p-4 w-full max-w-[1200px] mx-auto" ref={printRef}>
         <div className="bg-white p-6 shadow-md">
           {/* Header */}
           <PrintHeader 
