@@ -59,7 +59,7 @@ export const useInvoiceList = () => {
     mergedData.sort((a, b) => {
       // Get timestamps safely with type checking
       const getTimestamp = (item: Invoice): number => {
-        if ('updatedAt' in item && item.updatedAt) {
+        if (item.updatedAt) {
           return new Date(item.updatedAt).getTime();
         } else if (item.date) {
           return new Date(item.date).getTime();
@@ -78,6 +78,14 @@ export const useInvoiceList = () => {
   }, []);
 
   const handlePrintInvoice = (invoiceId: string) => {
+    // Prevent event bubbling if this is being called from an event handler
+    if (window.event) {
+      window.event.stopPropagation?.();
+      window.event.preventDefault?.();
+    }
+    
+    console.log("Opening print window for invoice ID:", invoiceId);
+    // Open in a new tab to avoid navigation issues
     window.open(`/data-entry/invoicing/print/${invoiceId}`, '_blank');
   };
 

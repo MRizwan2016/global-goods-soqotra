@@ -29,6 +29,9 @@ export const useInvoicePrintData = () => {
       return;
     }
     
+    console.log("Loading invoice data for ID:", id);
+    console.log("Current mode:", mode);
+    
     try {
       // First try to get from localStorage for real data
       const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
@@ -57,7 +60,7 @@ export const useInvoicePrintData = () => {
       toast.error("Error loading invoice data");
       setLoading(false);
     }
-  }, [id, navigate]);
+  }, [id, navigate, mode]);
   
   // Calculate totals from package details only if invoice is loaded
   const packageDetails = invoice?.packageDetails || invoice?.packageItems || [];

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Edit, Trash, Eye, Printer } from "lucide-react";
@@ -16,6 +17,12 @@ const InvoiceTableRow: React.FC<InvoiceRowProps> = ({
   indexOffset,
   onPrint
 }) => {
+  const handlePrintClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onPrint(item.id);
+  };
+
   return (
     <TableRow key={item.id} className="hover:bg-gray-50">
       <InvoiceTableCell className="text-center">{indexOffset + index + 1}</InvoiceTableCell>
@@ -51,7 +58,7 @@ const InvoiceTableRow: React.FC<InvoiceRowProps> = ({
         <Printer 
           size={16} 
           className="text-blue-500 inline-block cursor-pointer" 
-          onClick={() => onPrint(item.id)}
+          onClick={handlePrintClick}
         />
       </InvoiceTableCell>
     </TableRow>
