@@ -10,6 +10,7 @@ import JobItem from "./schedule/JobItem";
 import JobSummary from "./schedule/JobSummary";
 import { useJobSummaryCalculations } from "./schedule/useJobSummaryCalculations";
 import { useUserInfo } from "./schedule/useUserInfo";
+import { toast } from "sonner";
 
 interface PrintJobScheduleProps {
   jobs: QatarJob[];
@@ -26,6 +27,16 @@ const PrintJobSchedule: React.FC<PrintJobScheduleProps> = ({
   const printRef = useRef<HTMLDivElement>(null);
   
   const handlePrint = () => {
+    // Validate required fields
+    if (!scheduleData?.vehicle) {
+      toast.warning("Vehicle information is missing");
+    }
+    if (!scheduleData?.driver) {
+      toast.warning("Driver information is missing");
+    }
+    if (!scheduleData?.salesRep) {
+      toast.warning("Sales Rep information is missing");
+    }
     window.print();
   };
   
@@ -73,9 +84,15 @@ const PrintJobSchedule: React.FC<PrintJobScheduleProps> = ({
           <ScheduleInfo scheduleData={scheduleData} />
 
           {/* Job Details */}
-          {jobs.map((job) => (
-            <JobItem key={job.id} job={job} />
-          ))}
+          {jobs.length > 0 ? (
+            jobs.map((job) => (
+              <JobItem key={job.id} job={job} />
+            ))
+          ) : (
+            <div className="p-4 text-center border my-4">
+              <p className="text-gray-500">No jobs selected for this schedule</p>
+            </div>
+          )}
 
           {/* Summary Stats */}
           <JobSummary

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,8 @@ import {
 import { mockVehicles } from "../../../data/mockVehicles";
 import { mockSalesReps, mockDrivers, mockHelpers } from "../../../data/mockSalesReps";
 import { QatarJob } from "../../../types/jobTypes";
+import { cityVehicleMapping } from "../../../data/cityVehicleMapping";
+import { Badge } from "@/components/ui/badge";
 
 interface ScheduleFieldsProps {
   formData: any;
@@ -42,28 +44,41 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
   const jobCities = selectedJobs.map(job => job.city).filter(Boolean);
   const uniqueCities = [...new Set(jobCities)];
   
+  // Auto select vehicle based on city
+  useEffect(() => {
+    if (uniqueCities.length === 1 && !formData.vehicle) {
+      const city = uniqueCities[0];
+      const recommendedVehicles = cityVehicleMapping[city] || [];
+      if (recommendedVehicles.length > 0) {
+        handleSelectChange("vehicle", recommendedVehicles[0]);
+      }
+    }
+  }, [uniqueCities, formData.vehicle]);
+  
   // Filter vehicles based on cities and job assignments
   const filteredVehicles = mockVehicles.filter(vehicle => {
     // Show all vehicles if no jobs are selected
     if (selectedJobs.length === 0) return true;
     
     // City-based truck assignment logic
-    if (uniqueCities.includes('DOH') && vehicle.number === '41067') return true;
-    if (uniqueCities.includes('RAK') && vehicle.number === '41070') return true;
-    if (uniqueCities.includes('WAK') && vehicle.number === '41073') return true;
+    if (uniqueCities.length === 1) {
+      const city = uniqueCities[0];
+      const recommendedVehicles = cityVehicleMapping[city] || [];
+      return recommendedVehicles.includes(vehicle.number);
+    }
     
-    // Show FORK LIFT only for warehouse jobs
-    if (vehicle.type === "FORK LIFT" && selectedJobs.some(job => job.location.includes('WAREHOUSE'))) return true;
-    
-    // Fallback: show vehicle if it matches any city's first letter
-    if (uniqueCities.length > 0) {
+    // If multiple cities, show all vehicles that are used for any of the cities
+    if (uniqueCities.length > 1) {
       return uniqueCities.some(city => {
-        const cityCode = city.substring(0, 1);
-        return vehicle.number.includes(cityCode);
+        const cityVehicles = cityVehicleMapping[city] || [];
+        return cityVehicles.includes(vehicle.number);
       });
     }
     
-    return false;
+    // Show FORK LIFT only for warehouse jobs
+    if (vehicle.type === "FORK LIFT" && selectedJobs.some(job => job.location?.includes('WAREHOUSE'))) return true;
+    
+    return true;
   });
 
   return (
@@ -93,6 +108,15 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
               filteredVehicles.map(vehicle => (
                 <SelectItem key={vehicle.id} value={vehicle.number}>
                   {vehicle.number}/{vehicle.type}/{vehicle.description}
+                  {uniqueCities.map(city => {
+                    const cityVehicles = cityVehicleMapping[city] || [];
+                    if (cityVehicles.includes(vehicle.number)) {
+                      return (
+                        <Badge key={city} className="ml-1 text-xs">{city}</Badge>
+                      );
+                    }
+                    return null;
+                  })}
                 </SelectItem>
               ))
             ) : (
@@ -190,6 +214,23 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
           </PopoverContent>
         </Popover>
       </div>
+      
+      {/* City Information */}
+      {uniqueCities.length > 0 && (
+        <div>
+          <Label>CITIES:</Label>
+          <div className="flex flex-wrap gap-1 mt-1">
+            {uniqueCities.map(city => {
+              const recommendedVehicle = cityVehicleMapping[city]?.[0];
+              return (
+                <Badge key={city} className="px-2 py-1 mb-1">
+                  {city} {recommendedVehicle && ` → ${recommendedVehicle}`}
+                </Badge>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </>
   );
 };

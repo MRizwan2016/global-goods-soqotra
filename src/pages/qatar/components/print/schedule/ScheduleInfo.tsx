@@ -31,8 +31,8 @@ const ScheduleInfo: React.FC<ScheduleInfoProps> = ({ scheduleData }) => {
           {vehicle && (
             <span className="text-xs ml-1 text-gray-600">
               (TYPE: {
-                vehicle.startsWith("41") ? "LORRY" :
-                vehicle.startsWith("119") ? "PETROL MANUAL" : 
+                vehicle?.startsWith("41") ? "LORRY" :
+                vehicle?.startsWith("119") ? "PETROL MANUAL" : 
                 "OTHER"
               })
             </span>
