@@ -14,7 +14,16 @@ import { mockVehicles } from "../../data/mockJobData";
 import { QatarVehicle } from "../../types/vehicleTypes";
 
 const VehicleList: React.FC = () => {
-  const [vehicles] = useState<QatarVehicle[]>(mockVehicles);
+  // Make sure to cast mockVehicles to QatarVehicle[] to ensure type compatibility
+  const [vehicles] = useState<QatarVehicle[]>(
+    mockVehicles.map(vehicle => ({
+      ...vehicle,
+      // Ensure status is one of the expected types
+      status: (vehicle.status === "RUN" || vehicle.status === "GARAGE" || vehicle.status === "MAINTENANCE") 
+        ? vehicle.status 
+        : "GARAGE" // Default to GARAGE if it's not one of the expected types
+    }))
+  );
   
   return (
     <div className="border border-gray-200 rounded-md overflow-x-auto">

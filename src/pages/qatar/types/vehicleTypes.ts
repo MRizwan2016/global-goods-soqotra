@@ -18,3 +18,32 @@ export interface QatarDriver {
   licenseNumber: string;
   licenseExpiry: string;
 }
+
+// Add these types to match what's being used in QatarDashboard
+export interface VehicleStats {
+  vehicle: string;
+  totalJobs: number;
+  deliveries: number;
+  collections: number;
+}
+
+export interface DailyJobForecast {
+  date: string;
+  day: string;
+  totalJobs: number;
+  deliveries: number;
+  collections: number;
+}
+
+export interface JobStats {
+  total: number;
+  completed: number;
+  inProgress: number;
+  pending: number;
+}
+
+export interface JobTotals {
+  totalJobs: number;
+  totalDeliveries: number;
+  totalCollections: number;
+}
