@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { mockJobs } from "./data/mockJobData";
 import JobScheduleForm from "./components/job-generate/job-schedule-form";
 import JobSelectionTable from "./components/job-generate/JobSelectionTable";
@@ -9,9 +9,10 @@ import { useJobFiltering } from "./hooks/useJobFiltering";
 import { useJobSelection } from "./hooks/useJobSelection";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Truck } from "lucide-react";
+import { Truck, MapPin } from "lucide-react";
 import { groupBy } from "lodash";
 import { QatarJob } from "./types/jobTypes";
+import { Badge } from "@/components/ui/badge";
 
 const JobGeneratePage: React.FC = () => {
   // Use our custom hooks
@@ -38,19 +39,32 @@ const JobGeneratePage: React.FC = () => {
   } = useJobFiltering(mockJobs);
   
   const [showVehicleView, setShowVehicleView] = useState(false);
+  const [showCityView, setShowCityView] = useState(false);
   
   // Group selected jobs by vehicle
   const jobsByVehicle = groupBy(selectedJobs, 'vehicle');
   const vehicleNumbers = Object.keys(jobsByVehicle).filter(v => v); // Filter out empty vehicle values
   
+  // Group selected jobs by city
+  const jobsByCity = groupBy(selectedJobs, 'city');
+  const cityNames = Object.keys(jobsByCity).filter(c => c); // Filter out empty city values
+
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
   // Get jobs for the selected vehicle
   const selectedVehicleJobs = selectedVehicle && jobsByVehicle[selectedVehicle] 
     ? jobsByVehicle[selectedVehicle].map((job, index) => ({ ...job, sequenceNum: index + 1 }))
     : [];
 
+  // Get jobs for the selected city
+  const selectedCityJobs = selectedCity && jobsByCity[selectedCity]
+    ? jobsByCity[selectedCity].map((job, index) => ({ ...job, sequenceNum: index + 1 }))
+    : [];
+
   const toggleVehicleView = () => {
+    if (showCityView) setShowCityView(false);
+    
     setShowVehicleView(!showVehicleView);
     if (!showVehicleView && vehicleNumbers.length > 0) {
       setSelectedVehicle(vehicleNumbers[0]);
@@ -59,13 +73,43 @@ const JobGeneratePage: React.FC = () => {
     }
   };
   
+  const toggleCityView = () => {
+    if (showVehicleView) setShowVehicleView(false);
+    
+    setShowCityView(!showCityView);
+    if (!showCityView && cityNames.length > 0) {
+      setSelectedCity(cityNames[0]);
+    } else {
+      setSelectedCity(null);
+    }
+  };
+  
+  // Update vehicle selection when jobs change
+  useEffect(() => {
+    if (showVehicleView && !selectedVehicle && vehicleNumbers.length > 0) {
+      setSelectedVehicle(vehicleNumbers[0]);
+    }
+    if (showCityView && !selectedCity && cityNames.length > 0) {
+      setSelectedCity(cityNames[0]);
+    }
+  }, [selectedJobs, showVehicleView, showCityView]);
+  
+  // Determine which jobs to use for form and print
+  const jobsForSchedule = showVehicleView && selectedVehicle 
+    ? selectedVehicleJobs 
+    : showCityView && selectedCity 
+      ? selectedCityJobs
+      : selectedJobs;
+  
   if (isPrintMode) {
     return (
       <PrintJobSchedule 
-        jobs={selectedVehicle 
-          ? selectedVehicleJobs 
-          : selectedJobs.map((job, index) => ({...job, sequenceNum: index + 1}))}
-        scheduleData={{...scheduleData, vehicle: selectedVehicle || scheduleData.vehicle}}
+        jobs={jobsForSchedule.map((job, index) => ({...job, sequenceNum: index + 1}))}
+        scheduleData={{
+          ...scheduleData, 
+          vehicle: selectedVehicle || scheduleData.vehicle,
+          city: selectedCity || ''
+        }}
         onBack={handleBackFromPrint}
       />
     );
@@ -93,9 +137,9 @@ const JobGeneratePage: React.FC = () => {
             onPrintJobs={handleDirectPrint}
           />
           
-          {/* Vehicle Grouping Toggle */}
+          {/* Grouping Toggle Buttons */}
           {selectedJobs.length > 0 && (
-            <div className="mb-4">
+            <div className="mb-4 flex items-center gap-2">
               <Button 
                 onClick={toggleVehicleView}
                 variant="outline"
@@ -105,9 +149,19 @@ const JobGeneratePage: React.FC = () => {
                 {showVehicleView ? "Show All Jobs" : "Group by Vehicle"}
               </Button>
               
+              <Button 
+                onClick={toggleCityView}
+                variant="outline"
+                className={showCityView ? "bg-blue-50" : ""}
+              >
+                <MapPin className="mr-2 h-4 w-4" />
+                {showCityView ? "Show All Jobs" : "Group by City"}
+              </Button>
+              
+              {/* Vehicle Selection */}
               {showVehicleView && (
-                <div className="mt-2 p-4 border rounded-md bg-gray-50">
-                  <h3 className="font-bold mb-2">Select Vehicle to Print:</h3>
+                <div className="flex-1 p-4 border rounded-md bg-gray-50">
+                  <h3 className="font-bold mb-2">Select Vehicle:</h3>
                   <div className="flex flex-wrap gap-2">
                     {vehicleNumbers.length > 0 ? (
                       vehicleNumbers.map(vehicle => (
@@ -127,6 +181,33 @@ const JobGeneratePage: React.FC = () => {
                   </div>
                 </div>
               )}
+              
+              {/* City Selection */}
+              {showCityView && (
+                <div className="flex-1 p-4 border rounded-md bg-gray-50">
+                  <h3 className="font-bold mb-2">Select City:</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {cityNames.length > 0 ? (
+                      cityNames.map(city => (
+                        <Button
+                          key={city}
+                          variant={selectedCity === city ? "default" : "outline"}
+                          onClick={() => setSelectedCity(city)}
+                          className="mb-2"
+                          size="sm"
+                        >
+                          {city} ({jobsByCity[city].length} jobs)
+                          {city === 'DOH' && <Badge className="ml-2 bg-blue-600">Truck: 41067</Badge>}
+                          {city === 'RAK' && <Badge className="ml-2 bg-green-600">Truck: 41070</Badge>}
+                          {city === 'WAK' && <Badge className="ml-2 bg-amber-600">Truck: 41073</Badge>}
+                        </Button>
+                      ))
+                    ) : (
+                      <p>No cities assigned to selected jobs</p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
           
@@ -136,8 +217,10 @@ const JobGeneratePage: React.FC = () => {
                 onSubmit={handleScheduleSubmit} 
                 formData={scheduleData}
                 setFormData={setScheduleData}
-                selectedJobs={showVehicleView && selectedVehicle ? selectedVehicleJobs : selectedJobs}
-                disabled={(showVehicleView && !selectedVehicle) || selectedJobs.length === 0}
+                selectedJobs={jobsForSchedule}
+                disabled={(showVehicleView && !selectedVehicle) || 
+                          (showCityView && !selectedCity) || 
+                          selectedJobs.length === 0}
               />
             </div>
             

@@ -38,19 +38,32 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
     ? new Date(formData.scheduleDate) 
     : new Date();
     
-  // Filter vehicles based on job assignments
-  const jobLocations = selectedJobs.map(job => job.town);
+  // Extract cities from selected jobs
+  const jobCities = selectedJobs.map(job => job.city).filter(Boolean);
+  const uniqueCities = [...new Set(jobCities)];
   
-  // Only show vehicles appropriate for the selected jobs
+  // Filter vehicles based on cities and job assignments
   const filteredVehicles = mockVehicles.filter(vehicle => {
     // Show all vehicles if no jobs are selected
     if (selectedJobs.length === 0) return true;
     
-    // Simple logic to match vehicles to jobs based on type
-    // In a real app, this would be more sophisticated
-    if (vehicle.type === "LARGE" && selectedJobs.length > 5) return true;
-    if (vehicle.type === "MEDIUM" && selectedJobs.length <= 5) return true;
-    return vehicle.type === "SMALL" && selectedJobs.length <= 2;
+    // City-based truck assignment logic
+    if (uniqueCities.includes('DOH') && vehicle.number === '41067') return true;
+    if (uniqueCities.includes('RAK') && vehicle.number === '41070') return true;
+    if (uniqueCities.includes('WAK') && vehicle.number === '41073') return true;
+    
+    // Show FORK LIFT only for warehouse jobs
+    if (vehicle.type === "FORK LIFT" && selectedJobs.some(job => job.location.includes('WAREHOUSE'))) return true;
+    
+    // Fallback: show vehicle if it matches any city's first letter
+    if (uniqueCities.length > 0) {
+      return uniqueCities.some(city => {
+        const cityCode = city.substring(0, 1);
+        return vehicle.number.includes(cityCode);
+      });
+    }
+    
+    return false;
   });
 
   return (
@@ -76,18 +89,22 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
             <SelectValue placeholder="SELECT VEHICLE" />
           </SelectTrigger>
           <SelectContent>
-            {filteredVehicles.map(vehicle => (
-              <SelectItem key={vehicle.id} value={vehicle.number}>
-                {vehicle.number}/{vehicle.type}/{vehicle.description}
-              </SelectItem>
-            ))}
+            {filteredVehicles.length > 0 ? (
+              filteredVehicles.map(vehicle => (
+                <SelectItem key={vehicle.id} value={vehicle.number}>
+                  {vehicle.number}/{vehicle.type}/{vehicle.description}
+                </SelectItem>
+              ))
+            ) : (
+              <SelectItem value="no-match" disabled>No matching vehicles</SelectItem>
+            )}
           </SelectContent>
         </Select>
-        <p className="text-xs text-gray-500 mt-1">
-          {selectedJobs.length > 0 ? 
-            `Showing vehicles suitable for ${selectedJobs.length} selected jobs` : 
-            'Select jobs to see recommended vehicles'}
-        </p>
+        {uniqueCities.length > 0 && (
+          <p className="text-xs text-gray-500 mt-1">
+            Showing vehicles for {uniqueCities.join(', ')} ({selectedJobs.length} jobs selected)
+          </p>
+        )}
       </div>
       
       <div>
