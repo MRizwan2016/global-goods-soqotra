@@ -41,11 +41,22 @@ export const useInvoiceList = () => {
       }
     });
     
-    // Sort by most recently updated
+    // Sort by date instead of updatedAt since not all invoices have updatedAt
     mergedData.sort((a, b) => {
-      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-      return dateB - dateA;
+      // Use updatedAt if available, otherwise fall back to date
+      const dateA = a.updatedAt 
+        ? new Date(a.updatedAt).getTime() 
+        : a.date 
+          ? new Date(a.date).getTime() 
+          : 0;
+      
+      const dateB = b.updatedAt 
+        ? new Date(b.updatedAt).getTime() 
+        : b.date
+          ? new Date(b.date).getTime()
+          : 0;
+      
+      return dateB - dateA; // Sort in descending order (newest first)
     });
     
     setInvoiceData(mergedData);
