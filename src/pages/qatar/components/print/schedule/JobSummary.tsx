@@ -1,6 +1,9 @@
 
 import React from "react";
 import { QatarJob } from "../../../types/jobTypes";
+import JobCountSummary from "./components/JobCountSummary";
+import FinancialSummary from "./components/FinancialSummary";
+import ItemSummary from "./components/ItemSummary";
 
 interface JobSummaryProps {
   jobs: QatarJob[];
@@ -24,55 +27,21 @@ const JobSummary: React.FC<JobSummaryProps> = ({
     <div className="grid grid-cols-2 gap-4 mt-6">
       <div>
         {/* Job Counts */}
-        <div className="border border-blue-300 mb-4">
-          <table className="w-full text-sm">
-            <tbody>
-              <tr className="border-b border-blue-300">
-                <td className="p-2 font-bold border-r border-blue-300">NUMBER OF DELIVERIES</td>
-                <td className="p-2 text-right">{deliveryCount}</td>
-              </tr>
-              <tr>
-                <td className="p-2 font-bold border-r border-blue-300">NUMBER OF COLLECTIONS</td>
-                <td className="p-2 text-right">{collectionCount}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <JobCountSummary 
+          deliveryCount={deliveryCount} 
+          collectionCount={collectionCount} 
+        />
         
         {/* Financial Summary */}
-        <div className="border border-blue-300">
-          <table className="w-full text-sm">
-            <tbody>
-              <tr className="border-b border-blue-300">
-                <td className="p-2 font-bold border-r border-blue-300">TOTAL DELIVERY AMOUNT</td>
-                <td className="p-2 text-right">{totalDeliveryAmount}</td>
-              </tr>
-              <tr className="border-b border-blue-300">
-                <td className="p-2 font-bold border-r border-blue-300">TOTAL COLLECTION AMOUNT</td>
-                <td className="p-2 text-right">{totalCollectionAmount}</td>
-              </tr>
-              <tr>
-                <td className="p-2 font-bold border-r border-blue-300">TOTAL AMOUNT</td>
-                <td className="p-2 text-right">{totalAmount}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <FinancialSummary 
+          totalDeliveryAmount={totalDeliveryAmount}
+          totalCollectionAmount={totalCollectionAmount}
+          totalAmount={totalAmount}
+        />
       </div>
       
       {/* Item Summary */}
-      <div className="border border-blue-300">
-        <table className="w-full text-sm">
-          <tbody>
-            {Object.entries(itemCounts).map(([itemName, count], index) => (
-              <tr key={index} className={index < Object.entries(itemCounts).length - 1 ? "border-b border-blue-300" : ""}>
-                <td className="p-2 font-bold border-r border-blue-300">{itemName}</td>
-                <td className="p-2 text-right">{count}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ItemSummary itemCounts={itemCounts} />
     </div>
   );
 };
