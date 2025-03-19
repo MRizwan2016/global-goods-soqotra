@@ -1,5 +1,6 @@
 
 export const mockSalesReps = [
+  // Original Qatar sales reps
   {
     id: "sr1",
     name: "Ahmed Khalil",
@@ -14,5 +15,88 @@ export const mockSalesReps = [
     id: "sr3",
     name: "Yousef Al-Abdulla",
     code: "YA003"
+  },
+  // Additional sales reps from the UPB invoicing module
+  {
+    id: "sr4",
+    name: "Mr. Lahiru Chathuranga",
+    code: "LC004"
+  },
+  {
+    id: "sr5",
+    name: "Mr. Ali Hussain",
+    code: "AH005"
+  },
+  {
+    id: "sr6",
+    name: "Mr. Paolo Fernando",
+    code: "PF006"
+  },
+  {
+    id: "sr7",
+    name: "Mr. Evans",
+    code: "EV007"
+  },
+  {
+    id: "sr8",
+    name: "Mr. Paul Onchano",
+    code: "PO008"
+  },
+  {
+    id: "sr9",
+    name: "Mr. Edwin Mbugua",
+    code: "EM009"
+  },
+  {
+    id: "sr10",
+    name: "Mr. Zacharia",
+    code: "ZA010"
+  },
+  {
+    id: "sr11",
+    name: "Mr. Jun Jun Santos",
+    code: "JS011"
+  },
+  {
+    id: "sr12",
+    name: "Mr. Raymond",
+    code: "RM012"
+  }
+];
+
+// Combined list for helpers (which can be the same as sales reps)
+export const mockHelpers = mockSalesReps;
+
+// Expanded driver list
+export const mockDrivers = [
+  {
+    id: "d1",
+    name: "Mr. Abdullah",
+    license: "QT-12345"
+  },
+  {
+    id: "d2",
+    name: "Mr. Johny Venakdy",
+    license: "QT-23456"
+  },
+  {
+    id: "d3",
+    name: "Mr. Salih",
+    license: "QT-34567"
+  },
+  {
+    id: "d4",
+    name: "Mr. Kanaya",
+    license: "QT-45678"
+  },
+  {
+    id: "d5",
+    name: "Mr. Ashoka",
+    license: "QT-56789"
+  },
+  {
+    id: "d6",
+    name: "Mr. Idris Karar",
+    license: "QT-67890"
   }
 ];

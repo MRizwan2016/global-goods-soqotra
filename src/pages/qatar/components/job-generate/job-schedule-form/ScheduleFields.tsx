@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -15,8 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { mockVehicles } from "../../../data/mockVehicles";
-import { mockSalesReps } from "../../../data/mockSalesReps";
-import { mockDrivers } from "../../../data/mockVehicles";
+import { mockSalesReps, mockDrivers, mockHelpers } from "../../../data/mockSalesReps";
 import { QatarJob } from "../../../types/jobTypes";
 
 interface ScheduleFieldsProps {
@@ -99,10 +99,10 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
           <SelectTrigger id="salesRep" className="bg-blue-500 text-white">
             <SelectValue placeholder="SELECT SALES REP" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="max-h-[200px]">
             {mockSalesReps.map(rep => (
               <SelectItem key={rep.id} value={rep.name}>
-                {rep.name}/{rep.code}
+                {rep.name} {rep.code ? `(${rep.code})` : ''}
               </SelectItem>
             ))}
           </SelectContent>
@@ -121,7 +121,7 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
           <SelectContent>
             {mockDrivers.map(driver => (
               <SelectItem key={driver.id} value={driver.name}>
-                {driver.name}
+                {driver.name} {driver.license ? `(${driver.license})` : ''}
               </SelectItem>
             ))}
           </SelectContent>
@@ -137,10 +137,10 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
           <SelectTrigger id="helper" className="bg-blue-500 text-white">
             <SelectValue placeholder="SELECT HELPER" />
           </SelectTrigger>
-          <SelectContent>
-            {mockSalesReps.map(rep => (
-              <SelectItem key={rep.id} value={rep.name}>
-                {rep.name}/{rep.code}
+          <SelectContent className="max-h-[200px]">
+            {mockHelpers.map(helper => (
+              <SelectItem key={helper.id} value={helper.name}>
+                {helper.name} {helper.code ? `(${helper.code})` : ''}
               </SelectItem>
             ))}
           </SelectContent>
