@@ -10,76 +10,84 @@ export const navigationSections: NavigationSections = {
     iconColor: "text-green-700",
     submenu: [
       {
-        title: "Data Entry",
+        title: "DATA ENTRY",
         items: [
-          { name: "Invoicing", path: "/data-entry/invoicing" },
-          { name: "Payment Receivable", path: "/data-entry/payment-receivable" },
-          { name: "Booking Form Stock", path: "/data-entry/booking-form-stock" },
-          { name: "Selling Rates", path: "/data-entry/selling-rates" },
-          { name: "Bill of Lading", path: "/data-entry/bill-of-lading" },
-          { name: "Print Documents", path: "/data-entry/print-documents" },
+          { name: "INVOICING", path: "/data-entry/invoicing" },
+          { name: "PAYMENT RECEIVABLE", path: "/data-entry/payment-receivable" },
+          { name: "BOOKING FORM STOCK", path: "/data-entry/booking-form-stock" },
+          { name: "SELLING RATES", path: "/data-entry/selling-rates" },
+          { name: "BILL OF LADING", path: "/data-entry/bill-of-lading" },
+          { name: "PRINT DOCUMENTS", path: "/data-entry/print-documents" },
         ],
       },
       {
-        title: "Reports",
+        title: "REPORTS",
         items: [
-          { name: "Financial Reports", path: "/reports/financial" },
-          { name: "Cargo Reports", path: "/reports/cargo" },
+          { name: "FINANCIAL REPORTS", path: "/reports/financial" },
+          { name: "CARGO REPORTS", path: "/reports/cargo" },
         ],
       },
       {
-        title: "Master Data",
+        title: "MASTER DATA",
         items: [
-          { name: "Invoice Book", path: "/master/book/stock" },
-          { name: "Sales Rep", path: "/master/salesrep/list" },
-          { name: "Town", path: "/master/town" },
-          { name: "Package Options", path: "/master/package/list" },
+          { name: "INVOICE BOOK", path: "/master/book/stock" },
+          { name: "SALES REP", path: "/master/salesrep/list" },
+          { name: "TOWN", path: "/master/town" },
+          { name: "PACKAGE OPTIONS", path: "/master/package/list" },
         ],
       },
     ],
   },
   accounts: {
-    title: "Accounts",
+    title: "ACCOUNTS",
     icon: DollarSign,
     color: "from-purple-200 to-purple-100 text-purple-800 border-purple-300 hover:bg-purple-50",
     iconColor: "text-purple-700",
     submenu: [
       {
-        title: "Functions",
+        title: "FUNCTIONS",
         items: [
-          { name: "Payments", path: "/accounts/payment" },
-          { name: "Reconciliation", path: "/accounts/reconciliation" },
+          { name: "PAYMENTS", path: "/accounts/payment" },
+          { name: "RECONCILIATION", path: "/accounts/reconciliation" },
         ],
       },
     ],
   },
   admin: {
-    title: "Admin",
+    title: "ADMIN",
     icon: Settings,
     color: "from-rose-200 to-rose-100 text-rose-800 border-rose-300 hover:bg-rose-50",
     iconColor: "text-rose-700",
     submenu: [
       {
-        title: "Control Panel",
+        title: "CONTROL PANEL",
         items: [
-          { name: "Control Panel", path: "/admin/control-panel" },
-          { name: "Register User", path: "/admin/register" },
+          { name: "CONTROL PANEL", path: "/admin/control-panel" },
+          { name: "REGISTER USER", path: "/admin/register" },
         ],
       },
     ],
   },
   cargo: {
-    title: "Cargo Collection & Delivery",
+    title: "CARGO COLLECTION & DELIVERY",
     icon: Truck,
     color: "from-sky-200 to-sky-100 text-sky-800 border-sky-300 hover:bg-sky-50",
     iconColor: "text-sky-700",
     submenu: [
       {
-        title: "Kenya",
+        title: "KENYA",
         items: [
-          { name: "Dashboard", path: "/kenya/dashboard" },
-          { name: "New Delivery", path: "/kenya/new-delivery" },
-          { name: "Delivery Tracking", path: "/kenya/delivery-tracking" },
+          { name: "DASHBOARD", path: "/kenya" },
+          { name: "NEW DELIVERY", path: "/kenya/delivery/new" },
+          { name: "DELIVERY TRACKING", path: "/kenya/deliveries" },
+        ],
+      },
+      {
+        title: "QATAR",
+        items: [
+          { name: "DASHBOARD", path: "/qatar" },
+          { name: "ADD NEW JOB", path: "/qatar/job/new" },
+          { name: "JOB TRACKING", path: "/qatar/jobs" },
         ],
       },
     ],
