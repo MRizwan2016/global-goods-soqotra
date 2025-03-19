@@ -134,3 +134,44 @@ export const mockBranches: QatarBranch[] = [
     code: "QPR"
   }
 ];
+
+// Qatar Towns list as requested
+export const qatarTowns: string[] = [
+  "Doha",
+  "Al Rayyan", 
+  "Wukair", 
+  "Wakra", 
+  "Mansoora", 
+  "Najma", 
+  "Madeena Khaleefa", 
+  "Garafa", 
+  "Bin Omran", 
+  "Bin Mahmoud", 
+  "Muaithar", 
+  "Baaya", 
+  "Ain Khalid", 
+  "Mathar Al Qadeem", 
+  "Al Hilal", 
+  "Thumama", 
+  "Al Waab", 
+  "Al Saad", 
+  "Al Khor", 
+  "Um Salaal Ali", 
+  "Um Salaal Mohamed", 
+  "Zobara", 
+  "Shamal", 
+  "Fereej Al Sudan", 
+  "Al Naasar Street", 
+  "West Bay", 
+  "Onaiza", 
+  "Karana", 
+  "Katara", 
+  "Industrial Area", 
+  "New Industrial Area"
+];
+
+// Industrial Area Streets (1-52)
+export const industrialAreaStreets: string[] = Array.from(
+  { length: 52 }, 
+  (_, i) => `Street No. ${i + 1}`
+);
