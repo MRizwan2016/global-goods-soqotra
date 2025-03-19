@@ -5,6 +5,7 @@ import JobDetails from "@/pages/qatar/JobDetails";
 import NewJobForm from "@/pages/qatar/NewJobForm";
 import JobSchedulePrint from "@/pages/qatar/JobSchedulePrint";
 import JobGeneratePage from "@/pages/qatar/JobGeneratePage";
+import VehicleManagement from "@/pages/qatar/VehicleManagement";
 import { RouteConfig } from "./types";
 
 export const qatarRoutes: RouteConfig[] = [
@@ -36,6 +37,11 @@ export const qatarRoutes: RouteConfig[] = [
   {
     path: "/qatar/jobs/generate",
     element: JobGeneratePage,
+    private: true
+  },
+  {
+    path: "/qatar/vehicles",
+    element: VehicleManagement,
     private: true
   }
 ];

@@ -14,6 +14,10 @@ const JobTrackingHeader = () => {
     navigate("/qatar/jobs/generate");
   };
   
+  const handleManageVehicles = () => {
+    navigate("/qatar/vehicles");
+  };
+  
   return (
     <div className="p-4 bg-blue-50 border-b border-blue-100 flex justify-between items-center">
       <h3 className="text-lg font-medium text-blue-800">QATAR CARGO COLLECTION & DELIVERY MANAGEMENT</h3>
@@ -26,7 +30,11 @@ const JobTrackingHeader = () => {
           <Printer size={14} />
           JOB GENERATE
         </Button>
-        <Button variant="outline" className="flex items-center gap-1">
+        <Button 
+          variant="outline" 
+          className="flex items-center gap-1"
+          onClick={handleManageVehicles}
+        >
           <Truck size={14} />
           MANAGE VEHICLES
         </Button>

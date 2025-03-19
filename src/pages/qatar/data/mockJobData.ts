@@ -1,270 +1,580 @@
-import { DailyJobForecast, QatarBranch, QatarCity, QatarJob, QatarSector, QatarVehicle, VehicleStats } from "../types/jobTypes";
+import { QatarJob, QatarCity, QatarVehicle, QatarSector, QatarBranch } from "../types/jobTypes";
 
 export const mockJobs: QatarJob[] = [
   {
     id: "1",
-    jobNumber: "29909",
-    invoiceNumber: "INV-001",
-    jobType: "COLLECTION",
-    date: "19/03/2025",
-    time: "00:00",
+    jobNumber: "23070001",
+    invoiceNumber: "INV-2307-0001",
+    jobType: "DELIVERY",
+    date: "2023-07-01",
+    time: "10:00",
     amPm: "AM",
-    customer: "NANDAKUMAR",
-    mobileNumber: "55038528",
-    landNumber: "0",
-    sector: "COLOMBO",
-    branch: "BRANCH-1",
-    city: "DOHA",
-    town: "INDUSTRIAL AREA",
-    location: "EZDAN 23",
-    vehicle: "41073/Lorry/Diesel/41073/256",
-    remarks: "CARTON BOX // PROMOTION BOX // 47 WAREHOUSE DELIVERY",
-    advanceAmount: 13,
-    status: "SCHEDULED",
+    customer: "Qatar National Bank",
+    mobileNumber: "555-1234",
+    landNumber: "444-5678",
+    sector: "Banking",
+    branch: "Doha Main Branch",
+    city: "Doha",
+    town: "West Bay",
+    location: "QNB Tower",
+    vehicle: "Car",
+    remarks: "Fragile items",
+    advanceAmount: 50,
+    status: "PENDING",
     sameDay: "Y",
-    collectDate: "19/03/2025",
+    collectDate: "2023-07-01",
     items: [
-      {
-        id: "item-1",
-        jobId: "1",
-        itemName: "CARTON BOX - SMALL // PROMOTION BOX",
-        sellPrice: 50,
-        quantity: 1
-      }
+      { id: "item1", jobId: "1", itemName: "Laptop", sellPrice: 500, quantity: 1 },
+      { id: "item2", jobId: "1", itemName: "Documents", sellPrice: 100, quantity: 5 }
     ],
-    entryBy: "admin",
-    entryDate: "18/03/2025"
+    entryBy: "John Doe",
+    entryDate: "2023-06-30"
   },
   {
     id: "2",
-    jobNumber: "29909",
-    invoiceNumber: "INV-001",
-    jobType: "DELIVERY",
-    date: "19/03/2025",
-    time: "00:00",
-    amPm: "AM",
-    customer: "NANDAKUMAR",
-    mobileNumber: "55038528",
-    landNumber: "0",
-    sector: "COLOMBO",
-    branch: "BRANCH-1",
-    city: "DOHA",
-    town: "INDUSTRIAL AREA",
-    location: "EZDAN 23",
-    vehicle: "41073/Lorry/Diesel/41073/256",
-    remarks: "CARTON BOX // PROMOTION BOX // 47 WAREHOUSE DELIVERY",
-    advanceAmount: 13,
-    status: "SCHEDULED",
+    jobNumber: "23070002",
+    invoiceNumber: "INV-2307-0002",
+    jobType: "COLLECTION",
+    date: "2023-07-01",
+    time: "02:30",
+    amPm: "PM",
+    customer: "Doha Municipality",
+    mobileNumber: "555-4321",
+    landNumber: "444-8765",
+    sector: "Government",
+    branch: "Al Rayyan Branch",
+    city: "Doha",
+    town: "Al Rayyan",
+    location: "Municipality Office",
+    vehicle: "Van",
+    remarks: "Important files",
+    advanceAmount: 0,
+    status: "COMPLETED",
     sameDay: "Y",
-    collectDate: "19/03/2025",
+    collectDate: "2023-07-01",
     items: [
-      {
-        id: "item-2",
-        jobId: "2",
-        itemName: "CARTON BOX - SMALL // PROMOTION BOX",
-        sellPrice: 50,
-        quantity: 1
-      }
+      { id: "item3", jobId: "2", itemName: "Files", sellPrice: 80, quantity: 10 },
+      { id: "item4", jobId: "2", itemName: "Sealed Box", sellPrice: 120, quantity: 2 }
     ],
-    entryBy: "admin",
-    entryDate: "18/03/2025"
+    entryBy: "Jane Smith",
+    entryDate: "2023-06-30"
   },
   {
     id: "3",
-    jobNumber: "29903",
-    invoiceNumber: "INV-002",
-    jobType: "COLLECTION",
-    date: "19/03/2025",
-    time: "00:00",
-    amPm: "PM",
-    customer: "MR. UDAYA",
-    mobileNumber: "50252368",
-    landNumber: "0",
-    sector: "COLOMBO",
-    branch: "BRANCH-2",
-    city: "DOHA",
-    town: "EZDAN OASIS",
-    location: "BUILDING NO. B, 182 ROOM",
-    vehicle: "",
-    remarks: "",
-    advanceAmount: 230,
-    status: "PENDING",
-    sameDay: "Y",
-    collectDate: "19/03/2025",
+    jobNumber: "23070003",
+    invoiceNumber: "INV-2307-0003",
+    jobType: "DELIVERY",
+    date: "2023-07-02",
+    time: "09:00",
+    amPm: "AM",
+    customer: "Hamad International Airport",
+    mobileNumber: "555-9876",
+    landNumber: "444-2345",
+    sector: "Transportation",
+    branch: "Cargo Section",
+    city: "Doha",
+    town: "Airport Area",
+    location: "HIA Cargo Terminal",
+    vehicle: "Truck",
+    remarks: "Heavy equipment",
+    advanceAmount: 100,
+    status: "SCHEDULED",
+    sameDay: "N",
+    collectDate: "2023-07-02",
     items: [
-      {
-        id: "item-3",
-        jobId: "3",
-        itemName: "WOODEN BOX - (1M) - WHITE",
-        sellPrice: 100,
-        quantity: 1
-      }
+      { id: "item5", jobId: "3", itemName: "Spare Parts", sellPrice: 200, quantity: 3 },
+      { id: "item6", jobId: "3", itemName: "Tools", sellPrice: 150, quantity: 4 }
     ],
-    entryBy: "admin",
-    entryDate: "18/03/2025"
+    entryBy: "David Johnson",
+    entryDate: "2023-07-01"
   },
   {
     id: "4",
-    jobNumber: "29898",
-    invoiceNumber: "INV-003",
-    jobType: "DELIVERY",
-    date: "19/03/2025",
-    time: "00:00",
-    amPm: "AM",
-    customer: "ZAMEEL",
-    mobileNumber: "33969702",
-    landNumber: "0",
-    sector: "COLOMBO",
-    branch: "BRANCH-3",
-    city: "DOHA",
-    town: "BINMAHMOOD",
-    location: "",
-    vehicle: "",
-    remarks: "33969702 // 66099345",
-    advanceAmount: 230,
-    status: "SCHEDULED",
+    jobNumber: "23070004",
+    invoiceNumber: "INV-2307-0004",
+    jobType: "COLLECTION",
+    date: "2023-07-02",
+    time: "03:00",
+    amPm: "PM",
+    customer: "Sidra Medical Center",
+    mobileNumber: "555-5432",
+    landNumber: "444-7890",
+    sector: "Healthcare",
+    branch: "Outpatient Clinic",
+    city: "Doha",
+    town: "Education City",
+    location: "Sidra Hospital",
+    vehicle: "Car",
+    remarks: "Medical samples",
+    advanceAmount: 25,
+    status: "IN_PROGRESS",
     sameDay: "Y",
-    collectDate: "19/03/2025",
+    collectDate: "2023-07-02",
     items: [
-      {
-        id: "item-4",
-        jobId: "4",
-        itemName: "WOODEN BOX - (1M) - WHITE // PROMOTION BOX",
-        sellPrice: 100,
-        quantity: 1
-      }
+      { id: "item7", jobId: "4", itemName: "Blood Samples", sellPrice: 100, quantity: 2 },
+      { id: "item8", jobId: "4", itemName: "Lab Reports", sellPrice: 50, quantity: 6 }
     ],
-    entryBy: "admin",
-    entryDate: "18/03/2025"
+    entryBy: "Sarah Williams",
+    entryDate: "2023-07-01"
   },
   {
     id: "5",
-    jobNumber: "21125",
-    invoiceNumber: "INV-004",
-    jobType: "COLLECTION",
-    date: "19/03/2025",
-    time: "00:00",
+    jobNumber: "23070005",
+    invoiceNumber: "INV-2307-0005",
+    jobType: "DELIVERY",
+    date: "2023-07-03",
+    time: "11:00",
     amPm: "AM",
-    customer: "MS CHANTHIKA",
-    mobileNumber: "33746393",
-    landNumber: "0",
-    sector: "COLOMBO",
-    branch: "BRANCH-4",
-    city: "DOHA",
-    town: "DOHA CITY",
-    location: "",
-    vehicle: "",
-    remarks: "DELIVERY 50 50 50",
-    advanceAmount: 0,
+    customer: "Qatar University",
+    mobileNumber: "555-2222",
+    landNumber: "444-1111",
+    sector: "Education",
+    branch: "Main Library",
+    city: "Doha",
+    town: "Qatar University",
+    location: "QU Library",
+    vehicle: "Van",
+    remarks: "Books and journals",
+    advanceAmount: 75,
+    status: "CANCELLED",
+    sameDay: "N",
+    collectDate: "2023-07-03",
+    items: [
+      { id: "item9", jobId: "5", itemName: "Textbooks", sellPrice: 60, quantity: 8 },
+      { id: "item10", jobId: "5", itemName: "Journals", sellPrice: 40, quantity: 12 }
+    ],
+    entryBy: "Michael Brown",
+    entryDate: "2023-07-02"
+  },
+  {
+    id: "6",
+    jobNumber: "23070006",
+    invoiceNumber: "INV-2307-0006",
+    jobType: "COLLECTION",
+    date: "2023-07-03",
+    time: "04:30",
+    amPm: "PM",
+    customer: "Al Jazeera Media Network",
+    mobileNumber: "555-3333",
+    landNumber: "444-9999",
+    sector: "Media",
+    branch: "News Department",
+    city: "Doha",
+    town: "West Bay",
+    location: "Al Jazeera Tower",
+    vehicle: "Car",
+    remarks: "Confidential documents",
+    advanceAmount: 30,
     status: "PENDING",
     sameDay: "Y",
-    collectDate: "19/03/2025",
+    collectDate: "2023-07-03",
     items: [
-      {
-        id: "item-5",
-        jobId: "5",
-        itemName: "CARTON BOX - SMALL",
-        sellPrice: 50,
-        quantity: 1
-      }
+      { id: "item11", jobId: "6", itemName: "Documents", sellPrice: 70, quantity: 7 },
+      { id: "item12", jobId: "6", itemName: "Tapes", sellPrice: 90, quantity: 3 }
     ],
-    entryBy: "admin",
-    entryDate: "18/03/2025"
+    entryBy: "Linda Davis",
+    entryDate: "2023-07-02"
+  },
+  {
+    id: "7",
+    jobNumber: "23070007",
+    invoiceNumber: "INV-2307-0007",
+    jobType: "DELIVERY",
+    date: "2023-07-04",
+    time: "10:30",
+    amPm: "AM",
+    customer: "Commercial Bank of Qatar",
+    mobileNumber: "555-7777",
+    landNumber: "444-3333",
+    sector: "Banking",
+    branch: "Al Sadd Branch",
+    city: "Doha",
+    town: "Al Sadd",
+    location: "CBQ Branch",
+    vehicle: "Van",
+    remarks: "Financial reports",
+    advanceAmount: 60,
+    status: "COMPLETED",
+    sameDay: "Y",
+    collectDate: "2023-07-04",
+    items: [
+      { id: "item13", jobId: "7", itemName: "Reports", sellPrice: 80, quantity: 9 },
+      { id: "item14", jobId: "7", itemName: "Statements", sellPrice: 60, quantity: 11 }
+    ],
+    entryBy: "Robert Wilson",
+    entryDate: "2023-07-03"
+  },
+  {
+    id: "8",
+    jobNumber: "23070008",
+    invoiceNumber: "INV-2307-0008",
+    jobType: "COLLECTION",
+    date: "2023-07-04",
+    time: "02:00",
+    amPm: "PM",
+    customer: "Aspire Academy",
+    mobileNumber: "555-8888",
+    landNumber: "444-4444",
+    sector: "Education",
+    branch: "Sports Science Dept",
+    city: "Doha",
+    town: "Aspire Zone",
+    location: "Academy Building",
+    vehicle: "Car",
+    remarks: "Sports equipment",
+    advanceAmount: 40,
+    status: "SCHEDULED",
+    sameDay: "N",
+    collectDate: "2023-07-04",
+    items: [
+      { id: "item15", jobId: "8", itemName: "Equipment", sellPrice: 120, quantity: 4 },
+      { id: "item16", jobId: "8", itemName: "Uniforms", sellPrice: 70, quantity: 13 }
+    ],
+    entryBy: "Karen Taylor",
+    entryDate: "2023-07-03"
+  },
+  {
+    id: "9",
+    jobNumber: "23070009",
+    invoiceNumber: "INV-2307-0009",
+    jobType: "DELIVERY",
+    date: "2023-07-05",
+    time: "09:30",
+    amPm: "AM",
+    customer: "Museum of Islamic Art",
+    mobileNumber: "555-6666",
+    landNumber: "444-6666",
+    sector: "Culture",
+    branch: "Exhibition Dept",
+    city: "Doha",
+    town: "Corniche",
+    location: "MIA Park",
+    vehicle: "Truck",
+    remarks: "Art pieces",
+    advanceAmount: 120,
+    status: "IN_PROGRESS",
+    sameDay: "Y",
+    collectDate: "2023-07-05",
+    items: [
+      { id: "item17", jobId: "9", itemName: "Artifacts", sellPrice: 250, quantity: 2 },
+      { id: "item18", jobId: "9", itemName: "Display Cases", sellPrice: 150, quantity: 3 }
+    ],
+    entryBy: "Thomas Anderson",
+    entryDate: "2023-07-04"
+  },
+  {
+    id: "10",
+    jobNumber: "23070010",
+    invoiceNumber: "INV-2307-0010",
+    jobType: "COLLECTION",
+    date: "2023-07-05",
+    time: "03:30",
+    amPm: "PM",
+    customer: "Qatar Petroleum",
+    mobileNumber: "555-1111",
+    landNumber: "444-2222",
+    sector: "Energy",
+    branch: "Research Center",
+    city: "Doha",
+    town: "West Bay",
+    location: "QP Tower",
+    vehicle: "Van",
+    remarks: "Samples and equipment",
+    advanceAmount: 55,
+    status: "CANCELLED",
+    sameDay: "N",
+    collectDate: "2023-07-05",
+    items: [
+      { id: "item19", jobId: "10", itemName: "Samples", sellPrice: 90, quantity: 5 },
+      { id: "item20", jobId: "10", itemName: "Instruments", sellPrice: 110, quantity: 4 }
+    ],
+    entryBy: "Jessica White",
+    entryDate: "2023-07-04"
   }
 ];
 
-export const mockVehicleStats: VehicleStats[] = [
-  { vehicle: "41067", totalJobs: 8, deliveries: 3, collections: 5 },
-  { vehicle: "41073", totalJobs: 5, deliveries: 2, collections: 3 },
-  { vehicle: "119927", totalJobs: 1, deliveries: 0, collections: 1 }
-];
-
-export const mockDailyJobForecasts: DailyJobForecast[] = [
-  { date: "19/03/2025", day: "WED", totalJobs: 14, deliveries: 5, collections: 9 },
-  { date: "20/03/2025", day: "THU", totalJobs: 4, deliveries: 1, collections: 3 },
-  { date: "21/03/2025", day: "FRI", totalJobs: 4, deliveries: 0, collections: 4 },
-  { date: "22/03/2025", day: "SAT", totalJobs: 4, deliveries: 1, collections: 3 },
-  { date: "24/03/2025", day: "MON", totalJobs: 2, deliveries: 0, collections: 2 },
-  { date: "26/03/2025", day: "WED", totalJobs: 4, deliveries: 0, collections: 4 },
-  { date: "27/03/2025", day: "THU", totalJobs: 3, deliveries: 0, collections: 3 },
-  { date: "30/03/2025", day: "SUN", totalJobs: 2, deliveries: 1, collections: 1 },
-  { date: "31/03/2025", day: "MON", totalJobs: 6, deliveries: 2, collections: 4 },
-  { date: "01/04/2025", day: "TUE", totalJobs: 1, deliveries: 0, collections: 1 },
-  { date: "15/04/2025", day: "TUE", totalJobs: 1, deliveries: 0, collections: 1 },
-  { date: "22/04/2025", day: "TUE", totalJobs: 2, deliveries: 0, collections: 2 },
-  { date: "23/04/2025", day: "WED", totalJobs: 1, deliveries: 0, collections: 1 },
-  { date: "29/04/2025", day: "TUE", totalJobs: 2, deliveries: 0, collections: 2 },
-  { date: "30/04/2025", day: "WED", totalJobs: 7, deliveries: 1, collections: 6 },
-  { date: "08/05/2025", day: "THU", totalJobs: 1, deliveries: 0, collections: 1 },
-  { date: "13/05/2025", day: "TUE", totalJobs: 1, deliveries: 0, collections: 1 }
-];
-
-export const mockVehicles: QatarVehicle[] = [
-  { id: "1", number: "41070", type: "Lorry", description: "Diesel/41070/255" },
-  { id: "2", number: "41067", type: "Lorry", description: "Diesel/41067/255" },
-  { id: "3", number: "41504", type: "Lorry", description: "Diesel/41504/255" },
-  { id: "4", number: "41073", type: "Lorry", description: "Diesel/41073/255" },
-  { id: "5", number: "119927", type: "Lorry", description: "Petrol/119927/259" }
-];
-
 export const mockCities: QatarCity[] = [
-  { id: "1", name: "DOHA", code: "171" },
-  { id: "2", name: "AL WAKRA", code: "172" },
-  { id: "3", name: "AL KHOR", code: "173" },
-  { id: "4", name: "LUSAIL", code: "174" }
+  {
+    id: "c1",
+    name: "Doha",
+    code: "DOH"
+  },
+  {
+    id: "c2",
+    name: "Al Rayyan",
+    code: "RAY"
+  },
+  {
+    id: "c3",
+    name: "Al Wakrah",
+    code: "WAK"
+  },
+  {
+    id: "c4",
+    name: "Al Khor",
+    code: "KHO"
+  },
+  {
+    id: "c5",
+    name: "Al Shamal",
+    code: "SHA"
+  }
 ];
 
 export const mockSectors: QatarSector[] = [
-  { id: "1", name: "COLOMBO", code: "C" },
-  { id: "2", name: "SRI LANKA", code: "SL" },
-  { id: "3", name: "DUBAI", code: "DXB" },
-  { id: "4", name: "QATAR", code: "QTR" }
+  {
+    id: "s1",
+    name: "Banking",
+    code: "BNK"
+  },
+  {
+    id: "s2",
+    name: "Government",
+    code: "GOV"
+  },
+  {
+    id: "s3",
+    name: "Transportation",
+    code: "TRN"
+  },
+  {
+    id: "s4",
+    name: "Healthcare",
+    code: "MED"
+  },
+  {
+    id: "s5",
+    name: "Education",
+    code: "EDU"
+  },
+  {
+    id: "s6",
+    name: "Media",
+    code: "MED"
+  },
+  {
+    id: "s7",
+    name: "Energy",
+    code: "ENG"
+  },
+  {
+    id: "s8",
+    name: "Culture",
+    code: "CUL"
+  }
 ];
 
 export const mockBranches: QatarBranch[] = [
-  { id: "1", name: "DOHA", code: "HOF", sector: "COLOMBO" },
-  { id: "2", name: "AL WAKRA", code: "AWB", sector: "COLOMBO" },
-  { id: "3", name: "AL KHOR", code: "AKB", sector: "SRI LANKA" },
-  { id: "4", name: "DOHA", code: "DOH", sector: "DUBAI" }
+  {
+    id: "b1",
+    sector: "BNK",
+    name: "Doha Main Branch",
+    code: "DMB"
+  },
+  {
+    id: "b2",
+    sector: "GOV",
+    name: "Al Rayyan Branch",
+    code: "ARB"
+  },
+  {
+    id: "b3",
+    sector: "TRN",
+    name: "Cargo Section",
+    code: "HCS"
+  },
+  {
+    id: "b4",
+    sector: "MED",
+    name: "Outpatient Clinic",
+    code: "SOC"
+  },
+  {
+    id: "b5",
+    sector: "EDU",
+    name: "Main Library",
+    code: "QML"
+  },
+  {
+    id: "b6",
+    sector: "MED",
+    name: "News Department",
+    code: "AJN"
+  },
+  {
+    id: "b7",
+    sector: "BNK",
+    name: "Al Sadd Branch",
+    code: "CBS"
+  },
+  {
+    id: "b8",
+    sector: "EDU",
+    name: "Sports Science Dept",
+    code: "ASA"
+  },
+  {
+    id: "b9",
+    sector: "CUL",
+    name: "Exhibition Dept",
+    code: "MIE"
+  },
+  {
+    id: "b10",
+    sector: "ENG",
+    name: "Research Center",
+    code: "QPR"
+  }
 ];
 
 export const mockSalesReps = [
-  { id: "1", name: "GAMAGE KASMIKA GAYASHAN", code: "264" },
-  { id: "2", name: "MOHAMMED RIZAN", code: "189" },
-  { id: "3", name: "ABDUL SHAHID", code: "321" },
-  { id: "4", name: "SARA ALHAMED", code: "415" },
+  {
+    id: "sr1",
+    name: "Ahmed Khalil",
+    code: "AK001"
+  },
+  {
+    id: "sr2",
+    name: "Fatima Al-Thani",
+    code: "FA002"
+  },
+  {
+    id: "sr3",
+    name: "Yousef Al-Abdulla",
+    code: "YA003"
+  }
 ];
 
+// Updated mock vehicles based on provided data
+export const mockVehicles = [
+  {
+    id: "v1",
+    number: "41067",
+    type: "LORRY",
+    description: "DIESEL MANUAL",
+    status: "RUN",
+    licenseExpiry: "29/12/2016",
+    insuranceExpiry: "29/12/2016",
+    mileage: "19617"
+  },
+  {
+    id: "v2",
+    number: "41070",
+    type: "LORRY",
+    description: "DIESEL MANUAL",
+    status: "RUN",
+    licenseExpiry: "29/12/2016",
+    insuranceExpiry: "29/12/2016",
+    mileage: "16273"
+  },
+  {
+    id: "v3",
+    number: "41073", 
+    type: "LORRY",
+    description: "DIESEL MANUAL",
+    status: "RUN",
+    licenseExpiry: "29/12/2016",
+    insuranceExpiry: "29/12/2016",
+    mileage: "12226"
+  },
+  {
+    id: "v4",
+    number: "514005",
+    type: "LORRY",
+    description: "MITSUBISHI FUSO",
+    status: "GARAGE",
+    licenseExpiry: "28/10/2014",
+    insuranceExpiry: "28/10/2014",
+    mileage: "1"
+  },
+  {
+    id: "v5",
+    number: "119927",
+    type: "LORRY",
+    description: "PETROL MANUAL",
+    status: "RUN",
+    licenseExpiry: "17/11/2014",
+    insuranceExpiry: "17/11/2014",
+    mileage: "1"
+  },
+  {
+    id: "v6",
+    number: "74827",
+    type: "LORRY",
+    description: "TATA LORRY",
+    status: "GARAGE",
+    licenseExpiry: "18/11/2014",
+    insuranceExpiry: "18/11/2014",
+    mileage: "1"
+  },
+  {
+    id: "v7",
+    number: "1254681854",
+    type: "FORK LIFT",
+    description: "WAREHOUSE COLLECTION",
+    status: "GARAGE",
+    licenseExpiry: "00/00/0000",
+    insuranceExpiry: "00/00/0000",
+    mileage: "0"
+  }
+];
+
+// Updated mock drivers based on provided data
 export const mockDrivers = [
-  { id: "1", name: "KANAYA/D" },
-  { id: "2", name: "WCA AGENTS/246" },
-  { id: "3", name: "ABDUL RAZAK" },
-  { id: "4", name: "MOHAMMED SADIQ" },
+  {
+    id: "d1",
+    name: "ASHOKA",
+    code: "DRV01",
+    mobileNumber: "974-55667788",
+    licenseNumber: "QAT1234567",
+    licenseExpiry: "2025-12-31"
+  },
+  {
+    id: "d2",
+    name: "KANAYA",
+    code: "DRV02",
+    mobileNumber: "974-55998877",
+    licenseNumber: "QAT7654321",
+    licenseExpiry: "2024-11-15"
+  },
+  {
+    id: "d3",
+    name: "SALIEH",
+    code: "DRV03",
+    mobileNumber: "974-55112233",
+    licenseNumber: "QAT9876543",
+    licenseExpiry: "2025-06-30"
+  },
+  {
+    id: "d4",
+    name: "ABDULLAH",
+    code: "DRV04",
+    mobileNumber: "974-55443322",
+    licenseNumber: "QAT3456789",
+    licenseExpiry: "2024-09-20"
+  },
+  {
+    id: "d5",
+    name: "IDRIS KARAR",
+    code: "DRV05",
+    mobileNumber: "974-55778899",
+    licenseNumber: "QAT6543219",
+    licenseExpiry: "2025-03-15"
+  },
+  {
+    id: "d6",
+    name: "JOHNY VENAKADY",
+    code: "DRV06",
+    mobileNumber: "974-55221133",
+    licenseNumber: "QAT9876123",
+    licenseExpiry: "2024-08-10"
+  },
+  {
+    id: "d7",
+    name: "RAYMOND",
+    code: "DRV07",
+    mobileNumber: "974-55664422",
+    licenseNumber: "QAT4567891",
+    licenseExpiry: "2025-05-22"
+  }
 ];
-
-export const getJobStats = () => {
-  const total = mockJobs.length;
-  const completed = mockJobs.filter(job => job.status === "COMPLETED").length;
-  const inProgress = mockJobs.filter(job => job.status === "IN_PROGRESS").length;
-  const pending = mockJobs.filter(job => job.status === "PENDING").length;
-  
-  return {
-    total,
-    completed,
-    inProgress,
-    pending
-  };
-};
-
-// Calculate totals
-export const getTotals = () => {
-  const totalJobs = mockVehicleStats.reduce((sum, stats) => sum + stats.totalJobs, 0);
-  const totalDeliveries = mockVehicleStats.reduce((sum, stats) => sum + stats.deliveries, 0);
-  const totalCollections = mockVehicleStats.reduce((sum, stats) => sum + stats.collections, 0);
-  
-  return {
-    totalJobs,
-    totalDeliveries,
-    totalCollections
-  };
-};
