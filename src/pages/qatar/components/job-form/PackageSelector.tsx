@@ -1,8 +1,10 @@
 
 import { useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { JobItem } from "../../types/jobTypes";
+import { v4 as uuidv4 } from 'uuid';
 import {
   Select,
   SelectContent,
@@ -10,65 +12,73 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { packageOptions } from "../../data/packageOptions";
-import { JobItem } from "../../types/jobTypes";
 
 interface PackageSelectorProps {
   onAddItem: (item: JobItem) => void;
 }
 
+const packageOptions = [
+  "TELEVISION",
+  "TRAVELING BAG",
+  "CARTON BOX - SMALL",
+  "CARTON BOX - MEDIUM",
+  "CARTON BOX - LARGE",
+  "CARTON BOX - EXTRA LARGE",
+  "TRAVELLING BAGS",
+  "CARTON BOX - BULILIT",
+  "CARTON BOX - JUMBO",
+  "CARTON BOX - SUPER JUMBO",
+  "WASHING MACHINE",
+  "REFRIDGERATOR",
+  "DRUM - SMALL",
+  "DRUM - BIG",
+  "WOODEN BOX - 1 METER",
+  "WOODEN BOX - 1.5 METER",
+  "WOODEN BOX - 2 METER",
+  "WOODEN BOX - 2.5 METER",
+  "WOODEN BOX - 3 METER", 
+  "WOODEN BOX - 4 METER",
+  "STEEL BOX",
+  "GYM SET",
+  "MICROWAVE OVEN",
+  "OVEN",
+  "4 BURNER",
+  "DUVET"
+];
+
 const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
-  const [packageItem, setPackageItem] = useState({
-    itemName: "",
-    sellPrice: "",
-    quantity: "1"
-  });
+  const [selectedItem, setSelectedItem] = useState("");
+  const [sellPrice, setSellPrice] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
   
-  const handlePackageInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setPackageItem(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  
-  const handlePackageSelect = (value: string) => {
-    setPackageItem(prev => ({
-      ...prev,
-      itemName: value
-    }));
-  };
-  
-  const handleInsertPackage = () => {
-    if (!packageItem.itemName) return;
-    
-    const newItem: JobItem = {
-      id: Date.now().toString(),
-      jobId: "",
-      itemName: packageItem.itemName,
-      sellPrice: parseFloat(packageItem.sellPrice) || 0,
-      quantity: parseInt(packageItem.quantity) || 1
-    };
-    
-    onAddItem(newItem);
-    
-    // Reset package input fields
-    setPackageItem({
-      itemName: "",
-      sellPrice: "",
-      quantity: "1"
-    });
+  const handleAddItem = () => {
+    if (selectedItem) {
+      const newItem: JobItem = {
+        id: uuidv4(),
+        jobId: "",
+        itemName: selectedItem,
+        sellPrice,
+        quantity
+      };
+      
+      onAddItem(newItem);
+      
+      // Reset fields after adding
+      setSelectedItem("");
+      setSellPrice(0);
+      setQuantity(1);
+    }
   };
   
   return (
-    <div className="grid grid-cols-3 gap-4 mb-4">
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
       <div>
-        <Label htmlFor="itemName">ITEM:</Label>
-        <Select
-          value={packageItem.itemName}
-          onValueChange={handlePackageSelect}
+        <Label htmlFor="packageOption">PACKAGE TYPE:</Label>
+        <Select 
+          value={selectedItem} 
+          onValueChange={setSelectedItem}
         >
-          <SelectTrigger id="itemName" className="bg-blue-600 text-white">
+          <SelectTrigger id="packageOption" className="bg-white">
             <SelectValue placeholder="SELECT PACKAGE" />
           </SelectTrigger>
           <SelectContent>
@@ -82,35 +92,33 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
       </div>
       
       <div>
-        <Label htmlFor="sellPrice">SELL:</Label>
-        <Input 
-          id="sellPrice"
-          name="sellPrice"
+        <Label htmlFor="price">PRICE:</Label>
+        <Input
+          id="price"
           type="number"
-          value={packageItem.sellPrice}
-          onChange={handlePackageInputChange}
+          value={sellPrice || ''}
+          onChange={(e) => setSellPrice(Number(e.target.value))}
           placeholder="0"
         />
       </div>
       
       <div>
         <Label htmlFor="quantity">QUANTITY:</Label>
-        <Input 
+        <Input
           id="quantity"
-          name="quantity"
           type="number"
-          value={packageItem.quantity}
-          onChange={handlePackageInputChange}
+          value={quantity || ''}
+          onChange={(e) => setQuantity(Number(e.target.value))}
           placeholder="1"
+          min="1"
         />
       </div>
       
-      <div>
+      <div className="flex items-end">
         <Button 
-          type="button" 
-          className="bg-blue-600 hover:bg-blue-700 mt-3"
-          onClick={handleInsertPackage}
-          disabled={!packageItem.itemName}
+          onClick={handleAddItem} 
+          disabled={!selectedItem || sellPrice <= 0}
+          className="bg-blue-600 hover:bg-blue-700 w-full"
         >
           INSERT
         </Button>

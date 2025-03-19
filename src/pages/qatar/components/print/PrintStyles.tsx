@@ -12,11 +12,15 @@ const PrintStyles: React.FC = () => {
         body {
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
+          color-adjust: exact;
         }
         .print\\:hidden {
           display: none !important;
         }
-        .print\\:bg-green-100 {
+        .bg-blue-100 {
+          background-color: #dbeafe !important;
+        }
+        .bg-green-100 {
           background-color: #d1fae5 !important;
         }
         table {
@@ -31,6 +35,12 @@ const PrintStyles: React.FC = () => {
         }
         tfoot {
           display: table-footer-group;
+        }
+        @media print {
+          html, body {
+            width: 297mm; /* A4 width in landscape */
+            height: 210mm; /* A4 height in landscape */
+          }
         }
       `}
     </style>

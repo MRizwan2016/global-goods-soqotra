@@ -6,9 +6,12 @@ import { Truck, User, Plus, Printer, FileText } from "lucide-react";
 const JobTrackingHeader = () => {
   const navigate = useNavigate();
   
-  const handlePrintJobs = () => {
-    // Open the print page in a new window
-    window.open("/qatar/jobs/print", "_blank");
+  const handleNewJob = () => {
+    navigate("/qatar/job/new");
+  };
+  
+  const handleJobGenerate = () => {
+    navigate("/qatar/jobs/generate");
   };
   
   return (
@@ -18,7 +21,7 @@ const JobTrackingHeader = () => {
         <Button 
           variant="outline" 
           className="flex items-center gap-1"
-          onClick={handlePrintJobs}
+          onClick={handleJobGenerate}
         >
           <Printer size={14} />
           JOB GENERATE
@@ -33,7 +36,7 @@ const JobTrackingHeader = () => {
         </Button>
         <Button 
           className="bg-blue-600 hover:bg-blue-700 flex items-center gap-1"
-          onClick={() => navigate("/qatar/job/new")}
+          onClick={handleNewJob}
         >
           <Plus size={14} />
           ADD NEW JOB
