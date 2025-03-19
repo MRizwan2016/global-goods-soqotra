@@ -1,4 +1,3 @@
-
 export interface QatarVehicle {
   id: string;
   number: string;
@@ -17,6 +16,7 @@ export interface QatarDriver {
   mobileNumber: string;
   licenseNumber: string;
   licenseExpiry: string;
+  employmentStatus?: "ACTIVE" | "INACTIVE" | "ON_LEAVE";
 }
 
 // Add these types to match what's being used in QatarDashboard
