@@ -1,11 +1,17 @@
 
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { QatarJob } from "../../types/jobTypes";
 import JobStatusBadge from "../job-tracking/JobStatusBadge";
+import { formatCurrency } from "../../utils/formatters";
 
 interface JobSelectionTableProps {
   jobs: QatarJob[];
@@ -18,143 +24,76 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
   selectedJobs,
   onToggleSelect,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterJobType, setFilterJobType] = useState<string | null>(null);
-
-  const filteredJobs = jobs.filter((job) => {
-    const matchesSearch =
-      searchTerm === "" ||
-      job.jobNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.city.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesType =
-      filterJobType === null || job.jobType === filterJobType;
-
-    return matchesSearch && matchesType;
-  });
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-
+  // Determine if a job is selected
   const isSelected = (job: QatarJob) => {
-    return selectedJobs.some((selectedJob) => selectedJob.id === job.id);
+    return selectedJobs.some((j) => j.id === job.id);
   };
 
   return (
-    <Card>
-      <CardHeader className="bg-blue-600 text-white py-2 px-4">
-        <CardTitle className="text-md">SELECT JOBS</CardTitle>
-      </CardHeader>
-
-      <CardContent className="p-4">
-        <div className="flex flex-wrap gap-2 mb-4">
-          <div className="relative flex-grow">
-            <Input
-              placeholder="Search jobs by number or customer..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              className="pl-10"
-            />
-            <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-          </div>
-
-          <div className="flex gap-2">
-            <button
-              onClick={() => setFilterJobType(null)}
-              className={`px-3 py-1.5 rounded text-sm ${
-                filterJobType === null
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              ALL
-            </button>
-            <button
-              onClick={() => setFilterJobType("COLLECTION")}
-              className={`px-3 py-1.5 rounded text-sm ${
-                filterJobType === "COLLECTION"
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              COLLECTIONS
-            </button>
-            <button
-              onClick={() => setFilterJobType("DELIVERY")}
-              className={`px-3 py-1.5 rounded text-sm ${
-                filterJobType === "DELIVERY"
-                  ? "bg-green-600 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              DELIVERIES
-            </button>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border p-2 text-left w-12"></th>
-                <th className="border p-2 text-left">JOB #</th>
-                <th className="border p-2 text-left">DATE</th>
-                <th className="border p-2 text-left">TYPE</th>
-                <th className="border p-2 text-left">CUSTOMER</th>
-                <th className="border p-2 text-left">MOBILE</th>
-                <th className="border p-2 text-left">LOCATION</th>
-                <th className="border p-2 text-left">STATUS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredJobs.length === 0 ? (
-                <tr>
-                  <td colSpan={8} className="border p-4 text-center text-gray-500">
-                    No jobs found matching your search criteria
-                  </td>
-                </tr>
-              ) : (
-                filteredJobs.map((job) => (
-                  <tr 
-                    key={job.id} 
-                    className={`border-b hover:bg-gray-50 ${isSelected(job) ? 'bg-blue-50' : ''}`}
-                    onClick={() => onToggleSelect(job)}
-                  >
-                    <td className="border p-2 text-center">
-                      <Checkbox
-                        checked={isSelected(job)}
-                        onCheckedChange={() => onToggleSelect(job)}
-                      />
-                    </td>
-                    <td className="border p-2">{job.jobNumber}</td>
-                    <td className="border p-2">{job.date}</td>
-                    <td className="border p-2">
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-medium text-white ${
-                          job.jobType === "COLLECTION"
-                            ? "bg-blue-600"
-                            : "bg-green-600"
-                        }`}
-                      >
-                        {job.jobType}
-                      </span>
-                    </td>
-                    <td className="border p-2">{job.customer}</td>
-                    <td className="border p-2">{job.mobileNumber}</td>
-                    <td className="border p-2">{job.location}, {job.town}</td>
-                    <td className="border p-2">
-                      <JobStatusBadge status={job.status} />
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="border rounded-md shadow-sm bg-white">
+      <div className="p-3 border-b bg-gray-50">
+        <h2 className="font-bold text-lg">Select Jobs for Schedule</h2>
+        <p className="text-sm text-gray-500">
+          {selectedJobs.length} jobs selected
+        </p>
+      </div>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-gray-100">
+              <TableHead className="w-12"></TableHead>
+              <TableHead className="w-32">Job #</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Location</TableHead>
+              <TableHead>Date/Time</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+              <TableHead>Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {jobs.length > 0 ? (
+              jobs.map((job) => (
+                <TableRow
+                  key={job.id}
+                  className={`${
+                    isSelected(job) ? "bg-blue-50" : ""
+                  } hover:bg-gray-50 cursor-pointer`}
+                  onClick={() => onToggleSelect(job)}
+                >
+                  <TableCell>
+                    <Checkbox
+                      checked={isSelected(job)}
+                      onCheckedChange={() => onToggleSelect(job)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium">{job.jobNumber}</TableCell>
+                  <TableCell>{job.jobType}</TableCell>
+                  <TableCell>{job.customer}</TableCell>
+                  <TableCell>{job.town}</TableCell>
+                  <TableCell>
+                    {job.date} {job.time}{job.amPm}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {formatCurrency(job.advanceAmount || 0)}
+                  </TableCell>
+                  <TableCell>
+                    <JobStatusBadge status={job.status} />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-4">
+                  No jobs found matching the filters
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 };
 

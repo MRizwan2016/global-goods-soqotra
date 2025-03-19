@@ -105,7 +105,7 @@ const PrintJobSchedule: React.FC<PrintJobScheduleProps> = ({
           {/* Header */}
           <div className="text-center mb-4">
             <h1 className="text-2xl font-bold uppercase">
-              COLLECTION/ DELIVERY JOB SHEET [ SCHEDULE NO: {scheduleData?.scheduleNumber || "5352"} ] - [ALMARAAM LOGISTICS SERVICES & ]
+              COLLECTION/ DELIVERY JOB SHEET [ SCHEDULE NO: {scheduleData?.scheduleNumber || "5352"} ] - [SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL]
             </h1>
             <p className="text-sm mt-2">
               Printed Time: {formattedDate} {formattedTime}. Printed By: {userName}

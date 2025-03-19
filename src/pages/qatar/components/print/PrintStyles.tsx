@@ -41,6 +41,9 @@ const PrintStyles: React.FC = () => {
             width: 297mm; /* A4 width in landscape */
             height: 210mm; /* A4 height in landscape */
           }
+          .company-name {
+            font-weight: bold;
+          }
         }
       `}
     </style>
