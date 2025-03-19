@@ -16,9 +16,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { mockVehicles, mockSalesReps, mockDrivers } from "../../../data/mockJobData";
+import { QatarJob } from "../../../types/jobTypes";
 
 interface ScheduleFieldsProps {
   formData: any;
+  selectedJobs: QatarJob[];
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
   handleDateChange: (date: Date | undefined) => void;
@@ -26,6 +28,7 @@ interface ScheduleFieldsProps {
 
 const ScheduleFields: React.FC<ScheduleFieldsProps> = ({ 
   formData, 
+  selectedJobs,
   handleInputChange, 
   handleSelectChange,
   handleDateChange 
@@ -33,6 +36,21 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
   const selectedDate = formData.scheduleDate 
     ? new Date(formData.scheduleDate) 
     : new Date();
+    
+  // Filter vehicles based on job assignments
+  const jobLocations = selectedJobs.map(job => job.town);
+  
+  // Only show vehicles appropriate for the selected jobs
+  const filteredVehicles = mockVehicles.filter(vehicle => {
+    // Show all vehicles if no jobs are selected
+    if (selectedJobs.length === 0) return true;
+    
+    // Simple logic to match vehicles to jobs based on type
+    // In a real app, this would be more sophisticated
+    if (vehicle.type === "LARGE" && selectedJobs.length > 5) return true;
+    if (vehicle.type === "MEDIUM" && selectedJobs.length <= 5) return true;
+    return vehicle.type === "SMALL" && selectedJobs.length <= 2;
+  });
 
   return (
     <>
@@ -57,13 +75,18 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
             <SelectValue placeholder="SELECT VEHICLE" />
           </SelectTrigger>
           <SelectContent>
-            {mockVehicles.map(vehicle => (
+            {filteredVehicles.map(vehicle => (
               <SelectItem key={vehicle.id} value={vehicle.number}>
                 {vehicle.number}/{vehicle.type}/{vehicle.description}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
+        <p className="text-xs text-gray-500 mt-1">
+          {selectedJobs.length > 0 ? 
+            `Showing vehicles suitable for ${selectedJobs.length} selected jobs` : 
+            'Select jobs to see recommended vehicles'}
+        </p>
       </div>
       
       <div>

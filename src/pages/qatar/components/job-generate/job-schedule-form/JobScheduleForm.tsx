@@ -51,6 +51,7 @@ const JobScheduleForm: React.FC<JobScheduleFormProps> = ({
         <form onSubmit={handleSubmit} className="space-y-4">
           <ScheduleFields 
             formData={formData}
+            selectedJobs={selectedJobs}
             handleInputChange={handleInputChange}
             handleSelectChange={handleSelectChange}
             handleDateChange={handleDateChange}

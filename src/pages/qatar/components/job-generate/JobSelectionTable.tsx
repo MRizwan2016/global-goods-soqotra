@@ -29,12 +29,15 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
     return selectedJobs.some((j) => j.id === job.id);
   };
 
+  // Filter jobs to show only pending ones
+  const pendingJobs = jobs.filter(job => job.status === "PENDING");
+
   return (
     <div className="border rounded-md shadow-sm bg-white">
       <div className="p-3 border-b bg-gray-50">
         <h2 className="font-bold text-lg">Select Jobs for Schedule</h2>
         <p className="text-sm text-gray-500">
-          {selectedJobs.length} jobs selected
+          {selectedJobs.length} jobs selected - Showing pending jobs only
         </p>
       </div>
       <div className="overflow-x-auto">
@@ -42,7 +45,7 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
           <TableHeader>
             <TableRow className="bg-gray-100">
               <TableHead className="w-12"></TableHead>
-              <TableHead className="w-32">Job #</TableHead>
+              <TableHead className="w-32 font-bold text-blue-700">Job #</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Customer</TableHead>
               <TableHead>Location</TableHead>
@@ -52,8 +55,8 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {jobs.length > 0 ? (
-              jobs.map((job) => (
+            {pendingJobs.length > 0 ? (
+              pendingJobs.map((job) => (
                 <TableRow
                   key={job.id}
                   className={`${
@@ -68,7 +71,7 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
                       onClick={(e) => e.stopPropagation()}
                     />
                   </TableCell>
-                  <TableCell className="font-medium">{job.jobNumber}</TableCell>
+                  <TableCell className="font-bold text-blue-600">{job.jobNumber}</TableCell>
                   <TableCell>{job.jobType}</TableCell>
                   <TableCell>{job.customer}</TableCell>
                   <TableCell>{job.town}</TableCell>
@@ -86,7 +89,7 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
             ) : (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-4">
-                  No jobs found matching the filters
+                  No pending jobs found
                 </TableCell>
               </TableRow>
             )}

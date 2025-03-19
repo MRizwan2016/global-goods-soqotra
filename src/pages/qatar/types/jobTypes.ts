@@ -1,4 +1,3 @@
-
 export interface QatarJob {
   id: string;
   jobNumber: string;
@@ -24,6 +23,7 @@ export interface QatarJob {
   items?: JobItem[];
   entryBy: string;
   entryDate: string;
+  sequenceNum?: number;
 }
 
 export interface JobItem {

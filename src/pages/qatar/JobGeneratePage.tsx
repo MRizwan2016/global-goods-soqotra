@@ -7,6 +7,7 @@ import PrintJobSchedule from "./components/print/PrintJobSchedule";
 import JobFilters from "./components/job-generate/JobFilters";
 import { useJobFiltering } from "./hooks/useJobFiltering";
 import { useJobSelection } from "./hooks/useJobSelection";
+import Layout from "@/components/layout/Layout";
 
 const JobGeneratePage: React.FC = () => {
   // Use our custom hooks
@@ -35,7 +36,7 @@ const JobGeneratePage: React.FC = () => {
   if (isPrintMode) {
     return (
       <PrintJobSchedule 
-        jobs={selectedJobs} 
+        jobs={selectedJobs.map((job, index) => ({...job, sequenceNum: index + 1}))}
         scheduleData={scheduleData}
         onBack={handleBackFromPrint}
       />
@@ -43,44 +44,49 @@ const JobGeneratePage: React.FC = () => {
   }
   
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-[1200px] mx-auto">
-        <h1 className="text-2xl font-bold mb-6">JOB SCHEDULE GENERATION</h1>
-        
-        {/* Filters */}
-        <JobFilters
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-          sortBy={sortBy}
-          setSortBy={setSortBy}
-          filterDate={filterDate}
-          setFilterDate={setFilterDate}
-          selectedJobs={selectedJobs}
-          onCloseJobs={handleCloseJobs}
-          onPrintJobs={handleDirectPrint}
-        />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-1">
-            <JobScheduleForm 
-              onSubmit={handleScheduleSubmit} 
-              formData={scheduleData}
-              setFormData={setScheduleData}
-              selectedJobs={selectedJobs}
-              disabled={selectedJobs.length === 0}
-            />
-          </div>
+    <Layout title="Job Schedule Generation">
+      <div className="w-full">
+        <div className="max-w-full mx-auto">
+          <h1 className="text-2xl font-bold mb-6 flex items-center">
+            <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-10 mr-2" />
+            SOQOTRA LOGISTICS - JOB SCHEDULE GENERATION
+          </h1>
           
-          <div className="lg:col-span-2">
-            <JobSelectionTable 
-              jobs={filteredJobs} 
-              selectedJobs={selectedJobs}
-              onToggleSelect={toggleJobSelection}
-            />
+          {/* Filters */}
+          <JobFilters
+            statusFilter={statusFilter}
+            setStatusFilter={setStatusFilter}
+            sortBy={sortBy}
+            setSortBy={setSortBy}
+            filterDate={filterDate}
+            setFilterDate={setFilterDate}
+            selectedJobs={selectedJobs}
+            onCloseJobs={handleCloseJobs}
+            onPrintJobs={handleDirectPrint}
+          />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+            <div className="lg:col-span-1">
+              <JobScheduleForm 
+                onSubmit={handleScheduleSubmit} 
+                formData={scheduleData}
+                setFormData={setScheduleData}
+                selectedJobs={selectedJobs}
+                disabled={selectedJobs.length === 0}
+              />
+            </div>
+            
+            <div className="lg:col-span-3">
+              <JobSelectionTable 
+                jobs={filteredJobs} 
+                selectedJobs={selectedJobs}
+                onToggleSelect={toggleJobSelection}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
