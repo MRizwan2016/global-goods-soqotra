@@ -41,17 +41,24 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
   // Filter vehicles based on cities and job assignments
   const filteredVehicles = filterVehicles(mockVehicles, selectedJobs, uniqueCities);
 
+  // Focus on specific vehicle numbers
+  const specificVehicleNumbers = ["41070", "41067", "41073", "514005", "119927", "74827"];
+  const prioritizedVehicles = mockVehicles.filter(
+    vehicle => specificVehicleNumbers.includes(vehicle.number)
+  );
+  
   return (
     <>
       <ScheduleNumberField 
         value={formData.scheduleNumber}
         onChange={handleInputChange}
+        readonly={true}
       />
       
       <VehicleSelector
         value={formData.vehicle}
         onChange={(value) => handleSelectChange("vehicle", value)}
-        filteredVehicles={filteredVehicles}
+        filteredVehicles={prioritizedVehicles.length > 0 ? prioritizedVehicles : filteredVehicles}
         uniqueCities={uniqueCities}
         selectedJobs={selectedJobs}
       />

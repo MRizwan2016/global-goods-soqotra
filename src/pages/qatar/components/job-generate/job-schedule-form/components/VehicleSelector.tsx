@@ -22,6 +22,9 @@ interface VehicleSelectorProps {
   selectedJobs: QatarJob[];
 }
 
+// Specific vehicle numbers we want to prioritize
+const specificVehicleNumbers = ["41070", "41067", "41073", "514005", "119927", "74827"];
+
 const VehicleSelector: React.FC<VehicleSelectorProps> = ({
   value,
   onChange,
@@ -29,6 +32,16 @@ const VehicleSelector: React.FC<VehicleSelectorProps> = ({
   uniqueCities,
   selectedJobs,
 }) => {
+  // Prioritize the specific vehicles and put them at the top
+  const prioritizedVehicles = [...filteredVehicles].sort((a, b) => {
+    const aIsSpecific = specificVehicleNumbers.includes(a.number);
+    const bIsSpecific = specificVehicleNumbers.includes(b.number);
+    
+    if (aIsSpecific && !bIsSpecific) return -1;
+    if (!aIsSpecific && bIsSpecific) return 1;
+    return 0;
+  });
+
   return (
     <div className="mb-3">
       <Label htmlFor="vehicle" className="font-bold text-gray-700 mb-1 block">VEHICLE:</Label>
@@ -46,36 +59,42 @@ const VehicleSelector: React.FC<VehicleSelectorProps> = ({
           </div>
         </SelectTrigger>
         <SelectContent className="max-h-[300px]">
-          {filteredVehicles.length > 0 ? (
-            filteredVehicles.map(vehicle => (
-              <SelectItem 
-                key={vehicle.id} 
-                value={vehicle.number}
-                className="py-2 hover:bg-blue-50 transition-colors"
-              >
-                <div className="flex flex-col">
-                  <div className="flex items-center">
-                    <span className="font-bold">{vehicle.number}</span>
-                    <span className="mx-2">|</span>
-                    <span>{vehicle.type}</span>
+          {prioritizedVehicles.length > 0 ? (
+            prioritizedVehicles.map(vehicle => {
+              const isSpecific = specificVehicleNumbers.includes(vehicle.number);
+              return (
+                <SelectItem 
+                  key={vehicle.id} 
+                  value={vehicle.number}
+                  className={`py-2 hover:bg-blue-50 transition-colors ${isSpecific ? 'bg-blue-50' : ''}`}
+                >
+                  <div className="flex flex-col">
+                    <div className="flex items-center">
+                      <span className="font-bold">{vehicle.number}</span>
+                      <span className="mx-2">|</span>
+                      <span>{vehicle.type}</span>
+                      {isSpecific && (
+                        <Badge className="ml-2 bg-green-100 text-green-800">Recommended</Badge>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">{vehicle.description}</div>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {uniqueCities.map(city => {
+                        const cityVehicles = cityVehicleMapping[city] || [];
+                        if (cityVehicles.includes(vehicle.number)) {
+                          return (
+                            <Badge key={city} className="bg-blue-100 text-blue-800 text-xs hover:bg-blue-200">
+                              {city}
+                            </Badge>
+                          );
+                        }
+                        return null;
+                      })}
+                    </div>
                   </div>
-                  <div className="text-xs text-gray-500 mt-1">{vehicle.description}</div>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {uniqueCities.map(city => {
-                      const cityVehicles = cityVehicleMapping[city] || [];
-                      if (cityVehicles.includes(vehicle.number)) {
-                        return (
-                          <Badge key={city} className="bg-blue-100 text-blue-800 text-xs hover:bg-blue-200">
-                            {city}
-                          </Badge>
-                        );
-                      }
-                      return null;
-                    })}
-                  </div>
-                </div>
-              </SelectItem>
-            ))
+                </SelectItem>
+              );
+            })
           ) : (
             <SelectItem value="no-match" disabled>No matching vehicles</SelectItem>
           )}

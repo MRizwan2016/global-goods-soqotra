@@ -2,14 +2,23 @@
 import { useState, useEffect } from "react";
 import { cityVehicleMapping } from "../data/cityVehicleMapping";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from 'uuid';
+
+// Helper function to generate a unique schedule number
+const generateScheduleNumber = (): string => {
+  // Create a number based on current timestamp and a random component
+  const timestamp = new Date().getTime();
+  const randomComponent = Math.floor(Math.random() * 1000);
+  return `${timestamp % 10000}-${randomComponent}`;
+};
 
 export const useSchedulePrintForm = (
   selectedVehicle: string | null,
   selectedCity: string | null
 ) => {
-  // Form data for the schedule
+  // Form data for the schedule with auto-generated schedule number
   const [formData, setFormData] = useState({
-    scheduleNumber: Math.floor(Math.random() * 10000).toString(),
+    scheduleNumber: generateScheduleNumber(),
     vehicle: selectedVehicle || "",
     salesRep: "",
     driver: "",
@@ -67,7 +76,17 @@ export const useSchedulePrintForm = (
 
   const handlePrint = () => {
     if (validateForm()) {
-      window.print();
+      // Generate a new schedule number right before printing
+      // to ensure it's always unique
+      setFormData(prev => ({
+        ...prev,
+        scheduleNumber: generateScheduleNumber()
+      }));
+      
+      // Delay printing slightly to ensure state update
+      setTimeout(() => {
+        window.print();
+      }, 100);
     }
   };
 

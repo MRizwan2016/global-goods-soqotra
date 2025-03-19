@@ -26,3 +26,17 @@ export interface ScheduleFieldsProps {
   handleSelectChange: (name: string, value: string) => void;
   handleDateChange: (date: Date | undefined) => void;
 }
+
+export interface VehicleSelectorProps {
+  value: string;
+  onChange: (value: string) => void;
+  filteredVehicles: any[];
+  uniqueCities: string[];
+  selectedJobs: QatarJob[];
+}
+
+export interface ScheduleNumberFieldProps {
+  value: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  readonly?: boolean;
+}

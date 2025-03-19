@@ -4,12 +4,19 @@ import { QatarJob } from "../types/jobTypes";
 import { toast } from "sonner";
 import { cityVehicleMapping } from "../data/cityVehicleMapping";
 import { JobScheduleFormData } from "../components/job-generate/job-schedule-form/types";
+import { v4 as uuidv4 } from 'uuid';
+
+// Helper function to generate unique schedule number
+const generateUniqueScheduleNumber = (): string => {
+  const timestamp = new Date().getTime();
+  return `${timestamp % 10000}${Math.floor(Math.random() * 1000)}`;
+};
 
 export const useJobSelection = () => {
   const [selectedJobs, setSelectedJobs] = useState<QatarJob[]>([]);
   const [isPrintMode, setIsPrintMode] = useState(false);
   const [scheduleData, setScheduleData] = useState<JobScheduleFormData>({
-    scheduleNumber: "5352",
+    scheduleNumber: generateUniqueScheduleNumber(),
     vehicle: "",
     salesRep: "",
     driver: "",
@@ -66,20 +73,49 @@ export const useJobSelection = () => {
       toast.warning("Sales Rep information is missing");
     }
     
-    setScheduleData(data);
-    setIsPrintMode(true);
+    // Always generate a new schedule number to ensure uniqueness
+    const formDataWithUniqueSchedule = {
+      ...data,
+      scheduleNumber: generateUniqueScheduleNumber()
+    };
+    
+    setScheduleData(formDataWithUniqueSchedule);
+    
+    // Attempt to save the selected jobs with the schedule data
+    try {
+      // In a real app, this would save to an API
+      console.log("Saving schedule with jobs:", formDataWithUniqueSchedule, selectedJobs);
+      
+      // Simulate successful save
+      toast.success(`Schedule ${formDataWithUniqueSchedule.scheduleNumber} generated successfully`);
+      setIsPrintMode(true);
+    } catch (error) {
+      toast.error("Failed to save schedule. Please try again.");
+      console.error("Error saving schedule:", error);
+    }
   };
   
   const handleBackFromPrint = () => {
     setIsPrintMode(false);
+    // Generate a new schedule number when returning from print mode
+    setScheduleData(prev => ({
+      ...prev,
+      scheduleNumber: generateUniqueScheduleNumber()
+    }));
   };
   
   const handleCloseJobs = () => {
     // In a real app, this would update the backend
-    toast.success(`${selectedJobs.length} jobs have been closed`);
-    
-    // Clear selections after closing
-    setSelectedJobs([]);
+    try {
+      console.log(`Closing ${selectedJobs.length} jobs`);
+      toast.success(`${selectedJobs.length} jobs have been closed`);
+      
+      // Clear selections after closing
+      setSelectedJobs([]);
+    } catch (error) {
+      toast.error("Failed to close jobs. Please try again.");
+      console.error("Error closing jobs:", error);
+    }
   };
 
   const handleDirectPrint = () => {
@@ -89,8 +125,16 @@ export const useJobSelection = () => {
       return;
     }
     
-    // Go directly to print mode with current schedule data
-    setIsPrintMode(true);
+    // Generate new schedule number before printing
+    setScheduleData(prev => ({
+      ...prev,
+      scheduleNumber: generateUniqueScheduleNumber()
+    }));
+    
+    // Small delay to ensure state is updated
+    setTimeout(() => {
+      setIsPrintMode(true);
+    }, 100);
   };
   
   return {
