@@ -31,8 +31,14 @@ export const useSaveInvoice = (
     try {
       console.log("Saving invoice with data:", { formState, packageItems, isEditing, id });
       
+      // Add updatedAt timestamp for sorting in invoice list
+      const updatedFormState = {
+        ...formState,
+        updatedAt: new Date().toISOString()
+      };
+      
       // Save the invoice
-      const savedId = await handleSubmit(formState, packageItems, isEditing, id);
+      const savedId = await handleSubmit(updatedFormState, packageItems, isEditing, id);
       
       // Store the saved invoice ID
       setSavedInvoiceId(savedId);

@@ -18,27 +18,48 @@ export const useInvoicePrintData = () => {
   const [mode, setMode] = useState<"invoice" | "bl" | "certificate">(initialMode);
   
   // First try to get from localStorage for real data
-  const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-  const storedInvoice = storedInvoices.find((inv: any) => inv.id === id);
-  
-  // Fall back to mock data if not found in localStorage
-  const mockInvoice = mockInvoiceData.find(inv => inv.id === id);
-  
-  // Use stored invoice if available, otherwise use mock
-  const invoice = storedInvoice || mockInvoice;
+  const [invoice, setInvoice] = useState<any>(null);
   
   useEffect(() => {
-    if (!invoice) {
-      toast.error("Invoice not found. Please check the invoice ID.");
+    if (!id) {
+      toast.error("No invoice ID provided");
       setTimeout(() => {
         navigate("/data-entry/invoicing", { replace: true });
       }, 2000);
-    } else {
+      return;
+    }
+    
+    try {
+      // First try to get from localStorage for real data
+      const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+      let foundInvoice = storedInvoices.find((inv: any) => inv.id === id);
+      
+      // Fall back to mock data if not found in localStorage
+      if (!foundInvoice) {
+        foundInvoice = mockInvoiceData.find(inv => inv.id === id);
+        console.log("Invoice found in mock data:", foundInvoice);
+      } else {
+        console.log("Invoice found in localStorage:", foundInvoice);
+      }
+      
+      if (foundInvoice) {
+        setInvoice(foundInvoice);
+        setLoading(false);
+      } else {
+        console.error("Invoice not found with ID:", id);
+        toast.error("Invoice not found. Please check the invoice ID.");
+        setTimeout(() => {
+          navigate("/data-entry/invoicing", { replace: true });
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Error loading invoice:", error);
+      toast.error("Error loading invoice data");
       setLoading(false);
     }
-  }, [invoice, navigate]);
+  }, [id, navigate]);
   
-  // Calculate totals from package details
+  // Calculate totals from package details only if invoice is loaded
   const packageDetails = invoice?.packageDetails || invoice?.packageItems || [];
   const totalVolume = packageDetails.reduce((sum: number, pkg: any) => {
     return sum + parseFloat(pkg.volume || '0');

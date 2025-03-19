@@ -2,10 +2,24 @@
 import { useState, useEffect } from "react";
 import { mockInvoiceData } from "@/data/mockData";
 
+// Define a type for our invoice objects to help TypeScript
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  date: string;
+  customer: string;
+  branch?: string;
+  sector?: string;
+  freightBy?: string;
+  doorToDoor?: boolean;
+  updatedAt?: string; // Make updatedAt optional since it may not exist in all invoices
+  [key: string]: any; // Allow other properties
+}
+
 export const useInvoiceList = () => {
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [invoiceData, setInvoiceData] = useState<any[]>([]);
+  const [invoiceData, setInvoiceData] = useState<Invoice[]>([]);
   const entriesPerPage = 50;
   const [branch, setBranch] = useState("ALL");
   const [sector, setSector] = useState("ALL");
@@ -43,18 +57,18 @@ export const useInvoiceList = () => {
     
     // Sort by date instead of updatedAt since not all invoices have updatedAt
     mergedData.sort((a, b) => {
-      // Use updatedAt if available, otherwise fall back to date
-      const dateA = a.updatedAt 
-        ? new Date(a.updatedAt).getTime() 
-        : a.date 
-          ? new Date(a.date).getTime() 
-          : 0;
+      // Get timestamps safely with type checking
+      const getTimestamp = (item: Invoice): number => {
+        if ('updatedAt' in item && item.updatedAt) {
+          return new Date(item.updatedAt).getTime();
+        } else if (item.date) {
+          return new Date(item.date).getTime();
+        }
+        return 0;
+      };
       
-      const dateB = b.updatedAt 
-        ? new Date(b.updatedAt).getTime() 
-        : b.date
-          ? new Date(b.date).getTime()
-          : 0;
+      const dateA = getTimestamp(a);
+      const dateB = getTimestamp(b);
       
       return dateB - dateA; // Sort in descending order (newest first)
     });
