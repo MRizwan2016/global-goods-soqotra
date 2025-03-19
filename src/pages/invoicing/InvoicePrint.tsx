@@ -17,16 +17,21 @@ const InvoicePrint = () => {
     mode,
     setMode,
     isAuthenticated,
+    loading,
     handlePrint,
     handleBack,
   } = useInvoicePrintData();
   
   if (!isAuthenticated) {
-    return null; // Don't render anything while redirecting
+    return <div className="p-8 text-center">Redirecting to login...</div>;
+  }
+  
+  if (loading) {
+    return <div className="p-8 text-center">Loading invoice data...</div>;
   }
   
   if (!invoice) {
-    return <div className="p-8 text-center">Invoice not found</div>;
+    return <div className="p-8 text-center">Invoice not found. Redirecting...</div>;
   }
 
   return (

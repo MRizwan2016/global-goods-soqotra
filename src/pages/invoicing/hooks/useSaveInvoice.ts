@@ -29,21 +29,32 @@ export const useSaveInvoice = (
     }
     
     try {
-      // In a real app, this would be an API call
+      console.log("Saving invoice with data:", { formState, packageItems, isEditing, id });
+      
+      // Save the invoice
       const savedId = await handleSubmit(formState, packageItems, isEditing, id);
       
       // Store the saved invoice ID
       setSavedInvoiceId(savedId);
       
-      toast.success(`Invoice ${isEditing ? 'updated' : 'created'} successfully`);
+      // Verify the invoice was saved
+      const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+      const saved = invoices.some((inv: any) => inv.id === savedId);
       
-      if (!isEditing) {
-        // If creating a new invoice, redirect to edit page
-        setTimeout(() => {
-          navigate(`/data-entry/invoicing/edit/${savedId}`);
-        }, 500);
+      if (saved) {
+        toast.success(`Invoice ${isEditing ? 'updated' : 'created'} successfully`);
+        
+        if (!isEditing) {
+          // If creating a new invoice, redirect to edit page
+          setTimeout(() => {
+            navigate(`/data-entry/invoicing/edit/${savedId}`);
+          }, 500);
+        }
+      } else {
+        throw new Error("Failed to save invoice. Please try again.");
       }
     } catch (error) {
+      console.error("Error saving invoice:", error);
       toast.error(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };

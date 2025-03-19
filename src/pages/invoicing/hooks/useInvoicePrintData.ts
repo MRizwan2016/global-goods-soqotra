@@ -3,12 +3,14 @@ import { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import { mockInvoiceData } from "@/data/mockData";
+import { toast } from "sonner";
 
 export const useInvoicePrintData = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const { isAuthenticated } = useAuth();
+  const [loading, setLoading] = useState(true);
   
   // Parse the mode from URL query parameters
   const queryParams = new URLSearchParams(location.search);
@@ -25,13 +27,24 @@ export const useInvoicePrintData = () => {
   // Use stored invoice if available, otherwise use mock
   const invoice = storedInvoice || mockInvoice;
   
+  useEffect(() => {
+    if (!invoice) {
+      toast.error("Invoice not found. Please check the invoice ID.");
+      setTimeout(() => {
+        navigate("/data-entry/invoicing", { replace: true });
+      }, 2000);
+    } else {
+      setLoading(false);
+    }
+  }, [invoice, navigate]);
+  
   // Calculate totals from package details
   const packageDetails = invoice?.packageDetails || invoice?.packageItems || [];
   const totalVolume = packageDetails.reduce((sum: number, pkg: any) => {
     return sum + parseFloat(pkg.volume || '0');
   }, 0).toFixed(3);
   
-  const totalWeight = (parseFloat(invoice?.weight) || 397.8).toFixed(2);
+  const totalWeight = invoice ? (parseFloat(invoice.weight) || 0).toFixed(2) : "0.00";
   
   useEffect(() => {
     // If not authenticated, redirect to login
@@ -60,6 +73,7 @@ export const useInvoicePrintData = () => {
     mode,
     setMode,
     isAuthenticated,
+    loading,
     handlePrint,
     handleBack,
   };

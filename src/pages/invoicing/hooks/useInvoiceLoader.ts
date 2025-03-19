@@ -14,11 +14,16 @@ export const useInvoiceLoader = (id: string | undefined, initialFormState: FormS
   // Load invoice data for editing
   useEffect(() => {
     if (isEditing) {
-      // In a real app, fetch invoice by ID from API
-      // For now, use mock data
-      const invoice = mockInvoiceData.find(inv => inv.id === id);
+      // First try to get from localStorage for real data
+      const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+      const storedInvoice = storedInvoices.find((inv: any) => inv.id === id);
+      
+      // Fall back to mock data if not found in localStorage
+      const invoice = storedInvoice || mockInvoiceData.find(inv => inv.id === id);
       
       if (invoice) {
+        console.log("Loading invoice data:", invoice);
+        
         // Convert boolean values to strings and number to strings since our form state uses strings
         const formattedInvoice: FormState = {
           ...initialFormState,
