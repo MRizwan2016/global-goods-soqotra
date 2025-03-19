@@ -26,15 +26,17 @@ const JobGenerateLayout: React.FC<JobGenerateLayoutProps> = ({
   disabled
 }) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6 animate-fade-in">
       <div className="lg:col-span-1">
-        <JobScheduleForm 
-          onSubmit={handleScheduleSubmit} 
-          formData={scheduleData}
-          setFormData={setScheduleData}
-          selectedJobs={jobsForSchedule}
-          disabled={disabled}
-        />
+        <div className="sticky top-4 transition-all duration-300">
+          <JobScheduleForm 
+            onSubmit={handleScheduleSubmit} 
+            formData={scheduleData}
+            setFormData={setScheduleData}
+            selectedJobs={jobsForSchedule}
+            disabled={disabled}
+          />
+        </div>
       </div>
       
       <div className="lg:col-span-3">

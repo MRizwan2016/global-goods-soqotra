@@ -12,6 +12,7 @@ import {
 import { QatarVehicle } from "../../../../types/vehicleTypes";
 import { QatarJob } from "../../../../types/jobTypes";
 import { cityVehicleMapping } from "../../../../data/cityVehicleMapping";
+import { Truck } from "lucide-react";
 
 interface VehicleSelectorProps {
   value: string;
@@ -29,29 +30,50 @@ const VehicleSelector: React.FC<VehicleSelectorProps> = ({
   selectedJobs,
 }) => {
   return (
-    <div>
-      <Label htmlFor="vehicle">VEHICLE:</Label>
+    <div className="mb-3">
+      <Label htmlFor="vehicle" className="font-bold text-gray-700 mb-1 block">VEHICLE:</Label>
       <Select 
         value={value} 
         onValueChange={onChange}
       >
-        <SelectTrigger id="vehicle" className="bg-blue-500 text-white">
-          <SelectValue placeholder="SELECT VEHICLE" />
+        <SelectTrigger 
+          id="vehicle" 
+          className="bg-blue-500 text-white font-semibold border-0 hover:bg-blue-600 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            <Truck size={16} />
+            <SelectValue placeholder="SELECT VEHICLE" />
+          </div>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="max-h-[300px]">
           {filteredVehicles.length > 0 ? (
             filteredVehicles.map(vehicle => (
-              <SelectItem key={vehicle.id} value={vehicle.number}>
-                {vehicle.number}/{vehicle.type}/{vehicle.description}
-                {uniqueCities.map(city => {
-                  const cityVehicles = cityVehicleMapping[city] || [];
-                  if (cityVehicles.includes(vehicle.number)) {
-                    return (
-                      <Badge key={city} className="ml-1 text-xs">{city}</Badge>
-                    );
-                  }
-                  return null;
-                })}
+              <SelectItem 
+                key={vehicle.id} 
+                value={vehicle.number}
+                className="py-2 hover:bg-blue-50 transition-colors"
+              >
+                <div className="flex flex-col">
+                  <div className="flex items-center">
+                    <span className="font-bold">{vehicle.number}</span>
+                    <span className="mx-2">|</span>
+                    <span>{vehicle.type}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">{vehicle.description}</div>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {uniqueCities.map(city => {
+                      const cityVehicles = cityVehicleMapping[city] || [];
+                      if (cityVehicles.includes(vehicle.number)) {
+                        return (
+                          <Badge key={city} className="bg-blue-100 text-blue-800 text-xs hover:bg-blue-200">
+                            {city}
+                          </Badge>
+                        );
+                      }
+                      return null;
+                    })}
+                  </div>
+                </div>
               </SelectItem>
             ))
           ) : (
@@ -60,7 +82,7 @@ const VehicleSelector: React.FC<VehicleSelectorProps> = ({
         </SelectContent>
       </Select>
       {uniqueCities.length > 0 && (
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-gray-500 mt-1 animate-fade-in">
           Showing vehicles for {uniqueCities.join(', ')} ({selectedJobs.length} jobs selected)
         </p>
       )}

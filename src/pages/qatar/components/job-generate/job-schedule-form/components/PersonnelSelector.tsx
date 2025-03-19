@@ -34,19 +34,30 @@ const PersonnelSelector: React.FC<PersonnelSelectorProps> = ({
   placeholder,
 }) => {
   return (
-    <div>
-      <Label htmlFor={id}>{label}:</Label>
+    <div className="mb-3">
+      <Label htmlFor={id} className="font-bold text-gray-700 mb-1 block">{label}:</Label>
       <Select 
         value={value} 
         onValueChange={onChange}
       >
-        <SelectTrigger id={id} className="bg-blue-500 text-white">
+        <SelectTrigger 
+          id={id} 
+          className="bg-blue-500 text-white font-semibold border-0 hover:bg-blue-600 transition-colors"
+        >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent className="max-h-[200px]">
           {options.map(option => (
-            <SelectItem key={option.id} value={option.name}>
-              {option.name} {option.code ? `(${option.code})` : option.license ? `(${option.license})` : ''}
+            <SelectItem 
+              key={option.id} 
+              value={option.name}
+              className="py-2 hover:bg-blue-50 transition-colors"
+            >
+              <div className="flex flex-col">
+                <div className="font-medium">{option.name}</div>
+                {option.code && <div className="text-xs text-gray-500">Code: {option.code}</div>}
+                {option.license && <div className="text-xs text-gray-500">License: {option.license}</div>}
+              </div>
             </SelectItem>
           ))}
         </SelectContent>
