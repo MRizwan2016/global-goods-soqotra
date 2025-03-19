@@ -1,9 +1,10 @@
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import { QatarJob } from "../../types/jobTypes";
-import PrintStyles from "./PrintStyles";
 import PrintControls from "./PrintControls";
+import PrintStyles from "./PrintStyles";
 import { useNavigate } from "react-router-dom";
+import { formatCurrency } from "../../utils/formatters";
 
 interface PrintJobScheduleProps {
   jobs: QatarJob[];
@@ -11,133 +12,110 @@ interface PrintJobScheduleProps {
 
 const PrintJobSchedule: React.FC<PrintJobScheduleProps> = ({ jobs }) => {
   const navigate = useNavigate();
-  const printContentRef = useRef<HTMLDivElement>(null);
+  const printRef = useRef<HTMLDivElement>(null);
   
-  // Handle print action
   const handlePrint = () => {
     window.print();
   };
   
-  // Handle back button
   const handleBack = () => {
     navigate("/qatar/jobs");
   };
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       <PrintStyles />
+      
       <PrintControls 
         handleBack={handleBack}
         handlePrint={handlePrint}
         title="JOB SCHEDULE PRINT"
       />
       
-      <div className="container mx-auto p-4 bg-white shadow-sm">
-        <div ref={printContentRef} className="print:p-0">
-          <div className="bg-green-100 p-4 mb-4 print:bg-green-100">
-            <h1 className="text-xl font-bold">VIEW SCHEDULE JOBS LIST</h1>
-            <p>RECORD LISTED</p>
+      <div className="p-4 max-w-[1200px] mx-auto" ref={printRef}>
+        <div className="bg-white p-6 shadow-md">
+          <div className="mb-6 text-center border-b pb-4">
+            <h1 className="text-2xl font-bold">SOQOTRA QATAR CARGO</h1>
+            <h2 className="text-xl">JOB SCHEDULE REPORT</h2>
           </div>
           
-          {/* Schedule table */}
-          <div className="overflow-x-auto mb-6">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-blue-600 text-white">
-                  <th className="border p-2 text-left">NUM</th>
-                  <th className="border p-2 text-left">JOB NUMBER</th>
-                  <th className="border p-2 text-left">DATE</th>
-                  <th className="border p-2 text-left">SECTOR</th>
-                  <th className="border p-2 text-left">CUSTOMER</th>
-                  <th className="border p-2 text-left">MOBILE</th>
-                  <th className="border p-2 text-left">TOWN</th>
-                  <th className="border p-2 text-left">VEHICLE</th>
-                  <th className="border p-2 text-left">TYPE</th>
-                </tr>
-              </thead>
-              <tbody>
-                {jobs.slice(0, 20).map((job, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="border p-2">{index + 1}</td>
-                    <td className="border p-2">{job.jobNumber}</td>
-                    <td className="border p-2">{job.date}</td>
-                    <td className="border p-2">{job.sector}</td>
-                    <td className="border p-2">{job.customer === "--" ? "Unnamed" : job.customer}</td>
-                    <td className="border p-2">{job.mobileNumber}</td>
-                    <td className="border p-2">{job.town}</td>
-                    <td className="border p-2">{job.vehicle}</td>
-                    <td className="border p-2">{job.jobType}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* Job items section */}
-          <div>
-            <h2 className="text-lg font-bold mb-2">JOB ITEMS SUMMARY</h2>
-            <table className="w-full border-collapse mb-6">
-              <thead>
-                <tr className="bg-blue-600 text-white">
-                  <th className="border p-2 text-left">NUM</th>
-                  <th className="border p-2 text-left">JOB NUMBER</th>
-                  <th className="border p-2 text-left">ITEM</th>
-                  <th className="border p-2 text-left">JOB TYPE</th>
-                  <th className="border p-2 text-center">QUANTITY</th>
-                </tr>
-              </thead>
-              <tbody>
-                {jobs.slice(0, 5).map((job, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                    <td className="border p-2">{index + 1}</td>
-                    <td className="border p-2">{job.jobNumber}</td>
-                    <td className="border p-2">{job.items && job.items.length > 0 ? job.items[0].itemName : "PACKAGE"}</td>
-                    <td className="border p-2">{job.jobType}</td>
-                    <td className="border p-2 text-center">{job.items && job.items.length > 0 ? job.items[0].quantity : 1}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          
-          {/* Summary section */}
-          <div className="flex justify-between mb-4">
-            <div className="w-1/2 pr-2">
-              <h2 className="text-lg font-bold mb-2">ITEM SUMMARY</h2>
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-blue-600 text-white">
-                    <th className="border p-2 text-left">NUM</th>
-                    <th className="border p-2 text-left">ITEM</th>
-                    <th className="border p-2 text-center">QUANTITY</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="bg-white">
-                    <td className="border p-2">1</td>
-                    <td className="border p-2">CARTON BOX - SMALL</td>
-                    <td className="border p-2 text-center">3</td>
-                  </tr>
-                  <tr className="bg-gray-50">
-                    <td className="border p-2">2</td>
-                    <td className="border p-2">WOODEN BOX - (1M) - WHITE</td>
-                    <td className="border p-2 text-center">2</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            
-            <div className="w-1/2 pl-2">
-              <div className="mt-8 pt-8 text-right">
-                <p className="mb-2">PRINTED BY: ADMIN</p>
-                <p className="mb-2">DATE: {new Date().toLocaleDateString()}</p>
-                <p>TIME: {new Date().toLocaleTimeString()}</p>
+          <div className="grid grid-cols-1 gap-y-8">
+            {jobs.map((job, index) => (
+              <div key={job.id} className={`job-card ${index > 0 ? "pt-4" : ""} ${(index + 1) % 4 === 0 ? "page-break-after" : ""}`}>
+                <div className="border rounded">
+                  <div className={`p-3 font-bold text-white ${job.jobType === "COLLECTION" ? "bg-blue-600" : "bg-green-600"}`}>
+                    {job.jobType} JOB - #{job.jobNumber}
+                  </div>
+                  
+                  <div className="p-4">
+                    <div className="grid grid-cols-3 gap-4 mb-4">
+                      <div>
+                        <div className="font-bold">CUSTOMER:</div>
+                        <div>{job.customer}</div>
+                      </div>
+                      
+                      <div>
+                        <div className="font-bold">MOBILE:</div>
+                        <div>{job.mobileNumber}</div>
+                      </div>
+                      
+                      <div>
+                        <div className="font-bold">DATE/TIME:</div>
+                        <div>{job.date} {job.time} {job.amPm}</div>
+                      </div>
+                      
+                      <div>
+                        <div className="font-bold">LOCATION:</div>
+                        <div>{job.location}, {job.town}, {job.city}</div>
+                      </div>
+                      
+                      <div>
+                        <div className="font-bold">VEHICLE:</div>
+                        <div>{job.vehicle}</div>
+                      </div>
+                      
+                      <div>
+                        <div className="font-bold">AMOUNT:</div>
+                        <div>{formatCurrency(job.advanceAmount || 0)}</div>
+                      </div>
+                    </div>
+                    
+                    {job.items && job.items.length > 0 && (
+                      <div className="mt-4">
+                        <div className="font-bold mb-2">ITEMS:</div>
+                        <table className="w-full border-collapse text-sm">
+                          <thead>
+                            <tr className="bg-gray-100">
+                              <th className="border p-1 text-left">ITEM</th>
+                              <th className="border p-1 text-left">QTY</th>
+                              <th className="border p-1 text-left">PRICE</th>
+                              <th className="border p-1 text-left">TOTAL</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {job.items.map((item, idx) => (
+                              <tr key={idx} className="border-b">
+                                <td className="border p-1">{item.itemName}</td>
+                                <td className="border p-1">{item.quantity}</td>
+                                <td className="border p-1">{formatCurrency(item.sellPrice)}</td>
+                                <td className="border p-1">{formatCurrency(item.sellPrice * item.quantity)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                    
+                    {job.remarks && (
+                      <div className="mt-4">
+                        <div className="font-bold">REMARKS:</div>
+                        <div className="text-sm">{job.remarks}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          
-          <div className="mt-10 text-center print:mt-4">
-            <p className="text-gray-500">QATAR CARGO COLLECTION & DELIVERY - ALMARAAM LOGISTICS</p>
+            ))}
           </div>
         </div>
       </div>
