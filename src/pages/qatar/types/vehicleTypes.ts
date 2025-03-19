@@ -17,9 +17,10 @@ export interface QatarDriver {
   licenseNumber: string;
   licenseExpiry: string;
   employmentStatus?: "ACTIVE" | "INACTIVE" | "ON_LEAVE";
+  assignedVehicleId?: string;
+  assignedVehicleNumber?: string;
 }
 
-// Add these types to match what's being used in QatarDashboard
 export interface VehicleStats {
   vehicle: string;
   totalJobs: number;
