@@ -29,15 +29,12 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
     return selectedJobs.some((j) => j.id === job.id);
   };
 
-  // Filter jobs to show only pending ones
-  const pendingJobs = jobs.filter(job => job.status === "PENDING");
-
   return (
     <div className="border rounded-md shadow-sm bg-white">
       <div className="p-3 border-b bg-gray-50">
         <h2 className="font-bold text-lg">Select Jobs for Schedule</h2>
         <p className="text-sm text-gray-500">
-          {selectedJobs.length} jobs selected - Showing pending jobs only
+          {selectedJobs.length} jobs selected - Showing {jobs.length} jobs
         </p>
       </div>
       <div className="overflow-x-auto">
@@ -55,8 +52,8 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {pendingJobs.length > 0 ? (
-              pendingJobs.map((job) => (
+            {jobs.length > 0 ? (
+              jobs.map((job) => (
                 <TableRow
                   key={job.id}
                   className={`${
@@ -89,7 +86,7 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
             ) : (
               <TableRow>
                 <TableCell colSpan={8} className="text-center py-4">
-                  No pending jobs found
+                  No jobs found
                 </TableCell>
               </TableRow>
             )}
