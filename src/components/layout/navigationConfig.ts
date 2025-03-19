@@ -88,6 +88,8 @@ export const navigationSections: NavigationSections = {
           { name: "DASHBOARD", path: "/qatar" },
           { name: "ADD NEW JOB", path: "/qatar/job/new" },
           { name: "JOB TRACKING", path: "/qatar/jobs" },
+          { name: "JOB SCHEDULE", path: "/qatar/jobs/generate" },
+          { name: "PRINT SCHEDULES", path: "/qatar/jobs/print" },
         ],
       },
     ],

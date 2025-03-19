@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Clock, Filter, Save } from "lucide-react";
+import { CalendarIcon, Clock, Filter, Printer, Save } from "lucide-react";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -104,6 +104,16 @@ const JobGeneratePage: React.FC = () => {
     // Clear selections after closing
     setSelectedJobs([]);
   };
+
+  const handleDirectPrint = () => {
+    if (selectedJobs.length === 0) {
+      toast.warning("Please select jobs to print");
+      return;
+    }
+
+    // Go directly to print mode with current schedule data
+    setIsPrintMode(true);
+  };
   
   if (isPrintMode) {
     return (
@@ -180,6 +190,15 @@ const JobGeneratePage: React.FC = () => {
             >
               <Clock className="mr-2 h-4 w-4" />
               Close Selected Jobs
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+              onClick={handleDirectPrint}
+            >
+              <Printer className="mr-2 h-4 w-4" />
+              Print Selected Jobs
             </Button>
           </div>
         </div>
