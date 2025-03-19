@@ -1,3 +1,4 @@
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,8 +9,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useState, useEffect } from "react";
+import { Plus } from "lucide-react";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogFooter 
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { mockCities } from "../../data/mockLocations";
 import { mockVehicles } from "../../data/mockVehicles";
+import { qatarTowns, industrialAreaStreets } from "../../data/mockLocations";
 
 interface JobDetailsSectionProps {
   jobData: any;
@@ -22,6 +34,35 @@ const JobDetailsSection = ({
   handleInputChange, 
   handleSelectChange 
 }: JobDetailsSectionProps) => {
+  const [isIndustrialArea, setIsIndustrialArea] = useState(false);
+  const [isAddTownDialogOpen, setIsAddTownDialogOpen] = useState(false);
+  const [newTownName, setNewTownName] = useState("");
+
+  useEffect(() => {
+    // Check if selected town is an industrial area
+    setIsIndustrialArea(
+      jobData.town === "Industrial Area" || 
+      jobData.town === "New Industrial Area"
+    );
+    
+    // Reset location if town changes and it's not industrial area
+    if (!isIndustrialArea) {
+      // Don't reset through handleInputChange to avoid side effects
+      // Just use handleSelectChange for location if needed
+    }
+  }, [jobData.town]);
+
+  const handleAddNewTown = () => {
+    if (newTownName.trim()) {
+      // In a real application, this would add to the database
+      // For now, we just close the dialog
+      setIsAddTownDialogOpen(false);
+      setNewTownName("");
+      // Show confirmation
+      alert(`Town "${newTownName}" would be added to the database.`);
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="bg-gray-50 pb-2">
@@ -65,25 +106,85 @@ const JobDetailsSection = ({
         </div>
         
         <div>
-          <Label htmlFor="town">TOWN:</Label>
-          <Input 
-            id="town"
-            name="town"
-            value={jobData.town}
-            onChange={handleInputChange}
-            placeholder="TOWN"
-          />
+          <Label htmlFor="town" className="flex justify-between">
+            <span>TOWN:</span>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              size="sm"
+              className="text-blue-600 h-6 p-1"
+              onClick={() => setIsAddTownDialogOpen(true)}
+            >
+              <Plus size={16} />
+              <span className="text-xs">ADD TOWN</span>
+            </Button>
+          </Label>
+          <Select 
+            value={jobData.town} 
+            onValueChange={(value) => handleSelectChange("town", value)}
+          >
+            <SelectTrigger id="town" className="bg-blue-600 text-white">
+              <SelectValue placeholder="SELECT TOWN" />
+            </SelectTrigger>
+            <SelectContent>
+              {qatarTowns.map((town, index) => (
+                <SelectItem key={index} value={town}>
+                  {town}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Dialog to add new town */}
+          <Dialog open={isAddTownDialogOpen} onOpenChange={setIsAddTownDialogOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Town</DialogTitle>
+              </DialogHeader>
+              <div className="py-4">
+                <Label htmlFor="newTownName">Town Name:</Label>
+                <Input
+                  id="newTownName"
+                  value={newTownName}
+                  onChange={(e) => setNewTownName(e.target.value)}
+                  placeholder="Enter new town name"
+                />
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAddTownDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleAddNewTown}>Add Town</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </div>
         
         <div>
           <Label htmlFor="location">LOCATION:</Label>
-          <Input 
-            id="location"
-            name="location"
-            value={jobData.location}
-            onChange={handleInputChange}
-            placeholder="LOCATION"
-          />
+          {isIndustrialArea ? (
+            <Select 
+              value={jobData.location} 
+              onValueChange={(value) => handleSelectChange("location", value)}
+            >
+              <SelectTrigger id="location" className="bg-blue-600 text-white">
+                <SelectValue placeholder="SELECT STREET NUMBER" />
+              </SelectTrigger>
+              <SelectContent>
+                {industrialAreaStreets.map((street, index) => (
+                  <SelectItem key={index} value={street}>
+                    {street}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <Input 
+              id="location"
+              name="location"
+              value={jobData.location}
+              onChange={handleInputChange}
+              placeholder="LOCATION"
+            />
+          )}
         </div>
         
         <div>
