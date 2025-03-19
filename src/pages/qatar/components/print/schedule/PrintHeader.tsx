@@ -17,7 +17,7 @@ const PrintHeader: React.FC<PrintHeaderProps> = ({
   return (
     <div className="mb-4">
       <div className="flex items-center mb-2">
-        <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-10 mr-2" />
+        <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-10 mr-4" />
         <h1 className="text-2xl font-bold uppercase">
           SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL
         </h1>

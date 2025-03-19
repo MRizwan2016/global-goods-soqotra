@@ -58,7 +58,7 @@ const QatarDashboard = () => {
 
   return (
     <Layout title="Qatar Operations Dashboard">
-      <div className={`transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`w-full transition-opacity duration-500 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
         {/* Header */}
         <DashboardHeader />
         

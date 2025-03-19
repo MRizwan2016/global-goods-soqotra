@@ -6,7 +6,7 @@ import UserProfileSection from "./UserProfileSection";
 
 const SidebarWrapper = () => {
   return (
-    <div className="w-64 min-h-screen bg-sky-50 border-r border-sky-100 shadow-sm">
+    <div className="w-72 min-h-screen bg-sky-50 border-r border-sky-100 shadow-sm flex-shrink-0">
       <div className="flex flex-col h-full">
         <ScrollArea className="flex-1">
           <MainNavigation />
