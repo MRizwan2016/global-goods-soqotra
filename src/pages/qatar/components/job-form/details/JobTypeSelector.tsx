@@ -16,7 +16,7 @@ interface JobTypeSelectorProps {
 const JobTypeSelector = ({ jobType, handleSelectChange }: JobTypeSelectorProps) => {
   return (
     <div className="col-span-2 sm:col-span-1">
-      <Label htmlFor="jobType">JOB TYPE:</Label>
+      <Label htmlFor="jobType">PERSONAL EFFECTS JOB TYPE:</Label>
       <Select 
         value={jobType} 
         onValueChange={(value) => handleSelectChange("jobType", value)}
@@ -25,8 +25,8 @@ const JobTypeSelector = ({ jobType, handleSelectChange }: JobTypeSelectorProps) 
           <SelectValue placeholder="SELECT TYPE" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="COLLECTION">COLLECTION</SelectItem>
-          <SelectItem value="DELIVERY">DELIVERY</SelectItem>
+          <SelectItem value="COLLECTION">COLLECTION OF PERSONAL EFFECTS</SelectItem>
+          <SelectItem value="DELIVERY">DELIVERY OF HOUSEHOLD GOODS</SelectItem>
         </SelectContent>
       </Select>
     </div>

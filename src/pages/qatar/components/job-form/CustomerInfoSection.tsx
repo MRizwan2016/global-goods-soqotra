@@ -40,7 +40,7 @@ const CustomerInfoSection = ({
   return (
     <Card>
       <CardHeader className="bg-gray-50 pb-2">
-        <CardTitle className="text-md">CUSTOMER INFORMATION</CardTitle>
+        <CardTitle className="text-md">PERSONAL EFFECTS CUSTOMER INFORMATION</CardTitle>
       </CardHeader>
       
       <CardContent className="p-4 grid grid-cols-2 gap-4">

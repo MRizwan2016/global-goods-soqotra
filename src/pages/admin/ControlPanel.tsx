@@ -45,6 +45,7 @@ const ControlPanel = () => {
 
     console.log("All users:", users);
 
+    // Ensure all users have proper permissions structure
     const usersWithPermissions = users.map(user => {
       if (!user.permissions) {
         console.log("User missing permissions:", user.email);
@@ -57,7 +58,19 @@ const ControlPanel = () => {
             downloads: user.isAdmin ? true : false,
             accounting: user.isAdmin ? true : false,
             controlPanel: user.isAdmin ? true : false,
-            files: {}
+            files: {
+              salesRep: true,
+              town: true,
+              item: true,
+              packageOptions: true,
+              sellingRates: true,
+              container: true,
+              vessel: true,
+              invoiceBook: true,
+              driverHelper: true,
+              invoicing: true,
+              paymentReceivable: true
+            }
           }
         };
       } else if (!user.permissions.files) {
@@ -67,13 +80,26 @@ const ControlPanel = () => {
           permissions: {
             ...user.permissions,
             controlPanel: user.permissions.controlPanel ?? user.isAdmin,
-            files: {}
+            files: {
+              salesRep: true,
+              town: true,
+              item: true,
+              packageOptions: true,
+              sellingRates: true,
+              container: true,
+              vessel: true,
+              invoiceBook: true,
+              driverHelper: true,
+              invoicing: true,
+              paymentReceivable: true
+            }
           }
         };
       }
       return user;
     });
     
+    // Filter out admin users
     const filteredUsers = usersWithPermissions.filter(user => !user.isAdmin);
     setNonAdminUsers(filteredUsers);
     
