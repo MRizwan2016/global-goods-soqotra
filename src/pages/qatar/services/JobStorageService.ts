@@ -21,17 +21,24 @@ const getInitialJobs = (): QatarJob[] => {
   }
 };
 
-// Get the next available job number
+// Get the next available job number (5-digit format)
 const getNextJobNumber = (): string => {
   try {
     const currentCounter = localStorage.getItem(JOB_COUNTER_KEY);
-    const counterValue = currentCounter ? parseInt(currentCounter, 10) + 1 : 30000;
+    // Start from 10000 to ensure 5 digits
+    let counterValue = currentCounter ? parseInt(currentCounter, 10) + 1 : 10000;
+    
+    // Reset to 10000 if it exceeds 99999
+    if (counterValue > 99999) {
+      counterValue = 10000;
+    }
+    
     localStorage.setItem(JOB_COUNTER_KEY, counterValue.toString());
     return counterValue.toString();
   } catch (error) {
     console.error('Error generating job number:', error);
-    // Fallback to timestamp-based number
-    return (30000 + Math.floor(Math.random() * 10000)).toString();
+    // Fallback to random 5-digit number
+    return (10000 + Math.floor(Math.random() * 89999)).toString();
   }
 };
 
@@ -56,7 +63,7 @@ export const JobStorageService = {
       id: uuidv4(),
       status: 'PENDING',
       date: new Date().toLocaleDateString("en-GB"),
-      // Generate a unique job number if not provided
+      // Always generate a unique job number
       jobNumber: getNextJobNumber(),
       ...jobData,
     } as QatarJob;
