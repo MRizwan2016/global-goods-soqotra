@@ -17,7 +17,7 @@ interface JobFormProps {
 const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFormProps) => {
   const [jobData, setJobData] = useState({
     jobType: "COLLECTION",
-    jobNumber: isNewJob ? "29912" : "",
+    jobNumber: "",
     invoiceNumber: "",
     date: new Date().toLocaleDateString("en-GB"),
     time: "",

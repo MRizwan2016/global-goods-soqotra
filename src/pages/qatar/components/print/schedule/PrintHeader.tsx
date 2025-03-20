@@ -4,6 +4,7 @@ import CompanyLogo from "./components/CompanyLogo";
 import CompanyTitle from "./components/CompanyTitle";
 import ScheduleTitle from "./components/ScheduleTitle";
 import PrintTimestamp from "./components/PrintTimestamp";
+import ScheduleQRCode from "./components/ScheduleQRCode";
 
 interface PrintHeaderProps {
   scheduleNumber: string;
@@ -20,9 +21,12 @@ const PrintHeader: React.FC<PrintHeaderProps> = ({
 }) => {
   return (
     <div className="mb-4">
-      <div className="flex items-center mb-2">
-        <CompanyLogo />
-        <CompanyTitle />
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center">
+          <CompanyLogo />
+          <CompanyTitle />
+        </div>
+        <ScheduleQRCode scheduleNumber={scheduleNumber} />
       </div>
       <ScheduleTitle scheduleNumber={scheduleNumber} />
       <PrintTimestamp 

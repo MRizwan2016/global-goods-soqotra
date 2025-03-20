@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Storage key for localStorage
 const STORAGE_KEY = 'qatar_jobs';
+const JOB_COUNTER_KEY = 'qatar_job_counter';
 
 // Get initial jobs by combining mock data with any stored jobs
 const getInitialJobs = (): QatarJob[] => {
@@ -17,6 +18,20 @@ const getInitialJobs = (): QatarJob[] => {
   } catch (error) {
     console.error('Error loading jobs from storage:', error);
     return [];
+  }
+};
+
+// Get the next available job number
+const getNextJobNumber = (): string => {
+  try {
+    const currentCounter = localStorage.getItem(JOB_COUNTER_KEY);
+    const counterValue = currentCounter ? parseInt(currentCounter, 10) + 1 : 30000;
+    localStorage.setItem(JOB_COUNTER_KEY, counterValue.toString());
+    return counterValue.toString();
+  } catch (error) {
+    console.error('Error generating job number:', error);
+    // Fallback to timestamp-based number
+    return (30000 + Math.floor(Math.random() * 10000)).toString();
   }
 };
 
@@ -41,6 +56,8 @@ export const JobStorageService = {
       id: uuidv4(),
       status: 'PENDING',
       date: new Date().toLocaleDateString("en-GB"),
+      // Generate a unique job number if not provided
+      jobNumber: jobData.jobNumber || getNextJobNumber(),
       ...jobData,
     } as QatarJob;
 
