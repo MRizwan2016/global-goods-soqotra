@@ -57,7 +57,7 @@ export const JobStorageService = {
       status: 'PENDING',
       date: new Date().toLocaleDateString("en-GB"),
       // Generate a unique job number if not provided
-      jobNumber: jobData.jobNumber || getNextJobNumber(),
+      jobNumber: getNextJobNumber(),
       ...jobData,
     } as QatarJob;
 

@@ -23,6 +23,11 @@ const NewJobForm = () => {
     }
     
     try {
+      // Clear the job number if it was provided - let the service generate a unique one
+      if (jobData.jobNumber) {
+        delete jobData.jobNumber;
+      }
+      
       // Save the job using our storage service
       const savedJob = JobStorageService.saveJob(jobData);
       console.log("Job saved successfully:", savedJob);
