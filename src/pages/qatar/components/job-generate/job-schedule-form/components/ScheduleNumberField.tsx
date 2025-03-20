@@ -8,16 +8,17 @@ import { v4 as uuidv4 } from "uuid";
 const ScheduleNumberField: React.FC<ScheduleNumberFieldProps> = ({ 
   value, 
   onChange,
-  readonly = false
+  readonly = true // Changed default to true to always auto-generate
 }) => {
   // Generate a unique schedule number on component mount
   useEffect(() => {
-    if (!value && readonly) {
+    if (!value || value === "") {
       // Generate a schedule number based on date and random string
       const date = new Date();
       const dateStr = `${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, '0')}${String(date.getDate()).padStart(2, '0')}`;
-      const randomId = uuidv4().substring(0, 6);
-      const scheduleNumber = `SCH-${dateStr}-${randomId}`;
+      const timeStr = `${String(date.getHours()).padStart(2, '0')}${String(date.getMinutes()).padStart(2, '0')}`;
+      const randomId = uuidv4().substring(0, 4);
+      const scheduleNumber = `SCH-${dateStr}-${timeStr}-${randomId}`;
       
       // Call onChange with the new schedule number
       if (onChange) {
@@ -30,7 +31,7 @@ const ScheduleNumberField: React.FC<ScheduleNumberFieldProps> = ({
         onChange(event);
       }
     }
-  }, [value, readonly, onChange]);
+  }, []);
 
   return (
     <div className="mb-3">
@@ -47,11 +48,9 @@ const ScheduleNumberField: React.FC<ScheduleNumberFieldProps> = ({
         placeholder="Auto-generated"
         readOnly={readonly}
       />
-      {readonly && (
-        <p className="text-xs text-gray-500 mt-1">
-          Schedule number is auto-generated for uniqueness
-        </p>
-      )}
+      <p className="text-xs text-gray-500 mt-1">
+        Schedule number is auto-generated with date, time, and unique ID
+      </p>
     </div>
   );
 };

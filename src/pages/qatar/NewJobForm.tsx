@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import JobForm from "./components/JobForm";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Save, ArrowLeft } from "lucide-react";
+import { Save, ArrowLeft, Truck } from "lucide-react";
 
 const NewJobForm = () => {
   const navigate = useNavigate();
@@ -14,6 +14,12 @@ const NewJobForm = () => {
   const handleCreateJob = (jobData: any) => {
     setIsSaving(true);
     console.log("Creating new job:", jobData);
+    
+    // Add location-based vehicle assignment
+    if (jobData.city && !jobData.vehicle) {
+      const cityMapping = require('./data/cityVehicleMapping').cityVehicleMapping;
+      jobData.vehicle = cityMapping[jobData.city]?.[0] || "";
+    }
     
     // Simulate API call with timeout
     setTimeout(() => {
@@ -49,6 +55,17 @@ const NewJobForm = () => {
               Save Job
             </Button>
           </div>
+        </div>
+        
+        <div className="bg-yellow-50 p-4 rounded-md border border-yellow-200 mb-4">
+          <h3 className="flex items-center gap-2 font-medium text-yellow-800">
+            <Truck className="h-5 w-5" />
+            Personal Effects & Household Goods Only
+          </h3>
+          <p className="text-sm text-yellow-700 mt-1">
+            This form is specifically for collection or delivery of personal effects and household goods, 
+            not for commercial cargo.
+          </p>
         </div>
         
         <JobForm 

@@ -2,7 +2,7 @@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
-import { Plus } from "lucide-react";
+import { Plus, MapPin } from "lucide-react";
 import { 
   Dialog, 
   DialogContent, 
@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { qatarTowns, industrialAreaStreets } from "../../../data/mockLocations";
+import { cityVehicleMapping } from "../../../data/cityVehicleMapping";
 
 interface LocationSelectorProps {
   town: string;
@@ -37,12 +37,23 @@ const LocationSelector = ({
   const [isAddTownDialogOpen, setIsAddTownDialogOpen] = useState(false);
   const [newTownName, setNewTownName] = useState("");
 
+  // Get all location names from the cityVehicleMapping
+  const locationNames = Object.keys(cityVehicleMapping)
+    .filter(name => !name.includes("STREET NO.") && !["DOH", "RAK", "WAK", "UMS", "KHO", "DAY", "SHA", "WSB"].includes(name))
+    .sort();
+
+  // Get all industrial area street numbers
+  const industrialAreaStreets = Object.keys(cityVehicleMapping)
+    .filter(name => name.includes("STREET NO."))
+    .sort((a, b) => {
+      const numA = parseInt(a.replace("STREET NO. ", ""));
+      const numB = parseInt(b.replace("STREET NO. ", ""));
+      return numA - numB;
+    });
+
   useEffect(() => {
     // Check if selected town is an industrial area
-    setIsIndustrialArea(
-      town === "Industrial Area" || 
-      town === "New Industrial Area"
-    );
+    setIsIndustrialArea(town === "INDUSTRIAL AREA");
   }, [town]);
 
   const handleAddNewTown = () => {
@@ -56,11 +67,22 @@ const LocationSelector = ({
     }
   };
 
+  // Group locations by the first letter for better organization
+  const groupedLocations = locationNames.reduce((acc: Record<string, string[]>, location) => {
+    const firstLetter = location.charAt(0);
+    if (!acc[firstLetter]) acc[firstLetter] = [];
+    acc[firstLetter].push(location);
+    return acc;
+  }, {});
+
+  // Sort the keys for consistent display
+  const sortedGroups = Object.keys(groupedLocations).sort();
+
   return (
     <>
       <div>
         <Label htmlFor="town" className="flex justify-between">
-          <span>TOWN:</span>
+          <span>LOCATION:</span>
           <Button 
             type="button" 
             variant="ghost" 
@@ -69,7 +91,7 @@ const LocationSelector = ({
             onClick={() => setIsAddTownDialogOpen(true)}
           >
             <Plus size={16} />
-            <span className="text-xs">ADD TOWN</span>
+            <span className="text-xs">ADD LOCATION</span>
           </Button>
         </Label>
         <Select 
@@ -77,13 +99,21 @@ const LocationSelector = ({
           onValueChange={(value) => handleSelectChange("town", value)}
         >
           <SelectTrigger id="town" className="bg-blue-600 text-white">
-            <SelectValue placeholder="SELECT TOWN" />
+            <SelectValue placeholder="SELECT LOCATION" />
           </SelectTrigger>
-          <SelectContent>
-            {qatarTowns.map((town, index) => (
-              <SelectItem key={index} value={town}>
-                {town}
-              </SelectItem>
+          <SelectContent className="max-h-80">
+            {sortedGroups.map(group => (
+              <div key={group}>
+                <div className="px-2 py-1.5 text-xs font-semibold bg-gray-100">{group}</div>
+                {groupedLocations[group].map((locationName) => (
+                  <SelectItem key={locationName} value={locationName}>
+                    <div className="flex items-center">
+                      <MapPin className="h-3 w-3 mr-1.5 text-blue-500" />
+                      {locationName}
+                    </div>
+                  </SelectItem>
+                ))}
+              </div>
             ))}
           </SelectContent>
         </Select>
@@ -92,28 +122,28 @@ const LocationSelector = ({
         <Dialog open={isAddTownDialogOpen} onOpenChange={setIsAddTownDialogOpen}>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle>Add New Town</DialogTitle>
+              <DialogTitle>Add New Location</DialogTitle>
             </DialogHeader>
             <div className="py-4">
-              <Label htmlFor="newTownName">Town Name:</Label>
+              <Label htmlFor="newTownName">Location Name:</Label>
               <Input
                 id="newTownName"
                 value={newTownName}
                 onChange={(e) => setNewTownName(e.target.value)}
-                placeholder="Enter new town name"
+                placeholder="Enter new location name"
               />
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setIsAddTownDialogOpen(false)}>Cancel</Button>
-              <Button onClick={handleAddNewTown}>Add Town</Button>
+              <Button onClick={handleAddNewTown}>Add Location</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
       
-      <div>
-        <Label htmlFor="location">LOCATION:</Label>
-        {isIndustrialArea ? (
+      {isIndustrialArea && (
+        <div className="mt-4">
+          <Label htmlFor="location">STREET NUMBER:</Label>
           <Select 
             value={location} 
             onValueChange={(value) => handleSelectChange("location", value)}
@@ -122,23 +152,28 @@ const LocationSelector = ({
               <SelectValue placeholder="SELECT STREET NUMBER" />
             </SelectTrigger>
             <SelectContent>
-              {industrialAreaStreets.map((street, index) => (
-                <SelectItem key={index} value={street}>
+              {industrialAreaStreets.map((street) => (
+                <SelectItem key={street} value={street}>
                   {street}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        ) : (
+        </div>
+      )}
+      
+      {!isIndustrialArea && town && (
+        <div className="mt-4">
+          <Label htmlFor="location">ADDITIONAL LOCATION DETAILS:</Label>
           <Input 
             id="location"
             name="location"
             value={location}
             onChange={handleInputChange}
-            placeholder="LOCATION"
+            placeholder="Building name, block number, etc."
           />
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 };

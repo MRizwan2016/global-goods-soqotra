@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { QatarJob } from "../../types/jobTypes";
 import { Truck } from "lucide-react";
+import { getCitiesForVehicle } from "../../data/cityVehicleMapping";
 
 interface VehicleSelectionProps {
   jobsByVehicle: Record<string, QatarJob[]>;
@@ -16,12 +17,30 @@ const VehicleSelection: React.FC<VehicleSelectionProps> = ({
   setSelectedVehicle 
 }) => {
   // Use specific vehicle numbers as requested
-  const specificVehicles = ["41070", "41067", "41073", "514005", "119927", "74827"];
+  const specificVehicles = ["41067", "41073", "514005", "119927", "74827", "41070"];
   
   // Filter jobs by these specific vehicles
   const vehicleJobCounts = specificVehicles.map(vehicle => {
     const jobs = jobsByVehicle[vehicle] || [];
-    return { vehicle, jobCount: jobs.length };
+    const cities = getCitiesForVehicle(vehicle);
+    let vehicleLabel = vehicle;
+    
+    // Add label for vehicle based on general area
+    if (vehicle === "41067") {
+      vehicleLabel += " (West Bay/Dafna)";
+    } else if (vehicle === "41073") {
+      vehicleLabel += " (Wakra/Najma)";
+    } else if (vehicle === "514005") {
+      vehicleLabel += " (Industrial Area)";
+    } else if (vehicle === "119927") {
+      vehicleLabel += " (Warehouse)";
+    } else if (vehicle === "74827") {
+      vehicleLabel += " (Special Areas)";
+    } else if (vehicle === "41070") {
+      vehicleLabel += " (International)";
+    }
+    
+    return { vehicle, vehicleLabel, jobCount: jobs.length, cityCount: cities.length };
   });
 
   return (
@@ -29,7 +48,7 @@ const VehicleSelection: React.FC<VehicleSelectionProps> = ({
       <h3 className="text-lg font-medium mb-2">Select Vehicle:</h3>
       <div className="flex flex-wrap gap-2">
         {vehicleJobCounts.length > 0 ? (
-          vehicleJobCounts.map(({ vehicle, jobCount }) => (
+          vehicleJobCounts.map(({ vehicle, vehicleLabel, jobCount, cityCount }) => (
             <Button
               key={vehicle}
               variant={selectedVehicle === vehicle ? "default" : "outline"}
@@ -37,7 +56,7 @@ const VehicleSelection: React.FC<VehicleSelectionProps> = ({
               className="mb-2"
             >
               <Truck className="mr-2 h-4 w-4" />
-              {vehicle} ({jobCount} jobs)
+              {vehicleLabel} ({jobCount} jobs, {cityCount} locations)
             </Button>
           ))
         ) : (
