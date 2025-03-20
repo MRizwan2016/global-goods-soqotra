@@ -1,6 +1,5 @@
 
-import React from "react";
-import { mockJobs } from "./data/mockJobData";
+import React, { useEffect, useState } from "react";
 import { useJobFiltering } from "./hooks/useJobFiltering";
 import { useJobSelection } from "./hooks/useJobSelection";
 import { useJobGrouping } from "./hooks/useJobGrouping";
@@ -10,8 +9,21 @@ import JobFilters from "./components/job-generate/JobFilters";
 import JobGenerateHeader from "./components/job-generate/page-sections/JobGenerateHeader";
 import GroupControlPanel from "./components/job-generate/page-sections/GroupControlPanel";
 import JobGenerateLayout from "./components/job-generate/page-sections/JobGenerateLayout";
+import { JobStorageService } from "./services/JobStorageService";
+import { QatarJob } from "./types/jobTypes";
 
 const JobGeneratePage: React.FC = () => {
+  const [jobsData, setJobsData] = useState<QatarJob[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Load jobs from storage
+  useEffect(() => {
+    // Get all jobs from storage
+    const allJobs = JobStorageService.getAllJobs();
+    setJobsData(allJobs);
+    setIsLoading(false);
+  }, []);
+  
   // Use our custom hooks
   const {
     selectedJobs,
@@ -33,7 +45,7 @@ const JobGeneratePage: React.FC = () => {
     filterDate,
     setFilterDate,
     filteredJobs
-  } = useJobFiltering(mockJobs);
+  } = useJobFiltering(jobsData);
   
   const {
     showVehicleView,
@@ -47,6 +59,16 @@ const JobGeneratePage: React.FC = () => {
     jobsForSchedule,
     isFormDisabled
   } = useJobGrouping(selectedJobs);
+  
+  if (isLoading) {
+    return (
+      <Layout title="Job Schedule Generation">
+        <div className="w-full text-center py-8">
+          <p>Loading jobs...</p>
+        </div>
+      </Layout>
+    );
+  }
   
   if (isPrintMode) {
     return (

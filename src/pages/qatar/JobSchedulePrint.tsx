@@ -1,6 +1,5 @@
 
-import React, { useState } from "react";
-import { mockJobs } from "./data/mockJobData";
+import React, { useState, useEffect } from "react";
 import PrintJobSchedule from "./components/print/PrintJobSchedule";
 import { groupBy } from "lodash";
 import { QatarJob } from "./types/jobTypes";
@@ -9,11 +8,22 @@ import ViewModeToggle from "./components/schedule-print/ViewModeToggle";
 import VehicleSelection from "./components/schedule-print/VehicleSelection";
 import CitySelection from "./components/schedule-print/CitySelection";
 import ScheduleForm from "./components/schedule-print/ScheduleForm";
+import { JobStorageService } from "./services/JobStorageService";
 
 const JobSchedulePrint: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [allJobs, setAllJobs] = useState<QatarJob[]>([]);
+  
+  // Load jobs from storage
+  useEffect(() => {
+    const jobs = JobStorageService.getAllJobs();
+    setAllJobs(jobs);
+    setIsLoading(false);
+  }, []);
+  
   // Group jobs by vehicle and city
-  const jobsByVehicle = groupBy(mockJobs, 'vehicle');
-  const jobsByCity = groupBy(mockJobs, 'city');
+  const jobsByVehicle = groupBy(allJobs, 'vehicle');
+  const jobsByCity = groupBy(allJobs, 'city');
   const vehicleNumbers = Object.keys(jobsByVehicle).filter(v => v);
   
   // State for selection modes
@@ -48,6 +58,10 @@ const JobSchedulePrint: React.FC = () => {
     viewMode === 'vehicle' ? selectedVehicle : null,
     viewMode === 'city' ? selectedCity : null
   );
+
+  if (isLoading) {
+    return <div className="p-8 text-center">Loading jobs...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-white w-full">

@@ -6,6 +6,7 @@ import JobForm from "./components/JobForm";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Save, ArrowLeft, Truck } from "lucide-react";
+import { JobStorageService } from "./services/JobStorageService";
 
 const NewJobForm = () => {
   const navigate = useNavigate();
@@ -21,13 +22,21 @@ const NewJobForm = () => {
       jobData.vehicle = cityMapping[jobData.city]?.[0] || "";
     }
     
-    // Simulate API call with timeout
-    setTimeout(() => {
-      // Here you would normally submit the data to an API
-      toast.success("Job created successfully!");
+    try {
+      // Save the job using our storage service
+      const savedJob = JobStorageService.saveJob(jobData);
+      console.log("Job saved successfully:", savedJob);
+      
+      setTimeout(() => {
+        toast.success("Job created successfully!");
+        setIsSaving(false);
+        navigate("/qatar");
+      }, 800);
+    } catch (error) {
+      console.error("Error saving job:", error);
+      toast.error("Failed to save job. Please try again.");
       setIsSaving(false);
-      navigate("/qatar");
-    }, 800);
+    }
   };
   
   return (

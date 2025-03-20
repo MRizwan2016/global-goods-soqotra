@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { cityVehicleMapping } from "../data/cityVehicleMapping";
 import { JobScheduleFormData } from "../components/job-generate/job-schedule-form/types";
 import { v4 as uuidv4 } from 'uuid';
+import { JobStorageService } from "../services/JobStorageService";
 
 // Helper function to generate unique schedule number
 const generateUniqueScheduleNumber = (): string => {
@@ -83,7 +84,12 @@ export const useJobSelection = () => {
     
     // Attempt to save the selected jobs with the schedule data
     try {
-      // In a real app, this would save to an API
+      // Get selected job IDs
+      const selectedJobIds = selectedJobs.map(job => job.id);
+      
+      // Mark the jobs as scheduled
+      JobStorageService.markJobsAsScheduled(selectedJobIds);
+      
       console.log("Saving schedule with jobs:", formDataWithUniqueSchedule, selectedJobs);
       
       // Simulate successful save
@@ -107,6 +113,14 @@ export const useJobSelection = () => {
   const handleCloseJobs = () => {
     // In a real app, this would update the backend
     try {
+      // Get selected job IDs
+      const selectedJobIds = selectedJobs.map(job => job.id);
+      
+      // Mark the jobs as closed/completed
+      selectedJobIds.forEach(id => {
+        JobStorageService.updateJob(id, { status: 'COMPLETED' });
+      });
+      
       console.log(`Closing ${selectedJobs.length} jobs`);
       toast.success(`${selectedJobs.length} jobs have been closed`);
       
