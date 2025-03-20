@@ -28,9 +28,35 @@ export const useJobData = () => {
     setJobs(JobStorageService.getAllJobs());
   };
 
+  // Calculate job statistics
+  const getJobStatistics = () => {
+    return {
+      total: jobs.length,
+      completed: jobs.filter(job => job.status === 'COMPLETED').length,
+      inProgress: jobs.filter(job => job.status === 'IN_PROGRESS').length,
+      pending: jobs.filter(job => job.status === 'PENDING').length,
+      scheduled: jobs.filter(job => job.status === 'SCHEDULED').length
+    };
+  };
+
+  // Get recent jobs (last 10)
+  const getRecentJobs = () => {
+    return [...jobs]
+      .sort((a, b) => (b.id || '').localeCompare(a.id || ''))
+      .slice(0, 10);
+  };
+
+  // Get pending jobs
+  const getPendingJobs = () => {
+    return jobs.filter(job => job.status === 'PENDING');
+  };
+
   return {
     jobs,
     isLoading,
-    refreshJobs
+    refreshJobs,
+    getJobStatistics,
+    getRecentJobs,
+    getPendingJobs
   };
 };

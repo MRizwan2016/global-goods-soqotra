@@ -1,32 +1,27 @@
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Layout from "@/components/layout/Layout";
 import DashboardHeader from "./components/dashboard/DashboardHeader";
 import StatCards from "./components/dashboard/StatCards";
 import PendingJobs from "./components/dashboard/PendingJobs";
 import JobListing from "./components/dashboard/JobListing";
 import VehicleStatistics from "./components/dashboard/VehicleStatistics";
-import { JobStorageService } from "./services/JobStorageService";
-import { QatarJob, DailyJobForecast, VehicleStats } from "./types/jobTypes";
+import { DailyJobForecast, VehicleStats } from "./types/jobTypes";
+import { useJobData } from "./hooks/useJobData";
 
 const QatarDashboard = () => {
-  const [jobs, setJobs] = useState<QatarJob[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { 
+    isLoading, 
+    getRecentJobs, 
+    getJobStatistics, 
+    getPendingJobs 
+  } = useJobData();
   
-  useEffect(() => {
-    // Load jobs from storage
-    const allJobs = JobStorageService.getAllJobs();
-    setJobs(allJobs);
-    setIsLoading(false);
-  }, []);
+  // Get recent jobs for the listing
+  const recentJobs = getRecentJobs();
   
-  // Filter recent jobs (last 10)
-  const recentJobs = [...jobs]
-    .sort((a, b) => (b.id || '').localeCompare(a.id || ''))
-    .slice(0, 10);
-  
-  // Filter pending jobs
-  const pendingJobs = jobs.filter(job => job.status === 'PENDING');
+  // Get job statistics for the StatCards
+  const jobStats = getJobStatistics();
   
   // Generate mock data for the job forecasts (pending jobs component)
   const jobForecasts: DailyJobForecast[] = [
@@ -63,10 +58,10 @@ const QatarDashboard = () => {
       <DashboardHeader />
       <StatCards 
         stats={{
-          total: jobs.length,
-          completed: jobs.filter(job => job.status === 'COMPLETED').length,
-          inProgress: jobs.filter(job => job.status === 'IN_PROGRESS').length,
-          pending: pendingJobs.length
+          total: jobStats.total,
+          completed: jobStats.completed,
+          inProgress: jobStats.inProgress,
+          pending: jobStats.pending
         }}
       />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
