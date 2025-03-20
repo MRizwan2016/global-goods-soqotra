@@ -1,7 +1,7 @@
 
 import { toast } from "sonner";
 
-export const validateScheduleData = (scheduleData: any): boolean => {
+const validateScheduleData = (scheduleData: any): boolean => {
   let isValid = true;
   
   // Validate required fields
@@ -18,3 +18,5 @@ export const validateScheduleData = (scheduleData: any): boolean => {
   
   return isValid;
 };
+
+export default validateScheduleData;
