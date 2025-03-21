@@ -61,6 +61,27 @@ export const mockSalesReps = [
     id: "sr12",
     name: "Mr. Raymond",
     code: "RM012"
+  },
+  // New sales reps requested by user
+  {
+    id: "sr13",
+    name: "Mr. Gayashan",
+    code: "GY013"
+  },
+  {
+    id: "sr14",
+    name: "Mr. Paul Onchanga",
+    code: "PO014"
+  },
+  {
+    id: "sr15",
+    name: "Mr. Edwin Mbguoi",
+    code: "EM015"
+  },
+  {
+    id: "sr16",
+    name: "Mr. Paolo Fernando",
+    code: "PF016"
   }
 ];
 
@@ -98,5 +119,21 @@ export const mockDrivers = [
     id: "d6",
     name: "Mr. Idris Karar",
     license: "QT-67890"
+  },
+  // New drivers requested by user
+  {
+    id: "d7",
+    name: "Mr. Abdul",
+    license: "QT-78901"
+  },
+  {
+    id: "d8",
+    name: "Mr. Saleh",
+    license: "QT-89012"
+  },
+  {
+    id: "d9",
+    name: "Mr. Idries Karar",
+    license: "QT-90123"
   }
 ];

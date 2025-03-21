@@ -12,6 +12,8 @@ import JobGenerateLayout from "./components/job-generate/page-sections/JobGenera
 import { JobStorageService } from "./services/JobStorageService";
 import { QatarJob } from "./types/jobTypes";
 import ScheduleDetailsEditor from "./components/job-generate/schedule-details/ScheduleDetailsEditor";
+import { mockJobs } from "./data/mockJobData";
+import { toast } from "sonner";
 
 const JobGeneratePage: React.FC = () => {
   const [jobsData, setJobsData] = useState<QatarJob[]>([]);
@@ -20,7 +22,19 @@ const JobGeneratePage: React.FC = () => {
   // Load jobs from storage
   useEffect(() => {
     // Get all jobs from storage
-    const allJobs = JobStorageService.getAllJobs();
+    let allJobs = JobStorageService.getAllJobs();
+    
+    // If no jobs are in storage, initialize with mock data
+    if (allJobs.length === 0) {
+      console.log("No jobs found in storage, initializing with mock data");
+      mockJobs.forEach(job => {
+        JobStorageService.saveJob(job);
+      });
+      allJobs = JobStorageService.getAllJobs();
+      toast.success("Sample jobs loaded successfully");
+    }
+    
+    console.log("Loaded jobs:", allJobs.length);
     setJobsData(allJobs);
     setIsLoading(false);
   }, []);
@@ -124,6 +138,13 @@ const JobGeneratePage: React.FC = () => {
             onPrintJobs={handleDirectPrint}
             onEditSchedule={handleScheduleEdit}
           />
+          
+          {/* Status display */}
+          {jobsData.length === 0 && (
+            <div className="bg-amber-50 p-4 rounded-md border border-amber-200 my-4">
+              <p className="text-amber-800">No jobs available. Please add jobs in the job management section.</p>
+            </div>
+          )}
           
           {/* Grouping Toggle Buttons */}
           <GroupControlPanel 

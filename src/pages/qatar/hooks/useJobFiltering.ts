@@ -15,15 +15,17 @@ export const useJobFiltering = (jobs: QatarJob[]) => {
         return false;
       }
       
-      // Date filter
+      // Date filter - only if filterDate is provided
       if (filterDate) {
         const jobDate = new Date(job.date);
         const filterDateObj = new Date(filterDate);
         
+        // Check if the dates match by comparing year, month, and day
+        // This is more reliable than comparing full date strings
         if (
-          jobDate.getDate() !== filterDateObj.getDate() ||
+          jobDate.getFullYear() !== filterDateObj.getFullYear() ||
           jobDate.getMonth() !== filterDateObj.getMonth() ||
-          jobDate.getFullYear() !== filterDateObj.getFullYear()
+          jobDate.getDate() !== filterDateObj.getDate()
         ) {
           return false;
         }
@@ -43,6 +45,12 @@ export const useJobFiltering = (jobs: QatarJob[]) => {
       }
     });
   }, [jobs, statusFilter, sortBy, filterDate]);
+
+  // Debug the filtering process
+  console.log('Total jobs:', jobs.length);
+  console.log('Selected date:', filterDate);
+  console.log('Status filter:', statusFilter);
+  console.log('Filtered jobs:', filteredJobs.length);
 
   return {
     statusFilter,

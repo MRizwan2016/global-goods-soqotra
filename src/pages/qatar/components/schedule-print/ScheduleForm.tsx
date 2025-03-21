@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { mockSalesReps, mockDrivers, mockHelpers } from "../../data/mockSalesReps";
 
 interface ScheduleFormProps {
   formData: {
@@ -61,11 +62,9 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
             className="w-full p-2 border rounded bg-white"
           >
             <option value="">Select Sales Rep</option>
-            <option value="Ahmed Khalil">Ahmed Khalil</option>
-            <option value="Fatima Al-Thani">Fatima Al-Thani</option>
-            <option value="Yousef Al-Abdulla">Yousef Al-Abdulla</option>
-            <option value="Mr. Lahiru Chathuranga">Mr. Lahiru Chathuranga</option>
-            <option value="Mr. Ali Hussain">Mr. Ali Hussain</option>
+            {mockSalesReps.map(rep => (
+              <option key={rep.id} value={rep.name}>{rep.name}</option>
+            ))}
           </select>
         </div>
         <div>
@@ -77,12 +76,9 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
             className="w-full p-2 border rounded bg-white"
           >
             <option value="">Select Driver</option>
-            <option value="ASHOKA">ASHOKA</option>
-            <option value="KANAYA">KANAYA</option>
-            <option value="SALIEH">SALIEH</option>
-            <option value="ABDULLAH">ABDULLAH</option>
-            <option value="IDRIS KARAR">IDRIS KARAR</option>
-            <option value="JOHNY VENAKADY">JOHNY VENAKADY</option>
+            {mockDrivers.map(driver => (
+              <option key={driver.id} value={driver.name}>{driver.name}</option>
+            ))}
           </select>
         </div>
         <div>
@@ -94,11 +90,9 @@ const ScheduleForm: React.FC<ScheduleFormProps> = ({
             className="w-full p-2 border rounded bg-white"
           >
             <option value="">Select Helper</option>
-            <option value="Ahmed Khalil">Ahmed Khalil</option>
-            <option value="Fatima Al-Thani">Fatima Al-Thani</option>
-            <option value="Yousef Al-Abdulla">Yousef Al-Abdulla</option>
-            <option value="Mr. Lahiru Chathuranga">Mr. Lahiru Chathuranga</option>
-            <option value="Mr. Ali Hussain">Mr. Ali Hussain</option>
+            {mockHelpers.map(helper => (
+              <option key={helper.id} value={helper.name}>{helper.name}</option>
+            ))}
           </select>
         </div>
         <div>

@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -16,8 +16,8 @@ interface DateSelectorProps {
 const DateSelector: React.FC<DateSelectorProps> = ({ selectedDate, onDateChange }) => {
   // Parse the string date to a Date object for the calendar
   // Handle potential invalid date strings by defaulting to today
-  const parsedDate = selectedDate 
-    ? new Date(selectedDate) 
+  const parsedDate = selectedDate && isValid(new Date(selectedDate))
+    ? new Date(selectedDate)
     : new Date();
   
   // Handle date selection from calendar
@@ -40,10 +40,12 @@ const DateSelector: React.FC<DateSelectorProps> = ({ selectedDate, onDateChange 
             className="w-full justify-start text-left font-normal bg-white border-gray-300 hover:bg-gray-50"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {selectedDate ? format(parsedDate, "dd/MM/yyyy") : "Select date"}
+            {selectedDate && isValid(new Date(selectedDate)) 
+              ? format(parsedDate, "dd/MM/yyyy") 
+              : "Select date"}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 pointer-events-auto" align="start">
+        <PopoverContent className="w-auto p-0 bg-white z-50 pointer-events-auto" align="start">
           <Calendar
             mode="single"
             selected={parsedDate}
@@ -59,7 +61,9 @@ const DateSelector: React.FC<DateSelectorProps> = ({ selectedDate, onDateChange 
         <Input 
           type="text" 
           id="scheduleDate"
-          value={selectedDate ? format(parsedDate, "dd/MM/yyyy") : ""}
+          value={selectedDate && isValid(new Date(selectedDate)) 
+            ? format(parsedDate, "dd/MM/yyyy") 
+            : ""}
           readOnly
           className="bg-blue-50 border-blue-200 text-blue-900 font-medium"
         />

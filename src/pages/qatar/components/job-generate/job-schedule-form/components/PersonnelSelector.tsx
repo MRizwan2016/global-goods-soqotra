@@ -46,7 +46,7 @@ const PersonnelSelector: React.FC<PersonnelSelectorProps> = ({
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent className="max-h-[200px]">
+        <SelectContent className="max-h-[200px] bg-white z-50">
           {options.map(option => (
             <SelectItem 
               key={option.id} 
