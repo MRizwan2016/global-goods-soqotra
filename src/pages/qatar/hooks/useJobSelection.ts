@@ -1,10 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { QatarJob } from "../types/jobTypes";
 import { toast } from "sonner";
 import { cityVehicleMapping } from "../data/cityVehicleMapping";
 import { JobScheduleFormData } from "../components/job-generate/job-schedule-form/types";
-import { v4 as uuidv4 } from 'uuid';
 import { JobStorageService } from "../services/JobStorageService";
 
 // Helper function to generate unique schedule number
@@ -16,6 +14,7 @@ const generateUniqueScheduleNumber = (): string => {
 export const useJobSelection = () => {
   const [selectedJobs, setSelectedJobs] = useState<QatarJob[]>([]);
   const [isPrintMode, setIsPrintMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [scheduleData, setScheduleData] = useState<JobScheduleFormData>({
     scheduleNumber: generateUniqueScheduleNumber(),
     vehicle: "",
@@ -58,6 +57,29 @@ export const useJobSelection = () => {
       setSelectedJobs([...selectedJobs, job]);
     }
   };
+
+  const handleScheduleEdit = () => {
+    setIsEditMode(true);
+  };
+
+  const handleScheduleSave = () => {
+    // Validate required data
+    if (!scheduleData.vehicle) {
+      toast.error("Please select a vehicle before saving schedule details");
+      return;
+    }
+    
+    if (!scheduleData.driver) {
+      toast.warning("Driver information is missing");
+    }
+    
+    if (!scheduleData.salesRep) {
+      toast.warning("Sales Rep information is missing");
+    }
+    
+    setIsEditMode(false);
+    toast.success("Schedule details have been saved");
+  };
   
   const handleScheduleSubmit = (data: JobScheduleFormData) => {
     // Validate required data
@@ -77,7 +99,7 @@ export const useJobSelection = () => {
     // Always generate a new schedule number to ensure uniqueness
     const formDataWithUniqueSchedule = {
       ...data,
-      scheduleNumber: generateUniqueScheduleNumber()
+      scheduleNumber: data.scheduleNumber || generateUniqueScheduleNumber()
     };
     
     setScheduleData(formDataWithUniqueSchedule);
@@ -103,11 +125,8 @@ export const useJobSelection = () => {
   
   const handleBackFromPrint = () => {
     setIsPrintMode(false);
-    // Generate a new schedule number when returning from print mode
-    setScheduleData(prev => ({
-      ...prev,
-      scheduleNumber: generateUniqueScheduleNumber()
-    }));
+    setIsEditMode(false);
+    // Keep the same schedule number when returning from print mode for consistency
   };
   
   const handleCloseJobs = () => {
@@ -139,11 +158,7 @@ export const useJobSelection = () => {
       return;
     }
     
-    // Generate new schedule number before printing
-    setScheduleData(prev => ({
-      ...prev,
-      scheduleNumber: generateUniqueScheduleNumber()
-    }));
+    // Keep the current schedule number when printing directly
     
     // Small delay to ensure state is updated
     setTimeout(() => {
@@ -156,10 +171,14 @@ export const useJobSelection = () => {
     setSelectedJobs,
     isPrintMode,
     setIsPrintMode,
+    isEditMode,
+    setIsEditMode,
     scheduleData,
     setScheduleData,
     toggleJobSelection,
     handleScheduleSubmit,
+    handleScheduleEdit,
+    handleScheduleSave,
     handleBackFromPrint,
     handleCloseJobs,
     handleDirectPrint

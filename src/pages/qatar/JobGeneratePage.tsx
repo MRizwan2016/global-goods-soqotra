@@ -11,6 +11,7 @@ import GroupControlPanel from "./components/job-generate/page-sections/GroupCont
 import JobGenerateLayout from "./components/job-generate/page-sections/JobGenerateLayout";
 import { JobStorageService } from "./services/JobStorageService";
 import { QatarJob } from "./types/jobTypes";
+import ScheduleDetailsEditor from "./components/job-generate/schedule-details/ScheduleDetailsEditor";
 
 const JobGeneratePage: React.FC = () => {
   const [jobsData, setJobsData] = useState<QatarJob[]>([]);
@@ -28,10 +29,13 @@ const JobGeneratePage: React.FC = () => {
   const {
     selectedJobs,
     isPrintMode,
+    isEditMode,
     scheduleData,
     setScheduleData,
     toggleJobSelection,
     handleScheduleSubmit,
+    handleScheduleEdit,
+    handleScheduleSave,
     handleBackFromPrint,
     handleCloseJobs,
     handleDirectPrint
@@ -83,6 +87,23 @@ const JobGeneratePage: React.FC = () => {
       />
     );
   }
+
+  if (isEditMode) {
+    return (
+      <Layout title="Edit Schedule Details">
+        <div className="max-w-4xl mx-auto p-6">
+          <h2 className="text-2xl font-bold mb-6">Schedule Details</h2>
+          <ScheduleDetailsEditor 
+            scheduleData={scheduleData}
+            setScheduleData={setScheduleData}
+            onSave={handleScheduleSave}
+            onCancel={() => handleBackFromPrint()}
+            selectedJobs={jobsForSchedule}
+          />
+        </div>
+      </Layout>
+    );
+  }
   
   return (
     <Layout title="Job Schedule Generation">
@@ -101,6 +122,7 @@ const JobGeneratePage: React.FC = () => {
             selectedJobs={selectedJobs}
             onCloseJobs={handleCloseJobs}
             onPrintJobs={handleDirectPrint}
+            onEditSchedule={handleScheduleEdit}
           />
           
           {/* Grouping Toggle Buttons */}
@@ -119,7 +141,7 @@ const JobGeneratePage: React.FC = () => {
           <JobGenerateLayout 
             scheduleData={scheduleData}
             setScheduleData={setScheduleData}
-            handleScheduleSubmit={handleScheduleSubmit}
+            handleScheduleSubmit={handleScheduleEdit} // Change submit to edit mode
             jobsForSchedule={jobsForSchedule}
             filteredJobs={filteredJobs}
             selectedJobs={selectedJobs}

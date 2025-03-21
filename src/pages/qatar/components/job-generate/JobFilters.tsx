@@ -1,30 +1,23 @@
 
 import React from "react";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon, Clock, Filter, Printer } from "lucide-react";
-import { format } from "date-fns";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { QatarJob } from "../../types/jobTypes";
-import { toast } from "sonner";
+import { Calendar, Printer, CheckSquare, Edit } from "lucide-react";
 
 interface JobFiltersProps {
   statusFilter: string;
-  setStatusFilter: (value: string) => void;
+  setStatusFilter: (status: string) => void;
   sortBy: string;
-  setSortBy: (value: string) => void;
-  filterDate: Date | undefined;
-  setFilterDate: (date: Date | undefined) => void;
+  setSortBy: (sort: string) => void;
+  filterDate: string;
+  setFilterDate: (date: string) => void;
   selectedJobs: QatarJob[];
   onCloseJobs: () => void;
   onPrintJobs: () => void;
+  onEditSchedule: () => void;
 }
 
 const JobFilters: React.FC<JobFiltersProps> = ({
@@ -37,96 +30,113 @@ const JobFilters: React.FC<JobFiltersProps> = ({
   selectedJobs,
   onCloseJobs,
   onPrintJobs,
+  onEditSchedule
 }) => {
-  const handleCloseJobs = () => {
-    if (selectedJobs.length === 0) {
-      toast.warning("Please select jobs to close");
-      return;
-    }
-    
-    onCloseJobs();
-  };
-
-  const handlePrintJobs = () => {
-    if (selectedJobs.length === 0) {
-      toast.warning("Please select jobs to print");
-      return;
-    }
-    
-    onPrintJobs();
-  };
-
+  const today = new Date().toISOString().split('T')[0];
+  
   return (
-    <div className="bg-white p-4 rounded-md shadow-sm mb-6">
-      <div className="flex flex-wrap gap-3 items-center">
-        <div className="flex items-center gap-1">
-          <Filter size={16} className="text-gray-400" />
-          <span className="font-medium">Filters:</span>
+    <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <div>
+          <Label htmlFor="status-filter">Job Status</Label>
+          <Select 
+            value={statusFilter} 
+            onValueChange={setStatusFilter}
+          >
+            <SelectTrigger id="status-filter">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL">All Jobs</SelectItem>
+              <SelectItem value="PENDING">Pending Jobs</SelectItem>
+              <SelectItem value="SCHEDULED">Scheduled Jobs</SelectItem>
+              <SelectItem value="COMPLETED">Completed Jobs</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="PENDING">Pending</SelectItem>
-            <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
-            <SelectItem value="SCHEDULED">Scheduled</SelectItem>
-            <SelectItem value="COMPLETED">Completed</SelectItem>
-            <SelectItem value="CANCELLED">Cancelled</SelectItem>
-          </SelectContent>
-        </Select>
+        <div>
+          <Label htmlFor="sort-by">Sort By</Label>
+          <Select 
+            value={sortBy} 
+            onValueChange={setSortBy}
+          >
+            <SelectTrigger id="sort-by">
+              <SelectValue placeholder="Sort jobs" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="DATE_ASC">Date (Oldest First)</SelectItem>
+              <SelectItem value="DATE_DESC">Date (Newest First)</SelectItem>
+              <SelectItem value="CUSTOMER_ASC">Customer Name (A-Z)</SelectItem>
+              <SelectItem value="CUSTOMER_DESC">Customer Name (Z-A)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-40">
-            <SelectValue placeholder="Sort by" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">Newest First</SelectItem>
-            <SelectItem value="oldest">Oldest First</SelectItem>
-            <SelectItem value="jobNumber">Job Number</SelectItem>
-          </SelectContent>
-        </Select>
-        
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="w-48 justify-start text-left font-normal"
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {filterDate ? format(filterDate, "PPP") : "Pick a date"}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={filterDate}
-              onSelect={setFilterDate}
-              initialFocus
+        <div>
+          <Label htmlFor="date-filter">Date Filter</Label>
+          <div className="flex">
+            <Input 
+              id="date-filter"
+              type="date" 
+              className="rounded-r-none" 
+              value={filterDate} 
+              onChange={(e) => setFilterDate(e.target.value)}
+              max={today}
             />
-          </PopoverContent>
-        </Popover>
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="rounded-l-none border-l-0"
+              onClick={() => setFilterDate('')}
+            >
+              <Calendar className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
         
-        <Button 
-          variant="destructive" 
-          className="ml-auto"
-          onClick={handleCloseJobs}
-        >
-          <Clock className="mr-2 h-4 w-4" />
-          Close Selected Jobs
-        </Button>
-        
-        <Button 
-          variant="outline" 
-          className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
-          onClick={handlePrintJobs}
-        >
-          <Printer className="mr-2 h-4 w-4" />
-          Print Selected Jobs
-        </Button>
+        <div className="flex items-end space-x-2">
+          <Button 
+            type="button" 
+            variant="outline" 
+            className="flex gap-2 border-blue-300"
+            onClick={onCloseJobs}
+            disabled={selectedJobs.length === 0}
+          >
+            <CheckSquare className="h-4 w-4" />
+            <span className="whitespace-nowrap">Close Selected</span>
+          </Button>
+          
+          <Button 
+            type="button"
+            variant="outline"
+            className="flex gap-2 border-green-300"
+            onClick={onEditSchedule}
+            disabled={selectedJobs.length === 0}
+          >
+            <Edit className="h-4 w-4" />
+            <span className="whitespace-nowrap">Edit Schedule</span>
+          </Button>
+          
+          <Button 
+            type="button"
+            className="bg-blue-600 hover:bg-blue-700 flex gap-2"
+            onClick={onPrintJobs}
+            disabled={selectedJobs.length === 0}
+          >
+            <Printer className="h-4 w-4" />
+            <span className="whitespace-nowrap">Print Jobs</span>
+          </Button>
+        </div>
       </div>
+      
+      {selectedJobs.length > 0 && (
+        <div className="mt-2 text-sm bg-blue-50 p-2 rounded flex items-center justify-between">
+          <span className="font-medium text-blue-700">
+            {selectedJobs.length} job{selectedJobs.length !== 1 && 's'} selected
+          </span>
+        </div>
+      )}
     </div>
   );
 };

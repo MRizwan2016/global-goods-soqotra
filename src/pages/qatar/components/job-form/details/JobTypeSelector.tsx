@@ -27,6 +27,8 @@ const JobTypeSelector = ({ jobType, handleSelectChange }: JobTypeSelectorProps) 
         <SelectContent>
           <SelectItem value="COLLECTION">COLLECTION OF PERSONAL EFFECTS</SelectItem>
           <SelectItem value="DELIVERY">DELIVERY OF HOUSEHOLD GOODS</SelectItem>
+          <SelectItem value="PACKING">PACKING OF HOUSEHOLD ITEMS</SelectItem>
+          <SelectItem value="UNPACKING">UNPACKING OF PERSONAL EFFECTS</SelectItem>
         </SelectContent>
       </Select>
     </div>
