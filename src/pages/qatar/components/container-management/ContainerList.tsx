@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   Table, 
@@ -19,7 +18,7 @@ import {
 } from "@/components/ui/select";
 import { mockContainers } from "../../data/mockContainers";
 import { Card, CardContent } from "@/components/ui/card";
-import { Edit2, Search, Ship, ArrowUpDown, FileImport } from "lucide-react";
+import { Edit2, Search, Ship, ArrowUpDown, FileText } from "lucide-react";
 import { QatarContainer } from "../../types/containerTypes";
 
 interface ContainerListProps {
@@ -84,7 +83,7 @@ const ContainerList: React.FC<ContainerListProps> = ({ onContainerSelect }) => {
               </Select>
               
               <Button variant="default" className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2">
-                <FileImport size={18} />
+                <FileText size={18} />
                 Import
               </Button>
             </div>
