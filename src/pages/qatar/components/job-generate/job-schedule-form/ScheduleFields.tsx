@@ -20,10 +20,6 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
   handleSelectChange,
   handleDateChange 
 }) => {
-  const selectedDate = formData.scheduleDate 
-    ? new Date(formData.scheduleDate) 
-    : new Date();
-    
   // Extract cities from selected jobs
   const uniqueCities = extractUniqueCities(selectedJobs);
   
@@ -91,8 +87,8 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
       />
       
       <DateSelector
-        selectedDate={selectedDate}
-        onDateChange={handleDateChange}
+        selectedDate={formData.scheduleDate}
+        onDateChange={(date) => handleDateChange(date)}
       />
       
       <CityDisplay uniqueCities={uniqueCities} />

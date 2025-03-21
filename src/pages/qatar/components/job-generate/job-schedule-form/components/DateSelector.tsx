@@ -4,16 +4,27 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
 interface DateSelectorProps {
-  selectedDate: Date;
-  onDateChange: (date: Date | undefined) => void;
+  selectedDate: string;
+  onDateChange: (date: string) => void;
 }
 
 const DateSelector: React.FC<DateSelectorProps> = ({ selectedDate, onDateChange }) => {
+  // Parse the string date to a Date object for the calendar
+  const parsedDate = selectedDate ? new Date(selectedDate) : new Date();
+  
+  // Handle date selection from calendar
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      // Convert back to ISO string format and pass to parent
+      onDateChange(date.toISOString().split('T')[0]);
+    }
+  };
+
   return (
     <div className="mb-3">
       <Label htmlFor="scheduleDate" className="font-bold text-gray-700 mb-1 block">
@@ -26,14 +37,14 @@ const DateSelector: React.FC<DateSelectorProps> = ({ selectedDate, onDateChange 
             className="w-full justify-start text-left font-normal bg-white border-gray-300 hover:bg-gray-50"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {format(selectedDate, "dd/MM/yyyy")}
+            {format(parsedDate, "dd/MM/yyyy")}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
-            selected={selectedDate}
-            onSelect={onDateChange}
+            selected={parsedDate}
+            onSelect={handleDateSelect}
             initialFocus
           />
         </PopoverContent>
@@ -44,7 +55,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ selectedDate, onDateChange 
         <Input 
           type="text" 
           id="scheduleDate"
-          value={format(selectedDate, "dd/MM/yyyy")}
+          value={format(parsedDate, "dd/MM/yyyy")}
           readOnly
           className="bg-blue-50 border-blue-200 text-blue-900 font-medium"
         />
