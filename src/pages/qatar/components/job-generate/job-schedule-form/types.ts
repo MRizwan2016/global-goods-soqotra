@@ -26,3 +26,9 @@ export interface ScheduleFieldsProps {
   handleSelectChange: (name: string, value: string) => void;
   handleDateChange: (date: string) => void;
 }
+
+export interface ScheduleNumberFieldProps {
+  value: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  readonly?: boolean;
+}

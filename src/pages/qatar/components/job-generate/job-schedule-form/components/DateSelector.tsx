@@ -15,7 +15,10 @@ interface DateSelectorProps {
 
 const DateSelector: React.FC<DateSelectorProps> = ({ selectedDate, onDateChange }) => {
   // Parse the string date to a Date object for the calendar
-  const parsedDate = selectedDate ? new Date(selectedDate) : new Date();
+  // Handle potential invalid date strings by defaulting to today
+  const parsedDate = selectedDate 
+    ? new Date(selectedDate) 
+    : new Date();
   
   // Handle date selection from calendar
   const handleDateSelect = (date: Date | undefined) => {
@@ -37,7 +40,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ selectedDate, onDateChange 
             className="w-full justify-start text-left font-normal bg-white border-gray-300 hover:bg-gray-50"
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {format(parsedDate, "dd/MM/yyyy")}
+            {selectedDate ? format(parsedDate, "dd/MM/yyyy") : "Select date"}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
@@ -55,7 +58,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ selectedDate, onDateChange 
         <Input 
           type="text" 
           id="scheduleDate"
-          value={format(parsedDate, "dd/MM/yyyy")}
+          value={selectedDate ? format(parsedDate, "dd/MM/yyyy") : ""}
           readOnly
           className="bg-blue-50 border-blue-200 text-blue-900 font-medium"
         />
