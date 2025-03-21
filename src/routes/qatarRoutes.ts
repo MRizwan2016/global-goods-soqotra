@@ -8,6 +8,7 @@ import JobGeneratePage from "@/pages/qatar/JobGeneratePage";
 import VehicleManagement from "@/pages/qatar/VehicleManagement";
 import DriverManagement from "@/pages/qatar/DriverManagement";
 import FindCustomer from "@/pages/qatar/FindCustomer";
+import ContainerManagement from "@/pages/qatar/ContainerManagement";
 import { RouteConfig } from "./types";
 
 export const qatarRoutes: RouteConfig[] = [
@@ -54,6 +55,11 @@ export const qatarRoutes: RouteConfig[] = [
   {
     path: "/qatar/find-customer",
     element: FindCustomer,
+    private: true
+  },
+  {
+    path: "/qatar/containers",
+    element: ContainerManagement,
     private: true
   }
 ];
