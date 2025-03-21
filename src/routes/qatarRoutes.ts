@@ -60,6 +60,7 @@ export const qatarRoutes: RouteConfig[] = [
   {
     path: "/qatar/containers",
     element: ContainerManagement,
-    private: true
+    private: true,
+    requiredFile: "container"
   }
 ];

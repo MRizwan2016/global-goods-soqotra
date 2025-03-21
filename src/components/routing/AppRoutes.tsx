@@ -18,7 +18,7 @@ const AppRoutes = () => {
               element={
                 <PrivateRouteWrapper
                   requireAdmin={route.path.includes('/admin')} 
-                  requiredFile={route.requiredFile as any}
+                  requiredFile={route.requiredFile}
                   requiredPermission={route.requiredPermission}
                 >
                   <RouteElement />
@@ -49,7 +49,7 @@ const PrivateRouteWrapper = ({
 }: { 
   children: React.ReactNode; 
   requireAdmin?: boolean; 
-  requiredFile?: any;
+  requiredFile?: string;
   requiredPermission?: string;
 }) => {
   const location = useLocation();
