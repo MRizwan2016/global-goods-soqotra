@@ -5,7 +5,7 @@ import { QatarJob } from "../types/jobTypes";
 export const useJobFiltering = (jobs: QatarJob[]) => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
-  const [filterDate, setFilterDate] = useState<Date | undefined>(new Date());
+  const [filterDate, setFilterDate] = useState<string>(new Date().toISOString().split('T')[0]);
   
   // Filtered and sorted jobs
   const filteredJobs = useMemo(() => {
