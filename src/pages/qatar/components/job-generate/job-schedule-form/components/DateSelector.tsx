@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
@@ -23,7 +23,7 @@ const DateSelector: React.FC<DateSelectorProps> = ({ selectedDate, onDateChange 
   // Handle date selection from calendar
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
-      // Convert back to ISO string format and pass to parent
+      // Convert to ISO string format and pass to parent
       onDateChange(date.toISOString().split('T')[0]);
     }
   };
