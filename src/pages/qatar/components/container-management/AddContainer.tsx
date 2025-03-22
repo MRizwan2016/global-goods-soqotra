@@ -17,6 +17,7 @@ import { QatarContainer } from "../../types/containerTypes";
 import { containerTypes, directionTypes, getNextRunningNumber, mockContainers, sectors } from "../../data/mockContainers";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
+import ShippingLineSelector from "./ShippingLineSelector";
 
 interface AddContainerProps {
   onContainerCreated: () => void;
@@ -33,10 +34,11 @@ const AddContainer: React.FC<AddContainerProps> = ({ onContainerCreated, onCance
   const [weight, setWeight] = useState("0");
   const [etd, setEtd] = useState("");
   const [eta, setEta] = useState("");
+  const [shippingLine, setShippingLine] = useState("");
   
   const handleSave = () => {
     // Validation
-    if (!sector || !containerNumber || !sealNumber || !containerType || !direction || !etd || !eta) {
+    if (!sector || !containerNumber || !sealNumber || !containerType || !direction || !etd || !eta || !shippingLine) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -54,7 +56,8 @@ const AddContainer: React.FC<AddContainerProps> = ({ onContainerCreated, onCance
       loadDate: new Date().toLocaleDateString("en-GB"),
       weight: parseFloat(weight),
       status: "NEW",
-      sector
+      sector,
+      shippingLine
     };
     
     // Add to mock data (in real app would save to backend)
@@ -141,6 +144,11 @@ const AddContainer: React.FC<AddContainerProps> = ({ onContainerCreated, onCance
                 onChange={(e) => setWeight(e.target.value)}
               />
             </div>
+            
+            <ShippingLineSelector 
+              value={shippingLine}
+              onChange={setShippingLine}
+            />
           </div>
           
           <div>
