@@ -73,7 +73,7 @@ const ShippingLineSelector: React.FC<ShippingLineSelectorProps> = ({
     <div className="mb-4">
       <Label htmlFor="shippingLine" className="font-bold text-gray-700 mb-1 block">SHIPPING LINE:</Label>
       <div className="flex gap-2">
-        <Select value={value} onValueChange={onChange} className="flex-1">
+        <Select value={value} onValueChange={onChange}>
           <SelectTrigger 
             id="shippingLine" 
             className="bg-blue-500 text-white font-semibold border-0 hover:bg-blue-600 transition-colors"
