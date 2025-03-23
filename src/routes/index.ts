@@ -1,32 +1,38 @@
 
-import { RouteConfig } from "./types";
-import { authRoutes } from "./authRoutes";
-import { mainRoutes } from "./mainRoutes";
-import { adminRoutes } from "./adminRoutes";
-import { invoiceRoutes } from "./invoiceRoutes";
+import { dataEntryRoutes } from "./dataEntryRoutes";
+import { masterDataRoutes } from "./masterDataRoutes";
+import { reportsRoutes } from "./reportsRoutes";
 import { kenyaRoutes } from "./kenyaRoutes";
 import { qatarRoutes } from "./qatarRoutes";
-import { ladingRoutes } from "./ladingRoutes";
-import { reportsRoutes } from "./reportsRoutes";
 import { accountsRoutes } from "./accountsRoutes";
-import { masterRoutes } from "./masterRoutes";
-import { sellingRatesRoutes } from "./sellingRatesRoutes";
-import { printDocumentsRoutes } from "./printDocumentsRoutes";
-import { paymentReceivableRoutes } from "./paymentReceivableRoutes";
+import { adminRoutes } from "./adminRoutes";
+import { authRoutes } from "./authRoutes";
+import { RouteConfig } from "./types";
+import Dashboard from "@/pages/Dashboard";
 
-// Combine all routes into a single array
+const appRoutes: RouteConfig[] = [
+  {
+    path: "/",
+    element: Dashboard,
+    private: true
+  },
+  {
+    path: "/dashboard",
+    element: Dashboard,
+    private: true
+  }
+];
+
+// Make sure the route for invoice printing is given a higher priority (placed earlier in the array)
+// to avoid potential conflicts with the admin routes
 export const routes: RouteConfig[] = [
   ...authRoutes,
-  ...mainRoutes,
-  ...adminRoutes,
-  ...invoiceRoutes,
+  ...dataEntryRoutes,  // Move data entry routes earlier so the print route isn't conflicting
+  ...appRoutes,
+  ...masterDataRoutes,
+  ...reportsRoutes,
   ...kenyaRoutes,
   ...qatarRoutes,
-  ...ladingRoutes,
-  ...reportsRoutes,
   ...accountsRoutes,
-  ...masterRoutes,
-  ...sellingRatesRoutes,
-  ...printDocumentsRoutes,
-  ...paymentReceivableRoutes
+  ...adminRoutes,
 ];

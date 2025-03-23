@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Package, 
@@ -22,6 +22,21 @@ import InvoiceAssignment from "./components/container-management/invoice-assignm
 const ContainerManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("list");
   const [selectedContainerId, setSelectedContainerId] = useState<string | null>(null);
+  
+  // Add event listener for tab changes
+  useEffect(() => {
+    const handleTabChange = (event: CustomEvent) => {
+      if (event.detail && event.detail.tab) {
+        setActiveTab(event.detail.tab);
+      }
+    };
+    
+    document.addEventListener('changeContainerTab', handleTabChange as EventListener);
+    
+    return () => {
+      document.removeEventListener('changeContainerTab', handleTabChange as EventListener);
+    };
+  }, []);
   
   const handleContainerSelect = (containerId: string) => {
     setSelectedContainerId(containerId);

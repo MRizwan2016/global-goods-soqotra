@@ -25,7 +25,7 @@ const PrintShipperConsignee = ({
         <div>{shipper2 || "-"}</div>
         <div>-</div>
         <div>THUMAMA, DOHA</div>
-        <div className="mt-1">Mobile: {shipperMobile || "-"}</div>
+        <div className="mt-1 font-semibold">Mobile: {shipperMobile || "+974 1234 5678"}</div>
       </div>
       
       {/* Consignee */}
@@ -36,7 +36,7 @@ const PrintShipperConsignee = ({
         <div>KOTADENIYA</div>
         <div>DANOWITA, SRI LANKA</div>
         <div>PASSPORT NO : {consigneeIdNumber || "OL7449595"}</div>
-        <div className="mt-1">Mobile: {consigneeMobile || "-"}</div>
+        <div className="mt-1 font-semibold">Mobile: {consigneeMobile || "+94 7765 43210"}</div>
       </div>
     </div>
   );

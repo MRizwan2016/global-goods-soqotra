@@ -25,8 +25,17 @@ const ContainerActionsBar: React.FC<ContainerActionsBarProps> = ({
   const navigate = useNavigate();
   
   const handleAddNew = () => {
-    // Navigate to add container page
-    navigate("/qatar/container-management/add");
+    // Fix the navigation path to use the proper path
+    navigate("/qatar/containers");
+    
+    // Use a short timeout to ensure state is updated before changing tabs
+    setTimeout(() => {
+      // Use the parent component's tab change mechanism
+      const tabsEvent = new CustomEvent('changeContainerTab', { 
+        detail: { tab: 'add' } 
+      });
+      document.dispatchEvent(tabsEvent);
+    }, 10);
   };
 
   return (

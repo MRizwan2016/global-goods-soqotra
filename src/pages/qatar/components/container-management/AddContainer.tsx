@@ -14,10 +14,44 @@ import {
 } from "@/components/ui/select";
 import { PlusCircle, PackageCheck, ArrowLeft } from "lucide-react";
 import { QatarContainer } from "../../types/containerTypes";
-import { containerTypes, directionTypes, getNextRunningNumber, mockContainers, sectors } from "../../data/mockContainers";
+import { containerTypes, directionTypes, getNextRunningNumber, mockContainers } from "../../data/mockContainers";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import ShippingLineSelector from "./ShippingLineSelector";
+
+// Update the sectors constant with additional countries
+const sectors = [
+  { id: "DOHA", name: "DOHA" },
+  { id: "SAUDI ARABIA", name: "SAUDI ARABIA" },
+  { id: "OMAN", name: "OMAN" },
+  { id: "UGANDA", name: "UGANDA" },
+  { id: "KENYA", name: "KENYA" },
+  { id: "TUNISIA", name: "TUNISIA" },
+  { id: "ERITREA", name: "ERITREA" },
+  { id: "SUDAN", name: "SUDAN" },
+  { id: "SOMALIA", name: "SOMALIA" },
+  { id: "ETHIOPIA", name: "ETHIOPIA" }
+];
+
+// Update direction types with additional destinations
+const destinations = [
+  { id: "DIRECT", name: "DIRECT" },
+  { id: "MIX", name: "MIX" },
+  { id: "MOMBASA CFS", name: "MOMBASA CFS" },
+  { id: "NAIROBI CFS", name: "NAIROBI CFS" },
+  { id: "ASMARA CFS", name: "ASMARA CFS" },
+  { id: "HARGEISA CFS", name: "HARGEISA CFS" },
+  { id: "BERBARA CFS", name: "BERBARA CFS" },
+  { id: "PORT SUDAN", name: "PORT SUDAN" },
+  { id: "TUNIS CFS", name: "TUNIS CFS" },
+  { id: "ADDIS ABABA", name: "ADDIS ABABA" },
+  { id: "KAMPALA CFS", name: "KAMPALA CFS" },
+  { id: "SOHAR CFS", name: "SOHAR CFS" },
+  { id: "DAMMAM CFS", name: "DAMMAM CFS" },
+  { id: "RIYADH CFS", name: "RIYADH CFS" },
+  { id: "JEDDAH CFS", name: "JEDDAH CFS" },
+  { id: "GALLE CFS", name: "GALLE CFS" }
+];
 
 interface AddContainerProps {
   onContainerCreated: () => void;
@@ -185,7 +219,7 @@ const AddContainer: React.FC<AddContainerProps> = ({ onContainerCreated, onCance
                   <SelectValue placeholder="Select Direction" />
                 </SelectTrigger>
                 <SelectContent className="max-h-[200px] bg-white z-50">
-                  {directionTypes.map(direction => (
+                  {destinations.map(direction => (
                     <SelectItem 
                       key={direction.id} 
                       value={direction.id}

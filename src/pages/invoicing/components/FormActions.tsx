@@ -1,76 +1,77 @@
 
 import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Save, Printer, Eye } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 
 interface FormActionsProps {
   handleSave: () => void;
-  isValid?: boolean;
   invoiceId?: string;
 }
 
-const FormActions: React.FC<FormActionsProps> = ({ 
-  handleSave, 
-  isValid = true,
-  invoiceId
-}) => {
+const FormActions: React.FC<FormActionsProps> = ({ handleSave, invoiceId }) => {
   const navigate = useNavigate();
   
-  const handlePrintPreview = () => {
-    if (!invoiceId) {
-      toast.info("Please save the invoice first to preview or print it");
-      return;
+  const handlePrint = () => {
+    if (invoiceId) {
+      // Navigate to the print page with the invoice ID
+      navigate(`/data-entry/invoicing/print/${invoiceId}?mode=invoice`);
     }
-    
-    // Open in new tab but stay within the same session
-    const printUrl = `/data-entry/invoicing/print/${invoiceId}`;
-    window.open(printUrl, '_blank');
   };
   
-  const handleInvoicePreview = () => {
-    if (!invoiceId) {
-      toast.info("Please save the invoice first to preview it");
-      return;
+  const handlePreview = () => {
+    if (invoiceId) {
+      // Open preview in a new tab
+      window.open(`/data-entry/invoicing/print/${invoiceId}?mode=invoice`, "_blank");
     }
-    
-    // Navigate to preview page
-    navigate(`/data-entry/invoicing/preview/${invoiceId}`);
   };
-
+  
   return (
-    <div className="flex justify-end gap-3 mt-8 mb-4">
-      <Button
-        type="button"
-        variant="default"
-        disabled={!isValid}
-        onClick={handleSave}
-        className="bg-green-600 hover:bg-green-700"
-      >
-        <Save className="mr-2 h-4 w-4" />
-        Save Invoice
-      </Button>
+    <div className="flex justify-between mt-6 border-t pt-4">
+      <div>
+        <Button 
+          type="button"
+          variant="outline" 
+          onClick={() => navigate("/data-entry/invoicing")}
+        >
+          Back to List
+        </Button>
+      </div>
       
-      <Button
-        type="button"
-        variant="outline"
-        onClick={handleInvoicePreview}
-        className="border-gray-300"
-      >
-        <Eye className="mr-2 h-4 w-4" />
-        Preview Invoice
-      </Button>
-      
-      <Button
-        type="button"
-        variant="outline"
-        onClick={handlePrintPreview}
-        className="border-gray-300"
-      >
-        <Printer className="mr-2 h-4 w-4" />
-        Print Invoice
-      </Button>
+      <div className="flex gap-2">
+        {invoiceId && (
+          <>
+            <Button 
+              type="button"
+              variant="outline" 
+              className="flex items-center gap-2" 
+              onClick={handlePreview}
+            >
+              <Eye size={16} />
+              Preview
+            </Button>
+            
+            <Button 
+              type="button"
+              variant="outline" 
+              className="flex items-center gap-2" 
+              onClick={handlePrint}
+            >
+              <Printer size={16} />
+              Print
+            </Button>
+          </>
+        )}
+        
+        <Button 
+          type="button"
+          className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2" 
+          onClick={handleSave}
+        >
+          <Save size={16} />
+          Save
+        </Button>
+      </div>
     </div>
   );
 };
