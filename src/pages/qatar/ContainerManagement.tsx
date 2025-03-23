@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -16,6 +17,7 @@ import AddContainer from "./components/container-management/AddContainer";
 import LoadContainerDetails from "./components/container-management/LoadContainerDetails";
 import ContainerManifest from "./components/container-management/ContainerManifest";
 import { toast } from "sonner";
+import InvoiceAssignment from "./components/container-management/invoice-assignment/InvoiceAssignment";
 
 const ContainerManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("list");
@@ -49,9 +51,21 @@ const ContainerManagement: React.FC = () => {
 
   return (
     <div className="container py-6 mx-auto animate-fade-in">
-      <div className="mb-6 flex items-center">
-        <ShipIcon size={32} className="mr-3 text-soqotra-blue" />
-        <h1 className="text-3xl font-bold text-gray-800">Container Management</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center">
+          <ShipIcon size={32} className="mr-3 text-soqotra-blue" />
+          <h1 className="text-3xl font-bold text-gray-800">Container Management</h1>
+        </div>
+        
+        {activeTab === "list" && (
+          <Button 
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+            onClick={() => setActiveTab("add")}
+          >
+            <PlusCircle size={18} />
+            Add New Container
+          </Button>
+        )}
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -110,25 +124,7 @@ const ContainerManagement: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="invoices" className="space-y-4">
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-semibold mb-4">Batch Invoice Assignment</h2>
-            <p className="text-gray-600 mb-6">
-              Assign invoice numbers to container cargo items and manage unsettled invoices.
-              Invoice numbers will be automatically generated starting from GY 13136051.
-            </p>
-            
-            <div className="flex justify-end">
-              <Button 
-                className="bg-green-600 hover:bg-green-700"
-                onClick={() => {
-                  toast.success("All missing invoices have been assigned numbers");
-                }}
-              >
-                <FilePlus className="mr-2 h-4 w-4" />
-                Assign All Missing Invoice Numbers
-              </Button>
-            </div>
-          </div>
+          <InvoiceAssignment />
         </TabsContent>
       </Tabs>
     </div>

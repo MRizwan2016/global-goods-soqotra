@@ -43,6 +43,17 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
     }
   }, [formState.invoiceNumber, availableInvoices]);
 
+  // Add GY invoice numbers if not present
+  const enhancedInvoices = formState.invoiceNumber && !availableInvoices.length
+    ? [{ invoiceNumber: formState.invoiceNumber, bookNumber: "DEFAULT", assignedTo: "System" }]
+    : availableInvoices.length 
+      ? availableInvoices 
+      : Array.from({ length: 10 }, (_, i) => ({
+          invoiceNumber: `GY ${(13136051 + i).toString()}`,
+          bookNumber: "DEFAULT",
+          assignedTo: "System"
+        }));
+
   return (
     <div className="space-y-2">
       <Label>Invoice Number</Label>
@@ -50,7 +61,7 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
         {isEditing ? (
           <Input
             name="invoiceNumber"
-            value={formState.invoiceNumber}
+            value={formState.invoiceNumber || ""}
             readOnly={true}
             className="w-full"
           />
@@ -64,7 +75,7 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
               <SelectValue placeholder="Select invoice number" />
             </SelectTrigger>
             <SelectContent>
-              {availableInvoices.map(invoice => (
+              {enhancedInvoices.map((invoice: any) => (
                 <SelectItem key={invoice.invoiceNumber} value={invoice.invoiceNumber}>
                   {invoice.invoiceNumber} (Book {invoice.bookNumber})
                   {invoice.assignedTo && ` - ${invoice.assignedTo}`}

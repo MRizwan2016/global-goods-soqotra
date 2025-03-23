@@ -29,7 +29,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             <InvoiceTableHead className="w-16">Num</InvoiceTableHead>
             <InvoiceTableHead className="w-20">Modify</InvoiceTableHead>
             <InvoiceTableHead className="w-28">Inv. Date</InvoiceTableHead>
-            <InvoiceTableHead>Customer</InvoiceTableHead>
+            <InvoiceTableHead className="w-28">Inv. Number</InvoiceTableHead>
             <InvoiceTableHead>Shipper</InvoiceTableHead>
             <InvoiceTableHead>Consignee</InvoiceTableHead>
             <InvoiceTableHead className="w-16">S/A</InvoiceTableHead>

@@ -15,19 +15,12 @@ import { toast } from "sonner";
 import { ContainerCargo } from "../../../types/containerTypes";
 import { v4 as uuidv4 } from "uuid";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { mockInvoiceData } from "@/data/mockData";
 
 interface CargoSearchFormProps {
   containerId: string;
   onAddCargo: (cargo: ContainerCargo) => void;
 }
-
-// Mock data for invoice autocomplete - in a real app would come from API
-const mockInvoices = [
-  { invoiceNumber: "GY 13136051", items: [{ name: "Books and Documents", weight: 12.5, volume: 0.12 }] },
-  { invoiceNumber: "GY 13136052", items: [{ name: "Electronics", weight: 8.3, volume: 0.08 }] },
-  { invoiceNumber: "GY 13136053", items: [{ name: "Clothing", weight: 5.2, volume: 0.05 }] },
-  { invoiceNumber: "GY 13136054", items: [{ name: "Household Items", weight: 15.7, volume: 0.17 }] }
-];
 
 const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
   containerId,
@@ -51,10 +44,22 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
     return `BC${timestamp}`;
   };
 
+  // Enhanced mock invoices using real invoice data
+  const enhancedMockInvoices = mockInvoiceData.map(invoice => ({
+    invoiceNumber: invoice.invoiceNumber || `GY ${Math.floor(13136051 + Math.random() * 1000)}`,
+    items: [{
+      name: "Package " + invoice.packages,
+      weight: invoice.weight || 10,
+      volume: invoice.volume || 0.1
+    }],
+    shipper: invoice.shipper1,
+    consignee: invoice.consignee1
+  }));
+
   useEffect(() => {
-    if (bookingForm.length >= 4) {
+    if (bookingForm.length >= 2) {
       // Filter invoices that match the input
-      const filtered = mockInvoices.filter(invoice => 
+      const filtered = enhancedMockInvoices.filter(invoice => 
         invoice.invoiceNumber.toUpperCase().includes(bookingForm.toUpperCase())
       );
       setBookingFormSuggestions(filtered);
@@ -73,10 +78,17 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
     if (invoice.items && invoice.items.length > 0) {
       const item = invoice.items[0];
       setPackageName(item.name);
-      // You can auto-fill other fields as needed
+      setShipper(invoice.shipper || "");
     }
     
     toast.success(`Invoice ${invoice.invoiceNumber} selected`);
+  };
+
+  const handleBarcodeSearch = () => {
+    if (barcode) {
+      // Find invoice by barcode in a real app
+      toast.info(`Searching for barcode: ${barcode}`);
+    }
   };
 
   const handleInsertCargo = () => {
@@ -97,7 +109,7 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
       volume: currentInvoiceData?.items?.[0]?.volume || 0.1,
       weight: currentInvoiceData?.items?.[0]?.weight || 10,
       shipper,
-      consignee: shipper,
+      consignee: currentInvoiceData?.consignee || shipper,
       wh: "K",
       d2d: false
     };
@@ -138,7 +150,7 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
                   <Input
                     value={bookingForm}
                     onChange={(e) => setBookingForm(e.target.value)}
-                    placeholder="Enter booking form number"
+                    placeholder="Enter invoice number (GY 13136051)"
                     className="w-full"
                   />
                 </div>
@@ -151,13 +163,17 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
                       className="p-2 hover:bg-gray-100 cursor-pointer"
                       onClick={() => handleSelectInvoice(invoice)}
                     >
-                      {invoice.invoiceNumber}
+                      {invoice.invoiceNumber} - {invoice.shipper}
                     </div>
                   ))}
                 </div>
               </PopoverContent>
             </Popover>
-            <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
+            <Button 
+              variant="default" 
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={() => toast.info("Searching for invoice...")}
+            >
               <Search size={18} />
             </Button>
           </div>
@@ -174,6 +190,13 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
             placeholder="BARCODE"
             className="flex-1"
           />
+          <Button 
+            variant="outline"
+            className="border-blue-500 text-blue-500"
+            onClick={handleBarcodeSearch}
+          >
+            <Search size={18} />
+          </Button>
         </div>
       </div>
       

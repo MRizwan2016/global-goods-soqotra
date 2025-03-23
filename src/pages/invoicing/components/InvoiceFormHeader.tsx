@@ -15,7 +15,7 @@ const InvoiceFormHeader: React.FC<InvoiceFormHeaderProps> = ({ isEditing }) => {
 
   const handlePrint = () => {
     if (id) {
-      window.open(`/data-entry/invoicing/print/${id}`, '_blank');
+      navigate(`/data-entry/invoicing/print/${id}`);
     } else {
       toast.error("Please save the invoice first before printing");
     }

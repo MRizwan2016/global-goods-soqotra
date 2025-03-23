@@ -1,8 +1,9 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Edit, Trash, Eye, Printer } from "lucide-react";
 import { TableRow, InvoiceTableCell } from "@/components/ui/table";
+import { toast } from "sonner";
 
 interface InvoiceRowProps {
   item: any;
@@ -17,10 +18,18 @@ const InvoiceTableRow: React.FC<InvoiceRowProps> = ({
   indexOffset,
   onPrint
 }) => {
+  const navigate = useNavigate();
+
   const handlePrintClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     onPrint(item.id);
+  };
+
+  const handleViewClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    navigate(`/data-entry/invoicing/preview/${item.id}`);
   };
 
   return (
@@ -32,7 +41,7 @@ const InvoiceTableRow: React.FC<InvoiceRowProps> = ({
         </Link>
       </InvoiceTableCell>
       <InvoiceTableCell>{item.date}</InvoiceTableCell>
-      <InvoiceTableCell>{item.customer}</InvoiceTableCell>
+      <InvoiceTableCell className="font-medium text-blue-700">{item.invoiceNumber || "-"}</InvoiceTableCell>
       <InvoiceTableCell>{item.shipper1}</InvoiceTableCell>
       <InvoiceTableCell>{item.consignee1}</InvoiceTableCell>
       <InvoiceTableCell className="text-center">{item.salesAgent}</InvoiceTableCell>
@@ -49,10 +58,10 @@ const InvoiceTableRow: React.FC<InvoiceRowProps> = ({
       <InvoiceTableCell className="text-right">{item.statusCharge}</InvoiceTableCell>
       <InvoiceTableCell className="text-right">{item.offerDiscount}</InvoiceTableCell>
       <InvoiceTableCell className="text-center">
-        <Trash size={16} className="text-red-500 inline-block cursor-pointer" />
+        <Trash size={16} className="text-red-500 inline-block cursor-pointer" onClick={() => toast.error("Delete functionality not implemented")} />
       </InvoiceTableCell>
       <InvoiceTableCell className="text-center">
-        <Eye size={16} className="text-green-500 inline-block cursor-pointer" />
+        <Eye size={16} className="text-green-500 inline-block cursor-pointer" onClick={handleViewClick} />
       </InvoiceTableCell>
       <InvoiceTableCell className="text-center">
         <Printer 
