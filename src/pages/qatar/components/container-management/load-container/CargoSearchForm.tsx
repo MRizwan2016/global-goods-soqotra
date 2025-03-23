@@ -1,21 +1,14 @@
 
 import React, { useState, useEffect } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Barcode, Plus, Search } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { toast } from "sonner";
 import { ContainerCargo } from "../../../types/containerTypes";
 import { v4 as uuidv4 } from "uuid";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { mockInvoiceData } from "@/data/mockData";
+import SearchMethodSelector from "./cargo-search/SearchMethodSelector";
+import InvoiceSearchInput from "./cargo-search/InvoiceSearchInput";
+import BarcodeSearch from "./cargo-search/BarcodeSearch";
+import CargoDetailsInputs from "./cargo-search/CargoDetailsInputs";
+import InsertCargoButton from "./cargo-search/InsertCargoButton";
 
 interface CargoSearchFormProps {
   containerId: string;
@@ -35,7 +28,7 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
   const [packageName, setPackageName] = useState("");
   const [shipper, setShipper] = useState("");
   
-  // New state for current invoice data
+  // State for current invoice data
   const [currentInvoiceData, setCurrentInvoiceData] = useState<any>(null);
   
   // Generate a unique barcode if not provided
@@ -128,122 +121,38 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
   return (
     <div className="mt-6 space-y-3">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div>
-          <Label className="font-bold text-gray-700 mb-1 block">SEARCH BY:</Label>
-          <Select value={searchBy} onValueChange={setSearchBy}>
-            <SelectTrigger className="bg-blue-500 text-white">
-              <SelectValue placeholder="GY" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="GY">GY</SelectItem>
-              <SelectItem value="BARCODE">BARCODE</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <SearchMethodSelector 
+          searchBy={searchBy} 
+          onSearchMethodChange={setSearchBy} 
+        />
         
-        <div className="col-span-2">
-          <Label className="font-bold text-gray-700 mb-1 block">SEARCH BOOKING FORM:</Label>
-          <div className="flex gap-2 relative">
-            <Popover open={showSuggestions} onOpenChange={setShowSuggestions}>
-              <PopoverTrigger asChild>
-                <div className="flex-1 relative">
-                  <Input
-                    value={bookingForm}
-                    onChange={(e) => setBookingForm(e.target.value)}
-                    placeholder="Enter invoice number (GY 13136051)"
-                    className="w-full"
-                  />
-                </div>
-              </PopoverTrigger>
-              <PopoverContent className="w-full p-0" align="start">
-                <div className="max-h-[200px] overflow-y-auto">
-                  {bookingFormSuggestions.map((invoice) => (
-                    <div 
-                      key={invoice.invoiceNumber}
-                      className="p-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleSelectInvoice(invoice)}
-                    >
-                      {invoice.invoiceNumber} - {invoice.shipper}
-                    </div>
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-            <Button 
-              variant="default" 
-              className="bg-blue-600 hover:bg-blue-700"
-              onClick={() => toast.info("Searching for invoice...")}
-            >
-              <Search size={18} />
-            </Button>
-          </div>
-        </div>
-      </div>
-      
-      <div>
-        <Label className="font-bold text-gray-700 mb-1 block">SEARCH BARCODE:</Label>
-        <div className="flex gap-2 items-center">
-          <Barcode size={24} className="text-gray-700" />
-          <Input
-            value={barcode}
-            onChange={(e) => setBarcode(e.target.value)}
-            placeholder="BARCODE"
-            className="flex-1"
-          />
-          <Button 
-            variant="outline"
-            className="border-blue-500 text-blue-500"
-            onClick={handleBarcodeSearch}
-          >
-            <Search size={18} />
-          </Button>
-        </div>
-      </div>
-      
-      <div>
-        <Label className="font-bold text-gray-700 mb-1 block">BOOKING FORM:</Label>
-        <Input
-          value={bookingForm}
-          onChange={(e) => setBookingForm(e.target.value)}
-          className="bg-gray-100"
-          readOnly
+        <InvoiceSearchInput 
+          bookingForm={bookingForm}
+          onBookingFormChange={setBookingForm}
+          bookingFormSuggestions={bookingFormSuggestions}
+          showSuggestions={showSuggestions}
+          setShowSuggestions={setShowSuggestions}
+          onSelectInvoice={handleSelectInvoice}
         />
       </div>
       
-      <div>
-        <Label className="font-bold text-gray-700 mb-1 block">PACKAGE NUMBER:</Label>
-        <Input
-          value={packageNumber}
-          onChange={(e) => setPackageNumber(e.target.value)}
-        />
-      </div>
+      <BarcodeSearch 
+        barcode={barcode}
+        onBarcodeChange={setBarcode}
+        onBarcodeSearch={handleBarcodeSearch}
+      />
       
-      <div>
-        <Label className="font-bold text-gray-700 mb-1 block">PACKAGE NAME:</Label>
-        <Input
-          value={packageName}
-          onChange={(e) => setPackageName(e.target.value)}
-        />
-      </div>
+      <CargoDetailsInputs 
+        bookingForm={bookingForm}
+        packageNumber={packageNumber}
+        packageName={packageName}
+        shipper={shipper}
+        onPackageNumberChange={setPackageNumber}
+        onPackageNameChange={setPackageName}
+        onShipperChange={setShipper}
+      />
       
-      <div>
-        <Label className="font-bold text-gray-700 mb-1 block">SHIPPER:</Label>
-        <Input
-          value={shipper}
-          onChange={(e) => setShipper(e.target.value)}
-        />
-      </div>
-      
-      <div className="flex justify-center mt-4">
-        <Button 
-          variant="default" 
-          className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
-          onClick={handleInsertCargo}
-        >
-          <Plus size={18} />
-          Insert
-        </Button>
-      </div>
+      <InsertCargoButton onInsertCargo={handleInsertCargo} />
     </div>
   );
 };
