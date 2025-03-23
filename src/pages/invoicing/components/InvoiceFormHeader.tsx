@@ -1,8 +1,9 @@
 
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Printer } from "lucide-react";
+import { Printer, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface InvoiceFormHeaderProps {
   isEditing: boolean;
@@ -15,6 +16,16 @@ const InvoiceFormHeader: React.FC<InvoiceFormHeaderProps> = ({ isEditing }) => {
   const handlePrint = () => {
     if (id) {
       window.open(`/data-entry/invoicing/print/${id}`, '_blank');
+    } else {
+      toast.error("Please save the invoice first before printing");
+    }
+  };
+  
+  const handlePreview = () => {
+    if (id) {
+      navigate(`/data-entry/invoicing/preview/${id}`);
+    } else {
+      toast.error("Please save the invoice first before previewing");
     }
   };
 
@@ -25,14 +36,25 @@ const InvoiceFormHeader: React.FC<InvoiceFormHeaderProps> = ({ isEditing }) => {
       </h3>
       
       {isEditing && (
-        <Button 
-          onClick={handlePrint}
-          variant="outline"
-          className="flex items-center gap-2"
-        >
-          <Printer size={16} />
-          Print Invoice
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handlePreview}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Eye size={16} />
+            Preview Invoice
+          </Button>
+          
+          <Button 
+            onClick={handlePrint}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <Printer size={16} />
+            Print Invoice
+          </Button>
+        </div>
       )}
     </div>
   );

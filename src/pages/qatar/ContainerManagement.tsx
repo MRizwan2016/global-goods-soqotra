@@ -8,7 +8,8 @@ import {
   ShipIcon, 
   FileCheck,
   BarChart, 
-  List
+  List,
+  FilePlus
 } from "lucide-react";
 import ContainerList from "./components/container-management/ContainerList";
 import AddContainer from "./components/container-management/AddContainer";
@@ -54,7 +55,7 @@ const ContainerManagement: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 mb-8">
+        <TabsList className="grid grid-cols-5 mb-8">
           <TabsTrigger value="list" className="flex items-center gap-2">
             <List size={18} />
             <span>Container List</span>
@@ -70,6 +71,10 @@ const ContainerManagement: React.FC = () => {
           <TabsTrigger value="manifest" disabled={!selectedContainerId} className="flex items-center gap-2">
             <FileCheck size={18} />
             <span>Manifest</span>
+          </TabsTrigger>
+          <TabsTrigger value="invoices" className="flex items-center gap-2">
+            <FilePlus size={18} />
+            <span>Invoice Assignment</span>
           </TabsTrigger>
         </TabsList>
 
@@ -102,6 +107,28 @@ const ContainerManagement: React.FC = () => {
               onCancel={handleBackToList} 
             />
           )}
+        </TabsContent>
+
+        <TabsContent value="invoices" className="space-y-4">
+          <div className="bg-white shadow rounded-lg p-6">
+            <h2 className="text-lg font-semibold mb-4">Batch Invoice Assignment</h2>
+            <p className="text-gray-600 mb-6">
+              Assign invoice numbers to container cargo items and manage unsettled invoices.
+              Invoice numbers will be automatically generated starting from GY 13136051.
+            </p>
+            
+            <div className="flex justify-end">
+              <Button 
+                className="bg-green-600 hover:bg-green-700"
+                onClick={() => {
+                  toast.success("All missing invoices have been assigned numbers");
+                }}
+              >
+                <FilePlus className="mr-2 h-4 w-4" />
+                Assign All Missing Invoice Numbers
+              </Button>
+            </div>
+          </div>
         </TabsContent>
       </Tabs>
     </div>

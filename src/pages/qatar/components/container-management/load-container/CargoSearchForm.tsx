@@ -1,9 +1,9 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Barcode, Plus } from "lucide-react";
+import { Barcode, Plus, Search } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -14,22 +14,70 @@ import {
 import { toast } from "sonner";
 import { ContainerCargo } from "../../../types/containerTypes";
 import { v4 as uuidv4 } from "uuid";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface CargoSearchFormProps {
   containerId: string;
   onAddCargo: (cargo: ContainerCargo) => void;
 }
 
+// Mock data for invoice autocomplete - in a real app would come from API
+const mockInvoices = [
+  { invoiceNumber: "GY 13136051", items: [{ name: "Books and Documents", weight: 12.5, volume: 0.12 }] },
+  { invoiceNumber: "GY 13136052", items: [{ name: "Electronics", weight: 8.3, volume: 0.08 }] },
+  { invoiceNumber: "GY 13136053", items: [{ name: "Clothing", weight: 5.2, volume: 0.05 }] },
+  { invoiceNumber: "GY 13136054", items: [{ name: "Household Items", weight: 15.7, volume: 0.17 }] }
+];
+
 const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
   containerId,
   onAddCargo,
 }) => {
-  const [searchBy, setSearchBy] = React.useState("GY");
-  const [bookingForm, setBookingForm] = React.useState("");
-  const [barcode, setBarcode] = React.useState("");
-  const [packageNumber, setPackageNumber] = React.useState("");
-  const [packageName, setPackageName] = React.useState("");
-  const [shipper, setShipper] = React.useState("");
+  const [searchBy, setSearchBy] = useState("GY");
+  const [bookingForm, setBookingForm] = useState("");
+  const [bookingFormSuggestions, setBookingFormSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [barcode, setBarcode] = useState("");
+  const [packageNumber, setPackageNumber] = useState("");
+  const [packageName, setPackageName] = useState("");
+  const [shipper, setShipper] = useState("");
+  
+  // New state for current invoice data
+  const [currentInvoiceData, setCurrentInvoiceData] = useState<any>(null);
+  
+  // Generate a unique barcode if not provided
+  const generateBarcode = () => {
+    const timestamp = new Date().getTime().toString().slice(-8);
+    return `BC${timestamp}`;
+  };
+
+  useEffect(() => {
+    if (bookingForm.length >= 4) {
+      // Filter invoices that match the input
+      const filtered = mockInvoices.filter(invoice => 
+        invoice.invoiceNumber.toUpperCase().includes(bookingForm.toUpperCase())
+      );
+      setBookingFormSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setShowSuggestions(false);
+    }
+  }, [bookingForm]);
+
+  const handleSelectInvoice = (invoice: any) => {
+    setBookingForm(invoice.invoiceNumber);
+    setCurrentInvoiceData(invoice);
+    setShowSuggestions(false);
+    
+    // Auto-fill package data if available
+    if (invoice.items && invoice.items.length > 0) {
+      const item = invoice.items[0];
+      setPackageName(item.name);
+      // You can auto-fill other fields as needed
+    }
+    
+    toast.success(`Invoice ${invoice.invoiceNumber} selected`);
+  };
 
   const handleInsertCargo = () => {
     if (!packageName || !shipper) {
@@ -37,15 +85,17 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
       return;
     }
     
+    const generatedBarcode = barcode || generateBarcode();
+    
     const newCargoItem: ContainerCargo = {
       id: uuidv4(),
       containerId,
       invoiceNumber: bookingForm || "/00000000/N",
       lineNumber: "1",
-      barcode: barcode || undefined,
+      barcode: generatedBarcode,
       packageName,
-      volume: 0.1,
-      weight: 10,
+      volume: currentInvoiceData?.items?.[0]?.volume || 0.1,
+      weight: currentInvoiceData?.items?.[0]?.weight || 10,
       shipper,
       consignee: shipper,
       wh: "K",
@@ -58,6 +108,7 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
     setPackageName("");
     setShipper("");
     setBarcode("");
+    setCurrentInvoiceData(null);
     
     toast.success("Item added to cargo list");
   };
@@ -80,15 +131,34 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
         
         <div className="col-span-2">
           <Label className="font-bold text-gray-700 mb-1 block">SEARCH BOOKING FORM:</Label>
-          <div className="flex gap-2">
-            <Input
-              value={bookingForm}
-              onChange={(e) => setBookingForm(e.target.value)}
-              placeholder="Enter booking form number"
-              className="flex-1"
-            />
+          <div className="flex gap-2 relative">
+            <Popover open={showSuggestions} onOpenChange={setShowSuggestions}>
+              <PopoverTrigger asChild>
+                <div className="flex-1 relative">
+                  <Input
+                    value={bookingForm}
+                    onChange={(e) => setBookingForm(e.target.value)}
+                    placeholder="Enter booking form number"
+                    className="w-full"
+                  />
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" align="start">
+                <div className="max-h-[200px] overflow-y-auto">
+                  {bookingFormSuggestions.map((invoice) => (
+                    <div 
+                      key={invoice.invoiceNumber}
+                      className="p-2 hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleSelectInvoice(invoice)}
+                    >
+                      {invoice.invoiceNumber}
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
             <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
-              Insert
+              <Search size={18} />
             </Button>
           </div>
         </div>

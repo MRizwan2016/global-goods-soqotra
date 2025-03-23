@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Save, Printer } from "lucide-react";
+import { Save, Printer, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
@@ -42,6 +42,25 @@ const FormActions: React.FC<FormActionsProps> = ({
       navigate(printUrl);
     }
   };
+  
+  const handleInvoicePreview = () => {
+    if (!invoiceId) {
+      toast.info("Please save the invoice first to preview it");
+      return;
+    }
+    
+    // Check if the invoice exists
+    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const invoiceExists = invoices.some((inv: any) => inv.id === invoiceId);
+    
+    if (!invoiceExists) {
+      toast.error("Invoice not found. Please save the invoice first.");
+      return;
+    }
+    
+    // Navigate to preview page
+    navigate(`/data-entry/invoicing/preview/${invoiceId}`);
+  };
 
   return (
     <div className="flex justify-end gap-3 mt-8 mb-4">
@@ -59,11 +78,21 @@ const FormActions: React.FC<FormActionsProps> = ({
       <Button
         type="button"
         variant="outline"
+        onClick={handleInvoicePreview}
+        className="border-gray-300"
+      >
+        <Eye className="mr-2 h-4 w-4" />
+        Preview Invoice
+      </Button>
+      
+      <Button
+        type="button"
+        variant="outline"
         onClick={handlePrintPreview}
         className="border-gray-300"
       >
         <Printer className="mr-2 h-4 w-4" />
-        Preview Invoice
+        Print Invoice
       </Button>
     </div>
   );

@@ -62,5 +62,11 @@ export const qatarRoutes: RouteConfig[] = [
     element: ContainerManagement,
     private: true,
     requiredFile: "container"
+  },
+  {
+    path: "/qatar/container-invoices",
+    element: ContainerManagement,
+    private: true,
+    requiredFile: "container"
   }
 ];
