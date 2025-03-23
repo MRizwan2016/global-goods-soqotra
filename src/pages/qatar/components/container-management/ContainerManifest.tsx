@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileCheck } from "lucide-react";
+import { FileCheck, ArrowLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { 
@@ -16,6 +16,7 @@ import ManifestActionsBar from "./manifest/ManifestActionsBar";
 import ManifestTabsHeader from "./manifest/ManifestTabsHeader";
 import useContainerManifest from "./manifest/hooks/useContainerManifest";
 import TabsContentWrapper from "./manifest/TabsContentWrapper";
+import { Button } from "@/components/ui/button";
 
 interface ContainerManifestProps {
   containerId: string;
@@ -53,14 +54,25 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
   
   return (
     <Card className="shadow-md animate-fade-in">
-      <CardHeader className="bg-green-50 border-b">
-        <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
-          <FileCheck className="mr-2 text-green-600" size={22} />
-          Load Sea Cargo - Check & Confirm
-          <span className="ml-2 text-sm font-normal text-gray-600">
-            Running Number: {container.runningNumber} ## Container Number: ({container.containerNumber}) Record found.
-          </span>
-        </CardTitle>
+      <CardHeader className="bg-green-50 border-b flex justify-between items-center">
+        <div>
+          <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
+            <FileCheck className="mr-2 text-green-600" size={22} />
+            Load Sea Cargo - Check & Confirm
+            <span className="ml-2 text-sm font-normal text-gray-600">
+              Running Number: {container.runningNumber} ## Container Number: ({container.containerNumber}) Record found.
+            </span>
+          </CardTitle>
+        </div>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={onCancel}
+          className="flex items-center gap-1"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back
+        </Button>
       </CardHeader>
       
       <CardContent className="p-6">

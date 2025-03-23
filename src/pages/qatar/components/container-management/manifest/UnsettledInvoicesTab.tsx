@@ -23,7 +23,16 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
 }) => {
   const handleAssignNumber = (invoiceId: string) => {
     // This would update the invoice in a real app
-    toast.success("Invoice number assigned");
+    toast.success(`Invoice number assigned to ID: ${invoiceId}`);
+  };
+  
+  const handleAssignAllMissing = () => {
+    const missingCount = unsettledInvoices.filter(inv => !inv.invoiceNumber).length;
+    if (missingCount > 0) {
+      toast.success(`${missingCount} missing invoices have been assigned numbers`);
+    } else {
+      toast.info("No missing invoice numbers to assign");
+    }
   };
 
   return (
@@ -35,7 +44,7 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
       <div className="flex justify-end mb-4">
         <Button 
           className="bg-green-600 hover:bg-green-700"
-          onClick={() => toast.success("All missing invoices have been assigned numbers")}
+          onClick={handleAssignAllMissing}
         >
           <FilePlus className="mr-2 h-4 w-4" />
           Assign All Missing Invoice Numbers

@@ -24,37 +24,14 @@ const FormActions: React.FC<FormActionsProps> = ({
       return;
     }
     
-    // Check if the invoice exists in localStorage
-    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    const invoiceExists = invoices.some((inv: any) => inv.id === invoiceId);
-    
-    if (!invoiceExists) {
-      toast.error("Invoice not found. Please save the invoice again before printing.");
-      return;
-    }
-    
     // Open in new tab but stay within the same session
     const printUrl = `/data-entry/invoicing/print/${invoiceId}`;
-    const newWindow = window.open(printUrl, '_blank');
-    
-    // If popup blocked or failed to open, navigate in same window
-    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-      navigate(printUrl);
-    }
+    window.open(printUrl, '_blank');
   };
   
   const handleInvoicePreview = () => {
     if (!invoiceId) {
       toast.info("Please save the invoice first to preview it");
-      return;
-    }
-    
-    // Check if the invoice exists
-    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    const invoiceExists = invoices.some((inv: any) => inv.id === invoiceId);
-    
-    if (!invoiceExists) {
-      toast.error("Invoice not found. Please save the invoice first.");
       return;
     }
     

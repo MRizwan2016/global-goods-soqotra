@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 import ContainerFilters from "./ContainerFilters";
 import ContainerSearch from "./ContainerSearch";
 
@@ -21,6 +22,13 @@ const ContainerActionsBar: React.FC<ContainerActionsBarProps> = ({
   searchTerm,
   setSearchTerm
 }) => {
+  const navigate = useNavigate();
+  
+  const handleAddNew = () => {
+    // Navigate to add container page
+    navigate("/qatar/container-management/add");
+  };
+
   return (
     <div className="flex flex-wrap gap-4 justify-between mb-4">
       <ContainerFilters 
@@ -31,7 +39,11 @@ const ContainerActionsBar: React.FC<ContainerActionsBarProps> = ({
       />
       
       <div className="flex items-center gap-4">
-        <Button variant="default" className="bg-blue-600 hover:bg-blue-700">
+        <Button 
+          variant="default" 
+          className="bg-blue-600 hover:bg-blue-700"
+          onClick={handleAddNew}
+        >
           Add New
         </Button>
         <ContainerSearch
