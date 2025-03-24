@@ -26,7 +26,11 @@ const PrintControls: React.FC<PrintControlsProps> = ({
       </Button>
       <div className="text-xl font-bold flex-1 text-center">{title}</div>
       <Button
-        onClick={handlePrint}
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handlePrint();
+        }}
         className="flex items-center bg-blue-500 hover:bg-blue-600"
       >
         <Printer className="mr-2 h-4 w-4" />

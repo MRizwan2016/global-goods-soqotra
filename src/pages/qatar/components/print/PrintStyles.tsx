@@ -40,6 +40,7 @@ const PrintStyles: React.FC = () => {
           html, body {
             width: 297mm; /* A4 width in landscape */
             height: 210mm; /* A4 height in landscape */
+            overflow: visible !important;
           }
           .company-name {
             font-weight: bold;
@@ -52,6 +53,12 @@ const PrintStyles: React.FC = () => {
           img {
             display: block !important;
             visibility: visible !important;
+          }
+          a[href]:after {
+            content: none !important;
+          }
+          button {
+            display: none !important;
           }
         }
       `}

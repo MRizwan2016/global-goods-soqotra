@@ -25,9 +25,15 @@ const ScheduleContainer: React.FC<ScheduleContainerProps> = ({
     }
   };
   
-  const handlePrint = () => {
+  const handlePrint = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     // Validate the schedule data before printing
     if (validateScheduleData(scheduleData)) {
+      // Use the browser's print function directly
       window.print();
     }
   };

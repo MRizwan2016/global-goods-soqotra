@@ -43,12 +43,13 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
   const enhancedMockInvoices = mockInvoiceData.map(invoice => ({
     invoiceNumber: invoice.invoiceNumber || `GY ${Math.floor(13136051 + Math.random() * 1000)}`,
     items: [{
-      name: "Package " + invoice.packages,
+      name: invoice.packageType || "Wooden Box", // Use the actual package type from invoice
       weight: invoice.weight || 10,
       volume: invoice.volume || 0.1
     }],
     shipper: invoice.shipper1,
-    consignee: invoice.consignee1
+    consignee: invoice.consignee1,
+    packageType: invoice.packageType // Store the original package type
   }));
 
   useEffect(() => {
@@ -69,10 +70,10 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
     setCurrentInvoiceData(invoice);
     setShowSuggestions(false);
     
-    // Auto-fill package data if available
+    // Auto-fill package data with proper package type
     if (invoice.items && invoice.items.length > 0) {
-      const item = invoice.items[0];
-      setPackageName(item.name);
+      // Use the package type from the invoice data
+      setPackageName(invoice.packageType || invoice.items[0].name || "Wooden Box");
       setShipper(invoice.shipper || "");
     }
     
@@ -93,6 +94,10 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
     }
     
     const generatedBarcode = barcode || generateBarcode();
+
+    // Ensure we're using the correct volume from the invoice
+    const invoiceVolume = currentInvoiceData?.items?.[0]?.volume;
+    const invoiceWeight = currentInvoiceData?.items?.[0]?.weight;
     
     const newCargoItem: ContainerCargo = {
       id: uuidv4(),
@@ -100,9 +105,9 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
       invoiceNumber: bookingForm || "/00000000/N",
       lineNumber: packageNumber || "1",
       barcode: generatedBarcode,
-      packageName,
-      volume: currentInvoiceData?.items?.[0]?.volume || 0.1,
-      weight: currentInvoiceData?.items?.[0]?.weight || 10,
+      packageName: packageName, // Use the package type as set
+      volume: typeof invoiceVolume === 'number' ? invoiceVolume : 0.1,
+      weight: typeof invoiceWeight === 'number' ? invoiceWeight : 10,
       shipper,
       consignee: currentInvoiceData?.consignee || shipper,
       wh: "K",
