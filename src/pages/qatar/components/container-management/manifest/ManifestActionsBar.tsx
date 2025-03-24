@@ -6,12 +6,26 @@ import { ArrowLeft, Printer, Save } from "lucide-react";
 interface ManifestActionsBarProps {
   onCancel: () => void;
   onConfirm: () => void;
+  onPrint?: () => void;
 }
 
 const ManifestActionsBar: React.FC<ManifestActionsBarProps> = ({
   onCancel,
   onConfirm,
+  onPrint
 }) => {
+  const handlePrintClick = (e: React.MouseEvent) => {
+    if (onPrint) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      // Add small delay before print to ensure the UI is ready
+      setTimeout(() => {
+        onPrint();
+      }, 50);
+    }
+  };
+  
   return (
     <div className="flex justify-between mt-6">
       <div className="flex gap-2">
@@ -37,6 +51,7 @@ const ManifestActionsBar: React.FC<ManifestActionsBarProps> = ({
       <Button 
         variant="default" 
         className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+        onClick={handlePrintClick}
       >
         <Printer size={16} />
         Print

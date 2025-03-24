@@ -9,6 +9,7 @@ import VehicleManagement from "@/pages/qatar/VehicleManagement";
 import DriverManagement from "@/pages/qatar/DriverManagement";
 import FindCustomer from "@/pages/qatar/FindCustomer";
 import ContainerManagement from "@/pages/qatar/ContainerManagement";
+import VesselManagement from "@/pages/qatar/VesselManagement";
 import { RouteConfig } from "./types";
 
 export const qatarRoutes: RouteConfig[] = [
@@ -60,6 +61,12 @@ export const qatarRoutes: RouteConfig[] = [
   {
     path: "/qatar/containers",
     element: ContainerManagement,
+    private: true,
+    requiredFile: "container"
+  },
+  {
+    path: "/qatar/vessels",
+    element: VesselManagement,
     private: true,
     requiredFile: "container"
   },
