@@ -1,123 +1,87 @@
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { mockInvoiceData } from "@/data/mockData";
-
-// Define a type for our invoice objects to help TypeScript
-interface Invoice {
-  id: string;
-  invoiceNumber: string;
-  date: string;
-  customer: string;
-  branch?: string;
-  sector?: string;
-  freightBy?: string;
-  doorToDoor?: boolean;
-  updatedAt?: string; // Make updatedAt optional since it may not exist in all invoices
-  [key: string]: any; // Allow other properties
-}
+import { toast } from "sonner";
 
 export const useInvoiceList = () => {
+  const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [invoiceData, setInvoiceData] = useState<Invoice[]>([]);
-  const entriesPerPage = 50;
-  const [branch, setBranch] = useState("ALL");
-  const [sector, setSector] = useState("ALL");
-  const [transport, setTransport] = useState("ALL");
-  const [door, setDoor] = useState("ALL");
+  const [branch, setBranch] = useState("all");
+  const [sector, setSector] = useState("all");
+  const [transport, setTransport] = useState("all");
+  const [door, setDoor] = useState("all");
   const [invoiceNumber, setInvoiceNumber] = useState("");
-
-  // Load invoice data from localStorage and merge with mock data
+  
+  const entriesPerPage = 10;
+  
+  const [invoices, setInvoices] = useState<any[]>([]);
+  
   useEffect(() => {
-    // Get data from localStorage
-    const storedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    
-    // Create a map of mockInvoiceData by ID for faster lookups
-    const mockDataMap = new Map(mockInvoiceData.map(item => [item.id, item]));
-    
-    // Create a map of stored invoices by ID
-    const storedInvoiceMap = new Map(storedInvoices.map((item: any) => [item.id, item]));
-    
-    // Merge the two sets of data, prioritizing stored invoices
-    const mergedData = [...mockInvoiceData];
-    
-    // Add or update stored invoices
-    storedInvoices.forEach((invoice: any) => {
-      if (mockDataMap.has(invoice.id)) {
-        // Update existing mock invoice with stored data
-        const index = mergedData.findIndex(item => item.id === invoice.id);
-        if (index !== -1) {
-          mergedData[index] = invoice;
-        }
+    // Load invoices from localStorage if available
+    try {
+      const storedInvoices = localStorage.getItem('invoices');
+      if (storedInvoices) {
+        const parsedInvoices = JSON.parse(storedInvoices);
+        setInvoices(parsedInvoices);
       } else {
-        // Add new invoices that don't exist in mock data
-        mergedData.push(invoice);
+        // Use mock data if no local storage data
+        setInvoices(mockInvoiceData);
       }
-    });
-    
-    // Sort by date instead of updatedAt since not all invoices have updatedAt
-    mergedData.sort((a, b) => {
-      // Get timestamps safely with type checking
-      const getTimestamp = (item: Invoice): number => {
-        if (item.updatedAt) {
-          return new Date(item.updatedAt).getTime();
-        } else if (item.date) {
-          return new Date(item.date).getTime();
-        }
-        return 0;
-      };
-      
-      const dateA = getTimestamp(a);
-      const dateB = getTimestamp(b);
-      
-      return dateB - dateA; // Sort in descending order (newest first)
-    });
-    
-    setInvoiceData(mergedData);
-    console.log("Loaded invoice data:", mergedData);
-  }, []);
-
-  const handlePrintInvoice = (invoiceId: string) => {
-    // Prevent event bubbling if this is being called from an event handler
-    if (window.event) {
-      window.event.stopPropagation?.();
-      window.event.preventDefault?.();
+    } catch (error) {
+      console.error("Error loading invoices:", error);
+      // Fallback to mock data
+      setInvoices(mockInvoiceData);
     }
+  }, []);
+  
+  const filteredData = invoices.filter((item) => {
+    // Filter by search text
+    const matchesSearch = 
+      searchText === "" || 
+      (item.consignee1 && item.consignee1.toLowerCase().includes(searchText.toLowerCase())) || 
+      (item.shipper1 && item.shipper1.toLowerCase().includes(searchText.toLowerCase())) ||
+      (item.invoiceNumber && item.invoiceNumber.toLowerCase().includes(searchText.toLowerCase()));
     
-    console.log("Opening print window for invoice ID:", invoiceId);
-    // Open in a new tab to avoid navigation issues
-    window.open(`/data-entry/invoicing/print/${invoiceId}`, '_blank');
-  };
-
-  const filteredData = invoiceData.filter(
-    (item) =>
-      (searchText === "" || 
-        item.id?.toLowerCase().includes(searchText.toLowerCase()) || 
-        item.invoiceNumber?.toLowerCase().includes(searchText.toLowerCase()) || 
-        item.customer?.toLowerCase().includes(searchText.toLowerCase())) &&
-      (branch === "ALL" || item.branch === branch) &&
-      (sector === "ALL" || item.sector === sector) &&
-      (transport === "ALL" || item.freightBy === transport) &&
-      (door === "ALL" || 
-        (door === "YES" && item.doorToDoor === true) || 
-        (door === "NO" && item.doorToDoor === false)) &&
-      (invoiceNumber === "" || item.invoiceNumber === invoiceNumber)
-  );
-
-  const totalPages = Math.ceil(filteredData.length / entriesPerPage);
+    // Filter by branch
+    const matchesBranch = branch === "all" || item.branch === branch;
+    
+    // Filter by sector
+    const matchesSector = sector === "all" || item.sector === sector;
+    
+    // Filter by transport
+    const matchesTransport = transport === "all" || item.transportType === transport;
+    
+    // Filter by door to door
+    const matchesDoor = door === "all" || 
+      (door === "yes" && item.doorToDoor === true) || 
+      (door === "no" && item.doorToDoor === false);
+    
+    // Filter by invoice number
+    const matchesInvoiceNumber = 
+      invoiceNumber === "" || 
+      (item.invoiceNumber && item.invoiceNumber.includes(invoiceNumber));
+    
+    return matchesSearch && matchesBranch && matchesSector && 
+      matchesTransport && matchesDoor && matchesInvoiceNumber;
+  });
+  
   const indexOfLastEntry = currentPage * entriesPerPage;
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
   const currentEntries = filteredData.slice(indexOfFirstEntry, indexOfLastEntry);
+  const totalPages = Math.ceil(filteredData.length / entriesPerPage);
   
-  // Get unique invoice numbers for the dropdown
-  const invoiceNumbers = [...new Set(invoiceData.map(i => i.invoiceNumber))];
-
+  const handlePrintInvoice = (id: string) => {
+    // Use the print-documents route for viewing the print preview
+    window.open(`/data-entry/print-documents/invoice-print/${id}`, '_blank');
+  };
+  
   return {
     searchText,
     setSearchText,
     currentPage,
     setCurrentPage,
-    entriesPerPage,
     branch,
     setBranch,
     sector,
@@ -134,6 +98,5 @@ export const useInvoiceList = () => {
     indexOfLastEntry,
     indexOfFirstEntry,
     currentEntries,
-    invoiceNumbers
   };
 };

@@ -7,6 +7,7 @@ import { qatarRoutes } from "./qatarRoutes";
 import { accountsRoutes } from "./accountsRoutes";
 import { adminRoutes } from "./adminRoutes";
 import { authRoutes } from "./authRoutes";
+import { printDocumentsRoutes } from "./printDocumentsRoutes";
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 
@@ -27,7 +28,8 @@ const appRoutes: RouteConfig[] = [
 // to avoid potential conflicts with the admin routes
 export const routes: RouteConfig[] = [
   ...authRoutes,
-  ...dataEntryRoutes,  // Move data entry routes earlier so the print route isn't conflicting
+  ...printDocumentsRoutes, // Add print documents routes with high priority
+  ...dataEntryRoutes,  
   ...appRoutes,
   ...masterDataRoutes,
   ...reportsRoutes,

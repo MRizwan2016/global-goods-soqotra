@@ -4,7 +4,6 @@ import InvoiceForm from "@/pages/invoicing/InvoiceForm";
 import InvoiceList from "@/pages/invoicing/InvoiceList";
 import BillOfLadingForm from "@/pages/bill-of-lading/BillOfLadingForm";
 import BillOfLadingList from "@/pages/bill-of-lading/BillOfLadingList";
-import InvoicePrint from "@/pages/invoicing/InvoicePrint";
 
 export const dataEntryRoutes: RouteConfig[] = [
   {
@@ -15,11 +14,6 @@ export const dataEntryRoutes: RouteConfig[] = [
   {
     path: "/data-entry/invoicing/edit/:id",
     element: InvoiceForm,
-    private: true
-  },
-  {
-    path: "/data-entry/invoicing/print/:id",
-    element: InvoicePrint,
     private: true
   },
   {
