@@ -8,22 +8,22 @@ import InvoicePrint from "@/pages/invoicing/InvoicePrint";
 
 export const dataEntryRoutes: RouteConfig[] = [
   {
-    path: "/data-entry/invoice/new",
+    path: "/data-entry/invoicing/new",
     element: InvoiceForm,
     private: true
   },
   {
-    path: "/data-entry/invoice/edit",
+    path: "/data-entry/invoicing/edit/:id",
     element: InvoiceForm,
     private: true
   },
   {
-    path: "/data-entry/invoice/print/:id",
+    path: "/data-entry/invoicing/print/:id",
     element: InvoicePrint,
     private: true
   },
   {
-    path: "/data-entry/invoice",
+    path: "/data-entry/invoicing",
     element: InvoiceList,
     private: true
   },
