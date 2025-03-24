@@ -26,7 +26,8 @@ const CargoTable: React.FC<CargoTableProps> = ({
   }
 
   return (
-    <div className="mt-6">
+    <div className="mt-2">
+      <h3 className="text-lg font-semibold mb-2 text-blue-700">Packages Added to Container</h3>
       <div className="bg-blue-600 text-white py-1 mb-1">
         <Table>
           <TableHeader>
@@ -45,32 +46,34 @@ const CargoTable: React.FC<CargoTableProps> = ({
         </Table>
       </div>
       
-      <Table>
-        <TableBody>
-          {cargoItems.map((item, index) => (
-            <TableRow key={item.id}>
-              <TableCell className="text-center">{index + 1}</TableCell>
-              <TableCell>{item.invoiceNumber}</TableCell>
-              <TableCell>{item.lineNumber}</TableCell>
-              <TableCell>{item.packageName}</TableCell>
-              <TableCell>{item.volume.toFixed(3)}</TableCell>
-              <TableCell>{item.weight.toFixed(2)}</TableCell>
-              <TableCell>{item.shipper}</TableCell>
-              <TableCell>{item.consignee}</TableCell>
-              <TableCell className="text-center">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-red-600 p-1 h-auto"
-                  onClick={() => onRemoveItem(item.id)}
-                >
-                  <Trash2 size={18} />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <div className="max-h-[400px] overflow-y-auto border border-gray-200 rounded-sm">
+        <Table>
+          <TableBody>
+            {cargoItems.map((item, index) => (
+              <TableRow key={item.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                <TableCell className="text-center">{index + 1}</TableCell>
+                <TableCell>{item.invoiceNumber}</TableCell>
+                <TableCell>{item.lineNumber}</TableCell>
+                <TableCell>{item.packageName}</TableCell>
+                <TableCell>{item.volume.toFixed(3)}</TableCell>
+                <TableCell>{item.weight.toFixed(2)}</TableCell>
+                <TableCell>{item.shipper}</TableCell>
+                <TableCell>{item.consignee}</TableCell>
+                <TableCell className="text-center">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-red-600 p-1 h-auto"
+                    onClick={() => onRemoveItem(item.id)}
+                  >
+                    <Trash2 size={18} />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

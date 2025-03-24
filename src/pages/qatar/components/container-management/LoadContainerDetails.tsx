@@ -24,7 +24,7 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
   const [container, setContainer] = useState<QatarContainer | null>(null);
   const [cargoItems, setCargoItems] = useState<ContainerCargo[]>([]);
   
-  // Mock data for currently entered cargo
+  // State for currently entered cargo
   const [currentCargo, setCurrentCargo] = useState<ContainerCargo[]>([]);
   
   // Load container data
@@ -40,7 +40,7 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
   }, [containerId]);
   
   const handleAddCargo = (newCargoItem: ContainerCargo) => {
-    setCurrentCargo([...currentCargo, newCargoItem]);
+    setCurrentCargo(prev => [...prev, newCargoItem]);
   };
   
   const handleSave = () => {
@@ -67,10 +67,10 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
       container.weight = parseFloat(totalWeight.toFixed(2));
     }
     
-    // Notify parent
+    // Notify parent to move to manifest section
     onCargoLoaded();
     
-    toast.success("Container cargo saved successfully");
+    toast.success("Container cargo saved successfully. Proceeding to manifest section.");
   };
   
   const handleRemoveItem = (id: string) => {
@@ -85,6 +85,9 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
   if (!container) {
     return <div>Loading container details...</div>;
   }
+  
+  const totalVolume = currentCargo.reduce((sum, item) => sum + item.volume, 0).toFixed(3);
+  const totalWeight = currentCargo.reduce((sum, item) => sum + item.weight, 0).toFixed(2);
   
   return (
     <Card className="shadow-md animate-fade-in">
@@ -104,17 +107,36 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
         <CargoSearchForm 
           containerId={containerId}
           onAddCargo={handleAddCargo}
+          existingCargo={currentCargo}
         />
         
-        <CargoTable 
-          cargoItems={currentCargo}
-          onRemoveItem={handleRemoveItem}
-        />
+        {currentCargo.length > 0 && (
+          <div className="mt-6">
+            <div className="bg-blue-50 p-3 rounded-md mb-4 flex justify-between items-center">
+              <div>
+                <h3 className="font-semibold text-blue-700">Current Cargo Summary</h3>
+                <p className="text-sm text-blue-600">
+                  Packages: {currentCargo.length} | 
+                  Total Volume: {totalVolume} m³ | 
+                  Total Weight: {totalWeight} kg
+                </p>
+              </div>
+            </div>
+            
+            <CargoTable 
+              cargoItems={currentCargo}
+              onRemoveItem={handleRemoveItem}
+            />
+          </div>
+        )}
         
         <LoadContainerActionsBar 
           onCancel={onCancel}
           onSave={handleSave}
           disabled={currentCargo.length === 0}
+          totalItems={currentCargo.length}
+          totalVolume={totalVolume}
+          totalWeight={totalWeight}
         />
       </CardContent>
     </Card>

@@ -13,11 +13,13 @@ import InsertCargoButton from "./cargo-search/InsertCargoButton";
 interface CargoSearchFormProps {
   containerId: string;
   onAddCargo: (cargo: ContainerCargo) => void;
+  existingCargo: ContainerCargo[];
 }
 
 const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
   containerId,
   onAddCargo,
+  existingCargo
 }) => {
   const [searchBy, setSearchBy] = useState("GY");
   const [bookingForm, setBookingForm] = useState("");
@@ -96,7 +98,7 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
       id: uuidv4(),
       containerId,
       invoiceNumber: bookingForm || "/00000000/N",
-      lineNumber: "1",
+      lineNumber: packageNumber || "1",
       barcode: generatedBarcode,
       packageName,
       volume: currentInvoiceData?.items?.[0]?.volume || 0.1,
@@ -111,9 +113,7 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
     
     // Clear form fields
     setPackageName("");
-    setShipper("");
-    setBarcode("");
-    setCurrentInvoiceData(null);
+    setPackageNumber("");
     
     toast.success("Item added to cargo list");
   };
@@ -153,6 +153,12 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
       />
       
       <InsertCargoButton onInsertCargo={handleInsertCargo} />
+      
+      {existingCargo.length > 0 && (
+        <div className="mt-4 text-sm text-green-600">
+          {existingCargo.length} package(s) added to this container. Scroll down to view the cargo list.
+        </div>
+      )}
     </div>
   );
 };

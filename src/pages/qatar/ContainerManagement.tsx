@@ -22,6 +22,7 @@ import InvoiceAssignment from "./components/container-management/invoice-assignm
 const ContainerManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("list");
   const [selectedContainerId, setSelectedContainerId] = useState<string | null>(null);
+  const [containerLoaded, setContainerLoaded] = useState(false);
   
   // Add event listener for tab changes
   useEffect(() => {
@@ -38,8 +39,19 @@ const ContainerManagement: React.FC = () => {
     };
   }, []);
   
+  // Prevent users from manually switching tabs if they haven't completed the current step
+  const handleTabChange = (tab: string) => {
+    if (tab === "manifest" && selectedContainerId && !containerLoaded) {
+      toast.error("Please complete loading cargo before proceeding to manifest");
+      return;
+    }
+    
+    setActiveTab(tab);
+  };
+  
   const handleContainerSelect = (containerId: string) => {
     setSelectedContainerId(containerId);
+    setContainerLoaded(false);
     setActiveTab("load");
     toast.success("Container selected for loading");
   };
@@ -50,18 +62,22 @@ const ContainerManagement: React.FC = () => {
   };
 
   const handleCargoLoaded = () => {
+    setContainerLoaded(true);
     setActiveTab("manifest");
-    toast.success("Cargo loaded successfully");
+    toast.success("Cargo loaded successfully. Proceeding to manifest section.");
   };
 
   const handleManifestSubmitted = () => {
     setActiveTab("list");
+    setSelectedContainerId(null);
+    setContainerLoaded(false);
     toast.success("Manifest submitted successfully");
   };
 
   const handleBackToList = () => {
     setActiveTab("list");
     setSelectedContainerId(null);
+    setContainerLoaded(false);
   };
 
   return (
@@ -83,7 +99,7 @@ const ContainerManagement: React.FC = () => {
         )}
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid grid-cols-5 mb-8">
           <TabsTrigger value="list" className="flex items-center gap-2">
             <List size={18} />
@@ -93,11 +109,19 @@ const ContainerManagement: React.FC = () => {
             <PlusCircle size={18} />
             <span>Add Container</span>
           </TabsTrigger>
-          <TabsTrigger value="load" disabled={!selectedContainerId} className="flex items-center gap-2">
+          <TabsTrigger 
+            value="load" 
+            disabled={!selectedContainerId} 
+            className="flex items-center gap-2"
+          >
             <Package size={18} />
             <span>Load Cargo</span>
           </TabsTrigger>
-          <TabsTrigger value="manifest" disabled={!selectedContainerId} className="flex items-center gap-2">
+          <TabsTrigger 
+            value="manifest" 
+            disabled={!selectedContainerId || !containerLoaded} 
+            className="flex items-center gap-2"
+          >
             <FileCheck size={18} />
             <span>Manifest</span>
           </TabsTrigger>
