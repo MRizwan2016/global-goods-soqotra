@@ -25,6 +25,16 @@ const CargoTable: React.FC<CargoTableProps> = ({
     return null;
   }
 
+  // Helper function to safely format volume
+  const formatVolume = (volume: any): string => {
+    return typeof volume === 'number' ? volume.toFixed(3) : '0.000';
+  };
+
+  // Helper function to safely format weight
+  const formatWeight = (weight: any): string => {
+    return typeof weight === 'number' ? weight.toFixed(2) : '0.00';
+  };
+
   return (
     <div className="mt-2">
       <h3 className="text-lg font-semibold mb-2 text-blue-700">Packages Added to Container</h3>
@@ -55,8 +65,8 @@ const CargoTable: React.FC<CargoTableProps> = ({
                 <TableCell>{item.invoiceNumber}</TableCell>
                 <TableCell>{item.lineNumber}</TableCell>
                 <TableCell>{item.packageName}</TableCell>
-                <TableCell>{item.volume.toFixed(3)}</TableCell>
-                <TableCell>{item.weight.toFixed(2)}</TableCell>
+                <TableCell>{formatVolume(item.volume)}</TableCell>
+                <TableCell>{formatWeight(item.weight)}</TableCell>
                 <TableCell>{item.shipper}</TableCell>
                 <TableCell>{item.consignee}</TableCell>
                 <TableCell className="text-center">
