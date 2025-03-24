@@ -86,8 +86,27 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
     return <div>Loading container details...</div>;
   }
   
-  const totalVolume = currentCargo.reduce((sum, item) => sum + item.volume, 0).toFixed(3);
-  const totalWeight = currentCargo.reduce((sum, item) => sum + item.weight, 0).toFixed(2);
+  // Calculate totals ensuring we handle any edge cases where reduce would return NaN
+  const calculateTotalVolume = () => {
+    if (currentCargo.length === 0) return "0.000";
+    const total = currentCargo.reduce((sum, item) => {
+      const itemVolume = typeof item.volume === 'number' ? item.volume : 0;
+      return sum + itemVolume;
+    }, 0);
+    return total.toFixed(3);
+  };
+  
+  const calculateTotalWeight = () => {
+    if (currentCargo.length === 0) return "0.00";
+    const total = currentCargo.reduce((sum, item) => {
+      const itemWeight = typeof item.weight === 'number' ? item.weight : 0;
+      return sum + itemWeight;
+    }, 0);
+    return total.toFixed(2);
+  };
+  
+  const totalVolume = calculateTotalVolume();
+  const totalWeight = calculateTotalWeight();
   
   return (
     <Card className="shadow-md animate-fade-in">
