@@ -43,13 +43,13 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
   const enhancedMockInvoices = mockInvoiceData.map(invoice => ({
     invoiceNumber: invoice.invoiceNumber || `GY ${Math.floor(13136051 + Math.random() * 1000)}`,
     items: [{
-      name: invoice.packageType || "Wooden Box", // Use the actual package type from invoice
-      weight: invoice.weight || 10,
-      volume: invoice.volume || 0.1
+      name: invoice.packageDetails?.[0]?.name || "Wooden Box", // Use package details name if available
+      weight: typeof invoice.weight === 'string' ? parseFloat(invoice.weight) : 10,
+      volume: typeof invoice.volume === 'string' ? parseFloat(invoice.volume) : 0.1
     }],
     shipper: invoice.shipper1,
     consignee: invoice.consignee1,
-    packageType: invoice.packageType // Store the original package type
+    packageType: invoice.packageDetails?.[0]?.name || "Wooden Box" // Store package type from details
   }));
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
     
     // Auto-fill package data with proper package type
     if (invoice.items && invoice.items.length > 0) {
-      // Use the package type from the invoice data
+      // Get package name from invoice data
       setPackageName(invoice.packageType || invoice.items[0].name || "Wooden Box");
       setShipper(invoice.shipper || "");
     }
