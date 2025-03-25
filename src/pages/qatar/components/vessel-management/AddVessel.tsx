@@ -13,6 +13,18 @@ interface AddVesselProps {
   onCancel: () => void;
 }
 
+// Ports and sectors data
+const PORTS = [
+  "Doha", "Mombasa", "Nairobi", "Asmara", "Hargeisa", "Port Sudan", 
+  "Tunis", "Kampala", "Berbara", "Mogadishu", "Dammam", "Addis Ababa", 
+  "Riyadh", "Jeddah", "Dubai", "Sharjah", "Jabel Ali", "Sohar", "HAMAD SEA PORT", "COLOMBO"
+];
+
+const SECTORS = [
+  "Sri Lanka", "Kenya", "Uganda", "Tunisia", "United Arab Emirates", 
+  "Saudi Arabia", "Sudan", "Eritrea", "Oman", "Qatar", "Somalia", "Ethiopia", "COLOMBO", "GALLE", "KURUNEGALA"
+];
+
 const AddVessel: React.FC<AddVesselProps> = ({ onVesselCreated, onCancel }) => {
   const [formData, setFormData] = useState({
     id: uuidv4(),
@@ -77,9 +89,9 @@ const AddVessel: React.FC<AddVesselProps> = ({ onVesselCreated, onCancel }) => {
                     <SelectValue placeholder="Select Sector" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="COLOMBO">COLOMBO : C</SelectItem>
-                    <SelectItem value="GALLE">GALLE : G</SelectItem>
-                    <SelectItem value="KURUNEGALA">KURUNEGALA : K</SelectItem>
+                    {SECTORS.map(sector => (
+                      <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -153,24 +165,36 @@ const AddVessel: React.FC<AddVesselProps> = ({ onVesselCreated, onCancel }) => {
             <div className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="portOfLoading" className="block text-sm font-medium">PORT OF LOADING:</label>
-                <Input
-                  id="portOfLoading"
-                  name="portOfLoading"
-                  value={formData.portOfLoading}
-                  onChange={handleInputChange}
-                  className="w-full"
-                />
+                <Select 
+                  value={formData.portOfLoading} 
+                  onValueChange={(value) => handleSelectChange("portOfLoading", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Port of Loading" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PORTS.map(port => (
+                      <SelectItem key={port} value={port}>{port}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="space-y-2">
                 <label htmlFor="portOfDischarge" className="block text-sm font-medium">PORT OF DISCHARGE:</label>
-                <Input
-                  id="portOfDischarge"
-                  name="portOfDischarge"
-                  value={formData.portOfDischarge}
-                  onChange={handleInputChange}
-                  className="w-full"
-                />
+                <Select 
+                  value={formData.portOfDischarge} 
+                  onValueChange={(value) => handleSelectChange("portOfDischarge", value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select Port of Discharge" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PORTS.map(port => (
+                      <SelectItem key={port} value={port}>{port}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               
               <div className="space-y-2">
