@@ -50,11 +50,24 @@ export const useBillOfLadingData = () => {
   }, [id]);
 
   const handlePrint = () => {
-    window.print();
+    // Prevent any default redirects that might be happening
+    try {
+      window.print();
+    } catch (error) {
+      console.error("Error during print:", error);
+      toast.error("Print operation failed");
+    }
   };
 
   const handleBack = () => {
-    navigate(-1);
+    // Use a try/catch to catch any navigation errors
+    try {
+      navigate(-1);
+    } catch (error) {
+      console.error("Navigation error:", error);
+      // Fallback navigation to a safe route
+      navigate("/data-entry/print-documents");
+    }
   };
 
   return {

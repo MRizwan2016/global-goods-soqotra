@@ -15,20 +15,37 @@ const PrintControls: React.FC<PrintControlsProps> = ({
   title
 }) => {
   const handlePrintClick = (e: React.MouseEvent) => {
+    // Prevent default browser behavior
     e.preventDefault();
+    // Stop event propagation
     e.stopPropagation();
     
     // Add small delay before print to ensure the UI is ready
     setTimeout(() => {
       handlePrint();
     }, 50);
+    
+    // Return false to prevent any further actions
+    return false;
+  };
+  
+  const handleBackClick = (e: React.MouseEvent) => {
+    // Prevent default browser behavior
+    e.preventDefault();
+    // Stop event propagation
+    e.stopPropagation();
+    
+    handleBack();
+    
+    // Return false to prevent any further actions
+    return false;
   };
   
   return (
     <div className="print:hidden p-4 bg-white shadow-md mb-4 sticky top-0 z-10 flex items-center justify-between">
       <Button
         variant="outline"
-        onClick={handleBack}
+        onClick={handleBackClick}
         className="flex items-center"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
