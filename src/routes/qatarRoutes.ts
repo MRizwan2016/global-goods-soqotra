@@ -1,10 +1,11 @@
 
+import { lazy } from "react";
 import QatarDashboard from "@/pages/qatar/QatarDashboard";
+import NewJobForm from "@/pages/qatar/NewJobForm";
 import JobTracking from "@/pages/qatar/JobTracking";
 import JobDetails from "@/pages/qatar/JobDetails";
-import NewJobForm from "@/pages/qatar/NewJobForm";
-import JobSchedulePrint from "@/pages/qatar/JobSchedulePrint";
 import JobGeneratePage from "@/pages/qatar/JobGeneratePage";
+import JobSchedulePrint from "@/pages/qatar/JobSchedulePrint";
 import VehicleManagement from "@/pages/qatar/VehicleManagement";
 import DriverManagement from "@/pages/qatar/DriverManagement";
 import FindCustomer from "@/pages/qatar/FindCustomer";
@@ -12,10 +13,16 @@ import ContainerManagement from "@/pages/qatar/ContainerManagement";
 import VesselManagement from "@/pages/qatar/VesselManagement";
 import { RouteConfig } from "./types";
 
+// Define the routes for the Qatar section
 export const qatarRoutes: RouteConfig[] = [
   {
     path: "/qatar",
     element: QatarDashboard,
+    private: true
+  },
+  {
+    path: "/qatar/job/new",
+    element: NewJobForm,
     private: true
   },
   {
@@ -29,18 +36,13 @@ export const qatarRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/qatar/job/new",
-    element: NewJobForm,
+    path: "/qatar/jobs/generate",
+    element: JobGeneratePage,
     private: true
   },
   {
     path: "/qatar/jobs/print",
     element: JobSchedulePrint,
-    private: true
-  },
-  {
-    path: "/qatar/jobs/generate",
-    element: JobGeneratePage,
     private: true
   },
   {
@@ -61,19 +63,11 @@ export const qatarRoutes: RouteConfig[] = [
   {
     path: "/qatar/containers",
     element: ContainerManagement,
-    private: true,
-    requiredFile: "container"
+    private: true
   },
   {
     path: "/qatar/vessels",
     element: VesselManagement,
-    private: true,
-    requiredFile: "container"
-  },
-  {
-    path: "/qatar/container-invoices",
-    element: ContainerManagement,
-    private: true,
-    requiredFile: "container"
+    private: true
   }
 ];

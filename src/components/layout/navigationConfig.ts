@@ -95,6 +95,7 @@ export const navigationSections: NavigationSections = {
           { name: "DRIVERS", path: "/qatar/drivers" },
           { name: "FIND CUSTOMER", path: "/qatar/find-customer" },
           { name: "CONTAINERS", path: "/qatar/containers" },
+          { name: "VESSEL MANAGEMENT", path: "/qatar/vessels" },
         ],
       },
     ],

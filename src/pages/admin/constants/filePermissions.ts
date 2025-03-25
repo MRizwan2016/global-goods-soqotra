@@ -10,7 +10,7 @@ export const filePermissions = {
       packageOptions: { label: "Package Options", path: "/master/package-options" },
       sellingRates: { label: "Selling Rates", path: "/master/selling-rates" },
       container: { label: "Container", path: "/qatar/containers" },
-      vessel: { label: "Vessel", path: "/master/vessel" },
+      vessel: { label: "Vessel", path: "/qatar/vessels" },
       invoiceBook: { label: "Invoice Book", path: "/master/invoice-book" },
       driverHelper: { label: "Driver/Helper", path: "/master/driver-helper" },
     }
@@ -22,7 +22,7 @@ export const filePermissions = {
       invoicing: { label: "Invoicing", path: "/data-entry/invoicing" },
       paymentReceivable: { label: "Payment Receivable", path: "/data-entry/payment" },
       loadContainer: { label: "Load Container", path: "/data-entry/container" },
-      loadVessel: { label: "Load Vessel", path: "/data-entry/vessel" },
+      loadVessel: { label: "Load Vessel", path: "/qatar/vessels" },
       loadAirCargo: { label: "Load Air Cargo", path: "/data-entry/air-cargo" },
       packingList: { label: "Packing List", path: "/data-entry/packing-list" },
     }
