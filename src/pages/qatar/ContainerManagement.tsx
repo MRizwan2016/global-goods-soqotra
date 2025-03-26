@@ -7,6 +7,35 @@ import { useContainerManagement } from "./hooks/useContainerManagement";
 import TabsHeader from "./components/container-management/TabsHeader";
 import TabContent from "./components/container-management/TabContent";
 
+// Add some global styles for print mode
+const globalStyles = `
+  @media print {
+    body.print-only-manifest nav,
+    body.print-only-manifest header,
+    body.print-only-manifest footer,
+    body.print-only-manifest .no-print {
+      display: none !important;
+    }
+    
+    body.print-only-manifest {
+      background-color: white;
+    }
+    
+    body.print-only-manifest .print-container {
+      margin: 0;
+      padding: 0;
+    }
+    
+    @page {
+      margin: 15mm;
+    }
+    
+    .page-break-before {
+      page-break-before: always;
+    }
+  }
+`;
+
 const ContainerManagement: React.FC = () => {
   const {
     containers,
@@ -48,9 +77,12 @@ const ContainerManagement: React.FC = () => {
   }, [setActiveTab]);
 
   return (
-    <Layout title="Container Management">
+    <Layout title="CONTAINER MANAGEMENT">
+      {/* Add global styles for printing */}
+      <style>{globalStyles}</style>
+      
       <div className="container mx-auto py-6">
-        <Card>
+        <Card className="no-print">
           <CardContent className="p-0">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsHeader activeTab={activeTab} />
@@ -76,6 +108,7 @@ const ContainerManagement: React.FC = () => {
                 onManifestSubmitted={handleManifestSubmitted}
                 onPrintOptionsChange={handlePrintOptionsChange}
                 onPrint={handlePrint}
+                onAddContainer={handleAddContainer}
               />
             </Tabs>
           </CardContent>

@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, PrintOptions, UnsettledInvoice } from "../../../types/containerTypes";
 import { FileCheck, Package, Users, CreditCard } from "lucide-react";
 
@@ -32,6 +32,15 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
   const formatWeight = (weight: number) => weight.toFixed(2);
   const formatCurrency = (amount: number) => `QAR ${amount.toFixed(2)}`;
   
+  // When the component mounts, add a class to the body for printing purposes
+  useEffect(() => {
+    document.body.classList.add('print-only-manifest');
+    
+    return () => {
+      document.body.classList.remove('print-only-manifest');
+    };
+  }, []);
+  
   // Function to determine if a section should be shown
   const shouldShowSection = (section: "cargo" | "items" | "consignees" | "invoices") => {
     return printOptions.section === "all" || printOptions.section === section;
@@ -39,6 +48,30 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
   
   return (
     <div className={`print-container ${printOptions.orientation === "landscape" ? "landscape" : "portrait"}`}>
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          .print-container, .print-container * {
+            visibility: visible;
+          }
+          .print-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+          }
+          @page {
+            size: ${printOptions.orientation === "landscape" ? "landscape" : "portrait"};
+            margin: 15mm;
+          }
+          .page-break-before {
+            page-break-before: always;
+          }
+        }
+      `}</style>
+      
       <div className="print-manifest">
         <div className="print-header">
           <div className="logo-container">

@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, UnsettledInvoice, PrintOptions } from "../types/containerTypes";
+import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import mockContainers, { mockCargoItems } from "../data/mockContainers";
 
@@ -34,7 +35,18 @@ export const useContainerManagement = () => {
   }, []);
 
   const handleAddContainer = (newContainer: QatarContainer) => {
-    setContainers([...containers, newContainer]);
+    // Generate a unique ID if one is not provided
+    if (!newContainer.id) {
+      newContainer.id = uuidv4();
+    }
+    
+    // Set status to "PENDING" if not specified
+    if (!newContainer.status) {
+      newContainer.status = "PENDING";
+    }
+    
+    // Add to containers list
+    setContainers(prevContainers => [...prevContainers, newContainer]);
     setActiveTab("containers");
     toast.success("CONTAINER ADDED SUCCESSFULLY");
   };
@@ -98,7 +110,8 @@ export const useContainerManagement = () => {
   };
 
   const getCurrentContainer = () => {
-    return containers.find(container => container.id === (editContainerId || viewManifestId)) || null;
+    const id = editContainerId || viewManifestId;
+    return containers.find(container => container.id === id) || null;
   };
 
   const handlePrintOptionsChange = (options: Partial<PrintOptions>) => {
@@ -109,7 +122,7 @@ export const useContainerManagement = () => {
     window.print();
   };
 
-  // Get cargo items for the current container - check both ID and running number
+  // Get cargo items for the current container - now check both ID and running number
   const getCurrentCargoItems = () => {
     const containerId = viewManifestId || editContainerId;
     if (!containerId) return [];
@@ -117,10 +130,24 @@ export const useContainerManagement = () => {
     const container = containers.find(c => c.id === containerId);
     if (!container) return [];
     
-    return mockCargoItems.filter(item => 
-      item.containerId === containerId || 
-      (container.runningNumber && item.containerId === container.runningNumber.toString())
-    );
+    // First, look for items directly associated with the container ID
+    let cargoItems = mockCargoItems.filter(item => item.containerId === containerId);
+    
+    // If we didn't find any items and the container has a running number, look for that as well
+    if (cargoItems.length === 0 && container.runningNumber) {
+      const runningNumberStr = container.runningNumber.toString();
+      cargoItems = mockCargoItems.filter(item => item.containerId === runningNumberStr);
+      
+      // Also look for items where containerId might be the numeric part of the running number
+      if (cargoItems.length === 0) {
+        const numericPart = runningNumberStr.replace(/\D/g, '');
+        if (numericPart) {
+          cargoItems = mockCargoItems.filter(item => item.containerId === numericPart);
+        }
+      }
+    }
+    
+    return cargoItems;
   };
 
   // Process cargo items into ItemListEntry format
