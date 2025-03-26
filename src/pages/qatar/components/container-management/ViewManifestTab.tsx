@@ -32,6 +32,7 @@ const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
   onPrint
 }) => {
   const [activeTab, setActiveTab] = useState("container-details");
+  const [isPrinting, setIsPrinting] = useState(false);
 
   // Format container data for the ContainerList component
   const containerData = container ? [
@@ -49,6 +50,20 @@ const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
       volume: container.volume || 0
     }
   ] : [];
+  
+  const handlePrintClick = () => {
+    setIsPrinting(true);
+    
+    // Add a delay to ensure content is fully rendered
+    setTimeout(() => {
+      onPrint();
+      
+      // Reset printing state after a delay
+      setTimeout(() => {
+        setIsPrinting(false);
+      }, 1000);
+    }, 500);
+  };
 
   return (
     <div className="p-6 animate-fade-in">
@@ -97,7 +112,11 @@ const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
             </Select>
           </div>
           
-          <Button onClick={onPrint} className="bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-transform">
+          <Button 
+            onClick={handlePrintClick} 
+            className="bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-transform"
+            disabled={isPrinting}
+          >
             <Printer className="h-4 w-4 mr-2" />
             PRINT MANIFEST
           </Button>
@@ -401,6 +420,22 @@ const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
             
             .no-print {
               display: none !important;
+            }
+            
+            /* Make sure all non-printing content is hidden */
+            body * {
+              visibility: hidden;
+            }
+            
+            .print-container, .print-container * {
+              visibility: visible !important;
+            }
+            
+            .print-container {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
             }
           }
         `}

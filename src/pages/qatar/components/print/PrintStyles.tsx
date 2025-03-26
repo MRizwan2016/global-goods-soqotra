@@ -14,17 +14,21 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
             visibility: hidden;
           }
           .print-container, .print-container * {
-            visibility: visible;
+            visibility: visible !important;
           }
           .print-container {
             position: absolute;
             left: 0;
             top: 0;
             width: 100%;
+            height: auto;
+            padding: 10mm;
           }
+          
           .page-break-before {
             page-break-before: always;
           }
+          
           .no-print {
             display: none !important;
           }
@@ -44,12 +48,31 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
           table {
             width: 100% !important;
             table-layout: fixed;
+            border-collapse: collapse;
+            margin-bottom: 10mm;
+          }
+          
+          table, th, td {
+            border: 1px solid #000 !important;
+          }
+          
+          th {
+            background-color: #f0f0f0 !important;
+            color: #000 !important;
+            font-weight: bold;
+            padding: 8px;
+            text-align: left;
+          }
+          
+          td {
+            padding: 8px;
+            text-align: left;
           }
           
           /* Add logo styling */
           .logo-container {
             text-align: center;
-            margin-bottom: 10px;
+            margin-bottom: 10mm;
           }
           
           /* Section page breaks */
@@ -60,6 +83,22 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
           /* Last section should not have page break */
           .print-section:last-child {
             page-break-after: avoid;
+          }
+          
+          /* Ensure print-only elements are visible */
+          .print-only {
+            display: block !important;
+            visibility: visible !important;
+          }
+          
+          /* Fix for delayed printing */
+          @-webkit-keyframes printDelay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          .print-container {
+            -webkit-animation: printDelay 0.2s;
+            animation: printDelay 0.2s;
           }
         }
       `}

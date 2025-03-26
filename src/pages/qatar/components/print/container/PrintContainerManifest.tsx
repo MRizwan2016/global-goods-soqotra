@@ -34,9 +34,18 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
   
   // When the component mounts, add a class to the body for printing purposes
   useEffect(() => {
+    // Add a class to the body to apply print styles
     document.body.classList.add('print-only-manifest');
     
+    // Make sure DOM has time to update before any potential printing
+    const timer = setTimeout(() => {
+      // Trigger a window resize event to ensure all content is properly laid out
+      window.dispatchEvent(new Event('resize'));
+    }, 200);
+    
     return () => {
+      // Clean up when component unmounts
+      clearTimeout(timer);
       document.body.classList.remove('print-only-manifest');
     };
   }, []);
@@ -48,29 +57,66 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
   
   return (
     <div className={`print-container ${printOptions.orientation === "landscape" ? "landscape" : "portrait"}`}>
-      <style>{`
-        @media print {
-          body * {
-            visibility: hidden;
+      <style>
+        {`
+          @media print {
+            body * {
+              visibility: hidden;
+            }
+            .print-container, .print-container * {
+              visibility: visible !important;
+            }
+            .print-container {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
+              padding: 20px;
+            }
+            @page {
+              size: ${printOptions.orientation === "landscape" ? "landscape" : "portrait"};
+              margin: 15mm;
+            }
+            .page-break-before {
+              page-break-before: always;
+            }
+            
+            /* Enhanced table styles for printing */
+            table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-bottom: 20px;
+            }
+            
+            table, th, td {
+              border: 1px solid #000 !important;
+            }
+            
+            th {
+              background-color: #f0f0f0 !important;
+              color: #000 !important;
+              font-weight: bold;
+              padding: 8px;
+            }
+            
+            td {
+              padding: 8px;
+              text-align: left;
+            }
+            
+            /* High contrast for print */
+            .print-header h1 {
+              font-size: 18pt;
+              margin: 20px 0;
+            }
+            
+            .logo-container {
+              text-align: center;
+              margin-bottom: 20px;
+            }
           }
-          .print-container, .print-container * {
-            visibility: visible;
-          }
-          .print-container {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-          }
-          @page {
-            size: ${printOptions.orientation === "landscape" ? "landscape" : "portrait"};
-            margin: 15mm;
-          }
-          .page-break-before {
-            page-break-before: always;
-          }
-        }
-      `}</style>
+        `}
+      </style>
       
       <div className="print-manifest">
         <div className="print-header">

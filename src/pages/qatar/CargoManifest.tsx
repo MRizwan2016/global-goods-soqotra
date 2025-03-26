@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -14,6 +15,7 @@ const CargoManifest: React.FC = () => {
   const [country, setCountry] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
+  const [isPrinting, setIsPrinting] = useState(false);
   
   // Filter containers based on search and country
   const filteredContainers = mockContainers.filter(container => {
@@ -43,15 +45,21 @@ const CargoManifest: React.FC = () => {
   });
   
   const handlePrint = () => {
+    // Set printing state to true
+    setIsPrinting(true);
+    
     // Add class to body for print styles
     document.body.classList.add('print-only-manifest');
     
-    // Print the document
-    window.print();
-    
-    // Remove class after printing
+    // Add a delay to ensure content is rendered before printing
     setTimeout(() => {
-      document.body.classList.remove('print-only-manifest');
+      window.print();
+      
+      // Remove class after printing with a delay
+      setTimeout(() => {
+        document.body.classList.remove('print-only-manifest');
+        setIsPrinting(false);
+      }, 1000);
     }, 500);
   };
 
@@ -183,7 +191,7 @@ const CargoManifest: React.FC = () => {
                                     size="sm" 
                                     variant="outline" 
                                     className="h-8"
-                                    onClick={() => handlePrint()}
+                                    onClick={handlePrint}
                                   >
                                     <Printer size={14} />
                                   </Button>
@@ -259,7 +267,7 @@ const CargoManifest: React.FC = () => {
                                     size="sm" 
                                     variant="outline" 
                                     className="h-8"
-                                    onClick={() => handlePrint()}
+                                    onClick={handlePrint}
                                   >
                                     <Printer size={14} />
                                   </Button>
@@ -314,6 +322,27 @@ const CargoManifest: React.FC = () => {
             
             .no-print {
               display: none !important;
+            }
+            
+            .print-container {
+              display: block !important;
+              visibility: visible !important;
+            }
+            
+            /* Make sure all non-printing content is hidden */
+            body * {
+              visibility: hidden;
+            }
+            
+            .print-container, .print-container * {
+              visibility: visible !important;
+            }
+            
+            .print-container {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
             }
           }
         `}
