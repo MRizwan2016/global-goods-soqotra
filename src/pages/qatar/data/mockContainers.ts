@@ -1,6 +1,39 @@
 import { ConsigneeListItem, ContainerCargo, ItemListEntry, QatarContainer, UnsettledInvoice } from "../types/containerTypes";
 import { v4 as uuidv4 } from 'uuid';
 
+// Container type options
+export const containerTypes = [
+  { id: "20FT_STANDARD", name: "20FT Standard" },
+  { id: "40FT_STANDARD", name: "40FT Standard" },
+  { id: "40FT_HIGHC", name: "40FT High Cube" },
+  { id: "20FT_REEFER", name: "20FT Reefer" },
+  { id: "40FT_REEFER", name: "40FT Reefer" },
+  { id: "20FT_OPEN", name: "20FT Open Top" },
+  { id: "40FT_OPEN", name: "40FT Open Top" },
+  { id: "20FT_FLAT", name: "20FT Flat Rack" },
+  { id: "40FT_FLAT", name: "40FT Flat Rack" }
+];
+
+// Direction type options
+export const directionTypes = [
+  { id: "D", name: "Direct" },
+  { id: "M", name: "Mix" },
+  { id: "K", name: "Kolkata" },
+  { id: "C", name: "Chennai" }
+];
+
+// Helper function to get the next running number
+export const getNextRunningNumber = () => {
+  // Find the highest running number in the mockContainers array
+  const highest = mockContainers.reduce((max, container) => {
+    const num = parseInt(container.runningNumber);
+    return num > max ? num : max;
+  }, 0);
+  
+  // Return the next number as string
+  return (highest + 1).toString();
+};
+
 export const mockContainers: QatarContainer[] = [
   {
     id: uuidv4(),
