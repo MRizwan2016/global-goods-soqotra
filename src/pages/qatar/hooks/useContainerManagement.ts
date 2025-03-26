@@ -36,7 +36,7 @@ export const useContainerManagement = () => {
   const handleAddContainer = (newContainer: QatarContainer) => {
     setContainers([...containers, newContainer]);
     setActiveTab("containers");
-    toast.success("Container added successfully");
+    toast.success("CONTAINER ADDED SUCCESSFULLY");
   };
 
   const handleEditContainer = (containerId: string) => {
@@ -51,7 +51,7 @@ export const useContainerManagement = () => {
     setContainers(updatedContainers);
     setActiveTab("containers");
     setEditContainerId(null);
-    toast.success("Container updated successfully");
+    toast.success("CONTAINER UPDATED SUCCESSFULLY");
   };
 
   const handleCancelEdit = () => {
@@ -75,17 +75,17 @@ export const useContainerManagement = () => {
   };
 
   const handleManifestSubmitted = () => {
-    // Update container status to "Loaded" or similar
+    // Update container status to "LOADED" or similar
     const updatedContainers = containers.map(container => 
-      container.id === editContainerId ? { ...container, status: "Loaded" } : container
+      container.id === editContainerId ? { ...container, status: "CONFIRMED" } : container
     );
     setContainers(updatedContainers);
     setActiveTab("containers");
     
     // Show success message with view manifest option
-    toast.success("Container manifest submitted successfully", {
+    toast.success("CONTAINER MANIFEST SUBMITTED SUCCESSFULLY", {
       action: {
-        label: "View Manifest",
+        label: "VIEW MANIFEST",
         onClick: () => {
           // Create and dispatch a custom event
           const event = new CustomEvent('viewContainerManifest', { 
@@ -109,11 +109,18 @@ export const useContainerManagement = () => {
     window.print();
   };
 
-  // Get cargo items for the current container
+  // Get cargo items for the current container - check both ID and running number
   const getCurrentCargoItems = () => {
     const containerId = viewManifestId || editContainerId;
     if (!containerId) return [];
-    return mockCargoItems.filter(item => item.containerId === containerId);
+    
+    const container = containers.find(c => c.id === containerId);
+    if (!container) return [];
+    
+    return mockCargoItems.filter(item => 
+      item.containerId === containerId || 
+      (container.runningNumber && item.containerId === container.runningNumber.toString())
+    );
   };
 
   // Process cargo items into ItemListEntry format
@@ -127,11 +134,11 @@ export const useContainerManagement = () => {
         acc.push({
           id: item.id,
           invoice: item.invoiceNumber,
-          shipper: item.shipper,
-          consignee: item.consignee,
+          shipper: item.shipper.toUpperCase(),
+          consignee: item.consignee.toUpperCase(),
           packages: 1,
           volume: item.volume,
-          packageName: item.packageName,
+          packageName: item.packageName.toUpperCase(),
           quantity: 1
         });
       }
@@ -143,7 +150,7 @@ export const useContainerManagement = () => {
   const getConsigneeList = (): ConsigneeListItem[] => {
     return getCurrentCargoItems().reduce((acc: ConsigneeListItem[], item) => {
       const existingIndex = acc.findIndex(
-        entry => entry.consignee === item.consignee && entry.invoice === item.invoiceNumber
+        entry => entry.consignee === item.consignee.toUpperCase() && entry.invoice === item.invoiceNumber
       );
       if (existingIndex >= 0) {
         acc[existingIndex].volume += item.volume;
@@ -151,10 +158,10 @@ export const useContainerManagement = () => {
         acc.push({
           id: item.id,
           invoice: item.invoiceNumber,
-          shipper: item.shipper,
-          shipperContact: "Mobile: +974 " + Math.floor(10000000 + Math.random() * 90000000),
-          consignee: item.consignee,
-          consigneeContact: "Mobile: +94 " + Math.floor(700000000 + Math.random() * 90000000),
+          shipper: item.shipper.toUpperCase(),
+          shipperContact: "MOBILE: +974 " + Math.floor(10000000 + Math.random() * 90000000),
+          consignee: item.consignee.toUpperCase(),
+          consigneeContact: "MOBILE: +94 " + Math.floor(700000000 + Math.random() * 90000000),
           volume: item.volume
         });
       }
@@ -162,27 +169,26 @@ export const useContainerManagement = () => {
     }, []);
   };
 
-  // Process cargo items into UnsettledInvoice format
+  // Generate unsettled invoices from cargo items
   const getUnsettledInvoices = (): UnsettledInvoice[] => {
     return getCurrentCargoItems().reduce((acc: UnsettledInvoice[], item) => {
       const existingIndex = acc.findIndex(entry => 
         entry.invoiceNumber === item.invoiceNumber && 
-        entry.shipper === item.shipper &&
-        entry.consignee === item.consignee
+        entry.shipper === item.shipper.toUpperCase() &&
+        entry.consignee === item.consignee.toUpperCase()
       );
+      
       if (existingIndex === -1) {
         acc.push({
           id: item.id,
           invoiceNumber: item.invoiceNumber,
-          shipper: item.shipper,
-          consignee: item.consignee,
+          shipper: item.shipper.toUpperCase(),
+          consignee: item.consignee.toUpperCase(),
           amount: Math.floor(5000 + Math.random() * 10000) / 100,
-          paid: Math.random() > 0.3,
-          gy: "GY-" + Math.floor(100 + Math.random() * 900),
-          net: Math.floor(4000 + Math.random() * 8000) / 100,
-          due: Math.floor(100 + Math.random() * 2000) / 100
+          paid: Math.random() > 0.3 // 70% chance to be paid
         });
       }
+      
       return acc;
     }, []);
   };
@@ -211,3 +217,5 @@ export const useContainerManagement = () => {
     getUnsettledInvoices
   };
 };
+
+export default useContainerManagement;

@@ -17,10 +17,10 @@ const InsertCargoButton: React.FC<InsertCargoButtonProps> = ({
       <Button
         onClick={onInsertCargo}
         disabled={disabled}
-        className="bg-green-600 hover:bg-green-700 hover:scale-105 transition-all px-6 py-2 text-white font-medium"
+        className="bg-green-600 hover:bg-green-700 hover:scale-105 transition-all px-6 py-2 text-white font-medium uppercase"
       >
         <PackagePlus className="h-5 w-5 mr-2" />
-        Add Package to Container
+        ADD PACKAGE TO CONTAINER
       </Button>
     </div>
   );

@@ -21,12 +21,16 @@ export const useBarcodeScanner = ({
     
     // Most barcode scanners send an Enter key after scanning
     if (event.key === "Enter" && lastBarcode) {
-      onBarcodeDetected(lastBarcode);
+      // Special handling for container HASU4867845
+      const processedBarcode = lastBarcode.toUpperCase(); // Ensure uppercase
+      
+      // Send the barcode to the handler
+      onBarcodeDetected(processedBarcode);
       setLastBarcode(null);
       event.preventDefault();
     } else if (/^[a-zA-Z0-9-_]$/.test(event.key)) {
-      // Append to the current barcode
-      setLastBarcode(prev => (prev || "") + event.key);
+      // Append to the current barcode, always uppercase
+      setLastBarcode(prev => ((prev || "") + event.key).toUpperCase());
     }
   }, [enabled, lastBarcode, manualEntry, onBarcodeDetected]);
 
@@ -42,12 +46,12 @@ export const useBarcodeScanner = ({
   const startScanning = () => {
     setScanning(true);
     setLastBarcode(null);
-    toast.info("Barcode scanner activated");
+    toast.info("BARCODE SCANNER ACTIVATED");
   };
 
   const stopScanning = () => {
     setScanning(false);
-    toast.info("Barcode scanner deactivated");
+    toast.info("BARCODE SCANNER DEACTIVATED");
   };
 
   // Toggle manual entry mode
