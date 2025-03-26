@@ -5,17 +5,17 @@ import { Button } from "@/components/ui/button";
 import { PenLine, Truck, FileText, ClipboardList } from "lucide-react";
 
 interface ContainerListProps {
-  containersList: QatarContainer[];
-  onEditContainer: (containerId: string) => void;
-  onLoadContainer: (containerId: string) => void;
-  onViewManifest: (containerId: string) => void;
-  onCreateManifest: (containerId: string) => void;
+  containerData: QatarContainer[];
+  onEdit?: (containerId: string) => void;
+  onLoad?: (containerId: string) => void;
+  onViewManifest?: (containerId: string) => void;
+  onCreateManifest?: (containerId: string) => void;
 }
 
 const ContainerList: React.FC<ContainerListProps> = ({
-  containersList,
-  onEditContainer,
-  onLoadContainer,
+  containerData,
+  onEdit,
+  onLoad,
   onViewManifest,
   onCreateManifest
 }) => {
@@ -35,7 +35,7 @@ const ContainerList: React.FC<ContainerListProps> = ({
             </tr>
           </thead>
           <tbody>
-            {containersList.map((container) => (
+            {containerData.map((container) => (
               <tr key={container.id} className="border-b hover:bg-gray-50">
                 <td className="p-2">{container.containerNumber}</td>
                 <td className="p-2">{container.containerType}</td>
@@ -57,25 +57,27 @@ const ContainerList: React.FC<ContainerListProps> = ({
                 <td className="p-2">{container.sector || "N/A"}</td>
                 <td className="p-2">
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => onEditContainer(container.id)}
-                      title="Edit Container"
-                    >
-                      <PenLine className="h-4 w-4" />
-                    </Button>
-                    {container.status !== "Loaded" && (
+                    {onEdit && (
                       <Button
                         variant="outline"
                         size="icon"
-                        onClick={() => onLoadContainer(container.id)}
+                        onClick={() => onEdit(container.id)}
+                        title="Edit Container"
+                      >
+                        <PenLine className="h-4 w-4" />
+                      </Button>
+                    )}
+                    {onLoad && container.status !== "Loaded" && (
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => onLoad(container.id)}
                         title="Load Container"
                       >
                         <Truck className="h-4 w-4" />
                       </Button>
                     )}
-                    {container.status !== "Loaded" && (
+                    {onCreateManifest && container.status !== "Loaded" && (
                       <Button
                         variant="outline"
                         size="icon"
@@ -85,7 +87,7 @@ const ContainerList: React.FC<ContainerListProps> = ({
                         <ClipboardList className="h-4 w-4" />
                       </Button>
                     )}
-                    {container.status === "Loaded" && (
+                    {onViewManifest && container.status === "Loaded" && (
                       <Button
                         variant="outline"
                         size="icon"
