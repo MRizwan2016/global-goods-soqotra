@@ -6,9 +6,10 @@ import {
   ContainerCargo,
   ItemListEntry,
   ConsigneeListItem, 
-  UnsettledInvoice 
-} from "../../../../types/containerTypes";
-import mockContainers, { mockCargoItems } from "../../../../data/mockContainers";
+  UnsettledInvoice,
+  PrintOptions
+} from "../../../types/containerTypes";
+import mockContainers, { mockCargoItems } from "../../../data/mockContainers";
 
 const useContainerManifest = (containerId: string, onManifestSubmitted: () => void) => {
   const [container, setContainer] = useState<QatarContainer | null>(null);
@@ -17,8 +18,8 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
   const [vgmWeight, setVgmWeight] = useState("");
   const [activeTab, setActiveTab] = useState("cargo");
   const [printViewVisible, setPrintViewVisible] = useState(false);
-  const [printOptions, setPrintOptions] = useState({
-    section: "cargo" as "all" | "cargo" | "items" | "consignees" | "invoices",
+  const [printOptions, setPrintOptions] = useState<PrintOptions>({
+    section: "all" as "all" | "cargo" | "items" | "consignees" | "invoices",
     orientation: "portrait" as "portrait" | "landscape"
   });
   

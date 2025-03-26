@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -13,7 +12,7 @@ import { toast } from "sonner";
 import PrintStyles from "./components/print/PrintStyles";
 
 // Mock data imports - in a real application, this would be fetched from an API
-import mockContainers from "./data/mockContainers";
+import mockContainers, { mockCargoItems } from "./data/mockContainers";
 
 const ContainerManagement: React.FC = () => {
   const [containers, setContainers] = useState<QatarContainer[]>(mockContainers);
@@ -34,10 +33,13 @@ const ContainerManagement: React.FC = () => {
       }
     };
     
+    // Listen for both event types (for backward compatibility)
     document.addEventListener('viewManifest', handleViewManifest as EventListener);
+    document.addEventListener('viewContainerManifest', handleViewManifest as EventListener);
     
     return () => {
       document.removeEventListener('viewManifest', handleViewManifest as EventListener);
+      document.removeEventListener('viewContainerManifest', handleViewManifest as EventListener);
     };
   }, []);
 
@@ -196,7 +198,7 @@ const ContainerManagement: React.FC = () => {
         label: "View Manifest",
         onClick: () => {
           // Create and dispatch a custom event
-          const event = new CustomEvent('viewManifest', { 
+          const event = new CustomEvent('viewContainerManifest', { 
             detail: { containerId: editContainerId } 
           });
           document.dispatchEvent(event);
@@ -215,6 +217,13 @@ const ContainerManagement: React.FC = () => {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  // Get cargo items for the current container
+  const getCurrentCargoItems = () => {
+    const containerId = viewManifestId || editContainerId;
+    if (!containerId) return [];
+    return mockCargoItems.filter(item => item.containerId === containerId);
   };
 
   return (
@@ -304,15 +313,67 @@ const ContainerManagement: React.FC = () => {
               </TabsContent>
 
               <TabsContent value="view-manifest" className="p-0 border-0">
-                {viewManifestId && (
+                {viewManifestId && getCurrentContainer() && (
                   <>
                     <PrintStyles orientation={printOptions.orientation} />
                     <ViewContainerManifest 
                       container={getCurrentContainer() as QatarContainer}
-                      cargoItems={getMockCargoItems()}
-                      itemList={getMockItemList()}
-                      consigneeList={getMockConsigneeList()}
-                      unsettledInvoices={getMockUnsettledInvoices()}
+                      cargoItems={getCurrentCargoItems()}
+                      itemList={getCurrentCargoItems().reduce((acc: ItemListEntry[], item) => {
+                        const existingIndex = acc.findIndex(entry => entry.invoice === item.invoiceNumber);
+                        if (existingIndex >= 0) {
+                          acc[existingIndex].packages += 1;
+                          acc[existingIndex].volume += item.volume;
+                        } else {
+                          acc.push({
+                            id: item.id,
+                            invoice: item.invoiceNumber,
+                            shipper: item.shipper,
+                            consignee: item.consignee,
+                            packages: 1,
+                            volume: item.volume,
+                            packageName: item.packageName
+                          });
+                        }
+                        return acc;
+                      }, [])}
+                      consigneeList={getCurrentCargoItems().reduce((acc: ConsigneeListItem[], item) => {
+                        const existingIndex = acc.findIndex(
+                          entry => entry.consignee === item.consignee && entry.invoice === item.invoiceNumber
+                        );
+                        if (existingIndex >= 0) {
+                          acc[existingIndex].volume += item.volume;
+                        } else {
+                          acc.push({
+                            id: item.id,
+                            invoice: item.invoiceNumber,
+                            shipper: item.shipper,
+                            shipperContact: "Mobile: +974 " + Math.floor(10000000 + Math.random() * 90000000),
+                            consignee: item.consignee,
+                            consigneeContact: "Mobile: +94 " + Math.floor(700000000 + Math.random() * 90000000),
+                            volume: item.volume
+                          });
+                        }
+                        return acc;
+                      }, [])}
+                      unsettledInvoices={getCurrentCargoItems().reduce((acc: UnsettledInvoice[], item) => {
+                        const existingIndex = acc.findIndex(entry => 
+                          entry.invoiceNumber === item.invoiceNumber && 
+                          entry.shipper === item.shipper &&
+                          entry.consignee === item.consignee
+                        );
+                        if (existingIndex === -1) {
+                          acc.push({
+                            id: item.id,
+                            invoiceNumber: item.invoiceNumber,
+                            shipper: item.shipper,
+                            consignee: item.consignee,
+                            amount: Math.floor(5000 + Math.random() * 10000) / 100,
+                            paid: Math.random() > 0.3
+                          });
+                        }
+                        return acc;
+                      }, [])}
                       onBack={() => setActiveTab("containers")}
                       printOptions={printOptions}
                       onPrintOptionsChange={handlePrintOptionsChange}

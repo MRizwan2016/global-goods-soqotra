@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import useContainerManifest from "./manifest/hooks/useContainerManifest";
+import useContainerManifest from "./hooks/useContainerManifest";
 import ContainerDetailsSection from "./manifest/ContainerDetailsSection";
 import ManifestActionsBar from "./manifest/ManifestActionsBar";
 import ManifestTabsHeader from "./manifest/ManifestTabsHeader";
@@ -60,6 +60,7 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
         cargoItems={cargoItems}
         itemList={itemList}
         consigneeList={consigneeList}
+        unsettledInvoices={unsettledInvoices}
         totalVolume={totalVolume}
         totalWeight={totalWeight}
         totalPackages={totalPackages}

@@ -1,7 +1,7 @@
 
 import React from "react";
-import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem } from "../../../types/containerTypes";
-import PrintStyles from "../PrintStyles";
+import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, PrintOptions, UnsettledInvoice } from "../../../types/containerTypes";
+import { FileCheck, Package, Users, CreditCard } from "lucide-react";
 
 interface PrintContainerManifestProps {
   container: QatarContainer;
@@ -12,10 +12,8 @@ interface PrintContainerManifestProps {
   totalWeight: number;
   totalPackages: number;
   confirmDate: string;
-  printOptions?: {
-    section: "all" | "cargo" | "items" | "consignees" | "invoices";
-    orientation: "portrait" | "landscape";
-  };
+  printOptions: PrintOptions;
+  unsettledInvoices?: UnsettledInvoice[];
 }
 
 const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({ 
@@ -27,286 +25,180 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
   totalWeight,
   totalPackages,
   confirmDate,
-  printOptions = { section: "all", orientation: "portrait" }
+  printOptions,
+  unsettledInvoices = []
 }) => {
   const formatVolume = (volume: number) => volume.toFixed(3);
   const formatWeight = (weight: number) => weight.toFixed(2);
-
+  const formatCurrency = (amount: number) => `QAR ${amount.toFixed(2)}`;
+  
+  // Function to determine if a section should be shown
+  const shouldShowSection = (section: "cargo" | "items" | "consignees" | "invoices") => {
+    return printOptions.section === "all" || printOptions.section === section;
+  };
+  
   return (
-    <div className="min-h-screen bg-white print-container">
-      <PrintStyles orientation={printOptions.orientation} />
-      
-      <div className="p-8">
-        {/* Header - Always show */}
-        <div className="flex justify-between items-center mb-6 page-break-after-avoid">
-          <div className="flex items-center">
-            <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-16 w-16 mr-4" />
+    <div className={`print-container ${printOptions.orientation === "landscape" ? "landscape" : "portrait"}`}>
+      <div className="print-manifest">
+        <div className="print-header">
+          <div className="logo-container">
+            <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-16" />
           </div>
-          <div className="text-right">
-            <p className="text-sm">Print Date: {new Date().toLocaleDateString()}</p>
-            <p className="text-sm">Print Time: {new Date().toLocaleTimeString()}</p>
-          </div>
+          <h1 className="text-xl font-bold text-center my-4">CONTAINER MANIFEST</h1>
         </div>
         
-        {/* Manifest Title - Always show */}
-        <div className="bg-blue-600 text-white p-3 text-center mb-6 page-break-after-avoid">
-          <h2 className="text-xl font-bold">CONTAINER MANIFEST</h2>
-        </div>
-        
-        {/* Container Details - Always show */}
-        <div className="mb-6 border rounded-md overflow-hidden page-break-after-avoid">
-          <div className="bg-blue-600 text-white p-2 text-center">
-            <h3 className="font-bold">CONTAINER DETAILS</h3>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-0">
-            <div className="grid grid-cols-2 border-b border-r">
-              <div className="p-2 font-bold bg-gray-100">CONTAINER NUMBER:</div>
-              <div className="p-2">{container.containerNumber}</div>
+        <div className="container-details p-4 border rounded-md mb-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p><strong>Container Number:</strong> {container.containerNumber}</p>
+              <p><strong>Container Type:</strong> {container.containerType}</p>
+              <p><strong>Seal Number:</strong> {container.sealNumber || "N/A"}</p>
             </div>
-            <div className="grid grid-cols-2 border-b">
-              <div className="p-2 font-bold bg-gray-100">SEAL NUMBER:</div>
-              <div className="p-2">{container.sealNumber || "-"}</div>
-            </div>
-            
-            <div className="grid grid-cols-2 border-b border-r">
-              <div className="p-2 font-bold bg-gray-100">RUNNING NUMBER:</div>
-              <div className="p-2">{container.runningNumber}</div>
-            </div>
-            <div className="grid grid-cols-2 border-b">
-              <div className="p-2 font-bold bg-gray-100">CONTAINER TYPE:</div>
-              <div className="p-2">{container.containerType}</div>
-            </div>
-            
-            <div className="grid grid-cols-2 border-b border-r">
-              <div className="p-2 font-bold bg-gray-100">PACKAGES:</div>
-              <div className="p-2">{totalPackages}</div>
-            </div>
-            <div className="grid grid-cols-2 border-b">
-              <div className="p-2 font-bold bg-gray-100">CONTAINER WEIGHT:</div>
-              <div className="p-2">{formatWeight(totalWeight)} kg</div>
-            </div>
-            
-            <div className="grid grid-cols-2 border-r">
-              <div className="p-2 font-bold bg-gray-100">VOLUME:</div>
-              <div className="p-2">{formatVolume(totalVolume)} m³</div>
-            </div>
-            <div className="grid grid-cols-2">
-              <div className="p-2 font-bold bg-gray-100">DATE CONFIRMED:</div>
-              <div className="p-2">{confirmDate}</div>
+            <div>
+              <p><strong>Confirmation Date:</strong> {confirmDate}</p>
+              <p><strong>Total Packages:</strong> {totalPackages}</p>
+              <p><strong>Total Volume:</strong> {formatVolume(totalVolume)} m³</p>
+              <p><strong>Total Weight:</strong> {formatWeight(totalWeight)} kg</p>
             </div>
           </div>
         </div>
         
-        {/* Cargo Items */}
-        {(printOptions.section === "all" || printOptions.section === "cargo") && (
-          <div className="mb-6 page-break-before">
-            <div className="bg-blue-600 text-white p-2 text-center">
-              <h3 className="font-bold">CARGO ITEMS</h3>
+        {shouldShowSection("cargo") && (
+          <div className="cargo-items mb-8 page-break-before">
+            <div className="flex items-center mb-2">
+              <Package className="mr-2 h-5 w-5 text-blue-600" />
+              <h2 className="text-lg font-semibold">Cargo Items</h2>
             </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-blue-100">
-                    <th className="p-2 border text-center">No</th>
-                    <th className="p-2 border">Invoice</th>
-                    <th className="p-2 border">Line No</th>
-                    <th className="p-2 border">Package</th>
-                    <th className="p-2 border">Volume</th>
-                    <th className="p-2 border">Weight</th>
-                    <th className="p-2 border">Shipper</th>
-                    <th className="p-2 border">Consignee</th>
+            <table className="min-w-full border border-gray-300">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="border p-2 text-left">Invoice</th>
+                  <th className="border p-2 text-left">Line #</th>
+                  <th className="border p-2 text-left">Package</th>
+                  <th className="border p-2 text-left">Volume (m³)</th>
+                  <th className="border p-2 text-left">Weight (kg)</th>
+                  <th className="border p-2 text-left">Shipper</th>
+                  <th className="border p-2 text-left">Consignee</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cargoItems.map(item => (
+                  <tr key={item.id} className="border-b">
+                    <td className="border p-2">{item.invoiceNumber}</td>
+                    <td className="border p-2">{item.lineNumber}</td>
+                    <td className="border p-2">{item.packageName}</td>
+                    <td className="border p-2">{formatVolume(item.volume)}</td>
+                    <td className="border p-2">{formatWeight(item.weight)}</td>
+                    <td className="border p-2">{item.shipper}</td>
+                    <td className="border p-2">{item.consignee}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {cargoItems.map((item, index) => (
-                    <tr key={item.id}>
-                      <td className="p-2 border text-center">{index + 1}</td>
-                      <td className="p-2 border">{item.invoiceNumber}</td>
-                      <td className="p-2 border">{item.lineNumber}</td>
-                      <td className="p-2 border">{item.packageName}</td>
-                      <td className="p-2 border">{formatVolume(item.volume)}</td>
-                      <td className="p-2 border">{formatWeight(item.weight)}</td>
-                      <td className="p-2 border">{item.shipper}</td>
-                      <td className="p-2 border">{item.consignee}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr className="bg-gray-100">
-                    <td className="p-2 border text-right font-bold" colSpan={4}>Total:</td>
-                    <td className="p-2 border font-bold">{formatVolume(totalVolume)}</td>
-                    <td className="p-2 border font-bold">{formatWeight(totalWeight)}</td>
-                    <td className="p-2 border" colSpan={2}></td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
         
-        {/* Item List */}
-        {(printOptions.section === "all" || printOptions.section === "items") && (
-          <div className="mb-6 page-break-before">
-            <div className="bg-blue-600 text-white p-2 text-center">
-              <h3 className="font-bold">ITEM LIST</h3>
+        {shouldShowSection("items") && (
+          <div className="item-list mb-8 page-break-before">
+            <div className="flex items-center mb-2">
+              <FileCheck className="mr-2 h-5 w-5 text-green-600" />
+              <h2 className="text-lg font-semibold">Item List by Invoice</h2>
             </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-blue-100">
-                    <th className="p-2 border text-center">No</th>
-                    <th className="p-2 border">Invoice</th>
-                    <th className="p-2 border">Package Name</th>
-                    <th className="p-2 border">Quantity</th>
-                    <th className="p-2 border">Packages</th>
-                    <th className="p-2 border">Volume</th>
-                    <th className="p-2 border">Shipper</th>
-                    <th className="p-2 border">Consignee</th>
+            <table className="min-w-full border border-gray-300">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="border p-2 text-left">Invoice</th>
+                  <th className="border p-2 text-left">Shipper</th>
+                  <th className="border p-2 text-left">Consignee</th>
+                  <th className="border p-2 text-left">Packages</th>
+                  <th className="border p-2 text-left">Package Type</th>
+                  <th className="border p-2 text-left">Volume (m³)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {itemList.map(item => (
+                  <tr key={item.id} className="border-b">
+                    <td className="border p-2">{item.invoice}</td>
+                    <td className="border p-2">{item.shipper}</td>
+                    <td className="border p-2">{item.consignee}</td>
+                    <td className="border p-2">{item.packages}</td>
+                    <td className="border p-2">{item.packageName}</td>
+                    <td className="border p-2">{formatVolume(item.volume)}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {itemList.map((item, index) => (
-                    <tr key={item.id}>
-                      <td className="p-2 border text-center">{index + 1}</td>
-                      <td className="p-2 border">{item.invoice}</td>
-                      <td className="p-2 border">{item.packageName || "N/A"}</td>
-                      <td className="p-2 border text-center">{item.quantity || "-"}</td>
-                      <td className="p-2 border text-center">{item.packages}</td>
-                      <td className="p-2 border">{formatVolume(item.volume)}</td>
-                      <td className="p-2 border">{item.shipper}</td>
-                      <td className="p-2 border">{item.consignee}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr className="bg-gray-100">
-                    <td className="p-2 border text-right font-bold" colSpan={5}>Total:</td>
-                    <td className="p-2 border font-bold">{formatVolume(itemList.reduce((sum, item) => sum + item.volume, 0))}</td>
-                    <td className="p-2 border" colSpan={2}></td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
         
-        {/* Consignee List */}
-        {(printOptions.section === "all" || printOptions.section === "consignees") && (
-          <div className="mb-6 page-break-before">
-            <div className="bg-blue-600 text-white p-2 text-center">
-              <h3 className="font-bold">CONSIGNEE LIST</h3>
+        {shouldShowSection("consignees") && (
+          <div className="consignee-list mb-8 page-break-before">
+            <div className="flex items-center mb-2">
+              <Users className="mr-2 h-5 w-5 text-purple-600" />
+              <h2 className="text-lg font-semibold">Consignee Contact List</h2>
             </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-blue-100">
-                    <th className="p-2 border text-center">No</th>
-                    <th className="p-2 border">Invoice</th>
-                    <th className="p-2 border">Shipper</th>
-                    <th className="p-2 border">Contact</th>
-                    <th className="p-2 border">Consignee</th>
-                    <th className="p-2 border">Contact</th>
-                    <th className="p-2 border">Volume</th>
+            <table className="min-w-full border border-gray-300">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="border p-2 text-left">Invoice</th>
+                  <th className="border p-2 text-left">Shipper</th>
+                  <th className="border p-2 text-left">Shipper Contact</th>
+                  <th className="border p-2 text-left">Consignee</th>
+                  <th className="border p-2 text-left">Consignee Contact</th>
+                  <th className="border p-2 text-left">Volume (m³)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {consigneeList.map(consignee => (
+                  <tr key={consignee.id} className="border-b">
+                    <td className="border p-2">{consignee.invoice}</td>
+                    <td className="border p-2">{consignee.shipper}</td>
+                    <td className="border p-2">{consignee.shipperContact}</td>
+                    <td className="border p-2">{consignee.consignee}</td>
+                    <td className="border p-2">{consignee.consigneeContact}</td>
+                    <td className="border p-2">{formatVolume(consignee.volume)}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {consigneeList.map((item, index) => (
-                    <tr key={item.id}>
-                      <td className="p-2 border text-center">{index + 1}</td>
-                      <td className="p-2 border">{item.invoice}</td>
-                      <td className="p-2 border">{item.shipper}</td>
-                      <td className="p-2 border">{item.shipperContact || "-"}</td>
-                      <td className="p-2 border">{item.consignee}</td>
-                      <td className="p-2 border">{item.consigneeContact || "-"}</td>
-                      <td className="p-2 border">{formatVolume(item.volume)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr className="bg-gray-100">
-                    <td className="p-2 border text-right font-bold" colSpan={6}>Total:</td>
-                    <td className="p-2 border font-bold">{formatVolume(consigneeList.reduce((sum, item) => sum + item.volume, 0))}</td>
-                  </tr>
-                </tfoot>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
         
-        {/* Unsettled Invoices */}
-        {(printOptions.section === "all" || printOptions.section === "invoices") && (
-          <div className="mb-6 page-break-before">
-            <div className="bg-blue-600 text-white p-2 text-center">
-              <h3 className="font-bold">UNSETTLED INVOICES</h3>
+        {shouldShowSection("invoices") && unsettledInvoices && unsettledInvoices.length > 0 && (
+          <div className="unsettled-invoices page-break-before">
+            <div className="flex items-center mb-2">
+              <CreditCard className="mr-2 h-5 w-5 text-red-600" />
+              <h2 className="text-lg font-semibold">Unsettled Invoices</h2>
             </div>
-            
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-blue-100">
-                    <th className="p-2 border text-center">No</th>
-                    <th className="p-2 border">Invoice</th>
-                    <th className="p-2 border">GY</th>
-                    <th className="p-2 border">Shipper</th>
-                    <th className="p-2 border">Consignee</th>
-                    <th className="p-2 border">Amount</th>
-                    <th className="p-2 border">Status</th>
+            <table className="min-w-full border border-gray-300">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="border p-2 text-left">Invoice Number</th>
+                  <th className="border p-2 text-left">Shipper</th>
+                  <th className="border p-2 text-left">Consignee</th>
+                  <th className="border p-2 text-left">Amount</th>
+                  <th className="border p-2 text-left">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {unsettledInvoices.filter(invoice => !invoice.paid).map(invoice => (
+                  <tr key={invoice.id} className="border-b">
+                    <td className="border p-2">{invoice.invoiceNumber}</td>
+                    <td className="border p-2">{invoice.shipper}</td>
+                    <td className="border p-2">{invoice.consignee}</td>
+                    <td className="border p-2">{formatCurrency(invoice.amount)}</td>
+                    <td className="border p-2 text-red-600 font-semibold">Outstanding</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {itemList.reduce((unsettledList, item) => {
-                    const invoice = {
-                      id: item.id,
-                      invoiceNumber: item.invoice,
-                      shipper: item.shipper,
-                      consignee: item.consignee,
-                      amount: parseFloat((item.volume * 100).toFixed(2)),
-                      paid: false
-                    };
-                    
-                    if (!unsettledList.some(i => i.invoiceNumber === invoice.invoiceNumber)) {
-                      unsettledList.push(invoice);
-                    }
-                    
-                    return unsettledList;
-                  }, [] as any[]).map((item, index) => (
-                    <tr key={item.id}>
-                      <td className="p-2 border text-center">{index + 1}</td>
-                      <td className="p-2 border">{item.invoiceNumber}</td>
-                      <td className="p-2 border">{item.gy || "-"}</td>
-                      <td className="p-2 border">{item.shipper}</td>
-                      <td className="p-2 border">{item.consignee}</td>
-                      <td className="p-2 border text-right">{item.amount.toFixed(2)}</td>
-                      <td className="p-2 border text-center">{item.paid ? "PAID" : "UNPAID"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+                {unsettledInvoices.filter(invoice => !invoice.paid).length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="border p-4 text-center">No unsettled invoices found</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         )}
-        
-        {/* Signature Section - Always show at the end */}
-        <div className="mt-16 grid grid-cols-3 gap-8 page-break-before">
-          <div className="text-center">
-            <p className="font-bold">PREPARED BY</p>
-            <div className="border-t mt-12 pt-2">Name & Signature</div>
-          </div>
-          
-          <div className="text-center">
-            <p className="font-bold">CHECKED BY</p>
-            <div className="border-t mt-12 pt-2">Name & Signature</div>
-          </div>
-          
-          <div className="text-center">
-            <p className="font-bold">AUTHORIZED BY</p>
-            <div className="border-t mt-12 pt-2">Name & Signature</div>
-          </div>
-        </div>
       </div>
     </div>
   );

@@ -2,69 +2,55 @@
 import React from "react";
 
 interface PrintStylesProps {
-  orientation?: string;
+  orientation?: "portrait" | "landscape";
 }
 
 const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) => {
   return (
-    <style type="text/css" media="print">
+    <style>
       {`
-        @page {
-          size: A4 ${orientation};
-          margin: 10mm;
-        }
-        body {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
-        }
-        .print-container {
-          width: 100%;
-          max-width: 100%;
-          margin: 0;
-          padding: 0;
-          background-color: white;
-        }
-        .company-name {
-          color: #1E40AF !important;
-        }
-        button, .no-print {
-          display: none !important;
-        }
-        .bg-blue-600 {
-          background-color: #2563EB !important;
-          color: white !important;
-        }
-        .bg-blue-100 {
-          background-color: #DBEAFE !important;
-        }
-        .bg-gray-100 {
-          background-color: #F3F4F6 !important;
-        }
-        .border {
-          border: 1px solid #000 !important;
-        }
-        .border-r {
-          border-right: 1px solid #000 !important;
-        }
-        .border-b {
-          border-bottom: 1px solid #000 !important;
-        }
-        .text-blue-800 {
-          color: #1E40AF !important;
-        }
-        
-        /* Page break classes */
-        .page-break-before {
-          page-break-before: always;
-        }
-        .page-break-after {
-          page-break-after: always;
-        }
-        .page-break-after-avoid {
-          page-break-after: avoid;
-        }
-        .page-break-inside-avoid {
-          page-break-inside: avoid;
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          .print-container, .print-container * {
+            visibility: visible;
+          }
+          .print-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+          }
+          .page-break-before {
+            page-break-before: always;
+          }
+          .no-print {
+            display: none !important;
+          }
+          
+          /* Orientation settings */
+          @page {
+            size: ${orientation === "landscape" ? "landscape" : "portrait"};
+            margin: 1cm;
+          }
+          
+          /* Layout adjustments for landscape */
+          .landscape table {
+            font-size: 0.9em;
+          }
+          
+          /* Fix table width issues */
+          table {
+            width: 100% !important;
+            table-layout: fixed;
+          }
+          
+          /* Add logo styling */
+          .logo-container {
+            text-align: center;
+            margin-bottom: 10px;
+          }
         }
       `}
     </style>
