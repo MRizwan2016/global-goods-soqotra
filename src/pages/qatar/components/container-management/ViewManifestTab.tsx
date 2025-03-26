@@ -3,10 +3,22 @@ import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PrintOptions, ViewContainerManifestProps } from "../../types/containerTypes";
+import { PrintOptions, QatarContainer } from "../../types/containerTypes";
 import { ArrowLeft, Printer } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import ContainerList from "../vessel-management/manifest/ContainerList";
+import ContainerList from "./ContainerList";
+
+interface ViewContainerManifestProps {
+  container: QatarContainer | null;
+  cargoItems: any[];
+  itemList: any[];
+  consigneeList: any[];
+  unsettledInvoices: any[];
+  onBack: () => void;
+  printOptions: PrintOptions;
+  onPrintOptionsChange: (options: Partial<PrintOptions>) => void;
+  onPrint: () => void;
+}
 
 const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
   container,
@@ -21,7 +33,7 @@ const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState("container-details");
 
-  // This could be a real container with many cargo items
+  // Format container data for the ContainerList component
   const containerData = container ? [
     {
       id: container.id,
