@@ -4,13 +4,20 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 
+interface InvoiceSuggestion {
+  invoiceNumber: string;
+  shipper: string;
+  consignee: string;
+  [key: string]: any;
+}
+
 interface InvoiceSearchInputProps {
   bookingForm: string;
   onBookingFormChange: (value: string) => void;
-  bookingFormSuggestions: any[];
+  bookingFormSuggestions: InvoiceSuggestion[];
   showSuggestions: boolean;
   setShowSuggestions: (show: boolean) => void;
-  onSelectInvoice: (invoice: any) => void;
+  onSelectInvoice: (invoice: InvoiceSuggestion) => void;
 }
 
 const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
@@ -32,6 +39,7 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
           placeholder="GY/INVOICE"
           className="flex-1"
           onFocus={() => bookingFormSuggestions.length > 0 && setShowSuggestions(true)}
+          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
         />
       </div>
       
