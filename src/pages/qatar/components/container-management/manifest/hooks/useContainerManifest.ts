@@ -8,7 +8,7 @@ import {
   ConsigneeListItem, 
   UnsettledInvoice 
 } from "../../../../types/containerTypes";
-import { mockCargoItems, mockContainers, mockItemList, mockConsigneeList, mockUnsettledInvoices } from "../../../../data/mockContainers";
+import { mockCargoItems, mockContainers } from "../../../../data/mockContainers";
 
 const useContainerManifest = (containerId: string, onManifestSubmitted: () => void) => {
   const [container, setContainer] = useState<QatarContainer | null>(null);
@@ -16,11 +16,7 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
   const [confirmDate, setConfirmDate] = useState("");
   const [vgmWeight, setVgmWeight] = useState("");
   const [activeTab, setActiveTab] = useState("cargo");
-  
-  // Get mock data for display
-  const itemList = mockItemList;
-  const consigneeList = mockConsigneeList;
-  const unsettledInvoices = mockUnsettledInvoices;
+  const [printViewVisible, setPrintViewVisible] = useState(false);
   
   // Load container data
   useEffect(() => {
@@ -38,6 +34,80 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
     setConfirmDate(new Date().toLocaleDateString("en-GB", {day: "2-digit", month: "2-digit", year: "numeric"}));
   }, [containerId]);
   
+  // Generate filtered item list based on cargo items
+  const itemList: ItemListEntry[] = cargoItems.reduce((acc: ItemListEntry[], item) => {
+    // Check if this invoice is already in the list
+    const existingIndex = acc.findIndex(entry => entry.invoice === item.invoiceNumber);
+    
+    if (existingIndex >= 0) {
+      // Add to existing invoice
+      acc[existingIndex].packages += 1;
+      acc[existingIndex].volume += item.volume;
+    } else {
+      // Create new invoice entry
+      acc.push({
+        id: item.id,
+        invoice: item.invoiceNumber,
+        shipper: item.shipper,
+        consignee: item.consignee,
+        packages: 1,
+        volume: item.volume
+      });
+    }
+    
+    return acc;
+  }, []);
+  
+  // Generate consignee list with contact information
+  const consigneeList: ConsigneeListItem[] = cargoItems.reduce((acc: ConsigneeListItem[], item) => {
+    // Check if this consignee is already in the list
+    const existingIndex = acc.findIndex(
+      entry => entry.consignee === item.consignee && entry.invoice === item.invoiceNumber
+    );
+    
+    if (existingIndex >= 0) {
+      // Add to existing consignee
+      acc[existingIndex].volume += item.volume;
+    } else {
+      // Create new consignee entry with contact info
+      acc.push({
+        id: item.id,
+        invoice: item.invoiceNumber,
+        shipper: item.shipper,
+        shipperContact: "Mobile: +974 " + Math.floor(10000000 + Math.random() * 90000000),
+        consignee: item.consignee,
+        consigneeContact: "Mobile: +94 " + Math.floor(700000000 + Math.random() * 90000000),
+        volume: item.volume
+      });
+    }
+    
+    return acc;
+  }, []);
+  
+  // Generate unsettled invoices from cargo items
+  const unsettledInvoices: UnsettledInvoice[] = cargoItems.reduce((acc: UnsettledInvoice[], item) => {
+    // Check if this invoice is already in the list
+    const existingIndex = acc.findIndex(entry => 
+      entry.invoiceNumber === item.invoiceNumber && 
+      entry.shipper === item.shipper &&
+      entry.consignee === item.consignee
+    );
+    
+    if (existingIndex === -1) {
+      // Create new invoice entry
+      acc.push({
+        id: item.id,
+        invoiceNumber: item.invoiceNumber,
+        shipper: item.shipper,
+        consignee: item.consignee,
+        amount: Math.floor(5000 + Math.random() * 10000) / 100,
+        paid: Math.random() > 0.3 // 70% chance to be paid
+      });
+    }
+    
+    return acc;
+  }, []);
+  
   const handleConfirm = () => {
     if (!confirmDate) {
       toast.error("Please enter a confirmation date");
@@ -54,6 +124,20 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
     onManifestSubmitted();
     
     toast.success("Container manifest confirmed successfully");
+  };
+
+  const handlePrint = () => {
+    setPrintViewVisible(true);
+    
+    // Allow time for the print view to render before printing
+    setTimeout(() => {
+      window.print();
+      
+      // Reset after printing
+      setTimeout(() => {
+        setPrintViewVisible(false);
+      }, 500);
+    }, 100);
   };
   
   const formatVolume = (volume: number) => volume.toFixed(3);
@@ -73,6 +157,7 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
     setVgmWeight,
     activeTab,
     setActiveTab,
+    printViewVisible,
     totalPackages,
     totalVolume,
     totalWeight,
@@ -81,7 +166,8 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
     unsettledInvoices,
     formatVolume,
     formatWeight,
-    handleConfirm
+    handleConfirm,
+    handlePrint
   };
 };
 

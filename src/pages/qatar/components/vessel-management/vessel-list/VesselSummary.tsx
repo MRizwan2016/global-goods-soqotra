@@ -8,8 +8,8 @@ interface VesselSummaryProps {
 
 const VesselSummary: React.FC<VesselSummaryProps> = ({ filteredCount, totalCount }) => {
   return (
-    <div className="text-sm text-gray-500">
-      Showing {filteredCount} of {totalCount} vessels
+    <div className="text-sm text-gray-500 animate-fade-in">
+      Showing <span className="font-semibold text-blue-600">{filteredCount}</span> of <span className="font-semibold text-blue-600">{totalCount}</span> vessels
     </div>
   );
 };

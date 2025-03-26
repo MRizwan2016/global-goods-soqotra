@@ -1,16 +1,21 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
 import { VesselFormData } from "../types/vesselTypes";
+import { DEFAULT_PORT_OF_LOADING, generateRunningNumber } from "../constants/vesselData";
+import { mockVesselData } from "../mockVesselData";
 
 export function useVesselForm(onVesselCreated: () => void) {
+  // Extract existing running numbers for auto-generation
+  const existingRunningNumbers = mockVesselData.map(v => v.runningNumber);
+  
   const [formData, setFormData] = useState<VesselFormData>({
     id: uuidv4(),
-    runningNumber: "",
+    runningNumber: generateRunningNumber(existingRunningNumbers),
     vesselName: "",
     voyage: "",
-    portOfLoading: "",
+    portOfLoading: DEFAULT_PORT_OF_LOADING,
     portOfDischarge: "",
     shippingLine: "",
     direction: "MIX",
@@ -41,8 +46,10 @@ export function useVesselForm(onVesselCreated: () => void) {
     // In a real app, this would save to an API
     console.log("Saving vessel:", formData);
     
-    // Show success message
-    toast.success(`Vessel ${formData.vesselName} created successfully`);
+    // Show success message with animation
+    toast.success(`Vessel ${formData.vesselName} created successfully`, {
+      style: { backgroundColor: "#10B981", color: "white" }
+    });
     
     // Call callback
     onVesselCreated();
@@ -50,6 +57,7 @@ export function useVesselForm(onVesselCreated: () => void) {
 
   return {
     formData,
+    existingRunningNumbers,
     handleInputChange,
     handleSelectChange,
     handleSubmit

@@ -8,10 +8,10 @@ import { useVesselForm } from "./hooks/useVesselForm";
 import { AddVesselProps } from "./types/vesselTypes";
 
 const AddVessel: React.FC<AddVesselProps> = ({ onVesselCreated, onCancel }) => {
-  const { formData, handleInputChange, handleSelectChange, handleSubmit } = useVesselForm(onVesselCreated);
+  const { formData, existingRunningNumbers, handleInputChange, handleSelectChange, handleSubmit } = useVesselForm(onVesselCreated);
 
   return (
-    <Card className="shadow-md">
+    <Card className="shadow-md animate-fade-in">
       <CardHeader className="bg-green-50 border-b border-green-100">
         <CardTitle className="text-xl text-green-800">Add New Vessel</CardTitle>
       </CardHeader>
@@ -23,6 +23,7 @@ const AddVessel: React.FC<AddVesselProps> = ({ onVesselCreated, onCancel }) => {
               formData={formData}
               handleInputChange={handleInputChange}
               handleSelectChange={handleSelectChange}
+              existingRunningNumbers={existingRunningNumbers}
             />
             
             <ShippingDetailsForm 

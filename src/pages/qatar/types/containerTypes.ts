@@ -1,21 +1,15 @@
 
 export interface QatarContainer {
   id: string;
-  runningNumber: string;
   containerNumber: string;
-  sealNumber: string;
-  containerType: 'GP20' | 'GP40' | 'HC40' | 'RF20' | 'RF40' | 'FL20' | 'FL40' | 'OT20' | 'OT40' | '20FT_NML' | '40FT_HIGHC' | '40FT_STD' | '45FT_HIGHC';
-  direction: 'DIRECT' | 'MIX' | 'K' | 'M' | 'COLOMBO' | 'KURUNEGALA';
-  sector: string;
-  etd: string;
-  eta: string;
-  loadDate: string;
-  weight: number;
-  status: 'NEW' | 'LOADING' | 'LOADED' | 'SEALED' | 'SHIPPED' | 'COMPLETED' | 'CONFIRMED';
-  // Additional properties
-  packages?: number;
+  containerType: string;
+  runningNumber: string;
+  status: string;
+  sealNumber?: string;
+  weight?: number;
   volume?: number;
-  shippingLine?: string;
+  packages?: number;
+  vesselId?: string;
 }
 
 export interface ContainerCargo {
@@ -35,25 +29,34 @@ export interface ContainerCargo {
 
 export interface ItemListEntry {
   id: string;
-  itemName: string;
-  quantity: number;
+  invoice: string;
+  shipper: string;
+  consignee: string;
+  packages: number;
   volume: number;
 }
 
 export interface ConsigneeListItem {
   id: string;
   invoice: string;
+  shipper: string;
+  shipperContact?: string;
   consignee: string;
+  consigneeContact?: string;
   volume: number;
 }
 
 export interface UnsettledInvoice {
   id: string;
-  invoiceNumber: string;
-  gy: string;
+  invoiceNumber: string | null;
   shipper: string;
   consignee: string;
-  net: number;
-  paid: number;
-  due: number;
+  amount: number;
+  paid: boolean;
+}
+
+export interface ContainerManifestProps {
+  containerId: string;
+  onManifestSubmitted: () => void;
+  onCancel: () => void;
 }

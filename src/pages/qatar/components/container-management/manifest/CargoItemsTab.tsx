@@ -6,7 +6,8 @@ import {
   TableRow, 
   TableHead, 
   TableBody, 
-  TableCell 
+  TableCell,
+  TableFooter
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -25,61 +26,71 @@ const CargoItemsTab: React.FC<CargoItemsTabProps> = ({
 }) => {
   return (
     <div className="space-y-4">
-      <div className="bg-blue-600 text-white py-1 mb-1">
+      <div className="bg-blue-600 text-white text-center py-2 mb-2 font-bold">
+        CARGO ITEMS
+      </div>
+      
+      <div className="border border-gray-200 rounded-md overflow-hidden">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-blue-600">
             <TableRow>
-              <TableHead className="text-white font-semibold text-center">Num</TableHead>
-              <TableHead className="text-white font-semibold">INVOICE</TableHead>
-              <TableHead className="text-white font-semibold">L. Num</TableHead>
-              <TableHead className="text-white font-semibold">BARCODE</TableHead>
-              <TableHead className="text-white font-semibold">PACKAGE</TableHead>
-              <TableHead className="text-white font-semibold">VOLUME</TableHead>
-              <TableHead className="text-white font-semibold">WEIGHT</TableHead>
-              <TableHead className="text-white font-semibold">CONSIGNEE</TableHead>
-              <TableHead className="text-white font-semibold">SHIPPER</TableHead>
-              <TableHead className="text-white font-semibold">W/H</TableHead>
-              <TableHead className="text-white font-semibold">D2D</TableHead>
+              <TableHead className="text-white font-semibold text-center border-r border-white/20">Num</TableHead>
+              <TableHead className="text-white font-semibold border-r border-white/20">INVOICE</TableHead>
+              <TableHead className="text-white font-semibold border-r border-white/20">L. Num</TableHead>
+              <TableHead className="text-white font-semibold border-r border-white/20">BARCODE</TableHead>
+              <TableHead className="text-white font-semibold border-r border-white/20">PACKAGE</TableHead>
+              <TableHead className="text-white font-semibold border-r border-white/20">VOLUME</TableHead>
+              <TableHead className="text-white font-semibold border-r border-white/20">WEIGHT</TableHead>
+              <TableHead className="text-white font-semibold border-r border-white/20">CONSIGNEE</TableHead>
+              <TableHead className="text-white font-semibold border-r border-white/20">SHIPPER</TableHead>
+              <TableHead className="text-white font-semibold border-r border-white/20">W/H</TableHead>
+              <TableHead className="text-white font-semibold border-r border-white/20">D2D</TableHead>
               <TableHead className="text-white font-semibold text-center">UNLOAD</TableHead>
             </TableRow>
           </TableHeader>
+          
+          <TableBody>
+            {cargoItems.map((item, index) => (
+              <TableRow key={item.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                <TableCell className="text-center border-r border-gray-200">{index + 1}</TableCell>
+                <TableCell className="border-r border-gray-200">{item.invoiceNumber}</TableCell>
+                <TableCell className="border-r border-gray-200">{item.lineNumber}</TableCell>
+                <TableCell className="border-r border-gray-200">{item.barcode || "-"}</TableCell>
+                <TableCell className="border-r border-gray-200">{item.packageName}</TableCell>
+                <TableCell className="border-r border-gray-200">{formatVolume(item.volume)}</TableCell>
+                <TableCell className="border-r border-gray-200">
+                  <Input
+                    value={formatWeight(item.weight)}
+                    onChange={() => {}}
+                    className="w-full p-1 text-sm"
+                  />
+                </TableCell>
+                <TableCell className="border-r border-gray-200">{item.consignee}</TableCell>
+                <TableCell className="border-r border-gray-200">{item.shipper}</TableCell>
+                <TableCell className="border-r border-gray-200">{item.wh}</TableCell>
+                <TableCell className="border-r border-gray-200">{item.d2d ? "Yes" : "No"}</TableCell>
+                <TableCell className="text-center">
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-all whitespace-normal p-2 h-auto text-xs"
+                  >
+                    {item.packageName}
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+          <TableFooter>
+            <TableRow className="bg-gray-100">
+              <TableCell colSpan={5} className="text-right font-bold">TOTAL:</TableCell>
+              <TableCell className="font-bold">{formatVolume(cargoItems.reduce((sum, item) => sum + item.volume, 0))}</TableCell>
+              <TableCell className="font-bold">{formatWeight(cargoItems.reduce((sum, item) => sum + item.weight, 0))}</TableCell>
+              <TableCell colSpan={5}></TableCell>
+            </TableRow>
+          </TableFooter>
         </Table>
       </div>
-      
-      <Table>
-        <TableBody>
-          {cargoItems.map((item, index) => (
-            <TableRow key={item.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-              <TableCell className="text-center">{index + 1}</TableCell>
-              <TableCell>{item.invoiceNumber}</TableCell>
-              <TableCell>{item.lineNumber}</TableCell>
-              <TableCell>{item.barcode || "-"}</TableCell>
-              <TableCell>{item.packageName}</TableCell>
-              <TableCell>{formatVolume(item.volume)}</TableCell>
-              <TableCell>
-                <Input
-                  value={formatWeight(item.weight)}
-                  onChange={() => {}}
-                  className="w-full p-1 text-sm"
-                />
-              </TableCell>
-              <TableCell>{item.consignee}</TableCell>
-              <TableCell>{item.shipper}</TableCell>
-              <TableCell>{item.wh}</TableCell>
-              <TableCell>{item.d2d ? "Yes" : "No"}</TableCell>
-              <TableCell className="text-center">
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  className="bg-blue-600 hover:bg-blue-700 whitespace-normal p-2 h-auto text-xs"
-                >
-                  {item.packageName}
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
     </div>
   );
 };

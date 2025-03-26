@@ -6,7 +6,8 @@ import {
   PlusCircle, 
   List,
   FileCheck,
-  Anchor
+  Anchor,
+  Printer
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VesselList from "./components/vessel-management/VesselList";
@@ -19,6 +20,7 @@ const VesselManagement: React.FC = () => {
   const [activeTab, setActiveTab] = useState("list");
   const [selectedVesselId, setSelectedVesselId] = useState<string | null>(null);
   const [vesselLoaded, setVesselLoaded] = useState(false);
+  const [manifestSubmitted, setManifestSubmitted] = useState(false);
   
   // Prevent users from manually switching tabs if they haven't completed the current step
   const handleTabChange = (tab: string) => {
@@ -33,6 +35,7 @@ const VesselManagement: React.FC = () => {
   const handleVesselSelect = (vesselId: string) => {
     setSelectedVesselId(vesselId);
     setVesselLoaded(false);
+    setManifestSubmitted(false);
     setActiveTab("load");
     toast.success("Vessel selected for loading");
   };
@@ -49,16 +52,30 @@ const VesselManagement: React.FC = () => {
   };
 
   const handleManifestSubmitted = () => {
+    setManifestSubmitted(true);
     setActiveTab("list");
-    setSelectedVesselId(null);
-    setVesselLoaded(false);
-    toast.success("Manifest submitted successfully");
+    toast.success("Manifest submitted successfully", {
+      description: "You can now view or print the manifest",
+      action: {
+        label: "View Manifest",
+        onClick: () => {
+          setActiveTab("manifest");
+        }
+      }
+    });
   };
 
   const handleBackToList = () => {
     setActiveTab("list");
     setSelectedVesselId(null);
     setVesselLoaded(false);
+    setManifestSubmitted(false);
+  };
+  
+  const handleViewManifest = () => {
+    if (selectedVesselId) {
+      setActiveTab("manifest");
+    }
   };
 
   return (
@@ -70,38 +87,49 @@ const VesselManagement: React.FC = () => {
         </div>
         
         {activeTab === "list" && (
-          <Button 
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
-            onClick={() => setActiveTab("add")}
-          >
-            <PlusCircle size={18} />
-            Add New Vessel
-          </Button>
+          <div className="flex gap-2">
+            {selectedVesselId && manifestSubmitted && (
+              <Button 
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-transform"
+                onClick={handleViewManifest}
+              >
+                <Printer size={18} />
+                View Manifest
+              </Button>
+            )}
+            <Button 
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 hover:scale-105 transition-transform"
+              onClick={() => setActiveTab("add")}
+            >
+              <PlusCircle size={18} />
+              Add New Vessel
+            </Button>
+          </div>
         )}
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid grid-cols-4 mb-8">
-          <TabsTrigger value="list" className="flex items-center gap-2">
+          <TabsTrigger value="list" className="flex items-center gap-2 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
             <List size={18} />
             <span>Vessel List</span>
           </TabsTrigger>
-          <TabsTrigger value="add" className="flex items-center gap-2">
+          <TabsTrigger value="add" className="flex items-center gap-2 data-[state=active]:bg-green-600 data-[state=active]:text-white">
             <PlusCircle size={18} />
             <span>Add Vessel</span>
           </TabsTrigger>
           <TabsTrigger 
             value="load" 
             disabled={!selectedVesselId} 
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 data-[state=active]:bg-amber-600 data-[state=active]:text-white"
           >
             <Anchor size={18} />
             <span>Load Containers</span>
           </TabsTrigger>
           <TabsTrigger 
             value="manifest" 
-            disabled={!selectedVesselId || !vesselLoaded} 
-            className="flex items-center gap-2"
+            disabled={!selectedVesselId || (!vesselLoaded && !manifestSubmitted)} 
+            className="flex items-center gap-2 data-[state=active]:bg-teal-600 data-[state=active]:text-white"
           >
             <FileCheck size={18} />
             <span>Manifest</span>

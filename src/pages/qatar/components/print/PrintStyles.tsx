@@ -6,60 +6,47 @@ const PrintStyles: React.FC = () => {
     <style type="text/css" media="print">
       {`
         @page {
-          size: A4 landscape;
+          size: A4;
           margin: 10mm;
         }
         body {
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
-          color-adjust: exact;
         }
-        .print\\:hidden {
+        .print-container {
+          width: 100%;
+          max-width: 100%;
+          margin: 0;
+          padding: 0;
+          background-color: white;
+        }
+        .company-name {
+          color: #1E40AF !important;
+        }
+        button, .no-print {
           display: none !important;
         }
+        .bg-blue-600 {
+          background-color: #2563EB !important;
+          color: white !important;
+        }
         .bg-blue-100 {
-          background-color: #dbeafe !important;
+          background-color: #DBEAFE !important;
         }
-        .bg-green-100 {
-          background-color: #d1fae5 !important;
+        .bg-gray-100 {
+          background-color: #F3F4F6 !important;
         }
-        table {
-          page-break-inside: auto;
+        .border {
+          border: 1px solid #000 !important;
         }
-        tr {
-          page-break-inside: avoid;
-          page-break-after: auto;
+        .border-r {
+          border-right: 1px solid #000 !important;
         }
-        thead {
-          display: table-header-group;
+        .border-b {
+          border-bottom: 1px solid #000 !important;
         }
-        tfoot {
-          display: table-footer-group;
-        }
-        @media print {
-          html, body {
-            width: 297mm; /* A4 width in landscape */
-            height: 210mm; /* A4 height in landscape */
-            overflow: visible !important;
-          }
-          .company-name {
-            font-weight: bold;
-          }
-          .print-container {
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          img {
-            display: block !important;
-            visibility: visible !important;
-          }
-          a[href]:after {
-            content: none !important;
-          }
-          button {
-            display: none !important;
-          }
+        .text-blue-800 {
+          color: #1E40AF !important;
         }
       `}
     </style>

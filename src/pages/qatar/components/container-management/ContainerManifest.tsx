@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileCheck, ArrowLeft, ShipIcon } from "lucide-react";
+import { FileCheck, ArrowLeft, Ship } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import useContainerManifest from "./manifest/hooks/useContainerManifest";
@@ -9,6 +9,7 @@ import ContainerDetailsSection from "./manifest/ContainerDetailsSection";
 import ManifestActionsBar from "./manifest/ManifestActionsBar";
 import ManifestTabsHeader from "./manifest/ManifestTabsHeader";
 import TabsContentWrapper from "./manifest/TabsContentWrapper";
+import PrintContainerManifest from "../print/container/PrintContainerManifest";
 
 interface ContainerManifestProps {
   containerId: string;
@@ -30,6 +31,7 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     setVgmWeight,
     activeTab,
     setActiveTab,
+    printViewVisible,
     totalPackages,
     totalVolume,
     totalWeight,
@@ -38,11 +40,28 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     unsettledInvoices,
     formatVolume,
     formatWeight,
-    handleConfirm
+    handleConfirm,
+    handlePrint
   } = useContainerManifest(containerId, onManifestSubmitted);
   
   if (!container) {
     return <div>Loading container details...</div>;
+  }
+  
+  // Show print view when printing
+  if (printViewVisible) {
+    return (
+      <PrintContainerManifest 
+        container={container}
+        cargoItems={cargoItems}
+        itemList={itemList}
+        consigneeList={consigneeList}
+        totalVolume={totalVolume}
+        totalWeight={totalWeight}
+        totalPackages={totalPackages}
+        confirmDate={confirmDate}
+      />
+    );
   }
   
   return (
@@ -61,7 +80,7 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
           variant="outline" 
           size="sm"
           onClick={onCancel}
-          className="flex items-center gap-1"
+          className="flex items-center gap-1 hover:scale-105 transition-transform"
         >
           <ArrowLeft className="h-4 w-4" />
           Back
@@ -71,7 +90,7 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
       <CardContent className="p-6">
         <div className="bg-blue-50 p-4 rounded-md mb-6 border-l-4 border-blue-500">
           <div className="flex items-center text-blue-700 mb-2">
-            <ShipIcon size={20} className="mr-2" />
+            <Ship size={20} className="mr-2" />
             <h3 className="font-semibold">Container Cargo Summary</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -115,6 +134,7 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
         <ManifestActionsBar 
           onCancel={onCancel}
           onConfirm={handleConfirm}
+          onPrint={handlePrint}
         />
       </CardContent>
     </Card>

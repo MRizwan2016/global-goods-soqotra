@@ -12,7 +12,7 @@ import ItemListTab from "./ItemListTab";
 import UnsettledInvoicesTab from "./UnsettledInvoicesTab";
 import ConsigneeListTab from "./ConsigneeListTab";
 import { Button } from "@/components/ui/button";
-import { Save } from "lucide-react";
+import { Save, Receipt } from "lucide-react";
 import { toast } from "sonner";
 
 interface TabsContentWrapperProps {
@@ -78,12 +78,12 @@ const TabsContentWrapper: React.FC<TabsContentWrapperProps> = ({
       
       <TabsContent value="invoices">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold">Unsettled Invoices</h3>
+          <h3 className="text-lg font-semibold">Container Invoices</h3>
           <Button 
             onClick={handleSaveInvoices}
-            className="bg-green-600 hover:bg-green-700 text-white"
+            className="bg-green-600 hover:bg-green-700 text-white hover:scale-105 transition-transform"
           >
-            <Save className="mr-2 h-4 w-4" />
+            <Receipt className="mr-2 h-4 w-4" />
             Assign Invoice Numbers
           </Button>
         </div>

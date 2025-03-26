@@ -1,21 +1,31 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SECTORS, SHIPPING_LINES } from "../constants/vesselData";
+import { SECTORS, SECTOR_PORT_MAP, generateRunningNumber } from "../constants/vesselData";
 import { VesselFormData } from "../types/vesselTypes";
 
 interface VesselDetailsFormProps {
   formData: VesselFormData;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
+  existingRunningNumbers: string[];
 }
 
 const VesselDetailsForm: React.FC<VesselDetailsFormProps> = ({ 
   formData, 
   handleInputChange, 
-  handleSelectChange 
+  handleSelectChange,
+  existingRunningNumbers
 }) => {
+  // Set running number automatically when component mounts
+  useEffect(() => {
+    if (!formData.runningNumber) {
+      const newRunningNumber = generateRunningNumber(existingRunningNumbers);
+      handleSelectChange("runningNumber", newRunningNumber);
+    }
+  }, [formData.runningNumber, existingRunningNumbers, handleSelectChange]);
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -24,7 +34,7 @@ const VesselDetailsForm: React.FC<VesselDetailsFormProps> = ({
           value={formData.sector} 
           onValueChange={(value) => handleSelectChange("sector", value)}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full hover:border-blue-400 transition-colors">
             <SelectValue placeholder="Select Sector" />
           </SelectTrigger>
           <SelectContent>
@@ -42,7 +52,7 @@ const VesselDetailsForm: React.FC<VesselDetailsFormProps> = ({
           name="runningNumber"
           value={formData.runningNumber}
           onChange={handleInputChange}
-          className="w-full"
+          className="w-full hover:border-blue-400 transition-colors"
           required
         />
       </div>
@@ -53,13 +63,14 @@ const VesselDetailsForm: React.FC<VesselDetailsFormProps> = ({
           value={formData.shippingLine} 
           onValueChange={(value) => handleSelectChange("shippingLine", value)}
         >
-          <SelectTrigger className="w-full">
+          <SelectTrigger className="w-full hover:border-blue-400 transition-colors">
             <SelectValue placeholder="Select Shipping Line" />
           </SelectTrigger>
           <SelectContent>
-            {SHIPPING_LINES.map(line => (
-              <SelectItem key={line.value} value={line.value}>{line.label}</SelectItem>
-            ))}
+            <SelectItem value="ABUDHABI SHIPPING">ABUDHABI SHIPPING : ADS</SelectItem>
+            <SelectItem value="MAERSK LINE">MAERSK LINE : MSK</SelectItem>
+            <SelectItem value="MSC">MSC</SelectItem>
+            <SelectItem value="CMA CGM">CMA CGM</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -71,7 +82,7 @@ const VesselDetailsForm: React.FC<VesselDetailsFormProps> = ({
           name="vesselName"
           value={formData.vesselName}
           onChange={handleInputChange}
-          className="w-full"
+          className="w-full hover:border-blue-400 transition-colors"
           required
         />
       </div>
@@ -83,7 +94,7 @@ const VesselDetailsForm: React.FC<VesselDetailsFormProps> = ({
           name="masterBL"
           value={formData.masterBL}
           onChange={handleInputChange}
-          className="w-full"
+          className="w-full hover:border-blue-400 transition-colors"
         />
       </div>
       
@@ -94,7 +105,7 @@ const VesselDetailsForm: React.FC<VesselDetailsFormProps> = ({
           name="voyage"
           value={formData.voyage}
           onChange={handleInputChange}
-          className="w-full"
+          className="w-full hover:border-blue-400 transition-colors"
           required
         />
       </div>

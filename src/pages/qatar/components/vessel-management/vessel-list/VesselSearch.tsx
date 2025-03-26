@@ -19,7 +19,7 @@ const VesselSearch: React.FC<VesselSearchProps> = ({
         placeholder="Search vessels..."
         value={searchTerm}
         onChange={onSearchChange}
-        className="pl-10 w-full"
+        className="pl-10 w-full border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 transition-all"
       />
     </div>
   );

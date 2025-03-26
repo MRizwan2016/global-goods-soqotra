@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Save } from "lucide-react";
+import { Save, X } from "lucide-react";
 
 interface FormActionsProps {
   onCancel: () => void;
@@ -9,23 +9,23 @@ interface FormActionsProps {
 
 const FormActions: React.FC<FormActionsProps> = ({ onCancel }) => {
   return (
-    <div className="flex justify-between pt-4">
-      <Button
-        type="button"
-        variant="outline"
+    <div className="flex mt-6 justify-end space-x-4">
+      <Button 
+        type="button" 
+        variant="outline" 
         onClick={onCancel}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 hover:bg-red-50 hover:text-red-600 hover:scale-105 transition-all"
       >
-        <ArrowLeft size={16} />
-        Go Back
+        <X size={16} />
+        Cancel
       </Button>
       
       <Button 
         type="submit" 
-        className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+        className="bg-green-600 hover:bg-green-700 flex items-center gap-2 hover:scale-105 transition-all"
       >
         <Save size={16} />
-        Save
+        Save Vessel
       </Button>
     </div>
   );
