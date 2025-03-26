@@ -7,6 +7,8 @@ import ManifestHeader from "./manifest/ManifestHeader";
 import VesselDetails from "./manifest/VesselDetails";
 import ContainerList from "./manifest/ContainerList";
 import ManifestActions from "./manifest/ManifestActions";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface VesselManifestProps {
   vesselId: string;
@@ -24,6 +26,10 @@ const VesselManifest: React.FC<VesselManifestProps> = ({
     showPrintView,
     containerData,
     printRef,
+    printSection,
+    setPrintSection,
+    orientation,
+    setOrientation,
     handlePrint,
     handleConfirm
   } = useVesselManifest(vesselId, onManifestSubmitted);
@@ -36,7 +42,12 @@ const VesselManifest: React.FC<VesselManifestProps> = ({
   if (showPrintView) {
     return (
       <div ref={printRef}>
-        <PrintVesselManifest vessel={vessel} containerData={containerData} />
+        <PrintVesselManifest 
+          vessel={vessel} 
+          containerData={containerData} 
+          printSection={printSection}
+          orientation={orientation}
+        />
       </div>
     );
   }
@@ -50,6 +61,41 @@ const VesselManifest: React.FC<VesselManifestProps> = ({
           <VesselDetails vessel={vessel} />
           
           <ContainerList containerData={containerData} />
+          
+          <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-2">
+              <Label htmlFor="print-section">Print Section:</Label>
+              <Select 
+                value={printSection} 
+                onValueChange={(value) => setPrintSection(value as "all" | "cargo" | "summary")}
+              >
+                <SelectTrigger id="print-section" className="w-[180px]">
+                  <SelectValue placeholder="Select section" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Sections</SelectItem>
+                  <SelectItem value="cargo">Cargo Only</SelectItem>
+                  <SelectItem value="summary">Vessel Summary</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Label htmlFor="orientation">Page Orientation:</Label>
+              <Select 
+                value={orientation} 
+                onValueChange={(value) => setOrientation(value as "portrait" | "landscape")}
+              >
+                <SelectTrigger id="orientation" className="w-[150px]">
+                  <SelectValue placeholder="Select orientation" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="portrait">Portrait</SelectItem>
+                  <SelectItem value="landscape">Landscape</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
           
           <ManifestActions 
             onCancel={onCancel}

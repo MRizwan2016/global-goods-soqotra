@@ -4,6 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileCheck, ArrowLeft, Ship } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 import useContainerManifest from "./manifest/hooks/useContainerManifest";
 import ContainerDetailsSection from "./manifest/ContainerDetailsSection";
 import ManifestActionsBar from "./manifest/ManifestActionsBar";
@@ -32,6 +34,8 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     activeTab,
     setActiveTab,
     printViewVisible,
+    printOptions,
+    setPrintOptions,
     totalPackages,
     totalVolume,
     totalWeight,
@@ -60,6 +64,7 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
         totalWeight={totalWeight}
         totalPackages={totalPackages}
         confirmDate={confirmDate}
+        printOptions={printOptions}
       />
     );
   }
@@ -116,6 +121,49 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
           totalVolume={totalVolume}
           formatVolume={formatVolume}
         />
+        
+        <div className="flex items-center gap-4 my-4">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="print-section">Print Section:</Label>
+            <Select 
+              value={printOptions.section} 
+              onValueChange={(value) => setPrintOptions({
+                ...printOptions,
+                section: value as "all" | "cargo" | "items" | "consignees" | "invoices"
+              })}
+            >
+              <SelectTrigger id="print-section" className="w-[180px]">
+                <SelectValue placeholder="Select section" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sections</SelectItem>
+                <SelectItem value="cargo">Cargo Items</SelectItem>
+                <SelectItem value="items">Item List</SelectItem>
+                <SelectItem value="consignees">Consignee List</SelectItem>
+                <SelectItem value="invoices">Unsettled Invoices</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <Label htmlFor="orientation">Page Orientation:</Label>
+            <Select 
+              value={printOptions.orientation} 
+              onValueChange={(value) => setPrintOptions({
+                ...printOptions,
+                orientation: value as "portrait" | "landscape"
+              })}
+            >
+              <SelectTrigger id="orientation" className="w-[150px]">
+                <SelectValue placeholder="Select orientation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="portrait">Portrait</SelectItem>
+                <SelectItem value="landscape">Landscape</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
           <ManifestTabsHeader />

@@ -13,8 +13,8 @@ interface PrintContainerManifestProps {
   totalPackages: number;
   confirmDate: string;
   printOptions?: {
-    section: string;
-    orientation: string;
+    section: "all" | "cargo" | "items" | "consignees" | "invoices";
+    orientation: "portrait" | "landscape";
   };
 }
 
@@ -41,10 +41,6 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
         <div className="flex justify-between items-center mb-6 page-break-after-avoid">
           <div className="flex items-center">
             <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-16 w-16 mr-4" />
-            <div>
-              <h1 className="text-2xl font-bold company-name">ALMARAAM LOGISTICS SERVICES & TRADING W.L.L</h1>
-              <p className="text-sm">P.O.Box: 55861, Manthithu, Doha, Qatar</p>
-            </div>
           </div>
           <div className="text-right">
             <p className="text-sm">Print Date: {new Date().toLocaleDateString()}</p>

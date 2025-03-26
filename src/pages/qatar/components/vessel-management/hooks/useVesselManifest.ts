@@ -8,6 +8,8 @@ export const useVesselManifest = (vesselId: string, onManifestSubmitted: () => v
   const [vessel, setVessel] = useState<QatarVessel | null>(null);
   const [showPrintView, setShowPrintView] = useState(false);
   const [containerData, setContainerData] = useState<any[]>([]);
+  const [printSection, setPrintSection] = useState<"all" | "cargo" | "summary">("all");
+  const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
   const printRef = useRef<HTMLDivElement>(null);
   
   // Find vessel data
@@ -45,7 +47,18 @@ export const useVesselManifest = (vesselId: string, onManifestSubmitted: () => v
   
   const handleConfirm = () => {
     // In a real app, save to database
-    toast.success("Vessel manifest created successfully");
+    toast.success("Vessel manifest created successfully", {
+      action: {
+        label: "View Manifest",
+        onClick: () => {
+          // Create and dispatch a custom event
+          const event = new CustomEvent('viewVesselManifest', { 
+            detail: { vesselId: vesselId } 
+          });
+          document.dispatchEvent(event);
+        }
+      }
+    });
     onManifestSubmitted();
   };
   
@@ -54,6 +67,10 @@ export const useVesselManifest = (vesselId: string, onManifestSubmitted: () => v
     showPrintView,
     containerData,
     printRef,
+    printSection,
+    setPrintSection,
+    orientation,
+    setOrientation,
     handlePrint,
     handleConfirm
   };
