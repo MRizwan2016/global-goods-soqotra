@@ -8,7 +8,7 @@ import {
   ConsigneeListItem, 
   UnsettledInvoice 
 } from "../../../../types/containerTypes";
-import { mockCargoItems, mockContainers } from "../../../../data/mockContainers";
+import mockContainers, { mockCargoItems } from "../../../../data/mockContainers";
 
 const useContainerManifest = (containerId: string, onManifestSubmitted: () => void) => {
   const [container, setContainer] = useState<QatarContainer | null>(null);

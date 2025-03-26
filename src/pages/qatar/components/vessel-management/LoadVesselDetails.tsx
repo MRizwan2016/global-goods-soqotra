@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Save, Ship } from "lucide-react";
 import { mockVesselData, QatarVessel } from "./mockVesselData";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { mockContainers } from "../../data/mockContainers";
+import mockContainers from "../../data/mockContainers";
 import { toast } from "sonner";
 
 interface LoadVesselDetailsProps {

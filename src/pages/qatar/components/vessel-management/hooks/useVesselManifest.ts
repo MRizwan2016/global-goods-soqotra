@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { mockVesselData, QatarVessel } from "../mockVesselData";
-import { mockContainers } from "../../../data/mockContainers";
+import mockContainers from "../../../data/mockContainers";
 import { toast } from "sonner";
 
 export const useVesselManifest = (vesselId: string, onManifestSubmitted: () => void) => {

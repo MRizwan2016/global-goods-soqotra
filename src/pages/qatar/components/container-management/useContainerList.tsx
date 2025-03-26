@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { mockContainers } from "../../data/mockContainers";
+import mockContainers from "../../data/mockContainers";
 import { QatarContainer } from "../../types/containerTypes";
 
 export const useContainerList = () => {
@@ -14,7 +14,7 @@ export const useContainerList = () => {
     const matchesSearchTerm = 
       container.containerNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       container.runningNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      container.sealNumber.toLowerCase().includes(searchTerm.toLowerCase());
+      (container.sealNumber?.toLowerCase() || "").includes(searchTerm.toLowerCase());
     
     const matchesStatus = statusFilter === "all" || container.status === statusFilter;
     const matchesSector = sectorFilter === "all" || container.sector === sectorFilter;

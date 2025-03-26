@@ -1,6 +1,7 @@
 
-import { QatarContainer } from "../types/containerTypes";
+import { QatarContainer, ContainerCargo } from "../types/containerTypes";
 
+// This is the original mockContainers array
 const mockContainers: QatarContainer[] = [
   {
     id: "container1",
@@ -55,4 +56,65 @@ const mockContainers: QatarContainer[] = [
   }
 ];
 
+// Add mock cargo items
+const mockCargoItems: ContainerCargo[] = [
+  {
+    id: "cargo1",
+    containerId: "container1",
+    invoiceNumber: "INV12345",
+    lineNumber: "LN001",
+    barcode: "BC123456789",
+    packageName: "General Goods",
+    volume: 1.2,
+    weight: 250,
+    shipper: "Qatar Trading Co.",
+    consignee: "Kenya Imports Ltd",
+    wh: "WH001",
+    d2d: true
+  },
+  {
+    id: "cargo2",
+    containerId: "container1",
+    invoiceNumber: "INV12346",
+    lineNumber: "LN002",
+    barcode: "BC987654321",
+    packageName: "Electronics",
+    volume: 0.8,
+    weight: 150,
+    shipper: "Tech Distributors LLC",
+    consignee: "Digital Solutions Kenya",
+    wh: "WH002",
+    d2d: false
+  },
+  {
+    id: "cargo3",
+    containerId: "container2",
+    invoiceNumber: "INV12347",
+    lineNumber: "LN003",
+    barcode: "BC555666777",
+    packageName: "Textile Materials",
+    volume: 2.5,
+    weight: 350,
+    shipper: "Qatar Fabrics Intl.",
+    consignee: "Sri Lanka Garments",
+    wh: "WH003",
+    d2d: true
+  },
+  {
+    id: "cargo4",
+    containerId: "container2",
+    invoiceNumber: "INV12348",
+    lineNumber: "LN004",
+    barcode: "BC111222333",
+    packageName: "Auto Parts",
+    volume: 1.5,
+    weight: 420,
+    shipper: "Qatar Motors Supply",
+    consignee: "Colombo Auto Repairs",
+    wh: "WH004",
+    d2d: false
+  }
+];
+
+export { mockContainers, mockCargoItems };
 export default mockContainers;
