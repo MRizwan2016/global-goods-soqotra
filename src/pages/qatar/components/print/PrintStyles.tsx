@@ -25,6 +25,17 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
             padding: 10mm;
           }
           
+          /* Fix for delayed printing */
+          @keyframes printDelay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          
+          .print-container {
+            animation: printDelay 0.5s;
+            animation-fill-mode: forwards;
+          }
+          
           .page-break-before {
             page-break-before: always;
           }
@@ -50,10 +61,18 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
             table-layout: fixed;
             border-collapse: collapse;
             margin-bottom: 10mm;
+            page-break-inside: auto;
           }
           
           table, th, td {
             border: 1px solid #000 !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+          
+          tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
           }
           
           th {
@@ -89,16 +108,6 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
           .print-only {
             display: block !important;
             visibility: visible !important;
-          }
-          
-          /* Fix for delayed printing */
-          @-webkit-keyframes printDelay {
-            from { opacity: 0; }
-            to { opacity: 1; }
-          }
-          .print-container {
-            -webkit-animation: printDelay 0.2s;
-            animation: printDelay 0.2s;
           }
         }
       `}

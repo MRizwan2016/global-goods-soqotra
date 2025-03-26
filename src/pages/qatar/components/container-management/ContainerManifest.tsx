@@ -6,7 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import useContainerManifest from "./hooks/useContainerManifest";
+import { Skeleton } from "@/components/ui/skeleton";
+import useContainerManifest from "../../hooks/useContainerManifest";
 import ContainerDetailsSection from "./manifest/ContainerDetailsSection";
 import ManifestActionsBar from "./manifest/ManifestActionsBar";
 import ManifestTabsHeader from "./manifest/ManifestTabsHeader";
@@ -36,6 +37,8 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     printViewVisible,
     printOptions,
     setPrintOptions,
+    isLoading,
+    error,
     totalPackages,
     totalVolume,
     totalWeight,
@@ -48,15 +51,11 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     handlePrint
   } = useContainerManifest(containerId, onManifestSubmitted);
   
-  if (!container) {
-    return <div>Loading container details...</div>;
-  }
-  
   // Show print view when printing
   if (printViewVisible) {
     return (
       <PrintContainerManifest 
-        container={container}
+        container={container!}
         cargoItems={cargoItems}
         itemList={itemList}
         consigneeList={consigneeList}
@@ -67,6 +66,55 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
         confirmDate={confirmDate}
         printOptions={printOptions}
       />
+    );
+  }
+  
+  // Loading state
+  if (isLoading) {
+    return (
+      <Card className="shadow-md animate-fade-in">
+        <CardHeader className="bg-green-50 border-b">
+          <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
+            <FileCheck className="mr-2 text-green-600" size={22} />
+            Loading Container Manifest...
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-64 w-full" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  // Error state
+  if (error || !container) {
+    return (
+      <Card className="shadow-md animate-fade-in">
+        <CardHeader className="bg-red-50 border-b">
+          <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
+            <FileCheck className="mr-2 text-red-600" size={22} />
+            Error Loading Container Manifest
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="bg-red-50 p-4 rounded-md border border-red-200 text-red-700">
+            {error || "Container data not found. Please try again."}
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={onCancel}
+            className="mt-4 flex items-center gap-1"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Container List
+          </Button>
+        </CardContent>
+      </Card>
     );
   }
   

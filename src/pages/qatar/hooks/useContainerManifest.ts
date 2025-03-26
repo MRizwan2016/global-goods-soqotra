@@ -19,6 +19,8 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
   const [activeTab, setActiveTab] = useState("cargo");
   const [printViewVisible, setPrintViewVisible] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [printOptions, setPrintOptions] = useState<PrintOptions>({
     section: "all" as "all" | "cargo" | "items" | "consignees" | "invoices",
     orientation: "portrait" as "portrait" | "landscape"
@@ -26,24 +28,38 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
   
   // Load container data
   useEffect(() => {
-    const foundContainer = mockContainers.find(c => c.id === containerId);
-    if (foundContainer) {
-      setContainer(foundContainer);
-      setVgmWeight(foundContainer.weight?.toString() || "0");
-    }
+    setIsLoading(true);
+    setError(null);
     
-    // Get cargo items for this container by container ID OR by running number
-    const containerToFind = mockContainers.find(c => c.id === containerId);
-    if (containerToFind) {
-      const containerCargoItems = mockCargoItems.filter(item => 
-        item.containerId === containerId || 
-        (containerToFind.runningNumber && item.containerId === containerToFind.runningNumber.toString())
-      );
-      setCargoItems(containerCargoItems);
+    try {
+      // Find container by ID
+      const foundContainer = mockContainers.find(c => c.id === containerId);
+      
+      if (foundContainer) {
+        setContainer(foundContainer);
+        setVgmWeight(foundContainer.weight?.toString() || "0");
+        
+        // Get cargo items for this container by container ID OR by running number
+        const containerCargoItems = mockCargoItems.filter(item => 
+          item.containerId === containerId || 
+          (foundContainer.runningNumber && item.containerId === foundContainer.runningNumber.toString())
+        );
+        
+        setCargoItems(containerCargoItems);
+      } else {
+        setError("Container not found");
+        toast.error("Container not found");
+      }
+      
+      // Set confirm date to today
+      setConfirmDate(new Date().toLocaleDateString("en-GB", {day: "2-digit", month: "2-digit", year: "numeric"}));
+    } catch (err) {
+      console.error("Error loading container data:", err);
+      setError("Failed to load container data");
+      toast.error("Failed to load container data");
+    } finally {
+      setIsLoading(false);
     }
-    
-    // Set confirm date to today
-    setConfirmDate(new Date().toLocaleDateString("en-GB", {day: "2-digit", month: "2-digit", year: "numeric"}));
   }, [containerId]);
   
   // Generate filtered item list based on cargo items
@@ -127,8 +143,13 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
       return;
     }
     
+    if (!container) {
+      toast.error("CONTAINER DATA NOT FOUND");
+      return;
+    }
+    
     // Update container status
-    if (container) {
+    try {
       // Find the container in the mockContainers array
       const containerIndex = mockContainers.findIndex(c => c.id === container.id);
       if (containerIndex >= 0) {
@@ -136,23 +157,26 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
         mockContainers[containerIndex].confirmDate = confirmDate;
         // In a real app, we would save to the backend
       }
-    }
-    
-    // Notify parent of successful submission
-    onManifestSubmitted();
-    
-    toast.success("CONTAINER MANIFEST CONFIRMED SUCCESSFULLY", {
-      action: {
-        label: "VIEW MANIFEST",
-        onClick: () => {
-          // This will be handled in the parent component
-          const event = new CustomEvent('viewContainerManifest', { 
-            detail: { containerId } 
-          });
-          document.dispatchEvent(event);
+      
+      // Notify parent of successful submission
+      onManifestSubmitted();
+      
+      toast.success("CONTAINER MANIFEST CONFIRMED SUCCESSFULLY", {
+        action: {
+          label: "VIEW MANIFEST",
+          onClick: () => {
+            // This will be handled in the parent component
+            const event = new CustomEvent('viewContainerManifest', { 
+              detail: { containerId } 
+            });
+            document.dispatchEvent(event);
+          }
         }
-      }
-    });
+      });
+    } catch (err) {
+      console.error("Error confirming manifest:", err);
+      toast.error("FAILED TO CONFIRM MANIFEST");
+    }
   };
 
   const handlePrint = () => {
@@ -177,8 +201,8 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
           setPrintViewVisible(false);
           setIsPrinting(false);
         }, 1000);
-      }, 300);
-    }, 500);
+      }, 500);
+    }, 800); // Increased delay before printing
   };
   
   const formatVolume = (volume: number) => volume.toFixed(3);
@@ -203,6 +227,8 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
     isPrinting,
     printOptions,
     setPrintOptions,
+    isLoading,
+    error,
     totalPackages,
     totalVolume,
     totalWeight,
