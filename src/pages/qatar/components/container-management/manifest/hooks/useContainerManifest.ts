@@ -51,7 +51,8 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
         shipper: item.shipper,
         consignee: item.consignee,
         packages: 1,
-        volume: item.volume
+        volume: item.volume,
+        packageName: item.packageName
       });
     }
     
@@ -116,14 +117,28 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
     
     // Update container status
     if (container) {
-      container.status = "CONFIRMED";
-      // In a real app, we would save to the backend
+      // Find the container in the mockContainers array
+      const containerIndex = mockContainers.findIndex(c => c.id === container.id);
+      if (containerIndex >= 0) {
+        mockContainers[containerIndex].status = "CONFIRMED";
+        mockContainers[containerIndex].confirmDate = confirmDate;
+        // In a real app, we would save to the backend
+      }
     }
     
     // Notify parent
     onManifestSubmitted();
     
-    toast.success("Container manifest confirmed successfully");
+    toast.success("Container manifest confirmed successfully", {
+      action: {
+        label: "View Manifest",
+        onClick: () => {
+          // This will be handled in the parent component
+          const event = new CustomEvent('viewManifest', { detail: { containerId } });
+          document.dispatchEvent(event);
+        }
+      }
+    });
   };
 
   const handlePrint = () => {
@@ -158,6 +173,7 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
     activeTab,
     setActiveTab,
     printViewVisible,
+    setPrintViewVisible,
     totalPackages,
     totalVolume,
     totalWeight,

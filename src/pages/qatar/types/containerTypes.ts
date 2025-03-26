@@ -10,13 +10,13 @@ export interface QatarContainer {
   volume?: number;
   packages?: number;
   vesselId?: string;
-  // Add missing properties
   direction?: string;
   etd?: string;
   eta?: string;
   loadDate?: string;
   sector?: string;
   shippingLine?: string;
+  confirmDate?: string;
 }
 
 export interface ContainerCargo {
@@ -41,7 +41,6 @@ export interface ItemListEntry {
   consignee: string;
   packages: number;
   volume: number;
-  // Fix the itemName property issue in mockData
   packageName?: string;
   quantity?: number;
 }
@@ -63,7 +62,6 @@ export interface UnsettledInvoice {
   consignee: string;
   amount: number;
   paid: boolean;
-  // Additional properties from the mock data
   gy?: string;
   net?: number;
   due?: number;
@@ -73,4 +71,9 @@ export interface ContainerManifestProps {
   containerId: string;
   onManifestSubmitted: () => void;
   onCancel: () => void;
+}
+
+export interface PrintOptions {
+  section: "all" | "cargo" | "items" | "consignees" | "invoices";
+  orientation: "portrait" | "landscape";
 }

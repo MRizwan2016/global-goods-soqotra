@@ -1,12 +1,16 @@
 
 import React from "react";
 
-const PrintStyles: React.FC = () => {
+interface PrintStylesProps {
+  orientation?: string;
+}
+
+const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) => {
   return (
     <style type="text/css" media="print">
       {`
         @page {
-          size: A4;
+          size: A4 ${orientation};
           margin: 10mm;
         }
         body {
@@ -47,6 +51,20 @@ const PrintStyles: React.FC = () => {
         }
         .text-blue-800 {
           color: #1E40AF !important;
+        }
+        
+        /* Page break classes */
+        .page-break-before {
+          page-break-before: always;
+        }
+        .page-break-after {
+          page-break-after: always;
+        }
+        .page-break-after-avoid {
+          page-break-after: avoid;
+        }
+        .page-break-inside-avoid {
+          page-break-inside: avoid;
         }
       `}
     </style>
