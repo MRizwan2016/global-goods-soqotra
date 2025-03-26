@@ -59,9 +59,9 @@ const TabContent: React.FC<TabContentProps> = ({
     <>
       <TabsContent value="containers" className="m-0">
         <ContainerList 
-          containers={containers}
-          onEdit={onEditContainer}
-          onLoad={onLoadContainer}
+          containersList={containers}
+          onEditContainer={onEditContainer}
+          onLoadContainer={onLoadContainer}
           onCreateManifest={onCreateManifest}
           onViewManifest={onViewManifest}
         />
