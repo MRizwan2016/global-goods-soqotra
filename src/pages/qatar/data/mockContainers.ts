@@ -752,4 +752,8 @@ export const mockConsigneeList: ConsigneeListItem[] = [
     invoice: "13136068", 
     shipper: "IMTHIYAS M S M G M",
     consignee: "UMMA K M S S", 
-    shipperContact
+    shipperContact: "Mobile: +974 34567890",
+    consigneeContact: "Mobile: +94 73456789",
+    volume: 0.902 
+  }
+];
