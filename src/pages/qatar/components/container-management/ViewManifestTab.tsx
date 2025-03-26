@@ -36,10 +36,14 @@ const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
   // Format container data for the ContainerList component
   const containerData = container ? [
     {
+      ...container, // Spread all existing container properties
+      // Ensure all required properties from QatarContainer exist
       id: container.id,
       containerNumber: container.containerNumber,
-      sealNumber: container.sealNumber || "N/A",
       containerType: container.containerType,
+      runningNumber: container.runningNumber || "",
+      status: container.status,
+      sealNumber: container.sealNumber || "N/A",
       weight: container.weight || 0,
       packages: container.packages || 0,
       volume: container.volume || 0
