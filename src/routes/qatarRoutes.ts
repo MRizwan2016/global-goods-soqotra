@@ -11,6 +11,7 @@ import DriverManagement from "@/pages/qatar/DriverManagement";
 import FindCustomer from "@/pages/qatar/FindCustomer";
 import ContainerManagement from "@/pages/qatar/ContainerManagement";
 import VesselManagement from "@/pages/qatar/VesselManagement";
+import CargoManifest from "@/pages/qatar/CargoManifest";
 import { RouteConfig } from "./types";
 
 // Define the routes for the Qatar section
@@ -68,6 +69,11 @@ export const qatarRoutes: RouteConfig[] = [
   {
     path: "/qatar/vessels",
     element: VesselManagement,
+    private: true
+  },
+  {
+    path: "/qatar/cargo-manifest",
+    element: CargoManifest,
     private: true
   }
 ];

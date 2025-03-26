@@ -46,6 +46,13 @@ export function useVesselForm(onVesselCreated: () => void) {
     // In a real app, this would save to an API
     console.log("Saving vessel:", formData);
     
+    // Add to mockVesselData
+    mockVesselData.unshift({
+      ...formData,
+      status: "NEW",
+      containers: []
+    });
+    
     // Show success message with animation
     toast.success(`Vessel ${formData.vesselName} created successfully`, {
       style: { backgroundColor: "#10B981", color: "white" }

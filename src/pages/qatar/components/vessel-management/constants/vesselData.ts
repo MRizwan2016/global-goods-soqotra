@@ -1,4 +1,3 @@
-
 // Ports and sectors data for vessel management
 export const PORTS = [
   "Doha", "Mombasa", "Nairobi", "Asmara", "Hargeisa", "Port Sudan", 
@@ -25,7 +24,7 @@ export const SECTOR_PORT_MAP: {[key: string]: string[]} = {
   "KURUNEGALA": ["KURUNEGALA"]
 };
 
-export const DEFAULT_PORT_OF_LOADING = "HAMAD SEA PORT";
+export const DEFAULT_PORT_OF_LOADING = "DOHA PORT, QATAR";
 
 export const SECTORS = [
   "Sri Lanka", "Kenya", "Uganda", "Tunisia", "United Arab Emirates", 
@@ -40,17 +39,21 @@ export const SHIPPING_LINES = [
 ];
 
 // Generate running numbers starting from 100
-export const generateRunningNumber = (existingNumbers: string[] = []): string => {
-  // Find the highest existing number
-  let highestNumber = 99;
+export const generateRunningNumber = (existingNumbers: string[]): string => {
+  // Extract and find the highest numeric part from existing running numbers
+  let highestNumber = 0;
   
-  existingNumbers.forEach(numStr => {
-    const num = parseInt(numStr, 10);
-    if (!isNaN(num) && num > highestNumber) {
-      highestNumber = num;
+  existingNumbers.forEach(num => {
+    // Extract numeric part of the running number
+    const numericPart = parseInt(num.replace(/\D/g, ''));
+    if (!isNaN(numericPart) && numericPart > highestNumber) {
+      highestNumber = numericPart;
     }
   });
   
-  // Return the next number
-  return (highestNumber + 1).toString();
+  // Generate new running number
+  const newNumber = highestNumber + 1;
+  
+  // Format with leading zeros to keep 3 digits
+  return `V${String(newNumber).padStart(3, '0')}`;
 };

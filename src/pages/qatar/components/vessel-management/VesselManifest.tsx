@@ -35,7 +35,7 @@ const VesselManifest: React.FC<VesselManifestProps> = ({
   } = useVesselManifest(vesselId, onManifestSubmitted);
   
   if (!vessel) {
-    return <div>Loading vessel details...</div>;
+    return <div className="p-8 text-center animate-pulse">Loading vessel details...</div>;
   }
   
   // Show print view when printing
@@ -48,13 +48,59 @@ const VesselManifest: React.FC<VesselManifestProps> = ({
           printSection={printSection}
           orientation={orientation}
         />
+        
+        {/* Print styles */}
+        <style jsx global>{`
+          @media print {
+            @page {
+              size: ${orientation === "landscape" ? "landscape" : "portrait"};
+              margin: 15mm;
+            }
+            
+            body {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            
+            table {
+              border-collapse: collapse;
+              width: 100%;
+            }
+            
+            table, th, td {
+              border: 1px solid #ddd !important;
+            }
+            
+            th, td {
+              padding: 8px;
+              text-align: left;
+            }
+            
+            h1, h2, h3, h4 {
+              color: black !important;
+            }
+            
+            .print-header {
+              text-align: center;
+              margin-bottom: 20px;
+              font-size: 24px;
+              font-weight: bold;
+              border-bottom: 2px solid #333;
+              padding-bottom: 10px;
+            }
+            
+            .page-break-before {
+              page-break-before: always;
+            }
+          }
+        `}</style>
       </div>
     );
   }
   
   return (
-    <div className="space-y-6">
-      <Card className="shadow-md">
+    <div className="space-y-6 animate-fade-in">
+      <Card className="shadow-md hover:shadow-lg transition-shadow">
         <ManifestHeader vessel={vessel} />
         
         <CardContent className="p-6">
