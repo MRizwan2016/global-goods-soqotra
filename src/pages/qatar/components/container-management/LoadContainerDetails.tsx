@@ -3,11 +3,13 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { QatarContainer, ContainerCargo } from "../../types/containerTypes";
-import { ArrowLeft, Package, Truck } from "lucide-react";
+import { ArrowLeft, Package, Truck, Search, FileText } from "lucide-react";
 import { toast } from "sonner";
 import ContainerDetailsSection from "./load-container/ContainerDetailsSection";
 import CargoSearchForm from "./load-container/CargoSearchForm";
 import CargoTable from "./load-container/CargoTable";
+import CargoLoader from "./load-container/CargoLoader";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface LoadContainerDetailsProps {
   containerId: string;
@@ -24,6 +26,7 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
 }) => {
   // State to track loaded cargo items
   const [cargoItems, setCargoItems] = useState<ContainerCargo[]>([]);
+  const [activeTab, setActiveTab] = useState<string>("quickLoad");
   
   // Handle adding cargo to the container
   const handleAddCargo = (cargo: ContainerCargo) => {
@@ -53,24 +56,46 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
         <ContainerDetailsSection container={containerData} onContainerChange={() => {}} />
       )}
 
-      <Card className="mb-6 mt-6">
-        <CardHeader className="bg-gray-50">
-          <CardTitle className="text-lg flex items-center">
-            <Package className="mr-2 h-5 w-5" />
-            Cargo Search
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          <CargoSearchForm 
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
+        <TabsList className="grid grid-cols-2 mb-4 w-full max-w-md">
+          <TabsTrigger value="quickLoad" className="flex items-center">
+            <Package className="mr-2 h-4 w-4" />
+            Quick Load
+          </TabsTrigger>
+          <TabsTrigger value="advancedSearch" className="flex items-center">
+            <Search className="mr-2 h-4 w-4" />
+            Invoice Search
+          </TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="quickLoad">
+          <CargoLoader 
             containerId={containerId} 
-            onAddCargo={handleAddCargo}
-            existingCargo={cargoItems}
+            onAddCargo={handleAddCargo} 
           />
-        </CardContent>
-      </Card>
+        </TabsContent>
+        
+        <TabsContent value="advancedSearch">
+          <Card>
+            <CardHeader className="bg-gray-50">
+              <CardTitle className="text-lg flex items-center">
+                <FileText className="mr-2 h-5 w-5" />
+                Invoice Search
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4">
+              <CargoSearchForm 
+                containerId={containerId} 
+                onAddCargo={handleAddCargo}
+                existingCargo={cargoItems}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {cargoItems.length > 0 && (
-        <Card className="mb-6">
+        <Card className="mt-6 mb-6">
           <CardHeader className="bg-gray-50">
             <CardTitle className="text-lg">Cargo Items ({cargoItems.length})</CardTitle>
           </CardHeader>
