@@ -1,89 +1,70 @@
 
 import React from "react";
-import { 
-  Table, 
-  TableHeader, 
-  TableRow, 
-  TableHead, 
-  TableBody, 
-  TableCell 
-} from "@/components/ui/table";
+import { ContainerCargo } from "../../../types/containerTypes";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { ContainerCargo } from "../../../types/containerTypes";
 
 interface CargoTableProps {
   cargoItems: ContainerCargo[];
-  onRemoveItem: (id: string) => void;
+  onRemoveCargo: (cargoId: string) => void;
 }
 
-const CargoTable: React.FC<CargoTableProps> = ({
-  cargoItems,
-  onRemoveItem,
-}) => {
+const CargoTable: React.FC<CargoTableProps> = ({ cargoItems, onRemoveCargo }) => {
   if (cargoItems.length === 0) {
-    return null;
+    return <p className="text-gray-500">No cargo items added yet.</p>;
   }
 
-  // Helper function to safely format volume
-  const formatVolume = (volume: any): string => {
-    return typeof volume === 'number' ? volume.toFixed(3) : '0.000';
-  };
-
-  // Helper function to safely format weight
-  const formatWeight = (weight: any): string => {
-    return typeof weight === 'number' ? weight.toFixed(2) : '0.00';
-  };
-
   return (
-    <div className="mt-2">
-      <h3 className="text-lg font-semibold mb-2 text-blue-700">Packages Added to Container</h3>
-      <div className="bg-blue-600 text-white py-1 mb-1">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-white font-semibold text-center">Num</TableHead>
-              <TableHead className="text-white font-semibold">INVOICE</TableHead>
-              <TableHead className="text-white font-semibold">PACKAGE Num</TableHead>
-              <TableHead className="text-white font-semibold">PACKAGE</TableHead>
-              <TableHead className="text-white font-semibold">VOLUME</TableHead>
-              <TableHead className="text-white font-semibold">WEIGHT</TableHead>
-              <TableHead className="text-white font-semibold">SHIPPER</TableHead>
-              <TableHead className="text-white font-semibold">CONSIGNEE</TableHead>
-              <TableHead className="text-white font-semibold text-center">REMOVE</TableHead>
-            </TableRow>
-          </TableHeader>
-        </Table>
-      </div>
-      
-      <div className="max-h-[400px] overflow-y-auto border border-gray-200 rounded-sm">
-        <Table>
-          <TableBody>
-            {cargoItems.map((item, index) => (
-              <TableRow key={item.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                <TableCell className="text-center">{index + 1}</TableCell>
-                <TableCell>{item.invoiceNumber}</TableCell>
-                <TableCell>{item.lineNumber}</TableCell>
-                <TableCell>{item.packageName}</TableCell>
-                <TableCell>{formatVolume(item.volume)}</TableCell>
-                <TableCell>{formatWeight(item.weight)}</TableCell>
-                <TableCell>{item.shipper}</TableCell>
-                <TableCell>{item.consignee}</TableCell>
-                <TableCell className="text-center">
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-red-600 p-1 h-auto"
-                    onClick={() => onRemoveItem(item.id)}
-                  >
-                    <Trash2 size={18} />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-100">
+          <tr>
+            <th className="px-4 py-2 text-left">Barcode</th>
+            <th className="px-4 py-2 text-left">Invoice</th>
+            <th className="px-4 py-2 text-left">Package</th>
+            <th className="px-4 py-2 text-left">Shipper</th>
+            <th className="px-4 py-2 text-left">Consignee</th>
+            <th className="px-4 py-2 text-right">Volume</th>
+            <th className="px-4 py-2 text-right">Weight</th>
+            <th className="px-4 py-2 text-center">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cargoItems.map(item => (
+            <tr key={item.id} className="border-b">
+              <td className="px-4 py-2">{item.barcode}</td>
+              <td className="px-4 py-2">{item.invoiceNumber}</td>
+              <td className="px-4 py-2">{item.packageName}</td>
+              <td className="px-4 py-2">{item.shipper}</td>
+              <td className="px-4 py-2">{item.consignee}</td>
+              <td className="px-4 py-2 text-right">{item.volume.toFixed(3)}</td>
+              <td className="px-4 py-2 text-right">{item.weight.toFixed(2)}</td>
+              <td className="px-4 py-2 text-center">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  onClick={() => onRemoveCargo(item.id)}
+                >
+                  <Trash2 size={18} />
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+        <tfoot className="bg-gray-50 font-medium">
+          <tr>
+            <td colSpan={5} className="px-4 py-2 text-right">Total:</td>
+            <td className="px-4 py-2 text-right">
+              {cargoItems.reduce((sum, item) => sum + item.volume, 0).toFixed(3)}
+            </td>
+            <td className="px-4 py-2 text-right">
+              {cargoItems.reduce((sum, item) => sum + item.weight, 0).toFixed(2)}
+            </td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
     </div>
   );
 };

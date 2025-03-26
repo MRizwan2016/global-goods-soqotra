@@ -1,9 +1,13 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { QatarContainer } from "../../types/containerTypes";
-import { ArrowLeft, Truck } from "lucide-react";
+import { QatarContainer, ContainerCargo } from "../../types/containerTypes";
+import { ArrowLeft, Package, Truck } from "lucide-react";
+import { toast } from "sonner";
+import ContainerDetailsSection from "./load-container/ContainerDetailsSection";
+import CargoSearchForm from "./load-container/CargoSearchForm";
+import CargoTable from "./load-container/CargoTable";
 
 interface LoadContainerDetailsProps {
   containerId: string;
@@ -18,7 +22,21 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
   onLoadComplete,
   onCancel,
 }) => {
-  // This is a simplified component, in a real app you would have complex cargo loading workflows
+  // State to track loaded cargo items
+  const [cargoItems, setCargoItems] = useState<ContainerCargo[]>([]);
+  
+  // Handle adding cargo to the container
+  const handleAddCargo = (cargo: ContainerCargo) => {
+    setCargoItems(prev => [...prev, cargo]);
+    toast.success(`Cargo item added to container`);
+  };
+  
+  // Handle removing cargo from the container
+  const handleRemoveCargo = (cargoId: string) => {
+    setCargoItems(prev => prev.filter(item => item.id !== cargoId));
+    toast.info(`Cargo item removed`);
+  };
+
   return (
     <div className="p-6">
       <div className="flex items-center mb-6">
@@ -31,46 +49,46 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
         </h2>
       </div>
 
-      <Card className="mb-6">
+      {containerData && (
+        <ContainerDetailsSection container={containerData} onContainerChange={() => {}} />
+      )}
+
+      <Card className="mb-6 mt-6">
         <CardHeader className="bg-gray-50">
-          <CardTitle className="text-lg">Container Details</CardTitle>
+          <CardTitle className="text-lg flex items-center">
+            <Package className="mr-2 h-5 w-5" />
+            Cargo Search
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <p className="text-sm text-gray-500">Container Number</p>
-              <p className="font-medium">{containerData?.containerNumber || "N/A"}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Seal Number</p>
-              <p className="font-medium">{containerData?.sealNumber || "N/A"}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Type</p>
-              <p className="font-medium">{containerData?.containerType || "N/A"}</p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-500">Status</p>
-              <p className="font-medium">{containerData?.status || "N/A"}</p>
-            </div>
-          </div>
+          <CargoSearchForm 
+            containerId={containerId} 
+            onAddCargo={handleAddCargo}
+            existingCargo={cargoItems}
+          />
         </CardContent>
       </Card>
 
-      <Card className="mb-6">
-        <CardHeader className="bg-gray-50">
-          <CardTitle className="text-lg">Cargo Search</CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-          <p className="text-gray-500 mb-4">
-            This section would typically contain functionality to search for and add cargo items to the container.
-            For simplicity in this demo, we'll just provide a button to proceed to the manifest creation.
-          </p>
-        </CardContent>
-      </Card>
+      {cargoItems.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader className="bg-gray-50">
+            <CardTitle className="text-lg">Cargo Items ({cargoItems.length})</CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+            <CargoTable 
+              cargoItems={cargoItems} 
+              onRemoveCargo={handleRemoveCargo}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       <div className="flex justify-end">
-        <Button onClick={onLoadComplete} className="bg-blue-600 hover:bg-blue-700">
+        <Button 
+          onClick={onLoadComplete} 
+          className="bg-blue-600 hover:bg-blue-700"
+          disabled={cargoItems.length === 0}
+        >
           <Truck className="h-4 w-4 mr-2" />
           Proceed to Manifest
         </Button>

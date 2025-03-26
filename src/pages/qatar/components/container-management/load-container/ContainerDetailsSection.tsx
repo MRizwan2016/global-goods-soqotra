@@ -62,7 +62,7 @@ const ContainerDetailsSection: React.FC<ContainerDetailsSectionProps> = ({
           <div className="mt-3">
             <Label className="font-bold text-gray-700 mb-1 block">DATE LOAD:</Label>
             <Input
-              value={container.loadDate}
+              value={container.loadDate || new Date().toISOString().split('T')[0]}
               onChange={(e) => handleInputChange('loadDate', e.target.value)}
             />
           </div>

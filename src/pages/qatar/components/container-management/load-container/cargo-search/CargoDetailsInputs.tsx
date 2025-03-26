@@ -22,22 +22,25 @@ const CargoDetailsInputs: React.FC<CargoDetailsInputsProps> = ({
   onPackageNameChange,
   onShipperChange,
 }) => {
+  const packageOptions = [
+    "Wooden Box",
+    "Carton Box",
+    "Crate",
+    "Pallet",
+    "Drum",
+    "Roll",
+    "Bag",
+    "Bundle"
+  ];
+
   return (
-    <>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <Label className="font-bold text-gray-700 mb-1 block">BOOKING FORM:</Label>
-        <Input
-          value={bookingForm}
-          className="bg-gray-100"
-          readOnly
-        />
-      </div>
-      
-      <div>
-        <Label className="font-bold text-gray-700 mb-1 block">PACKAGE NUMBER:</Label>
+        <Label className="font-bold text-gray-700 mb-1 block">LINE NUMBER:</Label>
         <Input
           value={packageNumber}
           onChange={(e) => onPackageNumberChange(e.target.value)}
+          placeholder="PACKAGE NUMBER"
         />
       </div>
       
@@ -46,17 +49,25 @@ const CargoDetailsInputs: React.FC<CargoDetailsInputsProps> = ({
         <Input
           value={packageName}
           onChange={(e) => onPackageNameChange(e.target.value)}
+          placeholder="PACKAGE NAME"
+          list="packageOptions"
         />
+        <datalist id="packageOptions">
+          {packageOptions.map((option, index) => (
+            <option key={index} value={option} />
+          ))}
+        </datalist>
       </div>
       
-      <div>
+      <div className="md:col-span-2">
         <Label className="font-bold text-gray-700 mb-1 block">SHIPPER:</Label>
         <Input
           value={shipper}
           onChange={(e) => onShipperChange(e.target.value)}
+          placeholder="SHIPPER"
         />
       </div>
-    </>
+    </div>
   );
 };
 

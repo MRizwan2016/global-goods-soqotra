@@ -131,7 +131,7 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
       }
     }
     
-    // Notify parent
+    // Notify parent of successful submission
     onManifestSubmitted();
     
     toast.success("Container manifest confirmed successfully", {
@@ -139,7 +139,9 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
         label: "View Manifest",
         onClick: () => {
           // This will be handled in the parent component
-          const event = new CustomEvent('viewContainerManifest', { detail: { containerId } });
+          const event = new CustomEvent('viewContainerManifest', { 
+            detail: { containerId } 
+          });
           document.dispatchEvent(event);
         }
       }

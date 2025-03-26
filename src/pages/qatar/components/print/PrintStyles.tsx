@@ -51,6 +51,16 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
             text-align: center;
             margin-bottom: 10px;
           }
+          
+          /* Section page breaks */
+          .print-section {
+            page-break-after: always;
+          }
+          
+          /* Last section should not have page break */
+          .print-section:last-child {
+            page-break-after: avoid;
+          }
         }
       `}
     </style>

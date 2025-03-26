@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QatarContainer } from "../../types/containerTypes";
 import { v4 as uuidv4 } from "uuid";
+import { ArrowLeft } from "lucide-react";
 
 interface AddContainerProps {
   onSubmit: (container: QatarContainer) => void;
@@ -19,6 +20,22 @@ const containerTypes = ["20FT", "40FT", "40HC", "20FR", "40FR", "20OT", "40OT"];
 const shippingLines = ["MSC", "Maersk", "CMA CGM", "Hapag-Lloyd", "ONE", "Evergreen", "COSCO"];
 const sectors = ["QAT-KEN", "QAT-SL", "QAT-UAE", "QAT-SA", "QAT-OM"];
 const directions = ["Import", "Export"];
+
+// Generate running numbers starting from 100
+const generateRunningNumber = (existingNumbers: string[] = []): string => {
+  // Find the highest existing number
+  let highestNumber = 99;
+  
+  existingNumbers.forEach(numStr => {
+    const num = parseInt(numStr);
+    if (!isNaN(num) && num > highestNumber) {
+      highestNumber = num;
+    }
+  });
+  
+  // Return the next number
+  return (highestNumber + 1).toString();
+};
 
 const AddContainer: React.FC<AddContainerProps> = ({ 
   onSubmit, 
@@ -38,6 +55,31 @@ const AddContainer: React.FC<AddContainerProps> = ({
     shippingLine: "MSC"
   });
 
+  // Store existing running numbers for auto-generation
+  const [existingRunningNumbers, setExistingRunningNumbers] = useState<string[]>([]);
+
+  useEffect(() => {
+    // Get existing running numbers from mock data
+    // In a real app, this would be fetched from an API
+    const fetchExistingRunningNumbers = async () => {
+      try {
+        // Mock data for now - in a real app, fetch from API
+        const mockNumbers = ["100", "101", "102", "103"];
+        setExistingRunningNumbers(mockNumbers);
+        
+        // Set a new running number if not editing
+        if (!containerData && !formData.runningNumber) {
+          const newNumber = generateRunningNumber(mockNumbers);
+          setFormData(prev => ({...prev, runningNumber: newNumber}));
+        }
+      } catch (error) {
+        console.error("Failed to fetch running numbers:", error);
+      }
+    };
+    
+    fetchExistingRunningNumbers();
+  }, []);
+
   useEffect(() => {
     if (containerData) {
       setFormData(containerData);
@@ -46,7 +88,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
         id: uuidv4(),
         containerNumber: "",
         containerType: "20FT",
-        runningNumber: "",
+        runningNumber: generateRunningNumber(existingRunningNumbers),
         status: "Available",
         sealNumber: "",
         direction: "Export",
@@ -54,7 +96,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
         shippingLine: "MSC"
       });
     }
-  }, [containerData]);
+  }, [containerData, existingRunningNumbers]);
 
   const handleChange = (field: keyof QatarContainer, value: string | number) => {
     setFormData((prev) => ({
@@ -68,9 +110,32 @@ const AddContainer: React.FC<AddContainerProps> = ({
     onSubmit(formData);
   };
 
+  // Generate running number options
+  const generateRunningNumberOptions = () => {
+    const options = [];
+    const start = 100;
+    const end = start + 50; // Show 50 options
+    
+    for (let i = start; i <= end; i++) {
+      options.push(i.toString());
+    }
+    
+    return options;
+  };
+
   return (
     <Card className="mt-0 border-0 shadow-none">
       <CardContent className="p-6">
+        <div className="flex items-center mb-6">
+          <Button variant="outline" onClick={onCancel} className="mr-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h2 className="text-2xl font-bold">
+            {isEditing ? "Edit Container" : "Add Container"}
+          </h2>
+        </div>
+        
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
@@ -106,13 +171,21 @@ const AddContainer: React.FC<AddContainerProps> = ({
 
               <div>
                 <Label htmlFor="runningNumber">Running Number</Label>
-                <Input
-                  id="runningNumber"
-                  placeholder="Enter running number"
+                <Select
                   value={formData.runningNumber}
-                  onChange={(e) => handleChange("runningNumber", e.target.value)}
-                  required
-                />
+                  onValueChange={(value) => handleChange("runningNumber", value)}
+                >
+                  <SelectTrigger id="runningNumber">
+                    <SelectValue placeholder="Select running number" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {generateRunningNumberOptions().map((num) => (
+                      <SelectItem key={num} value={num}>
+                        {num}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
