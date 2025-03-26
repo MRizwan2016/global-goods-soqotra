@@ -1,18 +1,12 @@
 
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileCheck, ArrowLeft, Printer, FileText } from "lucide-react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, UnsettledInvoice, PrintOptions } from "../../../types/containerTypes";
+import { ArrowLeft, Printer, FileText } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, UnsettledInvoice } from "../../../types/containerTypes";
-import PrintContainerManifest from "../../print/container/PrintContainerManifest";
-import CargoItemsTab from "../manifest/CargoItemsTab";
-import ItemListTab from "../manifest/ItemListTab";
-import ConsigneeListTab from "../manifest/ConsigneeListTab";
-import UnsettledInvoicesTab from "../manifest/UnsettledInvoicesTab";
-import ManifestTabsHeader from "../manifest/ManifestTabsHeader";
 
 interface ViewContainerManifestProps {
   container: QatarContainer;
@@ -21,6 +15,9 @@ interface ViewContainerManifestProps {
   consigneeList: ConsigneeListItem[];
   unsettledInvoices: UnsettledInvoice[];
   onBack: () => void;
+  printOptions: PrintOptions;
+  onPrintOptionsChange: (options: Partial<PrintOptions>) => void;
+  onPrint: () => void;
 }
 
 const ViewContainerManifest: React.FC<ViewContainerManifestProps> = ({
@@ -29,190 +26,279 @@ const ViewContainerManifest: React.FC<ViewContainerManifestProps> = ({
   itemList,
   consigneeList,
   unsettledInvoices,
-  onBack
+  onBack,
+  printOptions,
+  onPrintOptionsChange,
+  onPrint
 }) => {
-  const [activeTab, setActiveTab] = useState("cargo");
-  const [printViewVisible, setPrintViewVisible] = useState(false);
-  const [printOptions, setPrintOptions] = useState({
-    section: "all", // "all", "cargo", "items", "consignees", "invoices"
-    orientation: "portrait" // "portrait", "landscape"
-  });
-  
-  const formatVolume = (volume: number) => volume.toFixed(3);
-  const formatWeight = (weight: number) => weight.toFixed(2);
-  
-  const totalVolume = cargoItems.reduce((sum, item) => sum + item.volume, 0);
-  const totalWeight = cargoItems.reduce((sum, item) => sum + item.weight, 0);
-  const totalPackages = cargoItems.length;
-  
-  const handlePrint = () => {
-    setPrintViewVisible(true);
-    
-    // Allow time for the print view to render before printing
-    setTimeout(() => {
-      window.print();
-      
-      // Reset after printing
-      setTimeout(() => {
-        setPrintViewVisible(false);
-      }, 500);
-    }, 100);
-  };
-  
-  // Show print view when printing
-  if (printViewVisible) {
-    return (
-      <PrintContainerManifest 
-        container={container}
-        cargoItems={cargoItems}
-        itemList={itemList}
-        consigneeList={consigneeList}
-        totalVolume={totalVolume}
-        totalWeight={totalWeight}
-        totalPackages={totalPackages}
-        confirmDate={container.confirmDate || new Date().toLocaleDateString()}
-        printOptions={printOptions}
-      />
-    );
-  }
-  
   return (
-    <Card className="shadow-md animate-fade-in">
-      <CardHeader className="bg-green-50 border-b flex justify-between items-center">
-        <div>
-          <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
-            <FileCheck className="mr-2 text-green-600" size={22} />
+    <div className="p-6">
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={onBack} className="no-print">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Container List
+          </Button>
+          <h2 className="text-2xl font-bold ml-4">
             Container Manifest: {container.containerNumber}
-            <span className="ml-2 text-sm font-normal text-gray-600">
-              Status: {container.status}
-            </span>
-          </CardTitle>
+          </h2>
         </div>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={onBack}
-          className="flex items-center gap-1 hover:scale-105 transition-transform"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
-      </CardHeader>
-      
-      <CardContent className="p-6">
-        <div className="bg-blue-50 p-4 rounded-md mb-6 border-l-4 border-blue-500">
-          <div className="flex items-center text-blue-700 mb-2">
-            <FileText size={20} className="mr-2" />
-            <h3 className="font-semibold">Container Cargo Summary</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-              <span className="font-medium">Total Packages:</span> {totalPackages}
-            </div>
-            <div>
-              <span className="font-medium">Total Volume:</span> {formatVolume(totalVolume)} m³
-            </div>
-            <div>
-              <span className="font-medium">Total Weight:</span> {formatWeight(totalWeight)} kg
-            </div>
-          </div>
-        </div>
-        
-        <div className="mb-6 bg-gray-50 p-4 rounded-md border">
-          <h3 className="font-semibold mb-3">Print Options</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h4 className="text-sm font-medium mb-2">Section to Print</h4>
-              <RadioGroup 
-                value={printOptions.section} 
-                onValueChange={(value) => setPrintOptions({...printOptions, section: value})}
-                className="flex flex-col space-y-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="all" id="section-all" />
-                  <Label htmlFor="section-all">All Sections</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="cargo" id="section-cargo" />
-                  <Label htmlFor="section-cargo">Cargo Items Only</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="items" id="section-items" />
-                  <Label htmlFor="section-items">Item List Only</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="consignees" id="section-consignees" />
-                  <Label htmlFor="section-consignees">Consignee List Only</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="invoices" id="section-invoices" />
-                  <Label htmlFor="section-invoices">Unsettled Invoices Only</Label>
-                </div>
-              </RadioGroup>
-            </div>
-            
-            <div>
-              <h4 className="text-sm font-medium mb-2">Page Orientation</h4>
-              <RadioGroup 
-                value={printOptions.orientation} 
-                onValueChange={(value) => setPrintOptions({...printOptions, orientation: value})}
-                className="flex flex-col space-y-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="portrait" id="orientation-portrait" />
-                  <Label htmlFor="orientation-portrait">Portrait (A4)</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="landscape" id="orientation-landscape" />
-                  <Label htmlFor="orientation-landscape">Landscape (A4)</Label>
-                </div>
-              </RadioGroup>
-            </div>
+        <div className="flex items-center gap-4 no-print">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="print-section">Print Section:</Label>
+            <Select 
+              value={printOptions.section} 
+              onValueChange={(value) => onPrintOptionsChange({ 
+                section: value as "all" | "cargo" | "items" | "consignees" | "invoices" 
+              })}
+            >
+              <SelectTrigger id="print-section" className="w-[180px]">
+                <SelectValue placeholder="Select section" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Sections</SelectItem>
+                <SelectItem value="cargo">Cargo Items</SelectItem>
+                <SelectItem value="items">Item List</SelectItem>
+                <SelectItem value="consignees">Consignee List</SelectItem>
+                <SelectItem value="invoices">Unsettled Invoices</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           
-          <Button 
-            variant="default" 
-            className="bg-green-600 hover:bg-green-700 flex items-center gap-2 mt-4 hover:scale-105 transition-transform"
-            onClick={handlePrint}
-          >
-            <Printer size={16} />
+          <div className="flex items-center gap-2">
+            <Label htmlFor="orientation">Page Orientation:</Label>
+            <Select 
+              value={printOptions.orientation} 
+              onValueChange={(value) => onPrintOptionsChange({ 
+                orientation: value as "portrait" | "landscape" 
+              })}
+            >
+              <SelectTrigger id="orientation" className="w-[150px]">
+                <SelectValue placeholder="Select orientation" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="portrait">Portrait</SelectItem>
+                <SelectItem value="landscape">Landscape</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <Button onClick={onPrint} className="ml-4">
+            <Printer className="h-4 w-4 mr-2" />
             Print Manifest
           </Button>
         </div>
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-          <ManifestTabsHeader />
-          
-          <TabsContent value="cargo">
-            <CargoItemsTab 
-              cargoItems={cargoItems}
-              formatVolume={formatVolume}
-              formatWeight={formatWeight}
-            />
-          </TabsContent>
-          
-          <TabsContent value="items">
-            <ItemListTab 
-              itemList={itemList}
-              formatVolume={formatVolume}
-            />
-          </TabsContent>
-          
-          <TabsContent value="consignees">
-            <ConsigneeListTab 
-              consigneeList={consigneeList}
-              formatVolume={formatVolume}
-            />
-          </TabsContent>
-          
-          <TabsContent value="invoices">
-            <UnsettledInvoicesTab 
-              unsettledInvoices={unsettledInvoices}
-            />
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+      </div>
+
+      <Card className="mb-6 print-container">
+        <CardHeader className="bg-gray-50">
+          <CardTitle className="text-lg company-name">Container Details</CardTitle>
+        </CardHeader>
+        <CardContent className="p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div>
+              <p className="text-sm text-gray-500">Container Number</p>
+              <p className="font-medium">{container.containerNumber}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Seal Number</p>
+              <p className="font-medium">{container.sealNumber || "N/A"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Type</p>
+              <p className="font-medium">{container.containerType}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Status</p>
+              <p className="font-medium">{container.status}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Weight</p>
+              <p className="font-medium">{container.weight || 0} kg</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Volume</p>
+              <p className="font-medium">{container.volume || 0} m³</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Packages</p>
+              <p className="font-medium">{container.packages || 0}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Shipping Line</p>
+              <p className="font-medium">{container.shippingLine || "N/A"}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Tabs defaultValue="cargo-items" className="print-tabs">
+        <TabsList className="no-print">
+          <TabsTrigger value="cargo-items">Cargo Items</TabsTrigger>
+          <TabsTrigger value="item-list">Item List</TabsTrigger>
+          <TabsTrigger value="consignee-list">Consignee List</TabsTrigger>
+          <TabsTrigger value="unsettled-invoices">Unsettled Invoices</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="cargo-items" className={printOptions.section === "all" || printOptions.section === "cargo" ? "block page-break-after" : "hidden"}>
+          <Card>
+            <CardHeader className="bg-gray-50">
+              <CardTitle className="text-lg company-name">Cargo Items</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-blue-600 text-white">
+                      <th className="p-2 text-left">Invoice #</th>
+                      <th className="p-2 text-left">Line #</th>
+                      <th className="p-2 text-left">Barcode</th>
+                      <th className="p-2 text-left">Package</th>
+                      <th className="p-2 text-left">Volume (m³)</th>
+                      <th className="p-2 text-left">Weight (kg)</th>
+                      <th className="p-2 text-left">Shipper</th>
+                      <th className="p-2 text-left">Consignee</th>
+                      <th className="p-2 text-left">WH</th>
+                      <th className="p-2 text-left">D2D</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {cargoItems.map((item) => (
+                      <tr key={item.id} className="border-t hover:bg-gray-50">
+                        <td className="p-2">{item.invoiceNumber}</td>
+                        <td className="p-2">{item.lineNumber}</td>
+                        <td className="p-2">{item.barcode || "N/A"}</td>
+                        <td className="p-2">{item.packageName}</td>
+                        <td className="p-2">{item.volume}</td>
+                        <td className="p-2">{item.weight}</td>
+                        <td className="p-2">{item.shipper}</td>
+                        <td className="p-2">{item.consignee}</td>
+                        <td className="p-2">{item.wh}</td>
+                        <td className="p-2">{item.d2d ? "Yes" : "No"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="item-list" className={printOptions.section === "all" || printOptions.section === "items" ? "block page-break-after" : "hidden"}>
+          <Card>
+            <CardHeader className="bg-gray-50">
+              <CardTitle className="text-lg company-name">Item List</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-blue-600 text-white">
+                      <th className="p-2 text-left">Invoice</th>
+                      <th className="p-2 text-left">Shipper</th>
+                      <th className="p-2 text-left">Consignee</th>
+                      <th className="p-2 text-left">Packages</th>
+                      <th className="p-2 text-left">Volume (m³)</th>
+                      <th className="p-2 text-left">Package Type</th>
+                      <th className="p-2 text-left">Quantity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {itemList.map((item) => (
+                      <tr key={item.id} className="border-t hover:bg-gray-50">
+                        <td className="p-2">{item.invoice}</td>
+                        <td className="p-2">{item.shipper}</td>
+                        <td className="p-2">{item.consignee}</td>
+                        <td className="p-2">{item.packages}</td>
+                        <td className="p-2">{item.volume}</td>
+                        <td className="p-2">{item.packageName || "N/A"}</td>
+                        <td className="p-2">{item.quantity || "N/A"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="consignee-list" className={printOptions.section === "all" || printOptions.section === "consignees" ? "block page-break-after" : "hidden"}>
+          <Card>
+            <CardHeader className="bg-gray-50">
+              <CardTitle className="text-lg company-name">Consignee List</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-blue-600 text-white">
+                      <th className="p-2 text-left">Invoice</th>
+                      <th className="p-2 text-left">Shipper</th>
+                      <th className="p-2 text-left">Shipper Contact</th>
+                      <th className="p-2 text-left">Consignee</th>
+                      <th className="p-2 text-left">Consignee Contact</th>
+                      <th className="p-2 text-left">Volume (m³)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {consigneeList.map((item) => (
+                      <tr key={item.id} className="border-t hover:bg-gray-50">
+                        <td className="p-2">{item.invoice}</td>
+                        <td className="p-2">{item.shipper}</td>
+                        <td className="p-2">{item.shipperContact || "N/A"}</td>
+                        <td className="p-2">{item.consignee}</td>
+                        <td className="p-2">{item.consigneeContact || "N/A"}</td>
+                        <td className="p-2">{item.volume}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="unsettled-invoices" className={printOptions.section === "all" || printOptions.section === "invoices" ? "block" : "hidden"}>
+          <Card>
+            <CardHeader className="bg-gray-50">
+              <CardTitle className="text-lg company-name">Unsettled Invoices</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-blue-600 text-white">
+                      <th className="p-2 text-left">Invoice Number</th>
+                      <th className="p-2 text-left">Shipper</th>
+                      <th className="p-2 text-left">Consignee</th>
+                      <th className="p-2 text-left">GY</th>
+                      <th className="p-2 text-left">Amount</th>
+                      <th className="p-2 text-left">Net</th>
+                      <th className="p-2 text-left">Due</th>
+                      <th className="p-2 text-left">Paid</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {unsettledInvoices.map((item) => (
+                      <tr key={item.id} className="border-t hover:bg-gray-50">
+                        <td className="p-2">{item.invoiceNumber || "N/A"}</td>
+                        <td className="p-2">{item.shipper}</td>
+                        <td className="p-2">{item.consignee}</td>
+                        <td className="p-2">{item.gy || "N/A"}</td>
+                        <td className="p-2">${item.amount.toFixed(2)}</td>
+                        <td className="p-2">${item.net?.toFixed(2) || "N/A"}</td>
+                        <td className="p-2">${item.due?.toFixed(2) || "N/A"}</td>
+                        <td className="p-2">{item.paid ? "Yes" : "No"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

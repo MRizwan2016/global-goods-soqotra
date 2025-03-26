@@ -1,278 +1,200 @@
 
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Grid } from "@/components/ui/grid";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { PlusCircle, PackageCheck, ArrowLeft } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { QatarContainer } from "../../types/containerTypes";
-import { containerTypes, directionTypes, getNextRunningNumber, mockContainers } from "../../data/mockContainers";
 import { v4 as uuidv4 } from "uuid";
-import { toast } from "sonner";
-import ShippingLineSelector from "./ShippingLineSelector";
-
-// Update the sectors constant with additional countries
-const sectors = [
-  { id: "DOHA", name: "DOHA" },
-  { id: "SAUDI ARABIA", name: "SAUDI ARABIA" },
-  { id: "OMAN", name: "OMAN" },
-  { id: "UGANDA", name: "UGANDA" },
-  { id: "KENYA", name: "KENYA" },
-  { id: "TUNISIA", name: "TUNISIA" },
-  { id: "ERITREA", name: "ERITREA" },
-  { id: "SUDAN", name: "SUDAN" },
-  { id: "SOMALIA", name: "SOMALIA" },
-  { id: "ETHIOPIA", name: "ETHIOPIA" }
-];
-
-// Update direction types with additional destinations
-const destinations = [
-  { id: "DIRECT", name: "DIRECT" },
-  { id: "MIX", name: "MIX" },
-  { id: "MOMBASA CFS", name: "MOMBASA CFS" },
-  { id: "NAIROBI CFS", name: "NAIROBI CFS" },
-  { id: "ASMARA CFS", name: "ASMARA CFS" },
-  { id: "HARGEISA CFS", name: "HARGEISA CFS" },
-  { id: "BERBARA CFS", name: "BERBARA CFS" },
-  { id: "PORT SUDAN", name: "PORT SUDAN" },
-  { id: "TUNIS CFS", name: "TUNIS CFS" },
-  { id: "ADDIS ABABA", name: "ADDIS ABABA" },
-  { id: "KAMPALA CFS", name: "KAMPALA CFS" },
-  { id: "SOHAR CFS", name: "SOHAR CFS" },
-  { id: "DAMMAM CFS", name: "DAMMAM CFS" },
-  { id: "RIYADH CFS", name: "RIYADH CFS" },
-  { id: "JEDDAH CFS", name: "JEDDAH CFS" },
-  { id: "GALLE CFS", name: "GALLE CFS" }
-];
 
 interface AddContainerProps {
-  onContainerCreated: () => void;
+  onSubmit: (container: QatarContainer) => void;
   onCancel: () => void;
+  containerData?: QatarContainer | null;
+  isEditing?: boolean;
 }
 
-const AddContainer: React.FC<AddContainerProps> = ({ onContainerCreated, onCancel }) => {
-  const [sector, setSector] = useState("");
-  const [runningNumber, setRunningNumber] = useState(getNextRunningNumber() + " C");
-  const [containerNumber, setContainerNumber] = useState("");
-  const [sealNumber, setSealNumber] = useState("");
-  const [containerType, setContainerType] = useState("");
-  const [direction, setDirection] = useState("");
-  const [weight, setWeight] = useState("0");
-  const [etd, setEtd] = useState("");
-  const [eta, setEta] = useState("");
-  const [shippingLine, setShippingLine] = useState("");
-  
-  const handleSave = () => {
-    // Validation
-    if (!sector || !containerNumber || !sealNumber || !containerType || !direction || !etd || !eta || !shippingLine) {
-      toast.error("Please fill in all required fields");
-      return;
+const containerTypes = ["20FT", "40FT", "40HC", "20FR", "40FR", "20OT", "40OT"];
+const shippingLines = ["MSC", "Maersk", "CMA CGM", "Hapag-Lloyd", "ONE", "Evergreen", "COSCO"];
+const sectors = ["QAT-KEN", "QAT-SL", "QAT-UAE", "QAT-SA", "QAT-OM"];
+const directions = ["Import", "Export"];
+
+const AddContainer: React.FC<AddContainerProps> = ({ 
+  onSubmit, 
+  onCancel, 
+  containerData = null, 
+  isEditing = false 
+}) => {
+  const [formData, setFormData] = useState<QatarContainer>({
+    id: "",
+    containerNumber: "",
+    containerType: "20FT",
+    runningNumber: "",
+    status: "Available",
+    sealNumber: "",
+    direction: "Export",
+    sector: "QAT-KEN",
+    shippingLine: "MSC"
+  });
+
+  useEffect(() => {
+    if (containerData) {
+      setFormData(containerData);
+    } else {
+      setFormData({
+        id: uuidv4(),
+        containerNumber: "",
+        containerType: "20FT",
+        runningNumber: "",
+        status: "Available",
+        sealNumber: "",
+        direction: "Export",
+        sector: "QAT-KEN",
+        shippingLine: "MSC"
+      });
     }
-    
-    // Create new container
-    const newContainer: QatarContainer = {
-      id: uuidv4(),
-      runningNumber: runningNumber.split(" ")[0],
-      containerNumber,
-      sealNumber,
-      containerType: containerType as any,
-      direction: direction as any,
-      etd,
-      eta,
-      loadDate: new Date().toLocaleDateString("en-GB"),
-      weight: parseFloat(weight),
-      status: "NEW",
-      sector,
-      shippingLine
-    };
-    
-    // Add to mock data (in real app would save to backend)
-    mockContainers.push(newContainer);
-    
-    // Notify parent
-    onContainerCreated();
-    
-    // Show success message
-    toast.success("Container added successfully");
+  }, [containerData]);
+
+  const handleChange = (field: keyof QatarContainer, value: string | number) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
-  
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
   return (
-    <Card className="shadow-md animate-fade-in">
-      <CardHeader className="bg-green-50 border-b">
-        <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
-          <PlusCircle className="mr-2 text-green-600" size={22} />
-          Add Container
-        </CardTitle>
-      </CardHeader>
+    <Card className="mt-0 border-0 shadow-none">
       <CardContent className="p-6">
-        <Grid className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <div className="mb-4">
-              <Label htmlFor="sector" className="font-bold text-gray-700 mb-1 block">SECTOR:</Label>
-              <Select value={sector} onValueChange={setSector}>
-                <SelectTrigger 
-                  id="sector" 
-                  className="bg-blue-500 text-white font-semibold border-0 hover:bg-blue-600 transition-colors"
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="containerNumber">Container Number</Label>
+                <Input
+                  id="containerNumber"
+                  placeholder="Enter container number"
+                  value={formData.containerNumber}
+                  onChange={(e) => handleChange("containerNumber", e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="containerType">Container Type</Label>
+                <Select
+                  value={formData.containerType}
+                  onValueChange={(value) => handleChange("containerType", value)}
                 >
-                  <SelectValue placeholder="Select Sector" />
-                </SelectTrigger>
-                <SelectContent className="max-h-[200px] bg-white z-50">
-                  {sectors.map(option => (
-                    <SelectItem 
-                      key={option.id} 
-                      value={option.id}
-                      className="py-2 hover:bg-blue-50 transition-colors"
-                    >
-                      {option.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                  <SelectTrigger id="containerType">
+                    <SelectValue placeholder="Select container type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {containerTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="runningNumber">Running Number</Label>
+                <Input
+                  id="runningNumber"
+                  placeholder="Enter running number"
+                  value={formData.runningNumber}
+                  onChange={(e) => handleChange("runningNumber", e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="sealNumber">Seal Number</Label>
+                <Input
+                  id="sealNumber"
+                  placeholder="Enter seal number"
+                  value={formData.sealNumber || ""}
+                  onChange={(e) => handleChange("sealNumber", e.target.value)}
+                />
+              </div>
             </div>
-            
-            <div className="mb-4">
-              <Label htmlFor="runningNumber" className="font-bold text-gray-700 mb-1 block">RUNNING NUMBER:</Label>
-              <Input
-                id="runningNumber"
-                value={runningNumber}
-                onChange={(e) => setRunningNumber(e.target.value)}
-                className="bg-gray-100 border-gray-300"
-                readOnly
-              />
-            </div>
-            
-            <div className="mb-4">
-              <Label htmlFor="containerNumber" className="font-bold text-gray-700 mb-1 block">CONTAINER NUMBER:</Label>
-              <Input
-                id="containerNumber"
-                value={containerNumber}
-                onChange={(e) => setContainerNumber(e.target.value)}
-                placeholder="Enter container number"
-              />
-            </div>
-            
-            <div className="mb-4">
-              <Label htmlFor="sealNumber" className="font-bold text-gray-700 mb-1 block">SEAL NUMBER:</Label>
-              <Input
-                id="sealNumber"
-                value={sealNumber}
-                onChange={(e) => setSealNumber(e.target.value)}
-                placeholder="Enter seal number"
-              />
-            </div>
-            
-            <div className="mb-4">
-              <Label htmlFor="weight" className="font-bold text-gray-700 mb-1 block">WEIGHT:</Label>
-              <Input
-                id="weight"
-                type="number"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-              />
-            </div>
-            
-            <ShippingLineSelector 
-              value={shippingLine}
-              onChange={setShippingLine}
-            />
-          </div>
-          
-          <div>
-            <div className="mb-4">
-              <Label htmlFor="containerType" className="font-bold text-gray-700 mb-1 block">CONTAINER TYPE:</Label>
-              <Select value={containerType} onValueChange={setContainerType}>
-                <SelectTrigger 
-                  id="containerType" 
-                  className="bg-blue-500 text-white font-semibold border-0 hover:bg-blue-600 transition-colors"
+
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="shippingLine">Shipping Line</Label>
+                <Select
+                  value={formData.shippingLine || ""}
+                  onValueChange={(value) => handleChange("shippingLine", value)}
                 >
-                  <SelectValue placeholder="Select Container Type" />
-                </SelectTrigger>
-                <SelectContent className="max-h-[200px] bg-white z-50">
-                  {containerTypes.map(type => (
-                    <SelectItem 
-                      key={type.id} 
-                      value={type.id}
-                      className="py-2 hover:bg-blue-50 transition-colors"
-                    >
-                      {type.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="mb-4">
-              <Label htmlFor="direction" className="font-bold text-gray-700 mb-1 block">DIRECT/MIX:</Label>
-              <Select value={direction} onValueChange={setDirection}>
-                <SelectTrigger 
-                  id="direction" 
-                  className="bg-blue-500 text-white font-semibold border-0 hover:bg-blue-600 transition-colors"
+                  <SelectTrigger id="shippingLine">
+                    <SelectValue placeholder="Select shipping line" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {shippingLines.map((line) => (
+                      <SelectItem key={line} value={line}>
+                        {line}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="direction">Direction</Label>
+                <Select
+                  value={formData.direction || ""}
+                  onValueChange={(value) => handleChange("direction", value)}
                 >
-                  <SelectValue placeholder="Select Direction" />
-                </SelectTrigger>
-                <SelectContent className="max-h-[200px] bg-white z-50">
-                  {destinations.map(direction => (
-                    <SelectItem 
-                      key={direction.id} 
-                      value={direction.id}
-                      className="py-2 hover:bg-blue-50 transition-colors"
-                    >
-                      {direction.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="mb-4">
-              <Label htmlFor="etd" className="font-bold text-gray-700 mb-1 block">E.T.D:</Label>
-              <Input
-                id="etd"
-                value={etd}
-                onChange={(e) => setEtd(e.target.value)}
-                placeholder="DD/MM/YYYY"
-              />
-            </div>
-            
-            <div className="mb-4">
-              <Label htmlFor="eta" className="font-bold text-gray-700 mb-1 block">E.T.A:</Label>
-              <Input
-                id="eta"
-                value={eta}
-                onChange={(e) => setEta(e.target.value)}
-                placeholder="DD/MM/YYYY"
-              />
+                  <SelectTrigger id="direction">
+                    <SelectValue placeholder="Select direction" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {directions.map((dir) => (
+                      <SelectItem key={dir} value={dir}>
+                        {dir}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label htmlFor="sector">Sector</Label>
+                <Select
+                  value={formData.sector || ""}
+                  onValueChange={(value) => handleChange("sector", value)}
+                >
+                  <SelectTrigger id="sector">
+                    <SelectValue placeholder="Select sector" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sectors.map((sector) => (
+                      <SelectItem key={sector} value={sector}>
+                        {sector}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
-        </Grid>
-        
-        <div className="flex justify-between mt-6">
-          <Button 
-            variant="outline" 
-            onClick={onCancel}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft size={16} />
-            Go Back
-          </Button>
-          
-          <Button 
-            variant="default" 
-            className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
-            onClick={handleSave}
-          >
-            <PackageCheck size={16} />
-            Save
-          </Button>
-        </div>
+
+          <div className="flex justify-end gap-4">
+            <Button type="button" variant="outline" onClick={onCancel}>
+              Cancel
+            </Button>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+              {isEditing ? "Update Container" : "Add Container"}
+            </Button>
+          </div>
+        </form>
       </CardContent>
     </Card>
   );

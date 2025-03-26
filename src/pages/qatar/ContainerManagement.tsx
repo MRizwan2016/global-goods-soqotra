@@ -7,18 +7,23 @@ import AddContainer from "./components/container-management/AddContainer";
 import LoadContainerDetails from "./components/container-management/LoadContainerDetails";
 import ContainerManifest from "./components/container-management/ContainerManifest";
 import ViewContainerManifest from "./components/container-management/view-manifest/ViewContainerManifest";
-import { Layout } from "@/components/layout/Layout";
-import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, UnsettledInvoice } from "./types/containerTypes";
+import Layout from "@/components/layout/Layout";
+import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, UnsettledInvoice, PrintOptions } from "./types/containerTypes";
 import { toast } from "sonner";
+import PrintStyles from "./components/print/PrintStyles";
 
 // Mock data imports - in a real application, this would be fetched from an API
-import { containers as mockContainers } from "./data/mockContainers";
+import mockContainers from "./data/mockContainers";
 
 const ContainerManagement: React.FC = () => {
   const [containers, setContainers] = useState<QatarContainer[]>(mockContainers);
   const [activeTab, setActiveTab] = useState("containers");
   const [editContainerId, setEditContainerId] = useState<string | null>(null);
   const [viewManifestId, setViewManifestId] = useState<string | null>(null);
+  const [printOptions, setPrintOptions] = useState<PrintOptions>({
+    section: "all",
+    orientation: "portrait"
+  });
 
   // Add event listener for manifest view
   useEffect(() => {
@@ -184,7 +189,6 @@ const ContainerManagement: React.FC = () => {
     );
     setContainers(updatedContainers);
     setActiveTab("containers");
-    setEditContainerId(null);
     
     // Show success message with view manifest option
     toast.success("Container manifest submitted successfully", {
@@ -205,8 +209,16 @@ const ContainerManagement: React.FC = () => {
     return containers.find(container => container.id === (editContainerId || viewManifestId)) || null;
   };
 
+  const handlePrintOptionsChange = (options: Partial<PrintOptions>) => {
+    setPrintOptions(prev => ({ ...prev, ...options }));
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
-    <Layout>
+    <Layout title="Container Management">
       <div className="container mx-auto py-6">
         <Card>
           <CardContent className="p-0">
@@ -242,23 +254,26 @@ const ContainerManagement: React.FC = () => {
 
               <TabsContent value="containers" className="p-0 border-0">
                 <ContainerList 
-                  containers={containers} 
                   onEditContainer={handleEditContainer}
                   onLoadContainer={handleLoadContainer} 
                   onViewManifest={handleViewManifest}
                   onCreateManifest={handleManifestContainer}
+                  containersList={containers}
                 />
               </TabsContent>
 
               <TabsContent value="add" className="p-0 border-0">
-                <AddContainer onAddContainer={handleAddContainer} onCancel={() => setActiveTab("containers")} />
+                <AddContainer 
+                  onSubmit={handleAddContainer} 
+                  onCancel={() => setActiveTab("containers")} 
+                />
               </TabsContent>
 
               <TabsContent value="edit" className="p-0 border-0">
                 {editContainerId && (
                   <AddContainer 
-                    container={getCurrentContainer()} 
-                    onAddContainer={handleUpdateContainer}
+                    containerData={getCurrentContainer()} 
+                    onSubmit={handleUpdateContainer}
                     onCancel={handleCancelEdit}
                     isEditing={true}
                   />
@@ -268,7 +283,8 @@ const ContainerManagement: React.FC = () => {
               <TabsContent value="load" className="p-0 border-0">
                 {editContainerId && (
                   <LoadContainerDetails 
-                    container={getCurrentContainer()}
+                    containerId={editContainerId}
+                    containerData={getCurrentContainer()}
                     onLoadComplete={() => {
                       handleManifestContainer(editContainerId);
                     }}
@@ -289,14 +305,20 @@ const ContainerManagement: React.FC = () => {
 
               <TabsContent value="view-manifest" className="p-0 border-0">
                 {viewManifestId && (
-                  <ViewContainerManifest 
-                    container={getCurrentContainer() as QatarContainer}
-                    cargoItems={getMockCargoItems()}
-                    itemList={getMockItemList()}
-                    consigneeList={getMockConsigneeList()}
-                    unsettledInvoices={getMockUnsettledInvoices()}
-                    onBack={() => setActiveTab("containers")}
-                  />
+                  <>
+                    <PrintStyles orientation={printOptions.orientation} />
+                    <ViewContainerManifest 
+                      container={getCurrentContainer() as QatarContainer}
+                      cargoItems={getMockCargoItems()}
+                      itemList={getMockItemList()}
+                      consigneeList={getMockConsigneeList()}
+                      unsettledInvoices={getMockUnsettledInvoices()}
+                      onBack={() => setActiveTab("containers")}
+                      printOptions={printOptions}
+                      onPrintOptionsChange={handlePrintOptionsChange}
+                      onPrint={handlePrint}
+                    />
+                  </>
                 )}
               </TabsContent>
             </Tabs>

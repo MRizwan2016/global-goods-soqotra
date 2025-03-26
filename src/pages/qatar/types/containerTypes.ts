@@ -77,3 +77,15 @@ export interface PrintOptions {
   section: "all" | "cargo" | "items" | "consignees" | "invoices";
   orientation: "portrait" | "landscape";
 }
+
+export interface ViewContainerManifestProps {
+  container: QatarContainer;
+  cargoItems: ContainerCargo[];
+  itemList: ItemListEntry[];
+  consigneeList: ConsigneeListItem[];
+  unsettledInvoices: UnsettledInvoice[];
+  onBack: () => void;
+  printOptions: PrintOptions;
+  onPrintOptionsChange: (options: Partial<PrintOptions>) => void;
+  onPrint: () => void;
+}
