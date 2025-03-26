@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,9 +26,9 @@ const CargoManifest: React.FC = () => {
     return matchesSearch && matchesCountry && container.status === "CONFIRMED";
   });
   
-  // Get vessels with confirmed manifests
+  // Get vessels with confirmed manifests - fixed status comparison to use valid status values
   const vesselsWithManifests = mockVesselData.filter(vessel => 
-    vessel.status === "LOADED" || vessel.status === "SAILED" || vessel.status === "ARRIVED"
+    vessel.status === "LOADED" || vessel.status === "SAILED" || vessel.status === "COMPLETED"
   );
   
   // Filter vessels based on search and country
