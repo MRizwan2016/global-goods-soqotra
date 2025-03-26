@@ -286,37 +286,39 @@ const CargoManifest: React.FC = () => {
       </div>
       
       {/* Print styles */}
-      <style jsx global>{`
-        @media print {
-          @page {
-            size: ${orientation === "landscape" ? "landscape" : "portrait"};
-            margin: 15mm;
+      <style>
+        {`
+          @media print {
+            @page {
+              size: ${orientation === "landscape" ? "landscape" : "portrait"};
+              margin: 15mm;
+            }
+            
+            body {
+              -webkit-print-color-adjust: exact !important;
+              print-color-adjust: exact !important;
+            }
+            
+            table {
+              border-collapse: collapse;
+              width: 100%;
+            }
+            
+            table, th, td {
+              border: 1px solid #ddd;
+            }
+            
+            th, td {
+              padding: 8px;
+              text-align: left;
+            }
+            
+            .no-print {
+              display: none !important;
+            }
           }
-          
-          body {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          
-          table {
-            border-collapse: collapse;
-            width: 100%;
-          }
-          
-          table, th, td {
-            border: 1px solid #ddd;
-          }
-          
-          th, td {
-            padding: 8px;
-            text-align: left;
-          }
-          
-          .no-print {
-            display: none !important;
-          }
-        }
-      `}</style>
+        `}
+      </style>
     </Layout>
   );
 };

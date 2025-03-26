@@ -50,50 +50,52 @@ const VesselManifest: React.FC<VesselManifestProps> = ({
         />
         
         {/* Print styles */}
-        <style jsx global>{`
-          @media print {
-            @page {
-              size: ${orientation === "landscape" ? "landscape" : "portrait"};
-              margin: 15mm;
+        <style>
+          {`
+            @media print {
+              @page {
+                size: ${orientation === "landscape" ? "landscape" : "portrait"};
+                margin: 15mm;
+              }
+              
+              body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+              }
+              
+              table {
+                border-collapse: collapse;
+                width: 100%;
+              }
+              
+              table, th, td {
+                border: 1px solid #ddd !important;
+              }
+              
+              th, td {
+                padding: 8px;
+                text-align: left;
+              }
+              
+              h1, h2, h3, h4 {
+                color: black !important;
+              }
+              
+              .print-header {
+                text-align: center;
+                margin-bottom: 20px;
+                font-size: 24px;
+                font-weight: bold;
+                border-bottom: 2px solid #333;
+                padding-bottom: 10px;
+              }
+              
+              .page-break-before {
+                page-break-before: always;
+              }
             }
-            
-            body {
-              -webkit-print-color-adjust: exact !important;
-              print-color-adjust: exact !important;
-            }
-            
-            table {
-              border-collapse: collapse;
-              width: 100%;
-            }
-            
-            table, th, td {
-              border: 1px solid #ddd !important;
-            }
-            
-            th, td {
-              padding: 8px;
-              text-align: left;
-            }
-            
-            h1, h2, h3, h4 {
-              color: black !important;
-            }
-            
-            .print-header {
-              text-align: center;
-              margin-bottom: 20px;
-              font-size: 24px;
-              font-weight: bold;
-              border-bottom: 2px solid #333;
-              padding-bottom: 10px;
-            }
-            
-            .page-break-before {
-              page-break-before: always;
-            }
-          }
-        `}</style>
+          `}
+        </style>
       </div>
     );
   }
