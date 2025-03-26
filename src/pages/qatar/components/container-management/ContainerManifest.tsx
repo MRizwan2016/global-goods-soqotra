@@ -1,18 +1,18 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileCheck, ArrowLeft, Ship } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs } from "@/components/ui/tabs";
 import useContainerManifest from "../../hooks/useContainerManifest";
+import ManifestHeader from "./manifest/ManifestHeader";
+import CargoSummary from "./manifest/CargoSummary";
+import PrintOptionsSelector from "./manifest/PrintOptionsSelector";
 import ContainerDetailsSection from "./manifest/ContainerDetailsSection";
 import ManifestActionsBar from "./manifest/ManifestActionsBar";
 import ManifestTabsHeader from "./manifest/ManifestTabsHeader";
 import TabsContentWrapper from "./manifest/TabsContentWrapper";
 import PrintContainerManifest from "../print/container/PrintContainerManifest";
+import ManifestSkeleton from "./manifest/ManifestSkeleton";
+import ManifestError from "./manifest/ManifestError";
 
 interface ContainerManifestProps {
   containerId: string;
@@ -71,94 +71,30 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
   
   // Loading state
   if (isLoading) {
-    return (
-      <Card className="shadow-md animate-fade-in">
-        <CardHeader className="bg-green-50 border-b">
-          <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
-            <FileCheck className="mr-2 text-green-600" size={22} />
-            Loading Container Manifest...
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-64 w-full" />
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <ManifestSkeleton />;
   }
   
   // Error state
   if (error || !container) {
-    return (
-      <Card className="shadow-md animate-fade-in">
-        <CardHeader className="bg-red-50 border-b">
-          <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
-            <FileCheck className="mr-2 text-red-600" size={22} />
-            Error Loading Container Manifest
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="bg-red-50 p-4 rounded-md border border-red-200 text-red-700">
-            {error || "Container data not found. Please try again."}
-          </div>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={onCancel}
-            className="mt-4 flex items-center gap-1"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Container List
-          </Button>
-        </CardContent>
-      </Card>
-    );
+    return <ManifestError error={error} onCancel={onCancel} />;
   }
   
   return (
     <Card className="shadow-md animate-fade-in">
-      <CardHeader className="bg-green-50 border-b flex justify-between items-center">
-        <div>
-          <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
-            <FileCheck className="mr-2 text-green-600" size={22} />
-            Container Manifest Confirmation
-            <span className="ml-2 text-sm font-normal text-gray-600">
-              Container: {container.containerNumber} | Status: {container.status}
-            </span>
-          </CardTitle>
-        </div>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={onCancel}
-          className="flex items-center gap-1 hover:scale-105 transition-transform"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </Button>
-      </CardHeader>
+      <ManifestHeader 
+        containerNumber={container.containerNumber}
+        status={container.status}
+        onCancel={onCancel}
+      />
       
       <CardContent className="p-6">
-        <div className="bg-blue-50 p-4 rounded-md mb-6 border-l-4 border-blue-500">
-          <div className="flex items-center text-blue-700 mb-2">
-            <Ship size={20} className="mr-2" />
-            <h3 className="font-semibold">Container Cargo Summary</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-              <span className="font-medium">Total Packages:</span> {totalPackages}
-            </div>
-            <div>
-              <span className="font-medium">Total Volume:</span> {formatVolume(totalVolume)} m³
-            </div>
-            <div>
-              <span className="font-medium">Total Weight:</span> {formatWeight(totalWeight)} kg
-            </div>
-          </div>
-        </div>
+        <CargoSummary 
+          totalPackages={totalPackages}
+          totalVolume={totalVolume}
+          totalWeight={totalWeight}
+          formatVolume={formatVolume}
+          formatWeight={formatWeight}
+        />
         
         <ContainerDetailsSection 
           container={container}
@@ -171,48 +107,10 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
           formatVolume={formatVolume}
         />
         
-        <div className="flex items-center gap-4 my-4">
-          <div className="flex items-center gap-2">
-            <Label htmlFor="print-section">Print Section:</Label>
-            <Select 
-              value={printOptions.section} 
-              onValueChange={(value) => setPrintOptions({
-                ...printOptions,
-                section: value as "all" | "cargo" | "items" | "consignees" | "invoices"
-              })}
-            >
-              <SelectTrigger id="print-section" className="w-[180px]">
-                <SelectValue placeholder="Select section" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Sections</SelectItem>
-                <SelectItem value="cargo">Cargo Items</SelectItem>
-                <SelectItem value="items">Item List</SelectItem>
-                <SelectItem value="consignees">Consignee List</SelectItem>
-                <SelectItem value="invoices">Unsettled Invoices</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <Label htmlFor="orientation">Page Orientation:</Label>
-            <Select 
-              value={printOptions.orientation} 
-              onValueChange={(value) => setPrintOptions({
-                ...printOptions,
-                orientation: value as "portrait" | "landscape"
-              })}
-            >
-              <SelectTrigger id="orientation" className="w-[150px]">
-                <SelectValue placeholder="Select orientation" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="portrait">Portrait</SelectItem>
-                <SelectItem value="landscape">Landscape</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <PrintOptionsSelector 
+          printOptions={printOptions}
+          setPrintOptions={setPrintOptions}
+        />
         
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
           <ManifestTabsHeader />
