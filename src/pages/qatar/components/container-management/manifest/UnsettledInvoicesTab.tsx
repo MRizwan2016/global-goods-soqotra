@@ -10,6 +10,9 @@ import {
 } from "@/components/ui/table";
 import { UnsettledInvoice } from "../../../types/containerTypes";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { CreditCard } from "lucide-react";
 
 interface UnsettledInvoicesTabProps {
   unsettledInvoices: UnsettledInvoice[];
@@ -18,6 +21,14 @@ interface UnsettledInvoicesTabProps {
 const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
   unsettledInvoices,
 }) => {
+  const navigate = useNavigate();
+
+  const handleRecordPayment = (invoice: UnsettledInvoice) => {
+    // Store the invoice data temporarily to use it in the payment form
+    sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
+    navigate("/accounts/add-payment");
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-blue-600 text-white text-center py-2 mb-2 font-bold">
@@ -33,7 +44,8 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
               <TableHead className="font-bold text-blue-800 border-r border-gray-200">SHIPPER</TableHead>
               <TableHead className="font-bold text-blue-800 border-r border-gray-200">CONSIGNEE</TableHead>
               <TableHead className="font-bold text-blue-800 border-r border-gray-200">AMOUNT</TableHead>
-              <TableHead className="font-bold text-blue-800">STATUS</TableHead>
+              <TableHead className="font-bold text-blue-800 border-r border-gray-200">STATUS</TableHead>
+              <TableHead className="font-bold text-blue-800">ACTION</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -45,7 +57,7 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
                   <TableCell className="border-r border-gray-200">{invoice.shipper}</TableCell>
                   <TableCell className="border-r border-gray-200">{invoice.consignee}</TableCell>
                   <TableCell className="text-right border-r border-gray-200">{invoice.amount.toFixed(2)}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center border-r border-gray-200">
                     <Badge 
                       className={`font-medium ${invoice.paid 
                         ? "bg-green-100 text-green-800 hover:bg-green-200" 
@@ -54,11 +66,24 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
                       {invoice.paid ? "PAID" : "UNPAID"}
                     </Badge>
                   </TableCell>
+                  <TableCell className="text-center">
+                    {!invoice.paid && (
+                      <Button 
+                        size="sm"
+                        variant="outline"
+                        className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                        onClick={() => handleRecordPayment(invoice)}
+                      >
+                        <CreditCard className="h-4 w-4 mr-1" />
+                        Record Payment
+                      </Button>
+                    )}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4 text-gray-500">
+                <TableCell colSpan={7} className="text-center py-4 text-gray-500">
                   No invoices found for this container
                 </TableCell>
               </TableRow>

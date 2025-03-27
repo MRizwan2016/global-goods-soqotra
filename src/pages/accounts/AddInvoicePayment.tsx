@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -137,6 +138,7 @@ const AddInvoicePayment = () => {
           id: storedInvoice.id || `gen-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           invoiceNumber: storedInvoice.invoiceNumber,
           date: storedInvoice.date || format(new Date(), "yyyy-MM-dd"),
+          // Use bookNumber if available, otherwise use empty string - avoid using bookingForm which causes TypeScript error
           bookingForm: storedInvoice.bookNumber || "",
           shipper1: storedInvoice.shipper || "",
           consignee1: storedInvoice.consignee || "",
@@ -279,26 +281,29 @@ const AddInvoicePayment = () => {
 
   const handleSelectInvoice = (invoice: any) => {
     setSelectedInvoice(invoice);
+    
+    // Create a consistent mapping for invoice data regardless of source
     setFormState({
       ...formState,
       invoiceNumber: invoice.invoiceNumber,
+      // Use bookingForm or bookNumber as available
       bookingForm: invoice.bookingForm || invoice.bookNumber || "",
-      shipper: invoice.shipper1 || "",
-      consignee: invoice.consignee1 || "",
+      shipper: invoice.shipper1 || invoice.shipper || "",
+      consignee: invoice.consignee1 || invoice.consignee || "",
       warehouse: invoice.warehouse || "",
-      shipmentType: invoice.freightType || "",
-      grossAmount: invoice.gross || 0,
+      shipmentType: invoice.freightType || invoice.shipmentType || "",
+      grossAmount: invoice.gross || invoice.amount || 0,
       discount: invoice.discount || 0,
-      netAmount: (invoice.gross || 0) - (invoice.discount || 0),
-      totalPaid: invoice.paid ? invoice.net : 0,
-      balanceToPay: invoice.paid ? 0 : invoice.net,
-      amountPaid: invoice.paid ? 0 : invoice.net,
+      netAmount: (invoice.net || invoice.amount || 0),
+      totalPaid: invoice.paid ? (invoice.net || invoice.amount || 0) : 0,
+      balanceToPay: invoice.paid ? 0 : (invoice.net || invoice.amount || 0),
+      amountPaid: invoice.paid ? 0 : (invoice.net || invoice.amount || 0),
       country: formState.country,
       currency: formState.currency
     });
     
     form.setValue("invoiceNumber", invoice.invoiceNumber);
-    form.setValue("amountPaid", invoice.paid ? 0 : invoice.net);
+    form.setValue("amountPaid", invoice.paid ? 0 : (invoice.net || invoice.amount || 0));
     
     setShowInvoiceSelector(false);
     toast({
