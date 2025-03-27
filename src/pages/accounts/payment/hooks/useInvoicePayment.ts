@@ -53,11 +53,12 @@ interface FormState {
   currency: string;
 }
 
-// Define an interface for invoice data to ensure type safety
+// Define a comprehensive interface for invoice data to ensure type safety
 interface Invoice {
   id: string;
   invoiceNumber: string;
   date: string;
+  // Handle both formats of properties
   bookingForm?: string;
   bookNumber?: string;
   shipper1?: string;
@@ -67,11 +68,21 @@ interface Invoice {
   warehouse?: string;
   freightType?: string;
   shipmentType?: string;
+  // Financial properties
   gross?: number;
   amount?: number;
   discount?: number;
   net?: number;
   paid?: boolean;
+  // Additional properties that might exist in some invoice objects
+  customer?: string;
+  salesAgent?: string;
+  doorToDoor?: boolean;
+  nic?: string;
+  volume?: string;
+  weight?: string;
+  packages?: number;
+  handOverBy?: string;
   [key: string]: any; // To allow for other properties that may exist
 }
 

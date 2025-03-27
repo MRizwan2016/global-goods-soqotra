@@ -3,8 +3,23 @@ import React from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 
+// Define the Invoice interface
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  date?: string;
+  net?: number;
+  amount?: number;
+  consignee1?: string;
+  consignee?: string;
+  paid?: boolean;
+  bookingForm?: string;
+  bookNumber?: string;
+  [key: string]: any; // Allow for other properties
+}
+
 interface SelectedInvoiceDetailsProps {
-  selectedInvoice: any;
+  selectedInvoice: Invoice | null;
   currencySymbol: string;
 }
 
@@ -32,7 +47,7 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
         </div>
         <div>
           <span className="text-sm text-gray-500">Customer:</span>
-          <p className="font-semibold text-gray-900">{selectedInvoice.consignee1 || 'N/A'}</p>
+          <p className="font-semibold text-gray-900">{selectedInvoice.consignee1 || selectedInvoice.consignee || 'N/A'}</p>
         </div>
         <div>
           <span className="text-sm text-gray-500">Date:</span>
@@ -40,7 +55,7 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
         </div>
         <div>
           <span className="text-sm text-gray-500">Total Amount:</span>
-          <p className="font-semibold text-gray-900">{currencySymbol}{selectedInvoice.net}</p>
+          <p className="font-semibold text-gray-900">{currencySymbol}{selectedInvoice.net || selectedInvoice.amount || 0}</p>
         </div>
         <div>
           <span className="text-sm text-gray-500">Payment Status:</span>

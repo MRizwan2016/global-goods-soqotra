@@ -1,10 +1,9 @@
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
 
 // Define interface for the invoice object to ensure type safety
 interface Invoice {
@@ -16,6 +15,8 @@ interface Invoice {
   consignee1?: string;
   consignee?: string;
   paid?: boolean;
+  bookingForm?: string;
+  bookNumber?: string;
   [key: string]: any; // Allow for other properties
 }
 
