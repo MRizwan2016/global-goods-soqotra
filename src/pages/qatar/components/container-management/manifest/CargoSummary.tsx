@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Ship, Package, Scale, BoxesStacked } from "lucide-react";
+import { Ship, Package, Scale, Boxes } from "lucide-react";
 
 interface CargoSummaryProps {
   totalPackages: number;
@@ -25,7 +25,7 @@ const CargoSummary: React.FC<CargoSummaryProps> = ({
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="flex items-center bg-white p-3 rounded-md border border-blue-100">
-          <BoxesStacked size={18} className="text-blue-500 mr-2" />
+          <Boxes size={18} className="text-blue-500 mr-2" />
           <div>
             <span className="text-xs text-gray-500 block">Total Packages</span>
             <span className="font-medium text-lg">{totalPackages}</span>
