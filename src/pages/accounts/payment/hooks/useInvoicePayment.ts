@@ -53,12 +53,34 @@ interface FormState {
   currency: string;
 }
 
+// Define an interface for invoice data to ensure type safety
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  date: string;
+  bookingForm?: string;
+  bookNumber?: string;
+  shipper1?: string;
+  shipper?: string;
+  consignee1?: string;
+  consignee?: string;
+  warehouse?: string;
+  freightType?: string;
+  shipmentType?: string;
+  gross?: number;
+  amount?: number;
+  discount?: number;
+  net?: number;
+  paid?: boolean;
+  [key: string]: any; // To allow for other properties that may exist
+}
+
 export const useInvoicePayment = () => {
   const navigate = useNavigate();
   const [invoicePrefix, setInvoicePrefix] = useState("");
-  const [matchingInvoices, setMatchingInvoices] = useState<any[]>([]);
+  const [matchingInvoices, setMatchingInvoices] = useState<Invoice[]>([]);
   const [showInvoiceSelector, setShowInvoiceSelector] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [date, setDate] = useState<Date>(new Date());
   const [selectedCountry, setSelectedCountry] = useState("QA");
   const [filteredCurrencies, setFilteredCurrencies] = useState(currencyOptions);
@@ -85,9 +107,10 @@ export const useInvoicePayment = () => {
   });
 
   // Get all invoices combining mock and stored data
-  const getAllInvoices = () => {
-    const storedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
-    const allInvoices = Array.from(JSON.parse(localStorage.getItem('mockInvoiceData') || '[]'));
+  const getAllInvoices = (): Invoice[] => {
+    const storedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]') as unknown[];
+    const allInvoices = Array.from(JSON.parse(localStorage.getItem('mockInvoiceData') || '[]') as Invoice[]);
+    
     storedInvoices.forEach((storedInvoice: any) => {
       if (storedInvoice.invoiceNumber && !allInvoices.some(inv => inv.invoiceNumber === storedInvoice.invoiceNumber)) {
         // Create a consistent structure regardless of source
@@ -96,7 +119,7 @@ export const useInvoicePayment = () => {
           invoiceNumber: storedInvoice.invoiceNumber,
           date: storedInvoice.date || format(new Date(), "yyyy-MM-dd"),
           // Handle both bookingForm and bookNumber
-          bookingForm: storedInvoice.bookingForm || "",
+          bookingForm: storedInvoice.bookingForm || storedInvoice.bookNumber || "",
           shipper1: storedInvoice.shipper || "",
           consignee1: storedInvoice.consignee || "",
           warehouse: storedInvoice.warehouse || "",
@@ -113,14 +136,14 @@ export const useInvoicePayment = () => {
     const sessionInvoice = sessionStorage.getItem('selectedInvoice');
     if (sessionInvoice) {
       try {
-        const parsedInvoice = JSON.parse(sessionInvoice);
+        const parsedInvoice = JSON.parse(sessionInvoice) as any;
         // Check if this invoice is not already in our list
         if (parsedInvoice.invoiceNumber && !allInvoices.some(inv => inv.invoiceNumber === parsedInvoice.invoiceNumber)) {
           allInvoices.push({
             id: parsedInvoice.id || `session-${Date.now()}`,
             invoiceNumber: parsedInvoice.invoiceNumber,
             date: parsedInvoice.date || format(new Date(), "yyyy-MM-dd"),
-            bookingForm: parsedInvoice.bookingForm || "",
+            bookingForm: parsedInvoice.bookingForm || parsedInvoice.bookNumber || "",
             shipper1: parsedInvoice.shipper || "",
             consignee1: parsedInvoice.consignee || "",
             warehouse: parsedInvoice.warehouse || "",
@@ -263,7 +286,7 @@ export const useInvoicePayment = () => {
   };
 
   // Handle selecting an invoice
-  const handleSelectInvoice = (invoice: any) => {
+  const handleSelectInvoice = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
     
     // Create a consistent mapping for invoice data regardless of source

@@ -5,15 +5,27 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { UnsettledInvoice } from "@/pages/qatar/types/containerTypes";
+
+// Define interface for the invoice object to ensure type safety
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  date?: string;
+  net?: number;
+  amount?: number;
+  consignee1?: string;
+  consignee?: string;
+  paid?: boolean;
+  [key: string]: any; // Allow for other properties
+}
 
 interface InvoiceSearchProps {
   invoicePrefix: string;
   setInvoicePrefix: React.Dispatch<React.SetStateAction<string>>;
-  matchingInvoices: any[];
+  matchingInvoices: Invoice[];
   showInvoiceSelector: boolean;
   setShowInvoiceSelector: React.Dispatch<React.SetStateAction<boolean>>;
-  handleSelectInvoice: (invoice: any) => void;
+  handleSelectInvoice: (invoice: Invoice) => void;
   handleInvoiceSearch: () => void;
 }
 
@@ -81,7 +93,7 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
                         <span className="text-indigo-600 font-medium">
-                          Amount: ${invoice.net}
+                          Amount: ${invoice.net || invoice.amount || 0}
                         </span>
                         <span>
                           {invoice.consignee1 || invoice.consignee || 'No consignee'}
