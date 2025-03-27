@@ -7,12 +7,12 @@ import { RouteConfig } from "./types";
 
 export const accountsRoutes: RouteConfig[] = [
   {
-    path: "/accounts/payment/add",
+    path: "/accounts/add-payment",
     element: AddInvoicePayment,
     private: true
   },
   {
-    path: "/accounts/payment",
+    path: "/accounts/payments",
     element: PaymentsPage,
     private: true
   },
