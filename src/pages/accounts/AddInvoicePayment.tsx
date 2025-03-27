@@ -12,7 +12,7 @@ import InvoiceSearch from "./payment/components/InvoiceSearch";
 import CountryCurrencySelector from "./payment/components/CountryCurrencySelector";
 import SelectedInvoiceDetails from "./payment/components/SelectedInvoiceDetails";
 import InvoiceFormFields from "./payment/components/InvoiceFormFields";
-import PaymentInformation from "./payment/components/PaymentInformation";
+import PaymentInformation from "./payment/components/payment-information";
 import ActionButtons from "./payment/components/ActionButtons";
 import { useInvoicePayment } from "./payment/hooks/useInvoicePayment";
 
