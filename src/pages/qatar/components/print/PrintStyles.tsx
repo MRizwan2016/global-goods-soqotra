@@ -11,43 +11,33 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
       {`
         @media print {
           body * {
-            visibility: hidden;
+            visibility: hidden !important;
           }
+          
+          body.print-only-manifest * {
+            visibility: hidden !important;
+          }
+          
           .print-container, .print-container * {
             visibility: visible !important;
-          }
-          .print-container {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: auto;
-            padding: 10mm;
-          }
-          
-          /* Fix for delayed printing */
-          @keyframes printDelay {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
           
           .print-container {
-            animation: printDelay 0.5s;
-            animation-fill-mode: forwards;
-          }
-          
-          .page-break-before {
-            page-break-before: always;
-          }
-          
-          .no-print {
-            display: none !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            padding: 10mm !important;
+            background-color: white !important;
           }
           
           /* Orientation settings */
           @page {
             size: ${orientation === "landscape" ? "landscape" : "portrait"};
-            margin: 1cm;
+            margin: 15mm;
           }
           
           /* Layout adjustments for landscape */
@@ -108,6 +98,24 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
           .print-only {
             display: block !important;
             visibility: visible !important;
+          }
+          
+          /* Hide non-print elements */
+          .no-print {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          
+          /* Prevent links from showing their URLs */
+          a {
+            text-decoration: none !important;
+            color: #000 !important;
+          }
+          
+          /* Force background colors to print */
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
         }
       `}

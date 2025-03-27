@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 const ManifestSkeleton: React.FC = () => {
   return (
-    <Card className="shadow-md animate-fade-in">
+    <Card className="shadow-md animate-pulse">
       <CardHeader className="bg-green-50 border-b">
         <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
           <FileCheck className="mr-2 text-green-600" size={22} />
@@ -14,10 +14,11 @@ const ManifestSkeleton: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <div className="space-y-4">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-32 w-full" />
-          <Skeleton className="h-64 w-full" />
+        <div className="space-y-6">
+          <Skeleton className="h-12 w-full bg-gray-200" />
+          <Skeleton className="h-36 w-full bg-gray-200" />
+          <Skeleton className="h-64 w-full bg-gray-200" />
+          <Skeleton className="h-16 w-full bg-gray-200" />
         </div>
       </CardContent>
     </Card>

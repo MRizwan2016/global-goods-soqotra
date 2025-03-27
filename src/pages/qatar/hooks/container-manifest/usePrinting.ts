@@ -18,23 +18,26 @@ export const usePrinting = () => {
     setIsPrinting(true);
     setPrintViewVisible(true);
     
-    // Allow time for the print view to fully render before printing
+    // Allow more time for the print view to fully render before printing
     setTimeout(() => {
       // Apply print-specific body class
       document.body.classList.add('print-only-manifest');
       
-      // Print after a short delay
+      // Trigger a small layout recalculation to ensure content is rendered
+      window.dispatchEvent(new Event('resize'));
+      
+      // Print after a longer delay to ensure content is fully rendered
       setTimeout(() => {
         window.print();
         
-        // Reset after printing with a delay to ensure printing completes
+        // Reset after printing with a longer delay to ensure printing completes
         setTimeout(() => {
           document.body.classList.remove('print-only-manifest');
           setPrintViewVisible(false);
           setIsPrinting(false);
-        }, 1000);
-      }, 500);
-    }, 800); // Increased delay before printing
+        }, 1500);
+      }, 1000);
+    }, 1200);
   };
 
   return {

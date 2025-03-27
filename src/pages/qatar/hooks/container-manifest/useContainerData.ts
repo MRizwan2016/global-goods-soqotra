@@ -20,35 +20,45 @@ export const useContainerData = (containerId: string) => {
     setIsLoading(true);
     setError(null);
     
-    try {
-      // Find container by ID
-      const foundContainer = mockContainers.find(c => c.id === containerId);
-      
-      if (foundContainer) {
-        setContainer(foundContainer);
-        setVgmWeight(foundContainer.weight?.toString() || "0");
+    // Add a slight delay to simulate network request
+    const loadTimer = setTimeout(() => {
+      try {
+        // Find container by ID
+        const foundContainer = mockContainers.find(c => c.id === containerId);
         
-        // Get cargo items for this container by container ID OR by running number
-        const containerCargoItems = mockCargoItems.filter(item => 
-          item.containerId === containerId || 
-          (foundContainer.runningNumber && item.containerId === foundContainer.runningNumber.toString())
-        );
-        
-        setCargoItems(containerCargoItems);
-      } else {
-        setError("Container not found");
-        toast.error("Container not found");
+        if (foundContainer) {
+          setContainer(foundContainer);
+          setVgmWeight(foundContainer.weight?.toString() || "0");
+          
+          // Get cargo items for this container by container ID OR by running number
+          const containerCargoItems = mockCargoItems.filter(item => 
+            item.containerId === containerId || 
+            (foundContainer.runningNumber && item.containerId === foundContainer.runningNumber.toString())
+          );
+          
+          if (containerCargoItems.length === 0) {
+            console.warn(`No cargo items found for container ID ${containerId} or running number ${foundContainer.runningNumber}`);
+          }
+          
+          setCargoItems(containerCargoItems);
+          
+          // Set confirm date to today
+          setConfirmDate(new Date().toLocaleDateString("en-GB", {day: "2-digit", month: "2-digit", year: "numeric"}));
+        } else {
+          console.error(`Container not found with ID: ${containerId}`);
+          setError(`Container with ID ${containerId} not found. Please check the container ID and try again.`);
+          toast.error("Container not found");
+        }
+      } catch (err) {
+        console.error("Error loading container data:", err);
+        setError("Failed to load container data. Please try again or contact support.");
+        toast.error("Failed to load container data");
+      } finally {
+        setIsLoading(false);
       }
-      
-      // Set confirm date to today
-      setConfirmDate(new Date().toLocaleDateString("en-GB", {day: "2-digit", month: "2-digit", year: "numeric"}));
-    } catch (err) {
-      console.error("Error loading container data:", err);
-      setError("Failed to load container data");
-      toast.error("Failed to load container data");
-    } finally {
-      setIsLoading(false);
-    }
+    }, 800); // Added delay to make loading state visible
+    
+    return () => clearTimeout(loadTimer);
   }, [containerId]);
 
   return {
