@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -48,7 +47,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-// Currency data with symbols and country information
 const currencyOptions = [
   { value: "USD", label: "US Dollar ($)", symbol: "$", countries: ["United States", "Ecuador", "El Salvador"] },
   { value: "EUR", label: "Euro (€)", symbol: "€", countries: ["Germany", "France", "Italy", "Spain"] },
@@ -64,7 +62,6 @@ const currencyOptions = [
   { value: "PHP", label: "Philippine Peso (₱)", symbol: "₱", countries: ["Philippines"] },
 ];
 
-// Countries that the company operates in
 const countryOptions = [
   { value: "US", label: "United States", currency: "USD" },
   { value: "UK", label: "United Kingdom", currency: "GBP" },
@@ -77,7 +74,6 @@ const countryOptions = [
   { value: "PH", label: "Philippines", currency: "PHP" },
 ];
 
-// Form validation schema
 const formSchema = z.object({
   invoiceNumber: z.string().min(1, "Invoice number is required"),
   amountPaid: z.number().min(0.01, "Amount must be greater than 0"),
@@ -95,11 +91,10 @@ const AddInvoicePayment = () => {
   const [showInvoiceSelector, setShowInvoiceSelector] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
   const [date, setDate] = React.useState<Date>(new Date());
-  const [selectedCountry, setSelectedCountry] = useState("QA"); // Default to Qatar
+  const [selectedCountry, setSelectedCountry] = useState("QA");
   const [filteredCurrencies, setFilteredCurrencies] = useState(currencyOptions);
-  const [currencySymbol, setCurrencySymbol] = useState("﷼"); // Default to QAR symbol
-  
-  // Initialize form with default values
+  const [currencySymbol, setCurrencySymbol] = useState("﷼");
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -112,7 +107,7 @@ const AddInvoicePayment = () => {
       currency: "QAR",
     },
   });
-  
+
   const [formState, setFormState] = useState({
     invoiceNumber: "",
     bookingForm: "",
@@ -133,22 +128,16 @@ const AddInvoicePayment = () => {
     currency: "QAR"
   });
 
-  // Load all invoices, including generated ones from localStorage
   const getAllInvoices = () => {
-    // Get stored invoices from localStorage
     const storedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
-    
-    // Combine with mock data, ensuring no duplicates (by invoice number)
     const allInvoices = [...mockInvoiceData];
-    
-    // Add stored invoices if they don't already exist in the array
     storedInvoices.forEach((storedInvoice: any) => {
       if (storedInvoice.invoiceNumber && !allInvoices.some(inv => inv.invoiceNumber === storedInvoice.invoiceNumber)) {
         allInvoices.push({
           id: storedInvoice.id || `gen-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           invoiceNumber: storedInvoice.invoiceNumber,
           date: storedInvoice.date || format(new Date(), "yyyy-MM-dd"),
-          bookNumber: storedInvoice.bookNumber || "",
+          bookingForm: storedInvoice.bookNumber || "",
           shipper1: storedInvoice.shipper || "",
           consignee1: storedInvoice.consignee || "",
           warehouse: storedInvoice.warehouse || "",
@@ -160,11 +149,9 @@ const AddInvoicePayment = () => {
         });
       }
     });
-    
     return allInvoices;
   };
 
-  // Filter GY invoices when prefix is typed
   useEffect(() => {
     if (invoicePrefix.length >= 2) {
       const allInvoices = getAllInvoices();
@@ -179,7 +166,6 @@ const AddInvoicePayment = () => {
     }
   }, [invoicePrefix]);
 
-  // Calculate derived values
   useEffect(() => {
     if (formState) {
       const netAmount = formState.grossAmount - formState.discount;
@@ -193,7 +179,6 @@ const AddInvoicePayment = () => {
     }
   }, [formState.grossAmount, formState.discount, formState.totalPaid]);
 
-  // Filter currencies based on selected country
   useEffect(() => {
     if (selectedCountry) {
       const country = countryOptions.find(c => c.value === selectedCountry);
@@ -206,7 +191,6 @@ const AddInvoicePayment = () => {
           form.setValue("currency", defaultCurrency);
         }
         
-        // Filter currencies that are commonly used in this country
         const relevantCurrencies = currencyOptions.filter(c => 
           c.value === defaultCurrency || c.value === "USD" || c.value === "EUR"
         );
@@ -222,7 +206,6 @@ const AddInvoicePayment = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
-    // Handle numeric fields
     if (["grossAmount", "discount", "totalPaid", "amountPaid"].includes(name)) {
       const numValue = parseFloat(value) || 0;
       setFormState(prev => ({ ...prev, [name]: numValue }));
@@ -277,7 +260,6 @@ const AddInvoicePayment = () => {
       return;
     }
 
-    // Search is handled by the useEffect
     const allInvoices = getAllInvoices();
     const filtered = allInvoices.filter(inv => 
       inv.invoiceNumber && inv.invoiceNumber.toLowerCase().includes(invoicePrefix.toLowerCase())
@@ -300,7 +282,7 @@ const AddInvoicePayment = () => {
     setFormState({
       ...formState,
       invoiceNumber: invoice.invoiceNumber,
-      bookingForm: invoice.bookNumber || "",
+      bookingForm: invoice.bookingForm || invoice.bookNumber || "",
       shipper: invoice.shipper1 || "",
       consignee: invoice.consignee1 || "",
       warehouse: invoice.warehouse || "",
@@ -310,7 +292,7 @@ const AddInvoicePayment = () => {
       netAmount: (invoice.gross || 0) - (invoice.discount || 0),
       totalPaid: invoice.paid ? invoice.net : 0,
       balanceToPay: invoice.paid ? 0 : invoice.net,
-      amountPaid: invoice.paid ? 0 : invoice.net, // Auto-fill the balance amount
+      amountPaid: invoice.paid ? 0 : invoice.net,
       country: formState.country,
       currency: formState.currency
     });
@@ -353,7 +335,6 @@ const AddInvoicePayment = () => {
       return;
     }
 
-    // Update the paid status in localStorage
     const storedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
     const updatedStoredInvoices = storedInvoices.map((inv: any) => {
       if (inv.invoiceNumber === formState.invoiceNumber) {
@@ -366,7 +347,6 @@ const AddInvoicePayment = () => {
     });
     localStorage.setItem('generatedInvoices', JSON.stringify(updatedStoredInvoices));
     
-    // Also update in mock data for this session
     const allInvoices = getAllInvoices();
     const updatedMock = allInvoices.map(inv => {
       if (inv.invoiceNumber === formState.invoiceNumber) {
@@ -378,7 +358,6 @@ const AddInvoicePayment = () => {
       return inv;
     });
     
-    // Store payment record
     const paymentRecord = {
       id: `pay-${Date.now()}`,
       invoiceNumber: formState.invoiceNumber,
@@ -393,17 +372,14 @@ const AddInvoicePayment = () => {
     payments.push(paymentRecord);
     localStorage.setItem('invoicePayments', JSON.stringify(payments));
     
-    // Success message
     toast({
       title: "Payment Recorded Successfully",
       description: `Payment of ${currencySymbol}${formState.amountPaid} for invoice ${formState.invoiceNumber} has been recorded.`,
     });
 
-    // Redirect to payment list
     navigate("/accounts/payments");
   };
 
-  // Animation variants
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -486,7 +462,6 @@ const AddInvoicePayment = () => {
                       </Button>
                     </div>
                     
-                    {/* Animated Invoice selector dropdown */}
                     <AnimatePresence>
                       {showInvoiceSelector && (
                         <motion.div 
@@ -535,7 +510,6 @@ const AddInvoicePayment = () => {
                   </div>
                 </motion.div>
 
-                {/* Country and Currency Selection */}
                 <motion.div 
                   variants={item}
                   initial={{ opacity: 0, y: 20 }}
