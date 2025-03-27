@@ -95,9 +95,9 @@ const AddInvoicePayment = () => {
   const [showInvoiceSelector, setShowInvoiceSelector] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
   const [date, setDate] = React.useState<Date>(new Date());
-  const [selectedCountry, setSelectedCountry] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("QA"); // Default to Qatar
   const [filteredCurrencies, setFilteredCurrencies] = useState(currencyOptions);
-  const [currencySymbol, setCurrencySymbol] = useState("$");
+  const [currencySymbol, setCurrencySymbol] = useState("﷼"); // Default to QAR symbol
   
   // Initialize form with default values
   const form = useForm<z.infer<typeof formSchema>>({
@@ -108,8 +108,8 @@ const AddInvoicePayment = () => {
       paymentDate: new Date(),
       paymentMethod: "CASH_IN_HAND",
       remarks: "",
-      country: "",
-      currency: "USD",
+      country: "QA",
+      currency: "QAR",
     },
   });
   
@@ -129,15 +129,47 @@ const AddInvoicePayment = () => {
     amountPaid: 0,
     paymentCollectDate: format(new Date(), "yyyy-MM-dd"),
     receivableAccount: "CASH_IN_HAND",
-    country: "",
-    currency: "USD"
+    country: "QA",
+    currency: "QAR"
   });
+
+  // Load all invoices, including generated ones from localStorage
+  const getAllInvoices = () => {
+    // Get stored invoices from localStorage
+    const storedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
+    
+    // Combine with mock data, ensuring no duplicates (by invoice number)
+    const allInvoices = [...mockInvoiceData];
+    
+    // Add stored invoices if they don't already exist in the array
+    storedInvoices.forEach((storedInvoice: any) => {
+      if (storedInvoice.invoiceNumber && !allInvoices.some(inv => inv.invoiceNumber === storedInvoice.invoiceNumber)) {
+        allInvoices.push({
+          id: storedInvoice.id || `gen-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          invoiceNumber: storedInvoice.invoiceNumber,
+          date: storedInvoice.date || format(new Date(), "yyyy-MM-dd"),
+          bookNumber: storedInvoice.bookNumber || "",
+          shipper1: storedInvoice.shipper || "",
+          consignee1: storedInvoice.consignee || "",
+          warehouse: storedInvoice.warehouse || "",
+          freightType: storedInvoice.shipmentType || "",
+          gross: storedInvoice.amount || 0,
+          discount: 0,
+          net: storedInvoice.amount || 0,
+          paid: storedInvoice.paid || false
+        });
+      }
+    });
+    
+    return allInvoices;
+  };
 
   // Filter GY invoices when prefix is typed
   useEffect(() => {
-    if (invoicePrefix.length >= 3) {
-      const filtered = mockInvoiceData.filter(inv => 
-        inv.invoiceNumber.toLowerCase().startsWith(invoicePrefix.toLowerCase())
+    if (invoicePrefix.length >= 2) {
+      const allInvoices = getAllInvoices();
+      const filtered = allInvoices.filter(inv => 
+        inv.invoiceNumber && inv.invoiceNumber.toLowerCase().includes(invoicePrefix.toLowerCase())
       );
       setMatchingInvoices(filtered);
       setShowInvoiceSelector(filtered.length > 0);
@@ -194,6 +226,10 @@ const AddInvoicePayment = () => {
     if (["grossAmount", "discount", "totalPaid", "amountPaid"].includes(name)) {
       const numValue = parseFloat(value) || 0;
       setFormState(prev => ({ ...prev, [name]: numValue }));
+      
+      if (name === "amountPaid") {
+        form.setValue("amountPaid", numValue);
+      }
     } else {
       setFormState(prev => ({ ...prev, [name]: value }));
     }
@@ -204,6 +240,7 @@ const AddInvoicePayment = () => {
     
     if (name === "country") {
       setSelectedCountry(value);
+      form.setValue("country", value);
     }
     
     if (name === "currency") {
@@ -211,6 +248,11 @@ const AddInvoicePayment = () => {
       if (currency) {
         setCurrencySymbol(currency.symbol);
       }
+      form.setValue("currency", value);
+    }
+    
+    if (name === "receivableAccount") {
+      form.setValue("paymentMethod", value);
     }
   };
 
@@ -226,16 +268,31 @@ const AddInvoicePayment = () => {
   };
 
   const handleInvoiceSearch = () => {
-    if (invoicePrefix.length < 3) {
+    if (invoicePrefix.length < 2) {
       toast({
         title: "Search Error",
-        description: "Please enter at least 3 characters of the invoice number",
+        description: "Please enter at least 2 characters of the invoice number",
         variant: "destructive"
       });
       return;
     }
 
     // Search is handled by the useEffect
+    const allInvoices = getAllInvoices();
+    const filtered = allInvoices.filter(inv => 
+      inv.invoiceNumber && inv.invoiceNumber.toLowerCase().includes(invoicePrefix.toLowerCase())
+    );
+    
+    if (filtered.length === 0) {
+      toast({
+        title: "No Matches Found",
+        description: "No invoices match your search criteria",
+        variant: "destructive"
+      });
+    } else {
+      setMatchingInvoices(filtered);
+      setShowInvoiceSelector(true);
+    }
   };
 
   const handleSelectInvoice = (invoice: any) => {
@@ -253,11 +310,13 @@ const AddInvoicePayment = () => {
       netAmount: (invoice.gross || 0) - (invoice.discount || 0),
       totalPaid: invoice.paid ? invoice.net : 0,
       balanceToPay: invoice.paid ? 0 : invoice.net,
+      amountPaid: invoice.paid ? 0 : invoice.net, // Auto-fill the balance amount
       country: formState.country,
       currency: formState.currency
     });
     
     form.setValue("invoiceNumber", invoice.invoiceNumber);
+    form.setValue("amountPaid", invoice.paid ? 0 : invoice.net);
     
     setShowInvoiceSelector(false);
     toast({
@@ -294,7 +353,47 @@ const AddInvoicePayment = () => {
       return;
     }
 
-    // Here you would save the payment data to your backend
+    // Update the paid status in localStorage
+    const storedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
+    const updatedStoredInvoices = storedInvoices.map((inv: any) => {
+      if (inv.invoiceNumber === formState.invoiceNumber) {
+        return {
+          ...inv,
+          paid: true
+        };
+      }
+      return inv;
+    });
+    localStorage.setItem('generatedInvoices', JSON.stringify(updatedStoredInvoices));
+    
+    // Also update in mock data for this session
+    const allInvoices = getAllInvoices();
+    const updatedMock = allInvoices.map(inv => {
+      if (inv.invoiceNumber === formState.invoiceNumber) {
+        return {
+          ...inv,
+          paid: true
+        };
+      }
+      return inv;
+    });
+    
+    // Store payment record
+    const paymentRecord = {
+      id: `pay-${Date.now()}`,
+      invoiceNumber: formState.invoiceNumber,
+      amount: formState.amountPaid,
+      currency: formState.currency,
+      method: formState.receivableAccount,
+      date: formState.paymentCollectDate,
+      remarks: formState.remarks
+    };
+    
+    const payments = JSON.parse(localStorage.getItem('invoicePayments') || '[]');
+    payments.push(paymentRecord);
+    localStorage.setItem('invoicePayments', JSON.stringify(payments));
+    
+    // Success message
     toast({
       title: "Payment Recorded Successfully",
       description: `Payment of ${currencySymbol}${formState.amountPaid} for invoice ${formState.invoiceNumber} has been recorded.`,
@@ -304,6 +403,7 @@ const AddInvoicePayment = () => {
     navigate("/accounts/payments");
   };
 
+  // Animation variants
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -409,11 +509,17 @@ const AddInvoicePayment = () => {
                                 >
                                   <div className="flex justify-between">
                                     <span className="font-medium text-indigo-800">{invoice.invoiceNumber}</span>
-                                    <span className="text-sm text-gray-500">{invoice.consignee1}</span>
+                                    <span className={`text-sm ${invoice.paid ? 'text-green-600 font-medium' : 'text-amber-600 font-medium'}`}>
+                                      {invoice.paid ? 'PAID' : 'UNPAID'}
+                                    </span>
                                   </div>
                                   <div className="flex justify-between text-xs text-gray-500 mt-1">
-                                    <span className="text-indigo-600 font-medium">Amount: ${invoice.net}</span>
-                                    <span>Date: {invoice.date}</span>
+                                    <span className="text-indigo-600 font-medium">
+                                      Amount: ${invoice.net}
+                                    </span>
+                                    <span>
+                                      {invoice.consignee1 || invoice.consignee || 'No consignee'}
+                                    </span>
                                   </div>
                                 </motion.div>
                               ))}
@@ -506,7 +612,7 @@ const AddInvoicePayment = () => {
                       </div>
                       <div>
                         <span className="text-sm text-gray-500">Customer:</span>
-                        <p className="font-semibold text-gray-900">{selectedInvoice.consignee1}</p>
+                        <p className="font-semibold text-gray-900">{selectedInvoice.consignee1 || 'N/A'}</p>
                       </div>
                       <div>
                         <span className="text-sm text-gray-500">Date:</span>
@@ -809,10 +915,10 @@ const AddInvoicePayment = () => {
             </Button>
             <Button 
               onClick={handleSave}
-              disabled={!formState.invoiceNumber || formState.amountPaid <= 0 || !formState.country || !formState.currency}
+              disabled={!formState.invoiceNumber || formState.amountPaid <= 0 || !formState.country || !formState.currency || (selectedInvoice && selectedInvoice.paid)}
               className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-colors"
             >
-              Save Payment
+              {selectedInvoice && selectedInvoice.paid ? "Invoice Already Paid" : "Save Payment"}
             </Button>
           </motion.div>
         </div>

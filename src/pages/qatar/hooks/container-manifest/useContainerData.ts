@@ -17,6 +17,12 @@ export const useContainerData = (containerId: string) => {
   
   // Load container data
   useEffect(() => {
+    if (!containerId) {
+      setError("No container ID provided.");
+      setIsLoading(false);
+      return;
+    }
+    
     setIsLoading(true);
     setError(null);
     
@@ -27,6 +33,7 @@ export const useContainerData = (containerId: string) => {
         const foundContainer = mockContainers.find(c => c.id === containerId);
         
         if (foundContainer) {
+          console.log("Container found:", foundContainer);
           setContainer(foundContainer);
           setVgmWeight(foundContainer.weight?.toString() || "0");
           
