@@ -52,10 +52,10 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
   } = useContainerManifest(containerId, onManifestSubmitted);
   
   // Show print view when printing
-  if (printViewVisible) {
+  if (printViewVisible && container) {
     return (
       <PrintContainerManifest 
-        container={container!}
+        container={container}
         cargoItems={cargoItems}
         itemList={itemList}
         consigneeList={consigneeList}

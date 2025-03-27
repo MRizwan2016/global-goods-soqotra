@@ -47,12 +47,18 @@ export const useContainerData = (containerId: string) => {
         } else {
           console.error(`Container not found with ID: ${containerId}`);
           setError(`Container with ID ${containerId} not found. Please check the container ID and try again.`);
-          toast.error("Container not found");
+          toast.error("Container not found", {
+            description: "The requested container could not be located in the system.",
+            duration: 5000
+          });
         }
       } catch (err) {
         console.error("Error loading container data:", err);
         setError("Failed to load container data. Please try again or contact support.");
-        toast.error("Failed to load container data");
+        toast.error("Failed to load container data", {
+          description: "There was an error retrieving the container information.",
+          duration: 5000
+        });
       } finally {
         setIsLoading(false);
       }

@@ -20,7 +20,7 @@ const ManifestError: React.FC<ManifestErrorProps> = ({ error, onCancel }) => {
       </CardHeader>
       <CardContent className="p-6">
         <div className="bg-red-50 p-4 rounded-md border border-red-200 text-red-700 mb-4">
-          {error || "Container data not found. Please try again or contact support if the issue persists."}
+          {error || "Container data not found. Please check the container ID and try again."}
         </div>
         <Button 
           variant="outline" 
