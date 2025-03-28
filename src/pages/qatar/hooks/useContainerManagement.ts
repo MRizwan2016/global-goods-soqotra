@@ -7,6 +7,7 @@ import mockContainers, { mockCargoItems } from "../data/mockContainers";
 
 export const useContainerManagement = () => {
   const [containers, setContainers] = useState<QatarContainer[]>(mockContainers);
+  const [cargoItems, setCargoItems] = useState<ContainerCargo[]>(mockCargoItems);
   const [activeTab, setActiveTab] = useState("containers");
   const [editContainerId, setEditContainerId] = useState<string | null>(null);
   const [viewManifestId, setViewManifestId] = useState<string | null>(null);
@@ -44,6 +45,11 @@ export const useContainerManagement = () => {
     if (!newContainer.status) {
       newContainer.status = "PENDING";
     }
+    
+    // Ensure container has appropriate defaults
+    newContainer.packages = newContainer.packages || 0;
+    newContainer.weight = newContainer.weight || 0;
+    newContainer.volume = newContainer.volume || 0;
     
     // Add to containers list
     setContainers(prevContainers => [...prevContainers, newContainer]);
@@ -84,6 +90,27 @@ export const useContainerManagement = () => {
   const handleViewManifest = (containerId: string) => {
     setViewManifestId(containerId);
     setActiveTab("view-manifest");
+  };
+
+  const handleAddCargo = (cargo: ContainerCargo) => {
+    setCargoItems(prev => [...prev, cargo]);
+    
+    // Update container stats
+    const containerId = cargo.containerId;
+    const updatedContainers = containers.map(container => {
+      if (container.id === containerId) {
+        return {
+          ...container,
+          packages: (container.packages || 0) + 1,
+          weight: (container.weight || 0) + cargo.weight,
+          volume: (container.volume || 0) + cargo.volume,
+          status: "LOADED" // Update status when cargo is added
+        };
+      }
+      return container;
+    });
+    
+    setContainers(updatedContainers);
   };
 
   const handleManifestSubmitted = () => {
@@ -131,23 +158,7 @@ export const useContainerManagement = () => {
     if (!container) return [];
     
     // First, look for items directly associated with the container ID
-    let cargoItems = mockCargoItems.filter(item => item.containerId === containerId);
-    
-    // If we didn't find any items and the container has a running number, look for that as well
-    if (cargoItems.length === 0 && container.runningNumber) {
-      const runningNumberStr = container.runningNumber.toString();
-      cargoItems = mockCargoItems.filter(item => item.containerId === runningNumberStr);
-      
-      // Also look for items where containerId might be the numeric part of the running number
-      if (cargoItems.length === 0) {
-        const numericPart = runningNumberStr.replace(/\D/g, '');
-        if (numericPart) {
-          cargoItems = mockCargoItems.filter(item => item.containerId === numericPart);
-        }
-      }
-    }
-    
-    return cargoItems;
+    return cargoItems.filter(item => item.containerId === containerId);
   };
 
   // Process cargo items into ItemListEntry format
@@ -222,6 +233,7 @@ export const useContainerManagement = () => {
 
   return {
     containers,
+    cargoItems,
     activeTab,
     setActiveTab,
     editContainerId,
@@ -235,6 +247,7 @@ export const useContainerManagement = () => {
     handleManifestContainer,
     handleViewManifest,
     handleManifestSubmitted,
+    handleAddCargo,
     getCurrentContainer,
     handlePrintOptionsChange,
     handlePrint,

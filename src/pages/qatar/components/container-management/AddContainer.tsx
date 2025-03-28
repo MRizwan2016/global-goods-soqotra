@@ -24,7 +24,7 @@ const directions = ["Import", "Export", "MIX"];
 // Generate running numbers starting from 100
 const generateRunningNumber = (existingNumbers: string[] = []): string => {
   // Find the highest existing number
-  let highestNumber = 99;
+  let highestNumber = 99; // Start at 99 so the first container will be 100
   
   existingNumbers.forEach(numStr => {
     if (!numStr) return;
@@ -76,7 +76,8 @@ const AddContainer: React.FC<AddContainerProps> = ({
     sealNumber: "",
     direction: "Export",
     sector: "QAT-KEN",
-    shippingLine: "MSC"
+    shippingLine: "MSC",
+    loadDate: new Date().toISOString().split('T')[0]
   });
 
   // Store existing running numbers for auto-generation
@@ -146,7 +147,8 @@ const AddContainer: React.FC<AddContainerProps> = ({
         sealNumber: "",
         direction: "Export",
         sector: "QAT-KEN",
-        shippingLine: "MSC"
+        shippingLine: "MSC",
+        loadDate: new Date().toISOString().split('T')[0]
       });
     }
   }, [containerData, existingRunningNumbers]);
@@ -345,6 +347,16 @@ const AddContainer: React.FC<AddContainerProps> = ({
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+              
+              <div>
+                <Label htmlFor="loadDate">Load Date</Label>
+                <Input
+                  id="loadDate"
+                  type="date"
+                  value={formData.loadDate || new Date().toISOString().split('T')[0]}
+                  onChange={(e) => handleChange("loadDate", e.target.value)}
+                />
               </div>
             </div>
           </div>

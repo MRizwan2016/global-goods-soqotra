@@ -22,9 +22,11 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
   const [vessel, setVessel] = useState<QatarVessel | null>(null);
   const [selectedContainers, setSelectedContainers] = useState<string[]>([]);
   const [availableContainers, setAvailableContainers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   
   // Find vessel data
   useEffect(() => {
+    setLoading(true);
     const foundVessel = mockVesselData.find(v => v.id === vesselId);
     if (foundVessel) {
       setVessel(foundVessel);
@@ -34,20 +36,18 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
       }
     }
     
-    // Filter available containers (those that are loaded and not assigned to any vessel)
-    const containers = mockContainers
-      .filter(container => 
-        container.status === 'LOADED' || 
-        container.status === 'SEALED'
-      )
-      .map(container => ({
-        id: container.id,
-        runningNumber: container.runningNumber,
-        containerNumber: container.containerNumber,
-        containerType: container.containerType
-      }));
+    // Get all containers, not just those with specific statuses
+    // This ensures containers show up for loading
+    const allContainers = mockContainers.map(container => ({
+      id: container.id,
+      runningNumber: container.runningNumber,
+      containerNumber: container.containerNumber,
+      containerType: container.containerType,
+      status: container.status
+    }));
     
-    setAvailableContainers(containers);
+    setAvailableContainers(allContainers);
+    setLoading(false);
   }, [vesselId]);
   
   const handleAddContainer = (containerId: string) => {
@@ -73,8 +73,12 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
     onContainersLoaded();
   };
   
+  if (loading) {
+    return <div className="flex justify-center p-8">Loading vessel details...</div>;
+  }
+  
   if (!vessel) {
-    return <div>Loading vessel details...</div>;
+    return <div className="flex justify-center p-8 text-red-500">Vessel not found</div>;
   }
   
   return (
@@ -167,13 +171,16 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <h3 className="font-medium mb-3">Available Containers</h3>
-              <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
-                {availableContainers.length > 0 ? (
-                  availableContainers.map(container => (
+              {availableContainers.length > 0 ? (
+                <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
+                  {availableContainers.map(container => (
                     <div key={container.id} className="p-3 flex justify-between items-center hover:bg-gray-50">
                       <div>
                         <div className="font-medium">Container #{container.runningNumber}</div>
-                        <div className="text-sm text-gray-500">{container.containerNumber} ({container.containerType})</div>
+                        <div className="text-sm text-gray-500">
+                          {container.containerNumber} ({container.containerType})
+                          {container.status && <span className="ml-2 text-blue-500">Status: {container.status}</span>}
+                        </div>
                       </div>
                       <Button 
                         variant="outline" 
@@ -184,18 +191,20 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
                         {selectedContainers.includes(container.runningNumber) ? 'Added' : 'Add'}
                       </Button>
                     </div>
-                  ))
-                ) : (
-                  <div className="p-4 text-center text-gray-500">No available containers</div>
-                )}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="p-4 text-center text-gray-500 border rounded-md">
+                  No available containers. Please create containers first.
+                </div>
+              )}
             </div>
             
             <div>
               <h3 className="font-medium mb-3">Selected Containers ({selectedContainers.length})</h3>
-              <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
-                {selectedContainers.length > 0 ? (
-                  selectedContainers.map(containerId => {
+              {selectedContainers.length > 0 ? (
+                <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
+                  {selectedContainers.map(containerId => {
                     const container = mockContainers.find(c => c.runningNumber === containerId);
                     return (
                       <div key={containerId} className="p-3 flex justify-between items-center hover:bg-gray-50">
@@ -217,11 +226,13 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
                         </Button>
                       </div>
                     );
-                  })
-                ) : (
-                  <div className="p-4 text-center text-gray-500">No containers selected</div>
-                )}
-              </div>
+                  })}
+                </div>
+              ) : (
+                <div className="p-4 text-center text-gray-500 border rounded-md">
+                  No containers selected. Select containers from the available list.
+                </div>
+              )}
             </div>
           </div>
           
@@ -237,6 +248,7 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
             
             <Button 
               onClick={handleSave}
+              disabled={selectedContainers.length === 0}
               className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
             >
               <Save size={16} />
