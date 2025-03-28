@@ -15,6 +15,14 @@ export const PAYMENT_METHODS = [
   { id: "online", name: "Online Payment" }
 ];
 
+// Payment status options
+export const PAYMENT_STATUSES = [
+  { id: "pending", name: "Pending", color: "bg-yellow-100 text-yellow-800" },
+  { id: "partial", name: "Partially Paid", color: "bg-blue-100 text-blue-800" },
+  { id: "completed", name: "Completed", color: "bg-green-100 text-green-800" },
+  { id: "canceled", name: "Canceled", color: "bg-red-100 text-red-800" }
+];
+
 // Country-currency mapping
 export const COUNTRY_CURRENCY_MAP = {
   "Qatar": ["QAR"],

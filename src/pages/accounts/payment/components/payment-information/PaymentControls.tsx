@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Textarea } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { FormState } from "../../types";
 
 interface PaymentControlsProps {
