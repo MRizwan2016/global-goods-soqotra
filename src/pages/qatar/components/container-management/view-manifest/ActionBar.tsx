@@ -2,7 +2,7 @@
 import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Printer } from "lucide-react";
+import { Printer, FileDown } from "lucide-react";
 import { PrintOptions } from "../../../types/containerTypes";
 import { Label } from "@/components/ui/label";
 
@@ -43,7 +43,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
       </div>
       
       <div className="flex items-center gap-2">
-        <Label htmlFor="orientation">Page Orientation:</Label>
+        <Label htmlFor="orientation">Page Layout:</Label>
         <Select 
           value={printOptions.orientation} 
           onValueChange={(value) => onPrintOptionsChange({ 
@@ -59,15 +59,6 @@ const ActionBar: React.FC<ActionBarProps> = ({
           </SelectContent>
         </Select>
       </div>
-      
-      <Button 
-        onClick={onPrintClick} 
-        className="ml-4"
-        disabled={isPrinting}
-      >
-        <Printer className="h-4 w-4 mr-2" />
-        {isPrinting ? "Preparing..." : "Print Manifest"}
-      </Button>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { TabsContent } from "@/components/ui/tabs";
 import { QatarContainer, PrintOptions } from "../../types/containerTypes";
@@ -5,7 +6,7 @@ import ContainerList from "./ContainerList";
 import ContainerForm from "./ContainerForm";
 import LoadContainerDetails from "./LoadContainerDetails";
 import ContainerManifest from "./ContainerManifest";
-import { ViewManifestTab } from "../container-management/view-manifest";
+import ViewManifestTab from "../container-management/view-manifest/ViewManifestTab";
 
 interface TabContentProps {
   activeTab: string;

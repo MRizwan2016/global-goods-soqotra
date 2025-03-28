@@ -1,6 +1,5 @@
 
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { QatarContainer } from "../../../types/containerTypes";
 
 interface ContainerDetailsProps {
@@ -8,48 +7,61 @@ interface ContainerDetailsProps {
 }
 
 const ContainerDetails: React.FC<ContainerDetailsProps> = ({ container }) => {
+  const formatVolume = (volume?: number) => volume ? volume.toFixed(3) : "0.000";
+  const formatWeight = (weight?: number) => weight ? weight.toFixed(2) : "0.00";
+  
+  // Format packages - fallback to a default value if not available
+  const packages = container.packages || 0;
+  const volume = container.volume || 0;
+  const weight = container.weight || 0;
+
   return (
-    <Card className="mb-6 print-container">
-      <CardHeader className="bg-gray-50">
-        <CardTitle className="text-lg company-name">Container Details</CardTitle>
-      </CardHeader>
-      <CardContent className="p-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div>
-            <p className="text-sm text-gray-500">Container Number</p>
-            <p className="font-medium">{container.containerNumber}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Seal Number</p>
-            <p className="font-medium">{container.sealNumber || "N/A"}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Type</p>
-            <p className="font-medium">{container.containerType}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Status</p>
-            <p className="font-medium">{container.status}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Weight</p>
-            <p className="font-medium">{container.weight || 0} kg</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Volume</p>
-            <p className="font-medium">{container.volume || 0} m³</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Packages</p>
-            <p className="font-medium">{container.packages || 0}</p>
-          </div>
-          <div>
-            <p className="text-sm text-gray-500">Shipping Line</p>
-            <p className="font-medium">{container.shippingLine || "N/A"}</p>
-          </div>
+    <div className="bg-gray-50 border rounded-md p-4 mb-6 print-visible shadow-sm">
+      <div className="text-center mb-4">
+        <h2 className="text-xl font-bold uppercase">CONTAINER MANIFEST</h2>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-8">
+        <div className="flex">
+          <div className="font-bold w-52">CONTAINER NUMBER:</div>
+          <div>{container.containerNumber}</div>
         </div>
-      </CardContent>
-    </Card>
+        
+        <div className="flex">
+          <div className="font-bold w-52">CONFIRMATION DATE:</div>
+          <div>{container.confirmDate || new Date().toLocaleDateString()}</div>
+        </div>
+        
+        <div className="flex">
+          <div className="font-bold w-52">CONTAINER TYPE:</div>
+          <div>{container.containerType}</div>
+        </div>
+        
+        <div className="flex">
+          <div className="font-bold w-52">TOTAL PACKAGES:</div>
+          <div>{packages}</div>
+        </div>
+        
+        <div className="flex">
+          <div className="font-bold w-52">SEAL NUMBER:</div>
+          <div>{container.sealNumber || "N/A"}</div>
+        </div>
+        
+        <div className="flex">
+          <div className="font-bold w-52">TOTAL VOLUME:</div>
+          <div>{formatVolume(volume)} m³</div>
+        </div>
+        
+        <div className="flex">
+          <div className="font-bold w-52">RUNNING NUMBER:</div>
+          <div>{container.runningNumber || "N/A"}</div>
+        </div>
+        
+        <div className="flex">
+          <div className="font-bold w-52">TOTAL WEIGHT:</div>
+          <div>{formatWeight(weight)} kg</div>
+        </div>
+      </div>
+    </div>
   );
 };
 

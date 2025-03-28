@@ -19,7 +19,7 @@ interface AddContainerProps {
 const containerTypes = ["20FT", "40FT", "40HC", "20FR", "40FR", "20OT", "40OT"];
 const shippingLines = ["MSC", "Maersk", "CMA CGM", "Hapag-Lloyd", "ONE", "Evergreen", "COSCO"];
 const sectors = ["QAT-KEN", "QAT-SL", "QAT-UAE", "QAT-SA", "QAT-OM"];
-const directions = ["Import", "Export"];
+const directions = ["Import", "Export", "MIX"];
 
 // Generate running numbers starting from 100
 const generateRunningNumber = (existingNumbers: string[] = []): string => {
@@ -27,7 +27,12 @@ const generateRunningNumber = (existingNumbers: string[] = []): string => {
   let highestNumber = 99;
   
   existingNumbers.forEach(numStr => {
-    const num = parseInt(numStr);
+    if (!numStr) return;
+    
+    // Extract numeric part if the running number is not just a number
+    const numericPart = numStr.replace(/\D/g, '');
+    const num = parseInt(numericPart);
+    
     if (!isNaN(num) && num > highestNumber) {
       highestNumber = num;
     }
@@ -35,6 +40,25 @@ const generateRunningNumber = (existingNumbers: string[] = []): string => {
   
   // Return the next number
   return (highestNumber + 1).toString();
+};
+
+// Function to generate a job number based on container details
+const generateJobNumber = (containerNumber: string = "", sector: string = ""): string => {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const random = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
+  
+  // Extract sector prefix if available
+  const sectorPrefix = sector.split('-')[0] || 'QAT';
+  
+  // Extract container number suffix (last 4 digits or characters)
+  const containerSuffix = containerNumber 
+    ? containerNumber.slice(-4) 
+    : random.toString().slice(0, 4);
+    
+  return `JOB-${sectorPrefix}-${year}${month}${day}-${containerSuffix}`;
 };
 
 const AddContainer: React.FC<AddContainerProps> = ({ 
@@ -57,20 +81,35 @@ const AddContainer: React.FC<AddContainerProps> = ({
 
   // Store existing running numbers for auto-generation
   const [existingRunningNumbers, setExistingRunningNumbers] = useState<string[]>([]);
+  const [jobNumber, setJobNumber] = useState<string>("");
 
   useEffect(() => {
-    // Get existing running numbers from mock data
-    // In a real app, this would be fetched from an API
+    // Get existing running numbers from mock data or localStorage
     const fetchExistingRunningNumbers = async () => {
       try {
-        // Mock data for now - in a real app, fetch from API
-        const mockNumbers = ["100", "101", "102", "103"];
+        // Attempt to get existing running numbers from localStorage
+        const savedNumbers = localStorage.getItem('existingRunningNumbers');
+        let mockNumbers: string[] = [];
+        
+        if (savedNumbers) {
+          mockNumbers = JSON.parse(savedNumbers);
+        } else {
+          // Mock data for now - in a real app, fetch from API
+          mockNumbers = ["100", "101", "102", "103"];
+          localStorage.setItem('existingRunningNumbers', JSON.stringify(mockNumbers));
+        }
+        
         setExistingRunningNumbers(mockNumbers);
         
         // Set a new running number if not editing
         if (!containerData && !formData.runningNumber) {
           const newNumber = generateRunningNumber(mockNumbers);
           setFormData(prev => ({...prev, runningNumber: newNumber}));
+          
+          // Add the new number to our list
+          const updatedNumbers = [...mockNumbers, newNumber];
+          setExistingRunningNumbers(updatedNumbers);
+          localStorage.setItem('existingRunningNumbers', JSON.stringify(updatedNumbers));
         }
       } catch (error) {
         console.error("Failed to fetch running numbers:", error);
@@ -83,12 +122,26 @@ const AddContainer: React.FC<AddContainerProps> = ({
   useEffect(() => {
     if (containerData) {
       setFormData(containerData);
+      
+      // If job number already exists for this container, retrieve it
+      if (containerData.id) {
+        const savedJobNumber = localStorage.getItem(`jobNumber_${containerData.id}`);
+        if (savedJobNumber) {
+          setJobNumber(savedJobNumber);
+        } else {
+          // Generate new job number
+          const newJobNumber = generateJobNumber(containerData.containerNumber, containerData.sector);
+          setJobNumber(newJobNumber);
+        }
+      }
     } else {
+      // For new containers
+      const newRunningNumber = generateRunningNumber(existingRunningNumbers);
       setFormData({
         id: uuidv4(),
         containerNumber: "",
         containerType: "20FT",
-        runningNumber: generateRunningNumber(existingRunningNumbers),
+        runningNumber: newRunningNumber,
         status: "Available",
         sealNumber: "",
         direction: "Export",
@@ -103,11 +156,38 @@ const AddContainer: React.FC<AddContainerProps> = ({
       ...prev,
       [field]: value,
     }));
+    
+    // If container number changes, update job number
+    if (field === 'containerNumber' || field === 'sector') {
+      const newJobNumber = generateJobNumber(
+        field === 'containerNumber' ? value as string : formData.containerNumber,
+        field === 'sector' ? value as string : formData.sector
+      );
+      setJobNumber(newJobNumber);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    
+    // Add job number to form data
+    const completeFormData = {
+      ...formData,
+      jobNumber: jobNumber
+    };
+    
+    // Save job number to localStorage
+    if (completeFormData.id) {
+      localStorage.setItem(`jobNumber_${completeFormData.id}`, jobNumber);
+    }
+    
+    // Add this running number to our saved list
+    if (!isEditing && formData.runningNumber) {
+      const updatedNumbers = [...existingRunningNumbers, formData.runningNumber];
+      localStorage.setItem('existingRunningNumbers', JSON.stringify(updatedNumbers));
+    }
+    
+    onSubmit(completeFormData);
   };
 
   // Generate running number options
@@ -170,7 +250,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
               </div>
 
               <div>
-                <Label htmlFor="runningNumber">Running Number</Label>
+                <Label htmlFor="runningNumber">Running Number (auto-generated)</Label>
                 <Select
                   value={formData.runningNumber}
                   onValueChange={(value) => handleChange("runningNumber", value)}
@@ -195,6 +275,16 @@ const AddContainer: React.FC<AddContainerProps> = ({
                   placeholder="Enter seal number"
                   value={formData.sealNumber || ""}
                   onChange={(e) => handleChange("sealNumber", e.target.value)}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="jobNumber">Job Number (auto-generated)</Label>
+                <Input
+                  id="jobNumber"
+                  value={jobNumber}
+                  readOnly
+                  className="bg-gray-100"
                 />
               </div>
             </div>

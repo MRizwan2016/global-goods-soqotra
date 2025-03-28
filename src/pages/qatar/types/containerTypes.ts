@@ -6,17 +6,18 @@ export interface QatarContainer {
   runningNumber: string;
   status: string;
   sealNumber?: string;
-  weight?: number;
-  volume?: number;
-  packages?: number;
-  vesselId?: string;
-  direction?: string;
+  confirmDate?: string;
   etd?: string;
   eta?: string;
-  loadDate?: string;
+  packages?: number;
+  weight?: number;
+  volume?: number;
+  direction?: string;
   sector?: string;
   shippingLine?: string;
-  confirmDate?: string;
+  vessel?: string;
+  vesselId?: string;
+  jobNumber?: string;
 }
 
 export interface ContainerCargo {
@@ -24,14 +25,13 @@ export interface ContainerCargo {
   containerId: string;
   invoiceNumber: string;
   lineNumber: string;
-  barcode?: string;
   packageName: string;
   volume: number;
   weight: number;
+  quantity: number;
   shipper: string;
   consignee: string;
-  wh: string;
-  d2d: boolean;
+  description?: string;
 }
 
 export interface ItemListEntry {
@@ -41,7 +41,7 @@ export interface ItemListEntry {
   consignee: string;
   packages: number;
   volume: number;
-  packageName?: string;
+  packageName: string;
   quantity?: number;
 }
 
@@ -49,43 +49,22 @@ export interface ConsigneeListItem {
   id: string;
   invoice: string;
   shipper: string;
-  shipperContact?: string;
+  shipperContact: string;
   consignee: string;
-  consigneeContact?: string;
+  consigneeContact: string;
   volume: number;
 }
 
 export interface UnsettledInvoice {
   id: string;
-  invoiceNumber: string | null;
+  invoiceNumber: string;
   shipper: string;
   consignee: string;
   amount: number;
   paid: boolean;
-  gy?: string;
-  net?: number;
-  due?: number;
-}
-
-export interface ContainerManifestProps {
-  containerId: string;
-  onManifestSubmitted: () => void;
-  onCancel: () => void;
 }
 
 export interface PrintOptions {
   section: "all" | "cargo" | "items" | "consignees" | "invoices";
   orientation: "portrait" | "landscape";
-}
-
-export interface ViewContainerManifestProps {
-  container: QatarContainer;
-  cargoItems: ContainerCargo[];
-  itemList: ItemListEntry[];
-  consigneeList: ConsigneeListItem[];
-  unsettledInvoices: UnsettledInvoice[];
-  onBack: () => void;
-  printOptions: PrintOptions;
-  onPrintOptionsChange: (options: Partial<PrintOptions>) => void;
-  onPrint: () => void;
 }

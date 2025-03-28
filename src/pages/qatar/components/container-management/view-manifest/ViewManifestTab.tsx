@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PrintOptions, QatarContainer } from "../../../types/containerTypes";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Printer, FileText } from "lucide-react";
 import ContainerHeader from "./ContainerHeader";
 import ActionBar from "./ActionBar";
 import ContainerDetails from "./ContainerDetails";
 import ContentTabs from "./ContentTabs";
 
-interface ViewContainerManifestProps {
+interface ViewManifestTabProps {
   container: QatarContainer | null;
   cargoItems: any[];
   itemList: any[];
@@ -19,7 +20,7 @@ interface ViewContainerManifestProps {
   onPrint: () => void;
 }
 
-const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
+const ViewManifestTab: React.FC<ViewManifestTabProps> = ({
   container,
   cargoItems,
   itemList,
@@ -30,9 +31,40 @@ const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
   onPrintOptionsChange,
   onPrint
 }) => {
-  const [activeTab, setActiveTab] = useState("container-details");
+  const [activeTab, setActiveTab] = useState("cargo-items");
   const [isPrinting, setIsPrinting] = useState(false);
   
+  // Generate a unique job number if not already set
+  const [jobNumber, setJobNumber] = useState<string>("");
+  
+  useEffect(() => {
+    // Generate a job number format: JOB-YYYY-MMDD-XXXX
+    if (!jobNumber) {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const random = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
+      const generatedJobNumber = `JOB-${year}-${month}${day}-${random}`;
+      setJobNumber(generatedJobNumber);
+      
+      // Store in localStorage to persist across page refreshes
+      if (container?.id) {
+        localStorage.setItem(`jobNumber_${container.id}`, generatedJobNumber);
+      }
+    }
+  }, [container?.id, jobNumber]);
+  
+  useEffect(() => {
+    // Try to retrieve job number from localStorage if it exists
+    if (container?.id) {
+      const savedJobNumber = localStorage.getItem(`jobNumber_${container.id}`);
+      if (savedJobNumber) {
+        setJobNumber(savedJobNumber);
+      }
+    }
+  }, [container?.id]);
+
   const handlePrintClick = () => {
     setIsPrinting(true);
     
@@ -47,6 +79,18 @@ const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
     }, 500);
   };
 
+  if (!container) {
+    return (
+      <div className="p-6 text-center">
+        <h2 className="text-xl font-bold mb-4">No container data available</h2>
+        <Button variant="outline" onClick={onBack}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Container List
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 animate-fade-in">
       <div className="flex items-center justify-between mb-6">
@@ -58,12 +102,29 @@ const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
           <h2 className="text-2xl font-bold">CONTAINER MANIFEST</h2>
         </div>
         
-        <ActionBar 
-          printOptions={printOptions}
-          onPrintOptionsChange={onPrintOptionsChange}
-          onPrintClick={handlePrintClick}
-          isPrinting={isPrinting}
-        />
+        <div className="flex items-center gap-4">
+          <div className="flex flex-col items-end mr-4">
+            <span className="text-sm font-medium text-gray-500">Job Number:</span>
+            <span className="font-bold text-blue-700">{jobNumber}</span>
+          </div>
+          
+          <Button 
+            variant="default" 
+            className="bg-green-600 hover:bg-green-700"
+            onClick={handlePrintClick}
+            disabled={isPrinting}
+          >
+            <Printer className="h-4 w-4 mr-2" />
+            {isPrinting ? "Printing..." : "Print Manifest"}
+          </Button>
+          
+          <ActionBar 
+            printOptions={printOptions}
+            onPrintOptionsChange={onPrintOptionsChange}
+            onPrintClick={handlePrintClick}
+            isPrinting={isPrinting}
+          />
+        </div>
       </div>
       
       {container && (
