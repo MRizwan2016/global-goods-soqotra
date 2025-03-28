@@ -1,7 +1,7 @@
 
-import { Vessel } from "./types/vesselTypes";
+import { Vessel, QatarVessel } from "./types/vesselTypes";
 
-export const mockVesselData: Vessel[] = [
+export const mockVesselData: QatarVessel[] = [
   {
     id: "vessel1",
     runningNumber: "VSL001",
@@ -46,7 +46,7 @@ export const containerStatusOptions = [
   "RETURNED"
 ];
 
-export const getVesselById = (id: string): Vessel | undefined => {
+export const getVesselById = (id: string): QatarVessel | undefined => {
   return mockVesselData.find(vessel => vessel.id === id);
 };
 

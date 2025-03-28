@@ -38,3 +38,14 @@ export interface VesselFilter {
   sector?: string;
   dateRange?: [Date | null, Date | null];
 }
+
+// Add QatarVessel interface that's being used in the vessel management components
+export interface QatarVessel extends Vessel {
+  loadDate?: string;
+}
+
+// Add AddVesselProps interface
+export interface AddVesselProps {
+  onVesselCreated: () => void;
+  onCancel: () => void;
+}

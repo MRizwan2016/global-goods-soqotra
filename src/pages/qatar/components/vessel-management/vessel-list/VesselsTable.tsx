@@ -1,9 +1,8 @@
-
 import React from "react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Eye, Ship } from "lucide-react";
-import { QatarVessel } from "../mockVesselData";
+import { QatarVessel } from "../types/vesselTypes";
 
 interface VesselsTableProps {
   vessels: QatarVessel[];

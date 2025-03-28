@@ -5,15 +5,33 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Barcode, Search, ZapOff, Zap, Keyboard } from "lucide-react";
 import { toast } from "sonner";
-import { createBarcodeScanner, ScannerType } from "@/utils/barcodeScanner";
+
+enum ScannerType {
+  KEYBOARD = 'keyboard',
+  CAMERA = 'camera'
+}
+
+// Mock barcode scanner utility for demonstration purposes
+const createBarcodeScanner = (config: any, type: ScannerType) => {
+  return {
+    start: () => console.log(`Started ${type} scanner`),
+    stop: () => console.log(`Stopped ${type} scanner`)
+  };
+};
 
 interface BarcodeSearchProps {
-  barcode: string;
-  onBarcodeChange: (value: string) => void;
-  onBarcodeSearch: () => void;
+  value: string; // Added to match passed props
+  onChange: (value: string) => void; // Added to match passed props
+  onSearch: () => void; // Added to match passed props
+  barcode?: string;
+  onBarcodeChange?: (value: string) => void;
+  onBarcodeSearch?: () => void;
 }
 
 const BarcodeSearch: React.FC<BarcodeSearchProps> = ({
+  value,
+  onChange,
+  onSearch,
   barcode,
   onBarcodeChange,
   onBarcodeSearch,
@@ -25,12 +43,12 @@ const BarcodeSearch: React.FC<BarcodeSearchProps> = ({
     // Create barcode scanner when component mounts
     if (scannerActive) {
       const scanner = createBarcodeScanner({
-        onDetect: (detectedBarcode) => {
-          onBarcodeChange(detectedBarcode);
+        onDetect: (detectedBarcode: string) => {
+          onChange(detectedBarcode);
           toast.success(`Barcode detected: ${detectedBarcode}`);
-          onBarcodeSearch();
+          onSearch();
         },
-        onError: (err) => {
+        onError: (err: Error) => {
           toast.error(`Scanner error: ${err.message}`);
           setScannerActive(false);
         }
@@ -44,7 +62,7 @@ const BarcodeSearch: React.FC<BarcodeSearchProps> = ({
         scanner.stop();
       };
     }
-  }, [scannerActive, scannerType, onBarcodeChange, onBarcodeSearch]);
+  }, [scannerActive, scannerType, onChange, onSearch]);
   
   const toggleScanner = () => {
     setScannerActive(!scannerActive);
@@ -61,16 +79,16 @@ const BarcodeSearch: React.FC<BarcodeSearchProps> = ({
       <div className="flex gap-2 items-center">
         <Barcode size={24} className="text-gray-700" />
         <Input
-          value={barcode}
-          onChange={(e) => onBarcodeChange(e.target.value)}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
           placeholder="BARCODE"
           className="flex-1"
-          onKeyDown={(e) => e.key === "Enter" && onBarcodeSearch()}
+          onKeyDown={(e) => e.key === "Enter" && onSearch()}
         />
         <Button 
           variant="outline"
           className="border-blue-500 text-blue-500"
-          onClick={onBarcodeSearch}
+          onClick={onSearch}
         >
           <Search size={18} />
         </Button>

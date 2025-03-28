@@ -1,7 +1,7 @@
 
 import React from "react";
 import { CardHeader, CardTitle } from "@/components/ui/card";
-import { QatarVessel } from "../mockVesselData";
+import { QatarVessel } from "../types/vesselTypes";
 
 interface ManifestHeaderProps {
   vessel: QatarVessel;

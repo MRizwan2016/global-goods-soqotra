@@ -12,21 +12,27 @@ interface InvoiceSuggestion {
 }
 
 interface InvoiceSearchInputProps {
-  bookingForm: string;
-  onBookingFormChange: (value: string) => void;
-  bookingFormSuggestions: InvoiceSuggestion[];
-  showSuggestions: boolean;
-  setShowSuggestions: (show: boolean) => void;
-  onSelectInvoice: (invoice: InvoiceSuggestion) => void;
+  value: string; // Added to match passed props
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; // Added to match passed props
+  onKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void; // Added to match passed props
+  bookingFormSuggestions?: InvoiceSuggestion[];
+  showSuggestions?: boolean;
+  setShowSuggestions?: (show: boolean) => void;
+  onSelectInvoice?: (invoice: InvoiceSuggestion) => void;
+  bookingForm?: string;
+  onBookingFormChange?: (value: string) => void;
 }
 
 const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
+  value,
+  onChange,
+  onKeyPress,
+  bookingFormSuggestions = [],
+  showSuggestions = false,
+  setShowSuggestions = () => {},
+  onSelectInvoice = () => {},
   bookingForm,
   onBookingFormChange,
-  bookingFormSuggestions,
-  showSuggestions,
-  setShowSuggestions,
-  onSelectInvoice,
 }) => {
   return (
     <div className="relative">
@@ -34,12 +40,13 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
       <div className="flex gap-2 items-center">
         <Search size={24} className="text-gray-700" />
         <Input
-          value={bookingForm}
-          onChange={(e) => onBookingFormChange(e.target.value)}
+          value={value}
+          onChange={onChange}
           placeholder="GY/INVOICE"
           className="flex-1"
           onFocus={() => bookingFormSuggestions.length > 0 && setShowSuggestions(true)}
           onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+          onKeyDown={onKeyPress}
         />
       </div>
       

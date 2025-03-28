@@ -10,24 +10,24 @@ import {
 } from "@/components/ui/select";
 
 interface SearchMethodSelectorProps {
-  searchBy: string;
-  onSearchMethodChange: (value: string) => void;
+  searchMethod: "invoice" | "barcode"; // Updated to match what's being passed
+  onMethodChange: (value: "invoice" | "barcode") => void; // Updated to match what's being passed
 }
 
 const SearchMethodSelector: React.FC<SearchMethodSelectorProps> = ({
-  searchBy,
-  onSearchMethodChange,
+  searchMethod, // Updated from searchBy
+  onMethodChange, // Updated from onSearchMethodChange
 }) => {
   return (
     <div>
       <Label className="font-bold text-gray-700 mb-1 block">SEARCH BY:</Label>
-      <Select value={searchBy} onValueChange={onSearchMethodChange}>
+      <Select value={searchMethod} onValueChange={onMethodChange}>
         <SelectTrigger className="bg-blue-500 text-white">
-          <SelectValue placeholder="GY" />
+          <SelectValue placeholder="INVOICE" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="GY">GY</SelectItem>
-          <SelectItem value="BARCODE">BARCODE</SelectItem>
+          <SelectItem value="invoice">INVOICE</SelectItem>
+          <SelectItem value="barcode">BARCODE</SelectItem>
         </SelectContent>
       </Select>
     </div>

@@ -1,7 +1,6 @@
-
 import React from "react";
-import { QatarVessel } from "../../../components/vessel-management/mockVesselData";
 import { QatarContainer } from "../../../types/containerTypes";
+import { QatarVessel } from "../../../components/vessel-management/types/vesselTypes";
 import PrintStyles from "../PrintStyles";
 
 interface PrintVesselManifestProps {

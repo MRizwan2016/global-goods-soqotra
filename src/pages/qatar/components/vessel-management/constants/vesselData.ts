@@ -41,6 +41,17 @@ export const SECTORS = [
   "COLOMBO"
 ];
 
+// Add SECTOR_PORT_MAP that maps sectors to ports
+export const SECTOR_PORT_MAP: Record<string, string[]> = {
+  "EAST AFRICA": ["MOMBASA", "DAR ES SALAAM", "ZANZIBAR"],
+  "WEST AFRICA": ["LAGOS", "TEMA", "DAKAR"],
+  "SOUTH ASIA": ["MUMBAI", "CHENNAI", "COLOMBO"],
+  "MIDDLE EAST": ["JEDDAH", "DUBAI", "SALALAH"],
+  "EUROPE": ["ROTTERDAM", "HAMBURG", "PIRAEUS"],
+  "FAR EAST": ["SINGAPORE", "HONG KONG", "SHANGHAI"],
+  "COLOMBO": ["COLOMBO"]
+};
+
 export const STATUS_COLORS = {
   "NEW": "bg-blue-100 text-blue-800",
   "SCHEDULED": "bg-purple-100 text-purple-800",
