@@ -44,17 +44,45 @@
 /* Navigation button gradients */
 .nav-button-gradient-upb {
   background: linear-gradient(to right, #e5f7e0, #f2fce2);
+  color: #065f46;
+  border: 1px solid #d1fae5;
 }
 
 .nav-button-gradient-accounts {
   background: linear-gradient(to right, #e5deff, #f4f0ff);
+  color: #5b21b6;
+  border: 1px solid #ddd6fe;
 }
 
 .nav-button-gradient-admin {
   background: linear-gradient(to right, #ffdee2, #fff0f2);
+  color: #be123c;
+  border: 1px solid #fecdd3;
 }
 
 .nav-button-gradient-cargo {
   background: linear-gradient(to right, #d3e4fd, #e5f0ff);
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
 }
 
+/* Hover effects for navigation buttons */
+.nav-button-gradient-upb:hover {
+  background: linear-gradient(to right, #dcf5d7, #e8f9d9);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.nav-button-gradient-accounts:hover {
+  background: linear-gradient(to right, #dcd5f7, #ebe7fc);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.nav-button-gradient-admin:hover {
+  background: linear-gradient(to right, #f5d7db, #f9e8eb);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.nav-button-gradient-cargo:hover {
+  background: linear-gradient(to right, #c9dcf9, #dbe8fb);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}

@@ -2,7 +2,6 @@
 import React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
 import { NavigationSectionProps } from "./types";
 
 const NavigationSection: React.FC<NavigationSectionProps> = ({
@@ -16,12 +15,11 @@ const NavigationSection: React.FC<NavigationSectionProps> = ({
   const Icon = section.icon;
 
   return (
-    <div className="w-full mb-2">
-      <Button
-        variant="ghost"
+    <div className="w-full mb-3">
+      <button
         className={cn(
-          "justify-between w-full px-4 py-3 rounded-md transition-all duration-300 hover:scale-105",
-          section.gradient || section.color,
+          "flex items-center justify-between w-full px-4 py-2.5 rounded-md text-left focus:outline-none",
+          `nav-button-gradient-${sectionKey}`,
           isActive ? "shadow-md" : ""
         )}
         onClick={onToggle}
@@ -31,20 +29,20 @@ const NavigationSection: React.FC<NavigationSectionProps> = ({
           <span className="font-bold">{section.title}</span>
         </div>
         {isActive ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-      </Button>
+      </button>
       
       {isActive && (
-        <div className="ml-8 mt-2 space-y-3 animate-accordion-down">
+        <div className="ml-6 mt-2 space-y-3 animate-accordion-down">
           {section.submenu.map((menu, index) => (
-            <div key={index} className="space-y-1">
-              <h4 className="font-medium text-sm text-gray-700 px-2">{menu.title}</h4>
+            <div key={index} className="space-y-1.5">
+              <h4 className="font-semibold text-sm text-gray-700 px-2">{menu.title}</h4>
               <ul className="space-y-1">
                 {menu.items.map((item, idx) => (
                   <li key={idx}>
                     <button
                       onClick={() => onNavigate(item.path)}
                       className={cn(
-                        "w-full text-left px-4 py-2 text-sm rounded-md transition-colors",
+                        "w-full text-left px-3 py-1.5 text-sm rounded-md transition-colors",
                         isPathActive(item.path)
                           ? "bg-gray-100 font-medium"
                           : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
