@@ -1,4 +1,3 @@
-
 export interface QatarContainer {
   id: string;
   containerNumber: string;
@@ -18,6 +17,7 @@ export interface QatarContainer {
   vessel?: string;
   vesselId?: string;
   jobNumber?: string;
+  loadDate?: string;
 }
 
 export interface ContainerCargo {
@@ -32,6 +32,9 @@ export interface ContainerCargo {
   shipper: string;
   consignee: string;
   description?: string;
+  barcode?: string;
+  wh?: string;
+  d2d?: boolean;
 }
 
 export interface ItemListEntry {

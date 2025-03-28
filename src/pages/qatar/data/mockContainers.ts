@@ -18,7 +18,8 @@ const mockContainers: QatarContainer[] = [
     etd: "2023-12-15",
     eta: "2023-12-25",
     sector: "QAT-KEN",
-    shippingLine: "MSC"
+    shippingLine: "MSC",
+    loadDate: "2023-12-01" // Added property
   },
   {
     id: "container2",
@@ -35,7 +36,8 @@ const mockContainers: QatarContainer[] = [
     etd: "2023-11-20",
     eta: "2023-12-05",
     sector: "QAT-SL",
-    shippingLine: "Maersk"
+    shippingLine: "Maersk",
+    loadDate: "2023-11-15" // Added property
   },
   {
     id: "container3",
@@ -52,7 +54,8 @@ const mockContainers: QatarContainer[] = [
     etd: "2023-12-20",
     eta: "2024-01-05",
     sector: "QAT-UAE",
-    shippingLine: "CMA CGM"
+    shippingLine: "CMA CGM",
+    loadDate: "2023-12-10" // Added property
   }
 ];
 
@@ -63,56 +66,60 @@ const mockCargoItems: ContainerCargo[] = [
     containerId: "container1",
     invoiceNumber: "INV12345",
     lineNumber: "LN001",
-    barcode: "BC123456789",
     packageName: "General Goods",
     volume: 1.2,
     weight: 250,
+    quantity: 1,
     shipper: "Qatar Trading Co.",
     consignee: "Kenya Imports Ltd",
-    wh: "WH001",
-    d2d: true
+    barcode: "BC123456789", // Added property
+    wh: "WH001", // Added property
+    d2d: true // Added property
   },
   {
     id: "cargo2",
     containerId: "container1",
     invoiceNumber: "INV12346",
     lineNumber: "LN002",
-    barcode: "BC987654321",
     packageName: "Electronics",
     volume: 0.8,
     weight: 150,
+    quantity: 1,
     shipper: "Tech Distributors LLC",
     consignee: "Digital Solutions Kenya",
-    wh: "WH002",
-    d2d: false
+    barcode: "BC987654321", // Added property
+    wh: "WH002", // Added property
+    d2d: false // Added property
   },
   {
     id: "cargo3",
     containerId: "container2",
     invoiceNumber: "INV12347",
     lineNumber: "LN003",
-    barcode: "BC555666777",
     packageName: "Textile Materials",
     volume: 2.5,
     weight: 350,
+    quantity: 1,
     shipper: "Qatar Fabrics Intl.",
     consignee: "Sri Lanka Garments",
-    wh: "WH003",
-    d2d: true
+    barcode: "BC555666777", // Added property
+    wh: "WH003", // Added property
+    d2d: true // Added property
   },
   {
     id: "cargo4",
     containerId: "container2",
     invoiceNumber: "INV12348",
     lineNumber: "LN004",
-    barcode: "BC111222333",
     packageName: "Auto Parts",
     volume: 1.5,
     weight: 420,
+    quantity: 1,
     shipper: "Qatar Motors Supply",
     consignee: "Colombo Auto Repairs",
-    wh: "WH004",
-    d2d: false
+    barcode: "BC111222333", // Added property
+    wh: "WH004", // Added property
+    d2d: false // Added property
   }
 ];
 
