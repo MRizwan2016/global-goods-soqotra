@@ -10,112 +10,92 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
     <style>
       {`
         @media print {
-          body * {
-            visibility: hidden !important;
-          }
-          
-          body.print-only-manifest * {
-            visibility: hidden !important;
-          }
-          
-          .print-container, .print-container * {
-            visibility: visible !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-          
-          .print-container {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            height: auto !important;
-            padding: 10mm !important;
-            background-color: white !important;
-          }
-          
-          /* Orientation settings */
           @page {
             size: ${orientation === "landscape" ? "landscape" : "portrait"};
             margin: 15mm;
           }
           
-          /* Layout adjustments for landscape */
-          .landscape table {
-            font-size: 0.9em;
+          body {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            background-color: white !important;
           }
           
-          /* Fix table width issues */
-          table {
-            width: 100% !important;
-            table-layout: fixed;
-            border-collapse: collapse;
-            margin-bottom: 10mm;
-            page-break-inside: auto;
-          }
-          
-          table, th, td {
-            border: 1px solid #000 !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-          }
-          
-          tr {
-            page-break-inside: avoid;
-            page-break-after: auto;
-          }
-          
-          th {
-            background-color: #f0f0f0 !important;
-            color: #000 !important;
-            font-weight: bold;
-            padding: 8px;
-            text-align: left;
-          }
-          
-          td {
-            padding: 8px;
-            text-align: left;
-          }
-          
-          /* Add logo styling */
-          .logo-container {
-            text-align: center;
-            margin-bottom: 10mm;
-          }
-          
-          /* Section page breaks */
-          .print-section {
-            page-break-after: always;
-          }
-          
-          /* Last section should not have page break */
-          .print-section:last-child {
-            page-break-after: avoid;
-          }
-          
-          /* Ensure print-only elements are visible */
           .print-only {
             display: block !important;
             visibility: visible !important;
           }
           
-          /* Hide non-print elements */
-          .no-print {
+          .print:hidden {
             display: none !important;
             visibility: hidden !important;
           }
           
-          /* Prevent links from showing their URLs */
-          a {
-            text-decoration: none !important;
-            color: #000 !important;
-          }
-          
-          /* Force background colors to print */
-          * {
+          /* Make headings and text print with the right colors */
+          h1, h2, h3, h4, h5, h6, p, table, div {
+            color-adjust: exact !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
+          }
+          
+          /* Ensure tables print properly */
+          table {
+            border-collapse: collapse;
+            width: 100%;
+          }
+          
+          table, th, td {
+            border: 1px solid #ddd;
+          }
+          
+          th, td {
+            padding: 8px;
+            text-align: left;
+          }
+          
+          /* Add page breaks if needed */
+          .page-break-before {
+            page-break-before: always;
+          }
+          
+          .page-break-after {
+            page-break-after: always;
+          }
+          
+          /* Hide non-printable elements */
+          button, .print\:hidden, .no-print {
+            display: none !important;
+          }
+          
+          /* Ensure the print container is visible */
+          .print-container {
+            display: block !important;
+            visibility: visible !important;
+            width: 100% !important;
+            max-width: none !important;
+            position: relative !important;
+            left: 0 !important;
+            top: 0 !important;
+          }
+          
+          /* For landscape mode, adjust table layout */
+          .landscape table {
+            font-size: 0.9em;
+          }
+        }
+        
+        /* Styles for print preview mode */
+        .print-only {
+          display: none;
+        }
+        
+        @media screen {
+          body.print-only-manifest .print-only {
+            display: block;
+          }
+          
+          body.print-only-manifest .print\:hidden {
+            display: none;
           }
         }
       `}

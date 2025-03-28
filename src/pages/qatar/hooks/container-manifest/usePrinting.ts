@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { PrintOptions } from "../../types/containerTypes";
 
@@ -18,26 +17,21 @@ export const usePrinting = () => {
     setIsPrinting(true);
     setPrintViewVisible(true);
     
-    // Allow more time for the print view to fully render before printing
+    // Apply print-specific body class immediately
+    document.body.classList.add('print-only-manifest');
+    
+    // First, let's make sure the view is properly rendered
     setTimeout(() => {
-      // Apply print-specific body class
-      document.body.classList.add('print-only-manifest');
+      // Trigger window.print() to show the print dialog
+      window.print();
       
-      // Trigger a small layout recalculation to ensure content is rendered
-      window.dispatchEvent(new Event('resize'));
-      
-      // Print after a longer delay to ensure content is fully rendered
+      // Keep the print view visible for future prints
+      // but reset the printing state
       setTimeout(() => {
-        window.print();
-        
-        // Reset after printing with a longer delay to ensure printing completes
-        setTimeout(() => {
-          document.body.classList.remove('print-only-manifest');
-          setPrintViewVisible(false);
-          setIsPrinting(false);
-        }, 1500);
+        setIsPrinting(false);
+        // We intentionally don't reset printViewVisible so the manifest stays visible
       }, 1000);
-    }, 1200);
+    }, 1000);
   };
 
   return {

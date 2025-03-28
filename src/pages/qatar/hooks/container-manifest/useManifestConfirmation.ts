@@ -25,6 +25,10 @@ export const useManifestConfirmation = (container: QatarContainer | null, contai
         // In a real app, we would save to the backend
       }
       
+      // Store the containerId in localStorage so we can retrieve it later
+      // This ensures the manifest can be viewed after being confirmed
+      localStorage.setItem('lastConfirmedContainerId', containerId);
+      
       // Notify parent of successful submission
       onManifestSubmitted();
       

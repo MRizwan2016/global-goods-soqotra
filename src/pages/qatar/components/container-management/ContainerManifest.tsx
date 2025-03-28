@@ -51,25 +51,8 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     handlePrint
   } = useContainerManifest(containerId, onManifestSubmitted);
   
-  // Show print view when printing
-  if (printViewVisible && container) {
-    return (
-      <PrintContainerManifest 
-        container={container}
-        cargoItems={cargoItems}
-        itemList={itemList}
-        consigneeList={consigneeList}
-        unsettledInvoices={unsettledInvoices}
-        totalVolume={totalVolume}
-        totalWeight={totalWeight}
-        totalPackages={totalPackages}
-        confirmDate={confirmDate}
-        printOptions={printOptions}
-      />
-    );
-  }
-  
-  // Loading state
+  // Show both print view and regular view when printing
+  // This ensures the print view is generated properly while still showing the UI
   if (isLoading) {
     return <ManifestSkeleton />;
   }
@@ -80,59 +63,80 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
   }
   
   return (
-    <Card className="shadow-md animate-fade-in">
-      <ManifestHeader 
-        containerNumber={container.containerNumber}
-        status={container.status}
-        onCancel={onCancel}
-      />
-      
-      <CardContent className="p-6">
-        <CargoSummary 
-          totalPackages={totalPackages}
-          totalVolume={totalVolume}
-          totalWeight={totalWeight}
-          formatVolume={formatVolume}
-          formatWeight={formatWeight}
-        />
-        
-        <ContainerDetailsSection 
-          container={container}
-          confirmDate={confirmDate}
-          setConfirmDate={setConfirmDate}
-          vgmWeight={vgmWeight}
-          setVgmWeight={setVgmWeight}
-          totalPackages={totalPackages}
-          totalVolume={totalVolume}
-          formatVolume={formatVolume}
-        />
-        
-        <PrintOptionsSelector 
-          printOptions={printOptions}
-          setPrintOptions={setPrintOptions}
-        />
-        
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-          <ManifestTabsHeader />
-          
-          <TabsContentWrapper
-            activeTab={activeTab}
+    <>
+      {/* Print view - hidden by default in regular view mode, shown when printing */}
+      {printViewVisible && container && (
+        <div className="print-only">
+          <PrintContainerManifest 
+            container={container}
             cargoItems={cargoItems}
             itemList={itemList}
-            unsettledInvoices={unsettledInvoices}
             consigneeList={consigneeList}
+            unsettledInvoices={unsettledInvoices}
+            totalVolume={totalVolume}
+            totalWeight={totalWeight}
+            totalPackages={totalPackages}
+            confirmDate={confirmDate}
+            printOptions={printOptions}
+          />
+        </div>
+      )}
+      
+      {/* Regular view - hidden when printing */}
+      <Card className="shadow-md animate-fade-in print:hidden">
+        <ManifestHeader 
+          containerNumber={container.containerNumber}
+          status={container.status}
+          onCancel={onCancel}
+        />
+        
+        <CardContent className="p-6">
+          <CargoSummary 
+            totalPackages={totalPackages}
+            totalVolume={totalVolume}
+            totalWeight={totalWeight}
             formatVolume={formatVolume}
             formatWeight={formatWeight}
           />
-        </Tabs>
-        
-        <ManifestActionsBar 
-          onCancel={onCancel}
-          onConfirm={handleConfirm}
-          onPrint={handlePrint}
-        />
-      </CardContent>
-    </Card>
+          
+          <ContainerDetailsSection 
+            container={container}
+            confirmDate={confirmDate}
+            setConfirmDate={setConfirmDate}
+            vgmWeight={vgmWeight}
+            setVgmWeight={setVgmWeight}
+            totalPackages={totalPackages}
+            totalVolume={totalVolume}
+            formatVolume={formatVolume}
+          />
+          
+          <PrintOptionsSelector 
+            printOptions={printOptions}
+            setPrintOptions={setPrintOptions}
+          />
+          
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
+            <ManifestTabsHeader />
+            
+            <TabsContentWrapper
+              activeTab={activeTab}
+              cargoItems={cargoItems}
+              itemList={itemList}
+              unsettledInvoices={unsettledInvoices}
+              consigneeList={consigneeList}
+              formatVolume={formatVolume}
+              formatWeight={formatWeight}
+            />
+          </Tabs>
+          
+          <ManifestActionsBar 
+            onCancel={onCancel}
+            onConfirm={handleConfirm}
+            onPrint={handlePrint}
+          />
+        </CardContent>
+      </Card>
+    </>
   );
 };
 

@@ -39,21 +39,14 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
   const formatVolume = (volume: number) => volume.toFixed(3);
   const formatWeight = (weight: number) => weight.toFixed(2);
   
-  // When the component mounts, add a class to the body for printing purposes
+  // When the component mounts, make sure it's visible for printing
   useEffect(() => {
-    // Add a class to the body to apply print styles
-    document.body.classList.add('print-only-manifest');
+    // Force layout recalculation to ensure the content is properly rendered
+    window.dispatchEvent(new Event('resize'));
     
-    // Make sure DOM has time to update before any potential printing
-    const timer = setTimeout(() => {
-      // Trigger a window resize event to ensure all content is properly laid out
-      window.dispatchEvent(new Event('resize'));
-    }, 500);
-    
+    // Return cleanup function
     return () => {
-      // Clean up when component unmounts
-      clearTimeout(timer);
-      document.body.classList.remove('print-only-manifest');
+      // Nothing to clean up
     };
   }, []);
   
