@@ -1,9 +1,15 @@
 
 import { toast } from "sonner";
-import { QatarContainer } from "../../types/containerTypes";
+import { QatarContainer, ContainerCargo } from "../../types/containerTypes";
 import mockContainers from "../../data/mockContainers";
 
-export const useManifestConfirmation = (container: QatarContainer | null, containerId: string, confirmDate: string, onManifestSubmitted: () => void) => {
+export const useManifestConfirmation = (
+  container: QatarContainer | null, 
+  containerId: string, 
+  confirmDate: string, 
+  cargoItems: ContainerCargo[], // Add cargo items as a separate parameter
+  onManifestSubmitted: () => void
+) => {
   const handleConfirm = () => {
     if (!confirmDate) {
       toast.error("PLEASE ENTER A CONFIRMATION DATE");
@@ -25,20 +31,20 @@ export const useManifestConfirmation = (container: QatarContainer | null, contai
         
         // Save additional data that might be needed for printing
         if (!mockContainers[containerIndex].packages) {
-          // Calculate total packages if not already set
-          const packages = container.cargoItems?.length || 0;
+          // Calculate total packages based on the provided cargo items
+          const packages = cargoItems?.length || 0;
           mockContainers[containerIndex].packages = packages;
         }
         
         if (!mockContainers[containerIndex].volume) {
-          // Calculate total volume if not already set
-          const volume = container.cargoItems?.reduce((sum, item) => sum + Number(item.volume), 0) || 0;
+          // Calculate total volume based on the provided cargo items
+          const volume = cargoItems?.reduce((sum, item) => sum + Number(item.volume), 0) || 0;
           mockContainers[containerIndex].volume = volume;
         }
         
         if (!mockContainers[containerIndex].weight) {
-          // Calculate total weight if not already set
-          const weight = container.cargoItems?.reduce((sum, item) => sum + Number(item.weight), 0) || 0;
+          // Calculate total weight based on the provided cargo items
+          const weight = cargoItems?.reduce((sum, item) => sum + Number(item.weight), 0) || 0;
           mockContainers[containerIndex].weight = weight;
         }
         

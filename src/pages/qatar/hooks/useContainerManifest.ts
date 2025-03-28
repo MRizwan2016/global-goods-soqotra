@@ -40,10 +40,10 @@ const useContainerManifest = (containerId: string, onManifestSubmitted: () => vo
     handlePrint
   } = usePrinting();
 
-  // Handle manifest confirmation
+  // Handle manifest confirmation - pass cargoItems to useManifestConfirmation
   const {
     handleConfirm
-  } = useManifestConfirmation(container, containerId, confirmDate, onManifestSubmitted);
+  } = useManifestConfirmation(container, containerId, confirmDate, cargoItems, onManifestSubmitted);
 
   // Formatters for display
   const {
