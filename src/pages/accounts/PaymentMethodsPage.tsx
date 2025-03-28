@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,7 +37,6 @@ const PaymentMethodsPage = () => {
   const { toast } = useToast();
   const [hoveredRow, setHoveredRow] = useState<number | null>(null);
 
-  // Recent payments list
   const recentPayments = [
     { id: 1, invoice: "GY13136051", customer: "Ali Saleh", amount: 750, date: "2023-06-18", status: "Completed" },
     { id: 2, invoice: "GY13136052", customer: "Mohammed Ali", amount: 1200, date: "2023-06-17", status: "Completed" },

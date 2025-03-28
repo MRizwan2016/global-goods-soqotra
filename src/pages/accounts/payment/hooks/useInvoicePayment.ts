@@ -1,45 +1,43 @@
 
 import { useState } from "react";
+import { Invoice } from "../types";
 import { useInvoiceSearch } from "./useInvoiceSearch";
 import { useCurrencyCountry } from "./useCurrencyCountry";
 import { usePaymentForm } from "./usePaymentForm";
-import { Invoice } from "../types";
 
 /**
- * Main hook for the invoice payment functionality
+ * Hook for managing invoice payment flow
  */
 export const useInvoicePayment = () => {
-  // Invoice states
-  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
-  
-  // Use the invoice search hook
-  const { 
-    invoicePrefix, 
-    setInvoicePrefix, 
-    matchingInvoices, 
-    showInvoiceSelector, 
-    setShowInvoiceSelector, 
-    handleInvoiceSearch 
-  } = useInvoiceSearch(setSelectedInvoice);
-  
-  // Use the currency and country hook
-  const { 
-    selectedCountry, 
-    filteredCurrencies, 
-    currencySymbol, 
+  // Use invoice search functionality
+  const {
+    invoicePrefix,
+    setInvoicePrefix,
+    matchingInvoices,
+    showInvoiceSelector,
+    setShowInvoiceSelector,
+    selectedInvoice,
+    setSelectedInvoice,
+    handleInvoiceSearch
+  } = useInvoiceSearch();
+
+  // Use currency and country selection
+  const {
+    selectedCountry,
+    currencySymbol,
     countryOptions,
-    handleCountryChange
+    filteredCurrencies
   } = useCurrencyCountry();
-  
-  // Use the payment form hook
-  const { 
-    formState, 
-    date, 
-    handleInputChange, 
-    handleSelectChange: handleFormSelectChange, 
-    handleDateSelect, 
-    handleSelectInvoice, 
-    handleSave 
+
+  // Use payment form management
+  const {
+    formState,
+    date,
+    handleInputChange,
+    handleSelectChange,
+    handleDateSelect,
+    handleSelectInvoice,
+    handleSave
   } = usePaymentForm(
     selectedInvoice,
     setSelectedInvoice,
@@ -47,15 +45,6 @@ export const useInvoicePayment = () => {
     selectedCountry,
     currencySymbol
   );
-  
-  // Combine select change handlers
-  const handleSelectChange = (name: string, value: string) => {
-    handleFormSelectChange(name, value);
-    
-    if (name === "country") {
-      handleCountryChange(value);
-    }
-  };
 
   return {
     formState,
@@ -66,7 +55,6 @@ export const useInvoicePayment = () => {
     setShowInvoiceSelector,
     selectedInvoice,
     date,
-    selectedCountry,
     filteredCurrencies,
     currencySymbol,
     countryOptions,

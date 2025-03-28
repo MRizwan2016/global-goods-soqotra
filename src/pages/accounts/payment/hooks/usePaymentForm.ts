@@ -6,6 +6,7 @@ import { useFormInputHandlers } from "./useFormInputHandlers";
 import { useInvoiceSelection } from "./useInvoiceSelection";
 import { usePaymentSave } from "./usePaymentSave";
 import { recalculateAmounts } from "../utils/amountCalculations";
+import { DEFAULT_PAYMENT_FORM_VALUES } from "../constants/paymentConstants";
 
 /**
  * Hook for managing payment form state and interactions
@@ -31,11 +32,11 @@ export const usePaymentForm = (
     netAmount: 0,
     totalPaid: 0,
     balanceToPay: 0,
-    amountPaid: 0,
+    amountPaid: DEFAULT_PAYMENT_FORM_VALUES.amountPaid,
     paymentCollectDate: format(new Date(), "yyyy-MM-dd"),
-    receivableAccount: "CASH_IN_HAND",
+    receivableAccount: DEFAULT_PAYMENT_FORM_VALUES.receivableAccount,
     country: selectedCountry,
-    currency: "QAR"
+    currency: DEFAULT_PAYMENT_FORM_VALUES.currency
   };
 
   // Use form input handlers

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { CreditCard } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getFadeInVariants } from "../../utils/animationVariants";
+import { PAYMENT_METHODS } from "../../constants/paymentConstants";
 
 interface PaymentMethodSelectorProps {
   receivableAccount: string;
@@ -35,11 +36,11 @@ const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
           <SelectValue placeholder="Select payment method" />
         </SelectTrigger>
         <SelectContent className="bg-white z-50">
-          <SelectItem value="CASH_IN_HAND" className="cursor-pointer">CASH IN HAND</SelectItem>
-          <SelectItem value="BANK_TRANSFER" className="cursor-pointer">BANK TRANSFER</SelectItem>
-          <SelectItem value="CREDIT_CARD" className="cursor-pointer">CREDIT CARD</SelectItem>
-          <SelectItem value="CHEQUE" className="cursor-pointer">CHEQUE</SelectItem>
-          <SelectItem value="MOBILE_MONEY" className="cursor-pointer">MOBILE MONEY</SelectItem>
+          {PAYMENT_METHODS.map((method) => (
+            <SelectItem key={method.id} value={method.id} className="cursor-pointer">
+              {method.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </motion.div>

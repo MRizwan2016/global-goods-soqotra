@@ -1,6 +1,7 @@
 
 import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PAYMENT_METHODS } from "../../../accounts/payment/constants/paymentConstants";
 
 interface PaymentMethodSelectorProps {
   formState: any;
@@ -11,14 +12,6 @@ const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
   formState,
   handleInputChange,
 }) => {
-  // Mock payment methods
-  const paymentMethods = [
-    { id: "bank", name: "Bank Transfer" },
-    { id: "cash", name: "Cash" },
-    { id: "card", name: "Credit Card" },
-    { id: "check", name: "Check" },
-  ];
-
   // Handle payment method selection
   const handlePaymentMethodChange = (value: string) => {
     const event = {
@@ -42,7 +35,7 @@ const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
           <SelectValue placeholder="Select payment method" />
         </SelectTrigger>
         <SelectContent>
-          {paymentMethods.map(method => (
+          {PAYMENT_METHODS.map(method => (
             <SelectItem key={method.id} value={method.id}>{method.name}</SelectItem>
           ))}
         </SelectContent>

@@ -2,6 +2,7 @@
 import React from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { PAYMENT_STATUSES } from "../../../accounts/payment/constants/paymentConstants";
 
 interface PaymentStatusSelectorProps {
   formState: any;
@@ -24,18 +25,11 @@ const PaymentStatusSelector: React.FC<PaymentStatusSelectorProps> = ({
   };
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case "paid":
-        return <Badge className="ml-2 bg-green-100 text-green-800 hover:bg-green-200">PAID</Badge>;
-      case "partial":
-        return <Badge className="ml-2 bg-blue-100 text-blue-800 hover:bg-blue-200">PARTIAL</Badge>;
-      case "pending":
-        return <Badge className="ml-2 bg-amber-100 text-amber-800 hover:bg-amber-200">PENDING</Badge>;
-      case "overdue":
-        return <Badge className="ml-2 bg-red-100 text-red-800 hover:bg-red-200">OVERDUE</Badge>;
-      default:
-        return null;
+    const statusConfig = PAYMENT_STATUSES.find(s => s.id === status);
+    if (statusConfig) {
+      return <Badge className={`ml-2 ${statusConfig.color} hover:bg-opacity-80`}>{statusConfig.name.toUpperCase()}</Badge>;
     }
+    return null;
   };
 
   return (
@@ -50,10 +44,9 @@ const PaymentStatusSelector: React.FC<PaymentStatusSelectorProps> = ({
             <SelectValue placeholder="Select payment status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="pending">Pending</SelectItem>
-            <SelectItem value="partial">Partially Paid</SelectItem>
-            <SelectItem value="paid">Paid</SelectItem>
-            <SelectItem value="overdue">Overdue</SelectItem>
+            {PAYMENT_STATUSES.map(status => (
+              <SelectItem key={status.id} value={status.id}>{status.name}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
         {formState.paymentStatus && getStatusBadge(formState.paymentStatus)}
