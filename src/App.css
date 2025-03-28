@@ -40,3 +40,21 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Navigation button gradients */
+.nav-button-gradient-upb {
+  background: linear-gradient(to right, #e5f7e0, #f2fce2);
+}
+
+.nav-button-gradient-accounts {
+  background: linear-gradient(to right, #e5deff, #f4f0ff);
+}
+
+.nav-button-gradient-admin {
+  background: linear-gradient(to right, #ffdee2, #fff0f2);
+}
+
+.nav-button-gradient-cargo {
+  background: linear-gradient(to right, #d3e4fd, #e5f0ff);
+}
+

@@ -16,12 +16,12 @@ const NavigationSection: React.FC<NavigationSectionProps> = ({
   const Icon = section.icon;
 
   return (
-    <div className="w-full">
+    <div className="w-full mb-2">
       <Button
         variant="ghost"
         className={cn(
-          "justify-between w-full px-4 py-3 border rounded-md transition-all duration-300 hover:scale-105 bg-gradient-to-r",
-          section.color,
+          "justify-between w-full px-4 py-3 rounded-md transition-all duration-300 hover:scale-105",
+          section.gradient || section.color,
           isActive ? "shadow-md" : ""
         )}
         onClick={onToggle}
@@ -34,7 +34,7 @@ const NavigationSection: React.FC<NavigationSectionProps> = ({
       </Button>
       
       {isActive && (
-        <div className="ml-8 mt-2 space-y-4 animate-accordion-down">
+        <div className="ml-8 mt-2 space-y-3 animate-accordion-down">
           {section.submenu.map((menu, index) => (
             <div key={index} className="space-y-1">
               <h4 className="font-medium text-sm text-gray-700 px-2">{menu.title}</h4>

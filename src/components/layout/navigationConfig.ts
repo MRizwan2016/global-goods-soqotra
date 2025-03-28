@@ -6,7 +6,8 @@ export const navigationSections: NavigationSections = {
   upb: {
     title: "UPB",
     icon: Database,
-    color: "from-green-200 to-green-100 text-green-800 border-green-300 hover:bg-green-50",
+    color: "bg-green-100 text-green-800 border border-green-300",
+    gradient: "bg-gradient-to-r from-green-100 to-green-50 text-green-800 border border-green-200",
     iconColor: "text-green-700",
     submenu: [
       {
@@ -43,7 +44,8 @@ export const navigationSections: NavigationSections = {
   accounts: {
     title: "ACCOUNTS",
     icon: DollarSign,
-    color: "from-purple-200 to-purple-100 text-purple-800 border-purple-300 hover:bg-purple-50",
+    color: "bg-purple-100 text-purple-800 border border-purple-300",
+    gradient: "bg-gradient-to-r from-purple-100 to-purple-50 text-purple-800 border border-purple-200",
     iconColor: "text-purple-700",
     submenu: [
       {
@@ -58,7 +60,8 @@ export const navigationSections: NavigationSections = {
   admin: {
     title: "ADMIN",
     icon: Settings,
-    color: "from-rose-200 to-rose-100 text-rose-800 border-rose-300 hover:bg-rose-50",
+    color: "bg-rose-100 text-rose-800 border border-rose-300",
+    gradient: "bg-gradient-to-r from-rose-100 to-rose-50 text-rose-800 border border-rose-200",
     iconColor: "text-rose-700",
     submenu: [
       {
@@ -73,7 +76,8 @@ export const navigationSections: NavigationSections = {
   cargo: {
     title: "CARGO COLLECTION & DELIVERY",
     icon: Truck,
-    color: "from-sky-200 to-sky-100 text-sky-800 border-sky-300 hover:bg-sky-50",
+    color: "bg-sky-100 text-sky-800 border border-sky-300",
+    gradient: "bg-gradient-to-r from-sky-100 to-sky-50 text-sky-800 border border-sky-200",
     iconColor: "text-sky-700",
     submenu: [
       {

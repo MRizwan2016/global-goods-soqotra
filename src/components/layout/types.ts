@@ -15,6 +15,7 @@ export interface NavigationSection {
   title: string;
   icon: LucideIcon;
   color: string;
+  gradient?: string;
   iconColor: string;
   submenu: NavigationSubmenu[];
 }
