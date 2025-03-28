@@ -7,9 +7,16 @@ import { Trash2 } from "lucide-react";
 interface CargoTableProps {
   cargoItems: ContainerCargo[];
   onRemoveCargo: (cargoId: string) => void;
+  formatVolume?: (volume: number) => string;
+  formatWeight?: (volume: number) => string;
 }
 
-const CargoTable: React.FC<CargoTableProps> = ({ cargoItems, onRemoveCargo }) => {
+const CargoTable: React.FC<CargoTableProps> = ({ 
+  cargoItems, 
+  onRemoveCargo,
+  formatVolume = (v) => v.toFixed(3),
+  formatWeight = (w) => w.toFixed(2)
+}) => {
   if (cargoItems.length === 0) {
     return <p className="text-gray-500">No cargo items added yet.</p>;
   }
@@ -37,8 +44,8 @@ const CargoTable: React.FC<CargoTableProps> = ({ cargoItems, onRemoveCargo }) =>
               <td className="px-4 py-2">{item.packageName}</td>
               <td className="px-4 py-2">{item.shipper}</td>
               <td className="px-4 py-2">{item.consignee}</td>
-              <td className="px-4 py-2 text-right">{item.volume.toFixed(3)}</td>
-              <td className="px-4 py-2 text-right">{item.weight.toFixed(2)}</td>
+              <td className="px-4 py-2 text-right">{formatVolume(item.volume)}</td>
+              <td className="px-4 py-2 text-right">{formatWeight(item.weight)}</td>
               <td className="px-4 py-2 text-center">
                 <Button 
                   variant="ghost" 
@@ -56,10 +63,10 @@ const CargoTable: React.FC<CargoTableProps> = ({ cargoItems, onRemoveCargo }) =>
           <tr>
             <td colSpan={5} className="px-4 py-2 text-right">Total:</td>
             <td className="px-4 py-2 text-right">
-              {cargoItems.reduce((sum, item) => sum + item.volume, 0).toFixed(3)}
+              {formatVolume(cargoItems.reduce((sum, item) => sum + item.volume, 0))}
             </td>
             <td className="px-4 py-2 text-right">
-              {cargoItems.reduce((sum, item) => sum + item.weight, 0).toFixed(2)}
+              {formatWeight(cargoItems.reduce((sum, item) => sum + item.weight, 0))}
             </td>
             <td></td>
           </tr>

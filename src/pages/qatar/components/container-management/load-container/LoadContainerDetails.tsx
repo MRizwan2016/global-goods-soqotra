@@ -124,7 +124,8 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
         </CardHeader>
         
         <CardContent className="p-6">
-          <ContainerDetailsSection containerData={containerData} />
+          {/* Fix here: Change containerData to container as expected by ContainerDetailsSection */}
+          <ContainerDetailsSection container={containerData} onContainerChange={() => {}} />
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
             <TabsList className="grid grid-cols-2 mb-6">
@@ -164,9 +165,10 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
                 </span>
               </div>
               
+              {/* Fix here: Change onRemove to onRemoveCargo as expected by CargoTable */}
               <CargoTable 
                 cargoItems={cargoItems} 
-                onRemove={handleRemoveCargo}
+                onRemoveCargo={handleRemoveCargo}
                 formatVolume={formatVolume}
                 formatWeight={formatWeight}
               />
