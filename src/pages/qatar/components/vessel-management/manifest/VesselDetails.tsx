@@ -1,6 +1,5 @@
-
 import React from "react";
-import { QatarVessel } from "../mockVesselData";
+import { QatarVessel } from "../types/vesselTypes";
 
 interface VesselDetailsProps {
   vessel: QatarVessel;

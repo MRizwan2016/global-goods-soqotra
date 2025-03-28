@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useRef } from "react";
-import { mockVesselData, QatarVessel } from "../mockVesselData";
+import { mockVesselData } from "../mockVesselData";
+import { QatarVessel } from "../types/vesselTypes";
 import mockContainers from "../../../data/mockContainers";
 import { toast } from "sonner";
 
