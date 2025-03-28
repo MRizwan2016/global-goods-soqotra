@@ -8,15 +8,11 @@ import { accountsRoutes } from "./accountsRoutes";
 import { adminRoutes } from "./adminRoutes";
 import { authRoutes } from "./authRoutes";
 import { printDocumentsRoutes } from "./printDocumentsRoutes";
+import { mainRoutes } from "./mainRoutes";
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 
 const appRoutes: RouteConfig[] = [
-  {
-    path: "/",
-    element: Dashboard,
-    private: true
-  },
   {
     path: "/dashboard",
     element: Dashboard,
@@ -24,11 +20,11 @@ const appRoutes: RouteConfig[] = [
   }
 ];
 
-// Make sure the route for invoice printing is given a higher priority (placed earlier in the array)
-// to avoid potential conflicts with the admin routes
+// Place mainRoutes at the beginning to give Landing page higher priority
 export const routes: RouteConfig[] = [
   ...authRoutes,
-  ...printDocumentsRoutes, // Add print documents routes with high priority
+  ...mainRoutes, // Added mainRoutes with higher priority
+  ...printDocumentsRoutes,
   ...dataEntryRoutes,  
   ...appRoutes,
   ...masterDataRoutes,
