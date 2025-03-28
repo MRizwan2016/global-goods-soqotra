@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { Save, ArrowLeft } from "lucide-react";
 
 interface ActionButtonsProps {
   formState: {
@@ -32,15 +33,17 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       <Button 
         variant="outline" 
         onClick={() => navigate("/accounts/payments")}
-        className="border-gray-300"
+        className="border-gray-300 hover:bg-gray-100 transition-all duration-200 flex items-center gap-2"
       >
+        <ArrowLeft size={16} />
         Cancel
       </Button>
       <Button 
         onClick={handleSave}
         disabled={!formState.invoiceNumber || formState.amountPaid <= 0 || !formState.country || !formState.currency || (selectedInvoice && selectedInvoice.paid)}
-        className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-colors"
+        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 flex items-center gap-2"
       >
+        <Save size={16} />
         {selectedInvoice && selectedInvoice.paid ? "Invoice Already Paid" : "Save Payment"}
       </Button>
     </motion.div>

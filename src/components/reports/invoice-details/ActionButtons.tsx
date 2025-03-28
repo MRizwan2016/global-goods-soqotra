@@ -46,7 +46,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   return (
     <div className={`mt-6 flex justify-center space-x-4 ${isFullScreen ? 'animate-fade-in' : ''}`}>
       <Button 
-        className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 transition-transform"
+        className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300"
         onClick={handlePrintInvoice}
       >
         <Printer className="mr-2 h-4 w-4" />
@@ -54,7 +54,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       </Button>
       
       <Button 
-        className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 transition-transform"
+        className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300"
         onClick={handlePrintCertificate}
       >
         <FileText className="mr-2 h-4 w-4" />
@@ -62,7 +62,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       </Button>
       
       <Button 
-        className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 transition-transform"
+        className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300"
         onClick={handlePrintHBL}
       >
         <FileText className="mr-2 h-4 w-4" />
@@ -70,7 +70,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       </Button>
       
       <Button 
-        className="bg-blue-500 hover:bg-blue-600 transform hover:scale-105 transition-transform"
+        className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300"
         onClick={handleBack}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />

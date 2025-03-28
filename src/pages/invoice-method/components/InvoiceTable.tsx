@@ -1,13 +1,32 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { CreditCard, FileText } from "lucide-react";
+import PaymentActionButton from "@/components/payment/PaymentActionButton";
+import ReceiptView from "@/components/payment/ReceiptView";
 
 interface InvoiceTableProps {
   status: "unpaid" | "partial" | "paid";
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({ status }) => {
+  const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+  const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
+
+  const handleViewReceipt = (invoice: any) => {
+    setSelectedReceipt({
+      receiptNumber: `REC-${Math.floor(10000 + Math.random() * 90000)}`,
+      invoiceNumber: invoice.id,
+      date: invoice.date,
+      customer: invoice.customer,
+      amount: invoice.amount,
+      paymentMethod: "Bank Transfer",
+      currency: "QAR",
+      remarks: invoice.remarks || "",
+    });
+    setIsReceiptOpen(true);
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200">
@@ -64,10 +83,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ status }) => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Button variant="outline" size="sm" className="flex items-center gap-1">
-                    <CreditCard className="h-3 w-3" />
-                    Collect
-                  </Button>
+                  <PaymentActionButton type="collect" onClick={() => {}} />
                 </td>
               </tr>
               <tr>
@@ -81,10 +97,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ status }) => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Button variant="outline" size="sm" className="flex items-center gap-1">
-                    <CreditCard className="h-3 w-3" />
-                    Collect
-                  </Button>
+                  <PaymentActionButton type="collect" onClick={() => {}} />
                 </td>
               </tr>
             </>
@@ -97,11 +110,13 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ status }) => {
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">QR 3,000.00</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">QR 1,500.00</td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-semibold text-amber-600">QR 1,500.00</td>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">
+                  Partial
+                </span>
+              </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <Button variant="outline" size="sm" className="flex items-center gap-1">
-                  <CreditCard className="h-3 w-3" />
-                  Complete
-                </Button>
+                <PaymentActionButton type="complete" onClick={() => {}} />
               </td>
             </tr>
           )}
@@ -114,10 +129,15 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ status }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">QR 2,750.00</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-05-02</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                    <FileText className="h-3 w-3" />
-                    View
-                  </Button>
+                  <PaymentActionButton 
+                    type="view" 
+                    onClick={() => handleViewReceipt({
+                      id: "INV-1000",
+                      date: "2023-05-01",
+                      customer: "Fatima Hassan",
+                      amount: 2750.00
+                    })} 
+                  />
                 </td>
               </tr>
               <tr>
@@ -127,16 +147,29 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ status }) => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">QR 1,850.00</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-04-27</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1">
-                    <FileText className="h-3 w-3" />
-                    View
-                  </Button>
+                  <PaymentActionButton 
+                    type="view" 
+                    onClick={() => handleViewReceipt({
+                      id: "INV-999",
+                      date: "2023-04-25",
+                      customer: "Abdulrahman Ali",
+                      amount: 1850.00
+                    })} 
+                  />
                 </td>
               </tr>
             </>
           )}
         </tbody>
       </table>
+
+      {selectedReceipt && (
+        <ReceiptView 
+          isOpen={isReceiptOpen} 
+          onClose={() => setIsReceiptOpen(false)} 
+          receiptData={selectedReceipt}
+        />
+      )}
     </div>
   );
 };
