@@ -1,59 +1,70 @@
-// Ports and sectors data for vessel management
-export const PORTS = [
-  "Doha", "Mombasa", "Nairobi", "Asmara", "Hargeisa", "Port Sudan", 
-  "Tunis", "Kampala", "Berbara", "Mogadishu", "Dammam", "Addis Ababa", 
-  "Riyadh", "Jeddah", "Dubai", "Sharjah", "Jabel Ali", "Sohar", "HAMAD SEA PORT", "COLOMBO"
-];
 
-// Mapping of sectors to their ports of discharge
-export const SECTOR_PORT_MAP: {[key: string]: string[]} = {
-  "Sri Lanka": ["COLOMBO", "GALLE", "KURUNEGALA"],
-  "Kenya": ["Mombasa", "Nairobi", "Kampala"],
-  "Uganda": ["Kampala"],
-  "Tunisia": ["Tunis"],
-  "United Arab Emirates": ["Dubai", "Sharjah", "Jabel Ali"],
-  "Saudi Arabia": ["Dammam", "Riyadh", "Jeddah"],
-  "Sudan": ["Port Sudan"],
-  "Eritrea": ["Asmara"],
-  "Oman": ["Sohar"],
-  "Qatar": ["Doha", "HAMAD SEA PORT"],
-  "Somalia": ["Mogadishu", "Berbara", "Hargeisa"],
-  "Ethiopia": ["Addis Ababa"],
-  "COLOMBO": ["COLOMBO"],
-  "GALLE": ["GALLE"],
-  "KURUNEGALA": ["KURUNEGALA"]
-};
-
-export const DEFAULT_PORT_OF_LOADING = "DOHA PORT, QATAR";
-
-export const SECTORS = [
-  "Sri Lanka", "Kenya", "Uganda", "Tunisia", "United Arab Emirates", 
-  "Saudi Arabia", "Sudan", "Eritrea", "Oman", "Qatar", "Somalia", "Ethiopia", "COLOMBO", "GALLE", "KURUNEGALA"
-];
+export const DEFAULT_PORT_OF_LOADING = "DOHA";
 
 export const SHIPPING_LINES = [
-  { value: "ABUDHABI SHIPPING", label: "ABUDHABI SHIPPING : ADS" },
-  { value: "MAERSK LINE", label: "MAERSK LINE : MSK" },
-  { value: "MSC", label: "MSC" },
-  { value: "CMA CGM", label: "CMA CGM" }
+  "MSC",
+  "MAERSK",
+  "CMA CGM",
+  "HAPAG-LLOYD",
+  "ONE",
+  "EVERGREEN",
+  "COSCO",
+  "YANG MING",
+  "HMM",
+  "ZIM"
 ];
 
-// Generate running numbers starting from 100
-export const generateRunningNumber = (existingNumbers: string[]): string => {
-  // Extract and find the highest numeric part from existing running numbers
-  let highestNumber = 0;
+export const VESSEL_STATUSES = [
+  "ALL",
+  "NEW",
+  "SCHEDULED",
+  "LOADING",
+  "IN_TRANSIT",
+  "ARRIVED",
+  "DISCHARGED",
+  "COMPLETED"
+];
+
+export const DIRECTIONS = [
+  "IMPORT",
+  "EXPORT",
+  "MIX"
+];
+
+export const SECTORS = [
+  "EAST AFRICA",
+  "WEST AFRICA",
+  "SOUTH ASIA",
+  "MIDDLE EAST",
+  "EUROPE",
+  "FAR EAST",
+  "COLOMBO"
+];
+
+export const STATUS_COLORS = {
+  "NEW": "bg-blue-100 text-blue-800",
+  "SCHEDULED": "bg-purple-100 text-purple-800",
+  "LOADING": "bg-yellow-100 text-yellow-800",
+  "IN_TRANSIT": "bg-green-100 text-green-800",
+  "ARRIVED": "bg-lime-100 text-lime-800",
+  "DISCHARGED": "bg-indigo-100 text-indigo-800",
+  "COMPLETED": "bg-gray-100 text-gray-800"
+};
+
+// Generate a running number for vessels
+export const generateRunningNumber = (existingNumbers: string[] = []): string => {
+  let highestNum = 0;
   
   existingNumbers.forEach(num => {
-    // Extract numeric part of the running number
-    const numericPart = parseInt(num.replace(/\D/g, ''));
-    if (!isNaN(numericPart) && numericPart > highestNumber) {
-      highestNumber = numericPart;
+    if (num && num.startsWith("VSL")) {
+      const numericPart = parseInt(num.substring(3));
+      if (!isNaN(numericPart) && numericPart > highestNum) {
+        highestNum = numericPart;
+      }
     }
   });
   
-  // Generate new running number
-  const newNumber = highestNumber + 1;
-  
-  // Format with leading zeros to keep 3 digits
-  return `V${String(newNumber).padStart(3, '0')}`;
+  // Increment and format with leading zeros
+  const nextNum = highestNum + 1;
+  return `VSL${nextNum.toString().padStart(3, '0')}`;
 };

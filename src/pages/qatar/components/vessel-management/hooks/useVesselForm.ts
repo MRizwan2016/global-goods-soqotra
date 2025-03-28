@@ -53,6 +53,22 @@ export function useVesselForm(onVesselCreated: () => void) {
       containers: []
     });
     
+    // Save to localStorage for persistence
+    try {
+      const savedVessels = localStorage.getItem('vessels');
+      let vessels = savedVessels ? JSON.parse(savedVessels) : [];
+      
+      vessels.unshift({
+        ...formData,
+        status: "NEW",
+        containers: []
+      });
+      
+      localStorage.setItem('vessels', JSON.stringify(vessels));
+    } catch (error) {
+      console.error("Error saving vessel to localStorage:", error);
+    }
+    
     // Show success message with animation
     toast.success(`Vessel ${formData.vesselName} created successfully`, {
       style: { backgroundColor: "#10B981", color: "white" }

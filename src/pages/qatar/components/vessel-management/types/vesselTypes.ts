@@ -1,5 +1,4 @@
 
-// Vessel Form Data interface
 export interface VesselFormData {
   id: string;
   runningNumber: string;
@@ -8,44 +7,34 @@ export interface VesselFormData {
   portOfLoading: string;
   portOfDischarge: string;
   shippingLine: string;
-  direction: "DIRECT" | "MIX";
+  direction: string;
   masterBL: string;
   etd: string;
   eta: string;
   sector: string;
 }
 
-// Props for AddVessel component
-export interface AddVesselProps {
-  onVesselCreated: () => void;
-  onCancel: () => void;
+export interface Vessel extends VesselFormData {
+  status: string;
+  containers: string[];
 }
 
-// Props for VesselList component
-export interface VesselListProps {
-  onVesselSelect: (vesselId: string) => void;
+export interface VesselWithContainerDetails extends Vessel {
+  containerDetails?: any[];
 }
 
-// Props for VesselSearch component
-export interface VesselSearchProps {
-  searchTerm: string;
-  onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+export interface VesselAction {
+  label: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+  color?: string;
+  disabled?: boolean;
 }
 
-// Props for SectorFilter component
-export interface SectorFilterProps {
-  value: string;
-  onChange: (value: string) => void;
-}
-
-// Props for VesselSummary component
-export interface VesselSummaryProps {
-  filteredCount: number;
-  totalCount: number;
-}
-
-// Props for VesselsTable component
-export interface VesselsTableProps {
-  vessels: any[];
-  onVesselSelect: (vesselId: string) => void;
+export interface VesselFilter {
+  status?: string;
+  shippingLine?: string;
+  direction?: string;
+  sector?: string;
+  dateRange?: [Date | null, Date | null];
 }

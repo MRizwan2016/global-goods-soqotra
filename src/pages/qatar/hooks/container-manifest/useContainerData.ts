@@ -29,11 +29,46 @@ export const useContainerData = (containerId: string) => {
     // Add a slight delay to simulate network request
     const loadTimer = setTimeout(() => {
       try {
-        // Find container by ID
+        // First check localStorage for updated container data
+        const savedContainer = localStorage.getItem(`container_${containerId}`);
+        
+        if (savedContainer) {
+          try {
+            const parsedContainer = JSON.parse(savedContainer);
+            console.log("Container found in localStorage:", parsedContainer);
+            setContainer(parsedContainer);
+            setVgmWeight(parsedContainer.weight?.toString() || "0");
+            
+            // Check for cargo items in localStorage
+            const savedCargoItems = localStorage.getItem(`cargoItems_${containerId}`);
+            if (savedCargoItems) {
+              try {
+                const parsedCargoItems = JSON.parse(savedCargoItems);
+                console.log("Cargo items found in localStorage:", parsedCargoItems);
+                setCargoItems(parsedCargoItems);
+              } catch (err) {
+                console.error("Error parsing saved cargo items:", err);
+              }
+            }
+            
+            // Set confirm date to today if not already set
+            setConfirmDate(parsedContainer.confirmDate || new Date().toLocaleDateString("en-GB", {
+              day: "2-digit", month: "2-digit", year: "numeric"
+            }));
+            
+            setIsLoading(false);
+            return;
+          } catch (parseErr) {
+            console.error("Error parsing saved container:", parseErr);
+            // Continue to check mock data if localStorage parsing fails
+          }
+        }
+        
+        // If not found in localStorage, check mock data
         const foundContainer = mockContainers.find(c => c.id === containerId);
         
         if (foundContainer) {
-          console.log("Container found:", foundContainer);
+          console.log("Container found in mock data:", foundContainer);
           setContainer(foundContainer);
           setVgmWeight(foundContainer.weight?.toString() || "0");
           

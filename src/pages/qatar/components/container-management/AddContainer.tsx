@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { QatarContainer } from "../../types/containerTypes";
 import { v4 as uuidv4 } from "uuid";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 interface AddContainerProps {
   onSubmit: (container: QatarContainer) => void;
@@ -77,7 +78,8 @@ const AddContainer: React.FC<AddContainerProps> = ({
     direction: "Export",
     sector: "QAT-KEN",
     shippingLine: "MSC",
-    loadDate: new Date().toISOString().split('T')[0]
+    loadDate: new Date().toISOString().split('T')[0],
+    jobNumber: ""
   });
 
   // Store existing running numbers for auto-generation
@@ -93,7 +95,13 @@ const AddContainer: React.FC<AddContainerProps> = ({
         let mockNumbers: string[] = [];
         
         if (savedNumbers) {
-          mockNumbers = JSON.parse(savedNumbers);
+          try {
+            mockNumbers = JSON.parse(savedNumbers);
+            console.log("Loaded existing running numbers:", mockNumbers);
+          } catch (err) {
+            console.error("Error parsing saved running numbers:", err);
+            mockNumbers = ["100", "101", "102", "103"];
+          }
         } else {
           // Mock data for now - in a real app, fetch from API
           mockNumbers = ["100", "101", "102", "103"];
@@ -105,6 +113,8 @@ const AddContainer: React.FC<AddContainerProps> = ({
         // Set a new running number if not editing
         if (!containerData && !formData.runningNumber) {
           const newNumber = generateRunningNumber(mockNumbers);
+          console.log("Generated new running number:", newNumber);
+          
           setFormData(prev => ({...prev, runningNumber: newNumber}));
           
           // Add the new number to our list
@@ -114,6 +124,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
         }
       } catch (error) {
         console.error("Failed to fetch running numbers:", error);
+        toast.error("Failed to generate running number");
       }
     };
     
@@ -126,9 +137,8 @@ const AddContainer: React.FC<AddContainerProps> = ({
       
       // If job number already exists for this container, retrieve it
       if (containerData.id) {
-        const savedJobNumber = localStorage.getItem(`jobNumber_${containerData.id}`);
-        if (savedJobNumber) {
-          setJobNumber(savedJobNumber);
+        if (containerData.jobNumber) {
+          setJobNumber(containerData.jobNumber);
         } else {
           // Generate new job number
           const newJobNumber = generateJobNumber(containerData.containerNumber, containerData.sector);
@@ -138,8 +148,10 @@ const AddContainer: React.FC<AddContainerProps> = ({
     } else {
       // For new containers
       const newRunningNumber = generateRunningNumber(existingRunningNumbers);
+      const newId = uuidv4();
+      
       setFormData({
-        id: uuidv4(),
+        id: newId,
         containerNumber: "",
         containerType: "20FT",
         runningNumber: newRunningNumber,
@@ -148,8 +160,13 @@ const AddContainer: React.FC<AddContainerProps> = ({
         direction: "Export",
         sector: "QAT-KEN",
         shippingLine: "MSC",
-        loadDate: new Date().toISOString().split('T')[0]
+        loadDate: new Date().toISOString().split('T')[0],
+        jobNumber: ""
       });
+      
+      // Generate a job number placeholder
+      const placeholderJobNumber = generateJobNumber("", "QAT-KEN");
+      setJobNumber(placeholderJobNumber);
     }
   }, [containerData, existingRunningNumbers]);
 
@@ -159,7 +176,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
       [field]: value,
     }));
     
-    // If container number changes, update job number
+    // If container number or sector changes, update job number
     if (field === 'containerNumber' || field === 'sector') {
       const newJobNumber = generateJobNumber(
         field === 'containerNumber' ? value as string : formData.containerNumber,
@@ -172,22 +189,35 @@ const AddContainer: React.FC<AddContainerProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Add job number to form data
-    const completeFormData = {
+    // Add job number to form data and ensure running number is included
+    const completeFormData: QatarContainer = {
       ...formData,
-      jobNumber: jobNumber
+      jobNumber: jobNumber,
+      runningNumber: formData.runningNumber || generateRunningNumber(existingRunningNumbers)
     };
+    
+    // Ensure we have a running number
+    if (!completeFormData.runningNumber) {
+      toast.error("Failed to generate running number");
+      return;
+    }
     
     // Save job number to localStorage
     if (completeFormData.id) {
       localStorage.setItem(`jobNumber_${completeFormData.id}`, jobNumber);
     }
     
-    // Add this running number to our saved list
+    // Add this running number to our saved list if it's a new container
     if (!isEditing && formData.runningNumber) {
-      const updatedNumbers = [...existingRunningNumbers, formData.runningNumber];
-      localStorage.setItem('existingRunningNumbers', JSON.stringify(updatedNumbers));
+      // Make sure the running number is not already in the list
+      if (!existingRunningNumbers.includes(formData.runningNumber)) {
+        const updatedNumbers = [...existingRunningNumbers, formData.runningNumber];
+        localStorage.setItem('existingRunningNumbers', JSON.stringify(updatedNumbers));
+      }
     }
+    
+    // Log the complete form data
+    console.log("Submitting container:", completeFormData);
     
     onSubmit(completeFormData);
   };

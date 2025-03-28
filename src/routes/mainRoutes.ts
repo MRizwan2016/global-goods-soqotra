@@ -2,13 +2,13 @@
 import Dashboard from "@/pages/Dashboard";
 import DataEntry from "@/pages/DataEntry";
 import NotFound from "@/pages/NotFound";
-import Index from "@/pages/Index";
+import Landing from "@/pages/Landing";
 import { RouteConfig } from "./types";
 
 export const mainRoutes: RouteConfig[] = [
   {
     path: "/",
-    element: Index,
+    element: Landing,
     private: false
   },
   {

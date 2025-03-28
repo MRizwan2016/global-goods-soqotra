@@ -28,6 +28,7 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
   const [cargoItems, setCargoItems] = useState<ContainerCargo[]>([]);
   const [totalVolume, setTotalVolume] = useState(0);
   const [totalWeight, setTotalWeight] = useState(0);
+  const [updatedContainer, setUpdatedContainer] = useState<QatarContainer | null>(containerData);
   
   // Initialize the cargo items
   useEffect(() => {
@@ -50,6 +51,11 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
     }
   }, [containerId]);
   
+  // Update container state when the prop changes
+  useEffect(() => {
+    setUpdatedContainer(containerData);
+  }, [containerData]);
+  
   // Update totals when cargo items change
   useEffect(() => {
     const volume = cargoItems.reduce((sum, item) => sum + item.volume, 0);
@@ -70,27 +76,48 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
     toast.success("Item removed from cargo list");
   };
   
+  const handleContainerChange = (updatedData: Partial<QatarContainer>) => {
+    if (updatedContainer) {
+      setUpdatedContainer({
+        ...updatedContainer,
+        ...updatedData
+      });
+    }
+  };
+  
   const handleSave = () => {
     if (cargoItems.length === 0) {
       toast.error("Please add at least one cargo item before proceeding");
       return;
     }
     
-    // In a real app, you would save the cargo items to the database here
-    
-    // Show success message
-    toast.success(`${cargoItems.length} cargo items saved to container`, {
-      description: `Total volume: ${totalVolume.toFixed(3)} m³, Total weight: ${totalWeight.toFixed(2)} kg`
-    });
-    
-    // Mark container as loaded
-    containerData!.packages = cargoItems.length;
-    containerData!.volume = totalVolume;
-    containerData!.weight = totalWeight;
-    containerData!.status = "LOADED";
-    
-    // Call the onLoadComplete callback
-    onLoadComplete();
+    // Create a complete updated container with all necessary values
+    if (updatedContainer) {
+      const containerToSave: QatarContainer = {
+        ...updatedContainer,
+        packages: cargoItems.length,
+        volume: totalVolume,
+        weight: totalWeight,
+        status: "LOADED"
+      };
+      
+      // In a real app, you would save the container to the database
+      console.log("Saving container:", containerToSave);
+      
+      // Save to localStorage for persistence between page refreshes
+      localStorage.setItem(`container_${containerId}`, JSON.stringify(containerToSave));
+      localStorage.setItem(`cargoItems_${containerId}`, JSON.stringify(cargoItems));
+      
+      // Show success message
+      toast.success(`${cargoItems.length} cargo items saved to container`, {
+        description: `Total volume: ${formatVolume(totalVolume)} m³, Total weight: ${formatWeight(totalWeight)} kg`
+      });
+      
+      // Call the onLoadComplete callback with the container ID
+      onLoadComplete();
+    } else {
+      toast.error("Container data is missing");
+    }
   };
   
   const formatVolume = (volume: number): string => {
@@ -124,8 +151,10 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
         </CardHeader>
         
         <CardContent className="p-6">
-          {/* Fix here: Change containerData to container as expected by ContainerDetailsSection */}
-          <ContainerDetailsSection container={containerData} onContainerChange={() => {}} />
+          <ContainerDetailsSection 
+            container={containerData} 
+            onContainerChange={handleContainerChange} 
+          />
           
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
             <TabsList className="grid grid-cols-2 mb-6">
@@ -165,7 +194,6 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
                 </span>
               </div>
               
-              {/* Fix here: Change onRemove to onRemoveCargo as expected by CargoTable */}
               <CargoTable 
                 cargoItems={cargoItems} 
                 onRemoveCargo={handleRemoveCargo}
