@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Banknote } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { getFadeInVariants } from "../../utils/animationVariants";
 
 interface PaymentAmountProps {
   amountPaid: number;
@@ -15,12 +16,14 @@ const PaymentAmount: React.FC<PaymentAmountProps> = ({
   currencySymbol,
   handleInputChange,
 }) => {
+  const fadeWithDelay = getFadeInVariants(0.2);
+  
   return (
     <motion.div 
       className="flex flex-col"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.2 }}
+      initial={fadeWithDelay.initial}
+      animate={fadeWithDelay.animate}
+      transition={fadeWithDelay.transition}
     >
       <label className="text-sm font-medium mb-1 text-gray-700 flex items-center gap-1">
         <Banknote className="h-4 w-4 text-green-600" />

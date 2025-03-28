@@ -1,7 +1,7 @@
 
 import React from "react";
-import { motion } from "framer-motion";
 import AmountDisplay from "./AmountDisplay";
+import { itemVariants } from "../../utils/animationVariants";
 
 interface AmountsSummaryProps {
   formState: {
@@ -20,11 +20,6 @@ const AmountsSummary: React.FC<AmountsSummaryProps> = ({
   currencySymbol,
   handleInputChange,
 }) => {
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 bg-gray-50 p-4 rounded-lg">
       <AmountDisplay

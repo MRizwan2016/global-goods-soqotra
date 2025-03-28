@@ -12,6 +12,16 @@ export interface Invoice {
   netAmount: number;
   totalPaid: number;
   balanceToPay: number;
+  // Additional fields needed for component compatibility
+  date?: string;
+  net?: number;
+  amount?: number;
+  consignee1?: string;
+  shipper1?: string;
+  bookNumber?: string;
+  freightType?: string;
+  gross?: number;
+  paid?: boolean;
 }
 
 export interface FormState {

@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
+import { itemVariants } from "../../utils/animationVariants";
 
 interface AmountDisplayProps {
   label: string;
@@ -28,13 +29,8 @@ const AmountDisplay: React.FC<AmountDisplayProps> = ({
   inputClassName = "bg-white border-gray-200 pl-8",
   symbolClassName = "absolute left-3 top-1/2 -translate-y-1/2 text-gray-500",
 }) => {
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
   return (
-    <motion.div variants={item} className={className}>
+    <motion.div variants={itemVariants} className={className}>
       <label className={labelClassName}>{label}:</label>
       <div className="relative">
         <span className={symbolClassName}>

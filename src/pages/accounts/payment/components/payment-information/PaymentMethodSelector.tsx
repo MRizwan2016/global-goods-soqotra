@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { CreditCard } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getFadeInVariants } from "../../utils/animationVariants";
 
 interface PaymentMethodSelectorProps {
   receivableAccount: string;
@@ -13,12 +14,14 @@ const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
   receivableAccount,
   handleSelectChange,
 }) => {
+  const fadeWithDelay = getFadeInVariants(0.4);
+  
   return (
     <motion.div 
       className="flex flex-col"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
+      initial={fadeWithDelay.initial}
+      animate={fadeWithDelay.animate}
+      transition={fadeWithDelay.transition}
     >
       <label className="text-sm font-medium mb-1 text-gray-700 flex items-center gap-1">
         <CreditCard className="h-4 w-4 text-purple-600" />

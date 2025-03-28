@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import { getFadeInVariants } from "../../utils/animationVariants";
 
 interface PaymentDatePickerProps {
   date: Date;
@@ -17,12 +18,14 @@ const PaymentDatePicker: React.FC<PaymentDatePickerProps> = ({
   date,
   handleDateSelect,
 }) => {
+  const fadeWithDelay = getFadeInVariants(0.3);
+  
   return (
     <motion.div 
       className="flex flex-col"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 }}
+      initial={fadeWithDelay.initial}
+      animate={fadeWithDelay.animate}
+      transition={fadeWithDelay.transition}
     >
       <label className="text-sm font-medium mb-1 text-gray-700 flex items-center gap-1">
         <CalendarIcon className="h-4 w-4 text-teal-600" />

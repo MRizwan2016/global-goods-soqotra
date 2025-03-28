@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Globe, CircleDollarSign } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { fadeInVariants } from "../utils/animationVariants";
 
 interface CountryOption {
   value: string;
@@ -13,8 +14,8 @@ interface CountryOption {
 interface CurrencyOption {
   value: string;
   label: string;
-  symbol: string;
-  countries: string[];
+  symbol?: string;
+  countries?: string[];
 }
 
 interface CountryCurrencySelectorProps {
@@ -35,8 +36,8 @@ const CountryCurrencySelector: React.FC<CountryCurrencySelectorProps> = ({
 }) => {
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={fadeInVariants.initial}
+      animate={fadeInVariants.animate}
       transition={{ delay: 0.2, duration: 0.4 }}
       className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-indigo-100 shadow-inner"
     >

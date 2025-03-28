@@ -2,6 +2,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
+import { fadeInVariants } from "../utils/animationVariants";
 
 // Define the Invoice interface
 interface Invoice {
@@ -31,8 +32,8 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={fadeInVariants.initial}
+      animate={fadeInVariants.animate}
       transition={{ duration: 0.3 }}
       className="border p-4 rounded-md bg-gradient-to-r from-indigo-50 to-purple-50 mb-6 shadow-inner"
     >

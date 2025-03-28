@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { containerVariants, itemVariants } from "../utils/animationVariants";
 
 interface InvoiceFormFieldsProps {
   formState: {
@@ -21,25 +22,10 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
   formState,
   handleInputChange,
 }) => {
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
-
   return (
-    <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
+    <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-        <motion.div variants={item} className="flex flex-col">
+        <motion.div variants={itemVariants} className="flex flex-col">
           <label className="text-sm font-medium mb-1 text-gray-700">INVOICE NUMBER:</label>
           <Input
             name="invoiceNumber"
@@ -50,7 +36,7 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
           />
         </motion.div>
         
-        <motion.div variants={item} className="flex flex-col">
+        <motion.div variants={itemVariants} className="flex flex-col">
           <label className="text-sm font-medium mb-1 text-gray-700">BOOKING FORM:</label>
           <Input
             name="bookingForm"
@@ -61,7 +47,7 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
           />
         </motion.div>
         
-        <motion.div variants={item} className="flex flex-col">
+        <motion.div variants={itemVariants} className="flex flex-col">
           <label className="text-sm font-medium mb-1 text-gray-700">SHIPPER:</label>
           <Input
             name="shipper"
@@ -72,7 +58,7 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
           />
         </motion.div>
         
-        <motion.div variants={item} className="flex flex-col">
+        <motion.div variants={itemVariants} className="flex flex-col">
           <label className="text-sm font-medium mb-1 text-gray-700">CONSIGNEE:</label>
           <Input
             name="consignee"
@@ -83,7 +69,7 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
           />
         </motion.div>
         
-        <motion.div variants={item} className="flex flex-col">
+        <motion.div variants={itemVariants} className="flex flex-col">
           <label className="text-sm font-medium mb-1 text-gray-700">WAREHOUSE:</label>
           <Input
             name="warehouse"
@@ -94,7 +80,7 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
           />
         </motion.div>
         
-        <motion.div variants={item} className="flex flex-col">
+        <motion.div variants={itemVariants} className="flex flex-col">
           <label className="text-sm font-medium mb-1 text-gray-700">SHIPMENT TYPE:</label>
           <Input
             name="shipmentType"
@@ -105,7 +91,7 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
           />
         </motion.div>
         
-        <motion.div variants={item} className="flex flex-col md:col-span-2">
+        <motion.div variants={itemVariants} className="flex flex-col md:col-span-2">
           <label className="text-sm font-medium mb-1 text-gray-700">REMARKS:</label>
           <Textarea
             name="remarks"

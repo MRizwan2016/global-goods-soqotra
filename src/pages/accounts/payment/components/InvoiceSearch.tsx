@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { fadeInVariants } from "../utils/animationVariants";
 
 // Define interface for the invoice object to ensure type safety
 interface Invoice {
@@ -41,10 +42,9 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({
 }) => {
   return (
     <motion.div 
-      variants={{
-        hidden: { opacity: 0, y: 20 },
-        show: { opacity: 1, y: 0 }
-      }}
+      variants={fadeInVariants}
+      initial="hidden"
+      animate="show"
       className="flex gap-4 items-start mb-6"
     >
       <div className="w-full max-w-md relative">

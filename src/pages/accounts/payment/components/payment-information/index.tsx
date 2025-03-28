@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import AmountsSummary from "./AmountsSummary";
 import PaymentControls from "./PaymentControls";
+import { containerVariants } from "../../utils/animationVariants";
 
 interface PaymentInformationProps {
   formState: {
@@ -29,22 +30,12 @@ const PaymentInformation: React.FC<PaymentInformationProps> = ({
   handleDateSelect,
   handleSelectChange,
 }) => {
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
   return (
     <div className="border-t border-dashed border-gray-200 pt-6 mt-6">
       <h3 className="font-medium text-lg mb-4 text-gray-800">Payment Information</h3>
       
       <motion.div
-        variants={container}
+        variants={containerVariants}
         initial="hidden"
         animate="show"
       >
