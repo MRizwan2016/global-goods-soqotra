@@ -108,6 +108,7 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
       packageName: packageName, // Use the package type as set
       volume: typeof invoiceVolume === 'number' ? invoiceVolume : 0.1,
       weight: typeof invoiceWeight === 'number' ? invoiceWeight : 10,
+      quantity: 1, // Added the required property
       shipper,
       consignee: currentInvoiceData?.consignee || shipper,
       wh: "K",

@@ -51,6 +51,7 @@ const CargoLoader: React.FC<CargoLoaderProps> = ({
       packageName,
       volume: 0.1,
       weight: 10,
+      quantity: 1, // Added the required property
       shipper,
       consignee: shipper,
       wh: "K",
