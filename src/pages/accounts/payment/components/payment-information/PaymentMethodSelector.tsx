@@ -1,49 +1,37 @@
 
 import React from "react";
-import { motion } from "framer-motion";
-import { CreditCard } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getFadeInVariants } from "../../utils/animationVariants";
 import { PAYMENT_METHODS } from "../../constants/paymentConstants";
+import { FormState } from "../../types";
 
 interface PaymentMethodSelectorProps {
-  receivableAccount: string;
+  formState: FormState;
   handleSelectChange: (name: string, value: string) => void;
 }
 
 const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
-  receivableAccount,
+  formState,
   handleSelectChange,
 }) => {
-  const fadeWithDelay = getFadeInVariants(0.4);
-  
   return (
-    <motion.div 
-      className="flex flex-col"
-      initial={fadeWithDelay.initial}
-      animate={fadeWithDelay.animate}
-      transition={fadeWithDelay.transition}
-    >
-      <label className="text-sm font-medium mb-1 text-gray-700 flex items-center gap-1">
-        <CreditCard className="h-4 w-4 text-purple-600" />
-        PAYMENT METHOD:
+    <div>
+      <label className="text-sm font-medium mb-1 block text-gray-700">
+        Payment Method:
       </label>
-      <Select
-        value={receivableAccount}
+      <Select 
+        value={formState.receivableAccount} 
         onValueChange={(value) => handleSelectChange("receivableAccount", value)}
       >
-        <SelectTrigger className="border-purple-200 focus:ring-purple-300">
+        <SelectTrigger className="w-full">
           <SelectValue placeholder="Select payment method" />
         </SelectTrigger>
-        <SelectContent className="bg-white z-50">
+        <SelectContent>
           {PAYMENT_METHODS.map((method) => (
-            <SelectItem key={method.id} value={method.id} className="cursor-pointer">
-              {method.name}
-            </SelectItem>
+            <SelectItem key={method.id} value={method.id}>{method.name}</SelectItem>
           ))}
         </SelectContent>
       </Select>
-    </motion.div>
+    </div>
   );
 };
 

@@ -4,14 +4,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Save, ArrowLeft } from "lucide-react";
+import { FormState } from "../types";
 
 interface ActionButtonsProps {
-  formState: {
-    invoiceNumber: string;
-    amountPaid: number;
-    country: string;
-    currency: string;
-  };
+  formState: FormState;
   selectedInvoice: any;
   handleSave: () => void;
 }

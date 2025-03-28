@@ -1,6 +1,6 @@
 
 import { useNavigate } from "react-router-dom";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { FormState } from "../types";
 
 /**
@@ -12,28 +12,22 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
   // Validate form before saving
   const validateForm = (): boolean => {
     if (!formState.invoiceNumber) {
-      toast({
-        title: "Validation Error",
-        description: "Please select an invoice first",
-        variant: "destructive"
+      toast.error("Validation Error", {
+        description: "Please select an invoice first"
       });
       return false;
     }
 
     if (formState.amountPaid <= 0) {
-      toast({
-        title: "Validation Error",
-        description: "Please enter a valid payment amount",
-        variant: "destructive"
+      toast.error("Validation Error", {
+        description: "Please enter a valid payment amount"
       });
       return false;
     }
 
     if (!formState.currency) {
-      toast({
-        title: "Validation Error",
-        description: "Please select a currency",
-        variant: "destructive"
+      toast.error("Validation Error", {
+        description: "Please select a currency"
       });
       return false;
     }
@@ -74,9 +68,8 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
     payments.push(paymentRecord);
     localStorage.setItem('invoicePayments', JSON.stringify(payments));
     
-    toast({
-      title: "Payment Recorded Successfully",
-      description: `Payment of ${currencySymbol}${formState.amountPaid} for invoice ${formState.invoiceNumber} has been recorded.`,
+    toast.success("Payment Recorded Successfully", {
+      description: `Payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded.`,
     });
 
     navigate("/accounts/payments");

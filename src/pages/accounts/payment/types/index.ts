@@ -2,16 +2,16 @@
 export interface Invoice {
   id: string;
   invoiceNumber: string;
-  bookingForm: string;
-  shipper: string;
-  consignee: string;
-  warehouse: string;
-  shipmentType: string;
-  grossAmount: number;
-  discount: number;
-  netAmount: number;
-  totalPaid: number;
-  balanceToPay: number;
+  bookingForm?: string;
+  shipper?: string;
+  consignee?: string;
+  warehouse?: string;
+  shipmentType?: string;
+  grossAmount?: number;
+  discount?: number;
+  netAmount?: number;
+  totalPaid?: number;
+  balanceToPay?: number;
   // Additional fields needed for component compatibility
   date?: string;
   net?: number;

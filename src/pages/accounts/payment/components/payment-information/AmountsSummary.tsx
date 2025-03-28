@@ -1,76 +1,52 @@
 
 import React from "react";
+import { motion } from "framer-motion";
 import AmountDisplay from "./AmountDisplay";
-import { itemVariants } from "../../utils/animationVariants";
+import { FormState } from "../../types";
 
 interface AmountsSummaryProps {
-  formState: {
-    grossAmount: number;
-    discount: number;
-    netAmount: number;
-    totalPaid: number;
-    balanceToPay: number;
-  };
+  formState: FormState;
   currencySymbol: string;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 const AmountsSummary: React.FC<AmountsSummaryProps> = ({
   formState,
   currencySymbol,
-  handleInputChange,
 }) => {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 bg-gray-50 p-4 rounded-lg">
-      <AmountDisplay
-        label="GROSS AMOUNT"
-        name="grossAmount"
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+      <AmountDisplay 
+        label="Gross Amount"
         value={formState.grossAmount}
-        onChange={handleInputChange}
         currencySymbol={currencySymbol}
-        isReadOnly={true}
+        textColor="text-gray-900"
       />
-      
-      <AmountDisplay
-        label="DISCOUNT"
-        name="discount"
+      <AmountDisplay 
+        label="Discount"
         value={formState.discount}
-        onChange={handleInputChange}
         currencySymbol={currencySymbol}
-        isReadOnly={true}
+        textColor="text-blue-600"
       />
-      
-      <AmountDisplay
-        label="NET AMOUNT"
-        name="netAmount"
+      <AmountDisplay 
+        label="Net Amount"
         value={formState.netAmount}
-        onChange={handleInputChange}
         currencySymbol={currencySymbol}
-        isReadOnly={true}
-        labelClassName="text-sm font-medium mb-1 text-gray-700"
-        inputClassName="bg-indigo-50 border-indigo-100 font-bold text-indigo-800 pl-8"
-        symbolClassName="absolute left-3 top-1/2 -translate-y-1/2 text-indigo-600 font-bold"
+        textColor="text-indigo-700"
+        isBold={true}
       />
-      
-      <AmountDisplay
-        label="TOTAL PAID"
-        name="totalPaid"
+      <AmountDisplay 
+        label="Total Paid"
         value={formState.totalPaid}
-        onChange={handleInputChange}
         currencySymbol={currencySymbol}
-        isReadOnly={true}
+        textColor="text-green-600"
       />
-      
-      <AmountDisplay
-        label="BALANCE TO PAY"
-        name="balanceToPay"
+      <AmountDisplay 
+        label="Balance to Pay"
         value={formState.balanceToPay}
-        onChange={handleInputChange}
         currencySymbol={currencySymbol}
-        isReadOnly={true}
-        labelClassName="text-sm font-medium mb-1 text-gray-700"
-        inputClassName="bg-amber-50 border-amber-100 font-bold text-amber-800 pl-8"
-        symbolClassName="absolute left-3 top-1/2 -translate-y-1/2 text-amber-600 font-bold"
+        textColor={formState.balanceToPay > 0 ? "text-amber-600" : "text-green-600"}
+        isBold={true}
+        className="col-span-2 md:col-span-1"
       />
     </div>
   );

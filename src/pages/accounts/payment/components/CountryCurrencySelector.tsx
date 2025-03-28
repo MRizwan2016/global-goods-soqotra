@@ -1,27 +1,15 @@
+
 import React from "react";
 import { motion } from "framer-motion";
-import { Globe, CircleDollarSign } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { FormState } from "../types";
 import { fadeInVariants } from "../utils/animationVariants";
-import { COUNTRY_CURRENCY_MAP } from "../constants/paymentConstants";
-
-type CountryOption = typeof COUNTRY_CURRENCY_MAP[number];
-
-interface CurrencyOption {
-  value: string;
-  label: string;
-  symbol?: string;
-  countries?: string[];
-}
 
 interface CountryCurrencySelectorProps {
-  formState: {
-    country: string;
-    currency: string;
-  };
+  formState: FormState;
   handleSelectChange: (name: string, value: string) => void;
-  countryOptions: readonly CountryOption[];
-  filteredCurrencies: CurrencyOption[];
+  countryOptions: string[];
+  filteredCurrencies: string[];
 }
 
 const CountryCurrencySelector: React.FC<CountryCurrencySelectorProps> = ({
@@ -32,59 +20,47 @@ const CountryCurrencySelector: React.FC<CountryCurrencySelectorProps> = ({
 }) => {
   return (
     <motion.div 
-      initial={fadeInVariants.initial}
-      animate={fadeInVariants.animate}
-      transition={{ delay: 0.2, duration: 0.4 }}
-      className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-indigo-100 shadow-inner"
+      variants={fadeInVariants}
+      initial="hidden"
+      animate="show"
+      className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"
     >
-      <h3 className="font-medium mb-3 text-indigo-800 flex items-center gap-2">
-        <Globe className="h-5 w-5 text-purple-500" />
-        Country and Currency Selection
-      </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-            <Globe className="h-4 w-4 text-indigo-600" />
-            Country Office:
-          </label>
-          <Select
-            value={formState.country}
-            onValueChange={(value) => handleSelectChange("country", value)}
-          >
-            <SelectTrigger className="border-indigo-200 focus:ring-indigo-300">
-              <SelectValue placeholder="Select country" />
-            </SelectTrigger>
-            <SelectContent className="bg-white z-50">
-              {countryOptions.map((country) => (
-                <SelectItem key={country.value} value={country.value} className="cursor-pointer">
-                  {country.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-            <CircleDollarSign className="h-4 w-4 text-green-600" />
-            Currency:
-          </label>
-          <Select
-            value={formState.currency}
-            onValueChange={(value) => handleSelectChange("currency", value)}
-          >
-            <SelectTrigger className="border-green-200 focus:ring-green-300">
-              <SelectValue placeholder="Select currency" />
-            </SelectTrigger>
-            <SelectContent className="bg-white z-50">
-              {filteredCurrencies.map((currency) => (
-                <SelectItem key={currency.value} value={currency.value} className="cursor-pointer">
-                  {currency.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div>
+        <label className="text-sm font-medium mb-1 block text-gray-700">
+          Country:
+        </label>
+        <Select 
+          value={formState.country} 
+          onValueChange={(value) => handleSelectChange("country", value)}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a country" />
+          </SelectTrigger>
+          <SelectContent>
+            {countryOptions.map((country) => (
+              <SelectItem key={country} value={country}>{country}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div>
+        <label className="text-sm font-medium mb-1 block text-gray-700">
+          Currency:
+        </label>
+        <Select 
+          value={formState.currency} 
+          onValueChange={(value) => handleSelectChange("currency", value)}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select a currency" />
+          </SelectTrigger>
+          <SelectContent>
+            {filteredCurrencies.map((currency) => (
+              <SelectItem key={currency} value={currency}>{currency}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </motion.div>
   );

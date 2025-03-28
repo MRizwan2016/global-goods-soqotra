@@ -1,60 +1,49 @@
 
 import React from "react";
-import { motion } from "framer-motion";
-import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getFadeInVariants } from "../../utils/animationVariants";
 
 interface PaymentDatePickerProps {
   date: Date;
-  handleDateSelect: (selectedDate: Date | undefined) => void;
+  handleDateSelect: (date: Date | undefined) => void;
 }
 
 const PaymentDatePicker: React.FC<PaymentDatePickerProps> = ({
   date,
   handleDateSelect,
 }) => {
-  const fadeWithDelay = getFadeInVariants(0.3);
-  
   return (
-    <motion.div 
-      className="flex flex-col"
-      initial={fadeWithDelay.initial}
-      animate={fadeWithDelay.animate}
-      transition={fadeWithDelay.transition}
-    >
-      <label className="text-sm font-medium mb-1 text-gray-700 flex items-center gap-1">
-        <CalendarIcon className="h-4 w-4 text-teal-600" />
-        PAYMENT DATE:
+    <div>
+      <label className="text-sm font-medium mb-1 block text-gray-700">
+        Payment Date:
       </label>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant="outline"
             className={cn(
-              "w-full justify-start text-left font-normal border-teal-200 hover:bg-teal-50",
+              "w-full justify-start text-left font-normal",
               !date && "text-muted-foreground"
             )}
           >
-            <CalendarIcon className="mr-2 h-4 w-4 text-teal-500" />
+            <CalendarIcon className="mr-2 h-4 w-4" />
             {date ? format(date, "PPP") : <span>Pick a date</span>}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 z-50" align="start">
+        <PopoverContent className="w-auto p-0">
           <Calendar
             mode="single"
             selected={date}
             onSelect={handleDateSelect}
             initialFocus
-            className="p-3 pointer-events-auto"
           />
         </PopoverContent>
       </Popover>
-    </motion.div>
+    </div>
   );
 };
 

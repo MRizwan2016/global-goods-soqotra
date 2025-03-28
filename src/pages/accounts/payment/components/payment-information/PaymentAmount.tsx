@@ -1,47 +1,39 @@
 
 import React from "react";
-import { motion } from "framer-motion";
-import { Banknote } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { getFadeInVariants } from "../../utils/animationVariants";
+import { FormState } from "../../types";
 
 interface PaymentAmountProps {
-  amountPaid: number;
+  formState: FormState;
   currencySymbol: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
 const PaymentAmount: React.FC<PaymentAmountProps> = ({
-  amountPaid,
+  formState,
   currencySymbol,
   handleInputChange,
 }) => {
-  const fadeWithDelay = getFadeInVariants(0.2);
-  
   return (
-    <motion.div 
-      className="flex flex-col"
-      initial={fadeWithDelay.initial}
-      animate={fadeWithDelay.animate}
-      transition={fadeWithDelay.transition}
-    >
-      <label className="text-sm font-medium mb-1 text-gray-700 flex items-center gap-1">
-        <Banknote className="h-4 w-4 text-green-600" />
-        AMOUNT PAID:
+    <div>
+      <label className="text-sm font-medium mb-1 block text-gray-700">
+        Amount Paid:
       </label>
       <div className="relative">
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-green-600">
-          {currencySymbol}
-        </span>
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+          <span className="text-gray-500">{currencySymbol}</span>
+        </div>
         <Input
           name="amountPaid"
-          value={amountPaid.toString()}
-          onChange={handleInputChange}
           type="number"
-          className="border-green-200 focus-visible:ring-green-300 font-medium pl-8"
+          value={formState.amountPaid}
+          onChange={handleInputChange}
+          className="pl-8"
+          min={0}
+          step={0.01}
         />
       </div>
-    </motion.div>
+    </div>
   );
 };
 

@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { CreditCard, FileText } from "lucide-react";
 import PaymentActionButton from "@/components/payment/PaymentActionButton";
 import ReceiptView from "@/components/payment/ReceiptView";
+import { useNavigate } from "react-router-dom";
 
 interface InvoiceTableProps {
   status: "unpaid" | "partial" | "paid";
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({ status }) => {
+  const navigate = useNavigate();
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [selectedReceipt, setSelectedReceipt] = useState<any>(null);
 
@@ -25,6 +27,21 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ status }) => {
       remarks: invoice.remarks || "",
     });
     setIsReceiptOpen(true);
+  };
+
+  const handleCollectPayment = (invoice: any) => {
+    // Save invoice to session storage for payment page
+    sessionStorage.setItem('selectedInvoice', JSON.stringify({
+      id: invoice.id,
+      invoiceNumber: invoice.id,
+      shipper: "Shipper Company",
+      consignee: invoice.customer,
+      amount: invoice.amount,
+      paid: false
+    }));
+    
+    // Navigate to payment page
+    navigate('/accounts/add-payment');
   };
 
   return (
@@ -83,7 +100,15 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ status }) => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <PaymentActionButton type="collect" onClick={() => {}} />
+                  <PaymentActionButton 
+                    type="collect" 
+                    onClick={() => handleCollectPayment({
+                      id: "INV-1001",
+                      date: "2023-05-15",
+                      customer: "Ahmed Mohamed",
+                      amount: 1500.00
+                    })} 
+                  />
                 </td>
               </tr>
               <tr>
@@ -97,7 +122,15 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ status }) => {
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <PaymentActionButton type="collect" onClick={() => {}} />
+                  <PaymentActionButton 
+                    type="collect" 
+                    onClick={() => handleCollectPayment({
+                      id: "INV-1002",
+                      date: "2023-05-10",
+                      customer: "Sara Ali",
+                      amount: 2250.00
+                    })} 
+                  />
                 </td>
               </tr>
             </>
@@ -116,7 +149,17 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({ status }) => {
                 </span>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <PaymentActionButton type="complete" onClick={() => {}} />
+                <PaymentActionButton 
+                  type="complete" 
+                  onClick={() => handleCollectPayment({
+                    id: "INV-1003",
+                    date: "2023-05-08",
+                    customer: "Mohammed Khalid",
+                    amount: 1500.00, // Remaining amount
+                    totalAmount: 3000.00,
+                    paidAmount: 1500.00
+                  })} 
+                />
               </td>
             </tr>
           )}

@@ -1,42 +1,60 @@
 
 import { useState, useEffect } from "react";
-import { COUNTRY_CURRENCY_MAP, type CountryCode } from "../constants/paymentConstants";
+import { COUNTRY_CURRENCY_MAP } from "../constants/paymentConstants";
 
-// Define types to match the readonly constants
-type CountryOption = typeof COUNTRY_CURRENCY_MAP[number];
-type CurrencyOption = { label: string; value: string };
-
+/**
+ * Hook for managing country and currency selection
+ */
 export const useCurrencyCountry = () => {
-  const [selectedCountry, setSelectedCountry] = useState<CountryCode>("Qatar");
-  const [currencySymbol, setCurrencySymbol] = useState<string>("QAR");
+  const [selectedCountry, setSelectedCountry] = useState<string>("Qatar");
+  const [filteredCurrencies, setFilteredCurrencies] = useState<string[]>(["QAR"]);
+  const [currencySymbol, setCurrencySymbol] = useState<string>("QR");
   
-  // Country options from constants
-  const countryOptions = COUNTRY_CURRENCY_MAP;
+  // All country options from the map
+  const countryOptions = Object.keys(COUNTRY_CURRENCY_MAP);
   
-  // Currencies filtered by country
-  const [filteredCurrencies, setFilteredCurrencies] = useState<CurrencyOption[]>([
-    { label: "QAR", value: "QAR" }
-  ]);
-  
-  // Update currencies when country changes
   useEffect(() => {
-    const country = countryOptions.find(c => c.value === selectedCountry);
-    if (country) {
-      setCurrencySymbol(country.currency);
-      setFilteredCurrencies([{ label: country.currency, value: country.currency }]);
+    // Get currencies for the selected country
+    if (selectedCountry) {
+      setFilteredCurrencies(COUNTRY_CURRENCY_MAP[selectedCountry] || []);
     }
   }, [selectedCountry]);
   
+  // Update currency symbol when currency changes
+  useEffect(() => {
+    if (filteredCurrencies.length > 0) {
+      const currency = filteredCurrencies[0];
+      
+      if (currency === "USD") {
+        setCurrencySymbol("$");
+      } else if (currency === "EUR") {
+        setCurrencySymbol("€");
+      } else if (currency === "QAR") {
+        setCurrencySymbol("QR");
+      } else if (currency === "AED") {
+        setCurrencySymbol("AED");
+      } else if (currency === "KES") {
+        setCurrencySymbol("KSh");
+      } else if (currency === "INR") {
+        setCurrencySymbol("₹");
+      } else if (currency === "LKR") {
+        setCurrencySymbol("Rs");
+      } else {
+        setCurrencySymbol(currency);
+      }
+    }
+  }, [filteredCurrencies]);
+  
   // Handle country change
-  const handleCountryChange = (country: CountryCode) => {
+  const handleCountryChange = (country: string) => {
     setSelectedCountry(country);
   };
   
   return {
     selectedCountry,
-    handleCountryChange,
     currencySymbol,
     countryOptions,
-    filteredCurrencies
+    filteredCurrencies,
+    handleCountryChange
   };
 };

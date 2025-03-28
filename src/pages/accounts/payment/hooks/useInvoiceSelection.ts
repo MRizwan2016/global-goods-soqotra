@@ -1,5 +1,5 @@
 
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { FormState } from "../types";
 import { Invoice } from "../types";
 
@@ -36,8 +36,7 @@ export const useInvoiceSelection = (
     }));
     
     setShowInvoiceSelector(false);
-    toast({
-      title: "Invoice Selected",
+    toast.success("Invoice Selected", {
       description: `Invoice ${invoice.invoiceNumber} has been loaded`,
     });
   };

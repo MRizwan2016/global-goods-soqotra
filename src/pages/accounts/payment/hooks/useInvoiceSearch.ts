@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Invoice } from "../types";
 
 export const useInvoiceSearch = () => {
@@ -7,6 +7,21 @@ export const useInvoiceSearch = () => {
   const [matchingInvoices, setMatchingInvoices] = useState<Invoice[]>([]);
   const [showInvoiceSelector, setShowInvoiceSelector] = useState<boolean>(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+
+  // Check if there's a stored invoice from another component
+  useEffect(() => {
+    const storedInvoice = sessionStorage.getItem('selectedInvoice');
+    if (storedInvoice) {
+      try {
+        const parsedInvoice = JSON.parse(storedInvoice);
+        setSelectedInvoice(parsedInvoice);
+        // Clear from session storage to prevent reuse
+        sessionStorage.removeItem('selectedInvoice');
+      } catch (error) {
+        console.error("Error parsing stored invoice:", error);
+      }
+    }
+  }, []);
 
   // Handle invoice search
   const handleInvoiceSearch = () => {
@@ -49,7 +64,16 @@ export const useInvoiceSearch = () => {
       }
     ];
 
-    setMatchingInvoices(mockInvoices);
+    // Also get stored invoices from local storage
+    const storedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
+    const filteredStoredInvoices = storedInvoices.filter((inv: any) => 
+      inv.invoiceNumber && inv.invoiceNumber.toLowerCase().includes(invoicePrefix.toLowerCase())
+    );
+
+    // Combine mock and stored invoices
+    const allInvoices = [...mockInvoices, ...filteredStoredInvoices];
+    
+    setMatchingInvoices(allInvoices);
     setShowInvoiceSelector(true);
   };
 
