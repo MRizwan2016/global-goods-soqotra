@@ -26,7 +26,8 @@ export const useInvoicePayment = () => {
     selectedCountry,
     currencySymbol,
     countryOptions,
-    filteredCurrencies
+    filteredCurrencies,
+    handleCountryChange
   } = useCurrencyCountry();
 
   // Use payment form management
@@ -63,6 +64,7 @@ export const useInvoicePayment = () => {
     handleDateSelect,
     handleInvoiceSearch,
     handleSelectInvoice,
-    handleSave
+    handleSave,
+    handleCountryChange
   };
 };

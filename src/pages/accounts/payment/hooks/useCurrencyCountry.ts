@@ -1,16 +1,20 @@
 
 import { useState, useEffect } from "react";
-import { COUNTRY_CURRENCY_MAP } from "../constants/paymentConstants";
+import { COUNTRY_CURRENCY_MAP, type CountryCode } from "../constants/paymentConstants";
+
+// Define types to match the readonly constants
+type CountryOption = typeof COUNTRY_CURRENCY_MAP[number];
+type CurrencyOption = { label: string; value: string };
 
 export const useCurrencyCountry = () => {
-  const [selectedCountry, setSelectedCountry] = useState<string>("Qatar");
+  const [selectedCountry, setSelectedCountry] = useState<CountryCode>("Qatar");
   const [currencySymbol, setCurrencySymbol] = useState<string>("QAR");
   
   // Country options from constants
   const countryOptions = COUNTRY_CURRENCY_MAP;
   
   // Currencies filtered by country
-  const [filteredCurrencies, setFilteredCurrencies] = useState<{ label: string; value: string }[]>([
+  const [filteredCurrencies, setFilteredCurrencies] = useState<CurrencyOption[]>([
     { label: "QAR", value: "QAR" }
   ]);
   
@@ -24,7 +28,7 @@ export const useCurrencyCountry = () => {
   }, [selectedCountry]);
   
   // Handle country change
-  const handleCountryChange = (country: string) => {
+  const handleCountryChange = (country: CountryCode) => {
     setSelectedCountry(country);
   };
   

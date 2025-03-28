@@ -1,15 +1,11 @@
-
 import React from "react";
 import { motion } from "framer-motion";
 import { Globe, CircleDollarSign } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { fadeInVariants } from "../utils/animationVariants";
+import { COUNTRY_CURRENCY_MAP } from "../constants/paymentConstants";
 
-interface CountryOption {
-  value: string;
-  label: string;
-  currency: string;
-}
+type CountryOption = typeof COUNTRY_CURRENCY_MAP[number];
 
 interface CurrencyOption {
   value: string;
@@ -24,7 +20,7 @@ interface CountryCurrencySelectorProps {
     currency: string;
   };
   handleSelectChange: (name: string, value: string) => void;
-  countryOptions: CountryOption[];
+  countryOptions: readonly CountryOption[];
   filteredCurrencies: CurrencyOption[];
 }
 
