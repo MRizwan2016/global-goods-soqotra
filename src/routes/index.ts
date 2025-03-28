@@ -9,6 +9,7 @@ import { adminRoutes } from "./adminRoutes";
 import { authRoutes } from "./authRoutes";
 import { printDocumentsRoutes } from "./printDocumentsRoutes";
 import { mainRoutes } from "./mainRoutes";
+import { paymentReceivableRoutes } from "./paymentReceivableRoutes";
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 
@@ -33,4 +34,5 @@ export const routes: RouteConfig[] = [
   ...qatarRoutes,
   ...accountsRoutes,
   ...adminRoutes,
+  ...paymentReceivableRoutes, // Make sure paymentReceivableRoutes are included
 ];
