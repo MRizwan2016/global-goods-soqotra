@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs } from "@/components/ui/tabs";
 import useContainerManifest from "../../hooks/useContainerManifest";
@@ -35,6 +35,7 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     activeTab,
     setActiveTab,
     printViewVisible,
+    setPrintViewVisible,
     printOptions,
     setPrintOptions,
     isLoading,
@@ -51,6 +52,14 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     handlePrint
   } = useContainerManifest(containerId, onManifestSubmitted);
   
+  // Add effect to handle cleanup when component unmounts
+  useEffect(() => {
+    return () => {
+      // Remove print-only class from body when component unmounts
+      document.body.classList.remove('print-only-manifest');
+    };
+  }, []);
+  
   // Show both print view and regular view when printing
   // This ensures the print view is generated properly while still showing the UI
   if (isLoading) {
@@ -66,7 +75,7 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     <>
       {/* Print view - hidden by default in regular view mode, shown when printing */}
       {printViewVisible && container && (
-        <div className="print-only">
+        <div className="print-only" id="container-manifest-print-view">
           <PrintContainerManifest 
             container={container}
             cargoItems={cargoItems}

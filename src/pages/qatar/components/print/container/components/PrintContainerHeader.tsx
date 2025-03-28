@@ -27,24 +27,35 @@ const PrintContainerHeader: React.FC<PrintContainerHeaderProps> = ({
   return (
     <>
       <div className="print-header">
-        <div className="logo-container">
-          <img src="/soqotra-logo.png" alt="SOQOTRA LOGO" className="h-16" />
+        <div className="logo-container flex justify-center mb-4">
+          <img 
+            src="/soqotra-logo.png" 
+            alt="SOQOTRA LOGO" 
+            className="h-16 w-auto"
+            style={{ maxWidth: '200px' }}
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.onerror = null; // Prevent infinite loop
+              target.style.display = 'none';
+              console.error('Failed to load logo image');
+            }}
+          />
         </div>
         <h1 className="text-xl font-bold text-center my-4 uppercase">CONTAINER MANIFEST</h1>
       </div>
       
-      <div className="container-details p-4 border rounded-md mb-6">
+      <div className="container-details p-4 border border-gray-300 rounded-md mb-6 bg-gray-50">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <p><strong>CONTAINER NUMBER:</strong> {containerNumber}</p>
-            <p><strong>CONTAINER TYPE:</strong> {containerType}</p>
-            <p><strong>SEAL NUMBER:</strong> {sealNumber || "N/A"}</p>
+            <p className="mb-2"><strong>CONTAINER NUMBER:</strong> {containerNumber}</p>
+            <p className="mb-2"><strong>CONTAINER TYPE:</strong> {containerType}</p>
+            <p className="mb-2"><strong>SEAL NUMBER:</strong> {sealNumber || "N/A"}</p>
           </div>
           <div>
-            <p><strong>CONFIRMATION DATE:</strong> {confirmDate}</p>
-            <p><strong>TOTAL PACKAGES:</strong> {totalPackages}</p>
-            <p><strong>TOTAL VOLUME:</strong> {formatVolume(totalVolume)} m³</p>
-            <p><strong>TOTAL WEIGHT:</strong> {formatWeight(totalWeight)} kg</p>
+            <p className="mb-2"><strong>CONFIRMATION DATE:</strong> {confirmDate}</p>
+            <p className="mb-2"><strong>TOTAL PACKAGES:</strong> {totalPackages}</p>
+            <p className="mb-2"><strong>TOTAL VOLUME:</strong> {formatVolume(totalVolume)} m³</p>
+            <p className="mb-2"><strong>TOTAL WEIGHT:</strong> {formatWeight(totalWeight)} kg</p>
           </div>
         </div>
       </div>

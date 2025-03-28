@@ -22,12 +22,35 @@ export const useManifestConfirmation = (container: QatarContainer | null, contai
       if (containerIndex >= 0) {
         mockContainers[containerIndex].status = "CONFIRMED";
         mockContainers[containerIndex].confirmDate = confirmDate;
+        
+        // Save additional data that might be needed for printing
+        if (!mockContainers[containerIndex].packages) {
+          // Calculate total packages if not already set
+          const packages = container.cargoItems?.length || 0;
+          mockContainers[containerIndex].packages = packages;
+        }
+        
+        if (!mockContainers[containerIndex].volume) {
+          // Calculate total volume if not already set
+          const volume = container.cargoItems?.reduce((sum, item) => sum + Number(item.volume), 0) || 0;
+          mockContainers[containerIndex].volume = volume;
+        }
+        
+        if (!mockContainers[containerIndex].weight) {
+          // Calculate total weight if not already set
+          const weight = container.cargoItems?.reduce((sum, item) => sum + Number(item.weight), 0) || 0;
+          mockContainers[containerIndex].weight = weight;
+        }
+        
         // In a real app, we would save to the backend
       }
       
       // Store the containerId in localStorage so we can retrieve it later
       // This ensures the manifest can be viewed after being confirmed
       localStorage.setItem('lastConfirmedContainerId', containerId);
+      
+      // Also store the confirmed date for reference
+      localStorage.setItem(`container_${containerId}_confirmDate`, confirmDate);
       
       // Notify parent of successful submission
       onManifestSubmitted();

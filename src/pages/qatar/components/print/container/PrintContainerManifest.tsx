@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, PrintOptions, UnsettledInvoice } from "../../../types/containerTypes";
 import PrintStyles from "../PrintStyles";
 import { 
@@ -36,6 +36,7 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
   printOptions,
   unsettledInvoices = []
 }) => {
+  const printRef = useRef<HTMLDivElement>(null);
   const formatVolume = (volume: number) => volume.toFixed(3);
   const formatWeight = (weight: number) => weight.toFixed(2);
   
@@ -44,11 +45,15 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
     // Force layout recalculation to ensure the content is properly rendered
     window.dispatchEvent(new Event('resize'));
     
+    console.log('PrintContainerManifest mounted with container:', container.containerNumber);
+    console.log('Print options:', printOptions);
+    console.log('Cargo items count:', cargoItems.length);
+    
     // Return cleanup function
     return () => {
       // Nothing to clean up
     };
-  }, []);
+  }, [container, printOptions, cargoItems.length]);
   
   // Function to determine if a section should be shown
   const shouldShowSection = (section: "cargo" | "items" | "consignees" | "invoices") => {
@@ -56,10 +61,14 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
   };
   
   return (
-    <div className={`print-container ${printOptions.orientation === "landscape" ? "landscape" : "portrait"}`}>
+    <div 
+      ref={printRef}
+      className={`print-manifest w-full ${printOptions.orientation === "landscape" ? "landscape" : "portrait"}`}
+      id="print-container-manifest"
+    >
       <PrintStyles orientation={printOptions.orientation} />
       
-      <div className="print-manifest">
+      <div className="print-content">
         <PrintContainerHeader 
           containerNumber={container.containerNumber}
           containerType={container.containerType}
@@ -100,6 +109,12 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
             formatCurrency={formatCurrency}
           />
         )}
+        
+        {/* Footer with timestamp */}
+        <div className="print-footer mt-8 text-sm text-gray-500 text-center">
+          <p>Printed on: {new Date().toLocaleString()}</p>
+          <p>SOQOTRA Shipping & Logistics</p>
+        </div>
       </div>
     </div>
   );

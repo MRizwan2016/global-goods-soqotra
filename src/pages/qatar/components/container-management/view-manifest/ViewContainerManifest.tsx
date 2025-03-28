@@ -1,12 +1,13 @@
-
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, UnsettledInvoice, PrintOptions } from "../../../types/containerTypes";
-import { ArrowLeft, Printer, FileText } from "lucide-react";
+import { ArrowLeft, Printer } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import PrintContainerManifest from "../../print/container/PrintContainerManifest";
+import PrintStyles from "../../print/PrintStyles";
 
 interface ViewContainerManifestProps {
   container: QatarContainer;
@@ -31,8 +32,60 @@ const ViewContainerManifest: React.FC<ViewContainerManifestProps> = ({
   onPrintOptionsChange,
   onPrint
 }) => {
+  const [isPrinting, setIsPrinting] = useState(false);
+  const [showPrintView, setShowPrintView] = useState(false);
+  
+  const totalVolume = cargoItems.reduce((sum, item) => sum + Number(item.volume), 0);
+  const totalWeight = cargoItems.reduce((sum, item) => sum + Number(item.weight), 0);
+  const totalPackages = cargoItems.reduce((sum, item) => sum + 1, 0);
+  
+  useEffect(() => {
+    return () => {
+      document.body.classList.remove('print-only-manifest');
+    };
+  }, []);
+  
+  const handlePrintClick = () => {
+    setIsPrinting(true);
+    setShowPrintView(true);
+    
+    document.body.classList.add('print-only-manifest');
+    
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+      
+      console.log('Preparing to print manifest for container:', container.containerNumber);
+      
+      setTimeout(() => {
+        console.log('Triggering print dialog');
+        window.print();
+        
+        setTimeout(() => {
+          setIsPrinting(false);
+        }, 1000);
+      }, 300);
+    }, 500);
+  };
+
   return (
     <div className="p-6">
+      {showPrintView && (
+        <div className="print-only" id="view-manifest-print-container">
+          <PrintContainerManifest 
+            container={container}
+            cargoItems={cargoItems}
+            itemList={itemList}
+            consigneeList={consigneeList}
+            unsettledInvoices={unsettledInvoices}
+            totalVolume={totalVolume}
+            totalWeight={totalWeight}
+            totalPackages={totalPackages}
+            confirmDate={container.confirmDate || new Date().toLocaleDateString()}
+            printOptions={printOptions}
+          />
+        </div>
+      )}
+      
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={onBack} className="no-print">
@@ -83,9 +136,13 @@ const ViewContainerManifest: React.FC<ViewContainerManifestProps> = ({
             </Select>
           </div>
           
-          <Button onClick={onPrint} className="ml-4">
+          <Button 
+            onClick={handlePrintClick} 
+            className="ml-4"
+            disabled={isPrinting}
+          >
             <Printer className="h-4 w-4 mr-2" />
-            Print Manifest
+            {isPrinting ? "Preparing..." : "Print Manifest"}
           </Button>
         </div>
       </div>
@@ -298,6 +355,8 @@ const ViewContainerManifest: React.FC<ViewContainerManifestProps> = ({
           </Card>
         </TabsContent>
       </Tabs>
+      
+      <PrintStyles orientation={printOptions.orientation} />
     </div>
   );
 };
