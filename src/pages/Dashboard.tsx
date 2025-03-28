@@ -58,7 +58,7 @@ const Dashboard = () => {
               <div className="p-6">
                 <h3 className="text-2xl font-bold mb-4">Kenya</h3>
                 <Link 
-                  to="/destinations/kenya" 
+                  to="/kenya" 
                   className="flex items-center gap-1 text-white hover:underline"
                 >
                   View Details 

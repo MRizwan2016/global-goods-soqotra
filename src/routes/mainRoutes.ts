@@ -3,6 +3,7 @@ import Dashboard from "@/pages/Dashboard";
 import DataEntry from "@/pages/DataEntry";
 import NotFound from "@/pages/NotFound";
 import Landing from "@/pages/Landing";
+import DestinationWrapper from "@/pages/destinations/DestinationWrapper";
 import { RouteConfig } from "./types";
 
 export const mainRoutes: RouteConfig[] = [
@@ -19,6 +20,11 @@ export const mainRoutes: RouteConfig[] = [
   {
     path: "/data-entry",
     element: DataEntry,
+    private: true
+  },
+  {
+    path: "/destinations/:country",
+    element: DestinationWrapper,
     private: true
   },
   {
