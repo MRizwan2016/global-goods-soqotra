@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { PrintOptions, QatarContainer } from "../../../types/containerTypes";
 import { ArrowLeft } from "lucide-react";
@@ -74,12 +73,12 @@ const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
       <div className="print-container">
         <ContentTabs 
           activeTab={activeTab}
-          setActiveTab={setActiveTab}
           cargoItems={cargoItems}
           itemList={itemList}
           consigneeList={consigneeList}
           unsettledInvoices={unsettledInvoices}
           container={container}
+          printOptions={printOptions}
         />
       </div>
       

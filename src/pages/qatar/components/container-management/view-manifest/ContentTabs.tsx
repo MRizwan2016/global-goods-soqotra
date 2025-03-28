@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PrintOptions, ContainerCargo, ItemListEntry, ConsigneeListItem, UnsettledInvoice } from "../../../types/containerTypes";
+import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, UnsettledInvoice, PrintOptions } from "../../../types/containerTypes";
 import CargoItemsTab from "./tabs/CargoItemsTab";
 import ItemListTab from "./tabs/ItemListTab";
 import ConsigneeListTab from "./tabs/ConsigneeListTab";
@@ -9,11 +9,13 @@ import UnsettledInvoicesTab from "./tabs/UnsettledInvoicesTab";
 
 interface ContentTabsProps {
   activeTab?: string;
+  setActiveTab?: React.Dispatch<React.SetStateAction<string>>;
   cargoItems: ContainerCargo[];
   itemList: ItemListEntry[];
   consigneeList: ConsigneeListItem[];
   unsettledInvoices: UnsettledInvoice[];
-  printOptions: PrintOptions;
+  container?: QatarContainer | null;
+  printOptions?: PrintOptions;
 }
 
 const ContentTabs: React.FC<ContentTabsProps> = ({
@@ -22,7 +24,7 @@ const ContentTabs: React.FC<ContentTabsProps> = ({
   itemList,
   consigneeList,
   unsettledInvoices,
-  printOptions
+  printOptions = { section: "all", orientation: "portrait" }
 }) => {
   return (
     <Tabs defaultValue={activeTab} className="print-tabs">
