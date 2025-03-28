@@ -34,7 +34,7 @@ const ConsigneeListTab: React.FC<ConsigneeListTabProps> = ({ consigneeList }) =>
                     <td className="p-2 border">{item.shipperContact || 'N/A'}</td>
                     <td className="p-2 border">{item.consignee}</td>
                     <td className="p-2 border">{item.consigneeContact || 'N/A'}</td>
-                    <td className="p-2 border">{item.volume.toFixed(2)} m³</td>
+                    <td className="p-2 border">{item.volume}</td>
                   </tr>
                 ))
               ) : (

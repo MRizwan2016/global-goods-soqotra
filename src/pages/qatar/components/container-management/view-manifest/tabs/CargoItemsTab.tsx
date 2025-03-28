@@ -14,38 +14,36 @@ const CargoItemsTab: React.FC<CargoItemsTabProps> = ({ cargoItems }) => {
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse border">
+          <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-gray-100 border-b">
-                <th className="p-2 text-left border">INVOICE</th>
-                <th className="p-2 text-left border">BARCODE</th>
-                <th className="p-2 text-left border">PACKAGE</th>
-                <th className="p-2 text-left border">VOLUME</th>
-                <th className="p-2 text-left border">WEIGHT</th>
-                <th className="p-2 text-left border">SHIPPER</th>
-                <th className="p-2 text-left border">CONSIGNEE</th>
+              <tr className="bg-blue-600 text-white">
+                <th className="p-2 text-left">Invoice #</th>
+                <th className="p-2 text-left">Line #</th>
+                <th className="p-2 text-left">Barcode</th>
+                <th className="p-2 text-left">Package</th>
+                <th className="p-2 text-left">Volume (m³)</th>
+                <th className="p-2 text-left">Weight (kg)</th>
+                <th className="p-2 text-left">Shipper</th>
+                <th className="p-2 text-left">Consignee</th>
+                <th className="p-2 text-left">WH</th>
+                <th className="p-2 text-left">D2D</th>
               </tr>
             </thead>
             <tbody>
-              {cargoItems && cargoItems.length > 0 ? (
-                cargoItems.map((item) => (
-                  <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors">
-                    <td className="p-2 border">{item.invoiceNumber}</td>
-                    <td className="p-2 border">{item.barcode || 'N/A'}</td>
-                    <td className="p-2 border">{item.packageName}</td>
-                    <td className="p-2 border">{item.volume} m³</td>
-                    <td className="p-2 border">{item.weight} kg</td>
-                    <td className="p-2 border">{item.shipper}</td>
-                    <td className="p-2 border">{item.consignee}</td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="p-4 text-center text-gray-500 border">
-                    NO CARGO ITEMS FOUND
-                  </td>
+              {cargoItems.map((item) => (
+                <tr key={item.id} className="border-t hover:bg-gray-50">
+                  <td className="p-2">{item.invoiceNumber}</td>
+                  <td className="p-2">{item.lineNumber}</td>
+                  <td className="p-2">{item.barcode || "N/A"}</td>
+                  <td className="p-2">{item.packageName}</td>
+                  <td className="p-2">{item.volume}</td>
+                  <td className="p-2">{item.weight}</td>
+                  <td className="p-2">{item.shipper}</td>
+                  <td className="p-2">{item.consignee}</td>
+                  <td className="p-2">{item.wh}</td>
+                  <td className="p-2">{item.d2d ? "Yes" : "No"}</td>
                 </tr>
-              )}
+              ))}
             </tbody>
           </table>
         </div>

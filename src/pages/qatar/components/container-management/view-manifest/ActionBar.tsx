@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
 import { PrintOptions } from "../../../types/containerTypes";
+import { Label } from "@/components/ui/label";
 
 interface ActionBarProps {
   printOptions: PrintOptions;
@@ -19,49 +20,53 @@ const ActionBar: React.FC<ActionBarProps> = ({
   isPrinting
 }) => {
   return (
-    <div className="flex items-center space-x-4">
-      <div className="flex items-center space-x-2">
-        <span className="text-sm font-medium">PRINT SECTION:</span>
+    <div className="flex items-center gap-4 no-print">
+      <div className="flex items-center gap-2">
+        <Label htmlFor="print-section">Print Section:</Label>
         <Select 
           value={printOptions.section} 
-          onValueChange={(value) => onPrintOptionsChange({ section: value as any })}
+          onValueChange={(value) => onPrintOptionsChange({ 
+            section: value as "all" | "cargo" | "items" | "consignees" | "invoices" 
+          })}
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="SELECT SECTION" />
+          <SelectTrigger id="print-section" className="w-[180px]">
+            <SelectValue placeholder="Select section" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">ALL SECTIONS</SelectItem>
-            <SelectItem value="cargo">CARGO DETAILS</SelectItem>
-            <SelectItem value="items">ITEM LIST</SelectItem>
-            <SelectItem value="consignees">CONSIGNEE LIST</SelectItem>
-            <SelectItem value="invoices">UNSETTLED INVOICES</SelectItem>
+            <SelectItem value="all">All Sections</SelectItem>
+            <SelectItem value="cargo">Cargo Items</SelectItem>
+            <SelectItem value="items">Item List</SelectItem>
+            <SelectItem value="consignees">Consignee List</SelectItem>
+            <SelectItem value="invoices">Unsettled Invoices</SelectItem>
           </SelectContent>
         </Select>
       </div>
       
-      <div className="flex items-center space-x-2">
-        <span className="text-sm font-medium">LAYOUT:</span>
+      <div className="flex items-center gap-2">
+        <Label htmlFor="orientation">Page Orientation:</Label>
         <Select 
           value={printOptions.orientation} 
-          onValueChange={(value) => onPrintOptionsChange({ orientation: value as any })}
+          onValueChange={(value) => onPrintOptionsChange({ 
+            orientation: value as "portrait" | "landscape" 
+          })}
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="SELECT ORIENTATION" />
+          <SelectTrigger id="orientation" className="w-[150px]">
+            <SelectValue placeholder="Select orientation" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="portrait">PORTRAIT</SelectItem>
-            <SelectItem value="landscape">LANDSCAPE</SelectItem>
+            <SelectItem value="portrait">Portrait</SelectItem>
+            <SelectItem value="landscape">Landscape</SelectItem>
           </SelectContent>
         </Select>
       </div>
       
       <Button 
         onClick={onPrintClick} 
-        className="bg-blue-600 hover:bg-blue-700 hover:scale-105 transition-transform"
+        className="ml-4"
         disabled={isPrinting}
       >
         <Printer className="h-4 w-4 mr-2" />
-        PRINT MANIFEST
+        {isPrinting ? "Preparing..." : "Print Manifest"}
       </Button>
     </div>
   );
