@@ -4,8 +4,9 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useInvoiceSearch } from "./useInvoiceSearch";
 import { usePaymentSave } from "./usePaymentSave";
-import { amountWithinRange, getBalanceForPayment } from "../utils/amountCalculations";
+import { useCurrencyCountry } from "./useCurrencyCountry";
 import { FormState } from "../types";
+import { getBalanceForPayment } from "../utils/amountCalculations";
 
 export const useInvoicePayment = () => {
   const navigate = useNavigate();
@@ -23,8 +24,8 @@ export const useInvoicePayment = () => {
     amountPaid: 0,
     remarks: "",
     receivableAccount: "cash",
-    country: "",
-    currency: "",
+    country: "Qatar",
+    currency: "QAR",
     paymentCollectDate: today.toISOString().split('T')[0],
   });
   
@@ -97,7 +98,7 @@ export const useInvoicePayment = () => {
       bookingForm: invoice.bookingForm || invoice.bookNumber || "",
       balanceToPay: balanceToPay,
       amountPaid: balanceToPay, // Default to paying the full amount
-      currency: invoice.currency || "", // Use currency from invoice if available
+      currency: invoice.currency || prev.currency, // Use currency from invoice if available
     }));
     
     // If invoice has currency, try to set the matching country
@@ -125,82 +126,15 @@ export const useInvoicePayment = () => {
       return;
     }
     
-    // Check if amount is within valid range
-    if (amountWithinRange(value, formState.balanceToPay)) {
-      setFormState(prev => ({ ...prev, amountPaid: value }));
-    } else if (value > formState.balanceToPay) {
-      // Allow overpayment but show warning
-      setFormState(prev => ({ ...prev, amountPaid: value }));
+    // Set the amount regardless
+    setFormState(prev => ({ ...prev, amountPaid: value }));
+    
+    // Show warning if overpayment
+    if (value > formState.balanceToPay) {
       toast.warning("Overpayment", {
         description: `The amount exceeds the balance due of ${currencySymbol}${formState.balanceToPay}`,
       });
     }
-  };
-
-  // Get the currency and country functions
-  const useCurrencyCountry = () => {
-    const [selectedCountry, setSelectedCountry] = useState<string>("Qatar");
-    const [filteredCurrencies, setFilteredCurrencies] = useState<string[]>(["QAR"]);
-    const [currencySymbol, setCurrencySymbol] = useState<string>("QR");
-    
-    // Define country currency mapping
-    const COUNTRY_CURRENCY_MAP: Record<string, string[]> = {
-      "Qatar": ["QAR"],
-      "UAE": ["AED"],
-      "USA": ["USD"],
-      "Kenya": ["KES"],
-      "India": ["INR"],
-      "Sri Lanka": ["LKR"],
-      "European Union": ["EUR"]
-    };
-    
-    // All country options from the map
-    const countryOptions = Object.keys(COUNTRY_CURRENCY_MAP);
-    
-    useEffect(() => {
-      // Get currencies for the selected country
-      if (selectedCountry) {
-        setFilteredCurrencies(COUNTRY_CURRENCY_MAP[selectedCountry] || []);
-      }
-    }, [selectedCountry]);
-    
-    // Update currency symbol when currency changes
-    useEffect(() => {
-      if (filteredCurrencies.length > 0) {
-        const currency = filteredCurrencies[0];
-        
-        if (currency === "USD") {
-          setCurrencySymbol("$");
-        } else if (currency === "EUR") {
-          setCurrencySymbol("€");
-        } else if (currency === "QAR") {
-          setCurrencySymbol("QR");
-        } else if (currency === "AED") {
-          setCurrencySymbol("AED");
-        } else if (currency === "KES") {
-          setCurrencySymbol("KSh");
-        } else if (currency === "INR") {
-          setCurrencySymbol("₹");
-        } else if (currency === "LKR") {
-          setCurrencySymbol("Rs");
-        } else {
-          setCurrencySymbol(currency);
-        }
-      }
-    }, [filteredCurrencies]);
-    
-    // Handle country change
-    const handleCountryChange = (country: string) => {
-      setSelectedCountry(country);
-    };
-    
-    return {
-      selectedCountry,
-      currencySymbol,
-      countryOptions,
-      filteredCurrencies,
-      handleCountryChange
-    };
   };
   
   return {

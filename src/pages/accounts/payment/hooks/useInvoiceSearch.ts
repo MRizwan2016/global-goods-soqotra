@@ -54,6 +54,9 @@ export const useInvoiceSearch = () => {
       {
         id: "1",
         invoiceNumber: `INV-${invoicePrefix}001`,
+        date: new Date().toISOString().split('T')[0],
+        net: 900,
+        paid: false,
         bookingForm: "BF-001",
         shipper: "ABC Company",
         consignee: "XYZ Corp",
@@ -69,6 +72,9 @@ export const useInvoiceSearch = () => {
       {
         id: "2",
         invoiceNumber: `INV-${invoicePrefix}002`,
+        date: new Date().toISOString().split('T')[0],
+        net: 1800,
+        paid: false,
         bookingForm: "BF-002",
         shipper: "DEF Ltd",
         consignee: "UVW Inc",

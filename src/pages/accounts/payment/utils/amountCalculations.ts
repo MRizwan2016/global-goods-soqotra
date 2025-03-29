@@ -1,3 +1,4 @@
+
 /**
  * Utility functions for payment amount calculations
  */
@@ -49,19 +50,23 @@ export const getBalanceForPayment = (invoice: any): number => {
  * Update form amounts and return the updated form state
  */
 export const recalculateAmounts = (formState: {
-  grossAmount: number;
-  discount: number;
-  totalPaid: number;
-  netAmount: number;
-  balanceToPay: number;
-  amountPaid: number;
+  grossAmount?: number;
+  discount?: number;
+  totalPaid?: number;
+  netAmount?: number;
+  balanceToPay?: number;
+  amountPaid?: number;
 }): {
   netAmount: number;
   balanceToPay: number;
   amountPaid: number;
 } => {
-  const netAmount = calculateNetAmount(formState.grossAmount, formState.discount);
-  const balanceToPay = calculateBalanceToPay(netAmount, formState.totalPaid);
+  const grossAmount = formState.grossAmount || 0;
+  const discount = formState.discount || 0;
+  const totalPaid = formState.totalPaid || 0;
+  
+  const netAmount = calculateNetAmount(grossAmount, discount);
+  const balanceToPay = calculateBalanceToPay(netAmount, totalPaid);
   const amountPaid = getSuggestedPaymentAmount(balanceToPay);
   
   return { netAmount, balanceToPay, amountPaid };

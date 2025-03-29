@@ -25,9 +25,9 @@ const PaymentStatusSelector: React.FC<PaymentStatusSelectorProps> = ({
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig = PAYMENT_STATUSES.find(s => s.id === status);
+    const statusConfig = PAYMENT_STATUSES.find(s => s.value === status);
     if (statusConfig) {
-      return <Badge className={`ml-2 ${statusConfig.color} hover:bg-opacity-80`}>{statusConfig.name.toUpperCase()}</Badge>;
+      return <Badge className={`ml-2 ${statusConfig.color} hover:bg-opacity-80`}>{statusConfig.label.toUpperCase()}</Badge>;
     }
     return null;
   };
@@ -45,7 +45,7 @@ const PaymentStatusSelector: React.FC<PaymentStatusSelectorProps> = ({
           </SelectTrigger>
           <SelectContent>
             {PAYMENT_STATUSES.map(status => (
-              <SelectItem key={status.id} value={status.id}>{status.name}</SelectItem>
+              <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>

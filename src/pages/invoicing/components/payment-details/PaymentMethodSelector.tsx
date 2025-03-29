@@ -36,7 +36,7 @@ const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
         </SelectTrigger>
         <SelectContent>
           {PAYMENT_METHODS.map(method => (
-            <SelectItem key={method.id} value={method.id}>{method.name}</SelectItem>
+            <SelectItem key={method.value} value={method.value}>{method.label}</SelectItem>
           ))}
         </SelectContent>
       </Select>

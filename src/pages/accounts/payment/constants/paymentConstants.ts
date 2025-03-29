@@ -39,3 +39,22 @@ export const PAYMENT_METHODS = [
   { value: "cheque", label: "Cheque" },
   { value: "other", label: "Other" }
 ];
+
+/**
+ * Payment status options
+ */
+export const PAYMENT_STATUSES = [
+  { value: "paid", label: "Paid", color: "bg-green-100 text-green-800" },
+  { value: "unpaid", label: "Unpaid", color: "bg-amber-100 text-amber-800" },
+  { value: "partial", label: "Partial", color: "bg-blue-100 text-blue-800" },
+  { value: "overdue", label: "Overdue", color: "bg-red-100 text-red-800" }
+];
+
+/**
+ * Default values for payment form
+ */
+export const DEFAULT_PAYMENT_FORM_VALUES = {
+  amountPaid: 0,
+  receivableAccount: "cash",
+  currency: "QAR"
+};

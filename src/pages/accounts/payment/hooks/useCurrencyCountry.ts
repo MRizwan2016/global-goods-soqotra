@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { COUNTRY_CURRENCY_MAP } from "../constants/paymentConstants";
+import { COUNTRY_CURRENCY_MAP, CURRENCY_SYMBOLS } from "../constants/paymentConstants";
 
 /**
  * Hook for managing country and currency selection
@@ -24,24 +24,7 @@ export const useCurrencyCountry = () => {
   useEffect(() => {
     if (filteredCurrencies.length > 0) {
       const currency = filteredCurrencies[0];
-      
-      if (currency === "USD") {
-        setCurrencySymbol("$");
-      } else if (currency === "EUR") {
-        setCurrencySymbol("€");
-      } else if (currency === "QAR") {
-        setCurrencySymbol("QR");
-      } else if (currency === "AED") {
-        setCurrencySymbol("AED");
-      } else if (currency === "KES") {
-        setCurrencySymbol("KSh");
-      } else if (currency === "INR") {
-        setCurrencySymbol("₹");
-      } else if (currency === "LKR") {
-        setCurrencySymbol("Rs");
-      } else {
-        setCurrencySymbol(currency);
-      }
+      setCurrencySymbol(CURRENCY_SYMBOLS[currency] || currency);
     }
   }, [filteredCurrencies]);
   
