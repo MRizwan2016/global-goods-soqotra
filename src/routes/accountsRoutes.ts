@@ -32,5 +32,10 @@ export const accountsRoutes: RouteConfig[] = [
     path: "/accounts/reconciliation",
     element: ReconciliationPage,
     private: true
+  },
+  {
+    path: "/invoice-payment/:invoiceId",
+    element: AddPaymentPage,
+    private: true
   }
 ];

@@ -37,6 +37,17 @@ interface Invoice {
 
 const PaymentReceivable = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  
+  // Setup storage event listener to refresh when localStorage changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setRefreshTrigger(prev => prev + 1);
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
   
   useEffect(() => {
     // Load invoices from localStorage or mockData
@@ -45,6 +56,7 @@ const PaymentReceivable = () => {
       if (storedInvoices) {
         const parsedInvoices = JSON.parse(storedInvoices);
         setInvoices(parsedInvoices);
+        console.log("Loaded invoices from localStorage:", parsedInvoices);
       } else {
         // Ensure we include invoice 010000 in mock data
         // First convert mockInvoiceData to Invoice[] using type assertion with unknown as intermediate step
@@ -91,7 +103,7 @@ const PaymentReceivable = () => {
       console.error("Error loading invoices:", error);
       toast.error("Could not load invoice data");
     }
-  }, []);
+  }, [refreshTrigger]); // Re-run this effect when refreshTrigger changes
 
   return (
     <Layout title="Payment Receivable">

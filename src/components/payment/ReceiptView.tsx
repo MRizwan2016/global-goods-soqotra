@@ -1,9 +1,10 @@
 
-import React from "react";
+import React, { useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Printer, Download, X } from "lucide-react";
+import { Printer, Download, X, Share2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { QRCodeSVG } from "qrcode.react";
 
 interface ReceiptViewProps {
   isOpen: boolean;
@@ -25,19 +26,38 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
   onClose,
   receiptData,
 }) => {
+  const receiptRef = useRef<HTMLDivElement>(null);
+  
   const handlePrint = () => {
     window.print();
   };
 
+  const handleDownloadPDF = () => {
+    // In a real application, this would use a PDF generation library
+    // For now, we'll just show a toast message
+    alert("PDF download functionality would be implemented here");
+  };
+
   const currencySymbol = receiptData.currency === "USD" ? "$" : 
                          receiptData.currency === "EUR" ? "€" : 
-                         receiptData.currency === "QAR" ? "QR" : "";
+                         receiptData.currency === "QAR" ? "QR" : 
+                         receiptData.currency === "AED" ? "AED" : "";
+
+  // Generate QR code data
+  const qrData = JSON.stringify({
+    receiptNumber: receiptData.receiptNumber,
+    invoiceNumber: receiptData.invoiceNumber,
+    amount: receiptData.amount,
+    currency: receiptData.currency,
+    date: receiptData.date,
+    verified: true
+  });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-0 overflow-hidden">
-        <div id="receipt-printable" className="print:p-6">
-          <DialogHeader className="p-6 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+      <DialogContent className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-0 overflow-hidden print:shadow-none print:border-none">
+        <div ref={receiptRef} id="receipt-printable" className="print:p-6">
+          <DialogHeader className="p-6 border-b bg-gradient-to-r from-blue-50 to-indigo-50 print:bg-white">
             <div className="flex justify-between items-center">
               <DialogTitle className="text-xl font-bold text-indigo-800">Payment Receipt</DialogTitle>
               <Button variant="ghost" size="icon" onClick={onClose} className="print:hidden">
@@ -57,13 +77,13 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-gray-600">Receipt #{receiptData.receiptNumber}</p>
+                <p className="text-sm font-semibold text-gray-800">Receipt #{receiptData.receiptNumber}</p>
                 <p className="text-sm text-gray-600">{formatDate(receiptData.date)}</p>
               </div>
             </div>
             
             {/* Receipt Details */}
-            <div className="space-y-3 mb-6">
+            <div className="space-y-3 mb-6 bg-gray-50 p-4 rounded-md">
               <div className="flex justify-between">
                 <span className="text-gray-600">Invoice Number:</span>
                 <span className="font-medium">{receiptData.invoiceNumber}</span>
@@ -74,11 +94,11 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Amount:</span>
-                <span className="font-medium">{currencySymbol} {receiptData.amount.toFixed(2)}</span>
+                <span className="font-bold text-green-700">{currencySymbol} {receiptData.amount.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Payment Method:</span>
-                <span className="font-medium">{receiptData.paymentMethod}</span>
+                <span className="font-medium capitalize">{receiptData.paymentMethod}</span>
               </div>
               {receiptData.remarks && (
                 <div className="flex justify-between">
@@ -87,9 +107,24 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
                 </div>
               )}
             </div>
+
+            {/* QR Code Section */}
+            <div className="flex justify-center mt-4 mb-6">
+              <div className="text-center">
+                <QRCodeSVG 
+                  value={qrData} 
+                  size={120} 
+                  bgColor={"#ffffff"}
+                  fgColor={"#000000"}
+                  level={"M"}
+                  includeMargin={false}
+                />
+                <p className="text-xs text-gray-500 mt-2">Scan to verify receipt</p>
+              </div>
+            </div>
             
             {/* Signature Section */}
-            <div className="mt-8 border-t pt-4">
+            <div className="mt-6 border-t pt-4">
               <div className="flex justify-between">
                 <div>
                   <p className="text-sm text-gray-600 mb-8">Customer Signature</p>
@@ -116,9 +151,12 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
               <Printer size={16} className="mr-2" />
               Print Receipt
             </Button>
-            <Button variant="outline" className="flex-1">
+            <Button variant="outline" className="flex-1" onClick={handleDownloadPDF}>
               <Download size={16} className="mr-2" />
               Download PDF
+            </Button>
+            <Button variant="outline" size="icon">
+              <Share2 size={16} />
             </Button>
           </div>
         </DialogFooter>

@@ -10,7 +10,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Eye, CreditCard } from "lucide-react";
+import { Eye, CreditCard, Receipt } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 // Define the Invoice interface to match the one in PaymentReceivable.tsx
@@ -30,17 +30,19 @@ interface InvoiceTableProps {
   onPay: (invoice: Invoice) => void;
   onView: (id: string) => void;
   showPayButton: boolean;
+  payButtonLabel?: string;
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({ 
   invoices, 
   onPay, 
   onView,
-  showPayButton 
+  showPayButton,
+  payButtonLabel = "Pay"
 }) => {
   return (
     <Table>
-      <TableCaption>List of {showPayButton ? 'unpaid' : 'paid'} invoices</TableCaption>
+      <TableCaption>List of {payButtonLabel === "Pay" ? 'unpaid' : 'paid'} invoices</TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead>Invoice #</TableHead>
@@ -85,10 +87,14 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                     variant="outline" 
                     size="sm" 
                     onClick={() => onPay(invoice)}
-                    className="h-8 px-2 text-green-600"
+                    className={`h-8 px-2 ${payButtonLabel === "Pay" ? "text-green-600" : "text-purple-600"}`}
                   >
-                    <CreditCard className="h-4 w-4 mr-1" />
-                    Pay
+                    {payButtonLabel === "Pay" ? (
+                      <CreditCard className="h-4 w-4 mr-1" />
+                    ) : (
+                      <Receipt className="h-4 w-4 mr-1" />
+                    )}
+                    {payButtonLabel}
                   </Button>
                 )}
               </div>

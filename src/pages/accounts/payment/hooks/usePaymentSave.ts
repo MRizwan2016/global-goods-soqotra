@@ -42,7 +42,7 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
     // Check if this is a partial or full payment
     const isFullPayment = formState.amountPaid >= formState.balanceToPay;
 
-    // Update stored invoices
+    // Update stored invoices in localStorage
     const storedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
     const updatedStoredInvoices = storedInvoices.map((inv: any) => {
       if (inv.invoiceNumber === formState.invoiceNumber) {
@@ -57,16 +57,34 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
     });
     localStorage.setItem('generatedInvoices', JSON.stringify(updatedStoredInvoices));
     
-    // Create a payment record
+    // Update all invoice types in all storages to ensure consistency
+    // This is key to fixing our issue - update the main invoices array
+    const mainInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const updatedMainInvoices = mainInvoices.map((inv: any) => {
+      if (inv.invoiceNumber === formState.invoiceNumber) {
+        return {
+          ...inv,
+          paid: isFullPayment,
+          partiallyPaid: !isFullPayment && formState.amountPaid > 0,
+          totalPaid: (inv.totalPaid || 0) + formState.amountPaid
+        };
+      }
+      return inv;
+    });
+    localStorage.setItem('invoices', JSON.stringify(updatedMainInvoices));
+    
+    // Create a payment record with receipt information
+    const receiptNumber = `REC-${Date.now().toString().slice(-6)}`;
     const paymentRecord = {
-      id: `pay-${Date.now()}`,
+      id: receiptNumber,
       invoiceNumber: formState.invoiceNumber,
       amount: formState.amountPaid,
       currency: formState.currency,
       method: formState.receivableAccount,
       date: formState.paymentCollectDate,
       isPartialPayment: !isFullPayment,
-      remarks: formState.remarks
+      remarks: formState.remarks,
+      customer: formState.customerName
     };
     
     // Save the payment record
@@ -74,12 +92,15 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
     payments.push(paymentRecord);
     localStorage.setItem('invoicePayments', JSON.stringify(payments));
     
+    // Trigger storage event to update other components
+    window.dispatchEvent(new Event('storage'));
+    
     const successMessage = isFullPayment 
       ? "Payment Recorded Successfully" 
       : "Partial Payment Recorded Successfully";
     
     const description = isFullPayment
-      ? `Full payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded.`
+      ? `Full payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded. Receipt #${receiptNumber} generated.`
       : `Partial payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded. Remaining balance: ${currencySymbol}${(formState.balanceToPay - formState.amountPaid).toFixed(2)}`;
     
     toast.success(successMessage, {
