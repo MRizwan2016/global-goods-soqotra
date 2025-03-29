@@ -67,6 +67,17 @@ export const usePaymentForm = (
       const netAmount = selectedInvoice.netAmount || selectedInvoice.net || selectedInvoice.amount || 0;
       const balanceToPay = netAmount - (selectedInvoice.totalPaid || 0);
       
+      // Set the invoice date to the payment date if available
+      if (selectedInvoice.date) {
+        try {
+          const selectedDate = new Date(selectedInvoice.date);
+          setDate(selectedDate);
+          handleDateSelect(selectedDate);
+        } catch (error) {
+          console.error("Error parsing invoice date:", error);
+        }
+      }
+      
       // Set the amount paid to the balance to pay by default
       setFormState(prev => ({
         ...prev,

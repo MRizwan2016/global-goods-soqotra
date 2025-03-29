@@ -27,7 +27,7 @@ interface SelectedInvoiceDetailsProps {
 
 const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
   selectedInvoice,
-  formState, // Add formState param
+  formState,
 }) => {
   if (!selectedInvoice) return null;
 
@@ -63,7 +63,7 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
         </div>
         <div>
           <span className="text-sm text-gray-500">Date:</span>
-          <p className="font-semibold text-gray-900">{selectedInvoice.date}</p>
+          <p className="font-semibold text-gray-900">{selectedInvoice.date || 'N/A'}</p>
         </div>
         <div>
           <span className="text-sm text-gray-500">Total Amount:</span>

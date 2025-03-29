@@ -18,7 +18,7 @@ export const useInvoiceSelection = (
     // Create a consistent mapping for invoice data regardless of source
     setFormState(prevState => ({
       ...prevState,
-      invoiceNumber: invoice.invoiceNumber,
+      invoiceNumber: invoice.invoiceNumber || "",
       // Handle different property names for bookingForm
       bookingForm: invoice.bookingForm || invoice.bookNumber || "",
       shipper: invoice.shipper1 || invoice.shipper || "",
@@ -31,6 +31,7 @@ export const useInvoiceSelection = (
       totalPaid: invoice.paid ? (invoice.net || invoice.amount || 0) : 0,
       balanceToPay: invoice.paid ? 0 : (invoice.net || invoice.amount || 0),
       amountPaid: invoice.paid ? 0 : (invoice.net || invoice.amount || 0),
+      paymentCollectDate: invoice.date || prevState.paymentCollectDate,
       country: prevState.country,
       currency: prevState.currency
     }));

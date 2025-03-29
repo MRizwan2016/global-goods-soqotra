@@ -57,9 +57,9 @@ const PaymentReceivable = () => {
           mockData.push({
             id: "inv-010000",
             invoiceNumber: "010000",
-            date: "2025-02-15",
+            date: "2025-03-30",
             shipper1: "Global Exports Ltd.",
-            consignee1: "Qatar Imports Co.",
+            consignee1: "PASTOR ZACH RICH",
             salesAgent: "John Doe",
             warehouse: "Main Warehouse",
             doorToDoor: true,
@@ -67,15 +67,17 @@ const PaymentReceivable = () => {
             volume: 2.5,
             weight: 230,
             packages: 5,
-            gross: 1200,
+            gross: 1500,
             discount: 0,
-            net: 1200,
+            net: 1500,
             paid: false,
             statusCharge: 0,
             offerDiscount: 0,
             branch: "Doha",
             sector: "Air",
             transportType: "Air",
+            bookingForm: "BF-10000",
+            freightType: "Air Freight",
           });
         }
         
