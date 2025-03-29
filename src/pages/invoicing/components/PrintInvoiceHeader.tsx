@@ -9,7 +9,7 @@ interface InvoiceHeaderProps {
 
 const PrintInvoiceHeader = ({ invoiceNumber, date, net }: InvoiceHeaderProps) => {
   return (
-    <div className="flex p-2">
+    <div className="flex p-2 border-b border-gray-300">
       {/* Logo section */}
       <div className="w-1/4 flex items-center justify-center">
         <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-20 w-20" />
@@ -26,11 +26,11 @@ const PrintInvoiceHeader = ({ invoiceNumber, date, net }: InvoiceHeaderProps) =>
       
       {/* Company info section */}
       <div className="w-2/4 text-right">
-        <h2 className="text-base font-bold">ALMARAAM LOGISTICS SERVICES & TRADING W.L.L</h2>
-        <p className="text-xs">P.O.Box: 55861, Manthithu, Doha, Qatar</p>
+        <h2 className="text-base font-bold">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</h2>
+        <p className="text-xs">Office No. 3, 1st Floor, Zone 55, Building No.53, Street No.76,</p>
+        <p className="text-xs">Azizia Commercial Street, P.O.Box: 55861, Azizia - Qatar</p>
         <p className="text-xs">Tele:+974 - 44832508</p>
-        <p className="text-xs">Fax:+974 - 44832508</p>
-        <p className="text-xs">email: ops@almaraam.com</p>
+        <p className="text-xs">email: accounts@soqotralogistics.com</p>
         <p className="text-xs">Print Date: {new Date().toLocaleDateString('en-GB')}</p>
         <p className="text-xs">Print by: Mohammed Rizwan</p>
         <div className="mt-1">

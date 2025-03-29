@@ -18,12 +18,14 @@ const StatusTabs: React.FC<StatusTabsProps> = ({ invoices }) => {
   const paidInvoices = invoices.filter(inv => inv.paid);
   
   const handlePayInvoice = (invoice: any) => {
-    // Navigate to the payment page with the invoice ID
+    // Store the selected invoice in session storage for the payment page
     sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
+    // Navigate to the accounts payment add page
     navigate("/accounts/payment/add");
   };
   
   const handleViewInvoice = (id: string) => {
+    // Open invoice print in a new tab
     window.open(`/data-entry/print-documents/invoice-print/${id}`, '_blank');
   };
   

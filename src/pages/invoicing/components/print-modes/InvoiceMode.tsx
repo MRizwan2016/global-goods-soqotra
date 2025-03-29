@@ -1,10 +1,5 @@
 
 import React from "react";
-import PrintInvoiceHeader from "../PrintInvoiceHeader";
-import PrintShipperConsignee from "../PrintShipperConsignee";
-import PrintDestinationInfo from "../PrintDestinationInfo";
-import PrintCargoTable from "../PrintCargoTable";
-import PrintInvoiceFooter from "../PrintInvoiceFooter";
 import { QRCodeSVG } from "qrcode.react";
 
 interface InvoiceModeProps {
@@ -21,16 +16,17 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
   totalVolume,
 }) => {
   return (
-    <div className="shadow-sm">
+    <div className="shadow-sm border border-gray-300">
       {/* Header Section */}
-      <div className="p-6 bg-white">
+      <div className="p-6 bg-white border-b border-gray-300">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-16 w-16 mr-4" />
             <div>
-              <h1 className="text-xl font-bold">SOQOTRA LOGISTICS SERVICES & TRADING W.L.L</h1>
-              <p className="text-sm">P.O.Box: 55861, Manthithu, Doha, Qatar</p>
-              <p className="text-sm">Tel: +974 - 44832508 | Email: ops@almaraam.com</p>
+              <h1 className="text-xl font-bold">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</h1>
+              <p className="text-sm">Office No. 3, 1st Floor, Zone 55, Building No.53, Street No.76,</p>
+              <p className="text-sm">Azizia Commercial Street, P.O.Box: 55861, Azizia - Qatar</p>
+              <p className="text-sm">Tel: +974 - 44832508 | Email: accounts@soqotralogistics.com</p>
             </div>
           </div>
           <div className="text-right">
@@ -51,8 +47,8 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
       </div>
       
       {/* Shipper/Consignee Section */}
-      <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50">
-        <div className="bg-white p-4 rounded shadow-sm">
+      <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 border-b border-gray-300">
+        <div className="bg-white p-4 rounded shadow-sm border border-gray-300">
           <h3 className="font-bold border-b pb-1 mb-2">SHIPPER</h3>
           <p className="font-medium">{invoice.shipper1 || ""}</p>
           {invoice.shipper2 && <p>{invoice.shipper2}</p>}
@@ -63,7 +59,7 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
           </p>
         </div>
         
-        <div className="bg-white p-4 rounded shadow-sm">
+        <div className="bg-white p-4 rounded shadow-sm border border-gray-300">
           <h3 className="font-bold border-b pb-1 mb-2">CONSIGNEE</h3>
           <p className="font-medium">{invoice.consignee1 || ""}</p>
           {invoice.consignee2 && <p>{invoice.consignee2}</p>}
@@ -81,7 +77,7 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
       </div>
       
       {/* Destination Info Section */}
-      <div className="p-4 bg-white">
+      <div className="p-4 bg-white border-b border-gray-300">
         <h3 className="font-bold border-b pb-1 mb-2">SHIPPING DETAILS</h3>
         <div className="grid grid-cols-4 gap-4">
           <div>
@@ -106,36 +102,47 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
       </div>
       
       {/* Cargo Table Section */}
-      <div className="p-4">
+      <div className="p-4 border-b border-gray-300">
         <h3 className="font-bold border-b pb-1 mb-2">CARGO DETAILS</h3>
-        <table className="w-full border-collapse">
+        <table className="w-full border-collapse border border-gray-300">
           <thead>
             <tr className="bg-gray-100">
-              <th className="border p-2 text-left">No.</th>
-              <th className="border p-2 text-left">Package Type</th>
-              <th className="border p-2 text-left">Qty</th>
-              <th className="border p-2 text-left">Weight (kg)</th>
-              <th className="border p-2 text-left">Volume (m³)</th>
-              <th className="border p-2 text-left">Description</th>
+              <th className="border border-gray-300 p-2 text-left">No.</th>
+              <th className="border border-gray-300 p-2 text-left">Package Type</th>
+              <th className="border border-gray-300 p-2 text-left">Qty</th>
+              <th className="border border-gray-300 p-2 text-left">Weight (kg)</th>
+              <th className="border border-gray-300 p-2 text-left">Volume (m³)</th>
+              <th className="border border-gray-300 p-2 text-left">Description</th>
             </tr>
           </thead>
           <tbody>
-            {packageDetails.map((pkg, index) => (
-              <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                <td className="border p-2">{index + 1}</td>
-                <td className="border p-2">{pkg.packageName}</td>
-                <td className="border p-2">{pkg.quantity}</td>
-                <td className="border p-2">{parseFloat(pkg.weight).toFixed(2)}</td>
-                <td className="border p-2">{parseFloat(pkg.volume).toFixed(3)}</td>
-                <td className="border p-2">{pkg.description || "General Cargo"}</td>
+            {packageDetails && packageDetails.length > 0 ? (
+              packageDetails.map((pkg, index) => (
+                <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                  <td className="border border-gray-300 p-2">{index + 1}</td>
+                  <td className="border border-gray-300 p-2">{pkg.packageName || "Carton Box"}</td>
+                  <td className="border border-gray-300 p-2">{pkg.quantity || 1}</td>
+                  <td className="border border-gray-300 p-2">{parseFloat(pkg.weight || 0).toFixed(2)}</td>
+                  <td className="border border-gray-300 p-2">{parseFloat(pkg.volume || 0).toFixed(3)}</td>
+                  <td className="border border-gray-300 p-2">{pkg.description || "General Cargo"}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td className="border border-gray-300 p-2">1</td>
+                <td className="border border-gray-300 p-2">Carton Box</td>
+                <td className="border border-gray-300 p-2">1</td>
+                <td className="border border-gray-300 p-2">{parseFloat(totalWeight).toFixed(2)}</td>
+                <td className="border border-gray-300 p-2">{totalVolume}</td>
+                <td className="border border-gray-300 p-2">General Cargo</td>
               </tr>
-            ))}
+            )}
             <tr className="bg-gray-100 font-semibold">
-              <td colSpan={2} className="border p-2 text-right">Total:</td>
-              <td className="border p-2">{packageDetails.reduce((sum, pkg) => sum + parseInt(pkg.quantity), 0)}</td>
-              <td className="border p-2">{totalWeight} kg</td>
-              <td className="border p-2">{totalVolume} m³</td>
-              <td className="border p-2"></td>
+              <td colSpan={2} className="border border-gray-300 p-2 text-right">Total:</td>
+              <td className="border border-gray-300 p-2">{packageDetails.reduce((sum, pkg) => sum + parseInt(pkg.quantity || 1), 0) || 1}</td>
+              <td className="border border-gray-300 p-2">{totalWeight} kg</td>
+              <td className="border border-gray-300 p-2">{totalVolume} m³</td>
+              <td className="border border-gray-300 p-2"></td>
             </tr>
           </tbody>
         </table>
@@ -147,7 +154,7 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
           <div className="text-sm">
             <p className="font-bold mb-2">TERMS & CONDITIONS:</p>
             <p>In case of dispute over any charges on this invoice please email:</p>
-            <p>manager@soqotra@almaraam.com TO US WITHIN SEVEN DAYS FROM THE DATE OF INVOICE.</p>
+            <p>accounts@soqotralogistics.com TO US WITHIN SEVEN DAYS FROM THE DATE OF INVOICE.</p>
             <p>Otherwise charges would be deemed as correct and payable without further delay.</p>
             <p className="mt-2">This invoice must be settle in full within seven days of the above date.</p>
             <p>Your goods are not insured through Soqotra Logistics Services, we accept no liability</p>
@@ -156,23 +163,23 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
           
           <div className="border-l pl-4">
             <div className="mb-4">
-              <table className="w-full">
+              <table className="w-full border border-gray-300">
                 <tbody>
                   <tr>
-                    <td className="p-1">Freight</td>
-                    <td className="p-1 text-right">{parseFloat(String(invoice.gross)).toFixed(2)} QAR</td>
+                    <td className="p-1 border-b border-gray-300">Freight</td>
+                    <td className="p-1 text-right border-b border-gray-300">{parseFloat(String(invoice.gross)).toFixed(2)} QAR</td>
                   </tr>
                   <tr>
-                    <td className="p-1">Discount</td>
-                    <td className="p-1 text-right">({parseFloat(String(invoice.discount)).toFixed(2)}) QAR</td>
+                    <td className="p-1 border-b border-gray-300">Discount</td>
+                    <td className="p-1 text-right border-b border-gray-300">({parseFloat(String(invoice.discount)).toFixed(2)}) QAR</td>
                   </tr>
                   <tr className="font-bold">
-                    <td className="p-1 border-t">Total</td>
-                    <td className="p-1 text-right border-t">{parseFloat(String(invoice.net)).toFixed(2)} QAR</td>
+                    <td className="p-1 border-t border-b border-gray-300">Total</td>
+                    <td className="p-1 text-right border-t border-b border-gray-300">{parseFloat(String(invoice.net)).toFixed(2)} QAR</td>
                   </tr>
                   <tr className="font-bold">
-                    <td className="p-1">Total Due</td>
-                    <td className="p-1 text-right">{parseFloat(String(invoice.net)).toFixed(2)} QAR</td>
+                    <td className="p-1 border-b border-gray-300">Total Due</td>
+                    <td className="p-1 text-right border-b border-gray-300">{parseFloat(String(invoice.net)).toFixed(2)} QAR</td>
                   </tr>
                 </tbody>
               </table>
@@ -183,11 +190,23 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
                 {invoice.paid ? "PAID" : "UNPAID"}
               </div>
             </div>
+
+            {/* Signature section */}
+            <div className="mt-8 grid grid-cols-2 gap-4">
+              <div className="text-center">
+                <p className="border-b border-gray-300 pb-2 mb-1">Customer Signature</p>
+                <p className="text-xs text-gray-500">Received goods in good condition</p>
+              </div>
+              <div className="text-center">
+                <p className="border-b border-gray-300 pb-2 mb-1">Authorized Signatory</p>
+                <p className="text-xs text-gray-500">For Soqotra Logistics</p>
+              </div>
+            </div>
           </div>
         </div>
         
         <div className="mt-8 pt-4 border-t text-center text-xs text-gray-500">
-          <p>Thank you for your business. For any inquiries, please contact us at ops@almaraam.com</p>
+          <p>Thank you for your business. For any inquiries, please contact us at accounts@soqotralogistics.com</p>
         </div>
       </div>
     </div>
