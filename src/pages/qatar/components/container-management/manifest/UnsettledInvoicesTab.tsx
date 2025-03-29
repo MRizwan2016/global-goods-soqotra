@@ -26,7 +26,7 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
   const handleRecordPayment = (invoice: UnsettledInvoice) => {
     // Store the invoice data temporarily to use it in the payment form
     sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
-    navigate("/accounts/add-payment");
+    navigate("/accounts/payment/add");
   };
 
   return (

@@ -20,8 +20,13 @@ const StatusTabs: React.FC<StatusTabsProps> = ({ invoices }) => {
   const handlePayInvoice = (invoice: any) => {
     // Store the selected invoice in session storage for the payment page
     sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
-    // Navigate to the accounts payment add page
+    // Navigate to the payment add page
     navigate("/accounts/payment/add");
+    
+    // Show toast notification
+    toast.success("Payment form opened", {
+      description: `Processing payment for invoice ${invoice.invoiceNumber}`,
+    });
   };
   
   const handleViewInvoice = (id: string) => {
