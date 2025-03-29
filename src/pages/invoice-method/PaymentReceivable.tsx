@@ -18,8 +18,8 @@ interface Invoice {
   warehouse: string;
   doorToDoor: boolean;
   nic: string;
-  volume: number;
-  weight: number;
+  volume: number | string;  // Allow both number and string
+  weight: number | string;  // Allow both number and string
   packages: number;
   gross: number;
   discount: number;
@@ -27,9 +27,12 @@ interface Invoice {
   paid: boolean;
   statusCharge: number;
   offerDiscount: number;
-  branch: string;
-  sector: string;
-  transportType: string;
+  branch?: string;          // Make optional
+  sector?: string;          // Make optional
+  transportType?: string;   // Make optional
+  customer?: string;        // Add customer field from mockData
+  // Additional fields that might be in the mock data
+  [key: string]: any;       // Allow any additional properties
 }
 
 const PaymentReceivable = () => {
@@ -44,7 +47,8 @@ const PaymentReceivable = () => {
         setInvoices(parsedInvoices);
       } else {
         // Ensure we include invoice 010000 in mock data
-        const mockData = [...mockInvoiceData] as Invoice[];
+        // First convert mockInvoiceData to Invoice[] using type assertion with unknown as intermediate step
+        const mockData = [...mockInvoiceData] as unknown as Invoice[];
         
         // Check if 010000 exists in mock data
         const hasInvoice010000 = mockData.some(invoice => invoice.invoiceNumber === "010000");
