@@ -8,6 +8,7 @@ import { fadeInVariants } from "../utils/animationVariants";
 interface CountryCurrencySelectorProps {
   formState: FormState;
   handleSelectChange: (name: string, value: string) => void;
+  handleCountryChange: (country: string) => void; // Add this prop
   countryOptions: string[];
   filteredCurrencies: string[];
 }
@@ -15,6 +16,7 @@ interface CountryCurrencySelectorProps {
 const CountryCurrencySelector: React.FC<CountryCurrencySelectorProps> = ({
   formState,
   handleSelectChange,
+  handleCountryChange, // Add this parameter
   countryOptions,
   filteredCurrencies,
 }) => {
@@ -31,7 +33,10 @@ const CountryCurrencySelector: React.FC<CountryCurrencySelectorProps> = ({
         </label>
         <Select 
           value={formState.country} 
-          onValueChange={(value) => handleSelectChange("country", value)}
+          onValueChange={(value) => {
+            handleCountryChange(value); // Call handleCountryChange when country changes
+            handleSelectChange("country", value);
+          }}
         >
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Select a country" />

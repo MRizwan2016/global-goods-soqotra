@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
 import { fadeInVariants } from "../utils/animationVariants";
+import { FormState } from "../types";
 
 // Define the Invoice interface
 interface Invoice {
@@ -21,14 +22,24 @@ interface Invoice {
 
 interface SelectedInvoiceDetailsProps {
   selectedInvoice: Invoice | null;
-  currencySymbol: string;
+  formState: FormState; // Add formState prop
 }
 
 const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
   selectedInvoice,
-  currencySymbol,
+  formState, // Add formState param
 }) => {
   if (!selectedInvoice) return null;
+
+  // Use currencySymbol from formState if available
+  const currencySymbol = formState.currency === "USD" ? "$" :
+                         formState.currency === "EUR" ? "€" :
+                         formState.currency === "QAR" ? "QR" :
+                         formState.currency === "AED" ? "AED" :
+                         formState.currency === "KES" ? "KSh" :
+                         formState.currency === "INR" ? "₹" :
+                         formState.currency === "LKR" ? "Rs" : 
+                         formState.currency;
 
   return (
     <motion.div 
