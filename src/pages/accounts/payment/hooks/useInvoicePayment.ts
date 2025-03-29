@@ -1,12 +1,9 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { DateValue } from "react-day-picker";
 import { toast } from "sonner";
 import { useInvoiceSearch } from "./useInvoiceSearch";
 import { usePaymentSave } from "./usePaymentSave";
-import { useCurrencyCountry } from "./useCurrencyCountry";
-import { useFormInputHandlers } from "./useFormInputHandlers";
 import { amountWithinRange, getBalanceForPayment } from "../utils/amountCalculations";
 import { FormState } from "../types";
 
@@ -15,7 +12,7 @@ export const useInvoicePayment = () => {
   
   // Get the current date
   const today = new Date();
-  const [date, setDate] = useState<DateValue>(today);
+  const [date, setDate] = useState<Date>(today);
   
   // Initialize form state
   const [formState, setFormState] = useState<FormState>({
@@ -48,15 +45,37 @@ export const useInvoicePayment = () => {
     currencySymbol,
     countryOptions,
     handleCountryChange,
-  } = useCurrencyCountry(formState, setFormState);
+  } = useCurrencyCountry();
   
-  const {
-    handleInputChange,
-    handleSelectChange,
-    handleDateSelect,
-  } = useFormInputHandlers(formState, setFormState, setDate);
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    
+    if (["amountPaid"].includes(name)) {
+      const numValue = parseFloat(value) || 0;
+      setFormState(prev => ({ ...prev, [name]: numValue }));
+    } else {
+      setFormState(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  // Handle select changes
+  const handleSelectChange = (name: string, value: string) => {
+    setFormState(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Handle date selection
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    if (selectedDate) {
+      setDate(selectedDate);
+      setFormState(prev => ({ 
+        ...prev, 
+        paymentCollectDate: selectedDate.toISOString().split('T')[0]
+      }));
+    }
+  };
   
-  const { handleSave } = usePaymentSave(formState, currencySymbol);
+  const { handleSave } = usePaymentSave(formState);
   
   // Handle selecting an invoice
   const handleSelectInvoice = (invoice: any) => {
@@ -116,6 +135,72 @@ export const useInvoicePayment = () => {
         description: `The amount exceeds the balance due of ${currencySymbol}${formState.balanceToPay}`,
       });
     }
+  };
+
+  // Get the currency and country functions
+  const useCurrencyCountry = () => {
+    const [selectedCountry, setSelectedCountry] = useState<string>("Qatar");
+    const [filteredCurrencies, setFilteredCurrencies] = useState<string[]>(["QAR"]);
+    const [currencySymbol, setCurrencySymbol] = useState<string>("QR");
+    
+    // Define country currency mapping
+    const COUNTRY_CURRENCY_MAP: Record<string, string[]> = {
+      "Qatar": ["QAR"],
+      "UAE": ["AED"],
+      "USA": ["USD"],
+      "Kenya": ["KES"],
+      "India": ["INR"],
+      "Sri Lanka": ["LKR"],
+      "European Union": ["EUR"]
+    };
+    
+    // All country options from the map
+    const countryOptions = Object.keys(COUNTRY_CURRENCY_MAP);
+    
+    useEffect(() => {
+      // Get currencies for the selected country
+      if (selectedCountry) {
+        setFilteredCurrencies(COUNTRY_CURRENCY_MAP[selectedCountry] || []);
+      }
+    }, [selectedCountry]);
+    
+    // Update currency symbol when currency changes
+    useEffect(() => {
+      if (filteredCurrencies.length > 0) {
+        const currency = filteredCurrencies[0];
+        
+        if (currency === "USD") {
+          setCurrencySymbol("$");
+        } else if (currency === "EUR") {
+          setCurrencySymbol("€");
+        } else if (currency === "QAR") {
+          setCurrencySymbol("QR");
+        } else if (currency === "AED") {
+          setCurrencySymbol("AED");
+        } else if (currency === "KES") {
+          setCurrencySymbol("KSh");
+        } else if (currency === "INR") {
+          setCurrencySymbol("₹");
+        } else if (currency === "LKR") {
+          setCurrencySymbol("Rs");
+        } else {
+          setCurrencySymbol(currency);
+        }
+      }
+    }, [filteredCurrencies]);
+    
+    // Handle country change
+    const handleCountryChange = (country: string) => {
+      setSelectedCountry(country);
+    };
+    
+    return {
+      selectedCountry,
+      currencySymbol,
+      countryOptions,
+      filteredCurrencies,
+      handleCountryChange
+    };
   };
   
   return {

@@ -1,114 +1,114 @@
 
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
 import { FormState } from "../types";
 
-/**
- * Hook to handle payment saving logic
- */
-export const usePaymentSave = (formState: FormState, currencySymbol: string) => {
+export const usePaymentSave = (formState: FormState) => {
   const navigate = useNavigate();
-  
-  // Validate form before saving
-  const validateForm = (): boolean => {
+
+  const handleSave = () => {
+    // Validate the form
     if (!formState.invoiceNumber) {
-      toast.error("Validation Error", {
-        description: "Please select an invoice first"
+      toast.error("Missing Information", {
+        description: "Please select an invoice to proceed"
       });
-      return false;
+      return;
     }
 
     if (formState.amountPaid <= 0) {
-      toast.error("Validation Error", {
-        description: "Please enter a valid payment amount"
+      toast.error("Invalid Amount", {
+        description: "Payment amount must be greater than zero"
       });
-      return false;
+      return;
     }
 
-    if (!formState.currency) {
-      toast.error("Validation Error", {
-        description: "Please select a currency"
+    if (!formState.country || !formState.currency) {
+      toast.error("Missing Information", {
+        description: "Please select a country and currency"
       });
-      return false;
+      return;
     }
-    
-    return true;
+
+    try {
+      // Get existing payments from localStorage or initialize empty array
+      const existingPaymentsStr = localStorage.getItem('payments');
+      const existingPayments = existingPaymentsStr ? JSON.parse(existingPaymentsStr) : [];
+      
+      // Create a new payment record
+      const newPayment = {
+        id: uuidv4(),
+        invoiceNumber: formState.invoiceNumber,
+        customerName: formState.customerName,
+        amount: formState.amountPaid,
+        currency: formState.currency,
+        country: formState.country,
+        date: formState.paymentCollectDate,
+        paymentMethod: formState.receivableAccount,
+        remarks: formState.remarks,
+        timestamp: new Date().toISOString(),
+        bookingForm: formState.bookingForm || '',
+      };
+      
+      // Add the new payment to the array
+      existingPayments.push(newPayment);
+      
+      // Save back to localStorage
+      localStorage.setItem('payments', JSON.stringify(existingPayments));
+      
+      // Update invoice status to paid if needed
+      updateInvoiceStatus(formState.invoiceNumber, formState.amountPaid, formState.balanceToPay);
+      
+      // Show success toast
+      toast.success("Payment Saved", {
+        description: "Payment has been recorded successfully"
+      });
+      
+      // Navigate back to payments list
+      navigate("/accounts/payments");
+      
+    } catch (error) {
+      console.error("Error saving payment:", error);
+      toast.error("Error Saving Payment", {
+        description: "There was an error saving the payment. Please try again."
+      });
+    }
   };
-
-  // Handle saving the payment
-  const handleSave = () => {
-    if (!validateForm()) return;
-
-    // Check if this is a partial or full payment
-    const isFullPayment = formState.amountPaid >= formState.balanceToPay;
-
-    // Update stored invoices in localStorage
-    const storedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
-    const updatedStoredInvoices = storedInvoices.map((inv: any) => {
-      if (inv.invoiceNumber === formState.invoiceNumber) {
-        return {
-          ...inv,
-          paid: isFullPayment, // Only mark as fully paid if the full amount is paid
-          partiallyPaid: !isFullPayment && formState.amountPaid > 0,
-          totalPaid: (inv.totalPaid || 0) + formState.amountPaid
-        };
-      }
-      return inv;
-    });
-    localStorage.setItem('generatedInvoices', JSON.stringify(updatedStoredInvoices));
-    
-    // Update all invoice types in all storages to ensure consistency
-    // This is key to fixing our issue - update the main invoices array
-    const mainInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    const updatedMainInvoices = mainInvoices.map((inv: any) => {
-      if (inv.invoiceNumber === formState.invoiceNumber) {
-        return {
-          ...inv,
-          paid: isFullPayment,
-          partiallyPaid: !isFullPayment && formState.amountPaid > 0,
-          totalPaid: (inv.totalPaid || 0) + formState.amountPaid
-        };
-      }
-      return inv;
-    });
-    localStorage.setItem('invoices', JSON.stringify(updatedMainInvoices));
-    
-    // Create a payment record with receipt information
-    const receiptNumber = `REC-${Date.now().toString().slice(-6)}`;
-    const paymentRecord = {
-      id: receiptNumber,
-      invoiceNumber: formState.invoiceNumber,
-      amount: formState.amountPaid,
-      currency: formState.currency,
-      method: formState.receivableAccount,
-      date: formState.paymentCollectDate,
-      isPartialPayment: !isFullPayment,
-      remarks: formState.remarks,
-      customer: formState.customerName
-    };
-    
-    // Save the payment record
-    const payments = JSON.parse(localStorage.getItem('invoicePayments') || '[]');
-    payments.push(paymentRecord);
-    localStorage.setItem('invoicePayments', JSON.stringify(payments));
-    
-    // Trigger storage event to update other components
-    window.dispatchEvent(new Event('storage'));
-    
-    const successMessage = isFullPayment 
-      ? "Payment Recorded Successfully" 
-      : "Partial Payment Recorded Successfully";
-    
-    const description = isFullPayment
-      ? `Full payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded. Receipt #${receiptNumber} generated.`
-      : `Partial payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded. Remaining balance: ${currencySymbol}${(formState.balanceToPay - formState.amountPaid).toFixed(2)}`;
-    
-    toast.success(successMessage, {
-      description: description,
-    });
-
-    navigate("/accounts/payments");
+  
+  // Function to update invoice status if paid
+  const updateInvoiceStatus = (invoiceNumber: string, amountPaid: number, balanceToPay: number) => {
+    try {
+      // Get existing invoices
+      const existingInvoicesStr = localStorage.getItem('invoices');
+      if (!existingInvoicesStr) return;
+      
+      const existingInvoices = JSON.parse(existingInvoicesStr);
+      
+      // Find the invoice by number
+      const updatedInvoices = existingInvoices.map((invoice: any) => {
+        if (invoice.invoiceNumber === invoiceNumber) {
+          // Mark as paid if payment covers the full balance
+          if (amountPaid >= balanceToPay) {
+            return { ...invoice, paid: true };
+          }
+          
+          // For partial payments, just update the amount paid so far
+          const currentPaid = invoice.paidAmount || 0;
+          return { 
+            ...invoice, 
+            paidAmount: currentPaid + amountPaid 
+          };
+        }
+        return invoice;
+      });
+      
+      // Save updated invoices back to localStorage
+      localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+      
+    } catch (error) {
+      console.error("Error updating invoice status:", error);
+    }
   };
-
+  
   return { handleSave };
 };

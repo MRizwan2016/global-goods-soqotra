@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { format } from "date-fns";
 import { FormState } from "../types";
 
 /**
@@ -13,7 +12,7 @@ export const useFormInputHandlers = (initialFormState: FormState) => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
-    if (["grossAmount", "discount", "totalPaid", "amountPaid"].includes(name)) {
+    if (["amountPaid"].includes(name)) {
       const numValue = parseFloat(value) || 0;
       setFormState(prev => ({ ...prev, [name]: numValue }));
     } else {
@@ -31,7 +30,7 @@ export const useFormInputHandlers = (initialFormState: FormState) => {
     if (selectedDate) {
       setFormState(prev => ({ 
         ...prev, 
-        paymentCollectDate: format(selectedDate, "yyyy-MM-dd") 
+        paymentCollectDate: selectedDate.toISOString().split('T')[0] 
       }));
     }
   };

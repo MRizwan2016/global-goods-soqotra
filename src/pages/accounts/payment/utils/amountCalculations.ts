@@ -1,4 +1,3 @@
-
 /**
  * Utility functions for payment amount calculations
  */
@@ -22,6 +21,28 @@ export const calculateBalanceToPay = (netAmount: number, totalPaid: number): num
  */
 export const getSuggestedPaymentAmount = (balanceToPay: number): number => {
   return balanceToPay > 0 ? balanceToPay : 0;
+};
+
+/**
+ * Check if the amount is within valid payment range (0 to balance)
+ */
+export const amountWithinRange = (amount: number, balance: number): boolean => {
+  return amount >= 0 && amount <= balance;
+};
+
+/**
+ * Get the balance to pay from an invoice object
+ */
+export const getBalanceForPayment = (invoice: any): number => {
+  // If invoice has balanceToPay property, use it
+  if (invoice.balanceToPay !== undefined) {
+    return invoice.balanceToPay;
+  }
+  
+  // Otherwise calculate from net minus any payments
+  const net = invoice.net || 0;
+  const paid = invoice.paidAmount || 0;
+  return net - paid;
 };
 
 /**
