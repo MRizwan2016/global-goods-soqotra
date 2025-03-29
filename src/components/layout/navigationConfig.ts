@@ -49,7 +49,8 @@ export const navigationSections: NavigationSections = {
       {
         title: "FUNCTIONS",
         items: [
-          { name: "PAYMENTS", path: "/accounts/payment" },
+          { name: "PAYMENTS", path: "/accounts/payments" },
+          { name: "ADD PAYMENT", path: "/accounts/payment/add" },
           { name: "RECONCILIATION", path: "/accounts/reconciliation" },
         ],
       },

@@ -10,7 +10,8 @@ export const accountsRoutes: RouteConfig[] = [
   {
     path: "/accounts/add-payment",
     element: AddInvoicePayment,
-    private: true
+    private: true,
+    requiredFile: "paymentMethods"
   },
   {
     path: "/accounts/payment/add",

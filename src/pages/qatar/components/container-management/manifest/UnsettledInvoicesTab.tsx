@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { CreditCard } from "lucide-react";
+import { toast } from "sonner";
 
 interface UnsettledInvoicesTabProps {
   unsettledInvoices: UnsettledInvoice[];
@@ -24,9 +25,23 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
   const navigate = useNavigate();
 
   const handleRecordPayment = (invoice: UnsettledInvoice) => {
+    console.log("Recording payment for invoice:", invoice);
+    
+    // Add currency to invoice if not present
+    const invoiceWithCurrency = {
+      ...invoice,
+      currency: invoice.currency || 'QAR' // Default to QAR if not present
+    };
+    
     // Store the invoice data temporarily to use it in the payment form
-    sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
-    navigate("/accounts/payment/add");
+    sessionStorage.setItem('selectedInvoice', JSON.stringify(invoiceWithCurrency));
+    
+    // Navigate to payment page with timestamp to force refresh
+    navigate(`/accounts/payment/add?t=${Date.now()}`);
+    
+    toast.success("Payment form opened", {
+      description: `Processing payment for invoice ${invoice.invoiceNumber}`,
+    });
   };
 
   return (

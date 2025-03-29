@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Invoice } from "../types";
+import { toast } from "sonner";
 
 export const useInvoiceSearch = () => {
   const [invoicePrefix, setInvoicePrefix] = useState<string>("");
@@ -13,13 +14,24 @@ export const useInvoiceSearch = () => {
     const storedInvoice = sessionStorage.getItem('selectedInvoice');
     if (storedInvoice) {
       try {
+        console.log("Found stored invoice in sessionStorage:", storedInvoice);
         const parsedInvoice = JSON.parse(storedInvoice);
         setSelectedInvoice(parsedInvoice);
+        
         // Clear from session storage to prevent reuse
         sessionStorage.removeItem('selectedInvoice');
+        
+        toast.success("Invoice loaded", {
+          description: `Invoice ${parsedInvoice.invoiceNumber} has been loaded for payment`,
+        });
       } catch (error) {
         console.error("Error parsing stored invoice:", error);
+        toast.error("Error loading invoice", {
+          description: "There was a problem loading the selected invoice",
+        });
       }
+    } else {
+      console.log("No stored invoice found in sessionStorage");
     }
   }, []);
 
@@ -51,7 +63,8 @@ export const useInvoiceSearch = () => {
         discount: 100,
         netAmount: 900,
         totalPaid: 500,
-        balanceToPay: 400
+        balanceToPay: 400,
+        currency: "QAR"
       },
       {
         id: "2",
@@ -65,7 +78,8 @@ export const useInvoiceSearch = () => {
         discount: 200,
         netAmount: 1800,
         totalPaid: 1000,
-        balanceToPay: 800
+        balanceToPay: 800,
+        currency: "USD"
       }
     ];
 

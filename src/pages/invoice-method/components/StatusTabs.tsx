@@ -18,10 +18,14 @@ const StatusTabs: React.FC<StatusTabsProps> = ({ invoices }) => {
   const paidInvoices = invoices.filter(inv => inv.paid);
   
   const handlePayInvoice = (invoice: any) => {
+    // Add additional logging to debug
+    console.log("Paying invoice:", invoice);
+    
     // Store the selected invoice in session storage for the payment page
     sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
-    // Navigate to the payment add page
-    navigate("/accounts/payment/add");
+    
+    // Navigate to the payment add page and add a timestamp to force reload
+    navigate(`/accounts/payment/add?t=${Date.now()}`);
     
     // Show toast notification
     toast.success("Payment form opened", {
