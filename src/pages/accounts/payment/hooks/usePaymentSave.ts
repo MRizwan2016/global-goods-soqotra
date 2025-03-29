@@ -39,13 +39,18 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
   const handleSave = () => {
     if (!validateForm()) return;
 
+    // Check if this is a partial or full payment
+    const isFullPayment = formState.amountPaid >= formState.balanceToPay;
+
     // Update stored invoices
     const storedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
     const updatedStoredInvoices = storedInvoices.map((inv: any) => {
       if (inv.invoiceNumber === formState.invoiceNumber) {
         return {
           ...inv,
-          paid: true
+          paid: isFullPayment, // Only mark as fully paid if the full amount is paid
+          partiallyPaid: !isFullPayment && formState.amountPaid > 0,
+          totalPaid: (inv.totalPaid || 0) + formState.amountPaid
         };
       }
       return inv;
@@ -60,6 +65,7 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
       currency: formState.currency,
       method: formState.receivableAccount,
       date: formState.paymentCollectDate,
+      isPartialPayment: !isFullPayment,
       remarks: formState.remarks
     };
     
@@ -68,8 +74,16 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
     payments.push(paymentRecord);
     localStorage.setItem('invoicePayments', JSON.stringify(payments));
     
-    toast.success("Payment Recorded Successfully", {
-      description: `Payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded.`,
+    const successMessage = isFullPayment 
+      ? "Payment Recorded Successfully" 
+      : "Partial Payment Recorded Successfully";
+    
+    const description = isFullPayment
+      ? `Full payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded.`
+      : `Partial payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded. Remaining balance: ${currencySymbol}${(formState.balanceToPay - formState.amountPaid).toFixed(2)}`;
+    
+    toast.success(successMessage, {
+      description: description,
     });
 
     navigate("/accounts/payments");

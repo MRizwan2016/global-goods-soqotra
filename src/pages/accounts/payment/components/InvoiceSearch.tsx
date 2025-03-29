@@ -1,7 +1,7 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search } from "lucide-react";
+import { Search, Receipt } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { fadeInVariants } from "../utils/animationVariants";
@@ -40,60 +40,79 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({
   handleSelectInvoice,
   handleInvoiceSearch,
 }) => {
+  // Show dropdown automatically when user starts typing
+  useEffect(() => {
+    if (invoicePrefix.length > 0) {
+      handleInvoiceSearch();
+      setShowInvoiceSelector(true);
+    } else {
+      setShowInvoiceSelector(false);
+    }
+  }, [invoicePrefix]);
+
   return (
     <motion.div 
       variants={fadeInVariants}
       initial="hidden"
       animate="show"
-      className="flex gap-4 items-start mb-6"
+      className="w-full mb-6"
     >
-      <div className="w-full max-w-md relative">
-        <label className="text-sm font-medium mb-1 block text-gray-700">
-          Enter Invoice Number (GY format):
-        </label>
-        <div className="flex">
-          <Input
-            value={invoicePrefix}
-            onChange={(e) => setInvoicePrefix(e.target.value)}
-            placeholder="Start typing GY..."
-            className="rounded-r-none border-r-0 focus-visible:ring-1 focus-visible:ring-indigo-400"
-          />
-          <Button 
-            onClick={handleInvoiceSearch}
-            className="rounded-l-none bg-indigo-600 hover:bg-indigo-700"
-          >
-            <Search className="h-4 w-4" />
-          </Button>
-        </div>
+      <div className="bg-white p-6 rounded-lg border border-gray-200">
+        <h3 className="text-lg font-semibold mb-4 text-gray-800">Search for Invoice</h3>
         
-        <AnimatePresence>
-          {showInvoiceSelector && (
-            <motion.div 
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 5 }}
-              className="mt-1 border rounded-md shadow-lg max-h-60 overflow-y-auto absolute z-50 bg-white w-full border-indigo-200"
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium text-gray-700">
+            Enter Invoice Number (GY format):
+          </label>
+          
+          <div className="relative w-full">
+            <Input
+              value={invoicePrefix}
+              onChange={(e) => setInvoicePrefix(e.target.value)}
+              placeholder="Start typing GY..."
+              className="pr-10"
+              autoComplete="off"
+            />
+            <Button 
+              onClick={handleInvoiceSearch}
+              size="icon"
+              variant="ghost"
+              className="absolute right-0 top-0 h-full aspect-square text-gray-500 hover:text-gray-700"
             >
-              <div className="p-2 bg-indigo-50 border-b border-indigo-100">
-                <h4 className="text-sm font-medium text-indigo-800">Matching Invoices</h4>
-              </div>
-              {matchingInvoices.length > 0 ? (
+              <Search className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <AnimatePresence>
+            {showInvoiceSelector && matchingInvoices.length > 0 && (
+              <motion.div 
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 5 }}
+                className="mt-1 border rounded-md shadow-lg max-h-60 overflow-y-auto z-50 bg-white w-full border-gray-200"
+              >
+                <div className="p-2 bg-blue-50 border-b border-blue-100">
+                  <h4 className="text-sm font-medium text-blue-800">Matching Invoices</h4>
+                </div>
                 <div>
                   {matchingInvoices.map((invoice) => (
                     <motion.div
                       key={invoice.id}
-                      className="p-3 hover:bg-indigo-50 cursor-pointer border-b last:border-0 transition-colors"
+                      className="p-3 hover:bg-gray-50 cursor-pointer border-b last:border-0 transition-colors"
                       onClick={() => handleSelectInvoice(invoice)}
-                      whileHover={{ backgroundColor: "rgba(238, 242, 255, 0.6)" }}
+                      whileHover={{ backgroundColor: "rgba(249, 250, 251, 0.8)" }}
                     >
-                      <div className="flex justify-between">
-                        <span className="font-medium text-indigo-800">{invoice.invoiceNumber}</span>
-                        <span className={`text-sm ${invoice.paid ? 'text-green-600 font-medium' : 'text-amber-600 font-medium'}`}>
+                      <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <Receipt className="h-4 w-4 text-blue-500" />
+                          <span className="font-medium text-gray-800">{invoice.invoiceNumber}</span>
+                        </div>
+                        <span className={`text-sm px-2 py-0.5 rounded-full ${invoice.paid ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
                           {invoice.paid ? 'PAID' : 'UNPAID'}
                         </span>
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
-                        <span className="text-indigo-600 font-medium">
+                        <span>
                           Amount: ${invoice.net || invoice.amount || 0}
                         </span>
                         <span>
@@ -103,14 +122,10 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({
                     </motion.div>
                   ))}
                 </div>
-              ) : (
-                <div className="p-4 text-center text-gray-500">
-                  No matching invoices found
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </motion.div>
   );

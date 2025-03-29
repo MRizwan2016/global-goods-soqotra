@@ -2,6 +2,7 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { FormState } from "../../types";
+import { motion } from "framer-motion";
 
 interface PaymentAmountProps {
   formState: FormState;
@@ -15,8 +16,8 @@ const PaymentAmount: React.FC<PaymentAmountProps> = ({
   handleInputChange,
 }) => {
   return (
-    <div>
-      <label className="text-sm font-medium mb-1 block text-gray-700">
+    <div className="space-y-2">
+      <label className="text-sm font-medium block text-gray-700">
         Amount Paid:
       </label>
       <div className="relative">
@@ -31,8 +32,18 @@ const PaymentAmount: React.FC<PaymentAmountProps> = ({
           className="pl-8"
           min={0}
           step={0.01}
+          placeholder="Enter payment amount"
         />
       </div>
+      {formState.balanceToPay > 0 && formState.amountPaid < formState.balanceToPay && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-xs text-amber-600 font-medium"
+        >
+          This is a partial payment. {currencySymbol}{(formState.balanceToPay - formState.amountPaid).toFixed(2)} will remain unpaid.
+        </motion.div>
+      )}
     </div>
   );
 };

@@ -38,7 +38,8 @@ export const useInvoicePayment = () => {
     handleSelectChange,
     handleDateSelect,
     handleSelectInvoice,
-    handleSave
+    handleSave,
+    handlePaymentAmountChange
   } = usePaymentForm(
     selectedInvoice,
     setSelectedInvoice,
@@ -65,6 +66,7 @@ export const useInvoicePayment = () => {
     handleInvoiceSearch,
     handleSelectInvoice,
     handleSave,
-    handleCountryChange
+    handleCountryChange,
+    handlePaymentAmountChange
   };
 };

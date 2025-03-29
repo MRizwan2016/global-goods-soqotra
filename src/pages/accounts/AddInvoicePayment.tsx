@@ -49,6 +49,21 @@ const AddInvoicePayment = () => {
     }
   };
 
+  // Check if there is an invoice in session storage (from direct payment link)
+  React.useEffect(() => {
+    const storedInvoice = sessionStorage.getItem('selectedInvoice');
+    if (storedInvoice) {
+      try {
+        const parsedInvoice = JSON.parse(storedInvoice);
+        handleSelectInvoice(parsedInvoice);
+        // Clear session storage after using it
+        sessionStorage.removeItem('selectedInvoice');
+      } catch (error) {
+        console.error("Error parsing stored invoice:", error);
+      }
+    }
+  }, []);
+
   return (
     <PrivateRoute requiredFile="paymentMethods">
       <Layout title="Add Invoice Payment">

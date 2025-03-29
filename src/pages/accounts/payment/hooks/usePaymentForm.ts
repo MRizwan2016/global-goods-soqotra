@@ -61,6 +61,21 @@ export const usePaymentForm = (
   // Date state
   const [date, setDate] = useState<Date>(new Date());
   
+  // Effect for handling selected invoice and setting suggested payment amount
+  useEffect(() => {
+    if (selectedInvoice && formState) {
+      const netAmount = selectedInvoice.net || selectedInvoice.amount || 0;
+      const balanceToPay = netAmount - (formState.totalPaid || 0);
+      
+      // Set the amount paid to the balance to pay by default
+      setFormState(prev => ({
+        ...prev,
+        amountPaid: balanceToPay,
+        balanceToPay: balanceToPay
+      }));
+    }
+  }, [selectedInvoice]);
+  
   // Effect for calculating amounts when relevant values change
   useEffect(() => {
     if (formState) {
@@ -89,6 +104,20 @@ export const usePaymentForm = (
     }
   };
 
+  // Custom input change handler specifically for amountPaid
+  const handlePaymentAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    const numValue = parseFloat(value) || 0;
+    
+    // Allow any amount between 0 and the balance to pay
+    if (numValue >= 0) {
+      setFormState(prev => ({ 
+        ...prev, 
+        amountPaid: numValue 
+      }));
+    }
+  };
+
   return {
     formState,
     date,
@@ -96,6 +125,7 @@ export const usePaymentForm = (
     handleSelectChange,
     handleDateSelect: handleDateSelectWithState,
     handleSelectInvoice,
-    handleSave
+    handleSave,
+    handlePaymentAmountChange
   };
 };

@@ -14,7 +14,7 @@ const AmountsSummary: React.FC<AmountsSummaryProps> = ({
   currencySymbol,
 }) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
       <AmountDisplay 
         label="Gross Amount"
         value={formState.grossAmount}
@@ -46,7 +46,6 @@ const AmountsSummary: React.FC<AmountsSummaryProps> = ({
         currencySymbol={currencySymbol}
         textColor={formState.balanceToPay > 0 ? "text-amber-600" : "text-green-600"}
         isBold={true}
-        className="col-span-2 md:col-span-1"
       />
     </div>
   );
