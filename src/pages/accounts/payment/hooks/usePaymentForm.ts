@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { FormState, Invoice } from "../types";
@@ -79,7 +78,7 @@ export const usePaymentForm = (
         try {
           const selectedDate = new Date(selectedInvoice.date);
           setDate(selectedDate);
-          handleDateSelect(selectedDate); // Fixed: Now correctly passing only one argument
+          handleDateSelect(selectedDate);  // Fixed: Only passing the date parameter
         } catch (error) {
           console.error("Error parsing invoice date:", error);
         }
