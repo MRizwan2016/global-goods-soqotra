@@ -8,13 +8,18 @@ interface PaymentAmountProps {
   formState: FormState;
   currencySymbol: string;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handlePaymentAmountChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const PaymentAmount: React.FC<PaymentAmountProps> = ({
   formState,
   currencySymbol,
   handleInputChange,
+  handlePaymentAmountChange,
 }) => {
+  // Use the specialized handler if provided, otherwise use the general one
+  const onChange = handlePaymentAmountChange || handleInputChange;
+
   return (
     <div className="space-y-2">
       <label className="text-sm font-medium block text-gray-700">
@@ -28,7 +33,7 @@ const PaymentAmount: React.FC<PaymentAmountProps> = ({
           name="amountPaid"
           type="number"
           value={formState.amountPaid}
-          onChange={handleInputChange}
+          onChange={onChange}
           className="pl-8"
           min={0}
           step={0.01}

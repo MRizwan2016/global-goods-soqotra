@@ -31,7 +31,8 @@ const AddPaymentPage = () => {
     handleInvoiceSearch,
     handleSelectInvoice,
     handleSave,
-    handleCountryChange
+    handleCountryChange,
+    handlePaymentAmountChange
   } = useInvoicePayment();
 
   const navigate = useNavigate();
@@ -77,18 +78,15 @@ const AddPaymentPage = () => {
             <div className="space-y-6">
               {/* Search for Invoice or Pick one already shown from direct link */}
               {!selectedInvoice && (
-                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                  <h3 className="text-lg font-semibold mb-4 text-gray-800">Search for Invoice</h3>
-                  <InvoiceSearch 
-                    invoicePrefix={invoicePrefix}
-                    setInvoicePrefix={setInvoicePrefix}
-                    handleInvoiceSearch={handleInvoiceSearch}
-                    showInvoiceSelector={showInvoiceSelector}
-                    setShowInvoiceSelector={setShowInvoiceSelector}
-                    matchingInvoices={matchingInvoices}
-                    handleSelectInvoice={handleSelectInvoice}
-                  />
-                </div>
+                <InvoiceSearch 
+                  invoicePrefix={invoicePrefix}
+                  setInvoicePrefix={setInvoicePrefix}
+                  handleInvoiceSearch={handleInvoiceSearch}
+                  showInvoiceSelector={showInvoiceSelector}
+                  setShowInvoiceSelector={setShowInvoiceSelector}
+                  matchingInvoices={matchingInvoices}
+                  handleSelectInvoice={handleSelectInvoice}
+                />
               )}
 
               {/* Display selected invoice details */}
@@ -116,6 +114,7 @@ const AddPaymentPage = () => {
                     handleInputChange={handleInputChange}
                     handleDateSelect={handleDateSelect}
                     handleSelectChange={handleSelectChange}
+                    handlePaymentAmountChange={handlePaymentAmountChange}
                   />
                   
                   {/* Invoice Fields */}

@@ -23,9 +23,14 @@ export const useInvoiceSearch = () => {
     }
   }, []);
 
+  // Handle invoice search automatically when prefix changes
+  useEffect(() => {
+    handleInvoiceSearch();
+  }, [invoicePrefix]);
+
   // Handle invoice search
   const handleInvoiceSearch = () => {
-    // Mock implementation for demonstration
+    // Don't show dropdown for empty input
     if (invoicePrefix.trim() === "") {
       setMatchingInvoices([]);
       setShowInvoiceSelector(false);

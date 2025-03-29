@@ -64,8 +64,8 @@ export const usePaymentForm = (
   // Effect for handling selected invoice and setting suggested payment amount
   useEffect(() => {
     if (selectedInvoice && formState) {
-      const netAmount = selectedInvoice.net || selectedInvoice.amount || 0;
-      const balanceToPay = netAmount - (formState.totalPaid || 0);
+      const netAmount = selectedInvoice.netAmount || selectedInvoice.net || selectedInvoice.amount || 0;
+      const balanceToPay = netAmount - (selectedInvoice.totalPaid || 0);
       
       // Set the amount paid to the balance to pay by default
       setFormState(prev => ({

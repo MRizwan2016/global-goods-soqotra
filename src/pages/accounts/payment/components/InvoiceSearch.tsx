@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, Receipt } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -40,16 +40,6 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({
   handleSelectInvoice,
   handleInvoiceSearch,
 }) => {
-  // Show dropdown automatically when user starts typing
-  useEffect(() => {
-    if (invoicePrefix.length > 0) {
-      handleInvoiceSearch();
-      setShowInvoiceSelector(true);
-    } else {
-      setShowInvoiceSelector(false);
-    }
-  }, [invoicePrefix]);
-
   return (
     <motion.div 
       variants={fadeInVariants}
