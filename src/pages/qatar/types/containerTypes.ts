@@ -66,6 +66,7 @@ export interface UnsettledInvoice {
   consignee: string;
   amount: number;
   paid: boolean;
+  currency?: string; // Added the currency property as optional
 }
 
 export interface PrintOptions {
