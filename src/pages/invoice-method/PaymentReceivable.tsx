@@ -7,8 +7,33 @@ import StatusTabs from "./components/StatusTabs";
 import { toast } from "sonner";
 import { mockInvoiceData } from "@/data/mockData";
 
+// Define a proper type for the invoice
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  date: string;
+  shipper1: string;
+  consignee1: string;
+  salesAgent: string;
+  warehouse: string;
+  doorToDoor: boolean;
+  nic: string;
+  volume: number;
+  weight: number;
+  packages: number;
+  gross: number;
+  discount: number;
+  net: number;
+  paid: boolean;
+  statusCharge: number;
+  offerDiscount: number;
+  branch: string;
+  sector: string;
+  transportType: string;
+}
+
 const PaymentReceivable = () => {
-  const [invoices, setInvoices] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   
   useEffect(() => {
     // Load invoices from localStorage or mockData
@@ -19,7 +44,7 @@ const PaymentReceivable = () => {
         setInvoices(parsedInvoices);
       } else {
         // Ensure we include invoice 010000 in mock data
-        const mockData = [...mockInvoiceData];
+        const mockData = [...mockInvoiceData] as Invoice[];
         
         // Check if 010000 exists in mock data
         const hasInvoice010000 = mockData.some(invoice => invoice.invoiceNumber === "010000");

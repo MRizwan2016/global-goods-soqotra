@@ -13,9 +13,21 @@ import { Button } from "@/components/ui/button";
 import { Eye, CreditCard } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
+// Define the Invoice interface to match the one in PaymentReceivable.tsx
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  date: string;
+  shipper1: string;
+  consignee1: string;
+  net: number;
+  paid: boolean;
+  [key: string]: any; // Allow other properties
+}
+
 interface InvoiceTableProps {
-  invoices: any[];
-  onPay: (invoice: any) => void;
+  invoices: Invoice[];
+  onPay: (invoice: Invoice) => void;
   onView: (id: string) => void;
   showPayButton: boolean;
 }
@@ -50,7 +62,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             <TableCell className="text-right">{invoice.net}</TableCell>
             <TableCell>
               <Badge 
-                variant={invoice.paid ? "default" : "secondary"}
+                variant="secondary"
                 className={invoice.paid ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}
               >
                 {invoice.paid ? "Paid" : "Unpaid"}
