@@ -22,6 +22,7 @@ export interface Invoice {
   freightType?: string;
   gross?: number;
   paid?: boolean;
+  currency?: string; // Added currency property
 }
 
 export interface FormState {
