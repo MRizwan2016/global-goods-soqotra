@@ -21,10 +21,10 @@ const appRoutes: RouteConfig[] = [
   }
 ];
 
-// Place printDocumentsRoutes and authRoutes higher in the order for better priority
+// Place printDocumentsRoutes at the very top to give them the highest priority
 export const routes: RouteConfig[] = [
+  ...printDocumentsRoutes, // Highest priority for print routes
   ...authRoutes,
-  ...printDocumentsRoutes, // Give print documents routes higher priority
   ...mainRoutes,
   ...dataEntryRoutes,  
   ...appRoutes,

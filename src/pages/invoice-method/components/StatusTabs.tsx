@@ -1,34 +1,74 @@
 
-import React from "react";
-import { Card } from "@/components/ui/card";
+import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FileText } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import InvoiceTable from "./InvoiceTable";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
-const StatusTabs = () => {
+interface StatusTabsProps {
+  invoices: any[];
+}
+
+const StatusTabs: React.FC<StatusTabsProps> = ({ invoices }) => {
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("unpaid");
+  
+  const unpaidInvoices = invoices.filter(inv => !inv.paid);
+  const paidInvoices = invoices.filter(inv => inv.paid);
+  
+  const handlePayInvoice = (invoice: any) => {
+    // Navigate to the payment page with the invoice ID
+    sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
+    navigate("/accounts/payment/add");
+  };
+  
+  const handleViewInvoice = (id: string) => {
+    window.open(`/data-entry/print-documents/invoice-print/${id}`, '_blank');
+  };
+  
   return (
-    <Tabs defaultValue="unpaid" className="w-full">
-      <TabsList className="grid w-full max-w-md grid-cols-3">
-        <TabsTrigger value="unpaid">Unpaid</TabsTrigger>
-        <TabsTrigger value="partial">Partially Paid</TabsTrigger>
-        <TabsTrigger value="paid">Paid</TabsTrigger>
+    <Tabs defaultValue="unpaid" className="w-full" onValueChange={setActiveTab}>
+      <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsTrigger value="unpaid">Unpaid Invoices</TabsTrigger>
+        <TabsTrigger value="paid">Paid Invoices</TabsTrigger>
       </TabsList>
       
       <TabsContent value="unpaid" className="space-y-4 mt-4">
-        <Card className="p-6">
-          <InvoiceTable status="unpaid" />
-        </Card>
-      </TabsContent>
-      
-      <TabsContent value="partial" className="space-y-4 mt-4">
-        <Card className="p-6">
-          <InvoiceTable status="partial" />
+        <Card>
+          <CardContent className="p-4">
+            {unpaidInvoices.length > 0 ? (
+              <InvoiceTable 
+                invoices={unpaidInvoices} 
+                onPay={handlePayInvoice} 
+                onView={handleViewInvoice}
+                showPayButton={true}
+              />
+            ) : (
+              <div className="text-center py-10 text-gray-500">
+                <p>No unpaid invoices found</p>
+              </div>
+            )}
+          </CardContent>
         </Card>
       </TabsContent>
       
       <TabsContent value="paid" className="space-y-4 mt-4">
-        <Card className="p-6">
-          <InvoiceTable status="paid" />
+        <Card>
+          <CardContent className="p-4">
+            {paidInvoices.length > 0 ? (
+              <InvoiceTable 
+                invoices={paidInvoices} 
+                onPay={() => {}} 
+                onView={handleViewInvoice}
+                showPayButton={false}
+              />
+            ) : (
+              <div className="text-center py-10 text-gray-500">
+                <p>No paid invoices found</p>
+              </div>
+            )}
+          </CardContent>
         </Card>
       </TabsContent>
     </Tabs>

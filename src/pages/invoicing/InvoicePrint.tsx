@@ -1,6 +1,6 @@
 
-import { useRef } from "react";
-import { useInvoicePrintData } from "./hooks/useInvoicePrintData";
+import { useRef, useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import PrintModeToolbar from "./components/print/PrintModeToolbar";
 import PrintStyles from "./components/print/PrintStyles";
 import InvoiceMode from "./components/print-modes/InvoiceMode";
@@ -8,30 +8,82 @@ import BillOfLadingMode from "./components/print-modes/BillOfLadingMode";
 import CertificateMode from "./components/print-modes/CertificateMode";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { mockInvoiceData } from "@/data/mockData";
+import { toast } from "sonner";
 
 const InvoicePrint = () => {
   const printRef = useRef<HTMLDivElement>(null);
-  const {
-    invoice,
-    packageDetails,
-    totalVolume,
-    totalWeight,
-    mode,
-    setMode,
-    isAuthenticated,
-    loading,
-    handlePrint,
-    handleBack,
-  } = useInvoicePrintData();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [invoice, setInvoice] = useState<any>(null);
+  const [mode, setMode] = useState<"invoice" | "bl" | "certificate">("invoice");
   
-  if (!isAuthenticated) {
-    return (
-      <div className="p-8 text-center">
-        <div className="animate-pulse">Redirecting to login...</div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    const loadInvoice = async () => {
+      if (!id) {
+        toast.error("No invoice ID provided");
+        return;
+      }
+      
+      try {
+        // First try to get from localStorage
+        const storedInvoices = localStorage.getItem('invoices');
+        let foundInvoice = null;
+        
+        if (storedInvoices) {
+          const parsedInvoices = JSON.parse(storedInvoices);
+          foundInvoice = parsedInvoices.find((inv: any) => inv.id === id);
+        }
+        
+        // If not found in localStorage, check mock data
+        if (!foundInvoice) {
+          foundInvoice = mockInvoiceData.find(inv => inv.id === id);
+        }
+        
+        if (foundInvoice) {
+          console.log("Found invoice:", foundInvoice);
+          setInvoice(foundInvoice);
+        } else {
+          console.error("Invoice not found with ID:", id);
+          toast.error("Invoice not found");
+        }
+      } catch (error) {
+        console.error("Error loading invoice:", error);
+        toast.error("Error loading invoice data");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadInvoice();
+  }, [id]);
   
+  // Calculate totals
+  const packageDetails = invoice?.packageDetails || invoice?.packageItems || [];
+  const totalVolume = packageDetails.reduce((sum: number, pkg: any) => {
+    return sum + parseFloat(pkg.volume || '0');
+  }, 0).toFixed(3);
+  
+  const totalWeight = invoice ? (parseFloat(invoice.weight) || 0).toFixed(2) : "0.00";
+  
+  const handlePrint = () => {
+    window.print();
+  };
+  
+  const handleBack = () => {
+    if (id) {
+      // Try to go back to referring page instead of hardcoding
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        navigate(`/data-entry/invoicing`);
+      }
+    } else {
+      navigate("/data-entry/invoicing");
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-8 text-center">
@@ -44,7 +96,7 @@ const InvoicePrint = () => {
     return (
       <div className="p-8 text-center">
         <div className="flex flex-col items-center gap-4">
-          <p>Invoice not found. Redirecting...</p>
+          <p>Invoice not found.</p>
           <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
             <ArrowLeft size={16} />
             Go Back

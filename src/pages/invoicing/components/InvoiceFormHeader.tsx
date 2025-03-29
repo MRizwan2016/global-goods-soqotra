@@ -15,7 +15,7 @@ const InvoiceFormHeader: React.FC<InvoiceFormHeaderProps> = ({ isEditing }) => {
 
   const handlePrint = () => {
     if (id) {
-      // Open in a new tab with the correct path
+      // Use window.open to open in a new tab - this avoids routing issues
       window.open(`/data-entry/print-documents/invoice-print/${id}`, '_blank');
     } else {
       toast.error("Please save the invoice first before printing");
@@ -24,7 +24,8 @@ const InvoiceFormHeader: React.FC<InvoiceFormHeaderProps> = ({ isEditing }) => {
   
   const handlePreview = () => {
     if (id) {
-      navigate(`/data-entry/invoicing/preview/${id}`);
+      // Use window.open for preview to avoid routing issues
+      window.open(`/data-entry/print-documents/invoice-print/${id}`, '_blank');
     } else {
       toast.error("Please save the invoice first before previewing");
     }
