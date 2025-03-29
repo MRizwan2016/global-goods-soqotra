@@ -21,6 +21,7 @@ export const usePaymentForm = (
   // Initial form state
   const initialFormState: FormState = {
     invoiceNumber: "",
+    customerName: "", // Add this line to include customerName required by FormState
     bookingForm: "",
     shipper: "",
     consignee: "",
@@ -78,7 +79,7 @@ export const usePaymentForm = (
         try {
           const selectedDate = new Date(selectedInvoice.date);
           setDate(selectedDate);
-          handleDateSelect(selectedDate);
+          handleDateSelect(selectedDate); // Fix: Remove the second argument
         } catch (error) {
           console.error("Error parsing invoice date:", error);
         }
@@ -88,6 +89,7 @@ export const usePaymentForm = (
       setFormState(prev => ({
         ...prev,
         invoiceNumber: selectedInvoice.invoiceNumber || "",
+        customerName: selectedInvoice.consignee1 || selectedInvoice.consignee || "", // Add this line
         bookingForm: selectedInvoice.bookingForm || selectedInvoice.bookNumber || "",
         shipper: selectedInvoice.shipper1 || selectedInvoice.shipper || "",
         consignee: selectedInvoice.consignee1 || selectedInvoice.consignee || "",
