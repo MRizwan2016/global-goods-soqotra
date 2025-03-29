@@ -35,7 +35,8 @@ const AddInvoicePayment = () => {
     handleDateSelect,
     handleInvoiceSearch,
     handleSelectInvoice,
-    handleSave
+    handleSave,
+    handleCountryChange
   } = useInvoicePayment();
 
   const container = {
@@ -105,6 +106,7 @@ const AddInvoicePayment = () => {
                 <CountryCurrencySelector 
                   formState={formState}
                   handleSelectChange={handleSelectChange}
+                  handleCountryChange={handleCountryChange}
                   countryOptions={countryOptions}
                   filteredCurrencies={filteredCurrencies}
                 />
@@ -112,7 +114,7 @@ const AddInvoicePayment = () => {
                 {selectedInvoice && (
                   <SelectedInvoiceDetails 
                     selectedInvoice={selectedInvoice} 
-                    currencySymbol={currencySymbol}
+                    formState={formState}
                   />
                 )}
 
