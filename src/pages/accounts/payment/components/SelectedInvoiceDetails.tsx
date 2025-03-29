@@ -41,6 +41,9 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
                          formState.currency === "LKR" ? "Rs" : 
                          formState.currency;
 
+  // Get the net amount from the invoice using different possible property names
+  const netAmount = selectedInvoice.net || selectedInvoice.amount || selectedInvoice.netAmount || 0;
+                         
   return (
     <motion.div 
       initial={fadeInVariants.initial}
@@ -67,7 +70,7 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
         </div>
         <div>
           <span className="text-sm text-gray-500">Total Amount:</span>
-          <p className="font-semibold text-gray-900">{currencySymbol}{selectedInvoice.net || selectedInvoice.amount || 0}</p>
+          <p className="font-semibold text-gray-900">{currencySymbol}{netAmount}</p>
         </div>
         <div>
           <span className="text-sm text-gray-500">Payment Status:</span>

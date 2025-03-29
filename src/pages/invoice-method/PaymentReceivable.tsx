@@ -57,7 +57,7 @@ const PaymentReceivable = () => {
           mockData.push({
             id: "inv-010000",
             invoiceNumber: "010000",
-            date: "2025-03-30",
+            date: "2023-03-30",
             shipper1: "Global Exports Ltd.",
             consignee1: "PASTOR ZACH RICH",
             salesAgent: "John Doe",
@@ -78,6 +78,8 @@ const PaymentReceivable = () => {
             transportType: "Air",
             bookingForm: "BF-10000",
             freightType: "Air Freight",
+            amount: 1500,
+            currency: "QAR"
           });
         }
         

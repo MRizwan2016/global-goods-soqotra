@@ -15,6 +15,16 @@ export const useInvoiceSelection = (
   const handleSelectInvoice = (invoice: Invoice) => {
     setSelectedInvoice(invoice);
     
+    // Get the correct amount values from the invoice
+    const grossAmount = invoice.gross || invoice.grossAmount || 0;
+    const discount = invoice.discount || 0;
+    const netAmount = invoice.net || invoice.amount || invoice.netAmount || 0;
+    const totalPaid = invoice.totalPaid || 0;
+    const balanceToPay = netAmount - totalPaid;
+    
+    console.log("Selected invoice data:", invoice);
+    console.log("Amount calculations:", { grossAmount, discount, netAmount, totalPaid, balanceToPay });
+    
     // Create a consistent mapping for invoice data regardless of source
     setFormState(prevState => ({
       ...prevState,
@@ -25,12 +35,13 @@ export const useInvoiceSelection = (
       consignee: invoice.consignee1 || invoice.consignee || "",
       warehouse: invoice.warehouse || "",
       shipmentType: invoice.freightType || invoice.shipmentType || "",
-      grossAmount: invoice.gross || invoice.amount || 0,
-      discount: invoice.discount || 0,
-      netAmount: (invoice.net || invoice.amount || 0),
-      totalPaid: invoice.paid ? (invoice.net || invoice.amount || 0) : 0,
-      balanceToPay: invoice.paid ? 0 : (invoice.net || invoice.amount || 0),
-      amountPaid: invoice.paid ? 0 : (invoice.net || invoice.amount || 0),
+      // Ensure all amount fields are properly populated
+      grossAmount: grossAmount,
+      discount: discount,
+      netAmount: netAmount,
+      totalPaid: totalPaid,
+      balanceToPay: balanceToPay,
+      amountPaid: balanceToPay,  // Set suggested payment amount to balance
       paymentCollectDate: invoice.date || prevState.paymentCollectDate,
       country: prevState.country,
       currency: prevState.currency

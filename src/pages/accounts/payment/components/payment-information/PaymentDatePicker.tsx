@@ -34,7 +34,7 @@ const PaymentDatePicker: React.FC<PaymentDatePickerProps> = ({
           <Calendar
             mode="single"
             selected={date}
-            onSelect={(selectedDate) => selectedDate && handleDateSelect(selectedDate)}
+            onSelect={handleDateSelect}
             initialFocus
           />
         </PopoverContent>

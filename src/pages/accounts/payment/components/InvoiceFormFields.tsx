@@ -29,10 +29,10 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
         </label>
         <Input
           name="invoiceNumber"
-          value={formState.invoiceNumber}
+          value={formState.invoiceNumber || ""}
           onChange={handleInputChange}
           readOnly={isReadOnly || true} // Always read-only since it's selected from dropdown
-          className={isReadOnly ? "bg-gray-50" : ""}
+          className="bg-gray-50"
         />
       </div>
       
@@ -42,10 +42,10 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
         </label>
         <Input
           name="bookingForm"
-          value={formState.bookingForm || ''}
+          value={formState.bookingForm || ""}
           onChange={handleInputChange}
           readOnly={isReadOnly || true} // Make read-only to match screenshot
-          className={isReadOnly ? "bg-gray-50" : ""}
+          className="bg-gray-50"
         />
       </div>
       
@@ -55,10 +55,10 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
         </label>
         <Input
           name="shipper"
-          value={formState.shipper || ''}
+          value={formState.shipper || ""}
           onChange={handleInputChange}
           readOnly={isReadOnly || true} // Make read-only to match screenshot
-          className={isReadOnly ? "bg-gray-50" : ""}
+          className="bg-gray-50"
         />
       </div>
       
@@ -68,10 +68,10 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
         </label>
         <Input
           name="consignee"
-          value={formState.consignee || ''}
+          value={formState.consignee || ""}
           onChange={handleInputChange}
           readOnly={isReadOnly || true} // Make read-only to match screenshot
-          className={isReadOnly ? "bg-gray-50" : ""}
+          className="bg-gray-50"
         />
       </div>
       
@@ -81,10 +81,10 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
         </label>
         <Input
           name="warehouse"
-          value={formState.warehouse || ''}
+          value={formState.warehouse || ""}
           onChange={handleInputChange}
           readOnly={isReadOnly || true} // Make read-only to match screenshot
-          className={isReadOnly ? "bg-gray-50" : ""}
+          className="bg-gray-50"
         />
       </div>
       
@@ -94,10 +94,10 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
         </label>
         <Input
           name="shipmentType"
-          value={formState.shipmentType || ''}
+          value={formState.shipmentType || ""}
           onChange={handleInputChange}
           readOnly={isReadOnly || true} // Make read-only to match screenshot
-          className={isReadOnly ? "bg-gray-50" : ""}
+          className="bg-gray-50"
         />
       </div>
     </motion.div>

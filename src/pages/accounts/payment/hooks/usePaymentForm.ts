@@ -64,8 +64,14 @@ export const usePaymentForm = (
   // Effect for handling selected invoice and setting suggested payment amount
   useEffect(() => {
     if (selectedInvoice && formState) {
-      const netAmount = selectedInvoice.netAmount || selectedInvoice.net || selectedInvoice.amount || 0;
-      const balanceToPay = netAmount - (selectedInvoice.totalPaid || 0);
+      console.log("Selected invoice in usePaymentForm:", selectedInvoice);
+      
+      // Get relevant fields from invoice
+      const grossAmount = selectedInvoice.gross || selectedInvoice.grossAmount || 0;
+      const discount = selectedInvoice.discount || 0;
+      const netAmount = selectedInvoice.net || selectedInvoice.amount || selectedInvoice.netAmount || 0;
+      const totalPaid = selectedInvoice.totalPaid || 0;
+      const balanceToPay = netAmount - totalPaid;
       
       // Set the invoice date to the payment date if available
       if (selectedInvoice.date) {
@@ -78,11 +84,23 @@ export const usePaymentForm = (
         }
       }
       
-      // Set the amount paid to the balance to pay by default
+      // Update form state with invoice data
       setFormState(prev => ({
         ...prev,
+        invoiceNumber: selectedInvoice.invoiceNumber || "",
+        bookingForm: selectedInvoice.bookingForm || selectedInvoice.bookNumber || "",
+        shipper: selectedInvoice.shipper1 || selectedInvoice.shipper || "",
+        consignee: selectedInvoice.consignee1 || selectedInvoice.consignee || "",
+        warehouse: selectedInvoice.warehouse || "",
+        shipmentType: selectedInvoice.freightType || selectedInvoice.shipmentType || "",
+        grossAmount: grossAmount,
+        discount: discount,
+        netAmount: netAmount,
+        totalPaid: totalPaid,
+        balanceToPay: balanceToPay,
         amountPaid: balanceToPay,
-        balanceToPay: balanceToPay
+        // Set currency from invoice if available
+        currency: selectedInvoice.currency || prev.currency
       }));
     }
   }, [selectedInvoice]);
