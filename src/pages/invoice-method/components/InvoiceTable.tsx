@@ -50,7 +50,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             <TableCell className="text-right">{invoice.net}</TableCell>
             <TableCell>
               <Badge 
-                variant={invoice.paid ? "success" : "secondary"}
+                variant={invoice.paid ? "default" : "secondary"}
                 className={invoice.paid ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"}
               >
                 {invoice.paid ? "Paid" : "Unpaid"}
