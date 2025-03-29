@@ -21,11 +21,11 @@ const appRoutes: RouteConfig[] = [
   }
 ];
 
-// Place mainRoutes at the beginning to give Landing page higher priority
+// Place printDocumentsRoutes and authRoutes higher in the order for better priority
 export const routes: RouteConfig[] = [
   ...authRoutes,
-  ...mainRoutes, // Added mainRoutes with higher priority
-  ...printDocumentsRoutes,
+  ...printDocumentsRoutes, // Give print documents routes higher priority
+  ...mainRoutes,
   ...dataEntryRoutes,  
   ...appRoutes,
   ...masterDataRoutes,
@@ -34,5 +34,5 @@ export const routes: RouteConfig[] = [
   ...qatarRoutes,
   ...accountsRoutes,
   ...adminRoutes,
-  ...paymentReceivableRoutes, // Make sure paymentReceivableRoutes are included
+  ...paymentReceivableRoutes,
 ];

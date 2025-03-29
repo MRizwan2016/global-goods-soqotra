@@ -73,7 +73,7 @@ export const useInvoiceList = () => {
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
   
   const handlePrintInvoice = (id: string) => {
-    // Use the print-documents route for viewing the print preview
+    // Use the correct print route
     window.open(`/data-entry/print-documents/invoice-print/${id}`, '_blank');
   };
   

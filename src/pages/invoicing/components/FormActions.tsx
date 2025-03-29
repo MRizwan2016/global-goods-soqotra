@@ -14,15 +14,15 @@ const FormActions: React.FC<FormActionsProps> = ({ handleSave, invoiceId }) => {
   
   const handlePrint = () => {
     if (invoiceId) {
-      // Navigate to the print page with the invoice ID
-      navigate(`/data-entry/invoicing/print/${invoiceId}?mode=invoice`);
+      // Navigate to the correct print page with the invoice ID
+      window.open(`/data-entry/print-documents/invoice-print/${invoiceId}`, '_blank');
     }
   };
   
   const handlePreview = () => {
     if (invoiceId) {
       // Open preview in a new tab
-      window.open(`/data-entry/invoicing/print/${invoiceId}?mode=invoice`, "_blank");
+      window.open(`/data-entry/print-documents/invoice-print/${invoiceId}`, "_blank");
     }
   };
   
