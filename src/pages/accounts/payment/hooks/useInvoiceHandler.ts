@@ -17,6 +17,13 @@ export const useInvoiceHandler = () => {
     setSelectedInvoice(invoice);
     setShowInvoiceSelector(false);
     
+    // Check if the invoice has already been loaded from sessionStorage
+    const isFromSessionStorage = !!sessionStorage.getItem('selectedInvoice');
+    if (isFromSessionStorage) {
+      // Clear the session storage to prevent reuse
+      sessionStorage.removeItem('selectedInvoice');
+    }
+    
     // If invoice is already paid, show a warning
     if (invoice.paid) {
       toast.warning("Invoice Already Paid", {
@@ -26,6 +33,19 @@ export const useInvoiceHandler = () => {
     
     // Special handling for invoice 010000
     if (invoice.invoiceNumber === "010000") {
+      // Check if this invoice is already marked as paid
+      let isPaid = invoice.paid || false;
+      
+      // If not set as paid, check if there are payments for it in localStorage
+      if (!isPaid) {
+        const storedPayments = localStorage.getItem('payments');
+        if (storedPayments) {
+          const payments = JSON.parse(storedPayments);
+          const invoice010000Payments = payments.filter((p: any) => p.invoiceNumber === "010000");
+          isPaid = invoice010000Payments.length > 0;
+        }
+      }
+      
       setFormState(prev => ({
         ...prev,
         invoiceNumber: "010000",
@@ -38,15 +58,15 @@ export const useInvoiceHandler = () => {
         grossAmount: 1500,
         discount: 0,
         netAmount: 1500,
-        totalPaid: invoice.paid ? 1500 : 0,
-        balanceToPay: invoice.paid ? 0 : 1500,
-        amountPaid: invoice.paid ? 0 : 1500,
+        totalPaid: isPaid ? 1500 : 0,
+        balanceToPay: isPaid ? 0 : 1500,
+        amountPaid: isPaid ? 0 : 1500,
         currency: "QAR",
         country: "Qatar",
       }));
       
       toast.success("Invoice Selected", {
-        description: `Invoice 010000 loaded for payment${invoice.paid ? ' (already paid)' : ''}`
+        description: `Invoice 010000 loaded for payment${isPaid ? ' (already paid)' : ''}`
       });
       return;
     }

@@ -70,6 +70,7 @@ const PaymentReceivable = () => {
       
       // Add invoice 010000 if it doesn't exist
       if (!hasInvoice010000) {
+        // Always add invoice 010000 as unpaid initially
         parsedInvoices.push({
           id: "inv-010000",
           invoiceNumber: "010000",
@@ -86,7 +87,7 @@ const PaymentReceivable = () => {
           gross: 1500,
           discount: 0,
           net: 1500,
-          paid: false,
+          paid: false, // We'll check payment status elsewhere
           statusCharge: 0,
           offerDiscount: 0,
           branch: "Doha",
@@ -99,6 +100,39 @@ const PaymentReceivable = () => {
         });
         
         console.log("Added invoice 010000 to the list");
+      }
+      
+      // Check if there are payments for invoice 010000
+      const payments = localStorage.getItem('payments');
+      if (payments) {
+        const parsedPayments = JSON.parse(payments);
+        
+        // Update paid status based on payments
+        parsedInvoices = parsedInvoices.map(invoice => {
+          // Find all payments for this invoice
+          const invoicePayments = parsedPayments.filter(
+            (payment: any) => payment.invoiceNumber === invoice.invoiceNumber
+          );
+          
+          // If there are payments, mark the invoice as paid
+          if (invoicePayments.length > 0) {
+            const totalPaid = invoicePayments.reduce(
+              (sum: number, payment: any) => sum + (parseFloat(payment.amount) || 0), 
+              0
+            );
+            
+            // Mark as paid if the total payments equal or exceed the invoice amount
+            const invoiceAmount = invoice.net || invoice.amount || 0;
+            return {
+              ...invoice,
+              paid: totalPaid >= invoiceAmount,
+              totalPaid: totalPaid,
+              paidAmount: totalPaid
+            };
+          }
+          
+          return invoice;
+        });
       }
       
       // Save updated invoices to localStorage

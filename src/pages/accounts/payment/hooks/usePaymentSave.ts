@@ -74,6 +74,14 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string = ""
         description: `Payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} has been recorded successfully`
       });
       
+      // Check if we need to show reconciliation reminder
+      checkReconciliationReminder(existingPayments);
+      
+      // Navigate back to payment receivable page after saving
+      setTimeout(() => {
+        navigate('/invoice-method/payment-receivable');
+      }, 1500);
+      
       return {
         success: true,
         paymentId,
@@ -85,6 +93,26 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string = ""
         description: "There was an error saving the payment. Please try again."
       });
       return { success: false };
+    }
+  };
+  
+  // Check if a reconciliation reminder should be shown
+  const checkReconciliationReminder = (payments: any[]) => {
+    // Get only the payments that haven't been reconciled yet
+    const unreconciled = payments.filter(p => !p.reconciled);
+    
+    if (unreconciled.length >= 10) {
+      // Show reconciliation reminder toast
+      toast.warning("Reconciliation Reminder", {
+        description: `You have ${unreconciled.length} unreconciled payments. Please reconcile them soon.`,
+        duration: 8000,
+        action: {
+          label: "Reconcile Now",
+          onClick: () => {
+            navigate('/accounts/payments/reconciliation');
+          }
+        }
+      });
     }
   };
   
@@ -103,14 +131,27 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string = ""
           // Mark as paid if payment covers the full balance
           if (amountPaid >= balanceToPay) {
             console.log(`Marking invoice ${invoiceNumber} as paid`);
-            return { ...invoice, paid: true, paidAmount: invoice.net || invoice.amount || 0 };
+            return { 
+              ...invoice, 
+              paid: true, 
+              paidAmount: invoice.net || invoice.amount || 0,
+              totalPaid: invoice.net || invoice.amount || 0,
+              balanceToPay: 0
+            };
           }
           
           // For partial payments, just update the amount paid so far
           const currentPaid = invoice.paidAmount || 0;
+          const totalPaid = currentPaid + amountPaid;
+          const invoiceAmount = invoice.net || invoice.amount || 0;
+          const newBalanceToPay = invoiceAmount - totalPaid;
+          
           return { 
             ...invoice, 
-            paidAmount: currentPaid + amountPaid 
+            paidAmount: totalPaid,
+            totalPaid: totalPaid,
+            balanceToPay: newBalanceToPay,
+            paid: totalPaid >= invoiceAmount
           };
         }
         return invoice;

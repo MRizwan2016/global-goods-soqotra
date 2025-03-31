@@ -18,8 +18,7 @@ export const useInvoiceSearch = () => {
         const parsedInvoice = JSON.parse(storedInvoice);
         setSelectedInvoice(parsedInvoice);
         
-        // Clear from session storage to prevent reuse
-        sessionStorage.removeItem('selectedInvoice');
+        // No need to clear from session storage here, the handleSelectInvoice will do it
         
         toast.success("Invoice loaded", {
           description: `Invoice ${parsedInvoice.invoiceNumber} has been loaded for payment`,

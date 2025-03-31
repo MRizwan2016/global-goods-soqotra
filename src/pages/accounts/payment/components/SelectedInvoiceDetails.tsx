@@ -35,6 +35,27 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
 
   console.log("Rendering SelectedInvoiceDetails with:", { selectedInvoice, formState });
 
+  // Get payment status from invoice or check localStorage for any payments made
+  const getPaymentStatus = (invoiceNumber: string, defaultPaid: boolean): boolean => {
+    // If invoice is already marked as paid, return true
+    if (defaultPaid) return true;
+    
+    // Check localStorage for payments
+    const paymentsStr = localStorage.getItem('payments');
+    if (!paymentsStr) return false;
+    
+    try {
+      const payments = JSON.parse(paymentsStr);
+      // Find payments for this invoice
+      const invoicePayments = payments.filter((p: any) => p.invoiceNumber === invoiceNumber);
+      // If we found any payments, consider it paid
+      return invoicePayments.length > 0;
+    } catch (e) {
+      console.error("Error parsing payments:", e);
+      return false;
+    }
+  };
+
   // Special handling for invoice 010000
   if (selectedInvoice.invoiceNumber === "010000") {
     // Use currency from formState or selectedInvoice
@@ -49,6 +70,9 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
                            currency === "INR" ? "₹" :
                            currency === "LKR" ? "Rs" : 
                            currency;
+                           
+    // Check if invoice 010000 has been paid
+    const isPaid = getPaymentStatus("010000", selectedInvoice.paid || false);
                            
     return (
       <motion.div 
@@ -81,7 +105,10 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
           <div>
             <span className="text-sm text-gray-500">Payment Status:</span>
             <p className="font-semibold">
-              <span className="text-amber-600">Unpaid</span>
+              {isPaid ? 
+                <span className="text-green-600">Paid</span> : 
+                <span className="text-amber-600">Unpaid</span>
+              }
             </p>
           </div>
           <div>
@@ -108,6 +135,9 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
 
   // Get the net amount from the invoice using different possible property names
   const netAmount = selectedInvoice.net || selectedInvoice.amount || selectedInvoice.netAmount || 0;
+  
+  // Check payment status from invoice or localStorage
+  const isPaid = getPaymentStatus(selectedInvoice.invoiceNumber, selectedInvoice.paid || false);
                          
   return (
     <motion.div 
@@ -140,7 +170,7 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
         <div>
           <span className="text-sm text-gray-500">Payment Status:</span>
           <p className="font-semibold">
-            {selectedInvoice.paid ? 
+            {isPaid ? 
               <span className="text-green-600">Paid</span> : 
               <span className="text-amber-600">Unpaid</span>
             }

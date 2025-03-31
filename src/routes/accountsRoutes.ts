@@ -1,41 +1,37 @@
 
+import { RouteObject } from "react-router-dom";
+import PaymentsPage from "@/pages/accounts/PaymentsPage";
 import AddInvoicePayment from "@/pages/accounts/AddInvoicePayment";
 import PaymentMethodsPage from "@/pages/accounts/PaymentMethodsPage";
 import ReconciliationPage from "@/pages/accounts/ReconciliationPage";
-import PaymentsPage from "@/pages/accounts/PaymentsPage";
 import AddPaymentPage from "@/pages/accounts/payment/AddPaymentPage";
-import { RouteConfig } from "./types";
+import ReconciliationPage from "@/pages/accounts/payments/ReconciliationPage";
 
-export const accountsRoutes: RouteConfig[] = [
+const accountsRoutes: RouteObject[] = [
   {
-    path: "/accounts/add-payment",
-    element: AddInvoicePayment,
-    private: true,
-    requiredFile: "paymentMethods"
+    path: "payments",
+    element: <PaymentsPage />,
   },
   {
-    path: "/accounts/payment/add",
-    element: AddPaymentPage,
-    private: true
+    path: "payments/add",
+    element: <AddInvoicePayment />,
   },
   {
-    path: "/accounts/payments",
-    element: PaymentsPage,
-    private: true
+    path: "payment/add",
+    element: <AddPaymentPage />,
   },
   {
-    path: "/accounts/payment-methods",
-    element: PaymentMethodsPage,
-    private: true
+    path: "payment-methods",
+    element: <PaymentMethodsPage />,
   },
   {
-    path: "/accounts/reconciliation",
-    element: ReconciliationPage,
-    private: true
+    path: "reconciliation",
+    element: <ReconciliationPage />,
   },
   {
-    path: "/invoice-payment/:invoiceId",
-    element: AddPaymentPage,
-    private: true
-  }
+    path: "payments/reconciliation",
+    element: <ReconciliationPage />,
+  },
 ];
+
+export default accountsRoutes;
