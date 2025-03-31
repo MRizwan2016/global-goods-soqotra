@@ -43,8 +43,10 @@ export const useInvoiceSelection = (
       balanceToPay: balanceToPay,
       amountPaid: balanceToPay,  // Set suggested payment amount to balance
       paymentCollectDate: invoice.date || prevState.paymentCollectDate,
-      country: prevState.country,
-      currency: prevState.currency
+      country: invoice.country || prevState.country,
+      currency: invoice.currency || prevState.currency,
+      // If the specific invoice 010000 is selected, set the amount to 1500
+      ...(invoice.invoiceNumber === "010000" && { amountPaid: 1500 })
     }));
     
     setShowInvoiceSelector(false);

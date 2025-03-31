@@ -44,7 +44,7 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
           name="bookingForm"
           value={formState.bookingForm || ""}
           onChange={handleInputChange}
-          readOnly={isReadOnly || true} // Make read-only to match screenshot
+          readOnly={isReadOnly || true}
           className="bg-gray-50"
         />
       </div>
@@ -57,7 +57,7 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
           name="shipper"
           value={formState.shipper || ""}
           onChange={handleInputChange}
-          readOnly={isReadOnly || true} // Make read-only to match screenshot
+          readOnly={isReadOnly || true}
           className="bg-gray-50"
         />
       </div>
@@ -70,7 +70,7 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
           name="consignee"
           value={formState.consignee || ""}
           onChange={handleInputChange}
-          readOnly={isReadOnly || true} // Make read-only to match screenshot
+          readOnly={isReadOnly || true}
           className="bg-gray-50"
         />
       </div>
@@ -83,7 +83,7 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
           name="warehouse"
           value={formState.warehouse || ""}
           onChange={handleInputChange}
-          readOnly={isReadOnly || true} // Make read-only to match screenshot
+          readOnly={isReadOnly || true}
           className="bg-gray-50"
         />
       </div>
@@ -96,7 +96,7 @@ const InvoiceFormFields: React.FC<InvoiceFormFieldsProps> = ({
           name="shipmentType"
           value={formState.shipmentType || ""}
           onChange={handleInputChange}
-          readOnly={isReadOnly || true} // Make read-only to match screenshot
+          readOnly={isReadOnly || true}
           className="bg-gray-50"
         />
       </div>

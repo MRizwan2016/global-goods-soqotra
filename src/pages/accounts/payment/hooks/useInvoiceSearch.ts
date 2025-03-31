@@ -49,24 +49,24 @@ export const useInvoiceSearch = () => {
       return;
     }
 
-    // Mock data for demonstration
+    // Mock data for demonstration with the specific 010000 invoice
     const mockInvoices: Invoice[] = [
       {
         id: "1",
-        invoiceNumber: `INV-${invoicePrefix}001`,
+        invoiceNumber: "010000",
         date: new Date().toISOString().split('T')[0],
-        net: 900,
+        net: 1500,
         paid: false,
-        bookingForm: "BF-001",
-        shipper: "ABC Company",
-        consignee: "XYZ Corp",
-        warehouse: "Warehouse A",
-        shipmentType: "AIR",
-        grossAmount: 1000,
-        discount: 100,
-        netAmount: 900,
-        totalPaid: 500,
-        balanceToPay: 400,
+        bookingForm: "BF-XA-2024-010",
+        shipper: "Global Shipping Inc.",
+        consignee: "Qatar Logistics Co.",
+        warehouse: "Doha Main Warehouse",
+        shipmentType: "SEA",
+        grossAmount: 1700,
+        discount: 200,
+        netAmount: 1500,
+        totalPaid: 0,
+        balanceToPay: 1500,
         currency: "QAR"
       },
       {
@@ -89,6 +89,12 @@ export const useInvoiceSearch = () => {
       }
     ];
 
+    // Filter to match the invoicePrefix or show the 010000 invoice
+    const filteredInvoices = mockInvoices.filter(inv => 
+      inv.invoiceNumber.toLowerCase().includes(invoicePrefix.toLowerCase()) ||
+      (invoicePrefix === "01" && inv.invoiceNumber === "010000")
+    );
+
     // Also get stored invoices from local storage
     const storedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
     const filteredStoredInvoices = storedInvoices.filter((inv: any) => 
@@ -96,7 +102,7 @@ export const useInvoiceSearch = () => {
     );
 
     // Combine mock and stored invoices
-    const allInvoices = [...mockInvoices, ...filteredStoredInvoices];
+    const allInvoices = [...filteredInvoices, ...filteredStoredInvoices];
     
     setMatchingInvoices(allInvoices);
     setShowInvoiceSelector(true);
