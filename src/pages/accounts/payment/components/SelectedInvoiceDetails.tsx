@@ -77,7 +77,7 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
         </div>
         <div>
           <span className="text-sm text-gray-500">Total Amount:</span>
-          <p className="font-semibold text-gray-900">{currencySymbol} {netAmount}</p>
+          <p className="font-semibold text-gray-900">{currencySymbol} {netAmount.toFixed(2)}</p>
         </div>
         <div>
           <span className="text-sm text-gray-500">Payment Status:</span>

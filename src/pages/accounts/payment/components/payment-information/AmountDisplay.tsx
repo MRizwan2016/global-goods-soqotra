@@ -3,7 +3,7 @@ import React from "react";
 
 interface AmountDisplayProps {
   label: string;
-  value: number;
+  value: number | undefined;
   currencySymbol: string;
   textColor?: string;
   isBold?: boolean;

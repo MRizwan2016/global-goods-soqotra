@@ -16,7 +16,7 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string = ""
       return;
     }
 
-    if (formState.amountPaid <= 0) {
+    if (!formState.amountPaid || formState.amountPaid <= 0) {
       toast.error("Invalid Amount", {
         description: "Payment amount must be greater than zero"
       });
@@ -36,10 +36,14 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string = ""
       const existingPayments = existingPaymentsStr ? JSON.parse(existingPaymentsStr) : [];
       
       // Create a new payment record
+      const paymentId = uuidv4();
+      const receiptNumber = `R-${Date.now().toString().substring(6)}`;
+      
       const newPayment = {
-        id: uuidv4(),
+        id: paymentId,
+        receiptNumber: receiptNumber,
         invoiceNumber: formState.invoiceNumber,
-        customerName: formState.customerName,
+        customerName: formState.customerName || formState.consignee,
         amount: formState.amountPaid,
         currency: formState.currency,
         country: formState.country,
@@ -70,14 +74,17 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string = ""
         description: `Payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} has been recorded successfully`
       });
       
-      // Navigate back to payments list
-      navigate("/accounts/payments");
-      
+      return {
+        success: true,
+        paymentId,
+        receiptNumber
+      };
     } catch (error) {
       console.error("Error saving payment:", error);
       toast.error("Error Saving Payment", {
         description: "There was an error saving the payment. Please try again."
       });
+      return { success: false };
     }
   };
   

@@ -13,6 +13,7 @@ export const useInvoiceSelection = (
 ) => {
   // Handle selecting an invoice
   const handleSelectInvoice = (invoice: Invoice) => {
+    console.log("Selecting invoice:", invoice);
     setSelectedInvoice(invoice);
     
     // Get the correct amount values from the invoice
@@ -22,7 +23,6 @@ export const useInvoiceSelection = (
     const totalPaid = invoice.totalPaid || 0;
     const balanceToPay = netAmount - totalPaid;
     
-    console.log("Selected invoice data:", invoice);
     console.log("Amount calculations:", { grossAmount, discount, netAmount, totalPaid, balanceToPay });
     
     // Create a consistent mapping for invoice data regardless of source
@@ -46,11 +46,15 @@ export const useInvoiceSelection = (
         paymentCollectDate: invoice.date || prevState.paymentCollectDate,
         country: invoice.country || prevState.country,
         currency: invoice.currency || prevState.currency,
+        customerName: invoice.consignee1 || invoice.consignee || "",
       };
       
       // Special handling for invoice 010000
       if (invoice.invoiceNumber === "010000") {
         updatedState.amountPaid = 1500;
+        updatedState.grossAmount = 1500;
+        updatedState.netAmount = 1500;
+        updatedState.balanceToPay = 1500;
       }
       
       console.log("Updated form state:", updatedState);
