@@ -75,7 +75,7 @@ const StatusTabs: React.FC<StatusTabsProps> = ({ invoices }) => {
       
       // Prepare receipt data
       const receipt = {
-        receiptNumber: payment.id,
+        receiptNumber: payment.receiptNumber || payment.id,
         invoiceNumber: invoice.invoiceNumber,
         date: payment.date || new Date().toISOString().split('T')[0],
         customer: invoice.consignee1 || invoice.consignee,

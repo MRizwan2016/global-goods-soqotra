@@ -102,7 +102,8 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string = ""
         if (invoice.invoiceNumber === invoiceNumber) {
           // Mark as paid if payment covers the full balance
           if (amountPaid >= balanceToPay) {
-            return { ...invoice, paid: true };
+            console.log(`Marking invoice ${invoiceNumber} as paid`);
+            return { ...invoice, paid: true, paidAmount: invoice.net || invoice.amount || 0 };
           }
           
           // For partial payments, just update the amount paid so far

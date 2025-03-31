@@ -17,6 +17,13 @@ export const useInvoiceHandler = () => {
     setSelectedInvoice(invoice);
     setShowInvoiceSelector(false);
     
+    // If invoice is already paid, show a warning
+    if (invoice.paid) {
+      toast.warning("Invoice Already Paid", {
+        description: `Invoice ${invoice.invoiceNumber} has already been paid.`
+      });
+    }
+    
     // Special handling for invoice 010000
     if (invoice.invoiceNumber === "010000") {
       setFormState(prev => ({
@@ -31,21 +38,21 @@ export const useInvoiceHandler = () => {
         grossAmount: 1500,
         discount: 0,
         netAmount: 1500,
-        totalPaid: 0,
-        balanceToPay: 1500,
-        amountPaid: 1500,
+        totalPaid: invoice.paid ? 1500 : 0,
+        balanceToPay: invoice.paid ? 0 : 1500,
+        amountPaid: invoice.paid ? 0 : 1500,
         currency: "QAR",
         country: "Qatar",
       }));
       
       toast.success("Invoice Selected", {
-        description: `Invoice 010000 loaded for payment`,
+        description: `Invoice 010000 loaded for payment${invoice.paid ? ' (already paid)' : ''}`
       });
       return;
     }
     
     // Get the balance to pay (either from invoice.balanceToPay or calculate it)
-    const balanceToPay = getBalanceForPayment(invoice);
+    const balanceToPay = invoice.paid ? 0 : getBalanceForPayment(invoice);
     
     // Get customer name from various possible properties
     const customerName = invoice.consignee1 || invoice.consignee || invoice.customer || "";
@@ -63,9 +70,9 @@ export const useInvoiceHandler = () => {
       grossAmount: invoice.gross || invoice.grossAmount || 0,
       discount: invoice.discount || 0,
       netAmount: invoice.net || invoice.amount || invoice.netAmount || 0,
-      totalPaid: invoice.totalPaid || 0,
+      totalPaid: invoice.totalPaid || (invoice.paid ? (invoice.net || invoice.amount || 0) : 0),
       balanceToPay: balanceToPay,
-      amountPaid: balanceToPay, // Default to paying the full amount
+      amountPaid: invoice.paid ? 0 : balanceToPay, // Default to zero if already paid
       currency: invoice.currency || prev.currency, // Use currency from invoice if available
     }));
     
@@ -80,7 +87,7 @@ export const useInvoiceHandler = () => {
     
     // Show toast notification
     toast.success("Invoice Selected", {
-      description: `Invoice ${invoice.invoiceNumber} loaded for payment`,
+      description: `Invoice ${invoice.invoiceNumber} loaded for payment${invoice.paid ? ' (already paid)' : ''}`
     });
   };
   
