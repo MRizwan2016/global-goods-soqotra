@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useInvoicePayment } from "./hooks/useInvoicePayment";
@@ -33,15 +33,12 @@ const AddPaymentPage = () => {
   } = useInvoicePayment();
 
   // Reference to receipt handler component
-  const receiptHandlerRef = useRef<HTMLDivElement>(null);
+  const receiptHandlerRef = useRef<any>(null);
   
   // Function to generate receipt
   const handleGenerateReceipt = () => {
     if (receiptHandlerRef.current) {
-      const generateFn = (receiptHandlerRef.current as any).generateReceipt;
-      if (typeof generateFn === 'function') {
-        return generateFn();
-      }
+      return receiptHandlerRef.current.generateReceipt();
     }
     return false;
   };
@@ -115,7 +112,7 @@ const AddPaymentPage = () => {
         </Card>
       </motion.div>
 
-      {/* Hidden Receipt Handler Component */}
+      {/* Receipt Handler Component with properly forwarded ref */}
       <ReceiptHandler
         ref={receiptHandlerRef}
         formState={formState}
