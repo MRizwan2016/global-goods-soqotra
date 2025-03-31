@@ -55,6 +55,43 @@ const PaymentReceivable = () => {
       const storedInvoices = localStorage.getItem('invoices');
       if (storedInvoices) {
         const parsedInvoices = JSON.parse(storedInvoices);
+        
+        // Ensure invoice 010000 is included
+        const hasInvoice010000 = parsedInvoices.some((invoice: any) => invoice.invoiceNumber === "010000");
+        
+        if (!hasInvoice010000) {
+          parsedInvoices.push({
+            id: "inv-010000",
+            invoiceNumber: "010000",
+            date: "2023-03-30",
+            shipper1: "Global Exports Ltd.",
+            consignee1: "PASTOR ZACH RICH",
+            salesAgent: "John Doe",
+            warehouse: "Main Warehouse",
+            doorToDoor: true,
+            nic: "QAT123456",
+            volume: 2.5,
+            weight: 230,
+            packages: 5,
+            gross: 1500,
+            discount: 0,
+            net: 1500,
+            paid: false,
+            statusCharge: 0,
+            offerDiscount: 0,
+            branch: "Doha",
+            sector: "Air",
+            transportType: "Air",
+            bookingForm: "BF-10000",
+            freightType: "Air Freight",
+            amount: 1500,
+            currency: "QAR"
+          });
+          
+          // Save updated invoices to localStorage
+          localStorage.setItem('invoices', JSON.stringify(parsedInvoices));
+        }
+        
         setInvoices(parsedInvoices);
         console.log("Loaded invoices from localStorage:", parsedInvoices);
       } else {

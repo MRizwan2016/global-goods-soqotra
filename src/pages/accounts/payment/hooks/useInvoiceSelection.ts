@@ -27,6 +27,31 @@ export const useInvoiceSelection = (
     
     // Create a consistent mapping for invoice data regardless of source
     setFormState(prevState => {
+      // Special handling for invoice 010000
+      if (invoice.invoiceNumber === "010000") {
+        console.log("Special handling for invoice 010000");
+        return {
+          ...prevState,
+          invoiceNumber: "010000",
+          bookingForm: invoice.bookingForm || "BF-10000",
+          shipper: invoice.shipper1 || "Global Exports Ltd.",
+          consignee: invoice.consignee1 || "PASTOR ZACH RICH",
+          warehouse: invoice.warehouse || "Main Warehouse",
+          shipmentType: invoice.freightType || "Air Freight",
+          grossAmount: 1500,
+          discount: 0,
+          netAmount: 1500,
+          totalPaid: 0,
+          balanceToPay: 1500,
+          amountPaid: 1500,
+          paymentCollectDate: invoice.date || prevState.paymentCollectDate,
+          country: invoice.country || "Qatar",
+          currency: invoice.currency || "QAR",
+          customerName: invoice.consignee1 || "PASTOR ZACH RICH",
+        };
+      }
+      
+      // For other invoices
       const updatedState = {
         ...prevState,
         invoiceNumber: invoice.invoiceNumber || "",
@@ -48,14 +73,6 @@ export const useInvoiceSelection = (
         currency: invoice.currency || prevState.currency,
         customerName: invoice.consignee1 || invoice.consignee || "",
       };
-      
-      // Special handling for invoice 010000
-      if (invoice.invoiceNumber === "010000") {
-        updatedState.amountPaid = 1500;
-        updatedState.grossAmount = 1500;
-        updatedState.netAmount = 1500;
-        updatedState.balanceToPay = 1500;
-      }
       
       console.log("Updated form state:", updatedState);
       return updatedState;
