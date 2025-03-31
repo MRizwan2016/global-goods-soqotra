@@ -8,8 +8,13 @@ interface ReceiptHandlerProps {
   customerName: string;
 }
 
-// Use forwardRef to properly handle the ref from parent component
-const ReceiptHandler = forwardRef<HTMLDivElement, ReceiptHandlerProps>(
+// Define the ref interface to expose our methods
+export interface ReceiptHandlerRef {
+  generateReceipt: () => boolean;
+}
+
+// Use forwardRef with the proper type parameters
+const ReceiptHandler = forwardRef<ReceiptHandlerRef, ReceiptHandlerProps>(
   ({ formState, customerName }, ref) => {
     const [showReceipt, setShowReceipt] = useState(false);
     const [receiptData, setReceiptData] = useState({

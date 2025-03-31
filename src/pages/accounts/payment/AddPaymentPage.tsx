@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import PaymentPageHeader from "./components/PaymentPageHeader";
 import PaymentPageContent from "./components/PaymentPageContent";
 import PaymentActionButtons from "./components/PaymentActionButtons";
-import ReceiptHandler from "./components/ReceiptHandler";
+import ReceiptHandler, { ReceiptHandlerRef } from "./components/ReceiptHandler";
 
 const AddPaymentPage = () => {
   const {
@@ -32,8 +32,8 @@ const AddPaymentPage = () => {
     handlePaymentAmountChange
   } = useInvoicePayment();
 
-  // Reference to receipt handler component
-  const receiptHandlerRef = useRef<any>(null);
+  // Reference to receipt handler component with the correct type
+  const receiptHandlerRef = useRef<ReceiptHandlerRef>(null);
   
   // Function to generate receipt
   const handleGenerateReceipt = () => {
@@ -112,7 +112,7 @@ const AddPaymentPage = () => {
         </Card>
       </motion.div>
 
-      {/* Receipt Handler Component with properly forwarded ref */}
+      {/* Receipt Handler Component with properly typed ref */}
       <ReceiptHandler
         ref={receiptHandlerRef}
         formState={formState}
