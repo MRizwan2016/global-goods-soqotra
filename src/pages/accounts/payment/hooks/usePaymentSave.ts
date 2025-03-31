@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import { FormState } from "../types";
 
-export const usePaymentSave = (formState: FormState) => {
+export const usePaymentSave = (formState: FormState, currencySymbol: string = "") => {
   const navigate = useNavigate();
 
   const handleSave = () => {
@@ -56,12 +56,18 @@ export const usePaymentSave = (formState: FormState) => {
       // Save back to localStorage
       localStorage.setItem('payments', JSON.stringify(existingPayments));
       
+      // Also save to invoicePayments for receipt viewing
+      const invoicePaymentsStr = localStorage.getItem('invoicePayments');
+      const invoicePayments = invoicePaymentsStr ? JSON.parse(invoicePaymentsStr) : [];
+      invoicePayments.push(newPayment);
+      localStorage.setItem('invoicePayments', JSON.stringify(invoicePayments));
+      
       // Update invoice status to paid if needed
       updateInvoiceStatus(formState.invoiceNumber, formState.amountPaid, formState.balanceToPay);
       
       // Show success toast
       toast.success("Payment Saved", {
-        description: "Payment has been recorded successfully"
+        description: `Payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} has been recorded successfully`
       });
       
       // Navigate back to payments list
@@ -104,6 +110,9 @@ export const usePaymentSave = (formState: FormState) => {
       
       // Save updated invoices back to localStorage
       localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+      
+      // Trigger storage event for other components to refresh
+      window.dispatchEvent(new Event('storage'));
       
     } catch (error) {
       console.error("Error updating invoice status:", error);

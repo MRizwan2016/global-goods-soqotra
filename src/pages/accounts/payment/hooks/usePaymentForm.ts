@@ -79,6 +79,7 @@ export const usePaymentForm = (
         try {
           const selectedDate = new Date(selectedInvoice.date);
           setDate(selectedDate);
+          // Only pass one argument to handleDateSelect
           handleDateSelect(selectedDate);
         } catch (error) {
           console.error("Error parsing invoice date:", error);
