@@ -21,6 +21,7 @@ const StatusTabs: React.FC<StatusTabsProps> = ({ invoices }) => {
   // Force refresh when localStorage changes (payment made)
   useEffect(() => {
     const handleStorageChange = () => {
+      console.log("Storage change detected, refreshing...");
       setRefreshTrigger(prev => prev + 1);
     };
     
@@ -56,30 +57,43 @@ const StatusTabs: React.FC<StatusTabsProps> = ({ invoices }) => {
   
   const handleViewReceipt = (invoice: any) => {
     // Find the payment record for this invoice
-    const payments = JSON.parse(localStorage.getItem('invoicePayments') || '[]');
-    const payment = payments.find((p: any) => p.invoiceNumber === invoice.invoiceNumber);
-    
-    if (!payment) {
-      toast.error("Receipt not found", {
-        description: "Could not find payment record for this invoice"
+    try {
+      const payments = JSON.parse(localStorage.getItem('invoicePayments') || '[]');
+      console.log("All payments:", payments);
+      
+      const payment = payments.find((p: any) => p.invoiceNumber === invoice.invoiceNumber);
+      
+      if (!payment) {
+        console.log("No payment found for invoice:", invoice.invoiceNumber);
+        toast.error("Receipt not found", {
+          description: "Could not find payment record for this invoice"
+        });
+        return;
+      }
+      
+      console.log("Found payment:", payment);
+      
+      // Prepare receipt data
+      const receipt = {
+        receiptNumber: payment.id,
+        invoiceNumber: invoice.invoiceNumber,
+        date: payment.date || new Date().toISOString().split('T')[0],
+        customer: invoice.consignee1 || invoice.consignee,
+        amount: payment.amount,
+        paymentMethod: payment.paymentMethod,
+        currency: payment.currency || "QAR",
+        remarks: payment.remarks
+      };
+      
+      console.log("Prepared receipt data:", receipt);
+      setReceiptData(receipt);
+      setShowReceipt(true);
+    } catch (error) {
+      console.error("Error retrieving payment data:", error);
+      toast.error("Error", {
+        description: "Could not retrieve payment information"
       });
-      return;
     }
-    
-    // Prepare receipt data
-    const receipt = {
-      receiptNumber: payment.id,
-      invoiceNumber: invoice.invoiceNumber,
-      date: payment.date || new Date().toISOString().split('T')[0],
-      customer: invoice.consignee1 || invoice.consignee,
-      amount: payment.amount,
-      paymentMethod: payment.method,
-      currency: payment.currency || "QAR",
-      remarks: payment.remarks
-    };
-    
-    setReceiptData(receipt);
-    setShowReceipt(true);
   };
   
   return (

@@ -55,9 +55,15 @@ const PaymentActionButton: React.FC<PaymentActionButtonProps> = ({
 
   const { text, icon, classes } = getButtonConfig();
 
+  // Add click handler with debugging
+  const handleClick = () => {
+    console.log(`Payment action button clicked: ${type}`);
+    onClick();
+  };
+
   return (
     <Button
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled}
       className={`flex items-center transition-all duration-200 ${classes} ${className}`}
       size="sm"

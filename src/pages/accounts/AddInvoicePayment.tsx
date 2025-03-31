@@ -36,7 +36,8 @@ const AddInvoicePayment = () => {
     handleInvoiceSearch,
     handleSelectInvoice,
     handleSave,
-    handleCountryChange
+    handleCountryChange,
+    handlePaymentAmountChange
   } = useInvoicePayment();
 
   const container = {
@@ -145,6 +146,7 @@ const AddInvoicePayment = () => {
                   handleInputChange={handleInputChange}
                   handleDateSelect={handleDateSelect}
                   handleSelectChange={handleSelectChange}
+                  handlePaymentAmountChange={handlePaymentAmountChange}
                 />
               </CardContent>
             </Card>

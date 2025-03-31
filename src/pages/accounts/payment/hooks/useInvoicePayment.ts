@@ -76,7 +76,7 @@ export const useInvoicePayment = () => {
     }
   };
   
-  const { handleSave } = usePaymentSave(formState);
+  const { handleSave } = usePaymentSave(formState, currencySymbol);
   
   // Handle selecting an invoice
   const handleSelectInvoice = (invoice: any) => {
