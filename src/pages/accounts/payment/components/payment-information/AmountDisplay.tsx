@@ -18,11 +18,14 @@ const AmountDisplay: React.FC<AmountDisplayProps> = ({
   isBold = false,
   className = "",
 }) => {
+  // Ensure value is a valid number or default to 0
+  const safeValue = typeof value === 'number' && !isNaN(value) ? value : 0;
+  
   return (
     <div className={`text-center ${className}`}>
       <p className="text-xs text-gray-500 mb-1">{label}</p>
       <p className={`${textColor} ${isBold ? 'font-semibold' : ''}`}>
-        {currencySymbol} {value.toFixed(2)}
+        {currencySymbol} {safeValue.toFixed(2)}
       </p>
     </div>
   );

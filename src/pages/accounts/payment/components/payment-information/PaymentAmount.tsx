@@ -26,6 +26,11 @@ const PaymentAmount: React.FC<PaymentAmountProps> = ({
     }
   };
 
+  // Ensure amountPaid is a number or empty string
+  const amountPaidValue = formState.amountPaid !== undefined && formState.amountPaid !== null 
+    ? formState.amountPaid.toString()
+    : "";
+
   return (
     <div className="flex flex-col">
       <label htmlFor="amountPaid" className="text-sm font-medium text-gray-600 mb-1">
@@ -39,7 +44,7 @@ const PaymentAmount: React.FC<PaymentAmountProps> = ({
           id="amountPaid"
           name="amountPaid"
           type="number"
-          value={formState.amountPaid || ""}
+          value={amountPaidValue}
           onChange={onAmountChange}
           className="pl-8 bg-white border border-gray-300 focus:border-blue-500 focus:ring-blue-500"
           placeholder="0.00"
