@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { FormState } from "../../types";
 
@@ -30,6 +30,11 @@ const PaymentAmount: React.FC<PaymentAmountProps> = ({
   const amountPaidValue = formState.amountPaid !== undefined && formState.amountPaid !== null 
     ? formState.amountPaid.toString()
     : "";
+    
+  // Log current value  
+  useEffect(() => {
+    console.log("Current amount paid value:", formState.amountPaid);
+  }, [formState.amountPaid]);
 
   return (
     <div className="flex flex-col">

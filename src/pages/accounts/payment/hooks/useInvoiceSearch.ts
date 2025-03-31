@@ -67,7 +67,8 @@ export const useInvoiceSearch = () => {
         netAmount: 1500,
         totalPaid: 0,
         balanceToPay: 1500,
-        currency: "QAR"
+        currency: "QAR",
+        country: "Qatar"
       },
       {
         id: "2",
@@ -105,7 +106,9 @@ export const useInvoiceSearch = () => {
     const allInvoices = [...filteredInvoices, ...filteredStoredInvoices];
     
     setMatchingInvoices(allInvoices);
-    setShowInvoiceSelector(true);
+    setShowInvoiceSelector(allInvoices.length > 0);
+    
+    console.log("Search results:", allInvoices);
   };
 
   return {

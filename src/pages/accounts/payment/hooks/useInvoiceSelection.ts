@@ -26,28 +26,36 @@ export const useInvoiceSelection = (
     console.log("Amount calculations:", { grossAmount, discount, netAmount, totalPaid, balanceToPay });
     
     // Create a consistent mapping for invoice data regardless of source
-    setFormState(prevState => ({
-      ...prevState,
-      invoiceNumber: invoice.invoiceNumber || "",
-      // Handle different property names for bookingForm
-      bookingForm: invoice.bookingForm || invoice.bookNumber || "",
-      shipper: invoice.shipper1 || invoice.shipper || "",
-      consignee: invoice.consignee1 || invoice.consignee || "",
-      warehouse: invoice.warehouse || "",
-      shipmentType: invoice.freightType || invoice.shipmentType || "",
-      // Ensure all amount fields are properly populated
-      grossAmount: grossAmount,
-      discount: discount,
-      netAmount: netAmount,
-      totalPaid: totalPaid,
-      balanceToPay: balanceToPay,
-      amountPaid: balanceToPay,  // Set suggested payment amount to balance
-      paymentCollectDate: invoice.date || prevState.paymentCollectDate,
-      country: invoice.country || prevState.country,
-      currency: invoice.currency || prevState.currency,
-      // If the specific invoice 010000 is selected, set the amount to 1500
-      ...(invoice.invoiceNumber === "010000" && { amountPaid: 1500 })
-    }));
+    setFormState(prevState => {
+      const updatedState = {
+        ...prevState,
+        invoiceNumber: invoice.invoiceNumber || "",
+        // Handle different property names for bookingForm
+        bookingForm: invoice.bookingForm || invoice.bookNumber || "",
+        shipper: invoice.shipper1 || invoice.shipper || "",
+        consignee: invoice.consignee1 || invoice.consignee || "",
+        warehouse: invoice.warehouse || "",
+        shipmentType: invoice.freightType || invoice.shipmentType || "",
+        // Ensure all amount fields are properly populated
+        grossAmount: grossAmount,
+        discount: discount,
+        netAmount: netAmount,
+        totalPaid: totalPaid,
+        balanceToPay: balanceToPay,
+        amountPaid: balanceToPay,  // Set suggested payment amount to balance
+        paymentCollectDate: invoice.date || prevState.paymentCollectDate,
+        country: invoice.country || prevState.country,
+        currency: invoice.currency || prevState.currency,
+      };
+      
+      // Special handling for invoice 010000
+      if (invoice.invoiceNumber === "010000") {
+        updatedState.amountPaid = 1500;
+      }
+      
+      console.log("Updated form state:", updatedState);
+      return updatedState;
+    });
     
     setShowInvoiceSelector(false);
     toast.success("Invoice Selected", {

@@ -17,6 +17,8 @@ interface Invoice {
   paid?: boolean;
   bookingForm?: string;
   bookNumber?: string;
+  country?: string;
+  currency?: string;
   [key: string]: any; // Allow for other properties
 }
 
@@ -31,15 +33,20 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
 }) => {
   if (!selectedInvoice) return null;
 
+  console.log("Rendering SelectedInvoiceDetails with:", { selectedInvoice, formState });
+
+  // Use currency from formState or selectedInvoice
+  const currency = formState.currency || selectedInvoice.currency || "QAR";
+  
   // Use currencySymbol from formState if available
-  const currencySymbol = formState.currency === "USD" ? "$" :
-                         formState.currency === "EUR" ? "€" :
-                         formState.currency === "QAR" ? "QR" :
-                         formState.currency === "AED" ? "AED" :
-                         formState.currency === "KES" ? "KSh" :
-                         formState.currency === "INR" ? "₹" :
-                         formState.currency === "LKR" ? "Rs" : 
-                         formState.currency;
+  const currencySymbol = currency === "USD" ? "$" :
+                         currency === "EUR" ? "€" :
+                         currency === "QAR" ? "QR" :
+                         currency === "AED" ? "AED" :
+                         currency === "KES" ? "KSh" :
+                         currency === "INR" ? "₹" :
+                         currency === "LKR" ? "Rs" : 
+                         currency;
 
   // Get the net amount from the invoice using different possible property names
   const netAmount = selectedInvoice.net || selectedInvoice.amount || selectedInvoice.netAmount || 0;
@@ -70,7 +77,7 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
         </div>
         <div>
           <span className="text-sm text-gray-500">Total Amount:</span>
-          <p className="font-semibold text-gray-900">{currencySymbol}{netAmount}</p>
+          <p className="font-semibold text-gray-900">{currencySymbol} {netAmount}</p>
         </div>
         <div>
           <span className="text-sm text-gray-500">Payment Status:</span>
@@ -80,6 +87,10 @@ const SelectedInvoiceDetails: React.FC<SelectedInvoiceDetailsProps> = ({
               <span className="text-amber-600">Unpaid</span>
             }
           </p>
+        </div>
+        <div>
+          <span className="text-sm text-gray-500">Currency:</span>
+          <p className="font-semibold text-gray-900">{currency}</p>
         </div>
       </div>
     </motion.div>
