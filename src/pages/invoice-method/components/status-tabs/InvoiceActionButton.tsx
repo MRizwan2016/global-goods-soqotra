@@ -60,6 +60,7 @@ const InvoiceActionButton: React.FC<InvoiceActionButtonProps> = ({
       className={`${classes} ${className}`}
       onClick={onClick}
       disabled={disabled}
+      type="button"
     >
       {icon}
       {text}

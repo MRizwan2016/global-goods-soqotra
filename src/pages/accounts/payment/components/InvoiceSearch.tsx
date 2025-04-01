@@ -68,6 +68,7 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({
               size="icon"
               variant="ghost"
               className="absolute right-0 top-0 h-full aspect-square text-gray-500 hover:text-gray-700"
+              type="button"
             >
               <Search className="h-4 w-4" />
             </Button>
@@ -103,7 +104,7 @@ const InvoiceSearch: React.FC<InvoiceSearchProps> = ({
                       </div>
                       <div className="flex justify-between text-xs text-gray-500 mt-1">
                         <span>
-                          Amount: ${invoice.net || invoice.amount || 0}
+                          Amount: {invoice.net || invoice.amount || 0}
                         </span>
                         <span>
                           {invoice.consignee1 || invoice.consignee || 'No consignee'}

@@ -11,7 +11,6 @@ import {
 import { UnsettledInvoice } from "../../../types/containerTypes";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
 import { CreditCard } from "lucide-react";
 import { toast } from "sonner";
 
@@ -22,8 +21,6 @@ interface UnsettledInvoicesTabProps {
 const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
   unsettledInvoices,
 }) => {
-  const navigate = useNavigate();
-
   const handleRecordPayment = (invoice: UnsettledInvoice) => {
     console.log("Recording payment for invoice:", invoice);
     
@@ -36,8 +33,8 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
     // Store the invoice data temporarily to use it in the payment form
     sessionStorage.setItem('selectedInvoice', JSON.stringify(invoiceWithCurrency));
     
-    // Navigate to payment page with timestamp to force refresh
-    navigate(`/accounts/payment/add?t=${Date.now()}`);
+    // Use direct window location to avoid potential router issues
+    window.location.href = `/accounts/payment/add?t=${Date.now()}`;
     
     toast.success("Payment form opened", {
       description: `Processing payment for invoice ${invoice.invoiceNumber}`,
@@ -86,6 +83,7 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
                       <Button 
                         size="sm"
                         variant="outline"
+                        type="button"
                         className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
                         onClick={() => handleRecordPayment(invoice)}
                       >

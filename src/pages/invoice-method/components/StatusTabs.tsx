@@ -29,14 +29,13 @@ const StatusTabs: React.FC<StatusTabsProps> = ({ invoices }) => {
   // Modify the handlePayClick to store the invoice in sessionStorage
   // before navigating to the payment page
   const handlePayClick = (invoice: Invoice) => {
+    console.log("Pay button clicked for invoice:", invoice);
+    
     // Store the selected invoice in sessionStorage
     sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
     
-    // Navigate to the payment page
-    navigate('/accounts/payment/add');
-    
-    // Also call the original handler
-    originalHandlePayClick(invoice);
+    // Navigate to the payment page - using direct navigation
+    window.location.href = '/accounts/payment/add';
   };
 
   return (
