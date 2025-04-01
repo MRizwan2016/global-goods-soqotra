@@ -55,15 +55,16 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
   // Ensure NIC number is displayed
   const nicNumber = item.nic || (item.id === "inv-13136051" ? "QAT987654" : "");
   
-  // Handle view invoice
+  // Handle view invoice - navigate to print preview
   const handleViewInvoice = () => {
-    navigate(`/data-entry/invoicing/view/${item.id}`);
-  };
-  
-  // Handle print preview - using delete button
-  const handlePrintPreview = () => {
     navigate(`/data-entry/print-documents/invoice-print/${item.id}`);
     toast.success("Opening print preview for invoice");
+  };
+  
+  // Handle delete - placeholder for delete functionality
+  const handleDeleteInvoice = () => {
+    // In a real app, this would show a confirmation dialog
+    toast.error("Delete functionality is not implemented");
   };
 
   return (
@@ -98,7 +99,7 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
           variant="ghost" 
           size="icon" 
           className="h-8 w-8 text-red-600"
-          onClick={handlePrintPreview}
+          onClick={handleDeleteInvoice}
         >
           <Trash className="h-4 w-4" />
         </Button>
