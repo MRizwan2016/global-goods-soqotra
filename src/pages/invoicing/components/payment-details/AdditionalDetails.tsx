@@ -4,10 +4,12 @@ import InputField from "./InputField";
 
 interface AdditionalDetailsProps {
   formState: any;
+  handleInputChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
 }
 
 const AdditionalDetails: React.FC<AdditionalDetailsProps> = ({
   formState,
+  handleInputChange,
 }) => {
   return (
     <>

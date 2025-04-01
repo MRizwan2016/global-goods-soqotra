@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 interface StaffFieldsProps {
   formState: any;
   handleSelectChange: (name: string, value: string) => void;
+  handleInputChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
 }
 
 const DRIVERS = [

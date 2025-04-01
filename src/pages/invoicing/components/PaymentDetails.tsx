@@ -86,13 +86,15 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
         
         <div>
           <PaymentMethodSelector 
-            paymentMethod={formState.paymentMethod}
+            formState={formState}
+            handleInputChange={handleInputChange}
             handleSelectChange={handleSelectChange}
           />
           
           <div className="mt-4">
             <PaymentStatusSelector 
-              paymentStatus={formState.paymentStatus}
+              formState={formState}
+              handleInputChange={handleInputChange}
               handleSelectChange={handleSelectChange}
             />
           </div>

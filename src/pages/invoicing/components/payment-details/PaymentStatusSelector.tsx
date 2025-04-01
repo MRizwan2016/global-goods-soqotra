@@ -5,24 +5,35 @@ import { Badge } from "@/components/ui/badge";
 import { PAYMENT_STATUSES } from "../../../accounts/payment/constants/paymentConstants";
 
 interface PaymentStatusSelectorProps {
-  formState: any;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  formState?: any;
+  paymentStatus?: string;
+  handleInputChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  handleSelectChange?: (name: string, value: string) => void;
 }
 
 const PaymentStatusSelector: React.FC<PaymentStatusSelectorProps> = ({
   formState,
+  paymentStatus,
   handleInputChange,
+  handleSelectChange,
 }) => {
   const handleStatusChange = (value: string) => {
-    const event = {
-      target: {
-        name: "paymentStatus",
-        value,
-      },
-    } as React.ChangeEvent<HTMLSelectElement>;
-    
-    handleInputChange(event);
+    if (handleSelectChange) {
+      handleSelectChange("paymentStatus", value);
+    } else if (handleInputChange) {
+      const event = {
+        target: {
+          name: "paymentStatus",
+          value,
+        },
+      } as React.ChangeEvent<HTMLSelectElement>;
+      
+      handleInputChange(event);
+    }
   };
+
+  // Determine the actual payment status value from either formState or direct prop
+  const actualPaymentStatus = paymentStatus || (formState && formState.paymentStatus) || "";
 
   const getStatusBadge = (status: string) => {
     const statusConfig = PAYMENT_STATUSES.find(s => s.value === status);
@@ -37,7 +48,7 @@ const PaymentStatusSelector: React.FC<PaymentStatusSelectorProps> = ({
       <label className="text-sm font-medium mb-1">PAYMENT STATUS:</label>
       <div className="flex items-center">
         <Select 
-          value={formState.paymentStatus || ""} 
+          value={actualPaymentStatus} 
           onValueChange={handleStatusChange}
         >
           <SelectTrigger className="w-full border border-gray-300">
@@ -49,7 +60,7 @@ const PaymentStatusSelector: React.FC<PaymentStatusSelectorProps> = ({
             ))}
           </SelectContent>
         </Select>
-        {formState.paymentStatus && getStatusBadge(formState.paymentStatus)}
+        {actualPaymentStatus && getStatusBadge(actualPaymentStatus)}
       </div>
     </div>
   );

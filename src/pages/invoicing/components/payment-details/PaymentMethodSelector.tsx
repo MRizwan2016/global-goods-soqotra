@@ -4,31 +4,42 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { PAYMENT_METHODS } from "../../../accounts/payment/constants/paymentConstants";
 
 interface PaymentMethodSelectorProps {
-  formState: any;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  formState?: any;
+  paymentMethod?: string;
+  handleInputChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  handleSelectChange?: (name: string, value: string) => void;
 }
 
 const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({
   formState,
+  paymentMethod,
   handleInputChange,
+  handleSelectChange,
 }) => {
   // Handle payment method selection
   const handlePaymentMethodChange = (value: string) => {
-    const event = {
-      target: {
-        name: "paymentMethod",
-        value,
-      },
-    } as React.ChangeEvent<HTMLSelectElement>;
-    
-    handleInputChange(event);
+    if (handleSelectChange) {
+      handleSelectChange("paymentMethod", value);
+    } else if (handleInputChange) {
+      const event = {
+        target: {
+          name: "paymentMethod",
+          value,
+        },
+      } as React.ChangeEvent<HTMLSelectElement>;
+      
+      handleInputChange(event);
+    }
   };
+
+  // Determine the actual payment method value from either formState or direct prop
+  const actualPaymentMethod = paymentMethod || (formState && formState.paymentMethod) || "";
 
   return (
     <div className="flex flex-col">
       <label className="text-sm font-medium mb-1">PAYMENT METHOD:</label>
       <Select 
-        value={formState.paymentMethod || ""} 
+        value={actualPaymentMethod} 
         onValueChange={handlePaymentMethodChange}
       >
         <SelectTrigger className="w-full border border-gray-300">
