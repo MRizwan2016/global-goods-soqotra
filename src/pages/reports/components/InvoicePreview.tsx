@@ -3,16 +3,18 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer, Box, Ship, Calendar, Truck, Info } from "lucide-react";
+import { ArrowLeft, Printer, Box, Ship, Calendar, Truck, Info, Receipt } from "lucide-react";
 import { mockInvoiceData } from "@/data/mockData";
 import { toast } from "sonner";
 import PrintStyles from "@/pages/invoicing/components/print/PrintStyles";
+import PaymentDetailsTable from "@/components/reports/invoice-details/PaymentDetailsTable";
 
 const InvoicePreview: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [invoice, setInvoice] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [paymentInfo, setPaymentInfo] = useState<any>(null);
 
   useEffect(() => {
     const fetchInvoiceData = () => {
@@ -33,6 +35,20 @@ const InvoicePreview: React.FC = () => {
         
         if (foundInvoice) {
           setInvoice(foundInvoice);
+          
+          // Check if there's payment information
+          const storedPayments = localStorage.getItem('payments');
+          if (storedPayments) {
+            const parsedPayments = JSON.parse(storedPayments);
+            const invoicePayment = parsedPayments.find((payment: any) => 
+              payment.invoiceId === id || payment.invoiceNumber === foundInvoice.invoiceNumber
+            );
+            
+            if (invoicePayment) {
+              console.log("Found payment info:", invoicePayment);
+              setPaymentInfo(invoicePayment);
+            }
+          }
         } else {
           toast.error("Invoice not found");
           setTimeout(() => navigate("/reports/cargo"), 2000);
@@ -54,6 +70,12 @@ const InvoicePreview: React.FC = () => {
 
   const handleBack = () => {
     navigate("/reports/cargo");
+  };
+  
+  const handlePrintInvoice = () => {
+    if (id) {
+      navigate(`/data-entry/print-documents/invoice-print/${id}`);
+    }
   };
 
   if (loading) {
@@ -113,13 +135,23 @@ const InvoicePreview: React.FC = () => {
         
         <h1 className="text-xl font-bold">Invoice #{invoice.invoiceNumber}</h1>
         
-        <Button 
-          onClick={handlePrint}
-          className="bg-green-600 hover:bg-green-700 flex items-center gap-1"
-        >
-          <Printer className="h-4 w-4" />
-          Print Preview
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handlePrintInvoice}
+            variant="outline"
+            className="flex items-center gap-1"
+          >
+            <Receipt className="h-4 w-4" />
+            Print Invoice
+          </Button>
+          <Button 
+            onClick={handlePrint}
+            className="bg-green-600 hover:bg-green-700 flex items-center gap-1"
+          >
+            <Printer className="h-4 w-4" />
+            Print Preview
+          </Button>
+        </div>
       </div>
       
       {/* Invoice Details Cards */}
@@ -354,7 +386,7 @@ const InvoicePreview: React.FC = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-gray-600">Payment Method:</p>
-                      <p className="font-medium">{invoice.paymentMethod || "Cash"}</p>
+                      <p className="font-medium">{invoice.paymentMethod || paymentInfo?.paymentMethod || "Cash"}</p>
                     </div>
                     <div>
                       <p className="text-gray-600">Payment Status:</p>
@@ -364,11 +396,11 @@ const InvoicePreview: React.FC = () => {
                     </div>
                     <div>
                       <p className="text-gray-600">Payment Date:</p>
-                      <p className="font-medium">{invoice.paymentDate || "Not available"}</p>
+                      <p className="font-medium">{paymentInfo?.paymentDate || invoice.paymentDate || "Not available"}</p>
                     </div>
                     <div>
                       <p className="text-gray-600">Receipt Number:</p>
-                      <p className="font-medium">{invoice.receiptNumber || "Not available"}</p>
+                      <p className="font-medium">{paymentInfo?.receiptNumber || invoice.receiptNumber || "Not available"}</p>
                     </div>
                   </div>
                 </div>
@@ -400,6 +432,14 @@ const InvoicePreview: React.FC = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Payment Details Table */}
+            {(invoice.paid || paymentInfo) && (
+              <PaymentDetailsTable 
+                paymentInfo={paymentInfo} 
+                invoice={invoice}
+              />
+            )}
           </CardContent>
         </Card>
       </div>

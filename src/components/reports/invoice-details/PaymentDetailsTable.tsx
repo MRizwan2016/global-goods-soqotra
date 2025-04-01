@@ -3,9 +3,21 @@ import React from 'react';
 
 interface PaymentDetailsTableProps {
   isFullScreen?: boolean;
+  paymentInfo?: any;
+  invoice?: any;
 }
 
-const PaymentDetailsTable: React.FC<PaymentDetailsTableProps> = ({ isFullScreen = false }) => {
+const PaymentDetailsTable: React.FC<PaymentDetailsTableProps> = ({ 
+  isFullScreen = false,
+  paymentInfo,
+  invoice
+}) => {
+  const paymentDate = paymentInfo?.paymentDate || invoice?.paymentDate || '';
+  const receiptNumber = paymentInfo?.receiptNumber || invoice?.receiptNumber || '';
+  const paidAmount = paymentInfo?.amountPaid || invoice?.net || 0;
+  const reconDate = paymentInfo?.reconciliationDate || '';
+  const reconNumber = paymentInfo?.reconciliationNumber || '';
+
   return (
     <div className={`mt-6 ${isFullScreen ? 'animate-fade-in' : ''}`}>
       <div className="bg-green-600 text-white p-2 font-semibold text-center">
@@ -26,12 +38,14 @@ const PaymentDetailsTable: React.FC<PaymentDetailsTableProps> = ({ isFullScreen 
           </thead>
           <tbody>
             <tr className="hover:bg-gray-100">
-              <td className="border border-gray-300 p-2 text-center"></td>
-              <td className="border border-gray-300 p-2 text-center"></td>
-              <td className="border border-gray-300 p-2 text-center"></td>
-              <td className="border border-gray-300 p-2 text-center"></td>
-              <td className="border border-gray-300 p-2 text-center"></td>
-              <td className="border border-gray-300 p-2 text-center"></td>
+              <td className="border border-gray-300 p-2 text-center">1</td>
+              <td className="border border-gray-300 p-2 text-center">{receiptNumber || '-'}</td>
+              <td className="border border-gray-300 p-2 text-center">{paymentDate || '-'}</td>
+              <td className="border border-gray-300 p-2 text-center">
+                {typeof paidAmount === 'number' ? paidAmount.toFixed(2) : paidAmount} QAR
+              </td>
+              <td className="border border-gray-300 p-2 text-center">{reconDate || '-'}</td>
+              <td className="border border-gray-300 p-2 text-center">{reconNumber || '-'}</td>
             </tr>
           </tbody>
         </table>

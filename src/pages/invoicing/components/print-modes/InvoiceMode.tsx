@@ -41,6 +41,9 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
               <h2 className="text-lg font-bold">INVOICE #{invoice.invoiceNumber}</h2>
               <p className="text-sm">Date: {invoice.date}</p>
               <p className="text-sm">Print Date: {new Date().toLocaleDateString()}</p>
+              {invoice.receiptNumber && (
+                <p className="text-sm font-medium">Receipt Number: {invoice.receiptNumber}</p>
+              )}
             </div>
           </div>
         </div>
@@ -99,6 +102,20 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
             <p>{invoice.paymentMethod || "Cash"}</p>
           </div>
         </div>
+        
+        {/* Payment Date & Receipt Number */}
+        {invoice.paid && (
+          <div className="grid grid-cols-4 gap-4 mt-2">
+            <div>
+              <p className="text-sm font-semibold">Payment Date:</p>
+              <p>{invoice.paymentDate || "Not specified"}</p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold">Receipt Number:</p>
+              <p>{invoice.receiptNumber || "Not specified"}</p>
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Cargo Table Section */}
