@@ -1,22 +1,7 @@
 
 import React from "react";
 import InvoiceActionButton from "./InvoiceActionButton";
-
-export interface Invoice {
-  id: string;
-  invoiceNumber: string;
-  date: string;
-  consignee1?: string;
-  consignee?: string;
-  customer?: string;
-  net?: number;
-  amount?: number;
-  gross?: number;
-  discount?: number;
-  paid: boolean;
-  currency?: string;
-  [key: string]: any;
-}
+import { Invoice } from "../../types/invoice";
 
 interface InvoiceRowProps {
   invoice: Invoice;
@@ -94,3 +79,6 @@ export const InvoiceRow: React.FC<InvoiceRowProps> = ({
     </tr>
   );
 };
+
+// Re-export the Invoice type
+export type { Invoice } from "../../types/invoice";
