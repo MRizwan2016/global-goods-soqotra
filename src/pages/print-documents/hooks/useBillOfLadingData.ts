@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { mockInvoiceData } from "@/data/mockData";
 import { mockBLData } from "@/pages/bill-of-lading/components/mockData";
 
-// Define a more comprehensive type for the Bill of Lading data
 interface BillOfLadingData {
   id: string;
   blNumber: string;
@@ -56,7 +54,6 @@ export const useBillOfLadingData = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // In a real app, fetch the BL data from an API
     const fetchBillOfLading = async () => {
       try {
         if (!id) {
@@ -66,10 +63,8 @@ export const useBillOfLadingData = () => {
           return;
         }
 
-        // First, check in the mockBLData (for direct BL records)
         let blRecord = mockBLData.find(bl => bl.id === id);
         if (blRecord) {
-          // Extract vehicle details if this is a car shipment
           const vehicleDetails = blRecord.cargoType === "Car" || blRecord.cargoType === "Truck" 
             ? extractVehicleDetails(blRecord.goodsDescription || "") 
             : {};
@@ -113,17 +108,14 @@ export const useBillOfLadingData = () => {
           return;
         }
         
-        // If not found in mockBLData, check for invoice data
         let invoiceData = null;
         
-        // First try to get data from localStorage
         const storedInvoices = localStorage.getItem('invoices');
         if (storedInvoices) {
           const parsedInvoices = JSON.parse(storedInvoices);
           invoiceData = parsedInvoices.find((inv: any) => inv.id === id);
         }
         
-        // If not found in localStorage, check mock data
         if (!invoiceData) {
           invoiceData = mockInvoiceData.find(inv => inv.id === id);
         }
@@ -135,7 +127,6 @@ export const useBillOfLadingData = () => {
           return;
         }
         
-        // Extract vehicle details if this relates to a car
         const packageDetails = getPackageDescription(invoiceData);
         const vehicleDetails = invoiceData.cargoType === "Car" || 
                               (invoiceData.packageDetails && invoiceData.packageDetails.some((p: any) => 
@@ -143,7 +134,6 @@ export const useBillOfLadingData = () => {
           ? extractVehicleDetails(packageDetails) 
           : {};
         
-        // Format data for BL
         const houseBillOfLading: BillOfLadingData = {
           id,
           blNumber: `BL-${invoiceData.invoiceNumber || id}`,
@@ -202,7 +192,6 @@ export const useBillOfLadingData = () => {
     
     if (!description) return details;
     
-    // Try to extract vehicle details from the description
     const makeMatch = description.match(/make:?\s*([^,\n]+)/i);
     if (makeMatch && makeMatch[1]) details.make = makeMatch[1].trim();
     
@@ -225,13 +214,11 @@ export const useBillOfLadingData = () => {
   const getPackageDescription = (invoice: any) => {
     let description = "SAID TO CONTAIN PERSONAL EFFECTS";
     
-    // Get package details if available
     const packageDetails = invoice.packageDetails || invoice.packageItems || [];
     if (packageDetails && packageDetails.length > 0) {
       const packageNames = packageDetails.map((p: any) => p.name || "PACKAGE").join(", ");
       description = `${packageNames}\nSAID TO CONTAIN PERSONAL EFFECTS`;
       
-      // If any package is a car, add vehicle details
       const carPackage = packageDetails.find((p: any) => 
         p.name && (p.name.toLowerCase().includes("car") || p.name.toLowerCase().includes("vehicle")));
       
@@ -260,7 +247,6 @@ export const useBillOfLadingData = () => {
       navigate(-1);
     } catch (error) {
       console.error("Navigation error:", error);
-      // Fallback navigation to a safe route
       navigate("/data-entry/invoicing");
     }
   };
