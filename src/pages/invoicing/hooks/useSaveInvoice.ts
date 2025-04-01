@@ -5,12 +5,20 @@ import { useNavigate } from "react-router-dom";
 import { FormState, PackageItem } from "../types/invoiceForm";
 import { useInvoiceSubmit } from "./useInvoiceSubmit";
 
-export const useSaveInvoice = (
-  formState: FormState,
-  packageItems: PackageItem[],
-  isEditing: boolean,
-  id?: string
-) => {
+// Define the input interface for better type safety
+interface SaveInvoiceProps {
+  formState: FormState;
+  packageItems: PackageItem[];
+  isEditing: boolean;
+  id?: string;
+}
+
+export const useSaveInvoice = ({
+  formState,
+  packageItems,
+  isEditing,
+  id
+}: SaveInvoiceProps) => {
   const navigate = useNavigate();
   const [savedInvoiceId, setSavedInvoiceId] = useState<string | null>(id || null);
   const { handleSubmit } = useInvoiceSubmit();
@@ -37,7 +45,7 @@ export const useSaveInvoice = (
         updatedAt: new Date().toISOString()
       };
       
-      // Save the invoice
+      // Save the invoice - call handleSubmit with all required params
       const savedId = await handleSubmit(updatedFormState, packageItems, isEditing, id);
       
       // Store the saved invoice ID
