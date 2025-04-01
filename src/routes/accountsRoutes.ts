@@ -5,7 +5,7 @@ import AddInvoicePayment from "@/pages/accounts/AddInvoicePayment";
 import PaymentMethodsPage from "@/pages/accounts/PaymentMethodsPage";
 import ReconciliationPage from "@/pages/accounts/ReconciliationPage";
 import AddPaymentPage from "@/pages/accounts/payment/AddPaymentPage";
-import ReconciliationPage from "@/pages/accounts/payments/ReconciliationPage";
+import PaidInvoicesPage from "@/pages/accounts/payments/PaidInvoicesPage";
 
 const accountsRoutes: RouteObject[] = [
   {
@@ -31,6 +31,10 @@ const accountsRoutes: RouteObject[] = [
   {
     path: "payments/reconciliation",
     element: <ReconciliationPage />,
+  },
+  {
+    path: "payments/paid",
+    element: <PaidInvoicesPage />,
   },
 ];
 
