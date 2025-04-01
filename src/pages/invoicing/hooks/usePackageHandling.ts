@@ -38,48 +38,55 @@ export const usePackageHandling = ({
       let height = formState.height;
       let packageWeight = formState.packageWeight;
       
-      // Set specific dimensions for different package types
-      if (description.includes("MEDIUM")) {
-        console.log("Setting medium carton box dimensions");
-        if (description === "MEDIUM") {
-          // Standard medium carton box
-          length = "21";
-          width = "21";
-          height = "30";
-          packageWeight = "80";
-        } else {
-          // Medium carton box
-          length = "19";
-          width = "19";
-          height = "29";
-          packageWeight = "70";
-        }
-      } else if (description.includes("SMALL")) {
+      // Set specific dimensions for different package types based on the table
+      if (description.includes("SMALL")) {
+        // Small carton box
         length = "19";
         width = "19";
         height = "19";
         packageWeight = "65";
+      } else if (description.includes("MEDIUM")) {
+        if (description === "CARTON BOX - MEDIUM") {
+          // Medium carton box (standard)
+          length = "19";
+          width = "19";
+          height = "29";
+          packageWeight = "70";
+        } else {
+          // If it's another type of medium box
+          length = "21";
+          width = "21";
+          height = "30";
+          packageWeight = "80";
+        }
       } else if (description.includes("LARGE")) {
+        // Large carton box
         length = "23";
         width = "23";
         height = "23";
         packageWeight = "80";
       } else if (description.includes("EXTRA LARGE")) {
+        // Extra large carton box
         length = "23";
         width = "23";
         height = "28";
         packageWeight = "100";
       } else if (description.includes("JUMBO")) {
-        length = "24";
-        width = "24";
-        height = "26";
-        packageWeight = "115";
-      } else if (description.includes("SUPER JUMBO")) {
-        length = "30";
-        width = "30";
-        height = "30";
-        packageWeight = "135";
+        if (description.includes("SUPER")) {
+          // Super jumbo carton box
+          length = "30";
+          width = "30";
+          height = "30";
+          packageWeight = "135";
+        } else {
+          // Jumbo carton box
+          length = "24";
+          width = "24";
+          height = "26";
+          packageWeight = "115";
+        }
       } else if (description.includes("BULILIT")) {
+        // Bulilit carton box
         length = "14";
         width = "14";
         height = "12";
