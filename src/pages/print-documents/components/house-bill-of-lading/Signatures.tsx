@@ -3,9 +3,15 @@ import React from "react";
 
 interface SignaturesProps {
   dateOfIssue: string;
+  editable?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
-const Signatures: React.FC<SignaturesProps> = ({ dateOfIssue }) => {
+const Signatures: React.FC<SignaturesProps> = ({ 
+  dateOfIssue,
+  editable = false,
+  onChange
+}) => {
   return (
     <div className="mt-10 grid grid-cols-2 gap-4">
       <div>
@@ -16,7 +22,17 @@ const Signatures: React.FC<SignaturesProps> = ({ dateOfIssue }) => {
       </div>
       <div>
         <p className="font-bold">DATE OF ISSUE:</p>
-        <p>{dateOfIssue}</p>
+        {editable ? (
+          <input
+            type="date"
+            name="dateOfIssue"
+            value={dateOfIssue}
+            onChange={onChange}
+            className="border border-gray-300 px-2 py-1"
+          />
+        ) : (
+          <p>{dateOfIssue}</p>
+        )}
         <p className="mt-6 text-sm">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>
       </div>
     </div>

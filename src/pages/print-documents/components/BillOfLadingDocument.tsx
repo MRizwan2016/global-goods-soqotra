@@ -1,11 +1,12 @@
-
 import React from "react";
 
 interface BillOfLadingDocumentProps {
   blData: any;
+  onBLDataChange?: (fieldName: string, value: string) => void;
+  editable?: boolean;
 }
 
-const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData }) => {
+const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData, onBLDataChange, editable = false }) => {
   if (!blData) {
     return (
       <div className="max-w-[210mm] mx-auto bg-white p-8 shadow-md text-center">

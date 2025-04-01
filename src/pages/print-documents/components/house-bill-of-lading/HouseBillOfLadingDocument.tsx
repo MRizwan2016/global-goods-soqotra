@@ -28,6 +28,30 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingDocumentProps> = ({
     }
   };
 
+  // Format description to handle vehicle details
+  const formatDescription = (description: string) => {
+    if (!description) return "";
+    
+    // Check if description contains vehicle information
+    if (description.toLowerCase().includes("car") || 
+        description.toLowerCase().includes("vehicle") || 
+        description.toLowerCase().includes("truck")) {
+      // Try to format vehicle information more prominently
+      const lines = description.split("\n");
+      return (
+        <>
+          {lines.map((line, index) => (
+            <div key={index} className={line.toLowerCase().includes("vehicle") || line.toLowerCase().includes("car") || line.toLowerCase().includes("truck") ? "font-bold" : ""}>
+              {line}
+            </div>
+          ))}
+        </>
+      );
+    }
+    
+    return description;
+  };
+
   return (
     <div className="house-bill-of-lading bg-white p-4 shadow-md max-w-[210mm] mx-auto">
       <Header 
@@ -86,12 +110,15 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingDocumentProps> = ({
           vehicleYear={blData.vehicleYear}
           vehicleColor={blData.vehicleColor}
           chassisNumber={blData.chassisNumber}
+          formatDescription={formatDescription}
         />
         
         <FreightInfo 
           freightPrepaid={blData.freightPrepaid}
+          packages={blData.packages}
           vessel={blData.vessel}
           voyage={blData.voyage}
+          finalDestination={blData.finalDestination}
           editable={editable}
           onChange={handleChange}
         />
