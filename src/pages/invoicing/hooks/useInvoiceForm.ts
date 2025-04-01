@@ -99,13 +99,18 @@ export const useInvoiceForm = (id?: string) => {
   // Get form state and handlers
   const { handleInputChange, handleSelectChange } = useFormHandling(formState, setFormState);
   
-  // Get package handlers
+  // Get package handlers - Fix: Pass as a single object instead of separate arguments
   const { 
     handlePackageSelect, 
     handleManualPackage, 
     handleAddPackage, 
     handleRemovePackage
-  } = usePackageHandling(formState, setFormState, packageItems, setPackageItems);
+  } = usePackageHandling({
+    formState, 
+    setFormState, 
+    packageItems, 
+    setPackageItems
+  });
   
   // Get invoice selection handlers
   const {
