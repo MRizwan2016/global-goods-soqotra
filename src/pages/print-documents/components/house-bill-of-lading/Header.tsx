@@ -4,27 +4,63 @@ import React from "react";
 interface HeaderProps {
   blNumber: string;
   date: string;
+  editable?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ blNumber, date }) => {
+const Header: React.FC<HeaderProps> = ({ 
+  blNumber, 
+  date, 
+  editable = false,
+  onChange 
+}) => {
   return (
-    <>
-      <div className="text-center border-b-2 border-black pb-4 mb-6">
-        <div className="flex justify-center mb-3">
-          <img src="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" alt="Soqotra Logo" className="h-16" />
-        </div>
-        <p className="text-sm mb-2">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>
-        <h1 className="text-2xl font-bold">HOUSE BILL OF LADING (H-BL)</h1>
-        <p className="text-sm">NOT NEGOTIABLE UNLESS CONSIGNED TO ORDER</p>
+    <div className="flex justify-between items-center mb-4">
+      <div className="flex-1">
+        <img 
+          src="/soqotra-logo.png" 
+          alt="Soqotra Shipping & Logistics" 
+          className="h-16"
+        />
       </div>
-
-      <div className="flex justify-end mb-4">
-        <div className="font-bold">
-          <p>BL Number: {blNumber}</p>
-          <p>Date: {date}</p>
+      
+      <div className="flex-1 text-center">
+        <h1 className="text-2xl font-bold">HOUSE BILL OF LADING</h1>
+        <p className="text-sm">Non-Negotiable</p>
+      </div>
+      
+      <div className="flex-1 text-right">
+        <div className="mb-2">
+          <span className="font-semibold mr-2">B/L No:</span>
+          {editable ? (
+            <input 
+              type="text" 
+              name="blNumber"
+              value={blNumber} 
+              onChange={onChange}
+              className="border border-gray-300 px-2 py-1 rounded w-32"
+            />
+          ) : (
+            <span>{blNumber}</span>
+          )}
+        </div>
+        
+        <div>
+          <span className="font-semibold mr-2">Date:</span>
+          {editable ? (
+            <input 
+              type="date" 
+              name="date"
+              value={date} 
+              onChange={onChange}
+              className="border border-gray-300 px-2 py-1 rounded w-32"
+            />
+          ) : (
+            <span>{date}</span>
+          )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

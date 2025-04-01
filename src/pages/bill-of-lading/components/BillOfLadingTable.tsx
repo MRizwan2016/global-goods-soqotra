@@ -49,7 +49,7 @@ const BillOfLadingTable = ({
               <TableRow key={item.id} className="hover:bg-gray-50">
                 <InvoiceTableCell className="text-center">{indexOfFirstEntry + index + 1}</InvoiceTableCell>
                 <InvoiceTableCell className="text-center">
-                  <Link to={`/bill-of-lading/edit/${item.id}`} className="inline-block text-blue-500 hover:text-blue-700">
+                  <Link to={`/data-entry/bill-of-lading/edit/${item.id}`} className="inline-block text-blue-500 hover:text-blue-700">
                     <Edit size={16} className="inline-block" />
                   </Link>
                 </InvoiceTableCell>

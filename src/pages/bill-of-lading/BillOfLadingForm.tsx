@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { toast } from "sonner";
@@ -9,15 +9,15 @@ import PartyInformation from "./components/PartyInformation";
 import ShippingDetails from "./components/ShippingDetails";
 import CargoDetails from "./components/CargoDetails";
 import FormActions from "./components/FormActions";
+import { getBillOfLadingById, saveBillOfLading } from "./services/BillOfLadingService";
 
 const BillOfLadingForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
   
-  const existingBL = isEditing 
-    ? mockBLData.find(bl => bl.id === id) 
-    : null;
+  // Get the existing record from our service
+  const existingBL = isEditing ? getBillOfLadingById(id!) : null;
     
   const [formState, setFormState] = useState({
     blNumber: existingBL?.blNumber || "",
@@ -54,7 +54,51 @@ const BillOfLadingForm = () => {
     vehicleYear: existingBL?.vehicleYear || "",
     vehicleColor: existingBL?.vehicleColor || "",
     chassisNumber: existingBL?.chassisNumber || "",
+    specialInstructions: existingBL?.specialInstructions || "",
   });
+
+  // Use useEffect to update form state if existingBL changes (for example, if data is loaded asynchronously)
+  useEffect(() => {
+    if (isEditing && existingBL) {
+      setFormState({
+        blNumber: existingBL.blNumber || "",
+        date: existingBL.date || "",
+        shipper: existingBL.shipper || "",
+        shipperAddress: existingBL.shipperAddress || "",
+        consignee: existingBL.consignee || "",
+        consigneeAddress: existingBL.consigneeAddress || "",
+        notifyParty: existingBL.notifyParty || "",
+        notifyPartyAddress: existingBL.notifyPartyAddress || "",
+        deliveryAgent: existingBL.deliveryAgent || "",
+        origin: existingBL.origin || "",
+        destination: existingBL.destination || "",
+        cargoType: existingBL.cargoType || "Personal Effects",
+        vessel: existingBL.vessel || "",
+        voyageNo: existingBL.voyageNo || "",
+        loadingPort: existingBL.loadingPort || "",
+        dischargePort: existingBL.dischargePort || "",
+        grossWeight: existingBL.grossWeight || "",
+        netWeight: existingBL.netWeight || "",
+        measurement: existingBL.measurement || "",
+        packages: existingBL.packages || "",
+        marksAndNumbers: existingBL.marksAndNumbers || "",
+        goodsDescription: existingBL.goodsDescription || "",
+        containerNo: existingBL.containerNo || "",
+        sealNo: existingBL.sealNo || "",
+        status: existingBL.status || "Shipped",
+        shippingMarks: existingBL.shippingMarks || "",
+        freightCharges: existingBL.freightCharges || "Prepaid",
+        placeOfIssue: existingBL.placeOfIssue || "",
+        dateOfIssue: existingBL.dateOfIssue || "",
+        vehicleMake: existingBL.vehicleMake || "",
+        vehicleModel: existingBL.vehicleModel || "",
+        vehicleYear: existingBL.vehicleYear || "",
+        vehicleColor: existingBL.vehicleColor || "",
+        chassisNumber: existingBL.chassisNumber || "",
+        specialInstructions: existingBL.specialInstructions || "",
+      });
+    }
+  }, [isEditing, existingBL]);
 
   // Destination countries
   const destinations = [
@@ -131,10 +175,21 @@ const BillOfLadingForm = () => {
       return;
     }
     
-    console.log("Saving Bill of Lading:", formState);
-    toast.success("Bill of Lading saved successfully");
-    
-    navigate("/data-entry/bill-of-lading");
+    try {
+      const blToSave = {
+        id: id || undefined,
+        ...formState
+      };
+      
+      const savedBL = saveBillOfLading(blToSave);
+      console.log("Saved Bill of Lading:", savedBL);
+      toast.success("Bill of Lading saved successfully");
+      
+      navigate("/data-entry/bill-of-lading");
+    } catch (error) {
+      console.error("Error saving Bill of Lading:", error);
+      toast.error("Failed to save Bill of Lading");
+    }
   };
   
   return (

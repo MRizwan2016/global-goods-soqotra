@@ -6,7 +6,7 @@ import {
   getBillOfLadingData, 
   filterBillOfLadingData, 
   paginateBillOfLadingData,
-  BillOfLading
+  deleteBillOfLading
 } from "../services/BillOfLadingService";
 
 export const useBillOfLadingList = () => {
@@ -18,8 +18,9 @@ export const useBillOfLadingList = () => {
   const [destination, setDestination] = useState("ALL");
   const [cargoType, setCargoType] = useState("ALL");
   const [status, setStatus] = useState("ALL");
+  const [refreshKey, setRefreshKey] = useState(0); // Used to force re-render
 
-  // Get all data
+  // Get all data - with the refreshKey dependency to refresh when data changes
   const allData = getBillOfLadingData();
   
   // Apply filters
@@ -48,7 +49,20 @@ export const useBillOfLadingList = () => {
   };
 
   const handleDeleteClick = (id: string) => {
-    toast.error("Delete functionality is not implemented");
+    if (window.confirm("Are you sure you want to delete this Bill of Lading?")) {
+      try {
+        const deleted = deleteBillOfLading(id);
+        if (deleted) {
+          toast.success("Bill of Lading deleted successfully");
+          setRefreshKey(prev => prev + 1); // Force refresh
+        } else {
+          toast.error("Failed to delete Bill of Lading");
+        }
+      } catch (error) {
+        console.error("Error deleting Bill of Lading:", error);
+        toast.error("An error occurred while deleting");
+      }
+    }
   };
 
   return {
