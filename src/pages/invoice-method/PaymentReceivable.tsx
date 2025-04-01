@@ -102,7 +102,53 @@ const PaymentReceivable = () => {
         console.log("Added invoice 010000 to the list");
       }
       
-      // Check if there are payments for invoice 010000
+      // Check if invoice 13136051 exists, or add it
+      const hasInvoice13136051 = parsedInvoices.some(invoice => invoice.invoiceNumber === "13136051");
+      
+      if (!hasInvoice13136051) {
+        parsedInvoices.push({
+          id: "inv-13136051",
+          invoiceNumber: "13136051",
+          date: "2025-04-01",
+          shipper1: "MR. SOORIYAPPERUMA",
+          consignee1: "MRS. FERNANDO",
+          salesAgent: "S",
+          warehouse: "Doha Warehouse",
+          doorToDoor: false,
+          nic: "QAT987654",
+          volume: 0.22,
+          weight: 80,
+          packages: 1,
+          gross: 250.00,
+          discount: 0,
+          net: 250.00,
+          paid: false,
+          statusCharge: 0,
+          offerDiscount: 0,
+          branch: "Doha",
+          sector: "Air",
+          transportType: "Air",
+          amount: 250.00,
+          currency: "QAR",
+          packageDetails: [
+            {
+              id: "pkg-13136051-1",
+              name: "CARTON BOX MEDIUM",
+              length: "21",
+              width: "21",
+              height: "30",
+              volume: "0.22",
+              weight: "80",
+              boxNumber: "1",
+              volumeWeight: "80"
+            }
+          ]
+        });
+        
+        console.log("Added invoice 13136051 to the list");
+      }
+      
+      // Check if there are payments for any invoices
       const payments = localStorage.getItem('payments');
       if (payments) {
         const parsedPayments = JSON.parse(payments);

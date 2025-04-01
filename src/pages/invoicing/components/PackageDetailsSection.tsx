@@ -28,8 +28,11 @@ const PackageDetailsSection: React.FC<PackageDetailsSectionProps> = ({
 }) => {
   return (
     <div className="mt-8">
-      <div className="bg-soqotra-blue text-white py-2 px-4 font-medium">
-        PACKAGES DETAILS
+      <div className="bg-soqotra-blue text-white py-2 px-4 font-medium flex justify-between items-center">
+        <span>PACKAGES DETAILS</span>
+        <div className="text-xs">
+          Standard dimensions: Small(19×19×19), Medium(21×21×30), Large(23×23×23), Extra Large(23×23×28)
+        </div>
       </div>
       
       <PackageSelector 

@@ -1,183 +1,210 @@
+
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { PackageItem, FormState } from "../types/invoiceForm";
+import { FormState, PackageItem } from "../types/invoiceForm";
+import { packageOptions } from "@/data/packageOptions";
 
-interface UsePackageHandlingProps {
+interface PackageHandlingProps {
   formState: FormState;
   setFormState: React.Dispatch<React.SetStateAction<FormState>>;
   packageItems: PackageItem[];
   setPackageItems: React.Dispatch<React.SetStateAction<PackageItem[]>>;
 }
 
-// Package dimension presets for common package types
-const PACKAGE_PRESETS: Record<string, { length: string; width: string; height: string }> = {
-  "Medium Carton Box": { length: "50", width: "40", height: "35" },
-  "Small Carton Box": { length: "30", width: "25", height: "20" },
-  "Large Carton Box": { length: "60", width: "50", height: "45" },
-  "Extra Large Carton Box": { length: "70", width: "60", height: "55" },
-};
-
 export const usePackageHandling = ({
-  formState,
-  setFormState,
-  packageItems,
+  formState, 
+  setFormState, 
+  packageItems, 
   setPackageItems
-}: UsePackageHandlingProps) => {
-  const [showManualPackageModal, setShowManualPackageModal] = useState(false);
-  const [manualPackageName, setManualPackageName] = useState("");
-  const [manualPackagePrice, setManualPackagePrice] = useState("");
+}: PackageHandlingProps) => {
   
-  const handlePackageSelect = (packageDescription: string) => {
-    const packageOption = packageDescription.split(" - ");
-    const packageName = packageOption[0];
-    const packagePrice = packageOption[1]?.replace(/[^0-9.]/g, "") || "0";
+  // Handle selecting a package from the dropdown
+  const handlePackageSelect = (description: string) => {
+    // Find the package option that matches the description
+    const selectedPackage = packageOptions.find(option => option.description === description);
     
-    const nextBoxNumber = (packageItems.length + 1).toString();
-    
-    // Set standard dimensions based on the package name if available
-    const dimensions = PACKAGE_PRESETS[packageName] || { length: "", width: "", height: "" };
-    
-    setFormState(prev => {
-      // Calculate cubic meter if dimensions are available
-      let cubicMetre = "";
-      if (dimensions.length && dimensions.width && dimensions.height) {
-        const l = parseFloat(dimensions.length);
-        const w = parseFloat(dimensions.width);
-        const h = parseFloat(dimensions.height);
-        cubicMetre = ((l * w * h) / 1000000).toFixed(3);
+    if (selectedPackage) {
+      console.log("Selected package:", selectedPackage);
+      
+      // Set default price if available
+      let price = formState.price;
+      if (selectedPackage.price) {
+        price = String(selectedPackage.price);
       }
       
-      return {
+      // Set dimensions based on package type
+      let length = formState.length;
+      let width = formState.width;
+      let height = formState.height;
+      let packageWeight = formState.packageWeight;
+      
+      // Set specific dimensions for different package types
+      if (description.includes("MEDIUM")) {
+        console.log("Setting medium carton box dimensions");
+        if (description === "MEDIUM") {
+          // Standard medium carton box
+          length = "21";
+          width = "21";
+          height = "30";
+          packageWeight = "80";
+        } else {
+          // Medium carton box
+          length = "19";
+          width = "19";
+          height = "29";
+          packageWeight = "70";
+        }
+      } else if (description.includes("SMALL")) {
+        length = "19";
+        width = "19";
+        height = "19";
+        packageWeight = "65";
+      } else if (description.includes("LARGE")) {
+        length = "23";
+        width = "23";
+        height = "23";
+        packageWeight = "80";
+      } else if (description.includes("EXTRA LARGE")) {
+        length = "23";
+        width = "23";
+        height = "28";
+        packageWeight = "100";
+      } else if (description.includes("JUMBO")) {
+        length = "24";
+        width = "24";
+        height = "26";
+        packageWeight = "115";
+      } else if (description.includes("SUPER JUMBO")) {
+        length = "30";
+        width = "30";
+        height = "30";
+        packageWeight = "135";
+      } else if (description.includes("BULILIT")) {
+        length = "14";
+        width = "14";
+        height = "12";
+        packageWeight = "10";
+      }
+      
+      // Calculate cubic meter based on the dimensions
+      let cubicMetre = "";
+      if (length && width && height) {
+        const l = parseFloat(length);
+        const w = parseFloat(width);
+        const h = parseFloat(height);
+        if (!isNaN(l) && !isNaN(w) && !isNaN(h)) {
+          cubicMetre = ((l * w * h) / 1000000).toFixed(6);
+        }
+      }
+      
+      setFormState(prev => ({
         ...prev,
-        packagesName: packageName,
-        price: packagePrice,
-        boxNumber: nextBoxNumber,
-        length: dimensions.length,
-        width: dimensions.width,
-        height: dimensions.height,
-        cubicMetre: cubicMetre
-      };
-    });
+        packagesName: description,
+        selectedPackage,
+        price,
+        length,
+        width,
+        height,
+        packageWeight,
+        cubicMetre
+      }));
+    }
   };
   
-  const handleManualPackage = (packageName: string, packagePrice: string) => {
-    const nextBoxNumber = (packageItems.length + 1).toString();
-    
+  // Handle manual package input
+  const handleManualPackage = (packageName: string, price: string) => {
     setFormState(prev => ({
       ...prev,
       packagesName: packageName,
-      price: packagePrice,
-      boxNumber: nextBoxNumber,
+      selectedPackage: { description: packageName, price: parseFloat(price) },
+      price
     }));
-    
-    setManualPackageName("");
-    setManualPackagePrice("");
-    setShowManualPackageModal(false);
   };
   
+  // Add a package to the list
   const handleAddPackage = () => {
-    if (!formState.packagesName) {
-      console.error("Package name is required");
-      return;
-    }
-    
-    const volume = calculateVolume(formState.length, formState.width, formState.height);
-    const volumeWeight = calculateVolumeWeight(volume);
-    
-    const price = parseFloat(formState.price) || 0;
-    const docFee = parseFloat(formState.documentsFee) || 0;
-    const total = price + docFee;
-    
-    const newItem: PackageItem = {
+    const newPackage: PackageItem = {
       id: uuidv4(),
       name: formState.packagesName,
       length: formState.length,
       width: formState.width,
       height: formState.height,
-      volume: volume.toString(),
+      volume: formState.cubicMetre,
       weight: formState.packageWeight,
-      boxNumber: formState.boxNumber || (packageItems.length + 1).toString(),
-      volumeWeight: volumeWeight.toString(),
+      boxNumber: formState.boxNumber,
+      volumeWeight: formState.volumeWeight,
       price: formState.price,
       documentsFee: formState.documentsFee,
-      total: total.toString()
+      total: calculateTotal(formState.price, formState.documentsFee)
     };
     
-    setPackageItems(prev => [...prev, newItem]);
+    setPackageItems(prev => [...prev, newPackage]);
     
-    updatePackageTotals([...packageItems, newItem]);
+    // Update the form state with the new package totals
+    updateFormTotals([...packageItems, newPackage]);
     
-    resetPackageFields();
-  };
-  
-  const handleRemovePackage = (id: string) => {
-    const updatedItems = packageItems.filter(item => item.id !== id);
-    setPackageItems(updatedItems);
-    
-    const renumberedItems = updatedItems.map((item, index) => ({
-      ...item,
-      boxNumber: (index + 1).toString()
-    }));
-    
-    setPackageItems(renumberedItems);
-    
-    updatePackageTotals(renumberedItems);
-  };
-  
-  const calculateVolume = (length: string, width: string, height: string) => {
-    const l = parseFloat(length) || 0;
-    const w = parseFloat(width) || 0;
-    const h = parseFloat(height) || 0;
-    
-    const volumeInCm = l * w * h;
-    const volumeInM = volumeInCm / 1000000;
-    
-    return parseFloat(volumeInM.toFixed(6));
-  };
-  
-  const calculateVolumeWeight = (volume: number) => {
-    const volumeWeight = volume * 167;
-    return parseFloat(volumeWeight.toFixed(2));
-  };
-  
-  const updatePackageTotals = (items: PackageItem[]) => {
-    const totalVolume = items.reduce((sum, item) => sum + (parseFloat(item.volume) || 0), 0);
-    const totalWeight = items.reduce((sum, item) => sum + (parseFloat(item.weight) || 0), 0);
-    const totalVolumeWeight = items.reduce((sum, item) => sum + (parseFloat(item.volumeWeight) || 0), 0);
-    const totalPackages = items.length;
-    
-    setFormState(prev => ({
-      ...prev,
-      volume: totalVolume.toFixed(6),
-      weight: totalWeight.toString(),
-      packages: totalPackages.toString(),
-    }));
-  };
-  
-  const resetPackageFields = () => {
+    // Reset package form
     setFormState(prev => ({
       ...prev,
       packagesName: "",
+      selectedPackage: null,
       length: "",
       width: "",
       height: "",
+      cubicMetre: "",
+      cubicFeet: "",
       packageWeight: "",
-      boxNumber: (packageItems.length + 1).toString(),
+      boxNumber: "",
+      volumeWeight: "",
       price: "",
       documentsFee: "",
+      total: ""
+    }));
+  };
+  
+  // Remove a package from the list
+  const handleRemovePackage = (id: string) => {
+    const updatedPackages = packageItems.filter(item => item.id !== id);
+    setPackageItems(updatedPackages);
+    
+    // Update the form state with the new package totals
+    updateFormTotals(updatedPackages);
+  };
+  
+  // Helper functions
+  const calculateTotal = (price: string, docFee: string): string => {
+    const p = parseFloat(price || "0");
+    const d = parseFloat(docFee || "0");
+    return (p + d).toFixed(2);
+  };
+  
+  const updateFormTotals = (packages: PackageItem[]) => {
+    // Calculate totals from all packages
+    let totalVolume = 0;
+    let totalWeight = 0;
+    let totalAmount = 0;
+    let packageCount = packages.length;
+    
+    packages.forEach(pkg => {
+      totalVolume += parseFloat(pkg.volume || "0");
+      totalWeight += parseFloat(pkg.weight || "0");
+      totalAmount += parseFloat(pkg.total || "0");
+    });
+    
+    setFormState(prev => ({
+      ...prev,
+      volume: totalVolume.toFixed(3),
+      weight: totalWeight.toFixed(2),
+      packages: String(packageCount),
+      gross: totalAmount.toFixed(2),
+      net: (totalAmount - parseFloat(prev.discount || "0")).toFixed(2)
     }));
   };
   
   return {
-    showManualPackageModal,
-    setShowManualPackageModal,
-    manualPackageName,
-    setManualPackageName,
-    manualPackagePrice,
-    setManualPackagePrice,
     handlePackageSelect,
     handleManualPackage,
     handleAddPackage,
-    handleRemovePackage,
+    handleRemovePackage
   };
 };
