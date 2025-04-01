@@ -132,13 +132,23 @@ const CargoDetails = ({ formState, handleInputChange }: CargoDetailsProps) => {
           </Select>
         </div>
         
+        <div className="flex flex-col">
+          <label className="text-sm font-medium mb-1">DELIVERY AGENT:</label>
+          <Input 
+            name="deliveryAgent"
+            value={formState.deliveryAgent || ""}
+            onChange={handleInputChange}
+            className="border border-gray-300"
+          />
+        </div>
+        
         <div className="flex flex-col md:col-span-3">
           <label className="text-sm font-medium mb-1">GOODS DESCRIPTION:</label>
           <Textarea 
             name="goodsDescription"
             value={formState.goodsDescription}
             onChange={handleInputChange}
-            className="border border-gray-300 min-h-[100px]"
+            className="border border-gray-300 min-h-[150px]"
           />
         </div>
 

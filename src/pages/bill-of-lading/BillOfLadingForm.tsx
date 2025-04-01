@@ -28,6 +28,7 @@ const BillOfLadingForm = () => {
     consigneeAddress: existingBL?.consigneeAddress || "",
     notifyParty: existingBL?.notifyParty || "",
     notifyPartyAddress: existingBL?.notifyPartyAddress || "",
+    deliveryAgent: existingBL?.deliveryAgent || "",
     origin: existingBL?.origin || "",
     destination: existingBL?.destination || "",
     cargoType: existingBL?.cargoType || "Personal Effects",
@@ -48,6 +49,11 @@ const BillOfLadingForm = () => {
     freightCharges: existingBL?.freightCharges || "Prepaid",
     placeOfIssue: existingBL?.placeOfIssue || "",
     dateOfIssue: existingBL?.dateOfIssue || "",
+    vehicleMake: existingBL?.vehicleMake || "",
+    vehicleModel: existingBL?.vehicleModel || "",
+    vehicleYear: existingBL?.vehicleYear || "",
+    vehicleColor: existingBL?.vehicleColor || "",
+    chassisNumber: existingBL?.chassisNumber || "",
   });
 
   // Destination countries

@@ -18,6 +18,7 @@ interface BillOfLadingData {
   consigneeIdNumber?: string;
   notifyParty?: string;
   notifyPartyAddress?: string;
+  deliveryAgent?: string;
   portOfLoading?: string;
   portOfDischarge?: string;
   marks?: string;
@@ -35,6 +36,8 @@ interface BillOfLadingData {
   vehicleYear?: string;
   vehicleColor?: string;
   chassisNumber?: string;
+  containerNo?: string;
+  sealNo?: string;
   specialInstructions?: string;
   voyage?: string;
   [key: string]: any; // Allow any additional fields
@@ -83,6 +86,7 @@ export const useBillOfLadingData = () => {
             consigneeIdNumber: "N/A",
             notifyParty: blRecord.notifyParty || "SAME AS CONSIGNEE",
             notifyPartyAddress: blRecord.notifyPartyAddress || "",
+            deliveryAgent: blRecord.deliveryAgent || "N/A",
             portOfLoading: blRecord.loadingPort || "DOHA, QATAR",
             portOfDischarge: blRecord.dischargePort || "COLOMBO, SRI LANKA",
             marks: blRecord.marksAndNumbers || "AS ADDRESSED",
@@ -92,6 +96,7 @@ export const useBillOfLadingData = () => {
             packages: blRecord.packages || "1",
             freightPrepaid: blRecord.freightCharges === "Prepaid",
             vessel: blRecord.vessel || "MV SOQOTRA QUEEN / XXXX",
+            voyage: blRecord.voyageNo || "N/A",
             finalDestination: blRecord.destination || "COLOMBO, SRI LANKA",
             dateOfIssue: blRecord.dateOfIssue || blRecord.date,
             cargoType: blRecord.cargoType,
@@ -99,7 +104,10 @@ export const useBillOfLadingData = () => {
             vehicleModel: blRecord.vehicleModel || vehicleDetails.model,
             vehicleYear: blRecord.vehicleYear || vehicleDetails.year,
             vehicleColor: blRecord.vehicleColor || vehicleDetails.color,
-            chassisNumber: blRecord.chassisNumber || vehicleDetails.chassis
+            chassisNumber: blRecord.chassisNumber || vehicleDetails.chassis,
+            containerNo: blRecord.containerNo || "N/A",
+            sealNo: blRecord.sealNo || "N/A",
+            specialInstructions: blRecord.specialInstructions || ""
           });
           setLoading(false);
           return;
@@ -148,6 +156,7 @@ export const useBillOfLadingData = () => {
           consigneeIdNumber: invoiceData.consigneeIdNumber || invoiceData.nic || "N/A",
           notifyParty: invoiceData.notifyParty || "SAME AS CONSIGNEE",
           notifyPartyAddress: invoiceData.notifyPartyAddress || "",
+          deliveryAgent: invoiceData.deliveryAgent || "N/A",
           portOfLoading: "DOHA, QATAR",
           portOfDischarge: invoiceData.warehouse || "COLOMBO, SRI LANKA",
           marks: "AS ADDRESSED",
@@ -164,7 +173,9 @@ export const useBillOfLadingData = () => {
           vehicleModel: vehicleDetails.model,
           vehicleYear: vehicleDetails.year,
           vehicleColor: vehicleDetails.color,
-          chassisNumber: vehicleDetails.chassis
+          chassisNumber: vehicleDetails.chassis,
+          containerNo: invoiceData.containerNo || "N/A",
+          sealNo: invoiceData.sealNo || "N/A"
         };
 
         setBlData(houseBillOfLading);

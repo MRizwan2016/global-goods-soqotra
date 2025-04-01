@@ -50,6 +50,7 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
   const consigneeIdNumber = blData?.consigneeIdNumber || 'N/A';
   const notifyParty = blData?.notifyParty || 'SAME AS CONSIGNEE';
   const notifyPartyAddress = blData?.notifyPartyAddress || '';
+  const deliveryAgent = blData?.deliveryAgent || 'N/A';
   const portOfLoading = blData?.portOfLoading || 'N/A';
   const portOfDischarge = blData?.portOfDischarge || 'N/A';
   const marks = blData?.marks || 'AS ADDRESSED';
@@ -62,6 +63,8 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
   const finalDestination = blData?.finalDestination || blData?.portOfDischarge || 'N/A';
   const dateOfIssue = blData?.dateOfIssue || blData?.date || 'N/A';
   const cargoType = blData?.cargoType || '';
+  const containerNo = blData?.containerNo || 'N/A';
+  const sealNo = blData?.sealNo || 'N/A';
 
   return (
     <div className="max-w-[210mm] mx-auto bg-white p-8 shadow-md">
@@ -100,11 +103,17 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
           </div>
         </div>
 
-        {/* Notify Party */}
-        <div className="border-2 border-black p-3 mb-6">
-          <h2 className="font-bold border-b border-black pb-1 mb-1">NOTIFY PARTY</h2>
-          <p>{notifyParty}</p>
-          <p className="text-sm">{notifyPartyAddress}</p>
+        {/* Notify Party & Delivery Agent */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="border-2 border-black p-3">
+            <h2 className="font-bold border-b border-black pb-1 mb-1">NOTIFY PARTY</h2>
+            <p>{notifyParty}</p>
+            <p className="text-sm">{notifyPartyAddress}</p>
+          </div>
+          <div className="border-2 border-black p-3">
+            <h2 className="font-bold border-b border-black pb-1 mb-1">DELIVERY AGENT</h2>
+            <p>{deliveryAgent}</p>
+          </div>
         </div>
 
         {/* Ports */}
@@ -116,6 +125,18 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
           <div className="border-2 border-black p-3">
             <h2 className="font-bold border-b border-black pb-1 mb-1">PORT OF DISCHARGE</h2>
             <p>{portOfDischarge}</p>
+          </div>
+        </div>
+
+        {/* Container & Seal Details */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="border-2 border-black p-3">
+            <h2 className="font-bold border-b border-black pb-1 mb-1">CONTAINER NO</h2>
+            <p>{containerNo}</p>
+          </div>
+          <div className="border-2 border-black p-3">
+            <h2 className="font-bold border-b border-black pb-1 mb-1">SEAL NO</h2>
+            <p>{sealNo}</p>
           </div>
         </div>
 

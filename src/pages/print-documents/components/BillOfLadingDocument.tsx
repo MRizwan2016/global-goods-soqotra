@@ -23,6 +23,8 @@ const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData }) =
   const consignee = blData?.consignee || 'N/A';
   const consigneeAddress = blData?.consigneeAddress || 'N/A';
   const notifyParty = blData?.notifyParty || 'SAME AS CONSIGNEE';
+  const notifyPartyAddress = blData?.notifyPartyAddress || '';
+  const deliveryAgent = blData?.deliveryAgent || 'N/A';
   const vessel = blData?.vessel || 'N/A';
   const voyage = blData?.voyage || 'N/A';
   const portOfLoading = blData?.portOfLoading || 'N/A';
@@ -35,6 +37,8 @@ const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData }) =
   const description = blData?.description || '';
   const specialInstructions = blData?.specialInstructions || 'N/A';
   const cargoType = blData?.cargoType || '';
+  const containerNo = blData?.containerNo || 'N/A';
+  const sealNo = blData?.sealNo || 'N/A';
 
   // Format description to handle vehicle details
   const formatDescription = (description: string) => {
@@ -96,28 +100,40 @@ const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData }) =
           <div className="border p-3">
             <h2 className="font-bold mb-1">Notify Party:</h2>
             <p>{notifyParty}</p>
+            <p className="text-sm">{notifyPartyAddress}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="border p-3">
+            <h2 className="font-bold mb-1">Delivery Agent:</h2>
+            <p>{deliveryAgent}</p>
+          </div>
           <div className="border p-3">
             <h2 className="font-bold mb-1">Vessel / Voyage:</h2>
             <p>{vessel} / {voyage}</p>
           </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="border p-3">
             <h2 className="font-bold mb-1">Port of Loading:</h2>
             <p>{portOfLoading}</p>
+          </div>
+          <div className="border p-3">
+            <h2 className="font-bold mb-1">Port of Discharge:</h2>
+            <p>{portOfDischarge}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="border p-3">
-            <h2 className="font-bold mb-1">Port of Discharge:</h2>
-            <p>{portOfDischarge}</p>
+            <h2 className="font-bold mb-1">Container No:</h2>
+            <p>{containerNo}</p>
           </div>
           <div className="border p-3">
-            <h2 className="font-bold mb-1">Final Destination:</h2>
-            <p>{finalDestination}</p>
+            <h2 className="font-bold mb-1">Seal No:</h2>
+            <p>{sealNo}</p>
           </div>
         </div>
 
