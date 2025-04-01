@@ -8,6 +8,7 @@ import PaymentPageHeader from "./components/PaymentPageHeader";
 import PaymentPageContent from "./components/PaymentPageContent";
 import PaymentActionButtons from "./components/PaymentActionButtons";
 import ReceiptHandler, { ReceiptHandlerRef } from "./components/ReceiptHandler";
+import { toast } from "sonner";
 
 const AddPaymentPage = () => {
   const {
@@ -45,11 +46,19 @@ const AddPaymentPage = () => {
 
   // Handle save with receipt generation
   const handleSaveWithReceipt = () => {
-    // First save the payment
-    handleSave();
+    // First save the payment and only generate receipt if save was successful
+    const saveSuccessful = handleSave();
     
-    // Then generate receipt
-    handleGenerateReceipt();
+    if (saveSuccessful) {
+      // Then generate receipt
+      const receiptGenerated = handleGenerateReceipt();
+      
+      if (!receiptGenerated) {
+        toast.error("Failed to generate receipt");
+      }
+    } else {
+      toast.error("Payment must be saved successfully before generating receipt");
+    }
   };
 
   // Check for invoice in session storage (from direct payment link)

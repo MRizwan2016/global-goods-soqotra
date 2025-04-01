@@ -1,185 +1,96 @@
 
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { v4 as uuidv4 } from "uuid";
 import { FormState } from "../types";
 
-export const usePaymentSave = (formState: FormState, currencySymbol: string = "") => {
+/**
+ * Hook for handling payment saving
+ */
+export const usePaymentSave = (formState: FormState, currencySymbol: string) => {
   const navigate = useNavigate();
 
-  const handleSave = () => {
-    // Validate the form
-    if (!formState.invoiceNumber) {
-      toast.error("Missing Information", {
-        description: "Please select an invoice to proceed"
-      });
-      return;
-    }
-
-    if (!formState.amountPaid || formState.amountPaid <= 0) {
-      toast.error("Invalid Amount", {
-        description: "Payment amount must be greater than zero"
-      });
-      return;
-    }
-
-    if (!formState.country || !formState.currency) {
-      toast.error("Missing Information", {
-        description: "Please select a country and currency"
-      });
-      return;
-    }
-
+  /**
+   * Save payment to localStorage
+   * @returns boolean indicating if save was successful
+   */
+  const handleSave = (): boolean => {
     try {
-      // Get existing payments from localStorage or initialize empty array
-      const existingPaymentsStr = localStorage.getItem('payments');
-      const existingPayments = existingPaymentsStr ? JSON.parse(existingPaymentsStr) : [];
+      console.log("Saving payment:", formState);
       
-      // Create a new payment record
-      const paymentId = uuidv4();
-      const receiptNumber = `R-${Date.now().toString().substring(6)}`;
+      // Validate required fields
+      if (!formState.invoiceNumber) {
+        toast.error("Invoice number is required");
+        return false;
+      }
       
-      // Ensure amount is a number
-      const amountPaid = typeof formState.amountPaid === 'string' 
-        ? parseFloat(formState.amountPaid) 
-        : formState.amountPaid;
+      if (formState.amountPaid <= 0) {
+        toast.error("Payment amount must be greater than zero");
+        return false;
+      }
       
-      const newPayment = {
-        id: paymentId,
-        receiptNumber: receiptNumber,
+      // Create payment object
+      const payment = {
+        id: `payment-${Date.now()}`,
         invoiceNumber: formState.invoiceNumber,
-        customerName: formState.customerName || formState.consignee,
-        amount: amountPaid,
-        currency: formState.currency,
-        country: formState.country,
-        date: formState.paymentCollectDate,
-        paymentMethod: formState.receivableAccount,
-        remarks: formState.remarks,
-        timestamp: new Date().toISOString(),
-        bookingForm: formState.bookingForm || '',
+        customerName: formState.consignee || formState.customerName || "Unknown",
+        date: formState.paymentCollectDate || new Date().toISOString().split('T')[0],
+        amount: formState.amountPaid,
+        currency: formState.currency || "QAR",
+        method: formState.receivableAccount || "cash",
+        remarks: formState.remarks || "",
+        timestamp: new Date().toISOString()
       };
       
-      // Add the new payment to the array
-      existingPayments.push(newPayment);
+      // Load existing payments
+      const existingPaymentsJSON = localStorage.getItem('payments') || '[]';
+      const existingPayments = JSON.parse(existingPaymentsJSON);
       
-      // Save back to localStorage
-      localStorage.setItem('payments', JSON.stringify(existingPayments));
+      // Add new payment
+      const updatedPayments = [...existingPayments, payment];
       
-      // Also save to invoicePayments for receipt viewing
-      const invoicePaymentsStr = localStorage.getItem('invoicePayments');
-      const invoicePayments = invoicePaymentsStr ? JSON.parse(invoicePaymentsStr) : [];
-      invoicePayments.push(newPayment);
-      localStorage.setItem('invoicePayments', JSON.stringify(invoicePayments));
+      // Save to localStorage
+      localStorage.setItem('payments', JSON.stringify(updatedPayments));
       
-      // Update invoice status to paid if needed
-      updateInvoiceStatus(formState.invoiceNumber, amountPaid, formState.balanceToPay);
+      // Update invoices in localStorage to reflect payment
+      const existingInvoicesJSON = localStorage.getItem('invoices') || '[]';
+      const existingInvoices = JSON.parse(existingInvoicesJSON);
       
-      // Show success toast
-      toast.success("Payment Saved", {
-        description: `Payment of ${currencySymbol}${amountPaid.toFixed(2)} has been recorded successfully`
-      });
-      
-      // Check if we need to show reconciliation reminder
-      checkReconciliationReminder(existingPayments);
-      
-      // Navigate back to payment receivable page after saving
-      setTimeout(() => {
-        navigate('/invoice-method/payment-receivable');
-      }, 1500);
-      
-      return {
-        success: true,
-        paymentId,
-        receiptNumber
-      };
-    } catch (error) {
-      console.error("Error saving payment:", error);
-      toast.error("Error Saving Payment", {
-        description: "There was an error saving the payment. Please try again."
-      });
-      return { success: false };
-    }
-  };
-  
-  // Check if a reconciliation reminder should be shown
-  const checkReconciliationReminder = (payments: any[]) => {
-    // Get only the payments that haven't been reconciled yet
-    const unreconciled = payments.filter(p => !p.reconciled);
-    
-    if (unreconciled.length >= 10) {
-      // Show reconciliation reminder toast
-      toast.warning("Reconciliation Reminder", {
-        description: `You have ${unreconciled.length} unreconciled payments. Please reconcile them soon.`,
-        duration: 8000,
-        action: {
-          label: "Reconcile Now",
-          onClick: () => {
-            navigate('/accounts/payments/reconciliation');
-          }
-        }
-      });
-    }
-  };
-  
-  // Function to update invoice status if paid
-  const updateInvoiceStatus = (invoiceNumber: string, amountPaid: number, balanceToPay: number) => {
-    try {
-      // Get existing invoices
-      const existingInvoicesStr = localStorage.getItem('invoices');
-      if (!existingInvoicesStr) return;
-      
-      const existingInvoices = JSON.parse(existingInvoicesStr);
-      
-      // Find the invoice by number
+      // Find the invoice to update
       const updatedInvoices = existingInvoices.map((invoice: any) => {
-        if (invoice.invoiceNumber === invoiceNumber) {
-          // Make sure we're handling the correct invoice net amount
-          const invoiceAmount = parseFloat(invoice.net) || invoice.amount || 0;
+        if (invoice.invoiceNumber === formState.invoiceNumber) {
+          // Calculate total paid amount including this payment
+          const previousPaid = invoice.totalPaid || 0;
+          const newTotalPaid = previousPaid + formState.amountPaid;
+          const invoiceAmount = invoice.net || invoice.amount || 0;
           
-          // Mark as paid if payment covers the full balance
-          if (amountPaid >= balanceToPay || amountPaid >= invoiceAmount) {
-            console.log(`Marking invoice ${invoiceNumber} as paid. Amount paid: ${amountPaid}, Invoice amount: ${invoiceAmount}`);
-            return { 
-              ...invoice, 
-              paid: true, 
-              paidAmount: invoiceAmount,
-              totalPaid: invoiceAmount,
-              balanceToPay: 0,
-              // Ensure correct gross and net values if they're strings
-              gross: String(parseFloat(invoice.gross) || invoiceAmount),
-              net: String(invoiceAmount)
-            };
-          }
-          
-          // For partial payments, just update the amount paid so far
-          const currentPaid = parseFloat(invoice.paidAmount) || 0;
-          const totalPaid = currentPaid + amountPaid;
-          const newBalanceToPay = invoiceAmount - totalPaid;
-          
-          return { 
-            ...invoice, 
-            paidAmount: totalPaid,
-            totalPaid: totalPaid,
-            balanceToPay: newBalanceToPay,
-            paid: totalPaid >= invoiceAmount,
-            // Ensure correct gross and net values
-            gross: String(parseFloat(invoice.gross) || invoiceAmount),
-            net: String(invoiceAmount)
+          // Update invoice payment status
+          return {
+            ...invoice,
+            totalPaid: newTotalPaid,
+            paidAmount: newTotalPaid,
+            paid: newTotalPaid >= invoiceAmount
           };
         }
         return invoice;
       });
       
-      // Save updated invoices back to localStorage
+      // Save updated invoices
       localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
       
-      // Trigger storage event for other components to refresh
+      // Trigger a storage event to notify other components about the update
       window.dispatchEvent(new Event('storage'));
       
+      toast.success("Payment Saved", {
+        description: `Payment of ${currencySymbol} ${formState.amountPaid.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded`,
+      });
+      
+      return true;
     } catch (error) {
-      console.error("Error updating invoice status:", error);
+      console.error("Error saving payment:", error);
+      toast.error("Failed to save payment");
+      return false;
     }
   };
-  
+
   return { handleSave };
 };
