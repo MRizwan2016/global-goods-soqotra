@@ -20,9 +20,17 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
 }) => {
   // Format number values consistently
   const formatNumber = (value: any): string => {
-    if (value === undefined || value === null) return "0";
-    const num = typeof value === 'string' ? parseFloat(value) : value;
-    return isNaN(num) ? "0" : num.toFixed(2);
+    if (value === undefined || value === null) return "0.00";
+    
+    // Convert to number if it's a string
+    let num: number;
+    if (typeof value === 'string') {
+      num = parseFloat(value);
+    } else {
+      num = value;
+    }
+    
+    return isNaN(num) ? "0.00" : num.toFixed(2);
   };
 
   // Ensure all required fields have values

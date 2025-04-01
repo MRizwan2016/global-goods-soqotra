@@ -33,9 +33,16 @@ export const InvoiceRow: React.FC<InvoiceRowProps> = ({
 }) => {
   // Determine the customer name from various possible fields
   const customerName = invoice.consignee1 || invoice.consignee || invoice.customer || 'Unknown';
+  
   // Get amount from net, amount, or calculate from gross-discount
+  // Ensure it's a number before using toFixed
   const amount = invoice.net || invoice.amount || 
     ((invoice.gross || 0) - (invoice.discount || 0));
+  
+  // Format the amount safely, ensuring it's a number
+  const formattedAmount = typeof amount === 'number' 
+    ? amount.toFixed(2) 
+    : parseFloat(String(amount || 0)).toFixed(2);
     
   return (
     <tr key={invoice.id} className="hover:bg-gray-50">
@@ -49,7 +56,7 @@ export const InvoiceRow: React.FC<InvoiceRowProps> = ({
         {customerName}
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-        {(invoice.currency || 'QAR')} {amount.toFixed(2)}
+        {(invoice.currency || 'QAR')} {formattedAmount}
       </td>
       <td className="px-6 py-4 whitespace-nowrap">
         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${

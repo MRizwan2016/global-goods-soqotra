@@ -49,7 +49,15 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   // Format number for display
   const formatNumber = (value: number | string | undefined): string => {
     if (value === undefined || value === null) return "0.00";
-    const num = typeof value === 'string' ? parseFloat(value) : value;
+    
+    // Convert to number if it's a string
+    let num: number;
+    if (typeof value === 'string') {
+      num = parseFloat(value);
+    } else {
+      num = value;
+    }
+    
     return isNaN(num) ? "0.00" : num.toFixed(2);
   };
 
