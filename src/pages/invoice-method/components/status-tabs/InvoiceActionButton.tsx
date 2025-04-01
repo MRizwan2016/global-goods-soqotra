@@ -53,12 +53,25 @@ const InvoiceActionButton: React.FC<InvoiceActionButtonProps> = ({
 
   const { text, icon, variant, classes } = getButtonConfig();
 
+  // Add a debugging handler for the button click
+  const handleButtonClick = (e: React.MouseEvent) => {
+    // Prevent the default behavior
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Log what button was clicked
+    console.log(`Button clicked: ${type}`);
+    
+    // Call the provided click handler
+    onClick();
+  };
+
   return (
     <Button
       variant={variant as any}
       size="sm"
       className={`${classes} ${className}`}
-      onClick={onClick}
+      onClick={handleButtonClick}
       disabled={disabled}
       type="button"
     >

@@ -7,36 +7,21 @@ import StatusTabsCounter from "./status-tabs/StatusTabsCounter";
 import UnpaidTabContent from "./status-tabs/UnpaidTabContent";
 import PaidTabContent from "./status-tabs/PaidTabContent";
 import { useStatusTabs } from "../hooks/useStatusTabs";
-import { useNavigate } from "react-router-dom";
 
 interface StatusTabsProps {
   invoices: Invoice[];
 }
 
 const StatusTabs: React.FC<StatusTabsProps> = ({ invoices }) => {
-  const navigate = useNavigate();
-  
   const {
     selectedTab,
     setSelectedTab,
     unpaidInvoices,
     paidInvoices,
-    handlePayClick: originalHandlePayClick,
+    handlePayClick,
     handleViewPaymentDetails,
     handleViewInvoice
   } = useStatusTabs({ invoices });
-  
-  // Modify the handlePayClick to store the invoice in sessionStorage
-  // before navigating to the payment page
-  const handlePayClick = (invoice: Invoice) => {
-    console.log("Pay button clicked for invoice:", invoice);
-    
-    // Store the selected invoice in sessionStorage
-    sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
-    
-    // Navigate to the payment page - using direct navigation
-    window.location.href = '/accounts/payment/add';
-  };
 
   return (
     <Tabs defaultValue="unpaid" className="w-full" onValueChange={setSelectedTab}>

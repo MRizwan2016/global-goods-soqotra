@@ -33,8 +33,8 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
     // Store the invoice data temporarily to use it in the payment form
     sessionStorage.setItem('selectedInvoice', JSON.stringify(invoiceWithCurrency));
     
-    // Use direct window location to avoid potential router issues
-    window.location.href = `/accounts/payment/add?t=${Date.now()}`;
+    // Use direct window location with absolute path to avoid routing issues
+    window.location.href = '/accounts/payment/add';
     
     toast.success("Payment form opened", {
       description: `Processing payment for invoice ${invoice.invoiceNumber}`,

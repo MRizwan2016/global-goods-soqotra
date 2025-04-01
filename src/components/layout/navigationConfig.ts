@@ -50,7 +50,7 @@ export const navigationSections: NavigationSections = {
         title: "FUNCTIONS",
         items: [
           { name: "PAYMENTS", path: "/accounts/payments" },
-          { name: "ADD PAYMENT", path: "/accounts/payment/add" },
+          { name: "ADD PAYMENT", path: "/accounts/payment/add" }, // Ensure this path is correct
           { name: "RECONCILIATION", path: "/accounts/reconciliation" },
         ],
       },
