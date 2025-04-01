@@ -4,6 +4,7 @@ import { dataEntryRoutes } from "./dataEntryRoutes";
 import accountsRoutes from "./accountsRoutes"; // Fixed import
 import { kenyaRoutes } from "./kenyaRoutes";
 import { reportsRoutes } from "./reportsRoutes";
+import { printDocumentsRoutes } from "./printDocumentsRoutes"; // Import the print documents routes
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
@@ -39,5 +40,6 @@ export const routes: RouteConfig[] = [
   ...dataEntryRoutes,
   ...accountsRoutes,
   ...kenyaRoutes,
-  ...reportsRoutes
+  ...reportsRoutes,
+  ...printDocumentsRoutes // Add the print documents routes
 ];
