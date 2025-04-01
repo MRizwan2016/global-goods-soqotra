@@ -3,7 +3,7 @@ import React from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
 import PrintControls from "./components/PrintControls";
 import BillOfLadingDocument from "./components/BillOfLadingDocument";
-import HouseBillOfLadingDocument from "./components/HouseBillOfLadingDocument";
+import HouseBillOfLadingDocument from "./components/house-bill-of-lading";
 import PrintStyles from "./components/PrintStyles";
 import { useBillOfLadingData } from "./hooks/useBillOfLadingData";
 import { useLocation } from "react-router-dom";
