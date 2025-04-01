@@ -18,9 +18,13 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
   return (
     <div className="max-w-[210mm] mx-auto bg-white p-8 shadow-md">
       <div className="border-2 border-black p-8">
-        {/* Header */}
+        {/* Header with Logo */}
         <div className="text-center border-b-2 border-black pb-4 mb-6">
-          <h1 className="text-2xl font-bold">HOUSE BILL OF LADING</h1>
+          <div className="flex justify-center mb-3">
+            <img src="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" alt="Soqotra Logo" className="h-16" />
+          </div>
+          <p className="text-sm mb-2">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>
+          <h1 className="text-2xl font-bold">HOUSE BILL OF LADING (H-BL)</h1>
           <p className="text-sm">NOT NEGOTIABLE UNLESS CONSIGNED TO ORDER</p>
         </div>
 
@@ -120,7 +124,7 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
           <div>
             <p className="font-bold">DATE OF ISSUE:</p>
             <p>{blData.dateOfIssue || blData.date}</p>
-            <p className="mt-6 text-sm">SOQOTRA SHIPPING & LOGISTICS</p>
+            <p className="mt-6 text-sm">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>
           </div>
         </div>
       </div>

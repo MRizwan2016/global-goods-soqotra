@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer, FileText } from "lucide-react";
+import { ArrowLeft, Printer } from "lucide-react";
 
 interface PrintControlsProps {
   handleBack: () => void;
@@ -16,54 +16,33 @@ const PrintControls: React.FC<PrintControlsProps> = ({
   title,
   isPreview = false
 }) => {
-  const handlePrintClick = (e: React.MouseEvent) => {
-    // Prevent default browser behavior
-    e.preventDefault();
-    // Stop event propagation
-    e.stopPropagation();
-    
-    // Add small delay before print to ensure the UI is ready
-    setTimeout(() => {
-      handlePrint();
-    }, 50);
-    
-    // Return false to prevent any further actions
-    return false;
-  };
-  
-  const handleBackClick = (e: React.MouseEvent) => {
-    // Prevent default browser behavior
-    e.preventDefault();
-    // Stop event propagation
-    e.stopPropagation();
-    
-    handleBack();
-    
-    // Return false to prevent any further actions
-    return false;
-  };
-  
   return (
-    <div className="print:hidden p-4 bg-white shadow-md mb-4 sticky top-0 z-10 flex items-center justify-between">
-      <Button
-        variant="outline"
-        onClick={handleBackClick}
-        className="flex items-center"
-      >
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back
-      </Button>
-      <div className="text-xl font-bold flex-1 text-center">
-        {title}
-        {isPreview && <span className="text-sm font-normal text-gray-500 ml-2">(Preview Mode)</span>}
+    <div className="print:hidden p-4 bg-white shadow-md mb-4 sticky top-0 z-10">
+      <div className="flex items-center justify-between">
+        <Button
+          variant="outline"
+          onClick={handleBack}
+          className="flex items-center"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          BACK
+        </Button>
+
+        <div className="flex-1 text-center">
+          <div className="flex justify-center items-center gap-2">
+            {isPreview && <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded">Preview Mode</span>}
+            <h1 className="text-xl font-bold">{title}</h1>
+          </div>
+        </div>
+
+        <Button
+          onClick={handlePrint}
+          className="flex items-center bg-blue-500 hover:bg-blue-600"
+        >
+          <Printer className="mr-2 h-4 w-4" />
+          {isPreview ? "PRINT" : "PRINT NOW"}
+        </Button>
       </div>
-      <Button
-        onClick={handlePrintClick}
-        className="flex items-center bg-blue-500 hover:bg-blue-600"
-      >
-        <Printer className="mr-2 h-4 w-4" />
-        {isPreview ? "Print Document" : "Print"}
-      </Button>
     </div>
   );
 };
