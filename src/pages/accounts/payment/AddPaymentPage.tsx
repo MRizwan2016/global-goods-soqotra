@@ -58,6 +58,7 @@ const AddPaymentPage = () => {
     if (storedInvoice) {
       try {
         const parsedInvoice = JSON.parse(storedInvoice);
+        console.log("Found invoice in session storage:", parsedInvoice);
         handleSelectInvoice(parsedInvoice);
         // Clear session storage after using it
         sessionStorage.removeItem('selectedInvoice');
