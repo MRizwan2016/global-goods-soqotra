@@ -23,7 +23,8 @@ export const useInvoiceSelection = (
         gross: 250,
         discount: 0,
         net: 250,
-        amount: 250
+        amount: 250,
+        country: "Qatar" // Add country property for this specific invoice
       })
     };
     
@@ -82,7 +83,7 @@ export const useInvoiceSelection = (
           balanceToPay: 250,
           amountPaid: 250,
           paymentCollectDate: fixedInvoice.date || prevState.paymentCollectDate,
-          country: fixedInvoice.country || "Qatar",
+          country: "Qatar", // Hardcode Qatar for this specific invoice
           currency: fixedInvoice.currency || "QAR",
           customerName: fixedInvoice.consignee1 || fixedInvoice.consignee || "MRS. FERNANDO",
         };
@@ -106,7 +107,8 @@ export const useInvoiceSelection = (
         balanceToPay: balanceToPay,
         amountPaid: balanceToPay,  // Set suggested payment amount to balance
         paymentCollectDate: fixedInvoice.date || prevState.paymentCollectDate,
-        country: fixedInvoice.country || prevState.country,
+        // Default to Qatar if country is not specified
+        country: "Qatar", // Default country value
         currency: fixedInvoice.currency || prevState.currency,
         customerName: fixedInvoice.consignee1 || fixedInvoice.consignee || "",
       };

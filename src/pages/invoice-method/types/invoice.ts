@@ -26,6 +26,7 @@ export interface Invoice {
   freightType?: string;
   amount?: number;
   currency?: string;
+  country?: string; // Added country property
   consignee?: string;
   packageDetails?: PackageDetail[];
   totalPaid?: number;
