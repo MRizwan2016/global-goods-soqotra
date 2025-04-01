@@ -39,17 +39,19 @@ const ShipperConsignee: React.FC<ShipperConsigneeProps> = ({
               name="shipperAddress"
               value={shipperAddress}
               onChange={onChange}
-              className="w-full border border-gray-300 px-2 py-1 mb-1 text-sm"
+              className="w-full border border-gray-300 px-2 py-1 text-sm mb-1"
               rows={2}
             />
-            <input
-              type="text"
-              name="shipperPhone"
-              value={shipperPhone}
-              onChange={onChange}
-              className="w-full border border-gray-300 px-2 py-1"
-              placeholder="TEL:"
-            />
+            <div className="flex items-center">
+              <span className="mr-2">TEL:</span>
+              <input
+                type="text"
+                name="shipperPhone"
+                value={shipperPhone}
+                onChange={onChange}
+                className="border border-gray-300 px-2 py-1 flex-1"
+              />
+            </div>
           </>
         ) : (
           <>
@@ -74,17 +76,19 @@ const ShipperConsignee: React.FC<ShipperConsigneeProps> = ({
               name="consigneeAddress"
               value={consigneeAddress}
               onChange={onChange}
-              className="w-full border border-gray-300 px-2 py-1 mb-1 text-sm"
+              className="w-full border border-gray-300 px-2 py-1 text-sm mb-1"
               rows={2}
             />
-            <input
-              type="text"
-              name="consigneeIdNumber"
-              value={consigneeIdNumber}
-              onChange={onChange}
-              className="w-full border border-gray-300 px-2 py-1"
-              placeholder="ID/PASSPORT:"
-            />
+            <div className="flex items-center">
+              <span className="mr-2">ID/PASSPORT:</span>
+              <input
+                type="text"
+                name="consigneeIdNumber"
+                value={consigneeIdNumber}
+                onChange={onChange}
+                className="border border-gray-300 px-2 py-1 flex-1"
+              />
+            </div>
           </>
         ) : (
           <>

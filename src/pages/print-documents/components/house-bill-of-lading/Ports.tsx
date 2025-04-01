@@ -11,13 +11,13 @@ interface PortsProps {
 
 const Ports: React.FC<PortsProps> = ({ 
   portOfLoading, 
-  portOfDischarge, 
+  portOfDischarge,
   finalDestination,
   editable = false,
-  onChange 
+  onChange
 }) => {
   return (
-    <div className="grid grid-cols-2 gap-4 mb-6">
+    <div className="grid grid-cols-3 gap-4 mb-6">
       <div className="border-2 border-black p-3">
         <h2 className="font-bold border-b border-black pb-1 mb-1">PORT OF LOADING</h2>
         {editable ? (
@@ -46,22 +46,20 @@ const Ports: React.FC<PortsProps> = ({
           <p>{portOfDischarge}</p>
         )}
       </div>
-      {finalDestination && (
-        <div className="border-2 border-black p-3 col-span-2">
-          <h2 className="font-bold border-b border-black pb-1 mb-1">FINAL DESTINATION</h2>
-          {editable ? (
-            <input
-              type="text"
-              name="finalDestination"
-              value={finalDestination}
-              onChange={onChange}
-              className="w-full border border-gray-300 px-2 py-1"
-            />
-          ) : (
-            <p>{finalDestination}</p>
-          )}
-        </div>
-      )}
+      <div className="border-2 border-black p-3">
+        <h2 className="font-bold border-b border-black pb-1 mb-1">FINAL DESTINATION</h2>
+        {editable ? (
+          <input
+            type="text"
+            name="finalDestination"
+            value={finalDestination || ""}
+            onChange={onChange}
+            className="w-full border border-gray-300 px-2 py-1"
+          />
+        ) : (
+          <p>{finalDestination || portOfDischarge}</p>
+        )}
+      </div>
     </div>
   );
 };

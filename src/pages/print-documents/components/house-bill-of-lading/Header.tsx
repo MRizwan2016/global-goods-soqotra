@@ -15,10 +15,10 @@ const Header: React.FC<HeaderProps> = ({
   onChange 
 }) => {
   return (
-    <div className="flex justify-between items-center mb-4">
+    <div className="flex justify-between items-center mb-6">
       <div className="flex-1">
         <img 
-          src="/soqotra-logo.png" 
+          src="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" 
           alt="Soqotra Shipping & Logistics" 
           className="h-16"
         />
@@ -41,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({
               className="border border-gray-300 px-2 py-1 rounded w-32"
             />
           ) : (
-            <span>{blNumber}</span>
+            <span className="bl-number">{blNumber}</span>
           )}
         </div>
         

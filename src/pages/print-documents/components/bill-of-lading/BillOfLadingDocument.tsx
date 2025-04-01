@@ -12,12 +12,25 @@ import ErrorState from "./ErrorState";
 
 interface BillOfLadingDocumentProps {
   blData: any;
+  onBLDataChange?: (fieldName: string, value: string) => void;
+  editable?: boolean;
 }
 
-const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData }) => {
+const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ 
+  blData,
+  onBLDataChange,
+  editable = false
+}) => {
   if (!blData) {
     return <ErrorState />;
   }
+
+  // Handle changes to input fields when in editable mode
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (onBLDataChange) {
+      onBLDataChange(e.target.name, e.target.value);
+    }
+  };
 
   // Safe access to properties
   const shipper = blData?.shipper || 'N/A';

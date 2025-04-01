@@ -3,10 +3,10 @@ import React from "react";
 
 interface FreightInfoProps {
   freightPrepaid: boolean;
-  packages?: string;
-  vessel: string;
-  finalDestination?: string;
+  packages: string;
+  vessel?: string;
   voyage?: string;
+  finalDestination?: string;
   editable?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
@@ -15,21 +15,21 @@ const FreightInfo: React.FC<FreightInfoProps> = ({
   freightPrepaid,
   packages,
   vessel,
-  finalDestination,
   voyage,
+  finalDestination,
   editable = false,
   onChange
 }) => {
-  const handleFreightTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFreightToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (onChange) {
-      const syntheticEvent = {
+      onChange({
+        ...e,
         target: {
+          ...e.target,
           name: "freightPrepaid",
-          value: e.target.value === "prepaid"
+          value: e.target.checked ? "true" : "false"
         }
-      } as unknown as React.ChangeEvent<HTMLInputElement>;
-      
-      onChange(syntheticEvent);
+      });
     }
   };
 
@@ -40,37 +40,25 @@ const FreightInfo: React.FC<FreightInfoProps> = ({
         {editable ? (
           <>
             <div className="mb-2">
-              <label className="inline-flex items-center mr-4">
+              <label className="inline-flex items-center">
                 <input
-                  type="radio"
-                  name="freightType"
-                  value="prepaid"
+                  type="checkbox"
+                  name="freightPrepaid"
                   checked={freightPrepaid}
-                  onChange={handleFreightTypeChange}
-                  className="mr-1"
+                  onChange={handleFreightToggle}
+                  className="mr-2"
                 />
                 <span>FREIGHT PREPAID</span>
               </label>
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  name="freightType"
-                  value="collect"
-                  checked={!freightPrepaid}
-                  onChange={handleFreightTypeChange}
-                  className="mr-1"
-                />
-                <span>FREIGHT COLLECT</span>
-              </label>
             </div>
-            <div>
-              <label className="block">PACKAGES:</label>
+            <div className="flex items-center">
+              <span className="mr-2">PACKAGES:</span>
               <input
                 type="text"
                 name="packages"
-                value={packages || ""}
+                value={packages}
                 onChange={onChange}
-                className="w-full border border-gray-300 px-2 py-1"
+                className="border border-gray-300 px-2 py-1 w-20"
               />
             </div>
           </>
@@ -85,43 +73,30 @@ const FreightInfo: React.FC<FreightInfoProps> = ({
         <h2 className="font-bold border-b border-black pb-1 mb-1">ADDITIONAL INFORMATION</h2>
         {editable ? (
           <>
-            <div className="mb-2">
-              <label className="block">VESSEL:</label>
+            <div className="mb-2 flex items-center">
+              <span className="mr-2 w-24">VESSEL:</span>
               <input
                 type="text"
                 name="vessel"
-                value={vessel}
+                value={vessel || ""}
                 onChange={onChange}
-                className="w-full border border-gray-300 px-2 py-1"
+                className="border border-gray-300 px-2 py-1 flex-1"
               />
             </div>
-            {voyage && (
-              <div className="mb-2">
-                <label className="block">VOYAGE:</label>
-                <input
-                  type="text"
-                  name="voyage"
-                  value={voyage}
-                  onChange={onChange}
-                  className="w-full border border-gray-300 px-2 py-1"
-                />
-              </div>
-            )}
-            <div>
-              <label className="block">FINAL DESTINATION:</label>
+            <div className="mb-2 flex items-center">
+              <span className="mr-2 w-24">VOYAGE:</span>
               <input
                 type="text"
-                name="finalDestination"
-                value={finalDestination || ""}
+                name="voyage"
+                value={voyage || ""}
                 onChange={onChange}
-                className="w-full border border-gray-300 px-2 py-1"
+                className="border border-gray-300 px-2 py-1 flex-1"
               />
             </div>
           </>
         ) : (
           <>
             <p>VESSEL/VOYAGE: {vessel}{voyage ? `/${voyage}` : ""}</p>
-            <p>FINAL DESTINATION: {finalDestination}</p>
           </>
         )}
       </div>

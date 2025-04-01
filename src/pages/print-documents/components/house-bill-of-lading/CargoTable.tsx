@@ -4,7 +4,7 @@ import React from "react";
 interface CargoTableProps {
   marks: string;
   description: string;
-  packages?: string;
+  packages: string;
   weight: string;
   volume: string;
   cargoType: string;
@@ -15,7 +15,7 @@ interface CargoTableProps {
   chassisNumber?: string;
   editable?: boolean;
   onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  formatDescription?: (description: string) => React.ReactNode;
+  formatDescription: (description: string) => React.ReactNode;
 }
 
 const CargoTable: React.FC<CargoTableProps> = ({
@@ -32,7 +32,7 @@ const CargoTable: React.FC<CargoTableProps> = ({
   chassisNumber,
   editable = false,
   onChange,
-  formatDescription = (text) => text
+  formatDescription
 }) => {
   return (
     <div className="mb-6">
@@ -60,84 +60,89 @@ const CargoTable: React.FC<CargoTableProps> = ({
                 marks
               )}
             </td>
-            <td className="border-2 border-black p-3 align-top min-h-[200px]">
+            <td className="border-2 border-black p-3 align-top min-h-[300px] cargo-description">
               <p className="font-bold mb-2">SHIPPER'S LOAD, COUNT & SEAL</p>
               <p className="mb-2">SAID TO CONTAIN:</p>
               {editable ? (
-                <>
-                  <textarea
-                    name="description"
-                    value={description}
-                    onChange={onChange}
-                    className="w-full border border-gray-300 px-2 py-1 mb-3"
-                    rows={4}
-                  />
-                  
-                  {(cargoType.toLowerCase() === "car" || cargoType.toLowerCase() === "truck") && (
-                    <div className="mt-3 border-t pt-2 border-gray-400">
-                      <p className="font-bold">VEHICLE DETAILS:</p>
-                      <div className="grid grid-cols-2 gap-2 mt-1">
+                <textarea
+                  name="description"
+                  value={description}
+                  onChange={onChange}
+                  className="w-full border border-gray-300 px-2 py-1 min-h-[100px]"
+                  rows={8}
+                />
+              ) : (
+                <div className="whitespace-pre-line">
+                  {formatDescription(description)}
+                </div>
+              )}
+              
+              {(cargoType.toLowerCase() === "car" || cargoType.toLowerCase() === "truck") && (
+                <div className="mt-3 border-t pt-2 border-gray-400">
+                  <p className="font-bold">VEHICLE DETAILS:</p>
+                  {editable ? (
+                    <div className="grid grid-cols-2 gap-2 mt-2">
+                      <div className="flex items-center">
+                        <span className="mr-2 w-16">Make:</span>
                         <input
                           type="text"
                           name="vehicleMake"
                           value={vehicleMake || ""}
                           onChange={onChange}
-                          className="border border-gray-300 px-2 py-1"
-                          placeholder="Make"
+                          className="border border-gray-300 px-2 py-1 flex-1"
                         />
+                      </div>
+                      <div className="flex items-center">
+                        <span className="mr-2 w-16">Model:</span>
                         <input
                           type="text"
                           name="vehicleModel"
                           value={vehicleModel || ""}
                           onChange={onChange}
-                          className="border border-gray-300 px-2 py-1"
-                          placeholder="Model"
+                          className="border border-gray-300 px-2 py-1 flex-1"
                         />
+                      </div>
+                      <div className="flex items-center">
+                        <span className="mr-2 w-16">Year:</span>
                         <input
                           type="text"
                           name="vehicleYear"
                           value={vehicleYear || ""}
                           onChange={onChange}
-                          className="border border-gray-300 px-2 py-1"
-                          placeholder="Year"
+                          className="border border-gray-300 px-2 py-1 flex-1"
                         />
+                      </div>
+                      <div className="flex items-center">
+                        <span className="mr-2 w-16">Color:</span>
                         <input
                           type="text"
                           name="vehicleColor"
                           value={vehicleColor || ""}
                           onChange={onChange}
-                          className="border border-gray-300 px-2 py-1"
-                          placeholder="Color"
+                          className="border border-gray-300 px-2 py-1 flex-1"
                         />
+                      </div>
+                      <div className="flex items-center col-span-2">
+                        <span className="mr-2 w-16">Chassis:</span>
                         <input
                           type="text"
                           name="chassisNumber"
                           value={chassisNumber || ""}
                           onChange={onChange}
-                          className="border border-gray-300 px-2 py-1 col-span-2"
-                          placeholder="Chassis/VIN Number"
+                          className="border border-gray-300 px-2 py-1 flex-1"
                         />
                       </div>
                     </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className="whitespace-pre-line">
-                    {formatDescription(description)}
-                  </div>
-                  
-                  {(cargoType.toLowerCase() === "car" || cargoType.toLowerCase() === "truck") && (
-                    <div className="mt-3 border-t pt-2 border-gray-400">
-                      <p className="font-bold">VEHICLE DETAILS:</p>
+                  ) : (
+                    <>
                       {vehicleMake && <p>Make: {vehicleMake}</p>}
                       {vehicleModel && <p>Model: {vehicleModel}</p>}
                       {vehicleYear && <p>Year: {vehicleYear}</p>}
                       {vehicleColor && <p>Color: {vehicleColor}</p>}
                       {chassisNumber && <p>Chassis/VIN: {chassisNumber}</p>}
-                    </div>
+                    </>
                   )}
-                </>
+                </div>
               )}
             </td>
             <td className="border-2 border-black p-2 text-center align-middle">
@@ -147,7 +152,7 @@ const CargoTable: React.FC<CargoTableProps> = ({
                   name="weight"
                   value={weight}
                   onChange={onChange}
-                  className="w-full border border-gray-300 px-2 py-1"
+                  className="w-full border border-gray-300 px-2 py-1 text-center"
                 />
               ) : (
                 weight
@@ -160,7 +165,7 @@ const CargoTable: React.FC<CargoTableProps> = ({
                   name="volume"
                   value={volume}
                   onChange={onChange}
-                  className="w-full border border-gray-300 px-2 py-1"
+                  className="w-full border border-gray-300 px-2 py-1 text-center"
                 />
               ) : (
                 volume
