@@ -12,7 +12,11 @@ export const warehouseOptions: Record<string, string[]> = {
   "Uganda": ["Kampala Warehouse"],
   "Kuwait": ["Kuwait Warehouse"],
   "Oman": ["Muscat Warehouse", "Sohar Warehouse", "Salalah Warehouse"],
-  "Qatar": ["Doha Warehouse"]
+  "Qatar": ["Doha Warehouse"],
+  "Tanzania": ["Dar es Salaam Warehouse"],
+  "Mozambique": ["Maputo Warehouse"],
+  "Somalia": ["Mogadishu Warehouse"],
+  "Ethiopia": ["Addis Ababa Warehouse"]
 };
 
 // City options by country
@@ -44,7 +48,11 @@ export const cityOptions: Record<string, string[]> = {
   ],
   "India": ["Mumbai", "Chennai", "Delhi", "Kolkata"],
   "Singapore": ["Singapore"],
-  "Bahrain": ["Manama", "Riffa", "Muharraq"]
+  "Bahrain": ["Manama", "Riffa", "Muharraq"],
+  "Tanzania": ["Dar es Salaam", "Arusha", "Dodoma", "Mwanza"],
+  "Mozambique": ["Maputo", "Beira", "Nampula"],
+  "Somalia": ["Mogadishu", "Hargeisa", "Kismayo"],
+  "Ethiopia": ["Addis Ababa", "Dire Dawa", "Mekelle"]
 };
 
 // Country codes for phone numbers
@@ -63,7 +71,11 @@ export const COUNTRY_CODES: Record<string, string> = {
   "Qatar": "+974 ",
   "India": "+91 ",
   "Singapore": "+65 ",
-  "Bahrain": "+973 "
+  "Bahrain": "+973 ",
+  "Tanzania": "+255 ",
+  "Mozambique": "+258 ",
+  "Somalia": "+252 ",
+  "Ethiopia": "+251 "
 };
 
 // Default country and city

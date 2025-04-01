@@ -1,154 +1,142 @@
 
-import { useEffect } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { FormState, PackageItem } from "../types/invoiceForm";
-import { packageOptions, PackageOption } from "@/data/packageOptions";
-import { KENYA_PRICING } from "../constants/locationData";
+import { generateNextBoxNumber } from "../utils/autoGenerators";
 
 export const usePackageHandling = (
-  formState: FormState, 
+  formState: FormState,
   setFormState: React.Dispatch<React.SetStateAction<FormState>>,
   packageItems: PackageItem[],
   setPackageItems: React.Dispatch<React.SetStateAction<PackageItem[]>>
 ) => {
+  const [isManualPackage, setIsManualPackage] = useState(false);
   
-  // Effect to handle Kenya-specific pricing when warehouse changes
-  useEffect(() => {
-    if (formState.country === "Kenya" && formState.warehouse && formState.packageWeight) {
-      const kgRate = KENYA_PRICING[formState.warehouse as keyof typeof KENYA_PRICING] || 0;
-      if (kgRate) {
-        const weight = parseFloat(formState.packageWeight) || 0;
-        const calculatedPrice = (weight * kgRate).toFixed(2);
-        
-        setFormState(prev => ({
-          ...prev,
-          price: calculatedPrice,
-          // Add the calculated price to other payment fields
-          freight: calculatedPrice,
-          gross: calculatedPrice,
-          total: calculatedPrice
-        }));
-      }
-    }
-  }, [formState.country, formState.warehouse, formState.packageWeight, setFormState]);
+  // Get existing box numbers from package items
+  const existingBoxNumbers = packageItems.map(item => item.boxNumber);
   
-  // Handler for package selection from dropdown
   const handlePackageSelect = (description: string) => {
-    if (!description) return;
-    
-    const selectedPackage = packageOptions.find((pkg: PackageOption) => pkg.description === description);
-    
-    if (selectedPackage) {
-      setFormState(prev => ({
-        ...prev,
-        packagesName: description,
-        selectedPackage,
-        length: String(selectedPackage.dimensions.length),
-        width: String(selectedPackage.dimensions.width),
-        height: String(selectedPackage.dimensions.height),
-        cubicMetre: String(selectedPackage.volumeInMeters),
-        price: String(selectedPackage.price),
-        documentsFee: String(selectedPackage.documentsFee),
-        total: String(selectedPackage.total)
-      }));
-    }
+    const packageOption = description;
+    setFormState(prev => ({
+      ...prev,
+      packagesName: packageOption
+    }));
   };
   
-  // Handler for manual package name update
   const handleManualPackage = (packageName: string, price: string) => {
-    if (!packageName) {
-      toast.error("Please enter a package name");
-      return;
-    }
-    
     setFormState(prev => ({
       ...prev,
       packagesName: packageName,
-      selectedPackage: null,
-      price: price || "0"
+      price: price,
+      isManualPackage: true
     }));
+    setIsManualPackage(true);
+  };
+  
+  const calculateVolumeWeight = (length: string, width: string, height: string) => {
+    const l = parseFloat(length) || 0;
+    const w = parseFloat(width) || 0;
+    const h = parseFloat(height) || 0;
     
-    toast.success("Package updated manually");
+    // Calculate volume
+    const volumeCubicMeter = (l * w * h) / 1000000; // Convert cm³ to m³
+    const volumeCubicFeet = volumeCubicMeter * 35.3147; // Convert m³ to ft³
+    
+    // Volume weight calculation standard for air freight (kg)
+    const volumeWeight = (l * w * h) / 5000;
+    
+    return {
+      cubicMetre: volumeCubicMeter.toFixed(4),
+      cubicFeet: volumeCubicFeet.toFixed(4),
+      volumeWeight: volumeWeight.toFixed(2),
+    };
+  };
+  
+  const calculateTotal = (price: string, weight: string, documentsFee: string) => {
+    const priceValue = parseFloat(price) || 0;
+    const weightValue = parseFloat(weight) || 0;
+    const docFee = parseFloat(documentsFee) || 0;
+    
+    return (priceValue * weightValue + docFee).toFixed(2);
   };
   
   const handleAddPackage = () => {
-    if (!formState.packagesName) {
-      toast.error("Please select or enter a package");
-      return;
-    }
+    // Generate next box number
+    const nextBoxNumber = generateNextBoxNumber(existingBoxNumbers);
     
-    const newPackage = {
-      id: Date.now().toString(),
+    // Calculate volume and weight
+    const volumeCalc = calculateVolumeWeight(
+      formState.length, 
+      formState.width, 
+      formState.height
+    );
+    
+    // Calculate chargeable weight (use higher of actual or volume weight)
+    const actualWeight = parseFloat(formState.packageWeight) || 0;
+    const volumeWeight = parseFloat(volumeCalc.volumeWeight) || 0;
+    const chargeableWeight = Math.max(actualWeight, volumeWeight);
+    
+    // Calculate total price
+    const total = calculateTotal(
+      formState.price, 
+      chargeableWeight.toString(), 
+      formState.documentsFee
+    );
+    
+    // Create package item
+    const newPackage: PackageItem = {
+      id: uuidv4(),
       name: formState.packagesName,
       length: formState.length,
       width: formState.width,
       height: formState.height,
-      volume: formState.cubicMetre,
-      weight: formState.packageWeight || "0",
-      boxNumber: formState.boxNumber || "0",
-      volumeWeight: formState.volumeWeight || "0",
+      volume: volumeCalc.cubicMetre,
+      weight: formState.packageWeight,
+      boxNumber: nextBoxNumber,
+      volumeWeight: volumeCalc.volumeWeight,
       price: formState.price,
       documentsFee: formState.documentsFee,
-      total: formState.total
+      total: total
     };
     
-    setPackageItems([...packageItems, newPackage]);
+    // Add package to list
+    setPackageItems(prev => [...prev, newPackage]);
     
-    // Calculate totals for payment section
-    const totalPrice = parseFloat(formState.price) || 0;
-    const totalDocFee = parseFloat(formState.documentsFee) || 0;
-    const packageTotal = totalPrice + totalDocFee;
-    
-    // Update payment fields
-    setFormState(prev => {
-      const currentFreight = parseFloat(prev.freight) || 0;
-      const newFreight = currentFreight + packageTotal;
-      return {
-        ...prev,
-        packagesName: "",
-        selectedPackage: null,
-        length: "",
-        width: "",
-        height: "",
-        cubicMetre: "",
-        price: "0",
-        documentsFee: "0",
-        total: "0",
-        packageWeight: "0",
-        boxNumber: "0",
-        volumeWeight: "0",
-        // Update payment section
-        freight: newFreight.toFixed(2),
-        gross: newFreight.toFixed(2),
-        net: newFreight.toFixed(2)
-      };
-    });
+    // Update total packages count
+    const totalPackages = packageItems.length + 1;
+    setFormState(prev => ({
+      ...prev,
+      packages: totalPackages.toString(),
+      // Reset package form fields
+      packagesName: "",
+      length: "",
+      width: "",
+      height: "",
+      cubicMetre: "",
+      cubicFeet: "",
+      packageWeight: "",
+      boxNumber: "",
+      volumeWeight: "",
+      selectedPackage: null
+    }));
   };
   
   const handleRemovePackage = (id: string) => {
-    const packageToRemove = packageItems.find(item => item.id === id);
-    if (packageToRemove) {
-      // Subtract from payment totals
-      const packageTotal = parseFloat(packageToRemove.price) + parseFloat(packageToRemove.documentsFee);
-      setFormState(prev => {
-        const currentFreight = parseFloat(prev.freight) || 0;
-        const newFreight = Math.max(0, currentFreight - packageTotal);
-        return {
-          ...prev,
-          freight: newFreight.toFixed(2),
-          gross: newFreight.toFixed(2),
-          net: newFreight.toFixed(2)
-        };
-      });
-    }
+    setPackageItems(prev => prev.filter(item => item.id !== id));
     
-    setPackageItems(packageItems.filter(item => item.id !== id));
+    // Update total packages count
+    const totalPackages = packageItems.length - 1;
+    setFormState(prev => ({
+      ...prev,
+      packages: Math.max(0, totalPackages).toString()
+    }));
   };
-
+  
   return {
     handlePackageSelect,
     handleManualPackage,
     handleAddPackage,
-    handleRemovePackage
+    handleRemovePackage,
+    isManualPackage
   };
 };

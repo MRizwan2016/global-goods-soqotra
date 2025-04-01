@@ -1,5 +1,9 @@
 
 import React from "react";
+import { Package, TruckIcon, User } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { COUNTRY_CODES } from "../constants/locationData";
 import InvoiceNumberSelector from "./basic-information/InvoiceNumberSelector";
 import LocationFields from "./basic-information/LocationFields";
 import StaffFields from "./basic-information/StaffFields";
@@ -10,11 +14,11 @@ interface BasicInformationProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
   showInvoiceSelector: boolean;
-  setShowInvoiceSelector: (show: boolean) => void;
+  setShowInvoiceSelector: (value: boolean) => void;
   availableInvoices: any[];
   handleSelectInvoice: (invoiceNumber: string) => void;
   isEditing: boolean;
-  countrySectorMap: { [key: string]: string };
+  countrySectorMap: Record<string, string>;
 }
 
 const BasicInformation: React.FC<BasicInformationProps> = ({
@@ -28,40 +32,91 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
   isEditing,
   countrySectorMap
 }) => {
+  // Get all available destinations (countries)
+  const destinations = Object.keys(countrySectorMap);
+  const freightOptions = ["Air", "Sea", "Both"];
+
   return (
-    <div className="space-y-4 p-4 border rounded-lg bg-gray-50">
-      <h2 className="text-lg font-semibold">Basic Information</h2>
-      <p className="text-sm text-gray-500">Enter the basic details for this invoice.</p>
+    <div className="border border-gray-200 rounded-md p-4">
+      <h3 className="text-lg font-medium text-gray-700 mb-4 flex items-center">
+        <Package className="mr-2 h-5 w-5 text-blue-600" />
+        Basic Information
+      </h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <InvoiceNumberSelector
-          formState={formState}
-          handleInputChange={handleInputChange}
-          showInvoiceSelector={showInvoiceSelector}
-          setShowInvoiceSelector={setShowInvoiceSelector}
-          availableInvoices={availableInvoices}
-          handleSelectInvoice={handleSelectInvoice}
-          isEditing={isEditing}
-        />
-        
-        <LocationFields
-          formState={formState}
+      {/* Invoice selector */}
+      <InvoiceNumberSelector 
+        formState={formState}
+        handleInputChange={handleInputChange}
+        showInvoiceSelector={showInvoiceSelector}
+        setShowInvoiceSelector={setShowInvoiceSelector}
+        availableInvoices={availableInvoices}
+        handleSelectInvoice={handleSelectInvoice}
+        isEditing={isEditing}
+      />
+      
+      <Separator className="my-4" />
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Location fields */}
+        <LocationFields 
+          formState={formState} 
           handleInputChange={handleInputChange}
           handleSelectChange={handleSelectChange}
           countrySectorMap={countrySectorMap}
         />
         
-        <StaffFields
-          formState={formState}
-          handleSelectChange={handleSelectChange}
-        />
-        
-        <AdditionalFields
+        {/* Staff fields */}
+        <StaffFields 
           formState={formState}
           handleInputChange={handleInputChange}
           handleSelectChange={handleSelectChange}
         />
+        
+        {/* Replace District with Destination */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Destination</label>
+          <Select 
+            onValueChange={(value) => handleSelectChange("country", value)}
+            value={formState.country || ""}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Destination" />
+            </SelectTrigger>
+            <SelectContent>
+              {destinations.map((country) => (
+                <SelectItem key={country} value={country}>{country}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        {/* Freight By with Sea/Air options */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium">Freight By</label>
+          <Select 
+            onValueChange={(value) => handleSelectChange("freightBy", value)}
+            value={formState.freightBy || "Air"}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select freight type" />
+            </SelectTrigger>
+            <SelectContent>
+              {freightOptions.map((option) => (
+                <SelectItem key={option} value={option}>{option}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
+      
+      <Separator className="my-4" />
+      
+      {/* Additional fields */}
+      <AdditionalFields 
+        formState={formState}
+        handleInputChange={handleInputChange}
+        handleSelectChange={handleSelectChange}
+      />
     </div>
   );
 };

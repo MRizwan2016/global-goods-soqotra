@@ -44,24 +44,24 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
     }
   };
   
-  // If country changes, update the phone number prefix
+  // If country changes, update the phone number prefixes
   useEffect(() => {
-    if (formState.country && formState.shipperMobile) {
+    if (formState.country) {
       const countryCode = COUNTRY_CODES[formState.country] || "";
-      if (!formState.shipperMobile.startsWith(countryCode)) {
-        // Strip any existing country code or non-numeric characters
-        const numericValue = formState.shipperMobile.replace(/\D+/g, '');
-        const newValue = countryCode + numericValue;
+      
+      // Update mobile number if it exists
+      if (formState.shipperMobile && !formState.shipperMobile.startsWith(countryCode)) {
+        const numericMobile = formState.shipperMobile.replace(/\D+/g, '');
+        const newMobileValue = countryCode + numericMobile;
         
-        // Update the form state with the new value
-        const event = {
+        const mobileEvent = {
           target: {
             name: "shipperMobile",
-            value: newValue
+            value: newMobileValue
           }
         } as React.ChangeEvent<HTMLInputElement>;
         
-        handleInputChange(event);
+        handleInputChange(mobileEvent);
       }
     }
   }, [formState.country]);
@@ -88,30 +88,12 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
         />
         
         <InputFieldWithIcon 
-          label="Mobile Number"
-          name="shipperMobile"
-          value={formState.shipperMobile}
-          onChange={handlePhoneChange}
-          icon={Phone}
-          placeholder={`${COUNTRY_CODES[formState.country] || "+xxx "} mobile number`}
-        />
-        
-        <InputFieldWithIcon 
-          label="QID/Passport No"
-          name="shipperIdNumber"
-          value={formState.shipperIdNumber}
-          onChange={handleInputChange}
-          icon={IdCard}
-          placeholder="Shipper's QID or passport number"
-        />
-        
-        <InputFieldWithIcon 
           label="Collection Address"
           name="collectionAddress"
           value={formState.collectionAddress}
           onChange={handleInputChange}
           icon={MapPin}
-          placeholder="Address for collection"
+          placeholder="Collection address"
         />
         
         <div className="flex flex-col">
@@ -130,6 +112,24 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
             </SelectContent>
           </Select>
         </div>
+        
+        <InputFieldWithIcon 
+          label="Mobile Number"
+          name="shipperMobile"
+          value={formState.shipperMobile}
+          onChange={handlePhoneChange}
+          icon={Phone}
+          placeholder={`${COUNTRY_CODES[formState.country] || "+xxx "} mobile number`}
+        />
+        
+        <InputFieldWithIcon 
+          label="NIC/Passport No"
+          name="shipperIdNumber"
+          value={formState.shipperIdNumber}
+          onChange={handleInputChange}
+          icon={IdCard}
+          placeholder="Shipper's NIC or passport number"
+        />
       </div>
     </div>
   );
