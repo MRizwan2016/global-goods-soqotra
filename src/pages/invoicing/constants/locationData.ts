@@ -28,7 +28,20 @@ export const cityOptions: Record<string, string[]> = {
   "Uganda": ["Kampala", "Entebbe", "Jinja"],
   "Kuwait": ["Kuwait City", "Hawalli", "Salmiya"],
   "Oman": ["Muscat", "Salalah", "Sohar"],
-  "Qatar": ["Doha", "Al Wakrah", "Al Khor", "Al Rayyan", "Al Saad"],
+  "Qatar": [
+    "Doha", "Al Rayyan", "Al Khor", "Al Saad", "Mansoora", "Najma", 
+    "Bin Omran", "Bin Mahmood", "Al Waab", "Industrial Area", 
+    "New Industrial Area", "Birkath Al Awamar", "Onaiza", "Doha Jadeed", 
+    "Doha City", "Doha Al Jadeed", "Um Salaal Ali", "Um Salaal Mohamed", 
+    "West Bay", "Katara", "Daffna", "Barwa Al Barha", "Barwa Madinath", 
+    "Wakra", "Wukair", "Baaya", "Muaithar", "Old Al Rayyan", "Sheheliya", 
+    "New Sheheliya", "Abu Nakhla", "Makainis", "Ain Khalith", "Bu Sidra", 
+    "Abu Hamoor", "Abu Sidra", "Aziziya", "Bani Hajar", "Duhail", 
+    "Dukhan", "Education City", "Muntaza", "New Salatha", "Old Salatha", 
+    "Moora", "Nuaija", "Al Hitmi", "Um-Gualaina", "Mathar Al Kadeem", 
+    "Messaieed", "Nasaraniya", "Madeena Khaleefa", "Garafa", "Jamaliya", 
+    "Lakhta", "Asian City", "Labour City"
+  ],
   "India": ["Mumbai", "Chennai", "Delhi", "Kolkata"],
   "Singapore": ["Singapore"],
   "Bahrain": ["Manama", "Riffa", "Muharraq"]

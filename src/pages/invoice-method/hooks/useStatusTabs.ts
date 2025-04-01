@@ -33,7 +33,7 @@ export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
   // Handle view invoice
   const handleViewInvoice = (id: string) => {
     // Navigate to invoice view page
-    window.open(`/invoice/view/${id}`, '_blank');
+    navigate(`/invoice/view/${id}`);
   };
 
   return {
