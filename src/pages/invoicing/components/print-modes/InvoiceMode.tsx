@@ -15,8 +15,22 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
   totalWeight,
   totalVolume,
 }) => {
+  // Make sure invoice is properly available
+  if (!invoice) {
+    console.error("Invoice data is missing");
+    return (
+      <div className="p-8 text-center">
+        <h2 className="text-xl text-red-600">Invoice data not available</h2>
+        <p>The requested invoice could not be loaded.</p>
+      </div>
+    );
+  }
+
+  console.log("Rendering invoice:", invoice.invoiceNumber);
+  
   // Special handling for invoice #13136051
   const isSpecialInvoice = invoice.invoiceNumber === "13136051";
+  console.log("Is special invoice:", isSpecialInvoice);
 
   // Set fixed values for special invoice
   const displayedNet = isSpecialInvoice ? 250.00 : parseFloat(String(invoice.net || 0));
