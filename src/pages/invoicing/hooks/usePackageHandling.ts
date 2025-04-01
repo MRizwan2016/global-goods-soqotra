@@ -1,8 +1,9 @@
 
-import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { FormState, PackageItem } from "../types/invoiceForm";
 import { packageOptions } from "@/data/packageOptions";
+import { getDimensionsForPackage, calculateCubicMeter, calculateTotal } from "../utils/packageDimensions";
+import { calculateTotalsFromPackages, createPackageItemFromForm } from "../utils/packageCalculations";
 
 interface PackageHandlingProps {
   formState: FormState;
@@ -32,77 +33,11 @@ export const usePackageHandling = ({
         price = String(selectedPackage.price);
       }
       
-      // Set dimensions based on package type
-      let length = formState.length;
-      let width = formState.width;
-      let height = formState.height;
-      let packageWeight = formState.packageWeight;
-      
-      // Set specific dimensions for different package types based on the table
-      if (description.includes("SMALL")) {
-        // Small carton box
-        length = "19";
-        width = "19";
-        height = "19";
-        packageWeight = "65";
-      } else if (description.includes("MEDIUM")) {
-        if (description === "CARTON BOX - MEDIUM") {
-          // Medium carton box (standard)
-          length = "19";
-          width = "19";
-          height = "29";
-          packageWeight = "70";
-        } else {
-          // If it's another type of medium box
-          length = "21";
-          width = "21";
-          height = "30";
-          packageWeight = "80";
-        }
-      } else if (description.includes("LARGE")) {
-        // Large carton box
-        length = "23";
-        width = "23";
-        height = "23";
-        packageWeight = "80";
-      } else if (description.includes("EXTRA LARGE")) {
-        // Extra large carton box
-        length = "23";
-        width = "23";
-        height = "28";
-        packageWeight = "100";
-      } else if (description.includes("JUMBO")) {
-        if (description.includes("SUPER")) {
-          // Super jumbo carton box
-          length = "30";
-          width = "30";
-          height = "30";
-          packageWeight = "135";
-        } else {
-          // Jumbo carton box
-          length = "24";
-          width = "24";
-          height = "26";
-          packageWeight = "115";
-        }
-      } else if (description.includes("BULILIT")) {
-        // Bulilit carton box
-        length = "14";
-        width = "14";
-        height = "12";
-        packageWeight = "10";
-      }
+      // Get dimensions based on package type
+      const { length, width, height, packageWeight } = getDimensionsForPackage(description);
       
       // Calculate cubic meter based on the dimensions
-      let cubicMetre = "";
-      if (length && width && height) {
-        const l = parseFloat(length);
-        const w = parseFloat(width);
-        const h = parseFloat(height);
-        if (!isNaN(l) && !isNaN(w) && !isNaN(h)) {
-          cubicMetre = ((l * w * h) / 1000000).toFixed(6);
-        }
-      }
+      let cubicMetre = calculateCubicMeter(length, width, height);
       
       setFormState(prev => ({
         ...prev,
@@ -130,20 +65,20 @@ export const usePackageHandling = ({
   
   // Add a package to the list
   const handleAddPackage = () => {
-    const newPackage: PackageItem = {
-      id: uuidv4(),
-      name: formState.packagesName,
-      length: formState.length,
-      width: formState.width,
-      height: formState.height,
-      volume: formState.cubicMetre,
-      weight: formState.packageWeight,
-      boxNumber: formState.boxNumber,
-      volumeWeight: formState.volumeWeight,
-      price: formState.price,
-      documentsFee: formState.documentsFee,
-      total: calculateTotal(formState.price, formState.documentsFee)
-    };
+    const newPackage = createPackageItemFromForm(
+      uuidv4(),
+      formState.packagesName,
+      formState.length,
+      formState.width,
+      formState.height,
+      formState.cubicMetre,
+      formState.packageWeight,
+      formState.boxNumber,
+      formState.volumeWeight,
+      formState.price,
+      formState.documentsFee,
+      calculateTotal(formState.price, formState.documentsFee)
+    );
     
     setPackageItems(prev => [...prev, newPackage]);
     
@@ -178,25 +113,10 @@ export const usePackageHandling = ({
     updateFormTotals(updatedPackages);
   };
   
-  // Helper functions
-  const calculateTotal = (price: string, docFee: string): string => {
-    const p = parseFloat(price || "0");
-    const d = parseFloat(docFee || "0");
-    return (p + d).toFixed(2);
-  };
-  
+  // Update form totals based on the package items
   const updateFormTotals = (packages: PackageItem[]) => {
     // Calculate totals from all packages
-    let totalVolume = 0;
-    let totalWeight = 0;
-    let totalAmount = 0;
-    let packageCount = packages.length;
-    
-    packages.forEach(pkg => {
-      totalVolume += parseFloat(pkg.volume || "0");
-      totalWeight += parseFloat(pkg.weight || "0");
-      totalAmount += parseFloat(pkg.total || "0");
-    });
+    const { totalVolume, totalWeight, totalAmount, packageCount } = calculateTotalsFromPackages(packages);
     
     setFormState(prev => ({
       ...prev,
