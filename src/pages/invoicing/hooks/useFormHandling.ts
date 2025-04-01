@@ -143,7 +143,7 @@ export const useFormHandling = (
     // Auto-generate box number for new packages
     if (name === 'boxNumber' && !value) {
       // Get box count and add 1
-      const boxCount = formState.packageItems?.length || 0;
+      const boxCount = parseFloat(formState.packages) || 0;
       const newBoxNumber = (boxCount + 1).toString();
       
       setFormState(prev => ({

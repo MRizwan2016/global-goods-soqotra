@@ -30,6 +30,7 @@ const initialFormState: FormState = {
   giftCargo: "No",
   prePaid: "Yes",
   country: DEFAULT_COUNTRY,
+  destination: "Kenya", // Default destination
   
   // Package details
   packagesName: "",
@@ -133,5 +134,6 @@ export const useInvoiceForm = (id?: string) => {
     handleSelectInvoice,
     handleSave,
     savedInvoiceId,
+    countrySectorMap,
   };
 };

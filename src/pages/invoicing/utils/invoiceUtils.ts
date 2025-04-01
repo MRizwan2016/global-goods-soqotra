@@ -33,6 +33,7 @@ export const initializeFormState = (existingInvoice: any): FormState => {
     giftCargo: "NO",
     prePaid: "NO",
     country: existingInvoice?.country || "Sri Lanka",
+    destination: existingInvoice?.destination || "Kenya", // Add default destination
     
     // Package details
     packagesName: "",
