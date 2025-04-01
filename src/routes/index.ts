@@ -1,10 +1,7 @@
 
 import { adminRoutes } from "./adminRoutes";
 import { dataEntryRoutes } from "./dataEntryRoutes";
-import { accountsRoutes } from "./accountsRoutes";
-import { destinationRoutes } from "./destinationRoutes";
-import { qaRoutes } from "./qaRoutes";
-import { uaeRoutes } from "./uaeRoutes";
+import accountsRoutes from "./accountsRoutes"; // Fixed import
 import { kenyaRoutes } from "./kenyaRoutes";
 import { reportsRoutes } from "./reportsRoutes";
 import { RouteConfig } from "./types";
@@ -41,9 +38,6 @@ export const routes: RouteConfig[] = [
   ...adminRoutes,
   ...dataEntryRoutes,
   ...accountsRoutes,
-  ...destinationRoutes,
-  ...qaRoutes,
-  ...uaeRoutes,
   ...kenyaRoutes,
   ...reportsRoutes
 ];
