@@ -3,6 +3,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Save, Printer, Eye } from "lucide-react";
+import { toast } from "sonner";
 
 interface FormActionsProps {
   handleSave: () => void;
@@ -16,6 +17,8 @@ const FormActions: React.FC<FormActionsProps> = ({ handleSave, invoiceId }) => {
     if (invoiceId) {
       // Navigate to the correct print page with the invoice ID
       window.open(`/data-entry/print-documents/invoice-print/${invoiceId}`, '_blank');
+    } else {
+      toast.error("Please save the invoice first before printing");
     }
   };
   
@@ -23,6 +26,8 @@ const FormActions: React.FC<FormActionsProps> = ({ handleSave, invoiceId }) => {
     if (invoiceId) {
       // Open preview in a new tab
       window.open(`/data-entry/print-documents/invoice-print/${invoiceId}`, "_blank");
+    } else {
+      toast.error("Please save the invoice first before previewing");
     }
   };
   
@@ -39,29 +44,25 @@ const FormActions: React.FC<FormActionsProps> = ({ handleSave, invoiceId }) => {
       </div>
       
       <div className="flex gap-2">
-        {invoiceId && (
-          <>
-            <Button 
-              type="button"
-              variant="outline" 
-              className="flex items-center gap-2" 
-              onClick={handlePreview}
-            >
-              <Eye size={16} />
-              Preview
-            </Button>
-            
-            <Button 
-              type="button"
-              variant="outline" 
-              className="flex items-center gap-2" 
-              onClick={handlePrint}
-            >
-              <Printer size={16} />
-              Print
-            </Button>
-          </>
-        )}
+        <Button 
+          type="button"
+          variant="outline" 
+          className="flex items-center gap-2" 
+          onClick={handlePreview}
+        >
+          <Eye size={16} />
+          Preview
+        </Button>
+        
+        <Button 
+          type="button"
+          variant="outline" 
+          className="flex items-center gap-2" 
+          onClick={handlePrint}
+        >
+          <Printer size={16} />
+          Print
+        </Button>
         
         <Button 
           type="button"

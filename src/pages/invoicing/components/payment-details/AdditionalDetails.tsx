@@ -24,12 +24,13 @@ const AdditionalDetails: React.FC<AdditionalDetailsProps> = ({
       </div>
       
       <div className="flex flex-col md:col-span-2">
-        <label className="text-sm font-medium mb-1">DISTRICT:</label>
+        <label className="text-sm font-medium mb-1">NET AMOUNT:</label>
         <InputField 
           label=""
-          name="districtDisplay"
-          value={formState.district}
+          name="netAmountDisplay"
+          value={formState.net}
           readOnly
+          className="font-bold text-blue-600"
         />
       </div>
     </>

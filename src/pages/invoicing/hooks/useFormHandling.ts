@@ -22,6 +22,17 @@ export const useFormHandling = (
     }
   }, [formState.country, formState.warehouse]);
   
+  // Initialize destination if not set
+  useEffect(() => {
+    if (formState.country && !formState.destination) {
+      // Default to Kenya if not set (can be changed by user)
+      setFormState(prev => ({
+        ...prev,
+        destination: "Kenya"
+      }));
+    }
+  }, [formState.country, formState.destination]);
+  
   // Update district based on warehouse for Kenya
   useEffect(() => {
     if (formState.country === "Kenya" && formState.warehouse) {
@@ -58,6 +69,34 @@ export const useFormHandling = (
         net: calculateNet(String(prev.gross), String(value))
       }));
     }
+    
+    // Calculate net for any payment component
+    if (['freight', 'destinationTransport', 'document', 'localTransport', 'packing', 
+         'storage', 'destinationClearing', 'destinationDoorDelivery', 'other'].includes(name)) {
+      
+      // Sum up all payment components
+      setTimeout(() => {
+        let total = 0;
+        total += parseFloat(formState.freight) || 0;
+        total += parseFloat(formState.destinationTransport) || 0;
+        total += parseFloat(formState.document) || 0;
+        total += parseFloat(formState.localTransport) || 0;
+        total += parseFloat(formState.packing) || 0;
+        total += parseFloat(formState.storage) || 0;
+        total += parseFloat(formState.destinationClearing) || 0;
+        total += parseFloat(formState.destinationDoorDelivery) || 0;
+        total += parseFloat(formState.other) || 0;
+        
+        const discount = parseFloat(formState.discount) || 0;
+        const net = total - discount;
+        
+        setFormState(prev => ({
+          ...prev,
+          gross: total.toString(),
+          net: net.toString()
+        }));
+      }, 0);
+    }
   };
   
   const handleSelectChange = (name: string, value: string) => {
@@ -77,7 +116,14 @@ export const useFormHandling = (
         sector: sectorForCountry || "",
         warehouse: defaultWarehouse,
         // Reset city selections when country changes
-        shipperCity: "",
+        shipperCity: ""
+      }));
+    }
+    
+    // If destination changes, reset consignee city
+    if (name === 'destination') {
+      setFormState(prev => ({
+        ...prev,
         consigneeCity: ""
       }));
     }
@@ -91,6 +137,18 @@ export const useFormHandling = (
       setFormState(prev => ({
         ...prev,
         district: district
+      }));
+    }
+    
+    // Auto-generate box number for new packages
+    if (name === 'boxNumber' && !value) {
+      // Get box count and add 1
+      const boxCount = formState.packageItems?.length || 0;
+      const newBoxNumber = (boxCount + 1).toString();
+      
+      setFormState(prev => ({
+        ...prev,
+        boxNumber: newBoxNumber
       }));
     }
   };

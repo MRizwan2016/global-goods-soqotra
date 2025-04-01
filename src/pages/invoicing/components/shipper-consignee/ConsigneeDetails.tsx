@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Phone, IdCard, MapPin } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -21,7 +20,8 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
   // Handle country code prefix for phone numbers
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    const countryCode = COUNTRY_CODES[formState.country] || "";
+    // Use destination country code for consignee
+    const countryCode = COUNTRY_CODES[formState.destination] || "";
     
     // If user is typing a new number and it doesn't start with the country code
     if (value && !value.startsWith(countryCode)) {
@@ -44,10 +44,10 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
     }
   };
   
-  // If country changes, update the phone number prefixes
+  // If destination changes, update the phone number prefixes
   useEffect(() => {
-    if (formState.country) {
-      const countryCode = COUNTRY_CODES[formState.country] || "";
+    if (formState.destination) {
+      const countryCode = COUNTRY_CODES[formState.destination] || "";
       
       // Update mobile number if it exists
       if (formState.consigneeMobile && !formState.consigneeMobile.startsWith(countryCode)) {
@@ -79,7 +79,7 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
         handleInputChange(landlineEvent);
       }
     }
-  }, [formState.country]);
+  }, [formState.destination]);
 
   return (
     <div>
@@ -112,7 +112,7 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
         />
         
         <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">City:</label>
+          <label className="text-sm font-medium mb-1">City (Destination):</label>
           <Select 
             value={formState.consigneeCity || ""} 
             onValueChange={(value) => handleSelectChange("consigneeCity", value)}
@@ -134,7 +134,7 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
           value={formState.consigneeMobile}
           onChange={handlePhoneChange}
           icon={Phone}
-          placeholder={`${COUNTRY_CODES[formState.country] || "+xxx "} mobile number`}
+          placeholder={`${COUNTRY_CODES[formState.destination] || "+xxx "} mobile number`}
         />
         
         <InputFieldWithIcon 
@@ -143,7 +143,7 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
           value={formState.consigneeLandline}
           onChange={handlePhoneChange}
           icon={Phone}
-          placeholder={`${COUNTRY_CODES[formState.country] || "+xxx "} landline number`}
+          placeholder={`${COUNTRY_CODES[formState.destination] || "+xxx "} landline number`}
         />
         
         <InputFieldWithIcon 

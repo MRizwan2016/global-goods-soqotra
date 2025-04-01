@@ -21,6 +21,7 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
   // Handle country code prefix for phone numbers
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    // Always use origin country (formState.country) code for shipper
     const countryCode = COUNTRY_CODES[formState.country] || "";
     
     // If user is typing a new number and it doesn't start with the country code
@@ -97,7 +98,7 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
         />
         
         <div className="flex flex-col">
-          <label className="text-sm font-medium mb-1">City:</label>
+          <label className="text-sm font-medium mb-1">City (Port of Loading):</label>
           <Select 
             value={formState.shipperCity || ""} 
             onValueChange={(value) => handleSelectChange("shipperCity", value)}

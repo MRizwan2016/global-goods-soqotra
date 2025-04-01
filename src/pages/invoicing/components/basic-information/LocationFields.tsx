@@ -62,17 +62,7 @@ const LocationFields: React.FC<LocationFieldsProps> = ({
       </div>
 
       <div className="space-y-2">
-        <Label>District</Label>
-        <Input
-          name="district"
-          value={formState.district}
-          onChange={handleInputChange}
-          className="w-full"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label>Country</Label>
+        <Label>Country (Origin)</Label>
         <Select 
           onValueChange={(value) => handleSelectChange("country", value)}
           value={formState.country || ""}

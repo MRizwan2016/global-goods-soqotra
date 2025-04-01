@@ -2,6 +2,7 @@
 import React, { useState, forwardRef, useImperativeHandle } from "react";
 import { FormState } from "../types";
 import ReceiptView from "@/components/payment/ReceiptView";
+import { toast } from "sonner";
 
 interface ReceiptHandlerProps {
   formState: FormState;
@@ -31,6 +32,7 @@ const ReceiptHandler = forwardRef<ReceiptHandlerRef, ReceiptHandlerProps>(
     // Function to generate receipt
     const generateReceipt = () => {
       if (!formState.invoiceNumber || formState.amountPaid <= 0) {
+        toast.error("Cannot generate receipt. Please ensure an invoice is selected and payment amount is entered.");
         return false;
       }
 
@@ -51,6 +53,7 @@ const ReceiptHandler = forwardRef<ReceiptHandlerRef, ReceiptHandlerProps>(
       
       // Show receipt modal
       setShowReceipt(true);
+      toast.success("Receipt generated successfully!");
       return true;
     };
 

@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { Invoice } from "../components/status-tabs/Invoice";
 
 interface UseStatusTabsProps {
@@ -8,16 +9,18 @@ interface UseStatusTabsProps {
 }
 
 export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
+  const [selectedTab, setSelectedTab] = useState<string>("unpaid");
   const navigate = useNavigate();
-  const [selectedTab, setSelectedTab] = useState("unpaid");
   
-  // Filter invoices by payment status
+  // Filter invoices into paid and unpaid
   const unpaidInvoices = invoices.filter(invoice => !invoice.paid);
   const paidInvoices = invoices.filter(invoice => invoice.paid);
   
-  // Handle payment button click
+  // Handle pay button click
   const handlePayClick = (invoice: Invoice) => {
-    // Store the selected invoice in sessionStorage for the payment page to access
+    console.log("Processing payment for invoice:", invoice.invoiceNumber);
+    
+    // Store the selected invoice in sessionStorage for the payment page
     sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
     
     // Navigate to the payment page
@@ -26,14 +29,23 @@ export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
   
   // Handle view payment details
   const handleViewPaymentDetails = (invoice: Invoice) => {
-    // For paid invoices, navigate to a details page
-    navigate(`/accounts/payments/reconciliation?invoice=${invoice.invoiceNumber}`);
+    console.log("Viewing payment details for invoice:", invoice.invoiceNumber);
+    
+    // Navigate to payment details
+    navigate(`/accounts/payments/details/${invoice.id}`);
   };
   
   // Handle view invoice
   const handleViewInvoice = (id: string) => {
-    // Navigate to invoice view page
-    navigate(`/invoice/view/${id}`);
+    console.log("Viewing invoice:", id);
+    
+    try {
+      // Navigate to the invoice print view
+      navigate(`/data-entry/print-documents/invoice-print/${id}`);
+    } catch (error) {
+      console.error("Error navigating to invoice:", error);
+      toast.error("Could not view invoice. Please try again.");
+    }
   };
 
   return {

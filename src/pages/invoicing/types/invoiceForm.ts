@@ -33,6 +33,7 @@ export interface FormState {
   giftCargo: string;
   prePaid: string;
   country: string;
+  destination: string; // Added destination country
   
   // Package details
   packagesName: string;
