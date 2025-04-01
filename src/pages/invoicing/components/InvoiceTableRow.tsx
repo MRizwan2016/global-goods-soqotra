@@ -3,7 +3,7 @@ import React from "react";
 import { TableRow, InvoiceTableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
-import { Pencil, Trash, Eye, Printer } from "lucide-react";
+import { Pencil, Trash, Eye, Printer, FileText } from "lucide-react";
 import { toast } from "sonner";
 
 interface InvoiceTableRowProps {
@@ -67,6 +67,12 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
     toast.error("Delete functionality is not implemented");
   };
 
+  // Handle House Bill of Lading
+  const handleHouseBL = () => {
+    navigate(`/data-entry/print-documents/bl-print/${item.id}?type=house`);
+    toast.success("Opening House Bill of Lading");
+  };
+
   return (
     <TableRow className="hover:bg-gray-50 transition-colors">
       <InvoiceTableCell className="text-center">{indexOffset + index + 1}</InvoiceTableCell>
@@ -122,6 +128,16 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
           onClick={() => onPrint(item.id)}
         >
           <Printer className="h-4 w-4" />
+        </Button>
+      </InvoiceTableCell>
+      <InvoiceTableCell className="text-center">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8 text-amber-600"
+          onClick={handleHouseBL}
+        >
+          <FileText className="h-4 w-4" />
         </Button>
       </InvoiceTableCell>
     </TableRow>

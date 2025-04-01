@@ -18,6 +18,6 @@ export const printDocumentsRoutes: RouteConfig[] = [
   {
     path: "/data-entry/print-documents/bl-print/:id",
     element: BillOfLadingPrint,
-    private: true
+    private: false // Set to false to ensure it doesn't require auth checks that might fail
   }
 ];

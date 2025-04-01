@@ -3,11 +3,12 @@ import React from "react";
 import LoadingSpinner from "./components/LoadingSpinner";
 import PrintControls from "./components/PrintControls";
 import BillOfLadingDocument from "./components/BillOfLadingDocument";
+import HouseBillOfLadingDocument from "./components/HouseBillOfLadingDocument";
 import PrintStyles from "./components/PrintStyles";
 import { useBillOfLadingData } from "./hooks/useBillOfLadingData";
 
 const BillOfLadingPrint: React.FC = () => {
-  const { loading, blData, handlePrint, handleBack } = useBillOfLadingData();
+  const { loading, blData, blType, handlePrint, handleBack } = useBillOfLadingData();
 
   if (loading) {
     return <LoadingSpinner message="Loading Bill of Lading..." />;
@@ -21,11 +22,15 @@ const BillOfLadingPrint: React.FC = () => {
       <PrintControls 
         handleBack={handleBack}
         handlePrint={handlePrint}
-        title={`Bill of Lading #${blData.blNumber}`}
+        title={`${blType === 'house' ? 'House' : 'Master'} Bill of Lading #${blData.blNumber}`}
       />
 
-      {/* Document to print */}
-      <BillOfLadingDocument blData={blData} />
+      {/* Document to print - select based on type */}
+      {blType === 'house' ? (
+        <HouseBillOfLadingDocument blData={blData} />
+      ) : (
+        <BillOfLadingDocument blData={blData} />
+      )}
     </div>
   );
 };
