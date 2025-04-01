@@ -53,17 +53,12 @@ const InvoiceActionButton: React.FC<InvoiceActionButtonProps> = ({
 
   const { text, icon, variant, classes } = getButtonConfig();
 
-  // Force the click event to bypass default handling completely
+  // Simplified click handler that directly calls the provided function
   const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    
     console.log(`InvoiceActionButton clicked: ${type}`);
-    
-    // Call the provided click handler with a slight delay to ensure event handling is complete
-    setTimeout(() => {
-      onClick();
-    }, 50);
+    onClick();
   };
 
   return (
