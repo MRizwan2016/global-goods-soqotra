@@ -115,8 +115,13 @@ export const useInvoiceForm = (id?: string) => {
     handleSelectInvoice
   } = useInvoiceSelection(isEditing, setFormState);
   
-  // Get save invoice handlers
-  const { handleSave, savedInvoiceId } = useSaveInvoice(formState, packageItems, isEditing, id);
+  // Get save invoice handlers - Fix here: useSaveInvoice expects only one object argument
+  const { handleSave, savedInvoiceId } = useSaveInvoice({
+    formState,
+    packageItems,
+    isEditing,
+    id
+  });
   
   return {
     formState,
