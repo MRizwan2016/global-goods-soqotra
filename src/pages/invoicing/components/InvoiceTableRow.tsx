@@ -2,7 +2,7 @@
 import React from "react";
 import { TableRow, InvoiceTableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Pencil, Trash, Eye, Printer } from "lucide-react";
 
 interface InvoiceTableRowProps {
@@ -18,6 +18,8 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
   indexOffset,
   onPrint
 }) => {
+  const navigate = useNavigate();
+  
   // Format number values consistently
   const formatNumber = (value: any): string => {
     if (value === undefined || value === null) return "0.00";
@@ -51,6 +53,11 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
 
   // Ensure NIC number is displayed
   const nicNumber = item.nic || (item.id === "inv-13136051" ? "QAT987654" : "");
+  
+  // Handle view invoice
+  const handleViewInvoice = () => {
+    navigate(`/data-entry/invoicing/view/${item.id}`);
+  };
 
   return (
     <TableRow className="hover:bg-gray-50 transition-colors">
@@ -85,11 +92,14 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
         </Button>
       </InvoiceTableCell>
       <InvoiceTableCell className="text-center">
-        <Link to={`/data-entry/invoicing/view/${item.id}`}>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600">
-            <Eye className="h-4 w-4" />
-          </Button>
-        </Link>
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8 text-green-600"
+          onClick={handleViewInvoice}
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
       </InvoiceTableCell>
       <InvoiceTableCell className="text-center">
         <Button 

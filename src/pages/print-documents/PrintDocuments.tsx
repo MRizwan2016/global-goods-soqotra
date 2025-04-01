@@ -74,11 +74,13 @@ const PrintDocuments = () => {
   const handlePrintInvoice = (id: string) => {
     console.log("Printing invoice ID:", id);
     window.open(`/data-entry/print-documents/invoice-print/${id}`, "_blank");
+    toast.success("Opening invoice for printing");
   };
   
   const handlePrintBL = (id: string) => {
     console.log("Printing BL ID:", id);
     window.open(`/data-entry/print-documents/bl-print/${id}`, "_blank");
+    toast.success("Opening bill of lading for printing");
   };
   
   return (

@@ -73,8 +73,13 @@ export const useInvoiceList = () => {
   const totalPages = Math.ceil(filteredData.length / entriesPerPage);
   
   const handlePrintInvoice = (id: string) => {
-    // Use the correct print route
-    window.open(`/data-entry/print-documents/invoice-print/${id}`, '_blank');
+    // Navigate to the print page with the correct ID
+    navigate(`/data-entry/print-documents/invoice-print/${id}`);
+    toast.success("Opening invoice for printing");
+  };
+  
+  const handleViewInvoice = (id: string) => {
+    navigate(`/data-entry/invoicing/view/${id}`);
   };
   
   return {
@@ -93,6 +98,7 @@ export const useInvoiceList = () => {
     invoiceNumber,
     setInvoiceNumber,
     handlePrintInvoice,
+    handleViewInvoice,
     filteredData,
     totalPages,
     indexOfLastEntry,

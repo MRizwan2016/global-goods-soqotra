@@ -27,6 +27,13 @@ export const invoiceRoutes: RouteConfig[] = [
     requiredFile: "invoicing"
   },
   {
+    path: "/data-entry/invoicing/view/:id",
+    element: InvoicePrint,
+    private: true,
+    requiredPermission: "dataEntry",
+    requiredFile: "invoicing"
+  },
+  {
     path: "/data-entry/invoicing/print/:id",
     element: InvoicePrint,
     private: true,

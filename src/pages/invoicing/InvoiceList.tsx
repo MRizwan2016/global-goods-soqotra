@@ -24,6 +24,7 @@ const InvoiceList = () => {
     invoiceNumber,
     setInvoiceNumber,
     handlePrintInvoice,
+    handleViewInvoice,
     filteredData,
     totalPages,
     indexOfLastEntry,
