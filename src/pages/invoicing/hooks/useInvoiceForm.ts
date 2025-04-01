@@ -30,7 +30,7 @@ const initialFormState: FormState = {
   giftCargo: "No",
   prePaid: "Yes",
   country: DEFAULT_COUNTRY,
-  destination: "Kenya", // Default destination
+  destination: "Kenya", // Default destination is different from DEFAULT_COUNTRY
   
   // Package details
   packagesName: "",
@@ -99,7 +99,7 @@ export const useInvoiceForm = (id?: string) => {
   // Get form state and handlers
   const { handleInputChange, handleSelectChange } = useFormHandling(formState, setFormState);
   
-  // Get package handlers - Fix: Pass as a single object instead of separate arguments
+  // Get package handlers - Pass as a single object
   const { 
     handlePackageSelect, 
     handleManualPackage, 
@@ -120,7 +120,7 @@ export const useInvoiceForm = (id?: string) => {
     handleSelectInvoice
   } = useInvoiceSelection(isEditing, setFormState);
   
-  // Get save invoice handlers - Pass a single object with all required properties
+  // Get save invoice handlers - Pass a single object
   const { handleSave, savedInvoiceId } = useSaveInvoice({
     formState,
     packageItems,

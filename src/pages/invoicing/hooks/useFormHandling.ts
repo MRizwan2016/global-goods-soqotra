@@ -22,16 +22,16 @@ export const useFormHandling = (
     }
   }, [formState.country, formState.warehouse]);
   
-  // Initialize destination if not set
+  // If no destination is set initially, don't auto-set it to match country
   useEffect(() => {
     if (formState.country && !formState.destination) {
-      // Default to Kenya if not set (can be changed by user)
+      // Don't auto-set destination to match country
       setFormState(prev => ({
         ...prev,
-        destination: "Kenya"
+        destination: prev.destination || "Kenya" // Only set if not already set
       }));
     }
-  }, [formState.country, formState.destination]);
+  }, [formState.country]);
   
   // Update district based on warehouse for Kenya
   useEffect(() => {

@@ -72,22 +72,16 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
           handleSelectChange={handleSelectChange}
         />
         
-        {/* Replace District with Destination */}
+        {/* Remove the destination field from here as it's in ShipperConsigneeDetails */}
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Destination</label>
-          <Select 
-            onValueChange={(value) => handleSelectChange("country", value)}
-            value={formState.country || ""}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Destination" />
-            </SelectTrigger>
-            <SelectContent>
-              {destinations.map((country) => (
-                <SelectItem key={country} value={country}>{country}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <label className="block text-sm font-medium">District</label>
+          <input
+            type="text"
+            name="district"
+            value={formState.district}
+            onChange={handleInputChange}
+            className="w-full border border-gray-300 rounded p-2"
+          />
         </div>
         
         {/* Freight By with Sea/Air options */}
