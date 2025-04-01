@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { mockInvoiceData } from "@/data/mockData";
+import { mockBLData } from "@/pages/bill-of-lading/components/mockData";
 
 export const useBillOfLadingData = () => {
   const { id } = useParams();
@@ -13,11 +14,51 @@ export const useBillOfLadingData = () => {
   
   const [loading, setLoading] = useState(true);
   const [blData, setBlData] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // In a real app, fetch the BL data from an API
     const fetchBillOfLading = async () => {
       try {
+        if (!id) {
+          setError("No Bill of Lading ID provided");
+          setLoading(false);
+          toast.error("No Bill of Lading ID provided");
+          return;
+        }
+
+        // First, check in the mockBLData (for direct BL records)
+        let blRecord = mockBLData.find(bl => bl.id === id);
+        if (blRecord) {
+          setBlData({
+            id,
+            blNumber: blRecord.blNumber,
+            date: blRecord.date,
+            shipper: blRecord.shipper,
+            shipperAddress: blRecord.shipperAddress || "DOHA, QATAR",
+            shipperPhone: "+974 XXXX XXXX",
+            consignee: blRecord.consignee,
+            consigneeAddress: blRecord.consigneeAddress || "N/A",
+            consigneeIdNumber: "N/A",
+            notifyParty: blRecord.notifyParty || "SAME AS CONSIGNEE",
+            notifyPartyAddress: blRecord.notifyPartyAddress || "",
+            portOfLoading: blRecord.loadingPort || "DOHA, QATAR",
+            portOfDischarge: blRecord.dischargePort || "COLOMBO, SRI LANKA",
+            marks: blRecord.marksAndNumbers || "AS ADDRESSED",
+            description: blRecord.goodsDescription || "SAID TO CONTAIN PERSONAL EFFECTS",
+            weight: blRecord.grossWeight || "0",
+            volume: blRecord.measurement || "0",
+            packages: blRecord.packages || "1",
+            freightPrepaid: blRecord.freightCharges === "Prepaid",
+            vessel: blRecord.vessel || "MV SOQOTRA QUEEN / XXXX",
+            finalDestination: blRecord.destination || "COLOMBO, SRI LANKA",
+            dateOfIssue: blRecord.dateOfIssue || blRecord.date
+          });
+          setLoading(false);
+          return;
+        }
+        
+        // If not found in mockBLData, check for invoice data
         let invoiceData = null;
         
         // First try to get data from localStorage
@@ -33,7 +74,8 @@ export const useBillOfLadingData = () => {
         }
         
         if (!invoiceData) {
-          toast.error("Invoice not found");
+          setError("Bill of Lading not found");
+          toast.error("Bill of Lading not found");
           setLoading(false);
           return;
         }
@@ -68,6 +110,7 @@ export const useBillOfLadingData = () => {
         setLoading(false);
       } catch (error) {
         console.error("Error fetching Bill of Lading:", error);
+        setError("Failed to load Bill of Lading data");
         toast.error("Failed to load Bill of Lading data");
         setLoading(false);
       }
@@ -112,6 +155,7 @@ export const useBillOfLadingData = () => {
     loading,
     blData,
     blType,
+    error,
     handlePrint,
     handleBack
   };

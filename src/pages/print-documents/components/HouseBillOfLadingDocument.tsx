@@ -6,6 +6,15 @@ interface HouseBillOfLadingProps {
 }
 
 const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData }) => {
+  if (!blData) {
+    return (
+      <div className="max-w-[210mm] mx-auto bg-white p-8 shadow-md text-center">
+        <h2 className="text-xl text-red-500">Bill of Lading data not available</h2>
+        <p className="mt-2">The requested Bill of Lading could not be loaded.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-[210mm] mx-auto bg-white p-8 shadow-md">
       <div className="border-2 border-black p-8">
