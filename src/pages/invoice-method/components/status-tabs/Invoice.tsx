@@ -1,7 +1,6 @@
 
 import React from "react";
-import { FileText, DollarSign, CheckCircle2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import InvoiceActionButton from "./InvoiceActionButton";
 
 export interface Invoice {
   id: string;
@@ -64,34 +63,20 @@ export const InvoiceRow: React.FC<InvoiceRowProps> = ({
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
         <div className="flex space-x-2">
           {!invoice.paid ? (
-            <Button 
-              variant="default" 
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700"
+            <InvoiceActionButton 
+              type="pay"
               onClick={() => handlePayClick(invoice)}
-            >
-              <DollarSign className="h-4 w-4 mr-1" />
-              Pay
-            </Button>
+            />
           ) : (
-            <Button 
-              variant="default" 
-              size="sm"
-              className="bg-green-600 hover:bg-green-700"
+            <InvoiceActionButton 
+              type="details"
               onClick={() => handleViewPaymentDetails && handleViewPaymentDetails(invoice)}
-            >
-              <CheckCircle2 className="h-4 w-4 mr-1" />
-              Details
-            </Button>
+            />
           )}
-          <Button 
-            variant="outline" 
-            size="sm"
+          <InvoiceActionButton 
+            type="view"
             onClick={() => handleViewInvoice(invoice.id)}
-          >
-            <FileText className="h-4 w-4 mr-1" />
-            View
-          </Button>
+          />
         </div>
       </td>
     </tr>
