@@ -1,0 +1,17 @@
+
+import React from "react";
+
+const Header: React.FC = () => {
+  return (
+    <div className="text-center border-b-2 border-black pb-4 mb-6">
+      <div className="flex justify-center mb-3">
+        <img src="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" alt="Soqotra Logo" className="h-16" />
+      </div>
+      <p className="text-sm mb-2">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>
+      <h1 className="text-2xl font-bold">MASTER BILL OF LADING (M-BL)</h1>
+      <p className="text-sm">NOT NEGOTIABLE UNLESS CONSIGNED TO ORDER</p>
+    </div>
+  );
+};
+
+export default Header;
