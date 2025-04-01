@@ -1,4 +1,3 @@
-
 import { v4 as uuidv4 } from "uuid";
 import { FormState, PackageItem } from "../types/invoiceForm";
 import { packageOptions } from "@/data/packageOptions";
@@ -27,14 +26,8 @@ export const usePackageHandling = ({
     if (selectedPackage) {
       console.log("Selected package:", selectedPackage);
       
-      // Set default price if available
-      let price = formState.price;
-      if (selectedPackage.price) {
-        price = String(selectedPackage.price);
-      }
-      
-      // Get dimensions based on package type
-      const { length, width, height, packageWeight } = getDimensionsForPackage(description);
+      // Get dimensions and price based on package type
+      const { length, width, height, packageWeight, price } = getDimensionsForPackage(description);
       
       // Calculate cubic meter based on the dimensions
       let cubicMetre = calculateCubicMeter(length, width, height);
@@ -43,7 +36,7 @@ export const usePackageHandling = ({
         ...prev,
         packagesName: description,
         selectedPackage,
-        price,
+        price: price || String(selectedPackage.price), // Use the price from dimensions or fall back to package option
         length,
         width,
         height,
