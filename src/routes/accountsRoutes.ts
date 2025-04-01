@@ -10,31 +10,31 @@ import PaidInvoicesPage from "@/pages/accounts/payments/PaidInvoicesPage";
 const accountsRoutes: RouteObject[] = [
   {
     path: "payments",
-    element: <PaymentsPage />,
+    element: PaymentsPage,
   },
   {
     path: "payments/add",
-    element: <AddInvoicePayment />,
+    element: AddInvoicePayment,
   },
   {
     path: "payment/add",
-    element: <AddPaymentPage />,
+    element: AddPaymentPage,
   },
   {
     path: "payment-methods",
-    element: <PaymentMethodsPage />,
+    element: PaymentMethodsPage,
   },
   {
     path: "reconciliation",
-    element: <ReconciliationPage />,
+    element: ReconciliationPage,
   },
   {
     path: "payments/reconciliation",
-    element: <ReconciliationPage />,
+    element: ReconciliationPage,
   },
   {
     path: "payments/paid",
-    element: <PaidInvoicesPage />,
+    element: PaidInvoicesPage,
   },
 ];
 
