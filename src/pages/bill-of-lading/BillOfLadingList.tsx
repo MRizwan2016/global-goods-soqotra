@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { 
   Table, 
@@ -21,6 +20,7 @@ import {
   Printer
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 // Mock data for Bill of Lading
 const mockBLData = [
@@ -87,6 +87,7 @@ const mockBLData = [
 ];
 
 const BillOfLadingList = () => {
+  const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const entriesPerPage = 50;
@@ -111,6 +112,15 @@ const BillOfLadingList = () => {
   const indexOfLastEntry = currentPage * entriesPerPage;
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
   const currentEntries = filteredData.slice(indexOfFirstEntry, indexOfLastEntry);
+
+  const handlePrintClick = (id: string) => {
+    navigate(`/data-entry/print-documents/bl-preview/${id}?type=house`);
+    toast.success("Opening Bill of Lading preview");
+  };
+
+  const handleDeleteClick = (id: string) => {
+    toast.error("Delete functionality is not implemented");
+  };
 
   return (
     <Layout title="Bill of Lading Management">
@@ -246,12 +256,18 @@ const BillOfLadingList = () => {
                         </span>
                       </InvoiceTableCell>
                       <InvoiceTableCell className="text-center">
-                        <Link to={`/data-entry/print-documents/bl/${item.id}`}>
-                          <Printer size={16} className="text-green-500 inline-block cursor-pointer" />
-                        </Link>
+                        <Printer 
+                          size={16} 
+                          className="text-green-500 inline-block cursor-pointer" 
+                          onClick={() => handlePrintClick(item.id)}
+                        />
                       </InvoiceTableCell>
                       <InvoiceTableCell className="text-center">
-                        <Trash size={16} className="text-red-500 inline-block cursor-pointer" />
+                        <Trash 
+                          size={16} 
+                          className="text-red-500 inline-block cursor-pointer" 
+                          onClick={() => handleDeleteClick(item.id)}
+                        />
                       </InvoiceTableCell>
                     </TableRow>
                   ))

@@ -19,5 +19,11 @@ export const printDocumentsRoutes: RouteConfig[] = [
     path: "/data-entry/print-documents/bl-print/:id",
     element: BillOfLadingPrint,
     private: false // Set to false to ensure it doesn't require auth checks that might fail
+  },
+  // Add a new route for the BL print preview
+  {
+    path: "/data-entry/print-documents/bl-preview/:id",
+    element: BillOfLadingPrint,
+    private: false
   }
 ];

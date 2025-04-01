@@ -1,18 +1,20 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Printer, FileText } from "lucide-react";
 
 interface PrintControlsProps {
   handleBack: () => void;
   handlePrint: () => void;
   title: string;
+  isPreview?: boolean;
 }
 
 const PrintControls: React.FC<PrintControlsProps> = ({
   handleBack,
   handlePrint,
-  title
+  title,
+  isPreview = false
 }) => {
   const handlePrintClick = (e: React.MouseEvent) => {
     // Prevent default browser behavior
@@ -51,13 +53,16 @@ const PrintControls: React.FC<PrintControlsProps> = ({
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back
       </Button>
-      <div className="text-xl font-bold flex-1 text-center">{title}</div>
+      <div className="text-xl font-bold flex-1 text-center">
+        {title}
+        {isPreview && <span className="text-sm font-normal text-gray-500 ml-2">(Preview Mode)</span>}
+      </div>
       <Button
         onClick={handlePrintClick}
         className="flex items-center bg-blue-500 hover:bg-blue-600"
       >
         <Printer className="mr-2 h-4 w-4" />
-        Print
+        {isPreview ? "Print Document" : "Print"}
       </Button>
     </div>
   );
