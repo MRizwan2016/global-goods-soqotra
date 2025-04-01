@@ -15,6 +15,27 @@ const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData }) =
     );
   }
 
+  // Safe access to properties
+  const shipper = blData?.shipper || 'N/A';
+  const shipperAddress = blData?.shipperAddress || 'N/A';
+  const blNumber = blData?.blNumber || 'N/A';
+  const date = blData?.date || 'N/A';
+  const consignee = blData?.consignee || 'N/A';
+  const consigneeAddress = blData?.consigneeAddress || 'N/A';
+  const notifyParty = blData?.notifyParty || 'SAME AS CONSIGNEE';
+  const vessel = blData?.vessel || 'N/A';
+  const voyage = blData?.voyage || 'N/A';
+  const portOfLoading = blData?.portOfLoading || 'N/A';
+  const portOfDischarge = blData?.portOfDischarge || 'N/A';
+  const finalDestination = blData?.finalDestination || blData?.portOfDischarge || 'N/A';
+  const packages = blData?.packages || '0';
+  const weight = blData?.weight || '0';
+  const volume = blData?.volume || '0';
+  const marks = blData?.marks || 'N/A';
+  const description = blData?.description || '';
+  const specialInstructions = blData?.specialInstructions || 'N/A';
+  const cargoType = blData?.cargoType || '';
+
   // Format description to handle vehicle details
   const formatDescription = (description: string) => {
     if (!description) return "";
@@ -55,48 +76,48 @@ const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData }) =
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="border p-3">
             <h2 className="font-bold mb-1">Shipper:</h2>
-            <p>{blData.shipper}</p>
-            <p className="text-sm">{blData.shipperAddress}</p>
+            <p>{shipper}</p>
+            <p className="text-sm">{shipperAddress}</p>
           </div>
           <div className="border p-3">
             <h2 className="font-bold mb-1">Bill of Lading Number:</h2>
-            <p>{blData.blNumber}</p>
+            <p>{blNumber}</p>
             <h2 className="font-bold mt-2 mb-1">Date:</h2>
-            <p>{blData.date}</p>
+            <p>{date}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="border p-3">
             <h2 className="font-bold mb-1">Consignee:</h2>
-            <p>{blData.consignee}</p>
-            <p className="text-sm">{blData.consigneeAddress}</p>
+            <p>{consignee}</p>
+            <p className="text-sm">{consigneeAddress}</p>
           </div>
           <div className="border p-3">
             <h2 className="font-bold mb-1">Notify Party:</h2>
-            <p>{blData.notifyParty}</p>
+            <p>{notifyParty}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="border p-3">
             <h2 className="font-bold mb-1">Vessel / Voyage:</h2>
-            <p>{blData.vessel} / {blData.voyage || "N/A"}</p>
+            <p>{vessel} / {voyage}</p>
           </div>
           <div className="border p-3">
             <h2 className="font-bold mb-1">Port of Loading:</h2>
-            <p>{blData.portOfLoading}</p>
+            <p>{portOfLoading}</p>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="border p-3">
             <h2 className="font-bold mb-1">Port of Discharge:</h2>
-            <p>{blData.portOfDischarge}</p>
+            <p>{portOfDischarge}</p>
           </div>
           <div className="border p-3">
             <h2 className="font-bold mb-1">Final Destination:</h2>
-            <p>{blData.finalDestination}</p>
+            <p>{finalDestination}</p>
           </div>
         </div>
 
@@ -105,28 +126,28 @@ const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData }) =
           <div className="grid grid-cols-4 gap-2 mb-3">
             <div className="col-span-1">
               <p className="font-semibold">Packages:</p>
-              <p>{blData.packages}</p>
+              <p>{packages}</p>
             </div>
             <div className="col-span-1">
               <p className="font-semibold">Weight:</p>
-              <p>{blData.weight}</p>
+              <p>{weight}</p>
             </div>
             <div className="col-span-1">
               <p className="font-semibold">Volume:</p>
-              <p>{blData.volume}</p>
+              <p>{volume}</p>
             </div>
             <div className="col-span-1">
               <p className="font-semibold">Marks:</p>
-              <p>{blData.marks}</p>
+              <p>{marks}</p>
             </div>
           </div>
           <div>
             <p className="font-semibold">Description of Goods:</p>
-            <div className="whitespace-pre-line min-h-[80px]">
-              {formatDescription(blData.description)}
+            <div className="whitespace-pre-line min-h-[150px]">
+              {formatDescription(description)}
             </div>
             
-            {blData.cargoType && blData.cargoType.toLowerCase() === "car" && (
+            {(cargoType.toLowerCase() === "car" || cargoType.toLowerCase() === "truck") && (
               <div className="mt-3 border-t pt-2 border-gray-400">
                 <p className="font-semibold">VEHICLE DETAILS:</p>
                 {blData.vehicleMake && <p>Make: {blData.vehicleMake}</p>}
@@ -141,7 +162,7 @@ const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData }) =
 
         <div className="border p-3 mb-6">
           <h2 className="font-bold mb-2">Special Instructions:</h2>
-          <p>{blData.specialInstructions || "N/A"}</p>
+          <p>{specialInstructions}</p>
         </div>
 
         <div className="mt-10 grid grid-cols-2 gap-4">

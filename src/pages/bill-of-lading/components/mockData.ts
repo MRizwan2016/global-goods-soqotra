@@ -30,6 +30,11 @@ export const mockBLData = [
     freightCharges: "Prepaid",
     placeOfIssue: "Doha, Qatar",
     dateOfIssue: "2023-05-08",
+    vehicleMake: "",
+    vehicleModel: "",
+    vehicleYear: "",
+    vehicleColor: "",
+    chassisNumber: ""
   },
   { 
     id: "2", 
@@ -61,5 +66,10 @@ export const mockBLData = [
     freightCharges: "Prepaid",
     placeOfIssue: "Doha, Qatar",
     dateOfIssue: "2023-06-10",
+    vehicleMake: "Toyota",
+    vehicleModel: "Land Cruiser",
+    vehicleYear: "2020",
+    vehicleColor: "White",
+    chassisNumber: "JT3DJ81W0Y420"
   },
 ];

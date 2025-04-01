@@ -5,6 +5,41 @@ import { toast } from "sonner";
 import { mockInvoiceData } from "@/data/mockData";
 import { mockBLData } from "@/pages/bill-of-lading/components/mockData";
 
+// Define a more comprehensive type for the Bill of Lading data
+interface BillOfLadingData {
+  id: string;
+  blNumber: string;
+  date: string;
+  shipper: string;
+  shipperAddress?: string;
+  shipperPhone?: string;
+  consignee: string;
+  consigneeAddress?: string;
+  consigneeIdNumber?: string;
+  notifyParty?: string;
+  notifyPartyAddress?: string;
+  portOfLoading?: string;
+  portOfDischarge?: string;
+  marks?: string;
+  description?: string;
+  weight?: string;
+  volume?: string;
+  packages?: string;
+  freightPrepaid?: boolean;
+  vessel?: string;
+  finalDestination?: string;
+  dateOfIssue?: string;
+  cargoType?: string;
+  vehicleMake?: string;
+  vehicleModel?: string;
+  vehicleYear?: string;
+  vehicleColor?: string;
+  chassisNumber?: string;
+  specialInstructions?: string;
+  voyage?: string;
+  [key: string]: any; // Allow any additional fields
+}
+
 export const useBillOfLadingData = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -14,7 +49,7 @@ export const useBillOfLadingData = () => {
   const isPreview = location.pathname.includes('bl-preview');
   
   const [loading, setLoading] = useState(true);
-  const [blData, setBlData] = useState<any>(null);
+  const [blData, setBlData] = useState<BillOfLadingData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -101,7 +136,7 @@ export const useBillOfLadingData = () => {
           : {};
         
         // Format data for BL
-        const houseBillOfLading = {
+        const houseBillOfLading: BillOfLadingData = {
           id,
           blNumber: `BL-${invoiceData.invoiceNumber || id}`,
           date: invoiceData.date || new Date().toISOString().split('T')[0],

@@ -1,7 +1,13 @@
 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select } from "@/components/ui/select";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue 
+} from "@/components/ui/select";
 
 interface CargoDetailsProps {
   formState: any;
@@ -10,6 +16,18 @@ interface CargoDetailsProps {
 
 const CargoDetails = ({ formState, handleInputChange }: CargoDetailsProps) => {
   const showVehicleDetails = formState.cargoType === "Car" || formState.cargoType === "Truck";
+
+  // Create a custom handler for the Select component
+  const handleSelectChange = (value: string, name: string) => {
+    const event = {
+      target: {
+        name,
+        value
+      }
+    } as React.ChangeEvent<HTMLSelectElement>;
+    
+    handleInputChange(event);
+  };
 
   return (
     <div className="mt-6">
@@ -101,13 +119,16 @@ const CargoDetails = ({ formState, handleInputChange }: CargoDetailsProps) => {
         <div className="flex flex-col">
           <label className="text-sm font-medium mb-1">FREIGHT CHARGES:</label>
           <Select
-            name="freightCharges"
             value={formState.freightCharges || "Prepaid"}
-            onChange={handleInputChange}
-            className="border border-gray-300"
+            onValueChange={(value) => handleSelectChange(value, "freightCharges")}
           >
-            <option value="Prepaid">Prepaid</option>
-            <option value="Collect">Collect</option>
+            <SelectTrigger className="border border-gray-300">
+              <SelectValue placeholder="Select freight charge type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Prepaid">Prepaid</SelectItem>
+              <SelectItem value="Collect">Collect</SelectItem>
+            </SelectContent>
           </Select>
         </div>
         

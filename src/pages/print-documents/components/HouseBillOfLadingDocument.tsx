@@ -39,6 +39,30 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
     return description;
   };
 
+  // Safe access to blData properties
+  const blNumber = blData?.blNumber || 'N/A';
+  const date = blData?.date || 'N/A';
+  const shipper = blData?.shipper || 'N/A';
+  const shipperAddress = blData?.shipperAddress || 'N/A';
+  const shipperPhone = blData?.shipperPhone || 'N/A';
+  const consignee = blData?.consignee || 'N/A';
+  const consigneeAddress = blData?.consigneeAddress || 'N/A';
+  const consigneeIdNumber = blData?.consigneeIdNumber || 'N/A';
+  const notifyParty = blData?.notifyParty || 'SAME AS CONSIGNEE';
+  const notifyPartyAddress = blData?.notifyPartyAddress || '';
+  const portOfLoading = blData?.portOfLoading || 'N/A';
+  const portOfDischarge = blData?.portOfDischarge || 'N/A';
+  const marks = blData?.marks || 'AS ADDRESSED';
+  const description = blData?.description || '';
+  const weight = blData?.weight || '0';
+  const volume = blData?.volume || '0';
+  const packages = blData?.packages || '1';
+  const freightPrepaid = blData?.freightPrepaid || false;
+  const vessel = blData?.vessel || 'TBA';
+  const finalDestination = blData?.finalDestination || blData?.portOfDischarge || 'N/A';
+  const dateOfIssue = blData?.dateOfIssue || blData?.date || 'N/A';
+  const cargoType = blData?.cargoType || '';
+
   return (
     <div className="max-w-[210mm] mx-auto bg-white p-8 shadow-md">
       <div className="border-2 border-black p-8">
@@ -55,8 +79,8 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
         {/* Document Details */}
         <div className="flex justify-end mb-4">
           <div className="font-bold">
-            <p>BL Number: {blData.blNumber}</p>
-            <p>Date: {blData.date}</p>
+            <p>BL Number: {blNumber}</p>
+            <p>Date: {date}</p>
           </div>
         </div>
 
@@ -64,34 +88,34 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="border-2 border-black p-3">
             <h2 className="font-bold border-b border-black pb-1 mb-1">SHIPPER</h2>
-            <p>{blData.shipper}</p>
-            <p className="text-sm">{blData.shipperAddress}</p>
-            <p>TEL: {blData.shipperPhone || "N/A"}</p>
+            <p>{shipper}</p>
+            <p className="text-sm">{shipperAddress}</p>
+            <p>TEL: {shipperPhone}</p>
           </div>
           <div className="border-2 border-black p-3">
             <h2 className="font-bold border-b border-black pb-1 mb-1">CONSIGNEE</h2>
-            <p>{blData.consignee}</p>
-            <p className="text-sm">{blData.consigneeAddress || "N/A"}</p>
-            <p>ID/PASSPORT: {blData.consigneeIdNumber || "N/A"}</p>
+            <p>{consignee}</p>
+            <p className="text-sm">{consigneeAddress}</p>
+            <p>ID/PASSPORT: {consigneeIdNumber}</p>
           </div>
         </div>
 
         {/* Notify Party */}
         <div className="border-2 border-black p-3 mb-6">
           <h2 className="font-bold border-b border-black pb-1 mb-1">NOTIFY PARTY</h2>
-          <p>{blData.notifyParty || "SAME AS CONSIGNEE"}</p>
-          <p className="text-sm">{blData.notifyPartyAddress || ""}</p>
+          <p>{notifyParty}</p>
+          <p className="text-sm">{notifyPartyAddress}</p>
         </div>
 
         {/* Ports */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="border-2 border-black p-3">
             <h2 className="font-bold border-b border-black pb-1 mb-1">PORT OF LOADING</h2>
-            <p>{blData.portOfLoading}</p>
+            <p>{portOfLoading}</p>
           </div>
           <div className="border-2 border-black p-3">
             <h2 className="font-bold border-b border-black pb-1 mb-1">PORT OF DISCHARGE</h2>
-            <p>{blData.portOfDischarge}</p>
+            <p>{portOfDischarge}</p>
           </div>
         </div>
 
@@ -109,16 +133,16 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
             <tbody>
               <tr>
                 <td className="border-2 border-black p-2 align-top" rowSpan={1}>
-                  {blData.marks || "AS ADDRESSED"}
+                  {marks}
                 </td>
-                <td className="border-2 border-black p-3 align-top min-h-[120px]">
+                <td className="border-2 border-black p-3 align-top min-h-[200px]">
                   <p className="font-bold mb-2">SHIPPER'S LOAD, COUNT & SEAL</p>
                   <p className="mb-2">SAID TO CONTAIN:</p>
                   <div className="whitespace-pre-line">
-                    {formatDescription(blData.description)}
+                    {formatDescription(description)}
                   </div>
                   
-                  {blData.cargoType && blData.cargoType.toLowerCase() === "car" && (
+                  {(cargoType.toLowerCase() === "car" || cargoType.toLowerCase() === "truck") && (
                     <div className="mt-3 border-t pt-2 border-gray-400">
                       <p className="font-bold">VEHICLE DETAILS:</p>
                       {blData.vehicleMake && <p>Make: {blData.vehicleMake}</p>}
@@ -129,8 +153,8 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
                     </div>
                   )}
                 </td>
-                <td className="border-2 border-black p-2 text-center align-middle">{blData.weight}</td>
-                <td className="border-2 border-black p-2 text-center align-middle">{blData.volume}</td>
+                <td className="border-2 border-black p-2 text-center align-middle">{weight}</td>
+                <td className="border-2 border-black p-2 text-center align-middle">{volume}</td>
               </tr>
             </tbody>
           </table>
@@ -140,13 +164,13 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="border-2 border-black p-3">
             <h2 className="font-bold border-b border-black pb-1 mb-1">FREIGHT DETAILS</h2>
-            <p>FREIGHT {blData.freightPrepaid ? "PREPAID" : "COLLECT"}</p>
-            <p>PACKAGES: {blData.packages}</p>
+            <p>FREIGHT {freightPrepaid ? "PREPAID" : "COLLECT"}</p>
+            <p>PACKAGES: {packages}</p>
           </div>
           <div className="border-2 border-black p-3">
             <h2 className="font-bold border-b border-black pb-1 mb-1">ADDITIONAL INFORMATION</h2>
-            <p>VESSEL/VOYAGE: {blData.vessel || "TBA"}</p>
-            <p>FINAL DESTINATION: {blData.finalDestination || blData.portOfDischarge}</p>
+            <p>VESSEL/VOYAGE: {vessel}</p>
+            <p>FINAL DESTINATION: {finalDestination}</p>
           </div>
         </div>
 
@@ -160,7 +184,7 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
           </div>
           <div>
             <p className="font-bold">DATE OF ISSUE:</p>
-            <p>{blData.dateOfIssue || blData.date}</p>
+            <p>{dateOfIssue}</p>
             <p className="mt-6 text-sm">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>
           </div>
         </div>
