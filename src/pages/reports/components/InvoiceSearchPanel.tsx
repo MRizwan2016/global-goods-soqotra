@@ -35,9 +35,26 @@ const InvoiceSearchPanel: React.FC = () => {
     }
     
     const query = searchQuery.toLowerCase();
-    const results = mockInvoiceData.filter(invoice => 
+    
+    // First try to get from localStorage for real data
+    let allInvoices = [...mockInvoiceData];
+    const storedInvoices = localStorage.getItem('invoices');
+    
+    if (storedInvoices) {
+      try {
+        const parsedInvoices = JSON.parse(storedInvoices);
+        // Combine with mock data, avoiding duplicates
+        const mockIds = new Set(mockInvoiceData.map(inv => inv.id));
+        const uniqueStoredInvoices = parsedInvoices.filter((inv: any) => !mockIds.has(inv.id));
+        allInvoices = [...mockInvoiceData, ...uniqueStoredInvoices];
+      } catch (error) {
+        console.error("Error parsing stored invoices:", error);
+      }
+    }
+    
+    const results = allInvoices.filter(invoice => 
       invoice.invoiceNumber.toLowerCase().includes(query) ||
-      invoice.consignee1.toLowerCase().includes(query) ||
+      invoice.consignee1?.toLowerCase().includes(query) ||
       invoice.shipper1?.toLowerCase().includes(query)
     );
     
@@ -52,7 +69,7 @@ const InvoiceSearchPanel: React.FC = () => {
   };
 
   const handleViewInvoice = (invoiceId: string) => {
-    // Navigate to the invoice print view
+    // Navigate to the invoice preview component
     navigate(`/data-entry/print-documents/invoice-preview/${invoiceId}`);
   };
 

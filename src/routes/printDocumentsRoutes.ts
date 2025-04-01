@@ -3,6 +3,7 @@ import PrintDocuments from "@/pages/print-documents/PrintDocuments";
 import InvoicePrint from "@/pages/invoicing/InvoicePrint";
 import BillOfLadingPrint from "@/pages/print-documents/BillOfLadingPrint";
 import { RouteConfig } from "./types";
+import InvoicePreview from "@/pages/reports/components/InvoicePreview";
 
 export const printDocumentsRoutes: RouteConfig[] = [
   {
@@ -20,10 +21,14 @@ export const printDocumentsRoutes: RouteConfig[] = [
     element: BillOfLadingPrint,
     private: false // Set to false to ensure it doesn't require auth checks that might fail
   },
-  // Add a new route for the BL print preview
   {
     path: "/data-entry/print-documents/bl-preview/:id",
     element: BillOfLadingPrint,
+    private: false
+  },
+  {
+    path: "/data-entry/print-documents/invoice-preview/:id",
+    element: InvoicePreview,
     private: false
   }
 ];
