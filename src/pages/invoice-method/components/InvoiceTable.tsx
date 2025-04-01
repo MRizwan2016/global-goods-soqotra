@@ -20,8 +20,14 @@ interface Invoice {
   date: string;
   shipper1: string;
   consignee1: string;
-  net: number;
+  net: number | string;
+  gross: number | string;
+  discount: number | string;
   paid: boolean;
+  statusCharge?: number | string;
+  offerDisc?: number | string;
+  volume?: number | string;
+  weight?: number | string;
   [key: string]: any; // Allow other properties
 }
 
@@ -40,6 +46,13 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   showPayButton,
   payButtonLabel = "Pay"
 }) => {
+  // Format number for display
+  const formatNumber = (value: number | string | undefined): string => {
+    if (value === undefined || value === null) return "0.00";
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    return isNaN(num) ? "0.00" : num.toFixed(2);
+  };
+
   return (
     <Table>
       <TableCaption>List of {payButtonLabel === "Pay" ? 'unpaid' : 'paid'} invoices</TableCaption>
@@ -61,7 +74,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             <TableCell>{invoice.date}</TableCell>
             <TableCell>{invoice.shipper1}</TableCell>
             <TableCell>{invoice.consignee1}</TableCell>
-            <TableCell className="text-right">{invoice.net}</TableCell>
+            <TableCell className="text-right">{formatNumber(invoice.net)}</TableCell>
             <TableCell>
               <Badge 
                 variant="secondary"

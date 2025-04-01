@@ -9,6 +9,14 @@ interface UsePackageHandlingProps {
   setPackageItems: React.Dispatch<React.SetStateAction<PackageItem[]>>;
 }
 
+// Package dimension presets for common package types
+const PACKAGE_PRESETS: Record<string, { length: string; width: string; height: string }> = {
+  "Medium Carton Box": { length: "50", width: "40", height: "35" },
+  "Small Carton Box": { length: "30", width: "25", height: "20" },
+  "Large Carton Box": { length: "60", width: "50", height: "45" },
+  "Extra Large Carton Box": { length: "70", width: "60", height: "55" },
+};
+
 export const usePackageHandling = ({
   formState,
   setFormState,
@@ -26,12 +34,30 @@ export const usePackageHandling = ({
     
     const nextBoxNumber = (packageItems.length + 1).toString();
     
-    setFormState(prev => ({
-      ...prev,
-      packagesName: packageName,
-      price: packagePrice,
-      boxNumber: nextBoxNumber,
-    }));
+    // Set standard dimensions based on the package name if available
+    const dimensions = PACKAGE_PRESETS[packageName] || { length: "", width: "", height: "" };
+    
+    setFormState(prev => {
+      // Calculate cubic meter if dimensions are available
+      let cubicMetre = "";
+      if (dimensions.length && dimensions.width && dimensions.height) {
+        const l = parseFloat(dimensions.length);
+        const w = parseFloat(dimensions.width);
+        const h = parseFloat(dimensions.height);
+        cubicMetre = ((l * w * h) / 1000000).toFixed(3);
+      }
+      
+      return {
+        ...prev,
+        packagesName: packageName,
+        price: packagePrice,
+        boxNumber: nextBoxNumber,
+        length: dimensions.length,
+        width: dimensions.width,
+        height: dimensions.height,
+        cubicMetre: cubicMetre
+      };
+    });
   };
   
   const handleManualPackage = (packageName: string, packagePrice: string) => {

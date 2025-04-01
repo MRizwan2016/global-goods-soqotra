@@ -39,12 +39,17 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string = ""
       const paymentId = uuidv4();
       const receiptNumber = `R-${Date.now().toString().substring(6)}`;
       
+      // Ensure amount is a number
+      const amountPaid = typeof formState.amountPaid === 'string' 
+        ? parseFloat(formState.amountPaid) 
+        : formState.amountPaid;
+      
       const newPayment = {
         id: paymentId,
         receiptNumber: receiptNumber,
         invoiceNumber: formState.invoiceNumber,
         customerName: formState.customerName || formState.consignee,
-        amount: formState.amountPaid,
+        amount: amountPaid,
         currency: formState.currency,
         country: formState.country,
         date: formState.paymentCollectDate,
@@ -67,11 +72,11 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string = ""
       localStorage.setItem('invoicePayments', JSON.stringify(invoicePayments));
       
       // Update invoice status to paid if needed
-      updateInvoiceStatus(formState.invoiceNumber, formState.amountPaid, formState.balanceToPay);
+      updateInvoiceStatus(formState.invoiceNumber, amountPaid, formState.balanceToPay);
       
       // Show success toast
       toast.success("Payment Saved", {
-        description: `Payment of ${currencySymbol}${formState.amountPaid.toFixed(2)} has been recorded successfully`
+        description: `Payment of ${currencySymbol}${amountPaid.toFixed(2)} has been recorded successfully`
       });
       
       // Check if we need to show reconciliation reminder
@@ -128,22 +133,27 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string = ""
       // Find the invoice by number
       const updatedInvoices = existingInvoices.map((invoice: any) => {
         if (invoice.invoiceNumber === invoiceNumber) {
+          // Make sure we're handling the correct invoice net amount
+          const invoiceAmount = parseFloat(invoice.net) || invoice.amount || 0;
+          
           // Mark as paid if payment covers the full balance
-          if (amountPaid >= balanceToPay) {
-            console.log(`Marking invoice ${invoiceNumber} as paid`);
+          if (amountPaid >= balanceToPay || amountPaid >= invoiceAmount) {
+            console.log(`Marking invoice ${invoiceNumber} as paid. Amount paid: ${amountPaid}, Invoice amount: ${invoiceAmount}`);
             return { 
               ...invoice, 
               paid: true, 
-              paidAmount: invoice.net || invoice.amount || 0,
-              totalPaid: invoice.net || invoice.amount || 0,
-              balanceToPay: 0
+              paidAmount: invoiceAmount,
+              totalPaid: invoiceAmount,
+              balanceToPay: 0,
+              // Ensure correct gross and net values if they're strings
+              gross: String(parseFloat(invoice.gross) || invoiceAmount),
+              net: String(invoiceAmount)
             };
           }
           
           // For partial payments, just update the amount paid so far
-          const currentPaid = invoice.paidAmount || 0;
+          const currentPaid = parseFloat(invoice.paidAmount) || 0;
           const totalPaid = currentPaid + amountPaid;
-          const invoiceAmount = invoice.net || invoice.amount || 0;
           const newBalanceToPay = invoiceAmount - totalPaid;
           
           return { 
@@ -151,7 +161,10 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string = ""
             paidAmount: totalPaid,
             totalPaid: totalPaid,
             balanceToPay: newBalanceToPay,
-            paid: totalPaid >= invoiceAmount
+            paid: totalPaid >= invoiceAmount,
+            // Ensure correct gross and net values
+            gross: String(parseFloat(invoice.gross) || invoiceAmount),
+            net: String(invoiceAmount)
           };
         }
         return invoice;

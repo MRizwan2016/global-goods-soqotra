@@ -1,74 +1,94 @@
 
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Edit, Trash, Eye, Printer } from "lucide-react";
 import { TableRow, InvoiceTableCell } from "@/components/ui/table";
-import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { Pencil, Trash, Eye, Printer } from "lucide-react";
 
-interface InvoiceRowProps {
+interface InvoiceTableRowProps {
   item: any;
   index: number;
   indexOffset: number;
   onPrint: (id: string) => void;
 }
 
-const InvoiceTableRow: React.FC<InvoiceRowProps> = ({ 
-  item, 
-  index, 
+const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
+  item,
+  index,
   indexOffset,
   onPrint
 }) => {
-  const navigate = useNavigate();
-
-  const handlePrintClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    onPrint(item.id);
+  // Format number values consistently
+  const formatNumber = (value: any): string => {
+    if (value === undefined || value === null) return "0";
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    return isNaN(num) ? "0" : num.toFixed(2);
   };
 
-  const handleViewClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigate(`/data-entry/invoicing/preview/${item.id}`);
+  // Ensure all required fields have values
+  const ensureValue = (value: any): string => {
+    return value !== undefined && value !== null ? value : "";
+  };
+
+  // Format date for display
+  const formatDate = (dateStr: string): string => {
+    if (!dateStr) return "";
+    try {
+      const date = new Date(dateStr);
+      return date.toISOString().split('T')[0];
+    } catch (e) {
+      return dateStr;
+    }
   };
 
   return (
-    <TableRow key={item.id} className="hover:bg-gray-50">
+    <TableRow className="hover:bg-gray-50 transition-colors">
       <InvoiceTableCell className="text-center">{indexOffset + index + 1}</InvoiceTableCell>
       <InvoiceTableCell className="text-center">
         <Link to={`/data-entry/invoicing/edit/${item.id}`}>
-          <Edit size={16} className="text-blue-500 inline-block" />
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-blue-600">
+            <Pencil className="h-4 w-4" />
+          </Button>
         </Link>
       </InvoiceTableCell>
-      <InvoiceTableCell>{item.date}</InvoiceTableCell>
-      <InvoiceTableCell className="font-medium text-blue-700">{item.invoiceNumber || "-"}</InvoiceTableCell>
-      <InvoiceTableCell>{item.shipper1}</InvoiceTableCell>
-      <InvoiceTableCell>{item.consignee1}</InvoiceTableCell>
-      <InvoiceTableCell className="text-center">{item.salesAgent}</InvoiceTableCell>
-      <InvoiceTableCell className="text-center">{item.warehouse}</InvoiceTableCell>
-      <InvoiceTableCell className="text-center">{item.doorToDoor ? "Yes" : "No"}</InvoiceTableCell>
-      <InvoiceTableCell>{item.nic}</InvoiceTableCell>
-      <InvoiceTableCell className="text-right">{item.volume}</InvoiceTableCell>
-      <InvoiceTableCell className="text-right">{item.weight}</InvoiceTableCell>
-      <InvoiceTableCell className="text-center">{item.packages}</InvoiceTableCell>
-      <InvoiceTableCell className="text-right">{item.gross}</InvoiceTableCell>
-      <InvoiceTableCell className="text-right">{item.discount}</InvoiceTableCell>
-      <InvoiceTableCell className="text-right">{item.net}</InvoiceTableCell>
+      <InvoiceTableCell>{formatDate(item.date || item.invoiceDate)}</InvoiceTableCell>
+      <InvoiceTableCell>{ensureValue(item.invoiceNumber)}</InvoiceTableCell>
+      <InvoiceTableCell>{ensureValue(item.shipper1)}</InvoiceTableCell>
+      <InvoiceTableCell>{ensureValue(item.consignee1)}</InvoiceTableCell>
+      <InvoiceTableCell className="text-center">{ensureValue(item.salesAgent)}</InvoiceTableCell>
+      <InvoiceTableCell>{ensureValue(item.warehouse)}</InvoiceTableCell>
+      <InvoiceTableCell className="text-center">{item.doorToDoor === true || item.doorToDoor === "Yes" ? "Yes" : "No"}</InvoiceTableCell>
+      <InvoiceTableCell>{ensureValue(item.nic)}</InvoiceTableCell>
+      <InvoiceTableCell className="text-right">{formatNumber(item.volume)}</InvoiceTableCell>
+      <InvoiceTableCell className="text-right">{formatNumber(item.weight)}</InvoiceTableCell>
+      <InvoiceTableCell className="text-center">{ensureValue(item.packages)}</InvoiceTableCell>
+      <InvoiceTableCell className="text-right">{formatNumber(item.gross)}</InvoiceTableCell>
+      <InvoiceTableCell className="text-right">{formatNumber(item.discount)}</InvoiceTableCell>
+      <InvoiceTableCell className="text-right">{formatNumber(item.net)}</InvoiceTableCell>
       <InvoiceTableCell className="text-center">{item.paid ? "Yes" : "No"}</InvoiceTableCell>
-      <InvoiceTableCell className="text-right">{item.statusCharge}</InvoiceTableCell>
-      <InvoiceTableCell className="text-right">{item.offerDiscount}</InvoiceTableCell>
+      <InvoiceTableCell className="text-right">{formatNumber(item.statusCharge)}</InvoiceTableCell>
+      <InvoiceTableCell className="text-right">{formatNumber(item.offerDiscount || item.offerDisc)}</InvoiceTableCell>
       <InvoiceTableCell className="text-center">
-        <Trash size={16} className="text-red-500 inline-block cursor-pointer" onClick={() => toast.error("Delete functionality not implemented")} />
+        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600">
+          <Trash className="h-4 w-4" />
+        </Button>
       </InvoiceTableCell>
       <InvoiceTableCell className="text-center">
-        <Eye size={16} className="text-green-500 inline-block cursor-pointer" onClick={handleViewClick} />
+        <Link to={`/data-entry/invoicing/view/${item.id}`}>
+          <Button variant="ghost" size="icon" className="h-8 w-8 text-green-600">
+            <Eye className="h-4 w-4" />
+          </Button>
+        </Link>
       </InvoiceTableCell>
       <InvoiceTableCell className="text-center">
-        <Printer 
-          size={16} 
-          className="text-blue-500 inline-block cursor-pointer" 
-          onClick={handlePrintClick}
-        />
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8 text-blue-600"
+          onClick={() => onPrint(item.id)}
+        >
+          <Printer className="h-4 w-4" />
+        </Button>
       </InvoiceTableCell>
     </TableRow>
   );
