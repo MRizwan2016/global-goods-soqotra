@@ -4,6 +4,7 @@ import { TableRow, InvoiceTableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { Pencil, Trash, Eye, Printer } from "lucide-react";
+import { toast } from "sonner";
 
 interface InvoiceTableRowProps {
   item: any;
@@ -58,6 +59,12 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
   const handleViewInvoice = () => {
     navigate(`/data-entry/invoicing/view/${item.id}`);
   };
+  
+  // Handle print preview - using delete button
+  const handlePrintPreview = () => {
+    navigate(`/data-entry/print-documents/invoice-print/${item.id}`);
+    toast.success("Opening print preview for invoice");
+  };
 
   return (
     <TableRow className="hover:bg-gray-50 transition-colors">
@@ -87,7 +94,12 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
       <InvoiceTableCell className="text-right">{formatNumber(item.statusCharge || 0)}</InvoiceTableCell>
       <InvoiceTableCell className="text-right">{formatNumber(item.offerDiscount || item.offerDisc || 0)}</InvoiceTableCell>
       <InvoiceTableCell className="text-center">
-        <Button variant="ghost" size="icon" className="h-8 w-8 text-red-600">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="h-8 w-8 text-red-600"
+          onClick={handlePrintPreview}
+        >
           <Trash className="h-4 w-4" />
         </Button>
       </InvoiceTableCell>
