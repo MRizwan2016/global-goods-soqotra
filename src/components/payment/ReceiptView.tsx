@@ -70,7 +70,17 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
             {/* Company Header */}
             <div className="flex items-center justify-between mb-6 border-b pb-4">
               <div className="flex items-center">
-                <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-12 mr-4" />
+                <img 
+                  src="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" 
+                  alt="Soqotra Logo" 
+                  className="h-12 mr-4"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null; // Prevent infinite loop
+                    target.src = "/soqotra-logo.png"; // Fallback to local path
+                    console.log("Using fallback logo path");
+                  }}
+                />
                 <div>
                   <h2 className="font-bold text-gray-800 text-lg">SOQOTRA</h2>
                   <p className="text-sm text-gray-600">Shipping & Logistics</p>

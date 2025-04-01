@@ -21,6 +21,12 @@ const Header: React.FC<HeaderProps> = ({
           src="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" 
           alt="Soqotra Shipping & Logistics" 
           className="h-16"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.onerror = null; // Prevent infinite loop
+            target.src = "/soqotra-logo.png"; // Fallback to local path
+            console.log("Using fallback logo path in HBL Header");
+          }}
         />
       </div>
       

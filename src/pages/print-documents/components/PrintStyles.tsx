@@ -42,6 +42,16 @@ const PrintStyles: React.FC = () => {
           overflow: visible !important;
           white-space: normal !important;
           text-overflow: initial !important;
+          max-width: 100% !important;
+          word-break: break-word !important;
+        }
+        
+        /* Make sure the logo is visible */
+        .house-bill-of-lading img {
+          display: block !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          max-height: 3cm !important;
         }
       `}
     </style>
