@@ -11,6 +11,7 @@ export const useBillOfLadingData = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const blType = queryParams.get('type') === 'house' ? 'house' : 'master';
+  const isPreview = location.pathname.includes('bl-preview');
   
   const [loading, setLoading] = useState(true);
   const [blData, setBlData] = useState<any>(null);
@@ -30,6 +31,11 @@ export const useBillOfLadingData = () => {
         // First, check in the mockBLData (for direct BL records)
         let blRecord = mockBLData.find(bl => bl.id === id);
         if (blRecord) {
+          // Extract vehicle details if this is a car shipment
+          const vehicleDetails = blRecord.cargoType === "Car" || blRecord.cargoType === "Truck" 
+            ? extractVehicleDetails(blRecord.goodsDescription || "") 
+            : {};
+
           setBlData({
             id,
             blNumber: blRecord.blNumber,
@@ -52,7 +58,13 @@ export const useBillOfLadingData = () => {
             freightPrepaid: blRecord.freightCharges === "Prepaid",
             vessel: blRecord.vessel || "MV SOQOTRA QUEEN / XXXX",
             finalDestination: blRecord.destination || "COLOMBO, SRI LANKA",
-            dateOfIssue: blRecord.dateOfIssue || blRecord.date
+            dateOfIssue: blRecord.dateOfIssue || blRecord.date,
+            cargoType: blRecord.cargoType,
+            vehicleMake: blRecord.vehicleMake || vehicleDetails.make,
+            vehicleModel: blRecord.vehicleModel || vehicleDetails.model,
+            vehicleYear: blRecord.vehicleYear || vehicleDetails.year,
+            vehicleColor: blRecord.vehicleColor || vehicleDetails.color,
+            chassisNumber: blRecord.chassisNumber || vehicleDetails.chassis
           });
           setLoading(false);
           return;
@@ -80,6 +92,14 @@ export const useBillOfLadingData = () => {
           return;
         }
         
+        // Extract vehicle details if this relates to a car
+        const packageDetails = getPackageDescription(invoiceData);
+        const vehicleDetails = invoiceData.cargoType === "Car" || 
+                              (invoiceData.packageDetails && invoiceData.packageDetails.some((p: any) => 
+                                p.name && p.name.toLowerCase().includes("car")))
+          ? extractVehicleDetails(packageDetails) 
+          : {};
+        
         // Format data for BL
         const houseBillOfLading = {
           id,
@@ -96,14 +116,20 @@ export const useBillOfLadingData = () => {
           portOfLoading: "DOHA, QATAR",
           portOfDischarge: invoiceData.warehouse || "COLOMBO, SRI LANKA",
           marks: "AS ADDRESSED",
-          description: getPackageDescription(invoiceData),
+          description: packageDetails,
           weight: invoiceData.weight || "0",
           volume: invoiceData.volume || "0",
           packages: invoiceData.packages || "1",
           freightPrepaid: invoiceData.paid === true,
           vessel: "MV SOQOTRA QUEEN / XXXX",
           finalDestination: invoiceData.finalDestination || invoiceData.warehouse || "COLOMBO, SRI LANKA",
-          dateOfIssue: invoiceData.date || new Date().toISOString().split('T')[0]
+          dateOfIssue: invoiceData.date || new Date().toISOString().split('T')[0],
+          cargoType: invoiceData.cargoType || "Personal Effects",
+          vehicleMake: vehicleDetails.make,
+          vehicleModel: vehicleDetails.model,
+          vehicleYear: vehicleDetails.year,
+          vehicleColor: vehicleDetails.color,
+          chassisNumber: vehicleDetails.chassis
         };
 
         setBlData(houseBillOfLading);
@@ -119,6 +145,37 @@ export const useBillOfLadingData = () => {
     fetchBillOfLading();
   }, [id, blType]);
 
+  const extractVehicleDetails = (description: string) => {
+    const details: any = {
+      make: "",
+      model: "",
+      year: "",
+      color: "",
+      chassis: ""
+    };
+    
+    if (!description) return details;
+    
+    // Try to extract vehicle details from the description
+    const makeMatch = description.match(/make:?\s*([^,\n]+)/i);
+    if (makeMatch && makeMatch[1]) details.make = makeMatch[1].trim();
+    
+    const modelMatch = description.match(/model:?\s*([^,\n]+)/i);
+    if (modelMatch && modelMatch[1]) details.model = modelMatch[1].trim();
+    
+    const yearMatch = description.match(/year:?\s*([^,\n]+)/i);
+    if (yearMatch && yearMatch[1]) details.year = yearMatch[1].trim();
+    
+    const colorMatch = description.match(/color:?\s*([^,\n]+)/i);
+    if (colorMatch && colorMatch[1]) details.color = colorMatch[1].trim();
+    
+    const chassisMatch = description.match(/chassis:?\s*([^,\n]+)/i) || 
+                          description.match(/vin:?\s*([^,\n]+)/i);
+    if (chassisMatch && chassisMatch[1]) details.chassis = chassisMatch[1].trim();
+    
+    return details;
+  };
+
   const getPackageDescription = (invoice: any) => {
     let description = "SAID TO CONTAIN PERSONAL EFFECTS";
     
@@ -127,6 +184,17 @@ export const useBillOfLadingData = () => {
     if (packageDetails && packageDetails.length > 0) {
       const packageNames = packageDetails.map((p: any) => p.name || "PACKAGE").join(", ");
       description = `${packageNames}\nSAID TO CONTAIN PERSONAL EFFECTS`;
+      
+      // If any package is a car, add vehicle details
+      const carPackage = packageDetails.find((p: any) => 
+        p.name && (p.name.toLowerCase().includes("car") || p.name.toLowerCase().includes("vehicle")));
+      
+      if (carPackage) {
+        description += "\n\nVEHICLE DETAILS:";
+        if (carPackage.description) {
+          description += `\n${carPackage.description}`;
+        }
+      }
     }
     
     return description;
@@ -156,6 +224,7 @@ export const useBillOfLadingData = () => {
     blData,
     blType,
     error,
+    isPreview,
     handlePrint,
     handleBack
   };

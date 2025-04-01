@@ -30,7 +30,11 @@ const PrintControls: React.FC<PrintControlsProps> = ({
 
         <div className="flex-1 text-center">
           <div className="flex justify-center items-center gap-2">
-            {isPreview && <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2 py-0.5 rounded">Preview Mode</span>}
+            {isPreview && (
+              <span className="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">
+                Preview Mode
+              </span>
+            )}
             <h1 className="text-xl font-bold">{title}</h1>
           </div>
         </div>
@@ -40,7 +44,7 @@ const PrintControls: React.FC<PrintControlsProps> = ({
           className="flex items-center bg-blue-500 hover:bg-blue-600"
         >
           <Printer className="mr-2 h-4 w-4" />
-          {isPreview ? "PRINT" : "PRINT NOW"}
+          {isPreview ? "PRINT PREVIEW" : "PRINT NOW"}
         </Button>
       </div>
     </div>

@@ -15,6 +15,30 @@ const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData }) =
     );
   }
 
+  // Format description to handle vehicle details
+  const formatDescription = (description: string) => {
+    if (!description) return "";
+    
+    // Check if description contains vehicle information
+    if (description.toLowerCase().includes("car") || 
+        description.toLowerCase().includes("vehicle") || 
+        description.toLowerCase().includes("truck")) {
+      // Try to format vehicle information more prominently
+      const lines = description.split("\n");
+      return (
+        <>
+          {lines.map((line, index) => (
+            <div key={index} className={line.toLowerCase().includes("vehicle") || line.toLowerCase().includes("car") || line.toLowerCase().includes("truck") ? "font-bold" : ""}>
+              {line}
+            </div>
+          ))}
+        </>
+      );
+    }
+    
+    return description;
+  };
+
   return (
     <div className="max-w-[210mm] mx-auto bg-white p-8 shadow-md">
       <div className="border-2 border-black p-8">
@@ -98,7 +122,20 @@ const BillOfLadingDocument: React.FC<BillOfLadingDocumentProps> = ({ blData }) =
           </div>
           <div>
             <p className="font-semibold">Description of Goods:</p>
-            <p>{blData.description}</p>
+            <div className="whitespace-pre-line min-h-[80px]">
+              {formatDescription(blData.description)}
+            </div>
+            
+            {blData.cargoType && blData.cargoType.toLowerCase() === "car" && (
+              <div className="mt-3 border-t pt-2 border-gray-400">
+                <p className="font-semibold">VEHICLE DETAILS:</p>
+                {blData.vehicleMake && <p>Make: {blData.vehicleMake}</p>}
+                {blData.vehicleModel && <p>Model: {blData.vehicleModel}</p>}
+                {blData.vehicleYear && <p>Year: {blData.vehicleYear}</p>}
+                {blData.vehicleColor && <p>Color: {blData.vehicleColor}</p>}
+                {blData.chassisNumber && <p>Chassis/VIN: {blData.chassisNumber}</p>}
+              </div>
+            )}
           </div>
         </div>
 

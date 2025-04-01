@@ -49,8 +49,8 @@ const BillOfLadingTable = ({
               <TableRow key={item.id} className="hover:bg-gray-50">
                 <InvoiceTableCell className="text-center">{indexOfFirstEntry + index + 1}</InvoiceTableCell>
                 <InvoiceTableCell className="text-center">
-                  <Link to={`/data-entry/bill-of-lading/edit/${item.id}`}>
-                    <Edit size={16} className="text-blue-500 inline-block" />
+                  <Link to={`/data-entry/bill-of-lading/edit/${item.id}`} className="inline-block text-blue-500 hover:text-blue-700">
+                    <Edit size={16} className="inline-block" />
                   </Link>
                 </InvoiceTableCell>
                 <InvoiceTableCell>{item.blNumber}</InvoiceTableCell>
@@ -71,18 +71,20 @@ const BillOfLadingTable = ({
                   </span>
                 </InvoiceTableCell>
                 <InvoiceTableCell className="text-center">
-                  <Printer 
-                    size={16} 
-                    className="text-green-500 inline-block cursor-pointer" 
+                  <button
                     onClick={() => handlePrintClick(item.id)}
-                  />
+                    className="text-green-500 hover:text-green-700"
+                  >
+                    <Printer size={16} className="inline-block" />
+                  </button>
                 </InvoiceTableCell>
                 <InvoiceTableCell className="text-center">
-                  <Trash 
-                    size={16} 
-                    className="text-red-500 inline-block cursor-pointer" 
+                  <button
                     onClick={() => handleDeleteClick(item.id)}
-                  />
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <Trash size={16} className="inline-block" />
+                  </button>
                 </InvoiceTableCell>
               </TableRow>
             ))
