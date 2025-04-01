@@ -1,15 +1,19 @@
 
 import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
+import { generateNextBoxNumber } from "../../utils/autoGenerators";
+import { PackageItem } from "../../types/invoiceForm";
 
 interface DimensionsInputsProps {
   formState: any;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  packageItems?: PackageItem[];
 }
 
 const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
   formState,
   handleInputChange,
+  packageItems = [],
 }) => {
   // Calculate cubic meter when dimensions change
   useEffect(() => {
@@ -32,6 +36,25 @@ const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
       }
     }
   }, [formState.length, formState.width, formState.height, handleInputChange]);
+
+  // Auto-generate box number
+  useEffect(() => {
+    // Get existing box numbers
+    const existingBoxNumbers = packageItems.map(item => item.boxNumber);
+    // Generate next box number
+    const nextBoxNumber = generateNextBoxNumber(existingBoxNumbers);
+    
+    if (!formState.boxNumber) {
+      const event = {
+        target: {
+          name: "boxNumber",
+          value: nextBoxNumber
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      
+      handleInputChange(event);
+    }
+  }, [packageItems, formState.boxNumber, handleInputChange]);
 
   return (
     <>
@@ -102,7 +125,9 @@ const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
           name="boxNumber"
           value={formState.boxNumber}
           onChange={handleInputChange}
-          className="border border-gray-300"
+          className="border border-gray-300 bg-gray-50"
+          readOnly
+          title="Box number is automatically generated"
         />
       </div>
       

@@ -3,6 +3,7 @@ import React from "react";
 import PackageSelector from "./PackageSelector";
 import PackageList from "./PackageList";
 import { PackageOption } from "@/data/packageOptions";
+import { PackageItem } from "../types/invoiceForm";
 
 interface PackageDetailsSectionProps {
   formState: any;
@@ -11,7 +12,7 @@ interface PackageDetailsSectionProps {
   handlePackageSelect: (description: string) => void;
   handleManualPackage?: (packageName: string, price: string) => void;
   handleAddPackage: () => void;
-  packageItems: any[];
+  packageItems: PackageItem[];
   handleRemovePackage: (id: string) => void;
 }
 
@@ -38,6 +39,7 @@ const PackageDetailsSection: React.FC<PackageDetailsSectionProps> = ({
         handlePackageSelect={handlePackageSelect}
         handleManualPackage={handleManualPackage}
         handleAddPackage={handleAddPackage}
+        packageItems={packageItems}
       />
       
       <PackageList 

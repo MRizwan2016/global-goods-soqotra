@@ -6,6 +6,7 @@ import PriceFields from "./package-selector/PriceFields";
 import PackageNameSelector from "./package-selector/PackageNameSelector";
 import ManualPackageDialog from "./package-selector/ManualPackageDialog";
 import AddPackageButton from "./package-selector/AddPackageButton";
+import { PackageItem } from "../types/invoiceForm";
 
 interface PackageSelectorProps {
   formState: any;
@@ -14,6 +15,7 @@ interface PackageSelectorProps {
   handlePackageSelect: (description: string) => void;
   handleManualPackage?: (packageName: string, price: string) => void;
   handleAddPackage: () => void;
+  packageItems: PackageItem[];
 }
 
 const PackageSelector: React.FC<PackageSelectorProps> = ({
@@ -23,6 +25,7 @@ const PackageSelector: React.FC<PackageSelectorProps> = ({
   handlePackageSelect,
   handleManualPackage,
   handleAddPackage,
+  packageItems,
 }) => {
   const [showManualDialog, setShowManualDialog] = useState(false);
 
@@ -49,6 +52,7 @@ const PackageSelector: React.FC<PackageSelectorProps> = ({
       <DimensionsInputs 
         formState={formState}
         handleInputChange={handleInputChange}
+        packageItems={packageItems}
       />
       
       <AddPackageButton handleAddPackage={handleAddPackage} />

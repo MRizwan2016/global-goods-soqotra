@@ -105,7 +105,8 @@ export const useFormHandling = (
       [name]: value
     }));
 
-    // If country changes, update the sector and warehouse
+    // If country changes, update the sector and warehouse only
+    // But DON'T update destination
     if (name === 'country') {
       const sectorForCountry = countrySectorMap[value as keyof typeof countrySectorMap];
       const countryWarehouses = warehouseOptions[value] || [];
