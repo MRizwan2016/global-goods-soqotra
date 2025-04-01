@@ -53,11 +53,12 @@ const InvoiceActionButton: React.FC<InvoiceActionButtonProps> = ({
 
   const { text, icon, variant, classes } = getButtonConfig();
 
-  // Simplified click handler that directly calls the provided function
+  // Simple click handler with proper event stopping
   const handleButtonClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     console.log(`InvoiceActionButton clicked: ${type}`);
+    // Call the provided onClick handler
     onClick();
   };
 

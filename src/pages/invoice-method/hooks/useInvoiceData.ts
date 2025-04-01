@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { mockInvoiceData } from "@/data/mockData";
-import { Invoice } from "../components/status-tabs/Invoice";
+import { Invoice } from "../types/invoice";
 
 export const useInvoiceData = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);

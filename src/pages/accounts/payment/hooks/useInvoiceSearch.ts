@@ -16,9 +16,15 @@ export const useInvoiceSearch = () => {
       try {
         console.log("Found stored invoice in sessionStorage:", storedInvoice);
         const parsedInvoice = JSON.parse(storedInvoice);
+        
+        // Set the invoice prefix to help with debugging
+        setInvoicePrefix(parsedInvoice.invoiceNumber || "");
+        
+        // Set the selected invoice
         setSelectedInvoice(parsedInvoice);
         
-        // No need to clear from session storage here, the handleSelectInvoice will do it
+        // Clear from session storage to prevent reuse
+        sessionStorage.removeItem('selectedInvoice');
         
         toast.success("Invoice loaded", {
           description: `Invoice ${parsedInvoice.invoiceNumber} has been loaded for payment`,
@@ -36,7 +42,9 @@ export const useInvoiceSearch = () => {
 
   // Handle invoice search automatically when prefix changes
   useEffect(() => {
-    handleInvoiceSearch();
+    if (invoicePrefix) {
+      handleInvoiceSearch();
+    }
   }, [invoicePrefix]);
 
   // Handle invoice search
@@ -91,23 +99,26 @@ export const useInvoiceSearch = () => {
         },
         {
           id: "2",
-          invoiceNumber: `INV-${invoicePrefix}002`,
-          date: new Date().toISOString().split('T')[0],
-          net: 1800,
+          invoiceNumber: "13136051",
+          date: "2025-04-01",
+          net: 250,
           paid: false,
-          bookingForm: "BF-002",
-          shipper: "DEF Ltd",
-          shipper1: "DEF Ltd",
-          consignee: "UVW Inc",
-          consignee1: "UVW Inc",
-          warehouse: "Warehouse B",
-          shipmentType: "SEA",
-          grossAmount: 2000,
-          discount: 200,
-          netAmount: 1800,
-          totalPaid: 1000,
-          balanceToPay: 800,
-          currency: "USD"
+          bookingForm: "BF-13136051",
+          shipper: "MR. SOORIYAPPERUMA",
+          shipper1: "MR. SOORIYAPPERUMA",
+          consignee: "MRS. FERNANDO",
+          consignee1: "MRS. FERNANDO",
+          warehouse: "Doha Warehouse",
+          shipmentType: "Air Freight",
+          freightType: "Air Freight",
+          grossAmount: 250,
+          gross: 250,
+          discount: 0,
+          netAmount: 250,
+          totalPaid: 0,
+          balanceToPay: 250,
+          currency: "QAR",
+          country: "Qatar"
         }
       ];
     }
