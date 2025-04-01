@@ -24,7 +24,7 @@ export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
       // Store the selected invoice in sessionStorage for the payment page
       sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
       
-      // Use direct window location with absolute path to avoid routing issues
+      // Force navigation to the add payment page using absolute path
       window.location.href = '/accounts/payment/add';
       
       // Show a toast notification

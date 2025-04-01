@@ -53,17 +53,17 @@ const InvoiceActionButton: React.FC<InvoiceActionButtonProps> = ({
 
   const { text, icon, variant, classes } = getButtonConfig();
 
-  // Add a debugging handler for the button click
+  // Force the click event to bypass default handling completely
   const handleButtonClick = (e: React.MouseEvent) => {
-    // Prevent the default behavior
     e.preventDefault();
     e.stopPropagation();
     
-    // Log what button was clicked
-    console.log(`Button clicked: ${type}`);
+    console.log(`InvoiceActionButton clicked: ${type}`);
     
-    // Call the provided click handler
-    onClick();
+    // Call the provided click handler with a slight delay to ensure event handling is complete
+    setTimeout(() => {
+      onClick();
+    }, 50);
   };
 
   return (
