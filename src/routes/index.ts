@@ -4,7 +4,8 @@ import { masterDataRoutes } from "./masterDataRoutes";
 import { reportsRoutes } from "./reportsRoutes";
 import { kenyaRoutes } from "./kenyaRoutes";
 import { qatarRoutes } from "./qatarRoutes";
-import { accountsRoutes } from "./accountsRoutes";
+// Fix: Correcting the import to use default export
+import accountsRoutes from "./accountsRoutes";
 import { adminRoutes } from "./adminRoutes";
 import { authRoutes } from "./authRoutes";
 import { printDocumentsRoutes } from "./printDocumentsRoutes";
