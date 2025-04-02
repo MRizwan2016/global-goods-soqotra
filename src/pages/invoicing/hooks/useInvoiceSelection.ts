@@ -41,6 +41,20 @@ export const useInvoiceSelection = (
   }, [isEditing]);
   
   const handleSelectInvoice = (invoiceNumber: string) => {
+    // Check if this invoice number is already used
+    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const isDuplicate = existingInvoices.some((inv: any) => inv.invoiceNumber === invoiceNumber);
+    
+    // Also check generated invoices
+    const generatedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
+    const isDuplicateInGenerated = generatedInvoices.some((inv: any) => inv.invoiceNumber === invoiceNumber);
+    
+    if (isDuplicate || isDuplicateInGenerated) {
+      toast.warning("Duplicate Invoice Number", { 
+        description: `Invoice number ${invoiceNumber} is already assigned to another customer`
+      });
+    }
+    
     // Find the selected invoice in our available invoices
     const selectedInvoice = availableInvoices.find(
       invoice => invoice.invoiceNumber === invoiceNumber

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { 
   Table, 
@@ -10,7 +9,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { FilePlus, Search, ArrowUpDown } from "lucide-react";
+import { FilePlus, Search, ArrowUpDown, AlertCircle } from "lucide-react";
 import { mockInvoiceData } from "@/data/mockData";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
@@ -30,8 +29,20 @@ const InvoiceAssignment: React.FC = () => {
   const [unsettledInvoices, setUnsettledInvoices] = useState<UnsettledInvoice[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [nextInvoiceNumber, setNextInvoiceNumber] = useState("GY 13136051");
+  const [usedInvoiceNumbers, setUsedInvoiceNumbers] = useState<string[]>([]);
   
   useEffect(() => {
+    // Get all used invoice numbers from existing invoices
+    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const existingNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
+    
+    // Also check generated invoices
+    const generatedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
+    const generatedNumbers = generatedInvoices.map((inv: any) => inv.invoiceNumber);
+    
+    // Combine all used invoice numbers
+    setUsedInvoiceNumbers([...existingNumbers, ...generatedNumbers]);
+    
     // Generate mock unsettled invoices based on mockInvoiceData
     const mockUnsettled: UnsettledInvoice[] = mockInvoiceData
       .filter(invoice => !invoice.paid && invoice.invoiceNumber === "")
@@ -59,30 +70,65 @@ const InvoiceAssignment: React.FC = () => {
   const generateNextInvoiceNumber = (current: string) => {
     const prefix = current.split(" ")[0];
     const number = parseInt(current.split(" ")[1]);
-    return `${prefix} ${(number + 1).toString().padStart(8, '0')}`;
+    let nextNumber = number + 1;
+    
+    // Keep incrementing until we find an unused number
+    let nextInvoiceNum = `${prefix} ${nextNumber.toString().padStart(8, '0')}`;
+    while (usedInvoiceNumbers.includes(nextInvoiceNum)) {
+      nextNumber++;
+      nextInvoiceNum = `${prefix} ${nextNumber.toString().padStart(8, '0')}`;
+    }
+    
+    return nextInvoiceNum;
   };
 
   const handleAssignInvoiceNumber = (id: string) => {
+    // Check if the current invoice number is already used
+    if (usedInvoiceNumbers.includes(nextInvoiceNumber)) {
+      toast.error(`Invoice number ${nextInvoiceNumber} is already assigned to another customer`);
+      
+      // Find the next available invoice number
+      setNextInvoiceNumber(generateNextInvoiceNumber(nextInvoiceNumber));
+      return;
+    }
+    
     setUnsettledInvoices(prevInvoices => {
       return prevInvoices.map(invoice => {
         if (invoice.id === id) {
           const newInvoice = { ...invoice, invoiceNumber: nextInvoiceNumber };
+          
+          // Add to used invoice numbers
+          setUsedInvoiceNumbers(prev => [...prev, nextInvoiceNumber]);
+          
+          // Generate the next available invoice number
           setNextInvoiceNumber(generateNextInvoiceNumber(nextInvoiceNumber));
           return newInvoice;
         }
         return invoice;
       });
     });
+    
     toast.success(`Invoice number ${nextInvoiceNumber} assigned`);
   };
 
   const handleAssignAllInvoices = () => {
     let currentInvoiceNumber = nextInvoiceNumber;
+    let newUsedNumbers: string[] = [...usedInvoiceNumbers];
     
     setUnsettledInvoices(prevInvoices => {
       return prevInvoices.map(invoice => {
         if (!invoice.invoiceNumber) {
+          // Skip used invoice numbers
+          while (newUsedNumbers.includes(currentInvoiceNumber)) {
+            currentInvoiceNumber = generateNextInvoiceNumber(currentInvoiceNumber);
+          }
+          
           const newInvoice = { ...invoice, invoiceNumber: currentInvoiceNumber };
+          
+          // Add to used invoice numbers
+          newUsedNumbers.push(currentInvoiceNumber);
+          
+          // Generate the next invoice number
           currentInvoiceNumber = generateNextInvoiceNumber(currentInvoiceNumber);
           return newInvoice;
         }
@@ -90,7 +136,10 @@ const InvoiceAssignment: React.FC = () => {
       });
     });
     
+    // Update the state with all new used numbers
+    setUsedInvoiceNumbers(newUsedNumbers);
     setNextInvoiceNumber(currentInvoiceNumber);
+    
     toast.success("All missing invoices have been assigned numbers");
   };
 
@@ -145,8 +194,13 @@ const InvoiceAssignment: React.FC = () => {
             {filteredInvoices.map((invoice, index) => (
               <TableRow key={invoice.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                 <TableCell className="text-center">{index + 1}</TableCell>
-                <TableCell className="text-center font-medium">
+                <TableCell className="text-center font-medium relative">
                   {invoice.invoiceNumber || "-"}
+                  {invoice.invoiceNumber && usedInvoiceNumbers.filter(num => num === invoice.invoiceNumber).length > 1 && (
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2">
+                      <AlertCircle size={16} className="text-red-500" />
+                    </span>
+                  )}
                 </TableCell>
                 <TableCell className="text-center">{invoice.gy}</TableCell>
                 <TableCell>{invoice.shipper}</TableCell>

@@ -36,6 +36,20 @@ export const useSaveInvoice = ({
       return;
     }
     
+    // Check for duplicate invoice number before saving (as an extra precaution)
+    if (!isEditing) {
+      const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+      const isDuplicate = existingInvoices.some((invoice: any) => 
+        invoice.invoiceNumber === formState.invoiceNumber && 
+        (!id || invoice.id !== id)
+      );
+      
+      if (isDuplicate) {
+        toast.error(`Invoice number ${formState.invoiceNumber} is already assigned to another customer`);
+        return;
+      }
+    }
+    
     try {
       console.log("Saving invoice with data:", { formState, packageItems, isEditing, id });
       

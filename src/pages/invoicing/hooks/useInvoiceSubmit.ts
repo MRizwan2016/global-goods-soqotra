@@ -9,6 +9,26 @@ export const useInvoiceSubmit = () => {
       throw new Error("Invoice number is required");
     }
     
+    // Check for duplicate invoice number if creating a new invoice
+    if (!isEditing) {
+      const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+      const isDuplicate = existingInvoices.some((invoice: any) => 
+        invoice.invoiceNumber === formState.invoiceNumber && 
+        (!id || invoice.id !== id) // Allow same invoice number for the same record when editing
+      );
+      
+      // Also check generated invoices
+      const generatedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
+      const isDuplicateInGenerated = generatedInvoices.some((invoice: any) => 
+        invoice.invoiceNumber === formState.invoiceNumber
+      );
+      
+      if (isDuplicate || isDuplicateInGenerated) {
+        toast.error(`Invoice number ${formState.invoiceNumber} is already assigned to another customer`);
+        throw new Error("Duplicate invoice number");
+      }
+    }
+    
     console.log("Saving invoice:", { ...formState, packageItems });
     
     // In a real app, this would be an API call
