@@ -28,15 +28,13 @@ const UnsettledInvoicesTable: React.FC<UnsettledInvoicesTableProps> = ({ unsettl
               {unsettledInvoices && unsettledInvoices.length > 0 ? (
                 unsettledInvoices.map((item) => (
                   <tr key={item.id} className="border-b hover:bg-gray-50 transition-colors">
-                    <td className="p-2 border">{item.invoiceNumber || 'N/A'}</td>
+                    <td className="p-2 border">{item.invoiceNumber}</td>
                     <td className="p-2 border">{item.shipper}</td>
                     <td className="p-2 border">{item.consignee}</td>
-                    <td className="p-2 border">${item.amount ? item.amount.toFixed(2) : '0.00'}</td>
+                    <td className="p-2 border">${item.amount.toFixed(2)}</td>
                     <td className="p-2 border">
-                      <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                        item.paid ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
-                      }`}>
-                        {item.paid ? "PAID" : "UNPAID"}
+                      <span className={`px-2 py-1 rounded text-xs ${item.paid ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        {item.paid ? 'PAID' : 'UNPAID'}
                       </span>
                     </td>
                   </tr>
@@ -44,7 +42,7 @@ const UnsettledInvoicesTable: React.FC<UnsettledInvoicesTableProps> = ({ unsettl
               ) : (
                 <tr>
                   <td colSpan={5} className="p-4 text-center text-gray-500 border">
-                    NO UNSETTLED INVOICES
+                    NO UNSETTLED INVOICES FOUND
                   </td>
                 </tr>
               )}

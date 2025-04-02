@@ -52,6 +52,11 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     handlePrint
   } = useContainerManifest(containerId, onManifestSubmitted);
   
+  console.log("Container Manifest Component - containerId:", containerId);
+  console.log("Container Manifest Component - container:", container);
+  console.log("Container Manifest Component - cargoItems:", cargoItems);
+  console.log("Container Manifest Component - error:", error);
+  
   // Add effect to handle cleanup when component unmounts
   useEffect(() => {
     return () => {

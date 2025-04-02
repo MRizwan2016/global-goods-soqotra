@@ -17,6 +17,8 @@ export const useContainerData = (containerId: string) => {
   
   // Load container data
   useEffect(() => {
+    console.log("Loading container data for ID:", containerId);
+    
     if (!containerId) {
       setError("No container ID provided.");
       setIsLoading(false);
@@ -48,7 +50,13 @@ export const useContainerData = (containerId: string) => {
                 setCargoItems(parsedCargoItems);
               } catch (err) {
                 console.error("Error parsing saved cargo items:", err);
+                // If there's an error parsing, fall back to empty array
+                setCargoItems([]);
               }
+            } else {
+              // If no saved cargo items are found, set empty array
+              setCargoItems([]);
+              console.warn("No cargo items found in localStorage for container", containerId);
             }
             
             // Set confirm date to today if not already set
@@ -86,6 +94,7 @@ export const useContainerData = (containerId: string) => {
           
           // Set confirm date to today
           setConfirmDate(new Date().toLocaleDateString("en-GB", {day: "2-digit", month: "2-digit", year: "numeric"}));
+          setIsLoading(false);
         } else {
           console.error(`Container not found with ID: ${containerId}`);
           setError(`Container with ID ${containerId} not found. Please check the container ID and try again.`);
@@ -93,6 +102,7 @@ export const useContainerData = (containerId: string) => {
             description: "The requested container could not be located in the system.",
             duration: 5000
           });
+          setIsLoading(false);
         }
       } catch (err) {
         console.error("Error loading container data:", err);
@@ -101,7 +111,6 @@ export const useContainerData = (containerId: string) => {
           description: "There was an error retrieving the container information.",
           duration: 5000
         });
-      } finally {
         setIsLoading(false);
       }
     }, 800); // Added delay to make loading state visible
