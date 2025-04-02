@@ -51,7 +51,8 @@ export const useInvoiceSelection = (
     
     if (isDuplicate || isDuplicateInGenerated) {
       toast.warning("Duplicate Invoice Number", { 
-        description: `Invoice number ${invoiceNumber} is already assigned to another customer`
+        description: `Invoice number ${invoiceNumber} is already assigned to another customer`,
+        duration: 5000
       });
     }
     

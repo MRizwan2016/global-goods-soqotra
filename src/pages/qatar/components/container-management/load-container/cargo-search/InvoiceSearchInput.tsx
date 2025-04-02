@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
@@ -12,9 +12,9 @@ interface InvoiceSuggestion {
 }
 
 interface InvoiceSearchInputProps {
-  value: string; // Added to match passed props
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; // Added to match passed props
-  onKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void; // Added to match passed props
+  value: string; 
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; 
+  onKeyPress?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   bookingFormSuggestions?: InvoiceSuggestion[];
   showSuggestions?: boolean;
   setShowSuggestions?: (show: boolean) => void;
@@ -34,6 +34,22 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
   bookingForm,
   onBookingFormChange,
 }) => {
+  // Handle input focus to show suggestions when at least 3 characters are typed
+  const handleInputFocus = () => {
+    if (value && value.length >= 3 && bookingFormSuggestions.length > 0) {
+      setShowSuggestions(true);
+    }
+  };
+
+  // Watch for value changes to show suggestions when typing
+  useEffect(() => {
+    if (value && value.length >= 3 && bookingFormSuggestions.length > 0) {
+      setShowSuggestions(true);
+    } else if (value.length < 3) {
+      setShowSuggestions(false);
+    }
+  }, [value, bookingFormSuggestions, setShowSuggestions]);
+
   return (
     <div className="relative">
       <Label className="font-bold text-gray-700 mb-1 block">GY/INVOICE NUMBER:</Label>
@@ -44,7 +60,7 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
           onChange={onChange}
           placeholder="GY/INVOICE"
           className="flex-1"
-          onFocus={() => bookingFormSuggestions.length > 0 && setShowSuggestions(true)}
+          onFocus={handleInputFocus}
           onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
           onKeyDown={onKeyPress}
         />
@@ -52,18 +68,22 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
       
       {showSuggestions && (
         <div className="absolute w-full bg-white border border-gray-300 rounded shadow-lg z-50 mt-1 max-h-60 overflow-y-auto">
-          {bookingFormSuggestions.map((invoice, index) => (
-            <div
-              key={index}
-              className="p-2 hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
-              onClick={() => onSelectInvoice(invoice)}
-            >
-              <div className="font-medium">{invoice.invoiceNumber}</div>
-              <div className="text-sm text-gray-600">
-                {invoice.shipper} → {invoice.consignee}
+          {bookingFormSuggestions.length > 0 ? (
+            bookingFormSuggestions.map((invoice, index) => (
+              <div
+                key={index}
+                className="p-2 hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
+                onClick={() => onSelectInvoice(invoice)}
+              >
+                <div className="font-medium">{invoice.invoiceNumber}</div>
+                <div className="text-sm text-gray-600">
+                  {invoice.shipper} → {invoice.consignee}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div className="p-2 text-gray-500">No matching invoices found</div>
+          )}
         </div>
       )}
     </div>

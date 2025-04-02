@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ContainerCargo } from "../../../types/containerTypes";
 import { toast } from "sonner";
-import { Search, Barcode, FileSearch, Package, Plus } from "lucide-react";
+import { Search, Barcode, FileSearch, Package, Plus, AlertCircle } from "lucide-react";
 import BarcodeSearch from "./cargo-search/BarcodeSearch";
 import InvoiceSearchInput from "./cargo-search/InvoiceSearchInput";
 import CargoDetailsInputs from "./cargo-search/CargoDetailsInputs";
@@ -21,58 +21,15 @@ interface CargoSearchFormProps {
   existingCargo: ContainerCargo[];
 }
 
-// Mock search results
-const mockInvoiceSearch = (query: string): any[] => {
-  if (!query) return [];
-  return [
-    {
-      id: "mock1",
-      invoiceNumber: query,
-      lineNumber: "LN001",
-      packageName: "General Cargo",
-      volume: 1.2,
-      weight: 300,
-      shipper: "Qatar Trading Co.",
-      consignee: "Kenya Imports Ltd",
-      barcode: "BC123456789",
-      wh: "WH001",
-      d2d: true,
-      quantity: 1
-    },
-    {
-      id: "mock2",
-      invoiceNumber: query,
-      lineNumber: "LN002",
-      packageName: "Electronics",
-      volume: 0.8,
-      weight: 150,
-      shipper: "Tech Distributors LLC",
-      consignee: "Digital Solutions Kenya",
-      barcode: "BC987654321",
-      wh: "WH002",
-      d2d: false,
-      quantity: 1
-    }
-  ];
-};
-
-const mockBarcodeSearch = (barcode: string): any | null => {
-  if (!barcode) return null;
-  return {
-    id: "mock-barcode",
-    invoiceNumber: "INV" + barcode.substring(2, 7),
-    lineNumber: "LN003",
-    packageName: "Barcode Item",
-    volume: 0.5,
-    weight: 75,
-    shipper: "Barcode Shipper",
-    consignee: "Barcode Consignee",
-    barcode: barcode,
-    wh: "WH003",
-    d2d: true,
-    quantity: 1
-  };
-};
+interface InvoiceSuggestion {
+  invoiceNumber: string;
+  shipper: string;
+  consignee: string;
+  packageName?: string;
+  volume?: number;
+  weight?: number;
+  id?: string;
+}
 
 const CargoSearchForm: React.FC<CargoSearchFormProps> = ({ 
   containerId, 
@@ -84,6 +41,8 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
   const [barcodeQuery, setBarcodeQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [selectedResult, setSelectedResult] = useState<any | null>(null);
+  const [invoiceSuggestions, setInvoiceSuggestions] = useState<InvoiceSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [cargoForm, setCargoForm] = useState({
     invoiceNumber: "",
     lineNumber: "",
@@ -98,6 +57,63 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
     quantity: "1"
   });
 
+  // Fetch invoice data from localStorage when component mounts
+  useEffect(() => {
+    // Get all saved invoices from localStorage
+    const savedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    
+    // Also check generated invoices if they exist
+    const generatedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
+    
+    // Combine the invoices
+    const allInvoices = [...savedInvoices, ...generatedInvoices];
+    
+    // Map to the format needed for suggestions
+    const mappedInvoices = allInvoices.map(invoice => ({
+      id: invoice.id,
+      invoiceNumber: invoice.invoiceNumber,
+      shipper: invoice.shipper1 || invoice.shipper || "Unknown Shipper",
+      consignee: invoice.consignee1 || invoice.consignee || "Unknown Consignee",
+      packageName: invoice.packageName || "General Cargo",
+      volume: calculateTotalVolume(invoice),
+      weight: calculateTotalWeight(invoice)
+    }));
+    
+    // Store for later use
+    localStorage.setItem('availableInvoices', JSON.stringify(mappedInvoices));
+    
+    console.log("Loaded invoice data for container loading:", mappedInvoices.length, "invoices");
+  }, []);
+
+  // Calculate total volume for an invoice (from packageDetails)
+  const calculateTotalVolume = (invoice: any): number => {
+    if (!invoice.packageDetails || !Array.isArray(invoice.packageDetails)) return 0;
+    return invoice.packageDetails.reduce((total: number, pkg: any) => total + (parseFloat(pkg.volume) || 0), 0);
+  };
+
+  // Calculate total weight for an invoice (from packageDetails)
+  const calculateTotalWeight = (invoice: any): number => {
+    if (!invoice.packageDetails || !Array.isArray(invoice.packageDetails)) return 0;
+    return invoice.packageDetails.reduce((total: number, pkg: any) => total + (parseFloat(pkg.weight) || 0), 0);
+  };
+  
+  // Filter invoice suggestions based on query
+  useEffect(() => {
+    if (invoiceQuery.length >= 3) {
+      const availableInvoices: InvoiceSuggestion[] = JSON.parse(localStorage.getItem('availableInvoices') || '[]');
+      
+      const filteredInvoices = availableInvoices.filter(invoice => 
+        invoice.invoiceNumber.includes(invoiceQuery)
+      );
+      
+      setInvoiceSuggestions(filteredInvoices);
+      setShowSuggestions(filteredInvoices.length > 0);
+    } else {
+      setInvoiceSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [invoiceQuery]);
+
   // Handle invoice search
   const handleInvoiceSearch = () => {
     if (!invoiceQuery) {
@@ -105,7 +121,12 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
       return;
     }
     
-    const results = mockInvoiceSearch(invoiceQuery);
+    // Search in all available invoices
+    const availableInvoices = JSON.parse(localStorage.getItem('availableInvoices') || '[]');
+    const results = availableInvoices.filter((invoice: any) => 
+      invoice.invoiceNumber.includes(invoiceQuery)
+    );
+    
     setSearchResults(results);
     
     if (results.length === 0) {
@@ -120,31 +141,80 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
       return;
     }
     
-    const result = mockBarcodeSearch(barcodeQuery);
+    const mockResult = {
+      id: "mock-barcode",
+      invoiceNumber: "INV" + barcodeQuery.substring(2, 7),
+      lineNumber: "LN003",
+      packageName: "Barcode Item",
+      volume: 0.5,
+      weight: 75,
+      shipper: "Barcode Shipper",
+      consignee: "Barcode Consignee",
+      barcode: barcodeQuery,
+      wh: "WH003",
+      d2d: true,
+      quantity: 1
+    };
     
-    if (result) {
-      setSelectedResult(result);
-      // Prefill the form with the result data
-      setCargoForm({
-        invoiceNumber: result.invoiceNumber,
-        lineNumber: result.lineNumber,
-        barcode: result.barcode,
-        packageName: result.packageName,
-        volume: result.volume.toString(),
-        weight: result.weight.toString(),
-        shipper: result.shipper,
-        consignee: result.consignee,
-        wh: result.wh || "WH001",
-        d2d: result.d2d || false,
-        quantity: result.quantity?.toString() || "1"
-      });
-      toast.success("Item found: " + result.packageName);
-    } else {
-      toast.error("No result found for barcode: " + barcodeQuery);
-    }
+    setSelectedResult(mockResult);
+    // Prefill the form with the result data
+    setCargoForm({
+      invoiceNumber: mockResult.invoiceNumber,
+      lineNumber: mockResult.lineNumber,
+      barcode: mockResult.barcode,
+      packageName: mockResult.packageName,
+      volume: mockResult.volume.toString(),
+      weight: mockResult.weight.toString(),
+      shipper: mockResult.shipper,
+      consignee: mockResult.consignee,
+      wh: mockResult.wh || "WH001",
+      d2d: mockResult.d2d || false,
+      quantity: mockResult.quantity?.toString() || "1"
+    });
+    toast.success("Item found: " + mockResult.packageName);
   };
 
-  // Select a result from the search results
+  // Handle selecting an invoice from the suggestions dropdown
+  const handleSelectInvoice = (invoice: InvoiceSuggestion) => {
+    setInvoiceQuery(invoice.invoiceNumber);
+    setShowSuggestions(false);
+    
+    // Create a result object from the selected invoice
+    const result = {
+      id: invoice.id || uuidv4(),
+      invoiceNumber: invoice.invoiceNumber,
+      lineNumber: `LN${Math.floor(1000 + Math.random() * 9000)}`,
+      packageName: invoice.packageName || "General Cargo",
+      volume: invoice.volume || 1,
+      weight: invoice.weight || 100,
+      shipper: invoice.shipper,
+      consignee: invoice.consignee,
+      barcode: `BC${Math.floor(100000000 + Math.random() * 900000000)}`,
+      wh: "WH001",
+      d2d: false,
+      quantity: 1
+    };
+    
+    setSelectedResult(result);
+    // Prefill the form
+    setCargoForm({
+      invoiceNumber: result.invoiceNumber,
+      lineNumber: result.lineNumber,
+      barcode: result.barcode,
+      packageName: result.packageName,
+      volume: result.volume.toString(),
+      weight: result.weight.toString(),
+      shipper: result.shipper,
+      consignee: result.consignee,
+      wh: "WH001",
+      d2d: false,
+      quantity: "1"
+    });
+    
+    toast.success(`Invoice ${invoice.invoiceNumber} selected`);
+  };
+
+  // Select a result from the search results table
   const handleSelectResult = (result: any) => {
     setSelectedResult(result);
     // Prefill the form with the result data
@@ -180,13 +250,18 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
       return;
     }
     
-    // Check if this item is already in the container
+    // Check if this invoice+barcode combination is already in the container
     const isDuplicate = existingCargo.some(item => 
-      item.barcode === cargoForm.barcode && cargoForm.barcode !== ""
+      item.invoiceNumber === cargoForm.invoiceNumber && 
+      item.barcode === cargoForm.barcode && 
+      cargoForm.barcode !== ""
     );
     
     if (isDuplicate) {
-      toast.error("This item is already in the container");
+      toast.error("This package is already loaded in the container", {
+        description: "Each package can only be loaded once",
+        icon: <AlertCircle className="h-5 w-5 text-red-500" />
+      });
       return;
     }
     
@@ -261,6 +336,10 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
                   value={invoiceQuery}
                   onChange={(e) => setInvoiceQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleInvoiceSearch()}
+                  bookingFormSuggestions={invoiceSuggestions}
+                  showSuggestions={showSuggestions}
+                  setShowSuggestions={setShowSuggestions}
+                  onSelectInvoice={handleSelectInvoice}
                 />
               </div>
               <Button onClick={handleInvoiceSearch} className="flex-shrink-0">

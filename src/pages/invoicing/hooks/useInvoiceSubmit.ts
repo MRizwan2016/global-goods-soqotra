@@ -59,12 +59,30 @@ export const useInvoiceSubmit = () => {
         existingInvoices.push(completeInvoice);
       }
     } else {
+      // Double check for duplicates just before saving
+      const isDuplicateBeforeSave = existingInvoices.some((invoice: any) => 
+        invoice.invoiceNumber === formState.invoiceNumber
+      );
+      
+      if (isDuplicateBeforeSave) {
+        toast.error(`Invoice number ${formState.invoiceNumber} was just assigned to another customer`);
+        throw new Error("Duplicate invoice number detected before saving");
+      }
+      
       // Add new invoice
       existingInvoices.push(completeInvoice);
     }
     
     // Save to localStorage
     localStorage.setItem('invoices', JSON.stringify(existingInvoices));
+    
+    // Also save an easily accessible list of invoice numbers for checking duplicates
+    try {
+      const invoiceNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
+      localStorage.setItem('usedInvoiceNumbers', JSON.stringify(invoiceNumbers));
+    } catch (error) {
+      console.error("Error saving invoice numbers list:", error);
+    }
     
     console.log(`Invoice ${isEditing ? 'updated' : 'created'} with ID: ${invoiceId}`);
     console.log("Current invoices in localStorage:", existingInvoices);

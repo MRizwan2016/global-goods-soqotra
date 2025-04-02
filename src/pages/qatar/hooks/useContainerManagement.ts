@@ -16,6 +16,18 @@ export const useContainerManagement = () => {
     orientation: "portrait"
   });
 
+  // Load previously saved cargo items
+  useEffect(() => {
+    try {
+      const savedCargoItems = localStorage.getItem('cargoItems');
+      if (savedCargoItems) {
+        setCargoItems(JSON.parse(savedCargoItems));
+      }
+    } catch (error) {
+      console.error("Error loading cargo items:", error);
+    }
+  }, []);
+
   // Add event listener for manifest view
   useEffect(() => {
     const handleViewManifest = (event: CustomEvent) => {
@@ -93,7 +105,28 @@ export const useContainerManagement = () => {
   };
 
   const handleAddCargo = (cargo: ContainerCargo) => {
-    setCargoItems(prev => [...prev, cargo]);
+    // Check if this cargo is already in the container
+    const existingCargoItems = getCurrentCargoItems();
+    const isDuplicate = existingCargoItems.some(item => 
+      item.invoiceNumber === cargo.invoiceNumber && 
+      item.barcode === cargo.barcode
+    );
+    
+    if (isDuplicate) {
+      toast.error("This package is already loaded in the container");
+      return;
+    }
+    
+    // Add cargo to the list
+    const updatedCargoItems = [...cargoItems, cargo];
+    setCargoItems(updatedCargoItems);
+    
+    // Save to localStorage for persistence
+    try {
+      localStorage.setItem('cargoItems', JSON.stringify(updatedCargoItems));
+    } catch (error) {
+      console.error("Error saving cargo items:", error);
+    }
     
     // Update container stats
     const containerId = cargo.containerId;
@@ -111,6 +144,8 @@ export const useContainerManagement = () => {
     });
     
     setContainers(updatedContainers);
+    
+    toast.success("Cargo item added to container");
   };
 
   const handleManifestSubmitted = () => {
@@ -157,7 +192,7 @@ export const useContainerManagement = () => {
     const container = containers.find(c => c.id === containerId);
     if (!container) return [];
     
-    // First, look for items directly associated with the container ID
+    // Look for items directly associated with the container ID
     return cargoItems.filter(item => item.containerId === containerId);
   };
 
