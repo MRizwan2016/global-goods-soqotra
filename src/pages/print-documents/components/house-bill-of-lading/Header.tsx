@@ -15,12 +15,12 @@ const Header: React.FC<HeaderProps> = ({
   onChange 
 }) => {
   return (
-    <div className="flex justify-between items-center mb-6">
+    <div className="flex justify-between items-center mb-4">
       <div className="flex-1">
         <img 
           src="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" 
           alt="Soqotra Shipping & Logistics" 
-          className="h-16"
+          className="h-12"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.onerror = null; // Prevent infinite loop
@@ -31,12 +31,12 @@ const Header: React.FC<HeaderProps> = ({
       </div>
       
       <div className="flex-1 text-center">
-        <h1 className="text-2xl font-bold">HOUSE BILL OF LADING</h1>
-        <p className="text-sm">Non-Negotiable</p>
+        <h1 className="text-xl font-bold">HOUSE BILL OF LADING</h1>
+        <p className="text-xs">Non-Negotiable</p>
       </div>
       
       <div className="flex-1 text-right">
-        <div className="mb-2 flex justify-end items-center">
+        <div className="mb-1 flex justify-end items-center">
           <span className="font-semibold mr-2">B/L No:</span>
           {editable ? (
             <input 

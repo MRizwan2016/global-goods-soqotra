@@ -24,6 +24,8 @@ const PrintStyles: React.FC = () => {
           padding: 5mm !important;
           margin: 0 !important;
           box-sizing: border-box;
+          font-size: 11px !important;
+          zoom: 0.9 !important;
         }
 
         /* Make sure tables can expand properly */
@@ -51,7 +53,7 @@ const PrintStyles: React.FC = () => {
           display: block !important;
           visibility: visible !important;
           opacity: 1 !important;
-          max-height: 3cm !important;
+          max-height: 2.5cm !important;
         }
         
         /* Allow text to wrap properly in all cells */
@@ -59,12 +61,32 @@ const PrintStyles: React.FC = () => {
           word-wrap: break-word !important;
           overflow-wrap: break-word !important;
           white-space: normal !important;
+          padding: 4px !important;
         }
         
         /* Fix for whitespace pre-line formatting */
         .whitespace-pre-line {
           white-space: pre-line !important;
           overflow: visible !important;
+        }
+        
+        /* Reduce vertical spacing to fit all content on one page */
+        .house-bill-of-lading .mb-4, 
+        .house-bill-of-lading .mb-6 {
+          margin-bottom: 0.5rem !important;
+        }
+        
+        .house-bill-of-lading .p-3,
+        .house-bill-of-lading .p-4,
+        .house-bill-of-lading .p-8 {
+          padding: 0.5rem !important;
+        }
+        
+        /* Ensure the entire BL fits on one page */
+        .house-bill-of-lading-document {
+          page-break-inside: avoid !important;
+          page-break-after: always !important;
+          page-break-before: auto !important;
         }
       `}
     </style>
