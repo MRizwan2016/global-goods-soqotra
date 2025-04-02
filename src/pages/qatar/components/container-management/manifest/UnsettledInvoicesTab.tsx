@@ -11,8 +11,9 @@ import {
 import { UnsettledInvoice } from "../../../types/containerTypes";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CreditCard } from "lucide-react";
+import { CreditCard, Eye } from "lucide-react";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 interface UnsettledInvoicesTabProps {
   unsettledInvoices: UnsettledInvoice[];
@@ -21,6 +22,8 @@ interface UnsettledInvoicesTabProps {
 const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
   unsettledInvoices,
 }) => {
+  const navigate = useNavigate();
+
   const handleRecordPayment = (invoice: UnsettledInvoice) => {
     console.log("Recording payment for invoice:", invoice);
     
@@ -39,6 +42,13 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
     toast.success("Payment form opened", {
       description: `Processing payment for invoice ${invoice.invoiceNumber}`,
     });
+  };
+
+  const handleViewInvoice = (invoice: UnsettledInvoice) => {
+    console.log("View invoice:", invoice);
+    // Navigate to invoice preview page
+    navigate(`/data-entry/print-documents/invoice-preview/${invoice.id}`);
+    toast.success(`Opening invoice preview for ${invoice.invoiceNumber || 'invoice'}`);
   };
 
   return (
@@ -79,18 +89,30 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center">
-                    {!invoice.paid && (
-                      <Button 
+                    <div className="flex items-center justify-center gap-2">
+                      {!invoice.paid && (
+                        <Button 
+                          size="sm"
+                          variant="outline"
+                          type="button"
+                          className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                          onClick={() => handleRecordPayment(invoice)}
+                        >
+                          <CreditCard className="h-4 w-4 mr-1" />
+                          Record Payment
+                        </Button>
+                      )}
+                      <Button
                         size="sm"
                         variant="outline"
                         type="button"
-                        className="bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
-                        onClick={() => handleRecordPayment(invoice)}
+                        className="bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+                        onClick={() => handleViewInvoice(invoice)}
                       >
-                        <CreditCard className="h-4 w-4 mr-1" />
-                        Record Payment
+                        <Eye className="h-4 w-4 mr-1" />
+                        View
                       </Button>
-                    )}
+                    </div>
                   </TableCell>
                 </TableRow>
               ))

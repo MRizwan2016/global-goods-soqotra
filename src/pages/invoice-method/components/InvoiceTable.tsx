@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Eye, CreditCard, Receipt } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 // Define the Invoice interface to match the one in PaymentReceivable.tsx
 interface Invoice {
@@ -46,6 +47,8 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
   showPayButton,
   payButtonLabel = "Pay"
 }) => {
+  const navigate = useNavigate();
+  
   // Format number for display
   const formatNumber = (value: number | string | undefined): string => {
     if (value === undefined || value === null) return "0.00";
@@ -59,6 +62,11 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
     }
     
     return isNaN(num) ? "0.00" : num.toFixed(2);
+  };
+
+  const handleViewClick = (id: string) => {
+    console.log("View button clicked for invoice ID:", id);
+    onView(id);
   };
 
   return (
@@ -96,7 +104,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => onView(invoice.id)}
+                  onClick={() => handleViewClick(invoice.id)}
                   className="h-8 px-2 text-blue-600"
                 >
                   <Eye className="h-4 w-4 mr-1" />

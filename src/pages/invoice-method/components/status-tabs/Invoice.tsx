@@ -65,7 +65,10 @@ export const InvoiceRow: React.FC<InvoiceRowProps> = ({
             )}
             <InvoiceActionButton 
               type="view"
-              onClick={() => handleViewInvoice(invoice.id)}
+              onClick={() => {
+                console.log("View button clicked for invoice:", invoice.id);
+                handleViewInvoice(invoice.id);
+              }}
             />
           </div>
         </td>
@@ -124,7 +127,10 @@ export const InvoiceRow: React.FC<InvoiceRowProps> = ({
           )}
           <InvoiceActionButton 
             type="view"
-            onClick={() => handleViewInvoice(invoice.id)}
+            onClick={() => {
+              console.log("View button clicked for invoice:", invoice.id);
+              handleViewInvoice(invoice.id);
+            }}
           />
         </div>
       </td>

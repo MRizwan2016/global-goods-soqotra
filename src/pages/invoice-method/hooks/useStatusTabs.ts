@@ -9,69 +9,63 @@ interface UseStatusTabsProps {
 }
 
 export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
-  const [selectedTab, setSelectedTab] = useState<string>("unpaid");
+  const [selectedTab, setSelectedTab] = useState("unpaid");
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [showPaymentDetails, setShowPaymentDetails] = useState(false);
+  const [showReceiptDialog, setShowReceiptDialog] = useState(false);
   const navigate = useNavigate();
-  
-  // Separate invoices by paid status
+
+  // Split invoices into paid and unpaid
   const unpaidInvoices = invoices.filter(invoice => !invoice.paid);
   const paidInvoices = invoices.filter(invoice => invoice.paid);
-  
-  // Handle click on Pay button
+
   const handlePayClick = (invoice: Invoice) => {
-    console.log("Pay clicked for invoice:", invoice.invoiceNumber);
+    console.log("Pay button clicked for invoice:", invoice);
+    setSelectedInvoice(invoice);
     
-    // Store selected invoice in session storage for the payment page
+    // Store the invoice data temporarily to use it in the payment form
     sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
     
-    // Navigate to payment page
+    // Navigate to the payment page
     navigate('/accounts/payment/add');
-  };
-  
-  // Handle click on View button
-  const handleViewInvoice = (id: string) => {
-    console.log("View clicked for invoice ID:", id);
     
-    // Placeholder for view invoice functionality
-    // In a real app, this would navigate to an invoice detail page
-    toast.info(`Viewing invoice details for ID: ${id}`);
-  };
-  
-  // Handle click on Details button for paid invoices
-  const handleViewPaymentDetails = (invoice: Invoice) => {
-    console.log("Details clicked for paid invoice:", invoice.invoiceNumber);
-    
-    // Generate a receipt number based on invoice number
-    const receiptNumber = `R-${invoice.invoiceNumber.substring(invoice.invoiceNumber.length - 4)}`;
-    
-    // Generate receipt data
-    const receiptData = {
-      receiptNumber: receiptNumber,
-      invoiceNumber: invoice.invoiceNumber,
-      date: invoice.paymentDate || invoice.date,
-      customer: invoice.consignee1 || invoice.consignee || invoice.customer || 'Unknown',
-      amount: typeof invoice.net === 'number' ? invoice.net : 
-              typeof invoice.amount === 'number' ? invoice.amount : 
-              invoice.invoiceNumber === "13136051" ? 250 : 0,
-      paymentMethod: invoice.paymentMethod || 'cash',
-      currency: invoice.currency || 'QAR',
-      remarks: invoice.remarks || ''
-    };
-    
-    // Open receipt in dialog
-    // We'll create a custom event to trigger this
-    const event = new CustomEvent('open-receipt', { 
-      detail: { receiptData } 
+    toast.success("Payment form opened", {
+      description: `Processing payment for invoice ${invoice.invoiceNumber}`,
     });
-    window.dispatchEvent(event);
   };
-  
+
+  const handleViewPaymentDetails = (invoice: Invoice) => {
+    console.log("View payment details for invoice:", invoice);
+    setSelectedInvoice(invoice);
+    setShowPaymentDetails(true);
+    
+    // Show receipt dialog
+    setShowReceiptDialog(true);
+  };
+
+  const handleViewInvoice = (id: string) => {
+    console.log("View invoice details for ID:", id);
+    // Navigate to invoice preview page
+    navigate(`/data-entry/print-documents/invoice-preview/${id}`);
+    toast.success("Opening invoice preview");
+  };
+
+  const handleClosePaymentDetails = () => {
+    setShowPaymentDetails(false);
+    setShowReceiptDialog(false);
+  };
+
   return {
     selectedTab,
     setSelectedTab,
     unpaidInvoices,
     paidInvoices,
+    selectedInvoice,
+    showPaymentDetails,
+    showReceiptDialog,
     handlePayClick,
+    handleViewPaymentDetails,
     handleViewInvoice,
-    handleViewPaymentDetails
+    handleClosePaymentDetails
   };
 };
