@@ -1,3 +1,4 @@
+
 /**
  * Utility functions for working with package dimensions
  */
@@ -88,7 +89,7 @@ export const getDimensionsForPackage = (description: string): {
 };
 
 /**
- * Calculate cubic meter based on dimensions
+ * Calculate cubic meter based on dimensions in inches
  */
 export const calculateCubicMeter = (length: string, width: string, height: string): string => {
   if (length && width && height) {
@@ -96,10 +97,37 @@ export const calculateCubicMeter = (length: string, width: string, height: strin
     const w = parseFloat(width);
     const h = parseFloat(height);
     if (!isNaN(l) && !isNaN(w) && !isNaN(h)) {
-      return ((l * w * h) / 1000000).toFixed(6);
+      // Convert cubic inches to cubic meters: 1 cubic inch = 0.0000163871 cubic meters
+      return ((l * w * h) * 0.0000163871).toFixed(6);
     }
   }
   return "";
+};
+
+/**
+ * Calculate price based on cubic meters for specific destinations
+ * @param cubicMeter - volume in cubic meters
+ * @param destination - destination city/country
+ * @returns calculated price based on destination rules
+ */
+export const calculatePriceByDestination = (cubicMeter: string, destination: string): {
+  price: string,
+  documentsFee: string
+} => {
+  const volume = parseFloat(cubicMeter);
+  const sriLankaSpecialCities = ["COLOMBO", "KURUNEGALA", "KANDY", "GALLE"];
+  
+  // Handle special pricing for specific cities in Sri Lanka
+  if (destination === "Sri Lanka" || sriLankaSpecialCities.some(city => destination.toUpperCase().includes(city))) {
+    // QAR 365/meter for special cities
+    const basePrice = (volume * 365).toFixed(2);
+    // Add QAR 50 documentation fee if volume > 1 cubic meter
+    const docFee = volume > 1 ? "50.00" : "0.00";
+    return { price: basePrice, documentsFee: docFee };
+  }
+  
+  // Default - return empty values to use existing prices
+  return { price: "", documentsFee: "" };
 };
 
 /**

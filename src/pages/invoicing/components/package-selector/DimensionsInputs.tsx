@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { generateNextBoxNumber } from "../../utils/autoGenerators";
 import { PackageItem } from "../../types/invoiceForm";
+import { calculateCubicMeter } from "../../utils/packageDimensions";
 
 interface DimensionsInputsProps {
   formState: any;
@@ -18,13 +19,14 @@ const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
   // Calculate cubic meter when dimensions change
   useEffect(() => {
     if (formState.length && formState.width && formState.height) {
-      const length = parseFloat(formState.length) || 0;
-      const width = parseFloat(formState.width) || 0;
-      const height = parseFloat(formState.height) || 0;
+      const length = formState.length;
+      const width = formState.width;
+      const height = formState.height;
       
-      if (length > 0 && width > 0 && height > 0) {
-        const cubicMetre = ((length * width * height) / 1000000).toFixed(3);
-        
+      // Use the updated calculation function
+      const cubicMetre = calculateCubicMeter(length, width, height);
+      
+      if (cubicMetre) {
         const event = {
           target: {
             name: "cubicMetre",
@@ -70,7 +72,7 @@ const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
       </div>
       
       <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">LENGTH:</label>
+        <label className="text-sm font-medium mb-1">LENGTH (inches):</label>
         <Input 
           name="length"
           value={formState.length}
@@ -90,7 +92,7 @@ const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
       </div>
       
       <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">WIDTH:</label>
+        <label className="text-sm font-medium mb-1">WIDTH (inches):</label>
         <Input 
           name="width"
           value={formState.width}
@@ -110,7 +112,7 @@ const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
       </div>
       
       <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">HEIGHT:</label>
+        <label className="text-sm font-medium mb-1">HEIGHT (inches):</label>
         <Input 
           name="height"
           value={formState.height}

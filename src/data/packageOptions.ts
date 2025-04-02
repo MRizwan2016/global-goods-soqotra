@@ -1,3 +1,4 @@
+
 export interface PackageOption {
   id: number;
   description: string;
@@ -26,7 +27,7 @@ export const packageOptions: PackageOption[] = [
     id: 2,
     description: "1.5 METER WOODEN BOX",
     dimensions: { length: 48, width: 36, height: 48 },
-    volumeInMeters: 1.391,
+    volumeInMeters: 1.391,  // Corrected calculation
     price: 507.83,
     documentsFee: 50.00,
     total: 557.83

@@ -1,7 +1,13 @@
+
 import { v4 as uuidv4 } from "uuid";
 import { FormState, PackageItem } from "../types/invoiceForm";
 import { packageOptions } from "@/data/packageOptions";
-import { getDimensionsForPackage, calculateCubicMeter, calculateTotal } from "../utils/packageDimensions";
+import { 
+  getDimensionsForPackage, 
+  calculateCubicMeter, 
+  calculateTotal,
+  calculatePriceByDestination 
+} from "../utils/packageDimensions";
 import { calculateTotalsFromPackages, createPackageItemFromForm } from "../utils/packageCalculations";
 
 interface PackageHandlingProps {
@@ -32,16 +38,26 @@ export const usePackageHandling = ({
       // Calculate cubic meter based on the dimensions
       let cubicMetre = calculateCubicMeter(length, width, height);
       
+      // Calculate price based on destination if applicable
+      const destination = formState.destination || "";
+      const { price: destinationPrice, documentsFee } = calculatePriceByDestination(cubicMetre, destination);
+      
+      // Use destination-specific price if available, otherwise use standard price
+      const finalPrice = destinationPrice || price || String(selectedPackage.price);
+      const finalDocFee = documentsFee || formState.documentsFee || "0";
+      
       setFormState(prev => ({
         ...prev,
         packagesName: description,
         selectedPackage,
-        price: price || String(selectedPackage.price), // Use the price from dimensions or fall back to package option
+        price: finalPrice,
+        documentsFee: finalDocFee,
         length,
         width,
         height,
         packageWeight,
-        cubicMetre
+        cubicMetre,
+        total: calculateTotal(finalPrice, finalDocFee)
       }));
     }
   };
