@@ -7,6 +7,7 @@ import StatusTabs from "./components/StatusTabs";
 import { useInvoiceData } from "./hooks/useInvoiceData";
 import { useInvoiceFilters } from "./hooks/useInvoiceFilters";
 import { toast } from "sonner";
+import PaymentReceiptHandler from "./components/PaymentReceiptHandler";
 
 const PaymentReceivable = () => {
   const { invoices } = useInvoiceData();
@@ -41,6 +42,9 @@ const PaymentReceivable = () => {
           onApplyFilters={handleApplyFilters}
         />
         <StatusTabs invoices={filteredInvoices} />
+        
+        {/* Add PaymentReceiptHandler to handle receipt generation */}
+        <PaymentReceiptHandler />
       </div>
     </Layout>
   );

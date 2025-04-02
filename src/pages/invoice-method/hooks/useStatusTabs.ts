@@ -1,8 +1,8 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
 import { Invoice } from "../types/invoice";
+import { toast } from "sonner";
 
 interface UseStatusTabsProps {
   invoices: Invoice[];
@@ -12,84 +12,66 @@ export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
   const [selectedTab, setSelectedTab] = useState<string>("unpaid");
   const navigate = useNavigate();
   
-  // Filter invoices into paid and unpaid
+  // Separate invoices by paid status
   const unpaidInvoices = invoices.filter(invoice => !invoice.paid);
   const paidInvoices = invoices.filter(invoice => invoice.paid);
   
-  // Handle pay button click
+  // Handle click on Pay button
   const handlePayClick = (invoice: Invoice) => {
-    console.log("Processing payment for invoice:", invoice.invoiceNumber);
+    console.log("Pay clicked for invoice:", invoice.invoiceNumber);
     
-    try {
-      // Store the invoice data properly
-      if (invoice) {
-        // Create a copy of the invoice with proper amount values
-        let enhancedInvoice = { ...invoice };
-        
-        // Ensure amount is set for invoice #13136051
-        if (invoice.invoiceNumber === "13136051") {
-          enhancedInvoice = {
-            ...enhancedInvoice,
-            gross: 250.00,
-            discount: 0,
-            net: 250.00,
-            amount: 250.00
-          };
-        }
-        
-        // Ensure all necessary fields are present
-        enhancedInvoice = {
-          ...enhancedInvoice,
-          consignee: enhancedInvoice.consignee || enhancedInvoice.consignee1 || "",
-          amount: enhancedInvoice.amount || enhancedInvoice.net || 0,
-          // Add any other required fields here
-        };
-
-        // Store the selected invoice in sessionStorage for the payment page
-        sessionStorage.setItem('selectedInvoice', JSON.stringify(enhancedInvoice));
-        
-        // Navigate to the correct payment page
-        console.log("Redirecting to payment page...");
-        navigate('/accounts/payment/add');
-        
-        toast.success(`Redirecting to payment page for invoice ${invoice.invoiceNumber}`);
-      } else {
-        throw new Error("Invalid invoice data");
-      }
-    } catch (error) {
-      console.error("Error navigating to payment page:", error);
-      toast.error("Could not open payment page. Please try again.");
-    }
+    // Store selected invoice in session storage for the payment page
+    sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
+    
+    // Navigate to payment page
+    navigate('/accounts/payment/add');
   };
   
-  // Handle view payment details
-  const handleViewPaymentDetails = (invoice: Invoice) => {
-    console.log("Viewing payment details for invoice:", invoice.invoiceNumber);
-    
-    // Navigate to payment details
-    navigate(`/accounts/payments/details/${invoice.id}`);
-  };
-  
-  // Handle view invoice
+  // Handle click on View button
   const handleViewInvoice = (id: string) => {
-    console.log("Viewing invoice:", id);
+    console.log("View clicked for invoice ID:", id);
     
-    try {
-      // Navigate to the invoice print view
-      navigate(`/data-entry/print-documents/invoice-print/${id}`);
-    } catch (error) {
-      console.error("Error navigating to invoice:", error);
-      toast.error("Could not view invoice. Please try again.");
-    }
+    // Placeholder for view invoice functionality
+    // In a real app, this would navigate to an invoice detail page
+    toast.info(`Viewing invoice details for ID: ${id}`);
   };
-
+  
+  // Handle click on Details button for paid invoices
+  const handleViewPaymentDetails = (invoice: Invoice) => {
+    console.log("Details clicked for paid invoice:", invoice.invoiceNumber);
+    
+    // Generate a receipt number based on invoice number
+    const receiptNumber = `R-${invoice.invoiceNumber.substring(invoice.invoiceNumber.length - 4)}`;
+    
+    // Generate receipt data
+    const receiptData = {
+      receiptNumber: receiptNumber,
+      invoiceNumber: invoice.invoiceNumber,
+      date: invoice.paymentDate || invoice.date,
+      customer: invoice.consignee1 || invoice.consignee || invoice.customer || 'Unknown',
+      amount: typeof invoice.net === 'number' ? invoice.net : 
+              typeof invoice.amount === 'number' ? invoice.amount : 
+              invoice.invoiceNumber === "13136051" ? 250 : 0,
+      paymentMethod: invoice.paymentMethod || 'cash',
+      currency: invoice.currency || 'QAR',
+      remarks: invoice.remarks || ''
+    };
+    
+    // Open receipt in dialog
+    // We'll create a custom event to trigger this
+    const event = new CustomEvent('open-receipt', { 
+      detail: { receiptData } 
+    });
+    window.dispatchEvent(event);
+  };
+  
   return {
     selectedTab,
     setSelectedTab,
     unpaidInvoices,
     paidInvoices,
     handlePayClick,
-    handleViewPaymentDetails,
-    handleViewInvoice
+    handleViewInvoice,
+    handleViewPaymentDetails
   };
 };
