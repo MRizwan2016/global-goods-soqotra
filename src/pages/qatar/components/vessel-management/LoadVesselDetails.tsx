@@ -28,17 +28,38 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
   // Find vessel data
   useEffect(() => {
     setLoading(true);
-    const foundVessel = mockVesselData.find(v => v.id === vesselId);
-    if (foundVessel) {
-      setVessel(foundVessel);
-      // Load existing containers if any
-      if (foundVessel.containers && foundVessel.containers.length > 0) {
-        setSelectedContainers(foundVessel.containers);
+    
+    // Get vessel from localStorage first if available
+    try {
+      const savedVesselData = localStorage.getItem('vesselData');
+      if (savedVesselData) {
+        const parsedData = JSON.parse(savedVesselData);
+        const foundVessel = parsedData.find((v: QatarVessel) => v.id === vesselId || v.runningNumber === vesselId);
+        if (foundVessel) {
+          setVessel(foundVessel);
+          // Load existing containers if any
+          if (foundVessel.containers && foundVessel.containers.length > 0) {
+            setSelectedContainers(foundVessel.containers);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error loading vessel data from localStorage:", error);
+    }
+    
+    // Fallback to mock data if not found in localStorage
+    if (!vessel) {
+      const foundVessel = mockVesselData.find(v => v.id === vesselId || v.runningNumber === vesselId);
+      if (foundVessel) {
+        setVessel(foundVessel);
+        // Load existing containers if any
+        if (foundVessel.containers && foundVessel.containers.length > 0) {
+          setSelectedContainers(foundVessel.containers);
+        }
       }
     }
     
-    // Get all containers, not just those with specific statuses
-    // This ensures containers show up for loading
+    // Get all containers including by runningNumber for compatibility
     const allContainers = mockContainers.map(container => ({
       id: container.id,
       runningNumber: container.runningNumber,
@@ -69,9 +90,37 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
       return;
     }
     
-    // In a real app, save to database
-    toast.success("Containers assigned to vessel successfully");
-    onContainersLoaded();
+    // Find the vessel index to update
+    const vesselIndex = mockVesselData.findIndex(v => v.id === vesselId || v.runningNumber === vesselId);
+    
+    if (vesselIndex !== -1) {
+      // Update the containers array
+      mockVesselData[vesselIndex].containers = [...selectedContainers];
+      
+      // Update the container references to this vessel
+      selectedContainers.forEach(containerId => {
+        const containerIndex = mockContainers.findIndex(
+          c => c.id === containerId || c.runningNumber === containerId
+        );
+        
+        if (containerIndex !== -1) {
+          mockContainers[containerIndex].vesselId = mockVesselData[vesselIndex].id;
+        }
+      });
+      
+      // Save to localStorage for persistence
+      try {
+        localStorage.setItem('vesselData', JSON.stringify(mockVesselData));
+        localStorage.setItem('containers', JSON.stringify(mockContainers));
+      } catch (error) {
+        console.error("Error saving data to localStorage:", error);
+      }
+      
+      toast.success("Containers assigned to vessel successfully");
+      onContainersLoaded();
+    } else {
+      toast.error("Vessel not found. Please refresh and try again.");
+    }
   };
   
   if (loading) {
@@ -175,7 +224,7 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
               {availableContainers.length > 0 ? (
                 <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
                   {availableContainers.map(container => (
-                    <div key={container.id} className="p-3 flex justify-between items-center hover:bg-gray-50">
+                    <div key={container.id || container.runningNumber} className="p-3 flex justify-between items-center hover:bg-gray-50">
                       <div>
                         <div className="font-medium">Container #{container.runningNumber}</div>
                         <div className="text-sm text-gray-500">
@@ -206,7 +255,7 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
               {selectedContainers.length > 0 ? (
                 <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
                   {selectedContainers.map(containerId => {
-                    const container = mockContainers.find(c => c.runningNumber === containerId);
+                    const container = mockContainers.find(c => c.id === containerId || c.runningNumber === containerId);
                     return (
                       <div key={containerId} className="p-3 flex justify-between items-center hover:bg-gray-50">
                         <div>

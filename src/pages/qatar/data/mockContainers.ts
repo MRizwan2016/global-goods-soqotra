@@ -1,4 +1,3 @@
-
 import { QatarContainer, ContainerCargo } from "../types/containerTypes";
 
 // This is the original mockContainers array
@@ -19,7 +18,7 @@ const mockContainers: QatarContainer[] = [
     eta: "2023-12-25",
     sector: "QAT-KEN",
     shippingLine: "MSC",
-    loadDate: "2023-12-01" // Added property
+    loadDate: "2023-12-01"
   },
   {
     id: "container2",
@@ -37,7 +36,7 @@ const mockContainers: QatarContainer[] = [
     eta: "2023-12-05",
     sector: "QAT-SL",
     shippingLine: "Maersk",
-    loadDate: "2023-11-15" // Added property
+    loadDate: "2023-11-15"
   },
   {
     id: "container3",
@@ -55,7 +54,25 @@ const mockContainers: QatarContainer[] = [
     eta: "2024-01-05",
     sector: "QAT-UAE",
     shippingLine: "CMA CGM",
-    loadDate: "2023-12-10" // Added property
+    loadDate: "2023-12-10"
+  },
+  {
+    id: "container387",
+    containerNumber: "QCTU3875432",
+    containerType: "40HC",
+    runningNumber: "387",
+    status: "Loaded",
+    sealNumber: "SL38752",
+    weight: 850.75,
+    volume: 35.2,
+    packages: 28,
+    vesselId: "vessel3",
+    direction: "Export",
+    etd: "2023-12-20",
+    eta: "2023-12-30",
+    sector: "QAT-UAE",
+    shippingLine: "CMA CGM",
+    loadDate: "2023-12-15"
   }
 ];
 
@@ -72,9 +89,9 @@ const mockCargoItems: ContainerCargo[] = [
     quantity: 1,
     shipper: "Qatar Trading Co.",
     consignee: "Kenya Imports Ltd",
-    barcode: "BC123456789", // Added property
-    wh: "WH001", // Added property
-    d2d: true // Added property
+    barcode: "BC123456789",
+    wh: "WH001",
+    d2d: true
   },
   {
     id: "cargo2",
@@ -87,9 +104,9 @@ const mockCargoItems: ContainerCargo[] = [
     quantity: 1,
     shipper: "Tech Distributors LLC",
     consignee: "Digital Solutions Kenya",
-    barcode: "BC987654321", // Added property
-    wh: "WH002", // Added property
-    d2d: false // Added property
+    barcode: "BC987654321",
+    wh: "WH002",
+    d2d: false
   },
   {
     id: "cargo3",
@@ -102,9 +119,9 @@ const mockCargoItems: ContainerCargo[] = [
     quantity: 1,
     shipper: "Qatar Fabrics Intl.",
     consignee: "Sri Lanka Garments",
-    barcode: "BC555666777", // Added property
-    wh: "WH003", // Added property
-    d2d: true // Added property
+    barcode: "BC555666777",
+    wh: "WH003",
+    d2d: true
   },
   {
     id: "cargo4",
@@ -117,11 +134,27 @@ const mockCargoItems: ContainerCargo[] = [
     quantity: 1,
     shipper: "Qatar Motors Supply",
     consignee: "Colombo Auto Repairs",
-    barcode: "BC111222333", // Added property
-    wh: "WH004", // Added property
-    d2d: false // Added property
+    barcode: "BC111222333",
+    wh: "WH004",
+    d2d: false
   }
 ];
+
+// Load from localStorage on module initialization
+try {
+  const savedContainers = localStorage.getItem('containers');
+  if (savedContainers) {
+    const parsedContainers = JSON.parse(savedContainers);
+    // Only update if the data is valid
+    if (Array.isArray(parsedContainers) && parsedContainers.length > 0) {
+      // Update mockContainers while preserving the reference
+      mockContainers.length = 0;
+      parsedContainers.forEach(container => mockContainers.push(container));
+    }
+  }
+} catch (error) {
+  console.error("Error loading containers from localStorage:", error);
+}
 
 export { mockContainers, mockCargoItems };
 export default mockContainers;
