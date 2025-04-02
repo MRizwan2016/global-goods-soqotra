@@ -1,6 +1,7 @@
 
 import { useState } from "react";
 import { PrintOptions } from "../../types/containerTypes";
+import { toast } from "sonner";
 
 export const usePrinting = () => {
   const [activeTab, setActiveTab] = useState("cargo");
@@ -12,12 +13,17 @@ export const usePrinting = () => {
   });
 
   const handlePrint = () => {
-    console.log("Print function called");
+    console.log("Print function called in usePrinting");
+    
     // Set printing state to prevent multiple clicks
-    if (isPrinting) return;
+    if (isPrinting) {
+      console.log("Already printing, ignoring click");
+      return;
+    }
     
     setIsPrinting(true);
     setPrintViewVisible(true);
+    toast.info("Preparing to print manifest...");
     
     // Apply print-specific body class immediately
     document.body.classList.add('print-only-manifest');
@@ -28,7 +34,7 @@ export const usePrinting = () => {
       window.dispatchEvent(new Event('resize'));
       
       // Ensure all images are loaded before printing
-      const images = document.querySelectorAll('.print-container img');
+      const images = document.querySelectorAll('.print-container img, .print-only img');
       const imagePromises = Array.from(images).map(img => {
         if ((img as HTMLImageElement).complete) return Promise.resolve();
         return new Promise(resolve => {
@@ -41,7 +47,13 @@ export const usePrinting = () => {
         // Wait a bit more to ensure everything is rendered
         setTimeout(() => {
           console.log('Triggering print dialog');
-          window.print();
+          try {
+            window.print();
+            toast.success("Print dialog opened");
+          } catch (error) {
+            console.error("Print error:", error);
+            toast.error("Failed to open print dialog");
+          }
           
           // Keep the print view visible for future prints
           // but reset the printing state
@@ -49,9 +61,9 @@ export const usePrinting = () => {
             setIsPrinting(false);
             // We intentionally don't reset printViewVisible so the manifest stays visible
           }, 1000);
-        }, 300);
+        }, 500);
       });
-    }, 500);
+    }, 700);
   };
 
   // Method to clear the print view when needed

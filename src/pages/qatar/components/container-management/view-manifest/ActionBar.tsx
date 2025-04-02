@@ -19,6 +19,13 @@ const ActionBar: React.FC<ActionBarProps> = ({
   onPrintClick,
   isPrinting
 }) => {
+  const handlePrintClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log("Print button clicked in ActionBar");
+    onPrintClick();
+  };
+
   return (
     <div className="flex items-center gap-4 no-print">
       <div className="flex items-center gap-2">
@@ -61,7 +68,7 @@ const ActionBar: React.FC<ActionBarProps> = ({
       </div>
       
       <Button 
-        onClick={onPrintClick}
+        onClick={handlePrintClick}
         disabled={isPrinting}
         className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
       >

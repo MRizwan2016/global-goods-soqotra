@@ -35,14 +35,14 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
           }
           
           /* Position the print container properly */
-          .print-container {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: auto;
+          .print-container, .print-only {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: auto !important;
             overflow: visible !important;
-            z-index: 9999;
+            z-index: 9999 !important;
             background-color: white !important;
           }
           

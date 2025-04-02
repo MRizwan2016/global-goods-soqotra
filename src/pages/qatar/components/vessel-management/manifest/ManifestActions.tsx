@@ -17,8 +17,19 @@ const ManifestActions: React.FC<ManifestActionsProps> = ({
   const handlePrintClick = (e: React.MouseEvent) => {
     // Prevent default to ensure we control the behavior
     e.preventDefault();
+    e.stopPropagation();
     console.log("Print button clicked in ManifestActions");
     onPrint(e);
+  };
+
+  const handleCancelClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onCancel();
+  };
+
+  const handleConfirmClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onConfirm();
   };
 
   return (
@@ -26,7 +37,7 @@ const ManifestActions: React.FC<ManifestActionsProps> = ({
       <div className="flex gap-2">
         <Button
           variant="outline"
-          onClick={onCancel}
+          onClick={handleCancelClick}
           className="flex items-center gap-2"
         >
           <ArrowLeft size={16} />
@@ -34,7 +45,7 @@ const ManifestActions: React.FC<ManifestActionsProps> = ({
         </Button>
         
         <Button 
-          onClick={onConfirm}
+          onClick={handleConfirmClick}
           className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
         >
           <Save size={16} />
