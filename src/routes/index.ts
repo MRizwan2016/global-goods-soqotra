@@ -1,10 +1,11 @@
 
 import { adminRoutes } from "./adminRoutes";
 import { dataEntryRoutes } from "./dataEntryRoutes";
-import accountsRoutes from "./accountsRoutes"; // Fixed import
+import accountsRoutes from "./accountsRoutes"; 
 import { kenyaRoutes } from "./kenyaRoutes";
 import { reportsRoutes } from "./reportsRoutes";
-import { printDocumentsRoutes } from "./printDocumentsRoutes"; // Import the print documents routes
+import { printDocumentsRoutes } from "./printDocumentsRoutes";
+import { paymentReceivableRoutes } from "./paymentReceivableRoutes"; // Import payment receivable routes
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
@@ -41,5 +42,6 @@ export const routes: RouteConfig[] = [
   ...accountsRoutes,
   ...kenyaRoutes,
   ...reportsRoutes,
-  ...printDocumentsRoutes // Add the print documents routes
+  ...printDocumentsRoutes,
+  ...paymentReceivableRoutes // Add payment receivable routes
 ];

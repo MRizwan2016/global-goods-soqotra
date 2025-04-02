@@ -1,4 +1,3 @@
-
 import { Database, DollarSign, Settings, Truck } from "lucide-react";
 import { NavigationSections } from "./types";
 
