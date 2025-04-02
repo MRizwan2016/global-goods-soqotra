@@ -9,6 +9,7 @@ import { ContainerHeader } from './index';
 import { ContainerDetails } from './index';
 import { ContentTabs } from './index';
 import { ActionBar } from './index';
+import { toast } from "sonner";
 
 interface ViewContainerManifestProps {
   container: QatarContainer;
@@ -35,6 +36,7 @@ const ViewContainerManifest: React.FC<ViewContainerManifestProps> = ({
 }) => {
   const [isPrinting, setIsPrinting] = useState(false);
   const [showPrintView, setShowPrintView] = useState(false);
+  const [activeTab, setActiveTab] = useState("cargo-items");
   
   const totalVolume = cargoItems.reduce((sum, item) => sum + Number(item.volume), 0);
   const totalWeight = cargoItems.reduce((sum, item) => sum + Number(item.weight), 0);
@@ -47,10 +49,14 @@ const ViewContainerManifest: React.FC<ViewContainerManifestProps> = ({
   }, []);
   
   const handlePrintClick = () => {
+    console.log("Print button clicked in ViewContainerManifest");
     setIsPrinting(true);
     setShowPrintView(true);
     
     document.body.classList.add('print-only-manifest');
+    
+    // Add a toast notification
+    toast.info("Preparing to print manifest...");
     
     setTimeout(() => {
       window.dispatchEvent(new Event('resize'));
@@ -63,6 +69,7 @@ const ViewContainerManifest: React.FC<ViewContainerManifestProps> = ({
         
         setTimeout(() => {
           setIsPrinting(false);
+          toast.success("Print dialog opened");
         }, 1000);
       }, 300);
     }, 500);
@@ -105,7 +112,8 @@ const ViewContainerManifest: React.FC<ViewContainerManifestProps> = ({
 
       <ContainerDetails container={container} />
       <ContentTabs 
-        activeTab="cargo-items"
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
         cargoItems={cargoItems}
         itemList={itemList}
         consigneeList={consigneeList}

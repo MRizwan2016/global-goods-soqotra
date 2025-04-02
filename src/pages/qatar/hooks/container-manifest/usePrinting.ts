@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { PrintOptions } from "../../types/containerTypes";
 
@@ -11,6 +12,7 @@ export const usePrinting = () => {
   });
 
   const handlePrint = () => {
+    console.log("Print function called");
     // Set printing state to prevent multiple clicks
     if (isPrinting) return;
     

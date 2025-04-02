@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PrintOptions, QatarContainer } from "../../../types/containerTypes";
@@ -66,6 +65,7 @@ const ViewManifestTab: React.FC<ViewManifestTabProps> = ({
   }, [container?.id]);
 
   const handlePrintClick = () => {
+    console.log("Print button clicked");
     setIsPrinting(true);
     
     // Add a delay to ensure content is fully rendered
@@ -76,7 +76,7 @@ const ViewManifestTab: React.FC<ViewManifestTabProps> = ({
       setTimeout(() => {
         setIsPrinting(false);
       }, 1000);
-    }, 500);
+    }, 200);
   };
 
   if (!container) {
@@ -134,6 +134,7 @@ const ViewManifestTab: React.FC<ViewManifestTabProps> = ({
       <div className="print-container">
         <ContentTabs 
           activeTab={activeTab}
+          onTabChange={setActiveTab}
           cargoItems={cargoItems}
           itemList={itemList}
           consigneeList={consigneeList}

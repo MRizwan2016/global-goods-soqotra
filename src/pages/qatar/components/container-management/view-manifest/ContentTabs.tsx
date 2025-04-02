@@ -1,54 +1,62 @@
 
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, UnsettledInvoice, PrintOptions } from "../../../types/containerTypes";
-import CargoItemsTab from "./tabs/CargoItemsTab";
-import ItemListTab from "./tabs/ItemListTab";
-import ConsigneeListTab from "./tabs/ConsigneeListTab";
-import UnsettledInvoicesTab from "./tabs/UnsettledInvoicesTab";
+import { PrintOptions, QatarContainer } from "../../../types/containerTypes";
+import CargoItemsTable from "./tabs/CargoItemsTable";
+import ItemListTable from "./tabs/ItemListTable";
+import ConsigneeListTable from "./tabs/ConsigneeListTable";
+import UnsettledInvoicesTable from "./tabs/UnsettledInvoicesTable";
 
 interface ContentTabsProps {
-  activeTab?: string;
-  setActiveTab?: React.Dispatch<React.SetStateAction<string>>;
-  cargoItems: ContainerCargo[];
-  itemList: ItemListEntry[];
-  consigneeList: ConsigneeListItem[];
-  unsettledInvoices: UnsettledInvoice[];
-  container?: QatarContainer | null;
-  printOptions?: PrintOptions;
+  activeTab: string;
+  onTabChange?: (value: string) => void;
+  cargoItems: any[];
+  itemList: any[];
+  consigneeList: any[];
+  unsettledInvoices: any[];
+  container?: QatarContainer;
+  printOptions: PrintOptions;
 }
 
 const ContentTabs: React.FC<ContentTabsProps> = ({
-  activeTab = "cargo-items",
+  activeTab,
+  onTabChange,
   cargoItems,
   itemList,
   consigneeList,
   unsettledInvoices,
-  printOptions = { section: "all", orientation: "portrait" }
+  container,
+  printOptions
 }) => {
+  const handleValueChange = (value: string) => {
+    if (onTabChange) {
+      onTabChange(value);
+    }
+  };
+
   return (
-    <Tabs defaultValue={activeTab} className="print-tabs">
-      <TabsList className="no-print">
-        <TabsTrigger value="cargo-items">Cargo Items</TabsTrigger>
-        <TabsTrigger value="item-list">Item List</TabsTrigger>
-        <TabsTrigger value="consignee-list">Consignee List</TabsTrigger>
-        <TabsTrigger value="unsettled-invoices">Unsettled Invoices</TabsTrigger>
+    <Tabs value={activeTab} onValueChange={handleValueChange} className="mt-6">
+      <TabsList className="mb-4 no-print">
+        <TabsTrigger value="cargo-items" className="px-4 py-2">Cargo Items</TabsTrigger>
+        <TabsTrigger value="item-list" className="px-4 py-2">Item List</TabsTrigger>
+        <TabsTrigger value="consignee-list" className="px-4 py-2">Consignee List</TabsTrigger>
+        <TabsTrigger value="unsettled-invoices" className="px-4 py-2">Unsettled Invoices</TabsTrigger>
       </TabsList>
-
-      <TabsContent value="cargo-items" className={printOptions.section === "all" || printOptions.section === "cargo" ? "block page-break-after" : "hidden"}>
-        <CargoItemsTab cargoItems={cargoItems} />
+      
+      <TabsContent value="cargo-items">
+        <CargoItemsTable cargoItems={cargoItems} />
       </TabsContent>
-
-      <TabsContent value="item-list" className={printOptions.section === "all" || printOptions.section === "items" ? "block page-break-after" : "hidden"}>
-        <ItemListTab itemList={itemList} />
+      
+      <TabsContent value="item-list">
+        <ItemListTable itemList={itemList} />
       </TabsContent>
-
-      <TabsContent value="consignee-list" className={printOptions.section === "all" || printOptions.section === "consignees" ? "block page-break-after" : "hidden"}>
-        <ConsigneeListTab consigneeList={consigneeList} />
+      
+      <TabsContent value="consignee-list">
+        <ConsigneeListTable consigneeList={consigneeList} />
       </TabsContent>
-
-      <TabsContent value="unsettled-invoices" className={printOptions.section === "all" || printOptions.section === "invoices" ? "block" : "hidden"}>
-        <UnsettledInvoicesTab unsettledInvoices={unsettledInvoices} />
+      
+      <TabsContent value="unsettled-invoices">
+        <UnsettledInvoicesTable unsettledInvoices={unsettledInvoices} />
       </TabsContent>
     </Tabs>
   );

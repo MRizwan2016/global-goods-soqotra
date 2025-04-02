@@ -14,6 +14,13 @@ const ManifestActions: React.FC<ManifestActionsProps> = ({
   onConfirm, 
   onPrint 
 }) => {
+  const handlePrintClick = (e: React.MouseEvent) => {
+    // Prevent default to ensure we control the behavior
+    e.preventDefault();
+    console.log("Print button clicked in ManifestActions");
+    onPrint(e);
+  };
+
   return (
     <div className="flex justify-between">
       <div className="flex gap-2">
@@ -36,8 +43,8 @@ const ManifestActions: React.FC<ManifestActionsProps> = ({
       </div>
       
       <Button 
-        onClick={onPrint}
-        className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+        onClick={handlePrintClick}
+        className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
       >
         <Printer size={16} />
         Print Manifest

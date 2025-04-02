@@ -59,6 +59,15 @@ const ActionBar: React.FC<ActionBarProps> = ({
           </SelectContent>
         </Select>
       </div>
+      
+      <Button 
+        onClick={onPrintClick}
+        disabled={isPrinting}
+        className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+      >
+        <Printer size={16} />
+        Print Manifest
+      </Button>
     </div>
   );
 };
