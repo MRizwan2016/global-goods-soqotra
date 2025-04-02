@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import NavigationSection from "./NavigationSection";
 import { navigationSections } from "./navigationConfig";
 
@@ -37,11 +37,13 @@ const MainNavigation: React.FC = () => {
   return (
     <div className="w-full p-2 animate-fade-in">
       <div className="flex justify-center mb-6">
-        <img 
-          src="/lovable-uploads/056bd63a-3806-4e08-9360-0e3edff62199.png" 
-          alt="Soqotra Logo" 
-          className="h-16 hover:scale-105 transition-transform"
-        />
+        <Link to="/">
+          <img 
+            src="/lovable-uploads/056bd63a-3806-4e08-9360-0e3edff62199.png" 
+            alt="Soqotra Logo" 
+            className="h-16 hover:scale-105 transition-transform"
+          />
+        </Link>
       </div>
       <div className="text-center mb-6">
         <p className="font-semibold text-sm text-gray-800 leading-tight">SOQOTRA LOGISTICS SERVICES,</p>

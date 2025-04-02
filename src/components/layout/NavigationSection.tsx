@@ -1,5 +1,6 @@
 
 import React from "react";
+import { Link } from "react-router-dom";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavigationSectionProps } from "./types";
@@ -44,17 +45,21 @@ const NavigationSection: React.FC<NavigationSectionProps> = ({
               <ul className="space-y-1">
                 {menu.items.map((item, idx) => (
                   <li key={idx}>
-                    <button
-                      onClick={() => onNavigate(item.path)}
+                    <Link 
+                      to={item.path}
                       className={cn(
-                        "w-full text-left px-3 py-1.5 text-sm rounded-md transition-all duration-200 transform hover:translate-x-1",
+                        "w-full block text-left px-3 py-1.5 text-sm rounded-md transition-all duration-200 transform hover:translate-x-1",
                         isPathActive(item.path)
                           ? `submenu-item-active-${sectionKey}`
                           : `submenu-item-${sectionKey} hover:bg-opacity-80`
                       )}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        onNavigate(item.path);
+                      }}
                     >
                       {item.name}
-                    </button>
+                    </Link>
                   </li>
                 ))}
               </ul>
