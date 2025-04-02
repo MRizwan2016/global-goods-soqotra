@@ -7,39 +7,61 @@ const PrintStyles: React.FC = () => {
       {`
         @page {
           size: A4 portrait;
-          margin: 5mm; /* Reduced from 10mm to 5mm for narrower margins */
+          margin: 5mm; /* Reduced margin for more content space */
         }
         body {
           -webkit-print-color-adjust: exact;
           print-color-adjust: exact;
+          background-color: white !important;
         }
         .print\\:hidden {
           display: none !important;
         }
         
-        /* Optimize print size for A4 paper */
+        /* Remove background colors and optimize for print */
         .house-bill-of-lading {
           width: 100% !important;
           max-width: 210mm !important;
           padding: 5mm !important;
           margin: 0 !important;
           box-sizing: border-box;
-          font-size: 11px !important;
+          font-size: 10px !important;
           zoom: 0.9 !important;
+          background-color: white !important;
+          color: black !important;
+        }
+
+        /* Remove all gradient backgrounds */
+        .nav-button-gradient-upb,
+        .nav-button-gradient-accounts,
+        .nav-button-gradient-admin,
+        .nav-button-gradient-cargo,
+        .submenu-header-upb,
+        .submenu-header-accounts,
+        .submenu-header-admin,
+        .submenu-header-cargo,
+        .submenu-item-upb,
+        .submenu-item-accounts,
+        .submenu-item-admin,
+        .submenu-item-cargo {
+          background: white !important;
+          background-image: none !important;
+          background-color: white !important;
         }
 
         /* Make sure tables can expand properly */
         table {
           width: 100%;
           table-layout: fixed;
+          background-color: white !important;
         }
 
-        /* Make cargo description area larger */
+        /* Make cargo description area taller for full content */
         .cargo-description {
-          min-height: 150px !important;
+          min-height: 180px !important;
         }
         
-        /* Ensure all content is visible */
+        /* Ensure all content is visible with no truncation */
         .bl-number {
           overflow: visible !important;
           white-space: normal !important;
@@ -53,7 +75,7 @@ const PrintStyles: React.FC = () => {
           display: block !important;
           visibility: visible !important;
           opacity: 1 !important;
-          max-height: 2.5cm !important;
+          max-height: 2cm !important;
         }
         
         /* Allow text to wrap properly in all cells */
@@ -61,7 +83,9 @@ const PrintStyles: React.FC = () => {
           word-wrap: break-word !important;
           overflow-wrap: break-word !important;
           white-space: normal !important;
-          padding: 4px !important;
+          padding: 3px !important;
+          background-color: white !important;
+          color: black !important;
         }
         
         /* Fix for whitespace pre-line formatting */
@@ -72,14 +96,18 @@ const PrintStyles: React.FC = () => {
         
         /* Reduce vertical spacing to fit all content on one page */
         .house-bill-of-lading .mb-4, 
-        .house-bill-of-lading .mb-6 {
-          margin-bottom: 0.5rem !important;
+        .house-bill-of-lading .mb-6,
+        .house-bill-of-lading .mb-3,
+        .house-bill-of-lading .mb-2 {
+          margin-bottom: 0.25rem !important;
         }
         
         .house-bill-of-lading .p-3,
         .house-bill-of-lading .p-4,
-        .house-bill-of-lading .p-8 {
-          padding: 0.5rem !important;
+        .house-bill-of-lading .p-8,
+        .house-bill-of-lading .p-6,
+        .house-bill-of-lading .p-2 {
+          padding: 0.25rem !important;
         }
         
         /* Ensure the entire BL fits on one page */
@@ -87,6 +115,20 @@ const PrintStyles: React.FC = () => {
           page-break-inside: avoid !important;
           page-break-after: always !important;
           page-break-before: auto !important;
+          background-color: white !important;
+        }
+
+        /* Ensure borders are visible in print */
+        .border, .border-2, .border-black, .border-gray-400 {
+          border-color: black !important;
+          border-width: 1px !important;
+        }
+
+        /* Force white background and black text */
+        .bg-soqotra-blue, .bg-gray-50, .bg-gradient-to-br {
+          background: white !important;
+          background-color: white !important;
+          color: black !important;
         }
       `}
     </style>

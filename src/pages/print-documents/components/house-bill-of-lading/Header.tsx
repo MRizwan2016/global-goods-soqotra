@@ -15,12 +15,12 @@ const Header: React.FC<HeaderProps> = ({
   onChange 
 }) => {
   return (
-    <div className="flex justify-between items-center mb-4">
+    <div className="flex justify-between items-center mb-2">
       <div className="flex-1">
         <img 
           src="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" 
           alt="Soqotra Shipping & Logistics" 
-          className="h-12"
+          className="h-10"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.onerror = null; // Prevent infinite loop
@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({
       </div>
       
       <div className="flex-1 text-center">
-        <h1 className="text-xl font-bold">HOUSE BILL OF LADING</h1>
+        <h1 className="text-lg font-bold">HOUSE BILL OF LADING</h1>
         <p className="text-xs">Non-Negotiable</p>
       </div>
       
