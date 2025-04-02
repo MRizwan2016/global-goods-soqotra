@@ -36,7 +36,7 @@ const Header: React.FC<HeaderProps> = ({
       </div>
       
       <div className="flex-1 text-right">
-        <div className="mb-2">
+        <div className="mb-2 flex justify-end items-center">
           <span className="font-semibold mr-2">B/L No:</span>
           {editable ? (
             <input 
@@ -44,10 +44,10 @@ const Header: React.FC<HeaderProps> = ({
               name="blNumber"
               value={blNumber} 
               onChange={onChange}
-              className="border border-gray-300 px-2 py-1 rounded w-32"
+              className="border border-gray-300 px-2 py-1 rounded w-48"
             />
           ) : (
-            <span className="bl-number">{blNumber}</span>
+            <span className="bl-number break-words overflow-visible w-48 inline-block text-right">{blNumber}</span>
           )}
         </div>
         

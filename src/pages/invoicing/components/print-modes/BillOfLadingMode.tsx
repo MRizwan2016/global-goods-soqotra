@@ -18,7 +18,7 @@ const BillOfLadingMode: React.FC<BillOfLadingModeProps> = ({
     <div className="border border-black p-6">
       <h2 className="text-center text-2xl font-bold mb-4">HOUSE BILL OF LADING</h2>
       <div className="text-right mb-6">
-        <p className="font-bold">BL Number: {invoice.invoiceNumber}-BL</p>
+        <p className="font-bold break-words">BL Number: {invoice.invoiceNumber}-BL</p>
         <p>Date: {invoice.date}</p>
       </div>
       
@@ -64,10 +64,10 @@ const BillOfLadingMode: React.FC<BillOfLadingModeProps> = ({
         <tbody>
           <tr>
             <td className="border p-2">AS ADDRESSED</td>
-            <td className="border p-2">
+            <td className="border p-2 whitespace-pre-line break-words">
               {packageDetails.map((pkg: any, index: number) => (
                 <div key={index}>
-                  {pkg.name} {index < packageDetails.length - 1 ? ", " : ""}
+                  {pkg.name || pkg.packageName} {index < packageDetails.length - 1 ? ", " : ""}
                 </div>
               ))}
               SAID TO CONTAIN USED PERSONAL EFFECTS

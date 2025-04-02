@@ -53,6 +53,19 @@ const PrintStyles: React.FC = () => {
           opacity: 1 !important;
           max-height: 3cm !important;
         }
+        
+        /* Allow text to wrap properly in all cells */
+        td, th {
+          word-wrap: break-word !important;
+          overflow-wrap: break-word !important;
+          white-space: normal !important;
+        }
+        
+        /* Fix for whitespace pre-line formatting */
+        .whitespace-pre-line {
+          white-space: pre-line !important;
+          overflow: visible !important;
+        }
       `}
     </style>
   );
