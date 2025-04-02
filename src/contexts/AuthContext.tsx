@@ -1,5 +1,4 @@
-
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { User, AuthContextType } from "@/types/auth";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "@/constants/auth";
@@ -8,7 +7,7 @@ import { useUserOperations } from "@/hooks/use-user-operations";
 import { useAuthOperations } from "@/hooks/use-auth-operations";
 
 // Create the context with an undefined initial value
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -28,7 +27,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
-        // Ensure current user has valid permissions structure
         setCurrentUser(ensureUserPermissions(parsedUser));
       } catch (error) {
         console.error("Failed to parse current user:", error);
@@ -40,7 +38,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const parsedUsers = JSON.parse(storedUsers);
         
-        // Ensure all users have the permissions property correctly set with files
         const updatedUsers = parsedUsers.map((user: any) => ensureUserPermissions(user));
         
         setUsers(updatedUsers);
@@ -57,7 +54,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Function to initialize the default admin user
   const initializeDefaultAdmin = () => {
-    // Initialize with admin user if no users exist
     const adminUser: User = {
       id: "admin-1",
       fullName: "System Administrator",
@@ -104,7 +100,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("users", JSON.stringify([adminUser]));
     console.log("Initialized with admin user:", [adminUser]);
     
-    // Also store admin password separately
     localStorage.setItem("admin-password", ADMIN_PASSWORD);
   };
 
@@ -140,7 +135,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     users,
     toggleUserStatus,
     sendActivationEmail: async (user: User) => {
-      // Import dynamically to avoid circular dependencies
       const { sendActivationEmail } = await import('@/utils/auth-utils');
       return sendActivationEmail(user);
     },
