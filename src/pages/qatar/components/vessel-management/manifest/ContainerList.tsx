@@ -5,7 +5,7 @@ interface ContainerListProps {
   containerData: any[];
 }
 
-const ContainerList: React.FC<ContainerListProps> = ({ containerData }) => {
+const ContainerList: React.FC<ContainerListProps> = ({ containerData = [] }) => {
   return (
     <div className="mb-6">
       <h3 className="font-medium mb-3 text-lg">Container List</h3>

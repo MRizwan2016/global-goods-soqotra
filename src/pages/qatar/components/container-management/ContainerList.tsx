@@ -8,26 +8,34 @@ import { PenLine, Truck, FileText, ClipboardList, Search, Package } from "lucide
 import { motion } from "framer-motion";
 
 interface ContainerListProps {
-  containerData: QatarContainer[];
+  containers: QatarContainer[];
+  statusFilter?: string;
+  searchText?: string;
   onEdit?: (containerId: string) => void;
+  onDelete?: (containerId: string) => void;
   onLoad?: (containerId: string) => void;
   onViewManifest?: (containerId: string) => void;
   onCreateManifest?: (containerId: string) => void;
+  onAddClick?: () => void;
 }
 
 const ContainerList: React.FC<ContainerListProps> = ({
-  containerData,
+  containers = [],
+  statusFilter: externalStatusFilter = "",
+  searchText: externalSearchText = "",
   onEdit,
+  onDelete,
   onLoad,
   onViewManifest,
-  onCreateManifest
+  onCreateManifest,
+  onAddClick
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const [searchTerm, setSearchTerm] = useState(externalSearchText);
+  const [statusFilter, setStatusFilter] = useState(externalStatusFilter);
   const [directionFilter, setDirectionFilter] = useState("");
   
-  // Filter containers based on search and filters
-  const filteredContainers = containerData.filter(container => {
+  // Filter containers based on search and filters, safely handling undefined or null containers
+  const filteredContainers = (containers || []).filter(container => {
     // Apply search filter
     const matchesSearch = searchTerm === "" || 
       container.containerNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||

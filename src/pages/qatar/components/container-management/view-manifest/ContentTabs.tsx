@@ -21,10 +21,10 @@ interface ContentTabsProps {
 const ContentTabs: React.FC<ContentTabsProps> = ({
   activeTab,
   onTabChange,
-  cargoItems,
-  itemList,
-  consigneeList,
-  unsettledInvoices,
+  cargoItems = [],
+  itemList = [],
+  consigneeList = [],
+  unsettledInvoices = [],
   container,
   printOptions
 }) => {
@@ -36,9 +36,13 @@ const ContentTabs: React.FC<ContentTabsProps> = ({
 
   // Make sure we have a valid activeTab - we ensure it's never an empty string
   const validActiveTab = activeTab || "cargo-items";
+  const validTabValues = ["cargo-items", "item-list", "consignee-list", "unsettled-invoices"];
+  
+  // If the activeTab is not in the valid tab values, default to cargo-items
+  const finalTabValue = validTabValues.includes(validActiveTab) ? validActiveTab : "cargo-items";
 
   return (
-    <Tabs value={validActiveTab} onValueChange={handleValueChange} className="mt-6">
+    <Tabs value={finalTabValue} onValueChange={handleValueChange} className="mt-6">
       <TabsList className="mb-4 no-print">
         <TabsTrigger value="cargo-items" className="px-4 py-2">
           Cargo Items

@@ -51,12 +51,38 @@ const TabContent: React.FC<TabContentProps> = ({
     <>
       <TabsContent value="containers" className="m-0">
         <ContainerList 
-          containers={containers}
+          containers={containers || []}
           statusFilter={statusFilter}
           searchText={searchText}
-          onEdit={onContainerEdit}
+          onEdit={(id) => {
+            const container = containers.find(c => c.id === id);
+            if (container) {
+              onContainerEdit(container);
+            }
+          }}
           onDelete={onContainerDelete}
           onAddClick={onAddContainer}
+          onLoad={(id) => {
+            const container = containers.find(c => c.id === id);
+            if (container) {
+              onContainerEdit(container);
+              onTabChange("load");
+            }
+          }}
+          onCreateManifest={(id) => {
+            const container = containers.find(c => c.id === id);
+            if (container) {
+              onContainerEdit(container);
+              onTabChange("manifest");
+            }
+          }}
+          onViewManifest={(id) => {
+            const container = containers.find(c => c.id === id);
+            if (container) {
+              onContainerEdit(container);
+              onTabChange("view-manifest");
+            }
+          }}
         />
       </TabsContent>
       
