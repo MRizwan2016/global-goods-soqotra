@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +7,7 @@ import { Grid } from "@/components/ui/grid";
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from "sonner";
 import { ContainerCargo } from "../../../types/containerTypes";
-import { PackageOpen } from "lucide-react";
+import { PackageOpen, Search } from "lucide-react";
 import InvoiceSearchInput from "./cargo-search/InvoiceSearchInput";
 
 interface CargoSearchFormProps {
@@ -35,70 +36,12 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
   const [warehouse, setWarehouse] = useState<string>("");
   
   // Suggestions state
-  const [bookingFormSuggestions, setBookingFormSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
-  const [filteredSuggestions, setFilteredSuggestions] = useState<any[]>([]);
-  
-  // Load saved invoices from localStorage for suggestions
-  useEffect(() => {
-    try {
-      // Get invoices from localStorage
-      const savedInvoices = localStorage.getItem('invoices');
-      // Get generated invoices from localStorage
-      const generatedInvoices = localStorage.getItem('generatedInvoices');
-      
-      let allInvoices = [];
-      
-      // Parse saved invoices if they exist
-      if (savedInvoices) {
-        const parsedInvoices = JSON.parse(savedInvoices);
-        allInvoices = [...parsedInvoices];
-      }
-      
-      // Parse and add generated invoices if they exist
-      if (generatedInvoices) {
-        const parsedGeneratedInvoices = JSON.parse(generatedInvoices);
-        allInvoices = [...allInvoices, ...parsedGeneratedInvoices];
-      }
-      
-      // Format for suggestions
-      const formattedSuggestions = allInvoices.map((invoice: any) => ({
-        invoiceNumber: invoice.invoiceNumber || invoice.bookingForm || "",
-        shipper: invoice.shipper || invoice.shipper1 || "",
-        consignee: invoice.consignee || invoice.consignee1 || "",
-        shipperAddress: invoice.shipperAddress || "",
-        consigneeAddress: invoice.consigneeAddress || "",
-        packages: invoice.packages || 0,
-        volume: invoice.volume || 0,
-        weight: invoice.weight || 0,
-        d2d: invoice.d2d || invoice.doorToDoor || false,
-        warehouse: invoice.warehouse || "",
-        packageName: invoice.packageName || "Box"
-      }));
-      
-      setBookingFormSuggestions(formattedSuggestions);
-      console.log("Loaded invoice suggestions:", formattedSuggestions.length);
-    } catch (error) {
-      console.error("Error loading invoice suggestions:", error);
-    }
-  }, []);
-  
-  // Filter suggestions based on input
-  useEffect(() => {
-    if (invoiceNumber && invoiceNumber.length >= 3) {
-      const filtered = bookingFormSuggestions.filter(invoice => 
-        invoice.invoiceNumber.toLowerCase().includes(invoiceNumber.toLowerCase())
-      );
-      setFilteredSuggestions(filtered);
-      setShowSuggestions(filtered.length > 0);
-    } else {
-      setFilteredSuggestions([]);
-      setShowSuggestions(false);
-    }
-  }, [invoiceNumber, bookingFormSuggestions]);
   
   // Enhanced invoice selection handler
   const handleSelectInvoice = (invoice: any) => {
+    console.log("Selected invoice:", invoice);
+    
     setInvoiceNumber(invoice.invoiceNumber);
     setShipper(invoice.shipper || invoice.shipper1 || "");
     setConsignee(invoice.consignee || invoice.consignee1 || "");

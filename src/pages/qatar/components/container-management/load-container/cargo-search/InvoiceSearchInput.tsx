@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Search, AlertCircle } from "lucide-react";
@@ -38,6 +38,8 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
   onSelectInvoice = () => {},
 }) => {
   const [suggestions, setSuggestions] = useState<InvoiceData[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
 
   // Load and filter suggestions when value changes
   useEffect(() => {
@@ -64,7 +66,7 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
         setSuggestions(filtered);
         setShowSuggestions(filtered.length > 0);
         
-        console.log("Found matching invoices:", filtered.length);
+        console.log("Found matching invoices:", filtered.length, filtered);
       } catch (error) {
         console.error("Error loading invoices:", error);
         toast.error("Error loading invoices", {
@@ -78,12 +80,32 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
     }
   }, [value, setShowSuggestions]);
 
+  // Handle click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        suggestionsRef.current && 
+        !suggestionsRef.current.contains(event.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [setShowSuggestions]);
+
   return (
     <div className="relative">
       <Label className="font-bold text-gray-700 mb-1 block">GY/INVOICE NUMBER:</Label>
       <div className="flex gap-2 items-center">
         <Search size={24} className="text-gray-700" />
         <Input
+          ref={inputRef}
           value={value}
           onChange={onChange}
           placeholder="Start typing invoice number..."
@@ -93,18 +115,23 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
               setShowSuggestions(true);
             }
           }}
-          onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
           onKeyDown={onKeyPress}
         />
       </div>
       
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute w-full bg-white border border-gray-300 rounded shadow-lg z-50 mt-1 max-h-60 overflow-y-auto">
+        <div 
+          ref={suggestionsRef}
+          className="absolute w-full bg-white border border-gray-300 rounded shadow-lg z-50 mt-1 max-h-60 overflow-y-auto"
+        >
           {suggestions.map((invoice, index) => (
             <div
               key={index}
               className="p-2 hover:bg-blue-50 cursor-pointer border-b last:border-b-0"
-              onClick={() => onSelectInvoice(invoice)}
+              onClick={() => {
+                onSelectInvoice(invoice);
+                setShowSuggestions(false);
+              }}
             >
               <div className="font-medium text-blue-600">{invoice.invoiceNumber}</div>
               <div className="text-sm text-gray-600">

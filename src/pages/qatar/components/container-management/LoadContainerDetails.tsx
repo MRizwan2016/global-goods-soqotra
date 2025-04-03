@@ -58,9 +58,43 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
   
   // Setup barcode scanner for the whole page
   const handlePackageBarcodeDetected = (barcode: string) => {
-    toast.info(`Barcode detected: ${barcode}`, {
-      description: "Use the entry forms to add cargo with this barcode"
-    });
+    // Get invoices from localStorage
+    const storedInvoices = localStorage.getItem('invoices');
+    const generatedInvoices = localStorage.getItem('generatedInvoices');
+    let allInvoices: any[] = [];
+
+    try {
+      if (storedInvoices) {
+        allInvoices = [...JSON.parse(storedInvoices)];
+      }
+      if (generatedInvoices) {
+        allInvoices = [...allInvoices, ...JSON.parse(generatedInvoices)];
+      }
+
+      // Try to find the invoice by invoice number or package/barcode
+      const matchingInvoice = allInvoices.find((inv: any) => 
+        inv.invoiceNumber === barcode || 
+        inv.packages?.toString() === barcode
+      );
+
+      if (matchingInvoice) {
+        toast.success(`Detected invoice: ${matchingInvoice.invoiceNumber}`, {
+          description: "Invoice details loaded automatically"
+        });
+        
+        // TODO: This would ideally trigger the invoice selection in the form
+        // For now, we'll just notify that it was detected
+      } else {
+        toast.info(`Barcode detected: ${barcode}`, {
+          description: "No matching invoice found. Use the entry forms to add cargo with this barcode"
+        });
+      }
+    } catch (error) {
+      console.error("Error processing barcode:", error);
+      toast.info(`Barcode detected: ${barcode}`, {
+        description: "Use the entry forms to add cargo with this barcode"
+      });
+    }
   };
   
   const { scanning, toggleScanning } = useBarcodeScanner({
