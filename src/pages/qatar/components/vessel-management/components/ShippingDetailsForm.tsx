@@ -1,8 +1,8 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SECTOR_PORT_MAP, DEFAULT_PORT_OF_LOADING } from "../constants/vesselData";
+import { SECTOR_PORT_MAP } from "../constants/vesselData";
 import { VesselFormData } from "../types/vesselTypes";
 
 interface ShippingDetailsFormProps {
@@ -16,38 +16,21 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
   handleInputChange, 
   handleSelectChange 
 }) => {
-  // Automatically set port of loading to DEFAULT_PORT_OF_LOADING
-  useEffect(() => {
-    if (!formData.portOfLoading) {
-      handleSelectChange("portOfLoading", DEFAULT_PORT_OF_LOADING);
-    }
-  }, [formData.portOfLoading, handleSelectChange]);
-
-  // Get available ports of discharge based on selected sector
-  const availablePorts = formData.sector ? SECTOR_PORT_MAP[formData.sector] || [] : [];
-  
-  // Automatically set port of discharge when sector changes
-  useEffect(() => {
-    if (formData.sector && availablePorts.length > 0 && 
-        (!formData.portOfDischarge || !availablePorts.includes(formData.portOfDischarge))) {
-      handleSelectChange("portOfDischarge", availablePorts[0]);
-    }
-  }, [formData.sector, availablePorts, formData.portOfDischarge, handleSelectChange]);
-
   return (
     <div className="space-y-4">
       <div className="space-y-2">
         <label htmlFor="portOfLoading" className="block text-sm font-medium">PORT OF LOADING:</label>
         <Select 
-          value={formData.portOfLoading || "select-loading-port"} 
+          value={formData.portOfLoading || "select-port"} 
           onValueChange={(value) => handleSelectChange("portOfLoading", value)}
         >
           <SelectTrigger className="w-full hover:border-blue-400 transition-colors">
             <SelectValue placeholder="Select Port of Loading" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={DEFAULT_PORT_OF_LOADING || "default-loading-port"}>{DEFAULT_PORT_OF_LOADING || "Default Port"}</SelectItem>
-            <SelectItem value="Doha">Doha</SelectItem>
+            <SelectItem value="DOHA, QATAR">DOHA, QATAR</SelectItem>
+            <SelectItem value="HAMAD PORT, QATAR">HAMAD PORT, QATAR</SelectItem>
+            <SelectItem value="MESSAIEED PORT, QATAR">MESSAIEED PORT, QATAR</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -55,39 +38,34 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
       <div className="space-y-2">
         <label htmlFor="portOfDischarge" className="block text-sm font-medium">PORT OF DISCHARGE:</label>
         <Select 
-          value={formData.portOfDischarge || "select-discharge-port"} 
+          value={formData.portOfDischarge || "select-port"} 
           onValueChange={(value) => handleSelectChange("portOfDischarge", value)}
-          disabled={availablePorts.length === 0}
         >
           <SelectTrigger className="w-full hover:border-blue-400 transition-colors">
-            <SelectValue placeholder={availablePorts.length === 0 ? "Select a sector first" : "Select Port of Discharge"} />
+            <SelectValue placeholder="Select Port of Discharge" />
           </SelectTrigger>
           <SelectContent>
-            {availablePorts.length > 0 ? (
-              availablePorts.map(port => (
-                <SelectItem key={port} value={port || "unknown-port"}>{port || "Unknown Port"}</SelectItem>
-              ))
-            ) : (
-              <SelectItem value="no-ports-available">No ports available</SelectItem>
-            )}
+            <SelectItem value="MOMBASA, KENYA">MOMBASA, KENYA</SelectItem>
+            <SelectItem value="COLOMBO, SRI LANKA">COLOMBO, SRI LANKA</SelectItem>
+            <SelectItem value="CHENNAI, INDIA">CHENNAI, INDIA</SelectItem>
+            <SelectItem value="KARACHI, PAKISTAN">KARACHI, PAKISTAN</SelectItem>
+            <SelectItem value="CHITTAGONG, BANGLADESH">CHITTAGONG, BANGLADESH</SelectItem>
           </SelectContent>
         </Select>
-        {availablePorts.length === 0 && formData.sector && (
-          <p className="text-sm text-red-500 mt-1">No ports available for the selected sector.</p>
-        )}
       </div>
       
       <div className="space-y-2">
-        <label htmlFor="direction" className="block text-sm font-medium">DIRECT/MIX:</label>
+        <label htmlFor="direction" className="block text-sm font-medium">DIRECTION:</label>
         <Select 
-          value={formData.direction || "DIRECT"} 
+          value={formData.direction || "MIX"} 
           onValueChange={(value) => handleSelectChange("direction", value)}
         >
           <SelectTrigger className="w-full hover:border-blue-400 transition-colors">
             <SelectValue placeholder="Select Direction" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="DIRECT">DIRECT</SelectItem>
+            <SelectItem value="EXPORT">EXPORT</SelectItem>
+            <SelectItem value="IMPORT">IMPORT</SelectItem>
             <SelectItem value="MIX">MIX</SelectItem>
           </SelectContent>
         </Select>

@@ -14,7 +14,7 @@ interface TabContentProps {
   editContainerId: string | null;
   viewManifestId: string | null;
   printOptions: PrintOptions;
-  getCurrentContainer: (id: string | null) => QatarContainer | null;
+  getCurrentContainer: (id?: string | null) => QatarContainer | null;
   getCurrentCargoItems: (containerId: string | null) => any[];
   getItemList: (containerId: string | null) => any[];
   getConsigneeList: (containerId: string | null) => any[];
@@ -57,6 +57,7 @@ const TabContent: React.FC<TabContentProps> = ({
 }) => {
   // Get the current container based on the edit container ID
   const currentContainer = getCurrentContainer(editContainerId);
+  const viewContainer = getCurrentContainer(viewManifestId);
   
   return (
     <>
@@ -119,9 +120,9 @@ const TabContent: React.FC<TabContentProps> = ({
       </TabsContent>
       
       <TabsContent value="view-manifest" className="m-0">
-        {currentContainer && (
+        {viewContainer && (
           <ViewManifestTab
-            container={currentContainer}
+            container={viewContainer}
             printOptions={printOptions}
             onPrintOptionsChange={onPrintOptionsChange}
             onPrint={onPrint}

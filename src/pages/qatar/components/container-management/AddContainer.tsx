@@ -1,414 +1,269 @@
 
 import React, { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
+import { ArrowLeft, Save } from "lucide-react";
+import { v4 as uuidv4 } from 'uuid';
 import { QatarContainer } from "../../types/containerTypes";
-import { v4 as uuidv4 } from "uuid";
-import { ArrowLeft } from "lucide-react";
-import { toast } from "sonner";
 
 interface AddContainerProps {
+  containerData?: QatarContainer;
+  isEditing?: boolean;
   onSubmit: (container: QatarContainer) => void;
   onCancel: () => void;
-  containerData?: QatarContainer | null;
-  isEditing?: boolean;
 }
 
-const containerTypes = ["20FT", "40FT", "40HC", "20FR", "40FR", "20OT", "40OT"];
-const shippingLines = ["MSC", "Maersk", "CMA CGM", "Hapag-Lloyd", "ONE", "Evergreen", "COSCO"];
-const sectors = ["QAT-KEN", "QAT-SL", "QAT-UAE", "QAT-SA", "QAT-OM"];
-const directions = ["Import", "Export", "MIX"];
-
-// Generate running numbers starting from 100
-const generateRunningNumber = (existingNumbers: string[] = []): string => {
-  // Find the highest existing number
-  let highestNumber = 99; // Start at 99 so the first container will be 100
-  
-  existingNumbers.forEach(numStr => {
-    if (!numStr) return;
-    
-    // Extract numeric part if the running number is not just a number
-    const numericPart = numStr.replace(/\D/g, '');
-    const num = parseInt(numericPart);
-    
-    if (!isNaN(num) && num > highestNumber) {
-      highestNumber = num;
-    }
-  });
-  
-  // Return the next number
-  return (highestNumber + 1).toString();
-};
-
-// Function to generate a job number based on container details
-const generateJobNumber = (containerNumber: string = "", sector: string = ""): string => {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const random = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
-  
-  // Extract sector prefix if available
-  const sectorPrefix = sector.split('-')[0] || 'QAT';
-  
-  // Extract container number suffix (last 4 digits or characters)
-  const containerSuffix = containerNumber 
-    ? containerNumber.slice(-4) 
-    : random.toString().slice(0, 4);
-    
-  return `JOB-${sectorPrefix}-${year}${month}${day}-${containerSuffix}`;
-};
-
-const AddContainer: React.FC<AddContainerProps> = ({ 
-  onSubmit, 
-  onCancel, 
-  containerData = null, 
-  isEditing = false 
+const AddContainer: React.FC<AddContainerProps> = ({
+  containerData,
+  isEditing = false,
+  onSubmit,
+  onCancel
 }) => {
-  const [formData, setFormData] = useState<QatarContainer>({
-    id: "",
+  const [container, setContainer] = useState<QatarContainer>({
+    id: uuidv4(),
     containerNumber: "",
     containerType: "20FT",
     runningNumber: "",
     status: "Available",
-    sealNumber: "",
+    shippingLine: "MSC",
     direction: "Export",
     sector: "QAT-KEN",
-    shippingLine: "MSC",
-    loadDate: new Date().toISOString().split('T')[0],
-    jobNumber: ""
+    ...containerData
   });
-
-  // Store existing running numbers for auto-generation
-  const [existingRunningNumbers, setExistingRunningNumbers] = useState<string[]>([]);
-  const [jobNumber, setJobNumber] = useState<string>("");
-
-  useEffect(() => {
-    // Get existing running numbers from mock data or localStorage
-    const fetchExistingRunningNumbers = async () => {
-      try {
-        // Attempt to get existing running numbers from localStorage
-        const savedNumbers = localStorage.getItem('existingRunningNumbers');
-        let mockNumbers: string[] = [];
-        
-        if (savedNumbers) {
-          try {
-            mockNumbers = JSON.parse(savedNumbers);
-            console.log("Loaded existing running numbers:", mockNumbers);
-          } catch (err) {
-            console.error("Error parsing saved running numbers:", err);
-            mockNumbers = ["100", "101", "102", "103"];
-          }
-        } else {
-          // Mock data for now - in a real app, fetch from API
-          mockNumbers = ["100", "101", "102", "103"];
-          localStorage.setItem('existingRunningNumbers', JSON.stringify(mockNumbers));
-        }
-        
-        setExistingRunningNumbers(mockNumbers);
-        
-        // Set a new running number if not editing
-        if (!containerData && !formData.runningNumber) {
-          const newNumber = generateRunningNumber(mockNumbers);
-          console.log("Generated new running number:", newNumber);
-          
-          setFormData(prev => ({...prev, runningNumber: newNumber}));
-          
-          // Add the new number to our list
-          const updatedNumbers = [...mockNumbers, newNumber];
-          setExistingRunningNumbers(updatedNumbers);
-          localStorage.setItem('existingRunningNumbers', JSON.stringify(updatedNumbers));
-        }
-      } catch (error) {
-        console.error("Failed to fetch running numbers:", error);
-        toast.error("Failed to generate running number");
-      }
-    };
-    
-    fetchExistingRunningNumbers();
-  }, []);
-
-  useEffect(() => {
-    if (containerData) {
-      setFormData(containerData);
-      
-      // If job number already exists for this container, retrieve it
-      if (containerData.id) {
-        if (containerData.jobNumber) {
-          setJobNumber(containerData.jobNumber);
-        } else {
-          // Generate new job number
-          const newJobNumber = generateJobNumber(containerData.containerNumber, containerData.sector);
-          setJobNumber(newJobNumber);
-        }
-      }
-    } else {
-      // For new containers
-      const newRunningNumber = generateRunningNumber(existingRunningNumbers);
-      const newId = uuidv4();
-      
-      setFormData({
-        id: newId,
-        containerNumber: "",
-        containerType: "20FT",
-        runningNumber: newRunningNumber,
-        status: "Available",
-        sealNumber: "",
-        direction: "Export",
-        sector: "QAT-KEN",
-        shippingLine: "MSC",
-        loadDate: new Date().toISOString().split('T')[0],
-        jobNumber: ""
-      });
-      
-      // Generate a job number placeholder
-      const placeholderJobNumber = generateJobNumber("", "QAT-KEN");
-      setJobNumber(placeholderJobNumber);
-    }
-  }, [containerData, existingRunningNumbers]);
-
-  const handleChange = (field: keyof QatarContainer, value: string | number) => {
-    setFormData((prev) => ({
+  
+  const handleChange = (field: string, value: string) => {
+    setContainer(prev => ({
       ...prev,
-      [field]: value,
+      [field]: value
     }));
-    
-    // If container number or sector changes, update job number
-    if (field === 'containerNumber' || field === 'sector') {
-      const newJobNumber = generateJobNumber(
-        field === 'containerNumber' ? value as string : formData.containerNumber,
-        field === 'sector' ? value as string : formData.sector
-      );
-      setJobNumber(newJobNumber);
-    }
   };
-
+  
+  const handleNumberChange = (field: string, value: string) => {
+    // For fields that should be numbers
+    const numValue = value === "" ? 0 : parseFloat(value);
+    setContainer(prev => ({
+      ...prev,
+      [field]: numValue
+    }));
+  };
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Add job number to form data and ensure running number is included
-    const completeFormData: QatarContainer = {
-      ...formData,
-      jobNumber: jobNumber,
-      runningNumber: formData.runningNumber || generateRunningNumber(existingRunningNumbers)
-    };
-    
-    // Ensure we have a running number
-    if (!completeFormData.runningNumber) {
-      toast.error("Failed to generate running number");
-      return;
+    // Generate running number if not provided
+    if (!container.runningNumber) {
+      const date = new Date();
+      const year = date.getFullYear().toString().substring(2);
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+      
+      setContainer(prev => ({
+        ...prev,
+        runningNumber: `C${year}${month}${random}`
+      }));
     }
     
-    // Save job number to localStorage
-    if (completeFormData.id) {
-      localStorage.setItem(`jobNumber_${completeFormData.id}`, jobNumber);
-    }
-    
-    // Add this running number to our saved list if it's a new container
-    if (!isEditing && formData.runningNumber) {
-      // Make sure the running number is not already in the list
-      if (!existingRunningNumbers.includes(formData.runningNumber)) {
-        const updatedNumbers = [...existingRunningNumbers, formData.runningNumber];
-        localStorage.setItem('existingRunningNumbers', JSON.stringify(updatedNumbers));
-      }
-    }
-    
-    // Log the complete form data
-    console.log("Submitting container:", completeFormData);
-    
-    onSubmit(completeFormData);
+    onSubmit(container);
   };
 
-  // Generate running number options
-  const generateRunningNumberOptions = () => {
-    const options = [];
-    const start = 100;
-    const end = start + 50; // Show 50 options
-    
-    for (let i = start; i <= end; i++) {
-      options.push(i.toString());
+  useEffect(() => {
+    // If editing, update the state with the container data
+    if (containerData && isEditing) {
+      setContainer(containerData);
     }
-    
-    return options;
-  };
-
-  // Make sure we have valid values for Select components
-  const safeShippingLine = formData.shippingLine || "MSC";
-  const safeDirection = formData.direction || "Export";
-  const safeSector = formData.sector || "QAT-KEN";
-  const safeContainerType = formData.containerType || "20FT";
-  const safeRunningNumber = formData.runningNumber || generateRunningNumberOptions()[0] || "100";
+  }, [containerData, isEditing]);
 
   return (
-    <Card className="mt-0 border-0 shadow-none">
-      <CardContent className="p-6">
-        <div className="flex items-center mb-6">
-          <Button variant="outline" onClick={onCancel} className="mr-4">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-          <h2 className="text-2xl font-bold">
-            {isEditing ? "Edit Container" : "Add Container"}
-          </h2>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="containerNumber">Container Number</Label>
-                <Input
-                  id="containerNumber"
-                  placeholder="Enter container number"
-                  value={formData.containerNumber}
-                  onChange={(e) => handleChange("containerNumber", e.target.value)}
-                  required
-                />
-              </div>
+    <div className="p-6">
+      <div className="flex items-center mb-6">
+        <Button variant="outline" onClick={onCancel} className="mr-4">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+        <h2 className="text-2xl font-bold">
+          {isEditing ? "Edit Container" : "Add New Container"}
+        </h2>
+      </div>
 
-              <div>
-                <Label htmlFor="containerType">Container Type</Label>
-                <Select
-                  value={safeContainerType}
-                  onValueChange={(value) => handleChange("containerType", value)}
-                >
-                  <SelectTrigger id="containerType">
-                    <SelectValue placeholder="Select container type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {containerTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="runningNumber">Running Number (auto-generated)</Label>
-                <Select
-                  value={safeRunningNumber}
-                  onValueChange={(value) => handleChange("runningNumber", value)}
-                >
-                  <SelectTrigger id="runningNumber">
-                    <SelectValue placeholder="Select running number" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {generateRunningNumberOptions().map((num) => (
-                      <SelectItem key={num} value={num}>
-                        {num}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="sealNumber">Seal Number</Label>
-                <Input
-                  id="sealNumber"
-                  placeholder="Enter seal number"
-                  value={formData.sealNumber || ""}
-                  onChange={(e) => handleChange("sealNumber", e.target.value)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="jobNumber">Job Number (auto-generated)</Label>
-                <Input
-                  id="jobNumber"
-                  value={jobNumber}
-                  readOnly
-                  className="bg-gray-100"
-                />
-              </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="containerNumber" className="font-semibold">
+                Container Number*
+              </Label>
+              <Input
+                id="containerNumber"
+                value={container.containerNumber}
+                onChange={(e) => handleChange("containerNumber", e.target.value)}
+                placeholder="e.g., ABCD1234567"
+                required
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="containerType" className="font-semibold">
+                Container Type
+              </Label>
+              <Select
+                value={container.containerType}
+                onValueChange={(value) => handleChange("containerType", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select container type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="20FT">20FT</SelectItem>
+                  <SelectItem value="40FT">40FT</SelectItem>
+                  <SelectItem value="40HC">40HC</SelectItem>
+                  <SelectItem value="45HC">45HC</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="sector" className="font-semibold">
+                Sector
+              </Label>
+              <Select
+                value={container.sector || "QAT-KEN"}
+                onValueChange={(value) => handleChange("sector", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select sector" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="QAT-KEN">QAT-KEN</SelectItem>
+                  <SelectItem value="QAT-LKA">QAT-LKA</SelectItem>
+                  <SelectItem value="QAT-IND">QAT-IND</SelectItem>
+                  <SelectItem value="QAT-PAK">QAT-PAK</SelectItem>
+                  <SelectItem value="QAT-BGD">QAT-BGD</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="status" className="font-semibold">
+                Status
+              </Label>
+              <Select
+                value={container.status}
+                onValueChange={(value) => handleChange("status", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Available">Available</SelectItem>
+                  <SelectItem value="In Transit">In Transit</SelectItem>
+                  <SelectItem value="Loading">Loading</SelectItem>
+                  <SelectItem value="Loaded">Loaded</SelectItem>
+                  <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="runningNumber" className="font-semibold">
+                Running Number
+              </Label>
+              <Input
+                id="runningNumber"
+                value={container.runningNumber || ""}
+                onChange={(e) => handleChange("runningNumber", e.target.value)}
+                placeholder="Auto-generated if left empty"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="shippingLine" className="font-semibold">
+                Shipping Line
+              </Label>
+              <Select
+                value={container.shippingLine || "MSC"}
+                onValueChange={(value) => handleChange("shippingLine", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select shipping line" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="MSC">MSC</SelectItem>
+                  <SelectItem value="CMA CGM">CMA CGM</SelectItem>
+                  <SelectItem value="MAERSK">MAERSK</SelectItem>
+                  <SelectItem value="EVERGREEN">EVERGREEN</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div>
+              <Label htmlFor="direction" className="font-semibold">
+                Direction
+              </Label>
+              <Select
+                value={container.direction || "Export"}
+                onValueChange={(value) => handleChange("direction", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select direction" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Export">Export</SelectItem>
+                  <SelectItem value="Import">Import</SelectItem>
+                  <SelectItem value="Transit">Transit</SelectItem>
+                  <SelectItem value="MIX">Mix</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="shippingLine">Shipping Line</Label>
-                <Select
-                  value={safeShippingLine}
-                  onValueChange={(value) => handleChange("shippingLine", value)}
-                >
-                  <SelectTrigger id="shippingLine">
-                    <SelectValue placeholder="Select shipping line" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {shippingLines.map((line) => (
-                      <SelectItem key={line} value={line}>
-                        {line}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="direction">Direction</Label>
-                <Select
-                  value={safeDirection}
-                  onValueChange={(value) => handleChange("direction", value)}
-                >
-                  <SelectTrigger id="direction">
-                    <SelectValue placeholder="Select direction" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {directions.map((dir) => (
-                      <SelectItem key={dir} value={dir}>
-                        {dir}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="sector">Sector</Label>
-                <Select
-                  value={safeSector}
-                  onValueChange={(value) => handleChange("sector", value)}
-                >
-                  <SelectTrigger id="sector">
-                    <SelectValue placeholder="Select sector" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sectors.map((sector) => (
-                      <SelectItem key={sector} value={sector}>
-                        {sector}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label htmlFor="loadDate">Load Date</Label>
+                <Label htmlFor="etd" className="font-semibold">
+                  ETD
+                </Label>
                 <Input
-                  id="loadDate"
+                  id="etd"
                   type="date"
-                  value={formData.loadDate || new Date().toISOString().split('T')[0]}
-                  onChange={(e) => handleChange("loadDate", e.target.value)}
+                  value={container.etd || ""}
+                  onChange={(e) => handleChange("etd", e.target.value)}
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="eta" className="font-semibold">
+                  ETA
+                </Label>
+                <Input
+                  id="eta"
+                  type="date"
+                  value={container.eta || ""}
+                  onChange={(e) => handleChange("eta", e.target.value)}
                 />
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="flex justify-end gap-4">
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Cancel
-            </Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-              {isEditing ? "Update Container" : "Add Container"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+        <div className="flex justify-end space-x-4">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            Cancel
+          </Button>
+          <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+            <Save className="h-4 w-4 mr-2" />
+            {isEditing ? "Update Container" : "Save Container"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 

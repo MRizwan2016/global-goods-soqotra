@@ -21,10 +21,16 @@ export const useContainerData = () => {
         const parsedContainers = JSON.parse(savedContainers);
         if (Array.isArray(parsedContainers) && parsedContainers.length > 0) {
           setContainers(parsedContainers);
+          console.log("Loaded containers from local storage:", parsedContainers.length);
         }
+      } else {
+        // If no saved containers, save the mock data
+        saveContainersToLocalStorage(mockContainers);
+        console.log("No saved containers found, using mock data");
       }
     } catch (error) {
       console.error("Error loading containers:", error);
+      toast.error("Error loading containers");
     } finally {
       // Add a slight delay to make loading state visible
       setTimeout(() => setIsLoading(false), 800);
@@ -34,12 +40,16 @@ export const useContainerData = () => {
   const saveContainersToLocalStorage = (containersData: QatarContainer[]) => {
     try {
       localStorage.setItem('containers', JSON.stringify(containersData));
+      console.log("Saved containers to localStorage:", containersData.length);
     } catch (error) {
       console.error("Error saving containers to localStorage:", error);
+      toast.error("Error saving containers");
     }
   };
 
   const handleAddContainer = (newContainer: QatarContainer) => {
+    console.log("Adding container:", newContainer);
+    
     // Generate a unique ID if one is not provided
     if (!newContainer.id) {
       newContainer.id = uuidv4();
@@ -70,10 +80,13 @@ export const useContainerData = () => {
   };
 
   const handleEditContainer = (containerId: string) => {
+    console.log("Editing container:", containerId);
     setEditContainerId(containerId);
   };
 
   const handleUpdateContainer = (updatedContainer: QatarContainer) => {
+    console.log("Updating container:", updatedContainer);
+    
     const updatedContainers = containers.map(container => 
       container.id === updatedContainer.id ? updatedContainer : container
     );
@@ -90,8 +103,9 @@ export const useContainerData = () => {
     return updatedContainers;
   };
 
-  const getCurrentContainer = () => {
-    return containers.find(container => container.id === editContainerId) || null;
+  const getCurrentContainer = (id: string | null = null) => {
+    const containerIdToUse = id || editContainerId;
+    return containers.find(container => container.id === containerIdToUse) || null;
   };
 
   return {

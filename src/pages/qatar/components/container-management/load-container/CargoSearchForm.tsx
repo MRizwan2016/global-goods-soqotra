@@ -1,19 +1,14 @@
 
 import React, { useState, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ContainerCargo } from "../../../types/containerTypes";
+import { Grid } from "@/components/ui/grid";
+import { v4 as uuidv4 } from 'uuid';
 import { toast } from "sonner";
-import { Search, Barcode, FileSearch, Package, Plus, AlertCircle } from "lucide-react";
-import BarcodeSearch from "./cargo-search/BarcodeSearch";
+import { ContainerCargo } from "../../../types/containerTypes";
+import { Search, PackageOpen, AlertCircle } from "lucide-react";
 import InvoiceSearchInput from "./cargo-search/InvoiceSearchInput";
-import CargoDetailsInputs from "./cargo-search/CargoDetailsInputs";
-import InsertCargoButton from "./cargo-search/InsertCargoButton";
-import SearchMethodSelector from "./cargo-search/SearchMethodSelector";
 
 interface CargoSearchFormProps {
   containerId: string;
@@ -21,408 +16,229 @@ interface CargoSearchFormProps {
   existingCargo: ContainerCargo[];
 }
 
-interface InvoiceSuggestion {
-  invoiceNumber: string;
-  shipper: string;
-  consignee: string;
-  packageName?: string;
-  volume?: number;
-  weight?: number;
-  id?: string;
-}
-
-const CargoSearchForm: React.FC<CargoSearchFormProps> = ({ 
-  containerId, 
+const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
+  containerId,
   onAddCargo,
-  existingCargo 
+  existingCargo
 }) => {
-  const [searchMethod, setSearchMethod] = useState<"invoice" | "barcode">("invoice");
-  const [invoiceQuery, setInvoiceQuery] = useState("");
-  const [barcodeQuery, setBarcodeQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [selectedResult, setSelectedResult] = useState<any | null>(null);
-  const [invoiceSuggestions, setInvoiceSuggestions] = useState<InvoiceSuggestion[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [cargoForm, setCargoForm] = useState({
-    invoiceNumber: "",
-    lineNumber: "",
-    barcode: "",
-    packageName: "",
-    volume: "",
-    weight: "",
-    shipper: "",
-    consignee: "",
-    wh: "WH001",
-    d2d: false,
-    quantity: "1"
-  });
-
-  // Fetch invoice data from localStorage when component mounts
-  useEffect(() => {
-    // Get all saved invoices from localStorage
-    const savedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    
-    // Also check generated invoices if they exist
-    const generatedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
-    
-    // Combine the invoices
-    const allInvoices = [...savedInvoices, ...generatedInvoices];
-    
-    // Map to the format needed for suggestions
-    const mappedInvoices = allInvoices.map(invoice => ({
-      id: invoice.id,
-      invoiceNumber: invoice.invoiceNumber,
-      shipper: invoice.shipper1 || invoice.shipper || "Unknown Shipper",
-      consignee: invoice.consignee1 || invoice.consignee || "Unknown Consignee",
-      packageName: invoice.packageName || "General Cargo",
-      volume: calculateTotalVolume(invoice),
-      weight: calculateTotalWeight(invoice)
-    }));
-    
-    // Store for later use
-    localStorage.setItem('availableInvoices', JSON.stringify(mappedInvoices));
-    
-    console.log("Loaded invoice data for container loading:", mappedInvoices.length, "invoices");
-  }, []);
-
-  // Calculate total volume for an invoice (from packageDetails)
-  const calculateTotalVolume = (invoice: any): number => {
-    if (!invoice.packageDetails || !Array.isArray(invoice.packageDetails)) return 0;
-    return invoice.packageDetails.reduce((total: number, pkg: any) => total + (parseFloat(pkg.volume) || 0), 0);
-  };
-
-  // Calculate total weight for an invoice (from packageDetails)
-  const calculateTotalWeight = (invoice: any): number => {
-    if (!invoice.packageDetails || !Array.isArray(invoice.packageDetails)) return 0;
-    return invoice.packageDetails.reduce((total: number, pkg: any) => total + (parseFloat(pkg.weight) || 0), 0);
-  };
+  // Form state
+  const [invoiceNumber, setInvoiceNumber] = useState<string>("");
+  const [lineNumber, setLineNumber] = useState<string>("");
+  const [packageName, setPackageName] = useState<string>("");
+  const [volume, setVolume] = useState<number>(0);
+  const [weight, setWeight] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number>(1);
+  const [shipper, setShipper] = useState<string>("");
+  const [consignee, setConsignee] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [barcode, setBarcode] = useState<string>("");
   
-  // Filter invoice suggestions based on query
+  // Suggestions state
+  const [bookingFormSuggestions, setBookingFormSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  
+  // Load saved invoices from localStorage for suggestions
   useEffect(() => {
-    if (invoiceQuery.length >= 3) {
-      const availableInvoices: InvoiceSuggestion[] = JSON.parse(localStorage.getItem('availableInvoices') || '[]');
+    try {
+      const savedInvoices = localStorage.getItem('invoices');
+      if (savedInvoices) {
+        const parsedInvoices = JSON.parse(savedInvoices);
+        
+        // Format for suggestions
+        const formattedSuggestions = parsedInvoices.map((invoice: any) => ({
+          invoiceNumber: invoice.invoiceNumber || invoice.bookingForm || "",
+          shipper: invoice.shipperName || "",
+          consignee: invoice.consigneeName || "",
+          shipperAddress: invoice.shipperAddress || "",
+          consigneeAddress: invoice.consigneeAddress || "",
+          packages: invoice.packages || [],
+          totalVolume: invoice.totalVolume || 0,
+          totalWeight: invoice.totalWeight || 0
+        }));
+        
+        setBookingFormSuggestions(formattedSuggestions);
+        console.log("Loaded suggestions:", formattedSuggestions.length);
+      }
+    } catch (error) {
+      console.error("Error loading invoice suggestions:", error);
+    }
+  }, []);
+  
+  // Handle selecting an invoice from suggestions
+  const handleSelectInvoice = (invoice: any) => {
+    setInvoiceNumber(invoice.invoiceNumber);
+    setShipper(invoice.shipper);
+    setConsignee(invoice.consignee);
+    
+    // Get total volume and weight from packages
+    if (invoice.packages && invoice.packages.length > 0) {
+      const totalVol = invoice.totalVolume || 
+        invoice.packages.reduce((sum: number, pkg: any) => sum + (parseFloat(pkg.volume) || 0), 0);
       
-      const filteredInvoices = availableInvoices.filter(invoice => 
-        invoice.invoiceNumber.includes(invoiceQuery)
-      );
+      const totalWgt = invoice.totalWeight || 
+        invoice.packages.reduce((sum: number, pkg: any) => sum + (parseFloat(pkg.weight) || 0), 0);
       
-      setInvoiceSuggestions(filteredInvoices);
-      setShowSuggestions(filteredInvoices.length > 0);
-    } else {
-      setInvoiceSuggestions([]);
-      setShowSuggestions(false);
-    }
-  }, [invoiceQuery]);
-
-  // Handle invoice search
-  const handleInvoiceSearch = () => {
-    if (!invoiceQuery) {
-      toast.error("Please enter an invoice number");
-      return;
+      setVolume(totalVol);
+      setWeight(totalWgt);
+      
+      // Set default package name if available
+      if (invoice.packages[0]?.packageName) {
+        setPackageName(invoice.packages[0].packageName);
+      }
+      
+      // Set quantity to number of packages
+      setQuantity(invoice.packages.length);
     }
     
-    // Search in all available invoices
-    const availableInvoices = JSON.parse(localStorage.getItem('availableInvoices') || '[]');
-    const results = availableInvoices.filter((invoice: any) => 
-      invoice.invoiceNumber.includes(invoiceQuery)
-    );
-    
-    setSearchResults(results);
-    
-    if (results.length === 0) {
-      toast.error("No results found for invoice: " + invoiceQuery);
-    }
-  };
-
-  // Handle barcode search
-  const handleBarcodeSearch = () => {
-    if (!barcodeQuery) {
-      toast.error("Please scan or enter a barcode");
-      return;
-    }
-    
-    const mockResult = {
-      id: "mock-barcode",
-      invoiceNumber: "INV" + barcodeQuery.substring(2, 7),
-      lineNumber: "LN003",
-      packageName: "Barcode Item",
-      volume: 0.5,
-      weight: 75,
-      shipper: "Barcode Shipper",
-      consignee: "Barcode Consignee",
-      barcode: barcodeQuery,
-      wh: "WH003",
-      d2d: true,
-      quantity: 1
-    };
-    
-    setSelectedResult(mockResult);
-    // Prefill the form with the result data
-    setCargoForm({
-      invoiceNumber: mockResult.invoiceNumber,
-      lineNumber: mockResult.lineNumber,
-      barcode: mockResult.barcode,
-      packageName: mockResult.packageName,
-      volume: mockResult.volume.toString(),
-      weight: mockResult.weight.toString(),
-      shipper: mockResult.shipper,
-      consignee: mockResult.consignee,
-      wh: mockResult.wh || "WH001",
-      d2d: mockResult.d2d || false,
-      quantity: mockResult.quantity?.toString() || "1"
-    });
-    toast.success("Item found: " + mockResult.packageName);
-  };
-
-  // Handle selecting an invoice from the suggestions dropdown
-  const handleSelectInvoice = (invoice: InvoiceSuggestion) => {
-    setInvoiceQuery(invoice.invoiceNumber);
     setShowSuggestions(false);
-    
-    // Create a result object from the selected invoice
-    const result = {
-      id: invoice.id || uuidv4(),
-      invoiceNumber: invoice.invoiceNumber,
-      lineNumber: `LN${Math.floor(1000 + Math.random() * 9000)}`,
-      packageName: invoice.packageName || "General Cargo",
-      volume: invoice.volume || 1,
-      weight: invoice.weight || 100,
-      shipper: invoice.shipper,
-      consignee: invoice.consignee,
-      barcode: `BC${Math.floor(100000000 + Math.random() * 900000000)}`,
-      wh: "WH001",
-      d2d: false,
-      quantity: 1
-    };
-    
-    setSelectedResult(result);
-    // Prefill the form
-    setCargoForm({
-      invoiceNumber: result.invoiceNumber,
-      lineNumber: result.lineNumber,
-      barcode: result.barcode,
-      packageName: result.packageName,
-      volume: result.volume.toString(),
-      weight: result.weight.toString(),
-      shipper: result.shipper,
-      consignee: result.consignee,
-      wh: "WH001",
-      d2d: false,
-      quantity: "1"
-    });
-    
     toast.success(`Invoice ${invoice.invoiceNumber} selected`);
   };
-
-  // Select a result from the search results table
-  const handleSelectResult = (result: any) => {
-    setSelectedResult(result);
-    // Prefill the form with the result data
-    setCargoForm({
-      invoiceNumber: result.invoiceNumber,
-      lineNumber: result.lineNumber,
-      barcode: result.barcode,
-      packageName: result.packageName,
-      volume: result.volume.toString(),
-      weight: result.weight.toString(),
-      shipper: result.shipper,
-      consignee: result.consignee,
-      wh: result.wh || "WH001",
-      d2d: result.d2d || false,
-      quantity: result.quantity?.toString() || "1"
-    });
-  };
-
-  // Handle form input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setCargoForm(prev => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value
-    }));
-  };
-
-  // Add cargo to the container
-  const handleAddCargo = () => {
-    // Validate form
-    if (!cargoForm.invoiceNumber || !cargoForm.packageName || !cargoForm.volume || !cargoForm.weight) {
-      toast.error("Please fill in all required fields");
-      return;
-    }
+  
+  // Filter suggestions based on input
+  const filteredSuggestions = bookingFormSuggestions.filter(invoice => 
+    invoice.invoiceNumber.toLowerCase().includes(invoiceNumber.toLowerCase())
+  );
+  
+  // Handle form submission to add cargo
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     
-    // Check if this invoice+barcode combination is already in the container
-    const isDuplicate = existingCargo.some(item => 
-      item.invoiceNumber === cargoForm.invoiceNumber && 
-      item.barcode === cargoForm.barcode && 
-      cargoForm.barcode !== ""
-    );
-    
-    if (isDuplicate) {
-      toast.error("This package is already loaded in the container", {
-        description: "Each package can only be loaded once",
+    if (!invoiceNumber) {
+      toast.error("Invoice number is required", {
         icon: <AlertCircle className="h-5 w-5 text-red-500" />
       });
       return;
     }
     
-    // Create cargo item
     const newCargo: ContainerCargo = {
       id: uuidv4(),
-      containerId: containerId,
-      invoiceNumber: cargoForm.invoiceNumber,
-      lineNumber: cargoForm.lineNumber || `LN${Math.floor(1000 + Math.random() * 9000)}`,
-      barcode: cargoForm.barcode || `BC${Math.floor(100000000 + Math.random() * 900000000)}`,
-      packageName: cargoForm.packageName,
-      volume: parseFloat(cargoForm.volume),
-      weight: parseFloat(cargoForm.weight),
-      shipper: cargoForm.shipper,
-      consignee: cargoForm.consignee,
-      wh: cargoForm.wh,
-      d2d: cargoForm.d2d,
-      quantity: parseInt(cargoForm.quantity) || 1
+      containerId,
+      invoiceNumber,
+      lineNumber,
+      packageName: packageName || "Package",
+      volume: Number(volume) || 0,
+      weight: Number(weight) || 0,
+      quantity: Number(quantity) || 1,
+      shipper,
+      consignee,
+      description,
+      barcode,
+      d2d: false
     };
     
-    // Add to parent component
     onAddCargo(newCargo);
     
-    // Reset form
-    setCargoForm({
-      invoiceNumber: "",
-      lineNumber: "",
-      barcode: "",
-      packageName: "",
-      volume: "",
-      weight: "",
-      shipper: "",
-      consignee: "",
-      wh: "WH001",
-      d2d: false,
-      quantity: "1"
-    });
-    
-    // Reset search state
-    setSearchResults([]);
-    setSelectedResult(null);
-    setInvoiceQuery("");
-    setBarcodeQuery("");
-    
-    // Show success toast
-    toast.success("Cargo added successfully");
+    // Reset form fields after adding
+    setLineNumber("");
+    setPackageName("");
+    setVolume(0);
+    setWeight(0);
+    setQuantity(1);
+    setDescription("");
+    setBarcode("");
+  };
+  
+  // Handle invoice search key press events
+  const handleInvoiceKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && filteredSuggestions.length > 0) {
+      handleSelectInvoice(filteredSuggestions[0]);
+      e.preventDefault();
+    }
   };
 
   return (
-    <div className="space-y-6">
-      <SearchMethodSelector 
-        searchMethod={searchMethod}
-        onMethodChange={setSearchMethod}
-      />
-      
-      {searchMethod === "invoice" && (
-        <Card className="shadow-sm">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center">
-              <FileSearch className="mr-2" size={18} />
-              Invoice Search
-            </CardTitle>
-            <CardDescription>
-              Search for cargo by invoice number
-            </CardDescription>
-          </CardHeader>
-          
-          <CardContent>
-            <div className="flex gap-2 mb-4">
-              <div className="flex-grow">
-                <InvoiceSearchInput 
-                  value={invoiceQuery}
-                  onChange={(e) => setInvoiceQuery(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleInvoiceSearch()}
-                  bookingFormSuggestions={invoiceSuggestions}
-                  showSuggestions={showSuggestions}
-                  setShowSuggestions={setShowSuggestions}
-                  onSelectInvoice={handleSelectInvoice}
-                />
-              </div>
-              <Button onClick={handleInvoiceSearch} className="flex-shrink-0">
-                <Search className="mr-2" size={16} />
-                Search
-              </Button>
-            </div>
-            
-            {searchResults.length > 0 && (
-              <div className="mt-4">
-                <h3 className="font-medium mb-2">Search Results</h3>
-                <div className="border rounded overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="px-4 py-2 text-left">Invoice</th>
-                        <th className="px-4 py-2 text-left">Package</th>
-                        <th className="px-4 py-2 text-right">Volume</th>
-                        <th className="px-4 py-2 text-right">Weight</th>
-                        <th className="px-4 py-2 text-center">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {searchResults.map((result) => (
-                        <tr 
-                          key={result.id} 
-                          className={`border-b hover:bg-gray-50 ${
-                            selectedResult?.id === result.id ? 'bg-blue-50' : ''
-                          }`}
-                        >
-                          <td className="px-4 py-2">{result.invoiceNumber}</td>
-                          <td className="px-4 py-2">{result.packageName}</td>
-                          <td className="px-4 py-2 text-right">{result.volume.toFixed(3)}</td>
-                          <td className="px-4 py-2 text-right">{result.weight.toFixed(2)}</td>
-                          <td className="px-4 py-2 text-center">
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => handleSelectResult(result)}
-                              className="text-blue-600 hover:bg-blue-50"
-                            >
-                              Select
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
-      
-      {searchMethod === "barcode" && (
-        <BarcodeSearch 
-          value={barcodeQuery}
-          onChange={setBarcodeQuery}
-          onSearch={handleBarcodeSearch}
-        />
-      )}
-      
-      <Card className="shadow-sm">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg flex items-center">
-            <Package className="mr-2" size={18} />
-            Cargo Details
-          </CardTitle>
-        </CardHeader>
-        
-        <CardContent>
-          <CargoDetailsInputs 
-            cargoForm={cargoForm}
-            onChange={handleChange}
+    <form onSubmit={handleSubmit}>
+      <Grid className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div>
+          <InvoiceSearchInput 
+            value={invoiceNumber}
+            onChange={(e) => setInvoiceNumber(e.target.value)}
+            onKeyPress={handleInvoiceKeyPress}
+            bookingFormSuggestions={filteredSuggestions}
+            showSuggestions={showSuggestions}
+            setShowSuggestions={setShowSuggestions}
+            onSelectInvoice={handleSelectInvoice}
           />
           
-          <div className="flex justify-end mt-6">
-            <InsertCargoButton onClick={handleAddCargo} />
+          <div className="mt-3">
+            <Label className="font-bold text-gray-700 mb-1 block">CARGO GROUP/LINE NO.</Label>
+            <Input 
+              value={lineNumber}
+              onChange={(e) => setLineNumber(e.target.value)}
+              placeholder="Line number"
+            />
           </div>
-        </CardContent>
-      </Card>
-    </div>
+          
+          <div className="mt-3">
+            <Label className="font-bold text-gray-700 mb-1 block">SHIPPER:</Label>
+            <Input 
+              value={shipper}
+              onChange={(e) => setShipper(e.target.value)}
+              placeholder="Shipper name"
+            />
+          </div>
+          
+          <div className="mt-3">
+            <Label className="font-bold text-gray-700 mb-1 block">CONSIGNEE:</Label>
+            <Input 
+              value={consignee}
+              onChange={(e) => setConsignee(e.target.value)}
+              placeholder="Consignee name"
+            />
+          </div>
+        </div>
+        
+        <div>
+          <div>
+            <Label className="font-bold text-gray-700 mb-1 block">PACKAGE TYPE:</Label>
+            <Input 
+              value={packageName}
+              onChange={(e) => setPackageName(e.target.value)}
+              placeholder="Box, Carton, etc."
+            />
+          </div>
+          
+          <div className="mt-3">
+            <Label className="font-bold text-gray-700 mb-1 block">VOLUME (m³):</Label>
+            <Input 
+              type="number"
+              step="0.001"
+              value={volume}
+              onChange={(e) => setVolume(parseFloat(e.target.value))}
+            />
+          </div>
+          
+          <div className="mt-3">
+            <Label className="font-bold text-gray-700 mb-1 block">WEIGHT (kg):</Label>
+            <Input 
+              type="number"
+              step="0.01"
+              value={weight}
+              onChange={(e) => setWeight(parseFloat(e.target.value))}
+            />
+          </div>
+          
+          <div className="mt-3">
+            <Label className="font-bold text-gray-700 mb-1 block">QUANTITY:</Label>
+            <Input 
+              type="number"
+              value={quantity}
+              onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
+            />
+          </div>
+        </div>
+      </Grid>
+      
+      <div className="flex justify-end">
+        <Button 
+          type="submit" 
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          <PackageOpen className="h-4 w-4 mr-2" />
+          Add Cargo to Container
+        </Button>
+      </div>
+    </form>
   );
 };
 
