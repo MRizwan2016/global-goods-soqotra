@@ -36,6 +36,8 @@ const AddContainer: React.FC<AddContainerProps> = ({
     shippingLine: "MSC",
     direction: "Export",
     sector: "QAT-KEN",
+    etd: "",
+    eta: "",
     ...containerData
   });
   
@@ -228,7 +230,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="etd" className="font-semibold">
-                  ETD
+                  ETD (Departure)
                 </Label>
                 <Input
                   id="etd"
@@ -240,7 +242,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
               
               <div>
                 <Label htmlFor="eta" className="font-semibold">
-                  ETA
+                  ETA (Arrival)
                 </Label>
                 <Input
                   id="eta"

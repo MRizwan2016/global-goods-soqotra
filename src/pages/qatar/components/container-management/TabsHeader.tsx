@@ -1,105 +1,96 @@
 
 import React from "react";
 import { TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Package, PlusCircle, Settings, FileCheck, Package2, FileText } from "lucide-react";
-import { motion } from "framer-motion";
+import { Box, Plus, Pen, Truck, FileText, Clipboard } from "lucide-react";
 
 interface TabsHeaderProps {
   activeTab: string;
+  onTabChange: (value: string) => void;
 }
 
-const TabsHeader: React.FC<TabsHeaderProps> = ({ activeTab }) => {
-  // Animation variants
-  const tabVariants = {
-    inactive: { scale: 1, backgroundColor: "rgba(255, 255, 255, 0.5)" },
-    active: (color: string) => ({ 
-      scale: 1.05, 
-      backgroundColor: color,
-      transition: { type: "spring", stiffness: 300, damping: 15 }
-    })
-  };
-
+const TabsHeader: React.FC<TabsHeaderProps> = ({ 
+  activeTab, 
+  onTabChange 
+}) => {
   return (
-    <TabsList className="grid grid-cols-5 mb-8 bg-gradient-to-r from-gray-100 to-white p-1 rounded-lg">
-      <motion.div
-        initial="inactive"
-        animate={activeTab === "containers" ? "active" : "inactive"}
-        variants={tabVariants}
-        custom="rgba(59, 130, 246, 0.9)"
-        className="rounded-md"
+    <TabsList className="bg-white border-b border-gray-200 w-full flex rounded-none p-0 h-auto">
+      <TabsTrigger
+        value="containers"
+        className={`flex items-center py-3 px-5 transition-colors ${
+          activeTab === "containers" 
+            ? "border-b-2 border-blue-600 text-blue-600" 
+            : "text-gray-500 hover:text-gray-800"
+        }`}
+        onClick={() => onTabChange("containers")}
       >
-        <TabsTrigger 
-          value="containers" 
-          className="w-full data-[state=active]:bg-transparent data-[state=active]:text-white uppercase font-semibold"
-        >
-          <Package className="mr-2 h-4 w-4" />
-          <span>CONTAINERS</span>
-        </TabsTrigger>
-      </motion.div>
+        <Box className="mr-2 h-5 w-5" />
+        CONTAINERS
+      </TabsTrigger>
       
-      <motion.div
-        initial="inactive"
-        animate={activeTab === "add" ? "active" : "inactive"}
-        variants={tabVariants}
-        custom="rgba(34, 197, 94, 0.9)"
-        className="rounded-md"
+      <TabsTrigger
+        value="add"
+        className={`flex items-center py-3 px-5 transition-colors ${
+          activeTab === "add" 
+            ? "border-b-2 border-blue-600 text-blue-600" 
+            : "text-gray-500 hover:text-gray-800"
+        }`}
+        onClick={() => onTabChange("add")}
       >
-        <TabsTrigger 
-          value="add" 
-          className="w-full data-[state=active]:bg-transparent data-[state=active]:text-white uppercase font-semibold"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          <span>ADD NEW</span>
-        </TabsTrigger>
-      </motion.div>
-      
-      <motion.div
-        initial="inactive"
-        animate={activeTab === "edit" ? "active" : "inactive"}
-        variants={tabVariants}
-        custom="rgba(234, 88, 12, 0.9)"
-        className="rounded-md"
+        <Plus className="mr-2 h-5 w-5" />
+        ADD NEW
+      </TabsTrigger>
+
+      <TabsTrigger
+        value="edit"
+        disabled={activeTab !== "edit"}
+        className={`flex items-center py-3 px-5 transition-colors ${
+          activeTab === "edit" 
+            ? "border-b-2 border-blue-600 text-blue-600" 
+            : "text-gray-500 hover:text-gray-800"
+        }`}
       >
-        <TabsTrigger 
-          value="edit" 
-          className="w-full data-[state=active]:bg-transparent data-[state=active]:text-white uppercase font-semibold"
-        >
-          <Settings className="mr-2 h-4 w-4" />
-          <span>EDIT</span>
-        </TabsTrigger>
-      </motion.div>
-      
-      <motion.div
-        initial="inactive"
-        animate={activeTab === "load" ? "active" : "inactive"}
-        variants={tabVariants}
-        custom="rgba(168, 85, 247, 0.9)"
-        className="rounded-md"
+        <Pen className="mr-2 h-5 w-5" />
+        EDIT
+      </TabsTrigger>
+
+      <TabsTrigger
+        value="load"
+        disabled={activeTab !== "load"}
+        className={`flex items-center py-3 px-5 transition-colors ${
+          activeTab === "load" 
+            ? "border-b-2 border-blue-600 text-blue-600" 
+            : "text-gray-500 hover:text-gray-800"
+        }`}
       >
-        <TabsTrigger 
-          value="load" 
-          className="w-full data-[state=active]:bg-transparent data-[state=active]:text-white uppercase font-semibold"
-        >
-          <Package2 className="mr-2 h-4 w-4" />
-          <span>LOAD</span>
-        </TabsTrigger>
-      </motion.div>
-      
-      <motion.div
-        initial="inactive"
-        animate={activeTab === "manifest" || activeTab === "view-manifest" ? "active" : "inactive"}
-        variants={tabVariants}
-        custom="rgba(20, 184, 166, 0.9)"
-        className="rounded-md"
+        <Truck className="mr-2 h-5 w-5" />
+        LOAD
+      </TabsTrigger>
+
+      <TabsTrigger
+        value="manifest"
+        disabled={activeTab !== "manifest"}
+        className={`flex items-center py-3 px-5 transition-colors ${
+          activeTab === "manifest" 
+            ? "border-b-2 border-blue-600 text-blue-600" 
+            : "text-gray-500 hover:text-gray-800"
+        }`}
       >
-        <TabsTrigger 
-          value={activeTab === "view-manifest" ? "view-manifest" : "manifest"} 
-          className="w-full data-[state=active]:bg-transparent data-[state=active]:text-white uppercase font-semibold"
-        >
-          <FileText className="mr-2 h-4 w-4" />
-          <span>MANIFEST</span>
-        </TabsTrigger>
-      </motion.div>
+        <Clipboard className="mr-2 h-5 w-5" />
+        MANIFEST
+      </TabsTrigger>
+
+      <TabsTrigger
+        value="view-manifest"
+        disabled={activeTab !== "view-manifest"}
+        className={`flex items-center py-3 px-5 transition-colors ${
+          activeTab === "view-manifest" 
+            ? "border-b-2 border-blue-600 text-blue-600" 
+            : "text-gray-500 hover:text-gray-800"
+        }`}
+      >
+        <FileText className="mr-2 h-5 w-5" />
+        VIEW MANIFEST
+      </TabsTrigger>
     </TabsList>
   );
 };

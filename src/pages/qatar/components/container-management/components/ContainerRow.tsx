@@ -67,7 +67,7 @@ const ContainerRow = ({
               <PenLine className="h-4 w-4" />
             </Button>
           )}
-          {onLoad && container.status !== "Loaded" && container.status !== "CONFIRMED" && (
+          {onLoad && (
             <Button
               variant="outline"
               size="sm"
@@ -78,7 +78,7 @@ const ContainerRow = ({
               <Truck className="h-4 w-4" />
             </Button>
           )}
-          {onCreateManifest && container.status !== "CONFIRMED" && (
+          {onCreateManifest && (
             <Button
               variant="outline"
               size="sm"
@@ -89,7 +89,7 @@ const ContainerRow = ({
               <ClipboardList className="h-4 w-4" />
             </Button>
           )}
-          {onViewManifest && container.status === "CONFIRMED" && (
+          {onViewManifest && (
             <Button
               variant="outline"
               size="sm"

@@ -72,6 +72,34 @@ const ContainerList: React.FC<ContainerListProps> = ({
     }
   };
 
+  const handleEditContainer = (id: string) => {
+    if (onEdit) {
+      console.log("Editing container with ID:", id);
+      onEdit(id);
+    }
+  };
+
+  const handleLoadContainer = (id: string) => {
+    if (onLoad) {
+      console.log("Loading container with ID:", id);
+      onLoad(id);
+    }
+  };
+
+  const handleViewManifest = (id: string) => {
+    if (onViewManifest) {
+      console.log("Viewing manifest for container with ID:", id);
+      onViewManifest(id);
+    }
+  };
+
+  const handleCreateManifest = (id: string) => {
+    if (onCreateManifest) {
+      console.log("Creating manifest for container with ID:", id);
+      onCreateManifest(id);
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -114,10 +142,10 @@ const ContainerList: React.FC<ContainerListProps> = ({
                     key={container.id}
                     container={container}
                     index={index}
-                    onEdit={onEdit}
-                    onLoad={onLoad}
-                    onViewManifest={onViewManifest}
-                    onCreateManifest={onCreateManifest}
+                    onEdit={handleEditContainer}
+                    onLoad={handleLoadContainer}
+                    onViewManifest={handleViewManifest}
+                    onCreateManifest={handleCreateManifest}
                   />
                 ))
               ) : (

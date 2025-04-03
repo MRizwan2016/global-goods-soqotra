@@ -5,6 +5,7 @@ import { useCargoOperations } from "./container-management/useCargoOperations";
 import { useManifestOperations } from "./container-management/useManifestOperations";
 import { useTabManagement } from "./container-management/useTabManagement";
 import { QatarContainer } from "../types/containerTypes";
+import { toast } from "sonner";
 
 export const useContainerManagement = () => {
   // Container data management
@@ -50,7 +51,7 @@ export const useContainerManagement = () => {
     handleCancelEdit,
     handleLoadContainer,
     handleManifestContainer
-  } = useTabManagement();
+  } = useTabManagement(setEditContainerId);
 
   // Listen for manifest view events
   useEffect(() => {
@@ -70,6 +71,26 @@ export const useContainerManagement = () => {
     };
   }, [handleViewManifest, setActiveTab]);
 
+  // Enhanced handleEditContainer to ensure tab switching works
+  const handleEditContainerWithTabSwitch = (id: string) => {
+    console.log("Editing container with ID:", id);
+    handleEditContainer(id);
+    setActiveTab("edit");
+    toast.info("Editing container", {
+      description: "Container details are now ready for editing",
+    });
+  };
+
+  // Enhanced handleLoadContainer to ensure tab switching works
+  const handleLoadContainerWithTabSwitch = (id: string) => {
+    console.log("Loading container with ID:", id);
+    handleEditContainer(id); // Set the edit container ID
+    setActiveTab("load");
+    toast.info("Loading container", {
+      description: "You can now load cargo into this container",
+    });
+  };
+
   return {
     // Container data
     containers,
@@ -88,7 +109,7 @@ export const useContainerManagement = () => {
     
     // Container operations
     handleAddContainer,
-    handleEditContainer,
+    handleEditContainer: handleEditContainerWithTabSwitch,
     handleUpdateContainer,
     handleCancelEdit,
     
@@ -96,7 +117,7 @@ export const useContainerManagement = () => {
     handleAddCargo,
     
     // Manifest operations
-    handleLoadContainer,
+    handleLoadContainer: handleLoadContainerWithTabSwitch,
     handleManifestContainer,
     handleViewManifest,
     handleManifestSubmitted,
