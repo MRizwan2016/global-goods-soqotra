@@ -36,7 +36,7 @@ const VehicleSelector = ({ vehicle, handleSelectChange }: VehicleSelectorProps) 
               </SelectItem>
             ))
           ) : (
-            <SelectItem value="no-vehicle" disabled>No vehicles available</SelectItem>
+            <SelectItem value="no-vehicles-available">No vehicles available</SelectItem>
           )}
         </SelectContent>
       </Select>

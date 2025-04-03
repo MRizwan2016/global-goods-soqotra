@@ -44,7 +44,7 @@ const JobSearch = ({ onSearch }: JobSearchProps) => {
             </SelectTrigger>
             <SelectContent>
               {mockSectors.map(sector => (
-                <SelectItem key={sector.id} value={sector.code}>
+                <SelectItem key={sector.id} value={sector.code || "no-code-available"}>
                   {sector.name} - {sector.code}
                 </SelectItem>
               ))}

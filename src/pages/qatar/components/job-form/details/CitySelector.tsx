@@ -36,7 +36,7 @@ const CitySelector = ({ city, handleSelectChange }: CitySelectorProps) => {
               </SelectItem>
             ))
           ) : (
-            <SelectItem value="no-cities" disabled>No cities available</SelectItem>
+            <SelectItem value="no-cities-available">No cities available</SelectItem>
           )}
         </SelectContent>
       </Select>

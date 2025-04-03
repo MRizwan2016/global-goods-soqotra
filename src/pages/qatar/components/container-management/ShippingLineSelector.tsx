@@ -70,7 +70,7 @@ const ShippingLineSelector: React.FC<ShippingLineSelectorProps> = ({
   };
 
   // Make sure we have a valid value selected
-  const validValue = value || (shippingLines.length > 0 ? shippingLines[0].id : "default");
+  const validValue = value || (shippingLines.length > 0 ? shippingLines[0].id : "default-shipping-line");
 
   return (
     <div className="mb-4">
