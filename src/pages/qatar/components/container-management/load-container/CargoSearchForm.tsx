@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,7 +6,7 @@ import { Grid } from "@/components/ui/grid";
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from "sonner";
 import { ContainerCargo } from "../../../types/containerTypes";
-import { Search, PackageOpen, AlertCircle } from "lucide-react";
+import { PackageOpen } from "lucide-react";
 import InvoiceSearchInput from "./cargo-search/InvoiceSearchInput";
 
 interface CargoSearchFormProps {
@@ -98,39 +97,70 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
     }
   }, [invoiceNumber, bookingFormSuggestions]);
   
-  // Handle selecting an invoice from suggestions
+  // Enhanced invoice selection handler
   const handleSelectInvoice = (invoice: any) => {
     setInvoiceNumber(invoice.invoiceNumber);
-    setShipper(invoice.shipper);
-    setConsignee(invoice.consignee);
+    setShipper(invoice.shipper || invoice.shipper1 || "");
+    setConsignee(invoice.consignee || invoice.consignee1 || "");
     setPackageName(invoice.packageName || "Box");
     setVolume(invoice.volume || 0);
     setWeight(invoice.weight || 0);
     setQuantity(invoice.packages || 1);
-    setD2d(invoice.d2d || false);
+    setD2d(invoice.d2d || invoice.doorToDoor || false);
     setWarehouse(invoice.warehouse || "");
     
-    setShowSuggestions(false);
-    toast.success(`Invoice ${invoice.invoiceNumber} selected`, {
-      description: `Shipper: ${invoice.shipper}, Consignee: ${invoice.consignee}`
+    toast.success(`Invoice ${invoice.invoiceNumber} details loaded`, {
+      description: `Shipper: ${invoice.shipper || invoice.shipper1}, Consignee: ${invoice.consignee || invoice.consignee1}`,
     });
   };
-  
-  // Handle invoice search key press events
-  const handleInvoiceKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && filteredSuggestions.length > 0) {
-      handleSelectInvoice(filteredSuggestions[0]);
-      e.preventDefault();
-    }
-  };
-  
+
+  // Enhanced barcode handler
+  useEffect(() => {
+    const handleBarcodeScan = (e: KeyboardEvent) => {
+      if (e.key === "Enter" && barcode) {
+        // Search for invoice with matching barcode or package number
+        const storedInvoices = localStorage.getItem('invoices');
+        const generatedInvoices = localStorage.getItem('generatedInvoices');
+        let allInvoices = [];
+
+        try {
+          if (storedInvoices) {
+            allInvoices = [...JSON.parse(storedInvoices)];
+          }
+          if (generatedInvoices) {
+            allInvoices = [...allInvoices, ...JSON.parse(generatedInvoices)];
+          }
+
+          const matchingInvoice = allInvoices.find((inv: any) => 
+            inv.invoiceNumber === barcode || 
+            inv.packages?.toString() === barcode
+          );
+
+          if (matchingInvoice) {
+            handleSelectInvoice(matchingInvoice);
+            setBarcode("");
+          } else {
+            toast.warning("No matching invoice found for barcode", {
+              description: "Please check the barcode and try again",
+            });
+          }
+        } catch (error) {
+          console.error("Error processing barcode:", error);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleBarcodeScan);
+    return () => window.removeEventListener('keydown', handleBarcodeScan);
+  }, [barcode]);
+
   // Handle form submission to add cargo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!invoiceNumber) {
       toast.error("Invoice number is required", {
-        icon: <AlertCircle className="h-5 w-5 text-red-500" />
+        icon: <PackageOpen className="h-5 w-5 text-red-500" />
       });
       return;
     }
@@ -166,11 +196,9 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
           <InvoiceSearchInput 
             value={invoiceNumber}
             onChange={(e) => setInvoiceNumber(e.target.value)}
-            onKeyPress={handleInvoiceKeyPress}
-            bookingFormSuggestions={filteredSuggestions}
+            onSelectInvoice={handleSelectInvoice}
             showSuggestions={showSuggestions}
             setShowSuggestions={setShowSuggestions}
-            onSelectInvoice={handleSelectInvoice}
           />
           
           <div className="mt-3">
