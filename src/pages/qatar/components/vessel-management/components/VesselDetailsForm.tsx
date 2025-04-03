@@ -31,7 +31,7 @@ const VesselDetailsForm: React.FC<VesselDetailsFormProps> = ({
       <div className="space-y-2">
         <label htmlFor="sector" className="block text-sm font-medium">SECTOR:</label>
         <Select 
-          value={formData.sector} 
+          value={formData.sector || "default-sector"} 
           onValueChange={(value) => handleSelectChange("sector", value)}
         >
           <SelectTrigger className="w-full hover:border-blue-400 transition-colors">
@@ -60,7 +60,7 @@ const VesselDetailsForm: React.FC<VesselDetailsFormProps> = ({
       <div className="space-y-2">
         <label htmlFor="shippingLine" className="block text-sm font-medium">SHIPPING LINE:</label>
         <Select 
-          value={formData.shippingLine} 
+          value={formData.shippingLine || "default-shipping-line"} 
           onValueChange={(value) => handleSelectChange("shippingLine", value)}
         >
           <SelectTrigger className="w-full hover:border-blue-400 transition-colors">

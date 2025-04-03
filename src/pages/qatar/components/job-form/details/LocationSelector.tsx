@@ -117,7 +117,7 @@ const LocationSelector = ({
                 </div>
               ))
             ) : (
-              <SelectItem value="no-locations" disabled>No locations available</SelectItem>
+              <SelectItem value="no-locations">No locations available</SelectItem>
             )}
           </SelectContent>
         </Select>
@@ -163,7 +163,7 @@ const LocationSelector = ({
                   </SelectItem>
                 ))
               ) : (
-                <SelectItem value="no-streets" disabled>No streets available</SelectItem>
+                <SelectItem value="no-streets">No streets available</SelectItem>
               )}
             </SelectContent>
           </Select>

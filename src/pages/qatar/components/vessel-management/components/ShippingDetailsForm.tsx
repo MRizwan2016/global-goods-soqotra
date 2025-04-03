@@ -39,7 +39,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
       <div className="space-y-2">
         <label htmlFor="portOfLoading" className="block text-sm font-medium">PORT OF LOADING:</label>
         <Select 
-          value={formData.portOfLoading} 
+          value={formData.portOfLoading || "default-loading-port"} 
           onValueChange={(value) => handleSelectChange("portOfLoading", value)}
         >
           <SelectTrigger className="w-full hover:border-blue-400 transition-colors">
@@ -55,7 +55,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
       <div className="space-y-2">
         <label htmlFor="portOfDischarge" className="block text-sm font-medium">PORT OF DISCHARGE:</label>
         <Select 
-          value={formData.portOfDischarge} 
+          value={formData.portOfDischarge || "default-discharge-port"} 
           onValueChange={(value) => handleSelectChange("portOfDischarge", value)}
           disabled={availablePorts.length === 0}
         >
@@ -63,9 +63,13 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
             <SelectValue placeholder={availablePorts.length === 0 ? "Select a sector first" : "Select Port of Discharge"} />
           </SelectTrigger>
           <SelectContent>
-            {availablePorts.map(port => (
-              <SelectItem key={port} value={port}>{port}</SelectItem>
-            ))}
+            {availablePorts.length > 0 ? (
+              availablePorts.map(port => (
+                <SelectItem key={port} value={port}>{port}</SelectItem>
+              ))
+            ) : (
+              <SelectItem value="no-ports-available">No ports available</SelectItem>
+            )}
           </SelectContent>
         </Select>
         {availablePorts.length === 0 && formData.sector && (
@@ -76,7 +80,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
       <div className="space-y-2">
         <label htmlFor="direction" className="block text-sm font-medium">DIRECT/MIX:</label>
         <Select 
-          value={formData.direction} 
+          value={formData.direction || "DIRECT"} 
           onValueChange={(value) => handleSelectChange("direction", value)}
         >
           <SelectTrigger className="w-full hover:border-blue-400 transition-colors">

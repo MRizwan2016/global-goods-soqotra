@@ -284,7 +284,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
               <div>
                 <Label htmlFor="runningNumber">Running Number (auto-generated)</Label>
                 <Select
-                  value={formData.runningNumber}
+                  value={formData.runningNumber || "default-running-number"}
                   onValueChange={(value) => handleChange("runningNumber", value)}
                 >
                   <SelectTrigger id="runningNumber">
@@ -325,7 +325,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
               <div>
                 <Label htmlFor="shippingLine">Shipping Line</Label>
                 <Select
-                  value={formData.shippingLine || ""}
+                  value={formData.shippingLine || "default-shipping-line"}
                   onValueChange={(value) => handleChange("shippingLine", value)}
                 >
                   <SelectTrigger id="shippingLine">
@@ -344,7 +344,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
               <div>
                 <Label htmlFor="direction">Direction</Label>
                 <Select
-                  value={formData.direction || ""}
+                  value={formData.direction || "default-direction"}
                   onValueChange={(value) => handleChange("direction", value)}
                 >
                   <SelectTrigger id="direction">
@@ -363,7 +363,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
               <div>
                 <Label htmlFor="sector">Sector</Label>
                 <Select
-                  value={formData.sector || ""}
+                  value={formData.sector || "default-sector"}
                   onValueChange={(value) => handleChange("sector", value)}
                 >
                   <SelectTrigger id="sector">

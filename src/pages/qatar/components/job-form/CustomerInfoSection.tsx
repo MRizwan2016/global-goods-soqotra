@@ -110,7 +110,7 @@ const CustomerInfoSection = ({
                   </SelectItem>
                 ))
               ) : (
-                <SelectItem value="default-country" disabled>No countries available</SelectItem>
+                <SelectItem value="default-country">No countries available</SelectItem>
               )}
             </SelectContent>
           </Select>
@@ -146,7 +146,7 @@ const CustomerInfoSection = ({
                   </SelectItem>
                 ))
               ) : (
-                <SelectItem value="default-branch" disabled>No branches available</SelectItem>
+                <SelectItem value="default-branch">No branches available</SelectItem>
               )}
             </SelectContent>
           </Select>
