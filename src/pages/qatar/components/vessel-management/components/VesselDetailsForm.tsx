@@ -39,7 +39,7 @@ const VesselDetailsForm: React.FC<VesselDetailsFormProps> = ({
           </SelectTrigger>
           <SelectContent>
             {SECTORS.map(sector => (
-              <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+              <SelectItem key={sector} value={sector || "unknown-sector"}>{sector || "Unknown Sector"}</SelectItem>
             ))}
           </SelectContent>
         </Select>

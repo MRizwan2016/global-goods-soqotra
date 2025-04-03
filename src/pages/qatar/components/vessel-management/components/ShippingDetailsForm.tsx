@@ -46,7 +46,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
             <SelectValue placeholder="Select Port of Loading" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value={DEFAULT_PORT_OF_LOADING}>{DEFAULT_PORT_OF_LOADING}</SelectItem>
+            <SelectItem value={DEFAULT_PORT_OF_LOADING || "default-loading-port"}>{DEFAULT_PORT_OF_LOADING || "Default Port"}</SelectItem>
             <SelectItem value="Doha">Doha</SelectItem>
           </SelectContent>
         </Select>
@@ -65,7 +65,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
           <SelectContent>
             {availablePorts.length > 0 ? (
               availablePorts.map(port => (
-                <SelectItem key={port} value={port}>{port}</SelectItem>
+                <SelectItem key={port} value={port || "unknown-port"}>{port || "Unknown Port"}</SelectItem>
               ))
             ) : (
               <SelectItem value="no-ports-available">No ports available</SelectItem>
