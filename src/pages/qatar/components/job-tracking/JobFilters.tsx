@@ -34,7 +34,7 @@ const JobFilters = ({
         <span className="text-sm text-gray-500">FILTERS:</span>
       </div>
       
-      <Select value={statusFilter} onValueChange={setStatusFilter}>
+      <Select value={statusFilter || "all"} onValueChange={setStatusFilter}>
         <SelectTrigger className="h-8 w-40">
           <SelectValue placeholder="Filter by Status" />
         </SelectTrigger>
@@ -48,7 +48,7 @@ const JobFilters = ({
         </SelectContent>
       </Select>
       
-      <Select value={typeFilter} onValueChange={setTypeFilter}>
+      <Select value={typeFilter || "all"} onValueChange={setTypeFilter}>
         <SelectTrigger className="h-8 w-40">
           <SelectValue placeholder="Filter by Type" />
         </SelectTrigger>

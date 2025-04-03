@@ -69,11 +69,14 @@ const ShippingLineSelector: React.FC<ShippingLineSelectorProps> = ({
     toast.success(`Added new shipping line: ${newShippingLine}`);
   };
 
+  // Make sure we have a valid value selected
+  const validValue = value || (shippingLines.length > 0 ? shippingLines[0].id : "default");
+
   return (
     <div className="mb-4">
       <Label htmlFor="shippingLine" className="font-bold text-gray-700 mb-1 block">SHIPPING LINE:</Label>
       <div className="flex gap-2">
-        <Select value={value} onValueChange={onChange}>
+        <Select value={validValue} onValueChange={onChange}>
           <SelectTrigger 
             id="shippingLine" 
             className="bg-blue-500 text-white font-semibold border-0 hover:bg-blue-600 transition-colors"

@@ -18,7 +18,7 @@ const JobTypeSelector = ({ jobType, handleSelectChange }: JobTypeSelectorProps) 
     <div className="col-span-2 sm:col-span-1">
       <Label htmlFor="jobType">PERSONAL EFFECTS JOB TYPE:</Label>
       <Select 
-        value={jobType} 
+        value={jobType || "COLLECTION"} 
         onValueChange={(value) => handleSelectChange("jobType", value)}
       >
         <SelectTrigger id="jobType" className="bg-blue-600 text-white">

@@ -95,26 +95,30 @@ const LocationSelector = ({
           </Button>
         </Label>
         <Select 
-          value={town} 
+          value={town || ""} 
           onValueChange={(value) => handleSelectChange("town", value)}
         >
           <SelectTrigger id="town" className="bg-blue-600 text-white">
             <SelectValue placeholder="SELECT LOCATION" />
           </SelectTrigger>
           <SelectContent className="max-h-80">
-            {sortedGroups.map(group => (
-              <div key={group}>
-                <div className="px-2 py-1.5 text-xs font-semibold bg-gray-100">{group}</div>
-                {groupedLocations[group].map((locationName) => (
-                  <SelectItem key={locationName} value={locationName}>
-                    <div className="flex items-center">
-                      <MapPin className="h-3 w-3 mr-1.5 text-blue-500" />
-                      {locationName}
-                    </div>
-                  </SelectItem>
-                ))}
-              </div>
-            ))}
+            {sortedGroups.length > 0 ? (
+              sortedGroups.map(group => (
+                <div key={group}>
+                  <div className="px-2 py-1.5 text-xs font-semibold bg-gray-100">{group}</div>
+                  {groupedLocations[group].map((locationName) => (
+                    <SelectItem key={locationName} value={locationName}>
+                      <div className="flex items-center">
+                        <MapPin className="h-3 w-3 mr-1.5 text-blue-500" />
+                        {locationName}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </div>
+              ))
+            ) : (
+              <SelectItem value="no-locations" disabled>No locations available</SelectItem>
+            )}
           </SelectContent>
         </Select>
 
@@ -145,18 +149,22 @@ const LocationSelector = ({
         <div className="mt-4">
           <Label htmlFor="location">STREET NUMBER:</Label>
           <Select 
-            value={location} 
+            value={location || ""} 
             onValueChange={(value) => handleSelectChange("location", value)}
           >
             <SelectTrigger id="location" className="bg-blue-600 text-white">
               <SelectValue placeholder="SELECT STREET NUMBER" />
             </SelectTrigger>
             <SelectContent>
-              {industrialAreaStreets.map((street) => (
-                <SelectItem key={street} value={street}>
-                  {street}
-                </SelectItem>
-              ))}
+              {industrialAreaStreets.length > 0 ? (
+                industrialAreaStreets.map((street) => (
+                  <SelectItem key={street} value={street}>
+                    {street}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="no-streets" disabled>No streets available</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -168,7 +176,7 @@ const LocationSelector = ({
           <Input 
             id="location"
             name="location"
-            value={location}
+            value={location || ""}
             onChange={handleInputChange}
             placeholder="Building name, block number, etc."
           />

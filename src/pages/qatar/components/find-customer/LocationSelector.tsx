@@ -78,18 +78,22 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           </Button>
         </Label>
         <Select
-          value={selectedTown}
+          value={selectedTown || ""}
           onValueChange={setSelectedTown}
         >
           <SelectTrigger id="town" className="bg-blue-600 text-white">
             <SelectValue placeholder="SELECT TOWN" />
           </SelectTrigger>
           <SelectContent>
-            {qatarTowns.map((town, index) => (
-              <SelectItem key={index} value={town}>
-                {town}
-              </SelectItem>
-            ))}
+            {qatarTowns.length > 0 ? (
+              qatarTowns.map((town, index) => (
+                <SelectItem key={index} value={town}>
+                  {town}
+                </SelectItem>
+              ))
+            ) : (
+              <SelectItem value="no-towns" disabled>No towns available</SelectItem>
+            )}
           </SelectContent>
         </Select>
       </div>
@@ -98,18 +102,22 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         <div>
           <Label htmlFor="location">LOCATION (STREET NO.):</Label>
           <Select
-            value={selectedLocation}
+            value={selectedLocation || ""}
             onValueChange={setSelectedLocation}
           >
             <SelectTrigger id="location" className="bg-blue-600 text-white">
               <SelectValue placeholder="SELECT STREET NUMBER" />
             </SelectTrigger>
             <SelectContent>
-              {industrialAreaStreets.map((street, index) => (
-                <SelectItem key={index} value={street}>
-                  {street}
-                </SelectItem>
-              ))}
+              {industrialAreaStreets.length > 0 ? (
+                industrialAreaStreets.map((street, index) => (
+                  <SelectItem key={index} value={street}>
+                    {street}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="no-streets" disabled>No streets available</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -120,7 +128,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           <Label htmlFor="locationInput">LOCATION:</Label>
           <Input
             id="locationInput"
-            value={selectedLocation}
+            value={selectedLocation || ""}
             onChange={(e) => setSelectedLocation(e.target.value)}
             placeholder="Enter location details"
           />

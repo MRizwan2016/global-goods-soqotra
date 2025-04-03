@@ -19,18 +19,22 @@ const CitySelector = ({ city, handleSelectChange }: CitySelectorProps) => {
     <div className="col-span-2 sm:col-span-1">
       <Label htmlFor="city">CITY:</Label>
       <Select 
-        value={city} 
+        value={city || ""} 
         onValueChange={(value) => handleSelectChange("city", value)}
       >
         <SelectTrigger id="city" className="bg-blue-600 text-white">
           <SelectValue placeholder="SELECT CITY" />
         </SelectTrigger>
         <SelectContent>
-          {mockCities.map(city => (
-            <SelectItem key={city.id} value={city.code}>
-              {city.name} - {city.code}
-            </SelectItem>
-          ))}
+          {mockCities.length > 0 ? (
+            mockCities.map(city => (
+              <SelectItem key={city.id} value={city.code}>
+                {city.name} - {city.code}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem value="no-cities" disabled>No cities available</SelectItem>
+          )}
         </SelectContent>
       </Select>
     </div>

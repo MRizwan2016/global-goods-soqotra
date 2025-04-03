@@ -40,7 +40,7 @@ const JobFilters: React.FC<JobFiltersProps> = ({
         <div>
           <Label htmlFor="status-filter">Job Status</Label>
           <Select 
-            value={statusFilter} 
+            value={statusFilter || "ALL"} 
             onValueChange={setStatusFilter}
           >
             <SelectTrigger id="status-filter">
@@ -58,7 +58,7 @@ const JobFilters: React.FC<JobFiltersProps> = ({
         <div>
           <Label htmlFor="sort-by">Sort By</Label>
           <Select 
-            value={sortBy} 
+            value={sortBy || "DATE_DESC"} 
             onValueChange={setSortBy}
           >
             <SelectTrigger id="sort-by">

@@ -58,7 +58,7 @@ const DateTimeSelector = ({
       <div>
         <Label htmlFor="amPm">AM/PM:</Label>
         <Select 
-          value={amPm} 
+          value={amPm || "AM"} 
           onValueChange={(value) => handleSelectChange("amPm", value)}
         >
           <SelectTrigger id="amPm" className="bg-blue-600 text-white">
@@ -74,7 +74,7 @@ const DateTimeSelector = ({
       <div>
         <Label htmlFor="sameDay">SAME DAY JOB:</Label>
         <Select 
-          value={sameDay} 
+          value={sameDay || "N"} 
           onValueChange={(value) => handleSelectChange("sameDay", value)}
         >
           <SelectTrigger id="sameDay" className="bg-blue-600 text-white">
