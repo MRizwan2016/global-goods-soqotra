@@ -8,6 +8,7 @@ import ContainerFilterBar from "./components/ContainerFilterBar";
 import ContainerRow from "./components/ContainerRow";
 import ContainerTableHead from "./components/ContainerTableHead";
 import NoContainersFound from "./components/NoContainersFound";
+import { PlusCircle } from "lucide-react";
 
 interface ContainerListProps {
   containers: QatarContainer[];
@@ -45,10 +46,10 @@ const ContainerList: React.FC<ContainerListProps> = ({
       (container.vessel && container.vessel.toLowerCase().includes(searchTerm.toLowerCase()));
     
     // Apply status filter
-    const matchesStatus = statusFilter === "" || container.status === statusFilter;
+    const matchesStatus = statusFilter === "" || statusFilter === "all-statuses" || container.status === statusFilter;
     
     // Apply direction filter
-    const matchesDirection = directionFilter === "" || container.direction === directionFilter;
+    const matchesDirection = directionFilter === "" || directionFilter === "all-directions" || container.direction === directionFilter;
     
     return matchesSearch && matchesStatus && matchesDirection;
   });
@@ -65,12 +66,28 @@ const ContainerList: React.FC<ContainerListProps> = ({
     }
   };
 
+  const handleAddNew = () => {
+    if (onAddClick) {
+      onAddClick();
+    }
+  };
+
   return (
     <div className="p-6">
-      <ContainerListHeader 
-        totalContainers={containers.length} 
-        filteredCount={filteredContainers.length} 
-      />
+      <div className="flex justify-between items-center mb-6">
+        <ContainerListHeader 
+          totalContainers={containers.length} 
+          filteredCount={filteredContainers.length} 
+        />
+        
+        <Button 
+          onClick={handleAddNew}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          <PlusCircle className="mr-2 h-4 w-4" />
+          Add New Container
+        </Button>
+      </div>
       
       <ContainerFilterBar 
         searchTerm={searchTerm}

@@ -45,9 +45,9 @@ export const useContainerData = () => {
       newContainer.id = uuidv4();
     }
     
-    // Set status to "PENDING" if not specified
+    // Set status to "Available" if not specified
     if (!newContainer.status) {
-      newContainer.status = "PENDING";
+      newContainer.status = "Available";
     }
     
     // Ensure container has appropriate defaults

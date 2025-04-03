@@ -17,7 +17,7 @@ interface ContainerManagementContentProps {
   editContainerId: string | null;
   viewManifestId: string | null;
   printOptions: PrintOptions;
-  getCurrentContainer: (id: string | null) => QatarContainer | null;
+  getCurrentContainer: () => QatarContainer | null;
   getCurrentCargoItems: (containerId: string | null) => any[];
   getItemList: (containerId: string | null) => any[];
   getConsigneeList: (containerId: string | null) => any[];
@@ -32,7 +32,7 @@ interface ContainerManagementContentProps {
   onManifestSubmitted: (data: any) => void;
   onPrintOptionsChange: (options: Partial<PrintOptions>) => void;
   onPrint: () => void;
-  onAddContainer: () => void;
+  onAddContainer: (container: QatarContainer) => void;
 }
 
 const ContainerManagementContent: React.FC<ContainerManagementContentProps> = ({

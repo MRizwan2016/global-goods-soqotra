@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import PrintStyles from "./components/container-management/PrintStyles";
 import ContainerHeader from "./components/container-management/ContainerHeader";
 import ContainerManagementContent from "./components/container-management/ContainerManagementContent";
+import { QatarContainer } from "./types/containerTypes";
 
 const ContainerManagement: React.FC = () => {
   const {
@@ -81,6 +82,12 @@ const ContainerManagement: React.FC = () => {
     }, 500);
   };
 
+  // Function to handle adding a new container
+  const handleAddNewContainer = (container: QatarContainer) => {
+    handleAddContainer(container);
+    setActiveTab("containers");
+  };
+
   // Log initial load for debugging
   useEffect(() => {
     console.log("ContainerManagement component loading");
@@ -135,7 +142,7 @@ const ContainerManagement: React.FC = () => {
           onManifestSubmitted={handleManifestSubmitted}
           onPrintOptionsChange={handlePrintOptionsChange}
           onPrint={handleContainerPrint}
-          onAddContainer={handleAddContainer}
+          onAddContainer={handleAddNewContainer}
         />
       </motion.div>
     </Layout>
