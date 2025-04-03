@@ -1,7 +1,8 @@
 
 import React from "react";
+import { TabsContent } from "@/components/ui/tabs";
 import ContainerList from "./ContainerList";
-import LoadContainer from "./LoadContainer";
+import LoadContainerDetails from "./LoadContainerDetails";
 import AddContainer from "./AddContainer";
 import ContainerManifest from "./ContainerManifest";
 import ViewManifestTab from "./view-manifest/ViewManifestTab";
@@ -79,9 +80,10 @@ const TabContent: React.FC<TabContentProps> = ({
       
       <TabsContent value="load" className="m-0">
         {selectedItem && (
-          <LoadContainer
-            container={selectedItem}
-            onLoad={onContainerLoad}
+          <LoadContainerDetails
+            containerId={selectedItem.id}
+            containerData={selectedItem}
+            onLoadComplete={() => onTabChange("manifest")}
             onCancel={() => onTabChange("containers")}
           />
         )}
