@@ -34,7 +34,7 @@ const ContentTabs: React.FC<ContentTabsProps> = ({
     }
   };
 
-  // Make sure we have a valid activeTab
+  // Make sure we have a valid activeTab - we ensure it's never an empty string
   const validActiveTab = activeTab || "cargo-items";
 
   return (

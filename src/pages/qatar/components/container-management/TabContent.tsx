@@ -1,56 +1,41 @@
 
 import React from "react";
-import { TabsContent } from "@/components/ui/tabs";
-import { QatarContainer, PrintOptions } from "../../types/containerTypes";
 import ContainerList from "./ContainerList";
-import ContainerForm from "./ContainerForm";
-import LoadContainerDetails from "./LoadContainerDetails";
+import LoadContainer from "./LoadContainer";
+import AddContainer from "./AddContainer";
 import ContainerManifest from "./ContainerManifest";
-import ViewManifestTab from "../container-management/view-manifest/ViewManifestTab";
+import ViewManifestTab from "./view-manifest/ViewManifestTab";
+import { Container, PrintOptions } from "../../types/containerTypes";
 
 interface TabContentProps {
   activeTab: string;
-  containers: QatarContainer[];
-  editContainerId: string | null;
-  viewManifestId: string | null;
+  containers: Container[];
+  statusFilter: string;
+  searchText: string;
+  selectedItem: Container | null;
   printOptions: PrintOptions;
-  getCurrentContainer: () => QatarContainer | null;
-  getCurrentCargoItems: () => any[];
-  getItemList: () => any[];
-  getConsigneeList: () => any[];
-  getUnsettledInvoices: () => any[];
-  onEditContainer: (id: string) => void;
-  onLoadContainer: (id: string) => void;
-  onViewManifest: (id: string) => void;
-  onCreateManifest: (id: string) => void;
-  onUpdateContainer: (container: QatarContainer) => void;
-  onCancelEdit: () => void;
-  onLoadComplete: (id: string) => void;
-  onManifestSubmitted: () => void;
+  onTabChange: (tab: string) => void;
+  onContainerEdit: (container: Container) => void;
+  onContainerSubmit: (container: Container) => void;
+  onContainerDelete: (id: string) => void;
+  onContainerLoad: (containerId: string, cargoId: string, quantity: number) => void;
   onPrintOptionsChange: (options: Partial<PrintOptions>) => void;
   onPrint: () => void;
-  onAddContainer: (container: QatarContainer) => void;
+  onAddContainer: () => void;
 }
 
 const TabContent: React.FC<TabContentProps> = ({
   activeTab,
   containers,
-  editContainerId,
-  viewManifestId,
+  statusFilter,
+  searchText,
+  selectedItem,
   printOptions,
-  getCurrentContainer,
-  getCurrentCargoItems,
-  getItemList,
-  getConsigneeList,
-  getUnsettledInvoices,
-  onEditContainer,
-  onLoadContainer,
-  onViewManifest,
-  onCreateManifest,
-  onUpdateContainer,
-  onCancelEdit,
-  onLoadComplete,
-  onManifestSubmitted,
+  onTabChange,
+  onContainerEdit,
+  onContainerSubmit,
+  onContainerDelete,
+  onContainerLoad,
   onPrintOptionsChange,
   onPrint,
   onAddContainer
@@ -65,64 +50,60 @@ const TabContent: React.FC<TabContentProps> = ({
     <>
       <TabsContent value="containers" className="m-0">
         <ContainerList 
-          containerData={containers}
-          onEdit={onEditContainer}
-          onLoad={onLoadContainer}
-          onCreateManifest={onCreateManifest}
-          onViewManifest={onViewManifest}
+          containers={containers}
+          statusFilter={statusFilter}
+          searchText={searchText}
+          onEdit={onContainerEdit}
+          onDelete={onContainerDelete}
+          onAddClick={onAddContainer}
         />
       </TabsContent>
       
       <TabsContent value="add" className="m-0">
-        <ContainerForm 
-          onSubmit={onAddContainer}
-          onCancel={onCancelEdit}
+        <AddContainer
+          onSubmit={onContainerSubmit}
+          onCancel={() => onTabChange("containers")}
         />
       </TabsContent>
       
       <TabsContent value="edit" className="m-0">
-        {editContainerId && (
-          <ContainerForm 
-            existingContainer={getCurrentContainer()}
-            onSubmit={onUpdateContainer}
-            onCancel={onCancelEdit}
+        {selectedItem && (
+          <AddContainer
+            onSubmit={onContainerSubmit}
+            onCancel={() => onTabChange("containers")}
+            containerData={selectedItem}
+            isEditing={true}
           />
         )}
       </TabsContent>
       
       <TabsContent value="load" className="m-0">
-        {editContainerId && (
-          <LoadContainerDetails
-            containerId={editContainerId}
-            containerData={getCurrentContainer()}
-            onLoadComplete={() => onLoadComplete(editContainerId)}
-            onCancel={onCancelEdit}
+        {selectedItem && (
+          <LoadContainer
+            container={selectedItem}
+            onLoad={onContainerLoad}
+            onCancel={() => onTabChange("containers")}
           />
         )}
       </TabsContent>
       
       <TabsContent value="manifest" className="m-0">
-        {editContainerId && (
+        {selectedItem && (
           <ContainerManifest
-            containerId={editContainerId}
-            onManifestSubmitted={onManifestSubmitted}
-            onCancel={onCancelEdit}
+            container={selectedItem}
+            onClose={() => onTabChange("containers")}
           />
         )}
       </TabsContent>
       
       <TabsContent value="view-manifest" className="m-0">
-        {viewManifestId && (
+        {selectedItem && (
           <ViewManifestTab
-            container={getCurrentContainer()}
-            cargoItems={getCurrentCargoItems()}
-            itemList={getItemList()}
-            consigneeList={getConsigneeList()}
-            unsettledInvoices={getUnsettledInvoices()}
-            onBack={onCancelEdit}
+            container={selectedItem}
             printOptions={printOptions}
             onPrintOptionsChange={onPrintOptionsChange}
             onPrint={onPrint}
+            onClose={() => onTabChange("containers")}
           />
         )}
       </TabsContent>

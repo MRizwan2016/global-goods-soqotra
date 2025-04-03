@@ -15,7 +15,7 @@ interface VehicleSelectorProps {
 }
 
 const VehicleSelector = ({ vehicle, handleSelectChange }: VehicleSelectorProps) => {
-  // Filter out any vehicles with empty number
+  // Filter out any vehicles with empty number and ensure there are no empty string values
   const validVehicles = mockVehicles.filter(v => v.number && v.number.trim() !== "");
   
   // For debugging

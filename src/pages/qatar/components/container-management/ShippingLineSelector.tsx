@@ -73,7 +73,7 @@ const ShippingLineSelector: React.FC<ShippingLineSelectorProps> = ({
   console.log("ShippingLineSelector rendered with value:", value);
   console.log("Available shipping lines:", shippingLines);
 
-  // Make sure we have a valid value selected
+  // Make sure we have a valid value selected - never an empty string
   const validValue = value || (shippingLines.length > 0 ? shippingLines[0].id : "default-shipping-line");
 
   return (
