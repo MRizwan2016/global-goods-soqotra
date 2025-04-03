@@ -95,7 +95,7 @@ const LocationSelector = ({
           </Button>
         </Label>
         <Select 
-          value={town || ""} 
+          value={town || "default-town"} 
           onValueChange={(value) => handleSelectChange("town", value)}
         >
           <SelectTrigger id="town" className="bg-blue-600 text-white">
@@ -149,7 +149,7 @@ const LocationSelector = ({
         <div className="mt-4">
           <Label htmlFor="location">STREET NUMBER:</Label>
           <Select 
-            value={location || ""} 
+            value={location || "default-street"} 
             onValueChange={(value) => handleSelectChange("location", value)}
           >
             <SelectTrigger id="location" className="bg-blue-600 text-white">

@@ -25,14 +25,14 @@ const CustomerInfoSection = ({
   handleSelectChange 
 }: CustomerInfoSectionProps) => {
   // Get list of countries from countrySectorMap
-  const countries = Object.keys(countrySectorMap);
+  const countries = Object.keys(countrySectorMap).filter(country => country.trim() !== "");
   
   // Get branches for selected country if any
   const getBranchesForCountry = (country: string) => {
     if (!country) return [];
     
     // Use warehouse options as branches for simplicity
-    return warehouseOptions[country] || [];
+    return (warehouseOptions[country] || []).filter(branch => branch && branch.trim() !== "");
   };
   
   const branches = jobData.country ? getBranchesForCountry(jobData.country) : [];
@@ -92,7 +92,7 @@ const CustomerInfoSection = ({
         <div>
           <Label htmlFor="country">COUNTRY:</Label>
           <Select 
-            value={jobData.country || ""} 
+            value={jobData.country || "default-country"} 
             onValueChange={(value) => {
               // Update country and associated sector
               handleSelectChange("country", value);
@@ -103,11 +103,15 @@ const CustomerInfoSection = ({
               <SelectValue placeholder="SELECT COUNTRY" />
             </SelectTrigger>
             <SelectContent>
-              {countries.map(country => (
-                <SelectItem key={country} value={country}>
-                  {country}
-                </SelectItem>
-              ))}
+              {countries.length > 0 ? (
+                countries.map(country => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="default-country" disabled>No countries available</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -127,7 +131,7 @@ const CustomerInfoSection = ({
         <div>
           <Label htmlFor="branch">BRANCH:</Label>
           <Select 
-            value={jobData.branch || ""} 
+            value={jobData.branch || "default-branch"} 
             onValueChange={(value) => handleSelectChange("branch", value)}
             disabled={branches.length === 0}
           >
@@ -142,7 +146,7 @@ const CustomerInfoSection = ({
                   </SelectItem>
                 ))
               ) : (
-                <SelectItem value="no-branches" disabled>No branches available</SelectItem>
+                <SelectItem value="default-branch" disabled>No branches available</SelectItem>
               )}
             </SelectContent>
           </Select>

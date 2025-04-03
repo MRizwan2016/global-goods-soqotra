@@ -15,22 +15,29 @@ interface VehicleSelectorProps {
 }
 
 const VehicleSelector = ({ vehicle, handleSelectChange }: VehicleSelectorProps) => {
+  // Filter out any vehicles with empty number
+  const validVehicles = mockVehicles.filter(v => v.number && v.number.trim() !== "");
+  
   return (
     <div>
       <Label htmlFor="vehicle">VEHICLE:</Label>
       <Select 
-        value={vehicle} 
+        value={vehicle || "default"} 
         onValueChange={(value) => handleSelectChange("vehicle", value)}
       >
         <SelectTrigger id="vehicle" className="bg-blue-600 text-white">
           <SelectValue placeholder="SELECT VEHICLE" />
         </SelectTrigger>
         <SelectContent>
-          {mockVehicles.map(vehicle => (
-            <SelectItem key={vehicle.id} value={vehicle.number}>
-              {vehicle.number}/{vehicle.type}/{vehicle.description}
-            </SelectItem>
-          ))}
+          {validVehicles.length > 0 ? (
+            validVehicles.map(vehicle => (
+              <SelectItem key={vehicle.id} value={vehicle.number}>
+                {vehicle.number}/{vehicle.type}/{vehicle.description}
+              </SelectItem>
+            ))
+          ) : (
+            <SelectItem value="no-vehicle" disabled>No vehicles available</SelectItem>
+          )}
         </SelectContent>
       </Select>
     </div>

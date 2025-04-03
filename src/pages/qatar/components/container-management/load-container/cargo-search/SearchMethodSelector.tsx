@@ -15,8 +15,8 @@ interface SearchMethodSelectorProps {
 }
 
 const SearchMethodSelector: React.FC<SearchMethodSelectorProps> = ({
-  searchMethod, // Updated from searchBy
-  onMethodChange, // Updated from onSearchMethodChange
+  searchMethod, 
+  onMethodChange, 
 }) => {
   return (
     <div>

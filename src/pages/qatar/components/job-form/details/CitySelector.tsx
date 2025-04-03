@@ -15,19 +15,22 @@ interface CitySelectorProps {
 }
 
 const CitySelector = ({ city, handleSelectChange }: CitySelectorProps) => {
+  // Filter out any city that might have empty code
+  const validCities = mockCities.filter(city => city.code && city.code.trim() !== "");
+
   return (
     <div className="col-span-2 sm:col-span-1">
       <Label htmlFor="city">CITY:</Label>
       <Select 
-        value={city || ""} 
+        value={city || "default"} 
         onValueChange={(value) => handleSelectChange("city", value)}
       >
         <SelectTrigger id="city" className="bg-blue-600 text-white">
           <SelectValue placeholder="SELECT CITY" />
         </SelectTrigger>
         <SelectContent>
-          {mockCities.length > 0 ? (
-            mockCities.map(city => (
+          {validCities.length > 0 ? (
+            validCities.map(city => (
               <SelectItem key={city.id} value={city.code}>
                 {city.name} - {city.code}
               </SelectItem>

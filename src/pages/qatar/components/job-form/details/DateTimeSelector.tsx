@@ -62,7 +62,7 @@ const DateTimeSelector = ({
           onValueChange={(value) => handleSelectChange("amPm", value)}
         >
           <SelectTrigger id="amPm" className="bg-blue-600 text-white">
-            <SelectValue />
+            <SelectValue placeholder="Select AM/PM" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="AM">AM</SelectItem>
@@ -78,7 +78,7 @@ const DateTimeSelector = ({
           onValueChange={(value) => handleSelectChange("sameDay", value)}
         >
           <SelectTrigger id="sameDay" className="bg-blue-600 text-white">
-            <SelectValue />
+            <SelectValue placeholder="Select Same Day" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="Y">YES</SelectItem>
