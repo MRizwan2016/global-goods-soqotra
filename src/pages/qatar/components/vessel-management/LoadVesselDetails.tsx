@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,23 +12,23 @@ interface LoadVesselDetailsProps {
   vesselId: string;
   onContainersLoaded: () => void;
   onCancel: () => void;
+  isViewMode?: boolean;
 }
 
 const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
   vesselId,
   onContainersLoaded,
-  onCancel
+  onCancel,
+  isViewMode = false
 }) => {
   const [vessel, setVessel] = useState<QatarVessel | null>(null);
   const [selectedContainers, setSelectedContainers] = useState<string[]>([]);
   const [availableContainers, setAvailableContainers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
-  // Find vessel data
   useEffect(() => {
     setLoading(true);
     
-    // Get vessel from localStorage first if available
     try {
       const savedVesselData = localStorage.getItem('vesselData');
       if (savedVesselData) {
@@ -37,7 +36,6 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
         const foundVessel = parsedData.find((v: QatarVessel) => v.id === vesselId || v.runningNumber === vesselId);
         if (foundVessel) {
           setVessel(foundVessel);
-          // Load existing containers if any
           if (foundVessel.containers && foundVessel.containers.length > 0) {
             setSelectedContainers(foundVessel.containers);
           }
@@ -47,19 +45,16 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
       console.error("Error loading vessel data from localStorage:", error);
     }
     
-    // Fallback to mock data if not found in localStorage
     if (!vessel) {
       const foundVessel = mockVesselData.find(v => v.id === vesselId || v.runningNumber === vesselId);
       if (foundVessel) {
         setVessel(foundVessel);
-        // Load existing containers if any
         if (foundVessel.containers && foundVessel.containers.length > 0) {
           setSelectedContainers(foundVessel.containers);
         }
       }
     }
     
-    // Get all containers including by runningNumber for compatibility
     const allContainers = mockContainers.map(container => ({
       id: container.id,
       runningNumber: container.runningNumber,
@@ -90,14 +85,11 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
       return;
     }
     
-    // Find the vessel index to update
     const vesselIndex = mockVesselData.findIndex(v => v.id === vesselId || v.runningNumber === vesselId);
     
     if (vesselIndex !== -1) {
-      // Update the containers array
       mockVesselData[vesselIndex].containers = [...selectedContainers];
       
-      // Update the container references to this vessel
       selectedContainers.forEach(containerId => {
         const containerIndex = mockContainers.findIndex(
           c => c.id === containerId || c.runningNumber === containerId
@@ -108,7 +100,6 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
         }
       });
       
-      // Save to localStorage for persistence
       try {
         localStorage.setItem('vesselData', JSON.stringify(mockVesselData));
         localStorage.setItem('containers', JSON.stringify(mockContainers));
@@ -137,7 +128,7 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
         <CardHeader className="bg-blue-50 border-b border-blue-100">
           <CardTitle className="text-xl text-blue-800 flex items-center">
             <Ship className="mr-2" size={20} />
-            Vessel Details - {vessel.vesselName || vessel.runningNumber}
+            {isViewMode ? "View Vessel Details" : "Vessel Details"} - {vessel.vesselName || vessel.runningNumber}
           </CardTitle>
         </CardHeader>
         
@@ -212,101 +203,116 @@ const LoadVesselDetails: React.FC<LoadVesselDetailsProps> = ({
         </CardContent>
       </Card>
       
-      <Card className="shadow-md">
-        <CardHeader className="bg-green-50 border-b border-green-100">
-          <CardTitle className="text-xl text-green-800">Load Containers to Vessel</CardTitle>
-        </CardHeader>
-        
-        <CardContent className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="font-medium mb-3">Available Containers</h3>
-              {availableContainers.length > 0 ? (
-                <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
-                  {availableContainers.map(container => (
-                    <div key={container.id || container.runningNumber} className="p-3 flex justify-between items-center hover:bg-gray-50">
-                      <div>
-                        <div className="font-medium">Container #{container.runningNumber}</div>
-                        <div className="text-sm text-gray-500">
-                          {container.containerNumber} ({container.containerType})
-                          {container.status && <span className="ml-2 text-blue-500">Status: {container.status}</span>}
-                        </div>
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleAddContainer(container.runningNumber)}
-                        disabled={selectedContainers.includes(container.runningNumber)}
-                      >
-                        {selectedContainers.includes(container.runningNumber) ? 'Added' : 'Add'}
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="p-4 text-center text-gray-500 border rounded-md">
-                  No available containers. Please create containers first.
-                </div>
-              )}
-            </div>
-            
-            <div>
-              <h3 className="font-medium mb-3">Selected Containers ({selectedContainers.length})</h3>
-              {selectedContainers.length > 0 ? (
-                <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
-                  {selectedContainers.map(containerId => {
-                    const container = mockContainers.find(c => c.id === containerId || c.runningNumber === containerId);
-                    return (
-                      <div key={containerId} className="p-3 flex justify-between items-center hover:bg-gray-50">
+      {!isViewMode && (
+        <Card className="shadow-md">
+          <CardHeader className="bg-green-50 border-b border-green-100">
+            <CardTitle className="text-xl text-green-800">Load Containers to Vessel</CardTitle>
+          </CardHeader>
+          
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h3 className="font-medium mb-3">Available Containers</h3>
+                {availableContainers.length > 0 ? (
+                  <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
+                    {availableContainers.map(container => (
+                      <div key={container.id || container.runningNumber} className="p-3 flex justify-between items-center hover:bg-gray-50">
                         <div>
-                          <div className="font-medium">Container #{containerId}</div>
-                          {container && (
-                            <div className="text-sm text-gray-500">
-                              {container.containerNumber} ({container.containerType})
-                            </div>
-                          )}
+                          <div className="font-medium">Container #{container.runningNumber}</div>
+                          <div className="text-sm text-gray-500">
+                            {container.containerNumber} ({container.containerType})
+                            {container.status && <span className="ml-2 text-blue-500">Status: {container.status}</span>}
+                          </div>
                         </div>
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => handleRemoveContainer(containerId)}
-                          className="text-red-500 hover:bg-red-50"
+                          onClick={() => handleAddContainer(container.runningNumber)}
+                          disabled={selectedContainers.includes(container.runningNumber)}
                         >
-                          Remove
+                          {selectedContainers.includes(container.runningNumber) ? 'Added' : 'Add'}
                         </Button>
                       </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="p-4 text-center text-gray-500 border rounded-md">
-                  No containers selected. Select containers from the available list.
-                </div>
-              )}
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-gray-500 border rounded-md">
+                    No available containers. Please create containers first.
+                  </div>
+                )}
+              </div>
+              
+              <div>
+                <h3 className="font-medium mb-3">Selected Containers ({selectedContainers.length})</h3>
+                {selectedContainers.length > 0 ? (
+                  <div className="border rounded-md divide-y max-h-80 overflow-y-auto">
+                    {selectedContainers.map(containerId => {
+                      const container = mockContainers.find(c => c.id === containerId || c.runningNumber === containerId);
+                      return (
+                        <div key={containerId} className="p-3 flex justify-between items-center hover:bg-gray-50">
+                          <div>
+                            <div className="font-medium">Container #{containerId}</div>
+                            {container && (
+                              <div className="text-sm text-gray-500">
+                                {container.containerNumber} ({container.containerType})
+                              </div>
+                            )}
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleRemoveContainer(containerId)}
+                            className="text-red-500 hover:bg-red-50"
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-gray-500 border rounded-md">
+                    No containers selected. Select containers from the available list.
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-          
-          <div className="flex justify-between mt-6">
-            <Button
-              variant="outline"
-              onClick={onCancel}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft size={16} />
-              Go Back
-            </Button>
             
-            <Button 
-              onClick={handleSave}
-              disabled={selectedContainers.length === 0}
-              className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
-            >
-              <Save size={16} />
-              Save and Proceed
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="flex justify-between mt-6">
+              <Button
+                variant="outline"
+                onClick={onCancel}
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft size={16} />
+                Go Back
+              </Button>
+              
+              <Button 
+                onClick={handleSave}
+                disabled={selectedContainers.length === 0}
+                className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+              >
+                <Save size={16} />
+                Save and Proceed
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+      
+      {isViewMode && (
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            onClick={onCancel}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft size={16} />
+            Go Back
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

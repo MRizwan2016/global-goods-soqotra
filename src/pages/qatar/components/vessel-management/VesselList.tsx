@@ -12,6 +12,7 @@ import { QatarVessel } from "./types/vesselTypes";
 import VesselsTable from "./vessel-list/VesselsTable";
 import { motion } from "framer-motion";
 import { format } from "date-fns";
+import { DateRange } from "react-day-picker";
 
 interface VesselListProps {
   onVesselSelect: (vesselId: string) => void;
@@ -24,7 +25,7 @@ const VesselList: React.FC<VesselListProps> = ({ onVesselSelect }) => {
   const [statusFilter, setStatusFilter] = useState("");
   const [lineFilter, setLineFilter] = useState("");
   const [directionFilter, setDirectionFilter] = useState("");
-  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([null, null]);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({ from: undefined, to: undefined });
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [filteredVessels, setFilteredVessels] = useState<QatarVessel[]>([]);
   const [sortConfig, setSortConfig] = useState<{
@@ -87,11 +88,11 @@ const VesselList: React.FC<VesselListProps> = ({ onVesselSelect }) => {
     }
     
     // Apply date range filter
-    if (dateRange[0] && dateRange[1]) {
+    if (dateRange?.from && dateRange?.to) {
       filtered = filtered.filter(vessel => {
         const etd = new Date(vessel.etd);
-        const startDate = dateRange[0] as Date;
-        const endDate = dateRange[1] as Date;
+        const startDate = dateRange.from as Date;
+        const endDate = dateRange.to as Date;
         
         // Check if etd is between the start and end dates
         return etd >= startDate && etd <= endDate;
@@ -127,7 +128,7 @@ const VesselList: React.FC<VesselListProps> = ({ onVesselSelect }) => {
     setStatusFilter("");
     setLineFilter("");
     setDirectionFilter("");
-    setDateRange([null, null]);
+    setDateRange(undefined);
   };
 
   const shippingLines = Array.from(new Set(vessels.map(v => v.shippingLine)));
@@ -207,9 +208,9 @@ const VesselList: React.FC<VesselListProps> = ({ onVesselSelect }) => {
                 className="w-full justify-start text-left font-normal bg-white border-gray-200"
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateRange[0] && dateRange[1] ? (
+                {dateRange?.from && dateRange?.to ? (
                   <span>
-                    {format(dateRange[0], "d MMM yyyy")} - {format(dateRange[1], "d MMM yyyy")}
+                    {format(dateRange.from, "d MMM yyyy")} - {format(dateRange.to, "d MMM yyyy")}
                   </span>
                 ) : (
                   <span>Select ETD range</span>
@@ -219,9 +220,9 @@ const VesselList: React.FC<VesselListProps> = ({ onVesselSelect }) => {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="range"
-                selected={dateRange as [Date, Date]}
-                onSelect={(range) => {
-                  setDateRange(range);
+                selected={dateRange}
+                onSelect={(selectedRange) => {
+                  setDateRange(selectedRange);
                   setCalendarOpen(false);
                 }}
                 numberOfMonths={2}
@@ -231,7 +232,7 @@ const VesselList: React.FC<VesselListProps> = ({ onVesselSelect }) => {
         </div>
       </motion.div>
 
-      {(searchTerm || statusFilter || lineFilter || directionFilter || (dateRange[0] && dateRange[1])) && (
+      {(searchTerm || statusFilter || lineFilter || directionFilter || (dateRange?.from && dateRange?.to)) && (
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
@@ -262,10 +263,10 @@ const VesselList: React.FC<VesselListProps> = ({ onVesselSelect }) => {
               </button>
             </div>
           )}
-          {dateRange[0] && dateRange[1] && (
+          {dateRange?.from && dateRange?.to && (
             <div className="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded-full flex items-center">
-              ETD: {format(dateRange[0], "d/M/yy")} - {format(dateRange[1], "d/M/yy")}
-              <button onClick={() => setDateRange([null, null])} className="ml-1 text-blue-700 hover:text-blue-900">
+              ETD: {format(dateRange.from, "d/M/yy")} - {format(dateRange.to, "d/M/yy")}
+              <button onClick={() => setDateRange(undefined)} className="ml-1 text-blue-700 hover:text-blue-900">
                 <X size={12} />
               </button>
             </div>

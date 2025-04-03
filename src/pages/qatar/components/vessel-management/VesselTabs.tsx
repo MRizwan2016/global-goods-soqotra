@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { List, PlusCircle, Anchor, FileCheck } from "lucide-react";
@@ -152,7 +151,6 @@ const VesselTabs: React.FC<VesselTabsProps> = ({
               vesselId={selectedVesselId} 
               onContainersLoaded={handleContainersLoaded} 
               onCancel={handleBackToList}
-              isViewMode={true}
             />
           </motion.div>
         )}
