@@ -84,6 +84,7 @@ const ContainerManagement: React.FC = () => {
     const handleTabChange = (event: CustomEvent) => {
       if (event.detail && event.detail.tab) {
         setActiveTab(event.detail.tab);
+        console.log("Tab changed via custom event to:", event.detail.tab);
       }
     };
     
@@ -96,17 +97,18 @@ const ContainerManagement: React.FC = () => {
 
   // Listen for manifest view events
   useEffect(() => {
-    const handleViewManifest = (event: CustomEvent) => {
+    const handleViewManifestEvent = (event: CustomEvent) => {
       if (event.detail && event.detail.containerId) {
         // Set the view manifest ID
+        console.log("Handling view manifest event for container:", event.detail.containerId);
         handleViewManifest(event.detail.containerId);
       }
     };
     
-    document.addEventListener('viewContainerManifest', handleViewManifest as EventListener);
+    document.addEventListener('viewContainerManifest', handleViewManifestEvent as EventListener);
     
     return () => {
-      document.removeEventListener('viewContainerManifest', handleViewManifest as EventListener);
+      document.removeEventListener('viewContainerManifest', handleViewManifestEvent as EventListener);
     };
   }, [handleViewManifest]);
 
@@ -127,12 +129,19 @@ const ContainerManagement: React.FC = () => {
   useEffect(() => {
     console.log("ContainerManagement component loading");
     console.log("Initial activeTab:", activeTab);
+    console.log("Initial containers:", containers);
+    console.log("Initial printOptions:", printOptions);
   }, []);
 
   // Additional logging for debugging the activeTab changes
   useEffect(() => {
     console.log("Active tab changed to:", activeTab);
   }, [activeTab]);
+
+  // Log when containers change
+  useEffect(() => {
+    console.log("Containers updated:", containers);
+  }, [containers]);
 
   return (
     <Layout title="CONTAINER MANAGEMENT">

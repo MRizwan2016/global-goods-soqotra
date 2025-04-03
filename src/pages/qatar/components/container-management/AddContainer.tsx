@@ -235,6 +235,13 @@ const AddContainer: React.FC<AddContainerProps> = ({
     return options;
   };
 
+  // Make sure we have valid values for Select components
+  const safeShippingLine = formData.shippingLine || "MSC";
+  const safeDirection = formData.direction || "Export";
+  const safeSector = formData.sector || "QAT-KEN";
+  const safeContainerType = formData.containerType || "20FT";
+  const safeRunningNumber = formData.runningNumber || generateRunningNumberOptions()[0] || "100";
+
   return (
     <Card className="mt-0 border-0 shadow-none">
       <CardContent className="p-6">
@@ -265,7 +272,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
               <div>
                 <Label htmlFor="containerType">Container Type</Label>
                 <Select
-                  value={formData.containerType}
+                  value={safeContainerType}
                   onValueChange={(value) => handleChange("containerType", value)}
                 >
                   <SelectTrigger id="containerType">
@@ -284,7 +291,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
               <div>
                 <Label htmlFor="runningNumber">Running Number (auto-generated)</Label>
                 <Select
-                  value={formData.runningNumber || "default-running-number"}
+                  value={safeRunningNumber}
                   onValueChange={(value) => handleChange("runningNumber", value)}
                 >
                   <SelectTrigger id="runningNumber">
@@ -325,7 +332,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
               <div>
                 <Label htmlFor="shippingLine">Shipping Line</Label>
                 <Select
-                  value={formData.shippingLine || "default-shipping-line"}
+                  value={safeShippingLine}
                   onValueChange={(value) => handleChange("shippingLine", value)}
                 >
                   <SelectTrigger id="shippingLine">
@@ -344,7 +351,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
               <div>
                 <Label htmlFor="direction">Direction</Label>
                 <Select
-                  value={formData.direction || "default-direction"}
+                  value={safeDirection}
                   onValueChange={(value) => handleChange("direction", value)}
                 >
                   <SelectTrigger id="direction">
@@ -363,7 +370,7 @@ const AddContainer: React.FC<AddContainerProps> = ({
               <div>
                 <Label htmlFor="sector">Sector</Label>
                 <Select
-                  value={formData.sector || "default-sector"}
+                  value={safeSector}
                   onValueChange={(value) => handleChange("sector", value)}
                 >
                   <SelectTrigger id="sector">

@@ -45,7 +45,7 @@ const TransportAssignment = ({
               <SelectValue placeholder="Select driver" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">-- No Driver Selected --</SelectItem>
+              <SelectItem value="no-driver">-- No Driver Selected --</SelectItem>
               {drivers
                 .filter(driver => driver.status === 'available')
                 .map(driver => (
@@ -67,7 +67,7 @@ const TransportAssignment = ({
               <SelectValue placeholder="Select vehicle" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">-- No Vehicle Selected --</SelectItem>
+              <SelectItem value="no-vehicle">-- No Vehicle Selected --</SelectItem>
               {vehicles
                 .filter(vehicle => vehicle.status === 'available')
                 .map(vehicle => (

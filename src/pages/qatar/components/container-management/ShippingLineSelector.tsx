@@ -69,6 +69,10 @@ const ShippingLineSelector: React.FC<ShippingLineSelectorProps> = ({
     toast.success(`Added new shipping line: ${newShippingLine}`);
   };
 
+  // Log for debugging
+  console.log("ShippingLineSelector rendered with value:", value);
+  console.log("Available shipping lines:", shippingLines);
+
   // Make sure we have a valid value selected
   const validValue = value || (shippingLines.length > 0 ? shippingLines[0].id : "default-shipping-line");
 

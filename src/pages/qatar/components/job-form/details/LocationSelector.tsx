@@ -39,12 +39,12 @@ const LocationSelector = ({
 
   // Get all location names from the cityVehicleMapping
   const locationNames = Object.keys(cityVehicleMapping)
-    .filter(name => !name.includes("STREET NO.") && !["DOH", "RAK", "WAK", "UMS", "KHO", "DAY", "SHA", "WSB"].includes(name))
+    .filter(name => name && name.trim() !== "" && !name.includes("STREET NO.") && !["DOH", "RAK", "WAK", "UMS", "KHO", "DAY", "SHA", "WSB"].includes(name))
     .sort();
 
   // Get all industrial area street numbers
   const industrialAreaStreets = Object.keys(cityVehicleMapping)
-    .filter(name => name.includes("STREET NO."))
+    .filter(name => name && name.trim() !== "" && name.includes("STREET NO."))
     .sort((a, b) => {
       const numA = parseInt(a.replace("STREET NO. ", ""));
       const numB = parseInt(b.replace("STREET NO. ", ""));
@@ -78,6 +78,9 @@ const LocationSelector = ({
   // Sort the keys for consistent display
   const sortedGroups = Object.keys(groupedLocations).sort();
 
+  // Add default town value if current town value is empty
+  const safeTown = town || "default-town";
+
   return (
     <>
       <div>
@@ -95,7 +98,7 @@ const LocationSelector = ({
           </Button>
         </Label>
         <Select 
-          value={town || "default-town"} 
+          value={safeTown} 
           onValueChange={(value) => handleSelectChange("town", value)}
         >
           <SelectTrigger id="town" className="bg-blue-600 text-white">
@@ -107,7 +110,7 @@ const LocationSelector = ({
                 <div key={group}>
                   <div className="px-2 py-1.5 text-xs font-semibold bg-gray-100">{group}</div>
                   {groupedLocations[group].map((locationName) => (
-                    <SelectItem key={locationName} value={locationName}>
+                    <SelectItem key={locationName} value={locationName || "unknown-location"}>
                       <div className="flex items-center">
                         <MapPin className="h-3 w-3 mr-1.5 text-blue-500" />
                         {locationName}
@@ -117,7 +120,7 @@ const LocationSelector = ({
                 </div>
               ))
             ) : (
-              <SelectItem value="no-locations">No locations available</SelectItem>
+              <SelectItem value="no-locations-available">No locations available</SelectItem>
             )}
           </SelectContent>
         </Select>
@@ -158,12 +161,12 @@ const LocationSelector = ({
             <SelectContent>
               {industrialAreaStreets.length > 0 ? (
                 industrialAreaStreets.map((street) => (
-                  <SelectItem key={street} value={street}>
+                  <SelectItem key={street} value={street || "unknown-street"}>
                     {street}
                   </SelectItem>
                 ))
               ) : (
-                <SelectItem value="no-streets">No streets available</SelectItem>
+                <SelectItem value="no-streets-available">No streets available</SelectItem>
               )}
             </SelectContent>
           </Select>
