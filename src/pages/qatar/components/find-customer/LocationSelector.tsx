@@ -61,6 +61,11 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
     }
   };
 
+  // Make sure we have valid arrays to work with
+  const validTowns = qatarTowns && qatarTowns.length ? qatarTowns.filter(town => town && town.trim() !== "") : [];
+  const validStreets = industrialAreaStreets && industrialAreaStreets.length ? 
+    industrialAreaStreets.filter(street => street && street.trim() !== "") : [];
+
   return (
     <div className="space-y-4">
       <div>
@@ -78,21 +83,21 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           </Button>
         </Label>
         <Select
-          value={selectedTown || ""}
+          value={selectedTown || "default-town"}
           onValueChange={setSelectedTown}
         >
           <SelectTrigger id="town" className="bg-blue-600 text-white">
             <SelectValue placeholder="SELECT TOWN" />
           </SelectTrigger>
           <SelectContent>
-            {qatarTowns.length > 0 ? (
-              qatarTowns.map((town, index) => (
-                <SelectItem key={index} value={town}>
+            {validTowns.length > 0 ? (
+              validTowns.map((town, index) => (
+                <SelectItem key={index} value={town || `town-${index}`}>
                   {town}
                 </SelectItem>
               ))
             ) : (
-              <SelectItem value="no-towns" disabled>No towns available</SelectItem>
+              <SelectItem value="no-towns-available">No towns available</SelectItem>
             )}
           </SelectContent>
         </Select>
@@ -102,21 +107,21 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         <div>
           <Label htmlFor="location">LOCATION (STREET NO.):</Label>
           <Select
-            value={selectedLocation || ""}
+            value={selectedLocation || "default-location"}
             onValueChange={setSelectedLocation}
           >
             <SelectTrigger id="location" className="bg-blue-600 text-white">
               <SelectValue placeholder="SELECT STREET NUMBER" />
             </SelectTrigger>
             <SelectContent>
-              {industrialAreaStreets.length > 0 ? (
-                industrialAreaStreets.map((street, index) => (
-                  <SelectItem key={index} value={street}>
+              {validStreets.length > 0 ? (
+                validStreets.map((street, index) => (
+                  <SelectItem key={index} value={street || `street-${index}`}>
                     {street}
                   </SelectItem>
                 ))
               ) : (
-                <SelectItem value="no-streets" disabled>No streets available</SelectItem>
+                <SelectItem value="no-streets-available">No streets available</SelectItem>
               )}
             </SelectContent>
           </Select>

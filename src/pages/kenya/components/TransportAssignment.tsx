@@ -26,6 +26,10 @@ const TransportAssignment = ({
   vehicles,
   onSelectChange
 }: TransportAssignmentProps) => {
+  // Ensure we have valid values
+  const safeDriverId = driverId || "no-driver";
+  const safeVehicleId = vehicleId || "no-vehicle";
+  
   return (
     <Card>
       <CardHeader>
@@ -38,7 +42,7 @@ const TransportAssignment = ({
         <div>
           <Label htmlFor="driverId">Assign Driver</Label>
           <Select
-            value={driverId} 
+            value={safeDriverId} 
             onValueChange={(value) => onSelectChange("driverId", value)}
           >
             <SelectTrigger className="mt-1">
@@ -49,7 +53,7 @@ const TransportAssignment = ({
               {drivers
                 .filter(driver => driver.status === 'available')
                 .map(driver => (
-                  <SelectItem key={driver.id} value={driver.id}>
+                  <SelectItem key={driver.id} value={driver.id || `driver-${Date.now()}`}>
                     {driver.name} - {driver.licenseNumber}
                   </SelectItem>
                 ))}
@@ -60,7 +64,7 @@ const TransportAssignment = ({
         <div>
           <Label htmlFor="vehicleId">Assign Vehicle</Label>
           <Select
-            value={vehicleId} 
+            value={safeVehicleId} 
             onValueChange={(value) => onSelectChange("vehicleId", value)}
           >
             <SelectTrigger className="mt-1">
@@ -71,7 +75,7 @@ const TransportAssignment = ({
               {vehicles
                 .filter(vehicle => vehicle.status === 'available')
                 .map(vehicle => (
-                  <SelectItem key={vehicle.id} value={vehicle.id}>
+                  <SelectItem key={vehicle.id} value={vehicle.id || `vehicle-${Date.now()}`}>
                     {vehicle.registrationNumber} - {vehicle.type} ({vehicle.capacity})
                   </SelectItem>
                 ))}

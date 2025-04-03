@@ -91,7 +91,7 @@ const ShippingLineSelector: React.FC<ShippingLineSelectorProps> = ({
             {shippingLines.map(line => (
               <SelectItem 
                 key={line.id} 
-                value={line.id}
+                value={line.id || `shipping-line-${Date.now()}`}
                 className="py-2 hover:bg-blue-50 transition-colors"
               >
                 <div className="flex items-center">

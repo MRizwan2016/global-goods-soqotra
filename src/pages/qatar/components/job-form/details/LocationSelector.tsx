@@ -110,7 +110,7 @@ const LocationSelector = ({
                 <div key={group}>
                   <div className="px-2 py-1.5 text-xs font-semibold bg-gray-100">{group}</div>
                   {groupedLocations[group].map((locationName) => (
-                    <SelectItem key={locationName} value={locationName || "unknown-location"}>
+                    <SelectItem key={locationName} value={locationName || `unknown-location-${group}`}>
                       <div className="flex items-center">
                         <MapPin className="h-3 w-3 mr-1.5 text-blue-500" />
                         {locationName}
@@ -161,7 +161,7 @@ const LocationSelector = ({
             <SelectContent>
               {industrialAreaStreets.length > 0 ? (
                 industrialAreaStreets.map((street) => (
-                  <SelectItem key={street} value={street || "unknown-street"}>
+                  <SelectItem key={street} value={street || `unknown-street-${Date.now()}`}>
                     {street}
                   </SelectItem>
                 ))

@@ -31,7 +31,7 @@ const VehicleSelector = ({ vehicle, handleSelectChange }: VehicleSelectorProps) 
         <SelectContent>
           {validVehicles.length > 0 ? (
             validVehicles.map(vehicle => (
-              <SelectItem key={vehicle.id} value={vehicle.number}>
+              <SelectItem key={vehicle.id} value={vehicle.number || `vehicle-${vehicle.id}`}>
                 {vehicle.number}/{vehicle.type}/{vehicle.description}
               </SelectItem>
             ))
