@@ -123,6 +123,17 @@ const ContainerManagement: React.FC = () => {
     }, 500);
   };
 
+  // Log initial load for debugging
+  useEffect(() => {
+    console.log("ContainerManagement component loading");
+    console.log("Initial activeTab:", activeTab);
+  }, []);
+
+  // Additional logging for debugging the activeTab changes
+  useEffect(() => {
+    console.log("Active tab changed to:", activeTab);
+  }, [activeTab]);
+
   return (
     <Layout title="CONTAINER MANAGEMENT">
       {/* Add global styles for printing */}
