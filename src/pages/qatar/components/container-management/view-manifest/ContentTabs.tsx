@@ -34,8 +34,11 @@ const ContentTabs: React.FC<ContentTabsProps> = ({
     }
   };
 
+  // Make sure we have a valid activeTab
+  const validActiveTab = activeTab || "cargo-items";
+
   return (
-    <Tabs value={activeTab} onValueChange={handleValueChange} className="mt-6">
+    <Tabs value={validActiveTab} onValueChange={handleValueChange} className="mt-6">
       <TabsList className="mb-4 no-print">
         <TabsTrigger value="cargo-items" className="px-4 py-2">
           Cargo Items

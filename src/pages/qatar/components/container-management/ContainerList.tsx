@@ -135,7 +135,7 @@ const ContainerList: React.FC<ContainerListProps> = ({
                     variants={itemVariants}
                   >
                     <td className="p-3 font-medium">{container.containerNumber}</td>
-                    <td className="p-3">{container.containerType}</td>
+                    <td className="p-3">{container.containerType || "N/A"}</td>
                     <td className="p-3">
                       <span
                         className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
@@ -147,7 +147,7 @@ const ContainerList: React.FC<ContainerListProps> = ({
                           "bg-gray-100 text-gray-800"
                         }`}
                       >
-                        {container.status}
+                        {container.status || "Pending"}
                       </span>
                     </td>
                     <td className="p-3">{container.shippingLine || "N/A"}</td>

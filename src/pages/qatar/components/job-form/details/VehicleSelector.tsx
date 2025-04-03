@@ -37,7 +37,7 @@ const VehicleSelector = ({ vehicle, handleSelectChange }: VehicleSelectorProps) 
             validVehicles.map(vehicle => (
               <SelectItem 
                 key={vehicle.id} 
-                value={vehicle.number || `vehicle-${vehicle.id}`}
+                value={vehicle.number ? vehicle.number : `vehicle-${vehicle.id}`}
               >
                 {vehicle.number}/{vehicle.type}/{vehicle.description}
               </SelectItem>

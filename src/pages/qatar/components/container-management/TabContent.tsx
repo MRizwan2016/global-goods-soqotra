@@ -55,6 +55,12 @@ const TabContent: React.FC<TabContentProps> = ({
   onPrint,
   onAddContainer
 }) => {
+  // Ensure we always have a valid activeTab with correct tabs from the UI
+  // This ensures no empty string or undefined values are passed
+  const validActiveTab = ["containers", "add", "edit", "load", "manifest", "view-manifest"].includes(activeTab) 
+    ? activeTab 
+    : "containers";
+
   return (
     <>
       <TabsContent value="containers" className="m-0">

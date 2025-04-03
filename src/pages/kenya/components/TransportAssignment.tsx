@@ -35,6 +35,10 @@ const TransportAssignment = ({
   console.log("Available drivers:", drivers);
   console.log("Available vehicles:", vehicles);
   
+  // Filter out any drivers or vehicles with missing or empty IDs
+  const validDrivers = drivers.filter(driver => driver.id && driver.status === 'available');
+  const validVehicles = vehicles.filter(vehicle => vehicle.id && vehicle.status === 'available');
+  
   return (
     <Card>
       <CardHeader>
@@ -55,13 +59,11 @@ const TransportAssignment = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="no-driver">-- No Driver Selected --</SelectItem>
-              {drivers
-                .filter(driver => driver.status === 'available' && driver.id)
-                .map(driver => (
-                  <SelectItem key={driver.id} value={driver.id}>
-                    {driver.name} - {driver.licenseNumber}
-                  </SelectItem>
-                ))}
+              {validDrivers.map(driver => (
+                <SelectItem key={driver.id} value={driver.id}>
+                  {driver.name} - {driver.licenseNumber}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -77,13 +79,11 @@ const TransportAssignment = ({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="no-vehicle">-- No Vehicle Selected --</SelectItem>
-              {vehicles
-                .filter(vehicle => vehicle.status === 'available' && vehicle.id)
-                .map(vehicle => (
-                  <SelectItem key={vehicle.id} value={vehicle.id}>
-                    {vehicle.registrationNumber} - {vehicle.type} ({vehicle.capacity})
-                  </SelectItem>
-                ))}
+              {validVehicles.map(vehicle => (
+                <SelectItem key={vehicle.id} value={vehicle.id}>
+                  {vehicle.registrationNumber} - {vehicle.type} ({vehicle.capacity})
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
