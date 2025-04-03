@@ -131,7 +131,7 @@ const VesselList: React.FC<VesselListProps> = ({ onVesselSelect }) => {
     setDateRange(undefined);
   };
 
-  const shippingLines = Array.from(new Set(vessels.map(v => v.shippingLine)));
+  const shippingLines = Array.from(new Set(vessels.map(v => v.shippingLine))).filter(Boolean);
 
   // Variants for animations
   const containerVariants = {
@@ -174,7 +174,7 @@ const VesselList: React.FC<VesselListProps> = ({ onVesselSelect }) => {
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Statuses</SelectItem>
+              <SelectItem value="all">All Statuses</SelectItem>
               <SelectItem value="NEW">New</SelectItem>
               <SelectItem value="SCHEDULED">Scheduled</SelectItem>
               <SelectItem value="LOADING">Loading</SelectItem>
@@ -192,7 +192,7 @@ const VesselList: React.FC<VesselListProps> = ({ onVesselSelect }) => {
               <SelectValue placeholder="Shipping Line" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Shipping Lines</SelectItem>
+              <SelectItem value="all">All Shipping Lines</SelectItem>
               {shippingLines.map(line => (
                 <SelectItem key={line} value={line}>{line}</SelectItem>
               ))}

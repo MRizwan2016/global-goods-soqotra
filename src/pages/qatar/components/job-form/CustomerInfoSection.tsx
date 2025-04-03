@@ -96,7 +96,7 @@ const CustomerInfoSection = ({
             onValueChange={(value) => {
               // Update country and associated sector
               handleSelectChange("country", value);
-              handleSelectChange("sector", countrySectorMap[value]);
+              handleSelectChange("sector", countrySectorMap[value] || "");
             }}
           >
             <SelectTrigger id="country" className="bg-blue-600 text-white">
@@ -117,7 +117,7 @@ const CustomerInfoSection = ({
           <Input 
             id="sector"
             name="sector"
-            value={jobData.sector}
+            value={jobData.sector || ""}
             onChange={handleInputChange}
             readOnly={true}
             className="bg-gray-100"
@@ -129,16 +129,21 @@ const CustomerInfoSection = ({
           <Select 
             value={jobData.branch || ""} 
             onValueChange={(value) => handleSelectChange("branch", value)}
+            disabled={branches.length === 0}
           >
             <SelectTrigger id="branch" className="bg-blue-600 text-white">
               <SelectValue placeholder="SELECT BRANCH" />
             </SelectTrigger>
             <SelectContent>
-              {branches.map(branch => (
-                <SelectItem key={branch} value={branch}>
-                  {branch}
-                </SelectItem>
-              ))}
+              {branches.length > 0 ? (
+                branches.map(branch => (
+                  <SelectItem key={branch} value={branch}>
+                    {branch}
+                  </SelectItem>
+                ))
+              ) : (
+                <SelectItem value="no-branches" disabled>No branches available</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -148,7 +153,7 @@ const CustomerInfoSection = ({
           <Textarea 
             id="remarks"
             name="remarks"
-            value={jobData.remarks}
+            value={jobData.remarks || ""}
             onChange={handleInputChange}
             placeholder="ENTER ANY ADDITIONAL INFORMATION ABOUT PERSONAL EFFECTS OR HOUSEHOLD GOODS"
             rows={3}
