@@ -11,20 +11,39 @@ export const useContainerManagement = () => {
   const [activeTab, setActiveTab] = useState("containers");
   const [editContainerId, setEditContainerId] = useState<string | null>(null);
   const [viewManifestId, setViewManifestId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [printOptions, setPrintOptions] = useState<PrintOptions>({
     section: "all",
     orientation: "portrait"
   });
 
-  // Load previously saved cargo items
+  // Load containers and cargo items with a loading state
   useEffect(() => {
+    setIsLoading(true);
+    
     try {
+      // Load containers from localStorage
+      const savedContainers = localStorage.getItem('containers');
+      if (savedContainers) {
+        const parsedContainers = JSON.parse(savedContainers);
+        if (Array.isArray(parsedContainers) && parsedContainers.length > 0) {
+          setContainers(parsedContainers);
+        }
+      }
+      
+      // Load cargo items from localStorage
       const savedCargoItems = localStorage.getItem('cargoItems');
       if (savedCargoItems) {
-        setCargoItems(JSON.parse(savedCargoItems));
+        const parsedCargoItems = JSON.parse(savedCargoItems);
+        if (Array.isArray(parsedCargoItems)) {
+          setCargoItems(parsedCargoItems);
+        }
       }
     } catch (error) {
-      console.error("Error loading cargo items:", error);
+      console.error("Error loading data:", error);
+    } finally {
+      // Add a slight delay to make loading state visible
+      setTimeout(() => setIsLoading(false), 800);
     }
   }, []);
 
@@ -47,6 +66,22 @@ export const useContainerManagement = () => {
     };
   }, []);
 
+  const saveContainersToLocalStorage = (containersData: QatarContainer[]) => {
+    try {
+      localStorage.setItem('containers', JSON.stringify(containersData));
+    } catch (error) {
+      console.error("Error saving containers to localStorage:", error);
+    }
+  };
+
+  const saveCargoItemsToLocalStorage = (cargoItemsData: ContainerCargo[]) => {
+    try {
+      localStorage.setItem('cargoItems', JSON.stringify(cargoItemsData));
+    } catch (error) {
+      console.error("Error saving cargo items to localStorage:", error);
+    }
+  };
+
   const handleAddContainer = (newContainer: QatarContainer) => {
     // Generate a unique ID if one is not provided
     if (!newContainer.id) {
@@ -64,9 +99,16 @@ export const useContainerManagement = () => {
     newContainer.volume = newContainer.volume || 0;
     
     // Add to containers list
-    setContainers(prevContainers => [...prevContainers, newContainer]);
+    const updatedContainers = [...containers, newContainer];
+    setContainers(updatedContainers);
+    saveContainersToLocalStorage(updatedContainers);
+    
     setActiveTab("containers");
-    toast.success("CONTAINER ADDED SUCCESSFULLY");
+    toast.success("Container added successfully", {
+      description: `Container ${newContainer.containerNumber} has been added to the system`,
+      position: "top-center",
+      className: "animate-slide-in-right"
+    });
   };
 
   const handleEditContainer = (containerId: string) => {
@@ -79,14 +121,21 @@ export const useContainerManagement = () => {
       container.id === updatedContainer.id ? updatedContainer : container
     );
     setContainers(updatedContainers);
+    saveContainersToLocalStorage(updatedContainers);
+    
     setActiveTab("containers");
     setEditContainerId(null);
-    toast.success("CONTAINER UPDATED SUCCESSFULLY");
+    toast.success("Container updated successfully", {
+      description: `Container ${updatedContainer.containerNumber} has been updated`,
+      position: "top-center",
+      className: "animate-slide-in-right"
+    });
   };
 
   const handleCancelEdit = () => {
     setActiveTab("containers");
     setEditContainerId(null);
+    setViewManifestId(null);
   };
 
   const handleLoadContainer = (containerId: string) => {
@@ -113,20 +162,16 @@ export const useContainerManagement = () => {
     );
     
     if (isDuplicate) {
-      toast.error("This package is already loaded in the container");
+      toast.error("This package is already loaded in the container", {
+        position: "top-center"
+      });
       return;
     }
     
     // Add cargo to the list
     const updatedCargoItems = [...cargoItems, cargo];
     setCargoItems(updatedCargoItems);
-    
-    // Save to localStorage for persistence
-    try {
-      localStorage.setItem('cargoItems', JSON.stringify(updatedCargoItems));
-    } catch (error) {
-      console.error("Error saving cargo items:", error);
-    }
+    saveCargoItemsToLocalStorage(updatedCargoItems);
     
     // Update container stats
     const containerId = cargo.containerId;
@@ -144,22 +189,37 @@ export const useContainerManagement = () => {
     });
     
     setContainers(updatedContainers);
+    saveContainersToLocalStorage(updatedContainers);
     
-    toast.success("Cargo item added to container");
+    toast.success("Cargo item added to container", {
+      description: `${cargo.packageName} from invoice ${cargo.invoiceNumber} added`,
+      position: "top-center",
+      className: "animate-slide-in-right"
+    });
   };
 
   const handleManifestSubmitted = () => {
-    // Update container status to "LOADED" or similar
-    const updatedContainers = containers.map(container => 
-      container.id === editContainerId ? { ...container, status: "CONFIRMED" } : container
-    );
-    setContainers(updatedContainers);
+    // Update container status to "CONFIRMED"
+    if (editContainerId) {
+      const updatedContainers = containers.map(container => 
+        container.id === editContainerId ? 
+          { ...container, status: "CONFIRMED", confirmDate: new Date().toISOString().split('T')[0] } : 
+          container
+      );
+      
+      setContainers(updatedContainers);
+      saveContainersToLocalStorage(updatedContainers);
+    }
+    
     setActiveTab("containers");
     
     // Show success message with view manifest option
-    toast.success("CONTAINER MANIFEST SUBMITTED SUCCESSFULLY", {
+    toast.success("Container manifest submitted successfully", {
+      description: "The cargo manifest has been confirmed",
+      position: "top-center",
+      className: "animate-slide-in-right",
       action: {
-        label: "VIEW MANIFEST",
+        label: "View Manifest",
         onClick: () => {
           // Create and dispatch a custom event
           const event = new CustomEvent('viewContainerManifest', { 
@@ -184,15 +244,11 @@ export const useContainerManagement = () => {
     window.print();
   };
 
-  // Get cargo items for the current container - now check both ID and running number
+  // Get cargo items for the current container
   const getCurrentCargoItems = () => {
     const containerId = viewManifestId || editContainerId;
     if (!containerId) return [];
     
-    const container = containers.find(c => c.id === containerId);
-    if (!container) return [];
-    
-    // Look for items directly associated with the container ID
     return cargoItems.filter(item => item.containerId === containerId);
   };
 
@@ -274,6 +330,7 @@ export const useContainerManagement = () => {
     editContainerId,
     viewManifestId,
     printOptions,
+    isLoading,
     handleAddContainer,
     handleEditContainer,
     handleUpdateContainer,

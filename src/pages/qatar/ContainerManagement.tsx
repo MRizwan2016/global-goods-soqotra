@@ -6,6 +6,8 @@ import Layout from "@/components/layout/Layout";
 import { useContainerManagement } from "./hooks/useContainerManagement";
 import TabsHeader from "./components/container-management/TabsHeader";
 import TabContent from "./components/container-management/TabContent";
+import LoadingState from "./components/shared/LoadingState";
+import { motion } from "framer-motion";
 
 // Add some global styles for print mode
 const globalStyles = `
@@ -59,6 +61,7 @@ const ContainerManagement: React.FC = () => {
     editContainerId,
     viewManifestId,
     printOptions,
+    isLoading,
     handleAddContainer,
     handleEditContainer,
     handleUpdateContainer,
@@ -125,39 +128,73 @@ const ContainerManagement: React.FC = () => {
       {/* Add global styles for printing */}
       <style>{globalStyles}</style>
       
-      <div className="container mx-auto py-6 animate-fade-in">
-        <Card className="no-print shadow-md">
-          <CardContent className="p-0">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsHeader activeTab={activeTab} />
-              
-              <TabContent 
-                activeTab={activeTab}
-                containers={containers}
-                editContainerId={editContainerId}
-                viewManifestId={viewManifestId}
-                printOptions={printOptions}
-                getCurrentContainer={getCurrentContainer}
-                getCurrentCargoItems={getCurrentCargoItems}
-                getItemList={getItemList}
-                getConsigneeList={getConsigneeList}
-                getUnsettledInvoices={getUnsettledInvoices}
-                onEditContainer={handleEditContainer}
-                onLoadContainer={handleLoadContainer}
-                onViewManifest={handleViewManifest}
-                onCreateManifest={handleManifestContainer}
-                onUpdateContainer={handleUpdateContainer}
-                onCancelEdit={handleCancelEdit}
-                onLoadComplete={handleManifestContainer}
-                onManifestSubmitted={handleManifestSubmitted}
-                onPrintOptionsChange={handlePrintOptionsChange}
-                onPrint={handleContainerPrint}
-                onAddContainer={handleAddContainer}
-              />
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
+      <motion.div 
+        className="container mx-auto py-6"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <motion.div
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="bg-gradient-to-r from-blue-100 to-white shadow-md rounded-lg mb-6 p-5"
+        >
+          <h1 className="text-2xl font-bold text-blue-800 flex items-center">
+            <span className="mr-2">📦</span>
+            Container Management System
+          </h1>
+          <p className="text-blue-600 mt-1">Manage containers, cargo loading, and manifests</p>
+        </motion.div>
+      
+        {isLoading ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <LoadingState type="container" text="Loading container management data..." />
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Card className="no-print shadow-md hover:shadow-lg transition-shadow duration-300">
+              <CardContent className="p-0">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                  <TabsHeader activeTab={activeTab} />
+                  
+                  <TabContent 
+                    activeTab={activeTab}
+                    containers={containers}
+                    editContainerId={editContainerId}
+                    viewManifestId={viewManifestId}
+                    printOptions={printOptions}
+                    getCurrentContainer={getCurrentContainer}
+                    getCurrentCargoItems={getCurrentCargoItems}
+                    getItemList={getItemList}
+                    getConsigneeList={getConsigneeList}
+                    getUnsettledInvoices={getUnsettledInvoices}
+                    onEditContainer={handleEditContainer}
+                    onLoadContainer={handleLoadContainer}
+                    onViewManifest={handleViewManifest}
+                    onCreateManifest={handleManifestContainer}
+                    onUpdateContainer={handleUpdateContainer}
+                    onCancelEdit={handleCancelEdit}
+                    onLoadComplete={handleManifestContainer}
+                    onManifestSubmitted={handleManifestSubmitted}
+                    onPrintOptionsChange={handlePrintOptionsChange}
+                    onPrint={handleContainerPrint}
+                    onAddContainer={handleAddContainer}
+                  />
+                </Tabs>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </motion.div>
     </Layout>
   );
 };

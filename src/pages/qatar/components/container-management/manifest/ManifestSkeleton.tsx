@@ -1,61 +1,79 @@
 
 import React from "react";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { motion } from "framer-motion";
 
 const ManifestSkeleton: React.FC = () => {
   return (
-    <Card className="shadow-md animate-fade-in">
-      <CardHeader className="bg-blue-50 border-b">
-        <CardTitle className="text-xl font-semibold text-gray-800 flex items-center">
-          <Loader2 className="mr-2 animate-spin" size={22} />
-          Loading Container Manifest
-        </CardTitle>
+    <Card className="shadow-md">
+      <CardHeader className="bg-gray-50 animate-pulse border-b h-16">
+        <div className="h-8 bg-gray-200 rounded-md w-3/5"></div>
       </CardHeader>
+      
       <CardContent className="p-6">
-        <div className="space-y-4">
-          {/* Summary skeleton */}
-          <div className="grid grid-cols-3 gap-4">
-            <Skeleton className="h-20 rounded-md" />
-            <Skeleton className="h-20 rounded-md" />
-            <Skeleton className="h-20 rounded-md" />
+        <div className="space-y-8">
+          {/* Container summary */}
+          <div className="animate-pulse space-y-4">
+            <div className="h-6 bg-gray-200 rounded-md w-1/4 mb-4"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="h-10 bg-gray-200 rounded-md"></div>
+              <div className="h-10 bg-gray-200 rounded-md"></div>
+              <div className="h-10 bg-gray-200 rounded-md"></div>
+            </div>
           </div>
           
-          {/* Container details skeleton */}
-          <div className="mt-6">
-            <Skeleton className="h-8 w-48 mb-4" />
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <Skeleton className="h-10 rounded-md" />
-              <Skeleton className="h-10 rounded-md" />
-              <Skeleton className="h-10 rounded-md" />
-              <Skeleton className="h-10 rounded-md" />
-              <Skeleton className="h-10 rounded-md" />
-              <Skeleton className="h-10 rounded-md" />
+          {/* Table skeleton */}
+          <div className="animate-pulse space-y-4">
+            <div className="h-6 bg-gray-200 rounded-md w-1/4 mb-4"></div>
+            <div className="h-10 bg-gray-300 rounded-md w-full"></div>
+            <div className="space-y-2">
+              <div className="h-12 bg-gray-200 rounded-md w-full"></div>
+              <div className="h-12 bg-gray-200 rounded-md w-full"></div>
+              <div className="h-12 bg-gray-200 rounded-md w-full"></div>
             </div>
           </div>
           
           {/* Tabs skeleton */}
-          <div className="mt-6">
-            <div className="flex gap-2 mb-4">
-              <Skeleton className="h-10 w-24 rounded-md" />
-              <Skeleton className="h-10 w-24 rounded-md" />
-              <Skeleton className="h-10 w-24 rounded-md" />
+          <div className="animate-pulse space-y-4">
+            <div className="flex space-x-2 mb-4">
+              <div className="h-8 bg-gray-200 rounded-md w-24"></div>
+              <div className="h-8 bg-gray-200 rounded-md w-24"></div>
+              <div className="h-8 bg-gray-200 rounded-md w-24"></div>
             </div>
-            
-            <Skeleton className="h-60 rounded-md" />
+            <div className="h-40 bg-gray-100 rounded-md w-full"></div>
           </div>
           
-          {/* Action buttons skeleton */}
-          <div className="flex justify-between items-center mt-6">
-            <Skeleton className="h-10 w-24 rounded-md" />
-            <div className="flex gap-2">
-              <Skeleton className="h-10 w-24 rounded-md" />
-              <Skeleton className="h-10 w-24 rounded-md" />
-            </div>
+          {/* Buttons skeleton */}
+          <div className="animate-pulse flex justify-end space-x-4 mt-8">
+            <div className="h-10 bg-gray-200 rounded-md w-24"></div>
+            <div className="h-10 bg-blue-200 rounded-md w-24"></div>
           </div>
         </div>
       </CardContent>
+      
+      {/* Animated loading indicator */}
+      <motion.div 
+        className="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.7, 1, 0.7]
+        }}
+        transition={{
+          duration: 1.5,
+          repeat: Infinity,
+          repeatType: "loop"
+        }}
+      >
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="w-5 h-5 border-2 border-white rounded-full border-t-transparent"
+        />
+      </motion.div>
     </Card>
   );
 };
