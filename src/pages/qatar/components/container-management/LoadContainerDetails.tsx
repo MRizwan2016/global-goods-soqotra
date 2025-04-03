@@ -3,13 +3,14 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { QatarContainer, ContainerCargo } from "../../types/containerTypes";
-import { ArrowLeft, Package, Truck, Search, FileText, AlertCircle } from "lucide-react";
+import { ArrowLeft, Package, Truck, Search, FileText, AlertCircle, Barcode } from "lucide-react";
 import { toast } from "sonner";
 import ContainerDetailsSection from "./load-container/ContainerDetailsSection";
 import CargoSearchForm from "./load-container/CargoSearchForm";
 import CargoTable from "./load-container/CargoTable";
 import CargoLoader from "./load-container/CargoLoader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import useBarcodeScanner from "../../hooks/useBarcodeScanner";
 
 interface LoadContainerDetailsProps {
   containerId: string;
@@ -31,20 +32,41 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
   
   // Load existing cargo items for this container
   useEffect(() => {
-    const savedCargoItems = JSON.parse(localStorage.getItem('cargoItems') || '[]');
-    const containerCargo = savedCargoItems.filter((item: any) => item.containerId === containerId);
-    
-    setCargoItems(containerCargo);
-    
-    // Track which invoice numbers are already loaded
-    const invoiceNumbers = new Set<string>();
-    containerCargo.forEach((item: ContainerCargo) => {
-      invoiceNumbers.add(item.invoiceNumber);
-    });
-    setLoadedInvoiceNumbers(invoiceNumbers);
-    
-    console.log(`Loaded ${containerCargo.length} cargo items for container ${containerId}`);
+    try {
+      const savedCargoItems = JSON.parse(localStorage.getItem('cargoItems') || '[]');
+      const containerCargo = savedCargoItems.filter((item: any) => item.containerId === containerId);
+      
+      setCargoItems(containerCargo);
+      
+      // Track which invoice numbers are already loaded
+      const invoiceNumbers = new Set<string>();
+      containerCargo.forEach((item: ContainerCargo) => {
+        if (item.invoiceNumber) {
+          invoiceNumbers.add(item.invoiceNumber);
+        }
+      });
+      setLoadedInvoiceNumbers(invoiceNumbers);
+      
+      console.log(`Loaded ${containerCargo.length} cargo items for container ${containerId}`);
+    } catch (error) {
+      console.error("Error loading cargo items:", error);
+      toast.error("Error loading existing cargo items", {
+        description: "Please try refreshing the page"
+      });
+    }
   }, [containerId]);
+  
+  // Setup barcode scanner for the whole page
+  const handlePackageBarcodeDetected = (barcode: string) => {
+    toast.info(`Barcode detected: ${barcode}`, {
+      description: "Use the entry forms to add cargo with this barcode"
+    });
+  };
+  
+  const { scanning, toggleScanning } = useBarcodeScanner({
+    onBarcodeDetected: handlePackageBarcodeDetected,
+    enabled: true
+  });
   
   // Handle adding cargo to the container
   const handleAddCargo = (cargo: ContainerCargo) => {
@@ -68,7 +90,9 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
     setCargoItems(updatedItems);
     
     // Update loaded invoice numbers
-    setLoadedInvoiceNumbers(prev => new Set([...prev, cargo.invoiceNumber]));
+    if (cargo.invoiceNumber) {
+      setLoadedInvoiceNumbers(prev => new Set([...prev, cargo.invoiceNumber]));
+    }
     
     toast.success(`Cargo item added to container`, {
       description: `Invoice: ${cargo.invoiceNumber}, ${cargo.packageName}`
@@ -86,15 +110,17 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
     setCargoItems(updatedItems);
     
     // Check if this was the last item for this invoice
-    const hasMoreItemsWithSameInvoice = updatedItems.some(item => 
-      item.invoiceNumber === cargoToRemove.invoiceNumber
-    );
-    
-    // If no more items with this invoice, remove from loaded invoices
-    if (!hasMoreItemsWithSameInvoice) {
-      const updatedInvoiceNumbers = new Set(loadedInvoiceNumbers);
-      updatedInvoiceNumbers.delete(cargoToRemove.invoiceNumber);
-      setLoadedInvoiceNumbers(updatedInvoiceNumbers);
+    if (cargoToRemove.invoiceNumber) {
+      const hasMoreItemsWithSameInvoice = updatedItems.some(item => 
+        item.invoiceNumber === cargoToRemove.invoiceNumber
+      );
+      
+      // If no more items with this invoice, remove from loaded invoices
+      if (!hasMoreItemsWithSameInvoice) {
+        const updatedInvoiceNumbers = new Set(loadedInvoiceNumbers);
+        updatedInvoiceNumbers.delete(cargoToRemove.invoiceNumber);
+        setLoadedInvoiceNumbers(updatedInvoiceNumbers);
+      }
     }
     
     toast.info(`Cargo item removed`);
@@ -103,33 +129,71 @@ const LoadContainerDetails: React.FC<LoadContainerDetailsProps> = ({
   // Complete loading and proceed
   const handleLoadComplete = () => {
     // Save cargo items to localStorage
-    const savedCargoItems = JSON.parse(localStorage.getItem('cargoItems') || '[]');
-    
-    // Remove existing items for this container
-    const filteredItems = savedCargoItems.filter((item: any) => item.containerId !== containerId);
-    
-    // Add current items
-    const updatedCargoItems = [...filteredItems, ...cargoItems];
-    localStorage.setItem('cargoItems', JSON.stringify(updatedCargoItems));
-    
-    // Proceed to manifest
-    onLoadComplete();
+    try {
+      const savedCargoItems = JSON.parse(localStorage.getItem('cargoItems') || '[]');
+      
+      // Remove existing items for this container
+      const filteredItems = savedCargoItems.filter((item: any) => item.containerId !== containerId);
+      
+      // Add current items
+      const updatedCargoItems = [...filteredItems, ...cargoItems];
+      localStorage.setItem('cargoItems', JSON.stringify(updatedCargoItems));
+      
+      // Update the container in localStorage to reflect loading status
+      const containers = JSON.parse(localStorage.getItem('containers') || '[]');
+      const updatedContainers = containers.map((container: QatarContainer) => {
+        if (container.id === containerId) {
+          return {
+            ...container,
+            status: 'LOADED',
+            packages: cargoItems.length,
+            weight: cargoItems.reduce((sum, item) => sum + (item.weight || 0), 0),
+            volume: cargoItems.reduce((sum, item) => sum + (item.volume || 0), 0),
+          };
+        }
+        return container;
+      });
+      localStorage.setItem('containers', JSON.stringify(updatedContainers));
+      
+      // Proceed to manifest
+      onLoadComplete();
+      
+      toast.success("Container loading complete", {
+        description: `Added ${cargoItems.length} cargo items to container`
+      });
+    } catch (error) {
+      console.error("Error saving cargo items:", error);
+      toast.error("Error saving cargo items", {
+        description: "Please try again"
+      });
+    }
   };
 
   return (
     <div className="p-6">
-      <div className="flex items-center mb-6">
-        <Button variant="outline" onClick={onCancel} className="mr-4">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center">
+          <Button variant="outline" onClick={onCancel} className="mr-4">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h2 className="text-2xl font-bold">
+            Load Container: {containerData?.containerNumber || containerId}
+          </h2>
+        </div>
+        
+        <Button 
+          variant={scanning ? "default" : "outline"}
+          onClick={toggleScanning}
+          className={scanning ? "bg-green-600 hover:bg-green-700" : ""}
+        >
+          <Barcode className="h-4 w-4 mr-2" />
+          {scanning ? "Scanner Active" : "Activate Scanner"}
         </Button>
-        <h2 className="text-2xl font-bold">
-          Load Container: {containerData?.containerNumber || containerId}
-        </h2>
       </div>
 
       {containerData && (
-        <ContainerDetailsSection container={containerData} onContainerChange={() => {}} />
+        <ContainerDetailsSection container={containerData} />
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">

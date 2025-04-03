@@ -20,6 +20,23 @@ export const useTabManagement = (setEditContainerId?: (id: string | null) => voi
     });
   };
   
+  // Handle container editing
+  const handleEditContainer = (containerId: string) => {
+    console.log("Editing container with ID:", containerId);
+    
+    // Set the edit container ID if we have a setter
+    if (setEditContainerId) {
+      setEditContainerId(containerId);
+    }
+    
+    // Switch to edit tab
+    setActiveTab("edit");
+    
+    toast.info("Editing container", {
+      description: "You can now edit this container's details",
+    });
+  };
+  
   // Handle container loading
   const handleLoadContainer = (containerId: string) => {
     console.log("Loading container with ID:", containerId);
@@ -58,6 +75,7 @@ export const useTabManagement = (setEditContainerId?: (id: string | null) => voi
     activeTab,
     setActiveTab,
     handleCancelEdit,
+    handleEditContainer,
     handleLoadContainer,
     handleManifestContainer
   };

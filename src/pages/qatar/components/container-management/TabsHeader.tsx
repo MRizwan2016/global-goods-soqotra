@@ -42,12 +42,12 @@ const TabsHeader: React.FC<TabsHeaderProps> = ({
 
       <TabsTrigger
         value="edit"
-        disabled={activeTab !== "edit"}
         className={`flex items-center py-3 px-5 transition-colors ${
           activeTab === "edit" 
             ? "border-b-2 border-blue-600 text-blue-600" 
             : "text-gray-500 hover:text-gray-800"
         }`}
+        onClick={(activeTab === "edit") ? undefined : () => null}
       >
         <Pen className="mr-2 h-5 w-5" />
         EDIT
@@ -55,12 +55,12 @@ const TabsHeader: React.FC<TabsHeaderProps> = ({
 
       <TabsTrigger
         value="load"
-        disabled={activeTab !== "load"}
         className={`flex items-center py-3 px-5 transition-colors ${
           activeTab === "load" 
             ? "border-b-2 border-blue-600 text-blue-600" 
             : "text-gray-500 hover:text-gray-800"
         }`}
+        onClick={(activeTab === "load") ? undefined : () => null}
       >
         <Truck className="mr-2 h-5 w-5" />
         LOAD
@@ -68,12 +68,12 @@ const TabsHeader: React.FC<TabsHeaderProps> = ({
 
       <TabsTrigger
         value="manifest"
-        disabled={activeTab !== "manifest"}
         className={`flex items-center py-3 px-5 transition-colors ${
           activeTab === "manifest" 
             ? "border-b-2 border-blue-600 text-blue-600" 
             : "text-gray-500 hover:text-gray-800"
         }`}
+        onClick={(activeTab === "manifest") ? undefined : () => null}
       >
         <Clipboard className="mr-2 h-5 w-5" />
         MANIFEST
@@ -81,12 +81,12 @@ const TabsHeader: React.FC<TabsHeaderProps> = ({
 
       <TabsTrigger
         value="view-manifest"
-        disabled={activeTab !== "view-manifest"}
         className={`flex items-center py-3 px-5 transition-colors ${
           activeTab === "view-manifest" 
             ? "border-b-2 border-blue-600 text-blue-600" 
             : "text-gray-500 hover:text-gray-800"
         }`}
+        onClick={(activeTab === "view-manifest") ? undefined : () => null}
       >
         <FileText className="mr-2 h-5 w-5" />
         VIEW MANIFEST

@@ -32,72 +32,97 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
   const [consignee, setConsignee] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [barcode, setBarcode] = useState<string>("");
+  const [d2d, setD2d] = useState<boolean>(false);
+  const [warehouse, setWarehouse] = useState<string>("");
   
   // Suggestions state
   const [bookingFormSuggestions, setBookingFormSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<any[]>([]);
   
   // Load saved invoices from localStorage for suggestions
   useEffect(() => {
     try {
+      // Get invoices from localStorage
       const savedInvoices = localStorage.getItem('invoices');
+      // Get generated invoices from localStorage
+      const generatedInvoices = localStorage.getItem('generatedInvoices');
+      
+      let allInvoices = [];
+      
+      // Parse saved invoices if they exist
       if (savedInvoices) {
         const parsedInvoices = JSON.parse(savedInvoices);
-        
-        // Format for suggestions
-        const formattedSuggestions = parsedInvoices.map((invoice: any) => ({
-          invoiceNumber: invoice.invoiceNumber || invoice.bookingForm || "",
-          shipper: invoice.shipperName || "",
-          consignee: invoice.consigneeName || "",
-          shipperAddress: invoice.shipperAddress || "",
-          consigneeAddress: invoice.consigneeAddress || "",
-          packages: invoice.packages || [],
-          totalVolume: invoice.totalVolume || 0,
-          totalWeight: invoice.totalWeight || 0
-        }));
-        
-        setBookingFormSuggestions(formattedSuggestions);
-        console.log("Loaded suggestions:", formattedSuggestions.length);
+        allInvoices = [...parsedInvoices];
       }
+      
+      // Parse and add generated invoices if they exist
+      if (generatedInvoices) {
+        const parsedGeneratedInvoices = JSON.parse(generatedInvoices);
+        allInvoices = [...allInvoices, ...parsedGeneratedInvoices];
+      }
+      
+      // Format for suggestions
+      const formattedSuggestions = allInvoices.map((invoice: any) => ({
+        invoiceNumber: invoice.invoiceNumber || invoice.bookingForm || "",
+        shipper: invoice.shipper || invoice.shipper1 || "",
+        consignee: invoice.consignee || invoice.consignee1 || "",
+        shipperAddress: invoice.shipperAddress || "",
+        consigneeAddress: invoice.consigneeAddress || "",
+        packages: invoice.packages || 0,
+        volume: invoice.volume || 0,
+        weight: invoice.weight || 0,
+        d2d: invoice.d2d || invoice.doorToDoor || false,
+        warehouse: invoice.warehouse || "",
+        packageName: invoice.packageName || "Box"
+      }));
+      
+      setBookingFormSuggestions(formattedSuggestions);
+      console.log("Loaded invoice suggestions:", formattedSuggestions.length);
     } catch (error) {
       console.error("Error loading invoice suggestions:", error);
     }
   }, []);
+  
+  // Filter suggestions based on input
+  useEffect(() => {
+    if (invoiceNumber && invoiceNumber.length >= 3) {
+      const filtered = bookingFormSuggestions.filter(invoice => 
+        invoice.invoiceNumber.toLowerCase().includes(invoiceNumber.toLowerCase())
+      );
+      setFilteredSuggestions(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setFilteredSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [invoiceNumber, bookingFormSuggestions]);
   
   // Handle selecting an invoice from suggestions
   const handleSelectInvoice = (invoice: any) => {
     setInvoiceNumber(invoice.invoiceNumber);
     setShipper(invoice.shipper);
     setConsignee(invoice.consignee);
-    
-    // Get total volume and weight from packages
-    if (invoice.packages && invoice.packages.length > 0) {
-      const totalVol = invoice.totalVolume || 
-        invoice.packages.reduce((sum: number, pkg: any) => sum + (parseFloat(pkg.volume) || 0), 0);
-      
-      const totalWgt = invoice.totalWeight || 
-        invoice.packages.reduce((sum: number, pkg: any) => sum + (parseFloat(pkg.weight) || 0), 0);
-      
-      setVolume(totalVol);
-      setWeight(totalWgt);
-      
-      // Set default package name if available
-      if (invoice.packages[0]?.packageName) {
-        setPackageName(invoice.packages[0].packageName);
-      }
-      
-      // Set quantity to number of packages
-      setQuantity(invoice.packages.length);
-    }
+    setPackageName(invoice.packageName || "Box");
+    setVolume(invoice.volume || 0);
+    setWeight(invoice.weight || 0);
+    setQuantity(invoice.packages || 1);
+    setD2d(invoice.d2d || false);
+    setWarehouse(invoice.warehouse || "");
     
     setShowSuggestions(false);
-    toast.success(`Invoice ${invoice.invoiceNumber} selected`);
+    toast.success(`Invoice ${invoice.invoiceNumber} selected`, {
+      description: `Shipper: ${invoice.shipper}, Consignee: ${invoice.consignee}`
+    });
   };
   
-  // Filter suggestions based on input
-  const filteredSuggestions = bookingFormSuggestions.filter(invoice => 
-    invoice.invoiceNumber.toLowerCase().includes(invoiceNumber.toLowerCase())
-  );
+  // Handle invoice search key press events
+  const handleInvoiceKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && filteredSuggestions.length > 0) {
+      handleSelectInvoice(filteredSuggestions[0]);
+      e.preventDefault();
+    }
+  };
   
   // Handle form submission to add cargo
   const handleSubmit = (e: React.FormEvent) => {
@@ -123,27 +148,15 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
       consignee,
       description,
       barcode,
-      d2d: false
+      d2d,
+      wh: warehouse
     };
     
     onAddCargo(newCargo);
     
     // Reset form fields after adding
     setLineNumber("");
-    setPackageName("");
-    setVolume(0);
-    setWeight(0);
-    setQuantity(1);
-    setDescription("");
     setBarcode("");
-  };
-  
-  // Handle invoice search key press events
-  const handleInvoiceKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && filteredSuggestions.length > 0) {
-      handleSelectInvoice(filteredSuggestions[0]);
-      e.preventDefault();
-    }
   };
 
   return (
@@ -186,6 +199,15 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
               placeholder="Consignee name"
             />
           </div>
+          
+          <div className="mt-3">
+            <Label className="font-bold text-gray-700 mb-1 block">WAREHOUSE:</Label>
+            <Input 
+              value={warehouse}
+              onChange={(e) => setWarehouse(e.target.value)}
+              placeholder="Warehouse"
+            />
+          </div>
         </div>
         
         <div>
@@ -224,6 +246,15 @@ const CargoSearchForm: React.FC<CargoSearchFormProps> = ({
               type="number"
               value={quantity}
               onChange={(e) => setQuantity(parseInt(e.target.value, 10))}
+            />
+          </div>
+          
+          <div className="mt-3">
+            <Label className="font-bold text-gray-700 mb-1 block">BARCODE:</Label>
+            <Input 
+              value={barcode}
+              onChange={(e) => setBarcode(e.target.value)}
+              placeholder="Enter barcode"
             />
           </div>
         </div>

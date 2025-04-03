@@ -5,11 +5,13 @@ import { toast } from "sonner";
 interface BarcodeScannerHookProps {
   onBarcodeDetected: (barcode: string) => void;
   enabled?: boolean;
+  onInvoiceBarcodeDetected?: (invoiceBarcode: string) => void;
 }
 
 export const useBarcodeScanner = ({ 
   onBarcodeDetected, 
-  enabled = true 
+  enabled = true,
+  onInvoiceBarcodeDetected
 }: BarcodeScannerHookProps) => {
   const [scanning, setScanning] = useState(false);
   const [lastBarcode, setLastBarcode] = useState<string | null>(null);
@@ -21,18 +23,35 @@ export const useBarcodeScanner = ({
     
     // Most barcode scanners send an Enter key after scanning
     if (event.key === "Enter" && lastBarcode) {
-      // Special handling for container HASU4867845
-      const processedBarcode = lastBarcode.toUpperCase(); // Ensure uppercase
+      // Process the barcode (make it uppercase)
+      const processedBarcode = lastBarcode.toUpperCase();
       
-      // Send the barcode to the handler
-      onBarcodeDetected(processedBarcode);
+      // Check if this is an invoice barcode (e.g., starts with GY or has specific format)
+      const isInvoiceBarcode = /^(GY|gy|Gy|gY)?[0-9]{7,8}$/.test(processedBarcode);
+      
+      if (isInvoiceBarcode && onInvoiceBarcodeDetected) {
+        // Format invoice number (remove GY prefix if present)
+        const formattedInvoice = processedBarcode.replace(/^(GY|gy|Gy|gY)/, "");
+        onInvoiceBarcodeDetected(formattedInvoice);
+        toast.info(`Invoice barcode detected: ${formattedInvoice}`, {
+          duration: 2000
+        });
+      } else {
+        // Regular package barcode
+        onBarcodeDetected(processedBarcode);
+        toast.info(`Package barcode detected: ${processedBarcode}`, {
+          duration: 2000
+        });
+      }
+      
+      // Reset for next scan
       setLastBarcode(null);
       event.preventDefault();
     } else if (/^[a-zA-Z0-9-_]$/.test(event.key)) {
-      // Append to the current barcode, always uppercase
-      setLastBarcode(prev => ((prev || "") + event.key).toUpperCase());
+      // Append to the current barcode
+      setLastBarcode(prev => ((prev || "") + event.key));
     }
-  }, [enabled, lastBarcode, manualEntry, onBarcodeDetected]);
+  }, [enabled, lastBarcode, manualEntry, onBarcodeDetected, onInvoiceBarcodeDetected]);
 
   // Start/stop scanning
   const toggleScanning = () => {
@@ -46,7 +65,9 @@ export const useBarcodeScanner = ({
   const startScanning = () => {
     setScanning(true);
     setLastBarcode(null);
-    toast.info("BARCODE SCANNER ACTIVATED");
+    toast.info("BARCODE SCANNER ACTIVATED", {
+      description: "Ready to scan invoice or package barcodes"
+    });
   };
 
   const stopScanning = () => {
@@ -57,6 +78,7 @@ export const useBarcodeScanner = ({
   // Toggle manual entry mode
   const toggleManualEntry = () => {
     setManualEntry(prev => !prev);
+    toast.info(manualEntry ? "Manual entry mode disabled" : "Manual entry mode enabled");
   };
 
   // Set up keydown listener for barcode scanner

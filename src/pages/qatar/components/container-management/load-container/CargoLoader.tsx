@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ContainerCargo } from "../../../types/containerTypes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Package, Plus } from "lucide-react";
+import { Package, Plus, Barcode, Search } from "lucide-react";
+import useBarcodeScanner from "../../../hooks/useBarcodeScanner";
 
 interface CargoLoaderProps {
   containerId: string;
@@ -28,6 +30,82 @@ const CargoLoader: React.FC<CargoLoaderProps> = ({ containerId, onAddCargo }) =>
     quantity: "1"
   });
 
+  const [invoiceList, setInvoiceList] = useState<any[]>([]);
+  
+  useEffect(() => {
+    try {
+      const savedInvoices = localStorage.getItem('invoices');
+      const generatedInvoices = localStorage.getItem('generatedInvoices');
+      
+      let allInvoices = [];
+      
+      if (savedInvoices) {
+        const parsedInvoices = JSON.parse(savedInvoices);
+        allInvoices = [...parsedInvoices];
+      }
+      
+      if (generatedInvoices) {
+        const parsedGeneratedInvoices = JSON.parse(generatedInvoices);
+        allInvoices = [...allInvoices, ...parsedGeneratedInvoices];
+      }
+      
+      setInvoiceList(allInvoices);
+      console.log(`Loaded ${allInvoices.length} invoices for barcode lookup`);
+    } catch (error) {
+      console.error("Error loading invoices for barcode lookup:", error);
+    }
+  }, []);
+
+  const handleInvoiceBarcodeDetected = (invoiceNumber: string) => {
+    const invoice = invoiceList.find(inv => 
+      inv.invoiceNumber === invoiceNumber || 
+      inv.invoiceNumber === `GY${invoiceNumber}` ||
+      inv.invoiceNumber === `${invoiceNumber}`
+    );
+    
+    if (invoice) {
+      setCargoForm(prev => ({
+        ...prev,
+        invoiceNumber: invoice.invoiceNumber,
+        shipper: invoice.shipper || invoice.shipper1 || "",
+        consignee: invoice.consignee || invoice.consignee1 || "",
+        packageName: invoice.packageName || "Box",
+        volume: invoice.volume?.toString() || "0",
+        weight: invoice.weight?.toString() || "0",
+        d2d: invoice.d2d || invoice.doorToDoor || false,
+        wh: invoice.warehouse || prev.wh
+      }));
+      
+      toast.success(`Invoice ${invoice.invoiceNumber} loaded`, {
+        description: `${invoice.shipper || invoice.shipper1} → ${invoice.consignee || invoice.consignee1}`
+      });
+    } else {
+      setCargoForm(prev => ({
+        ...prev,
+        invoiceNumber
+      }));
+      
+      toast.warning(`Invoice ${invoiceNumber} not found in system`, {
+        description: "Only invoice number has been set"
+      });
+    }
+  };
+  
+  const handlePackageBarcodeDetected = (barcode: string) => {
+    setCargoForm(prev => ({
+      ...prev,
+      barcode
+    }));
+    
+    toast.info(`Package barcode scanned: ${barcode}`);
+  };
+
+  const { scanning, toggleScanning } = useBarcodeScanner({
+    onBarcodeDetected: handlePackageBarcodeDetected,
+    onInvoiceBarcodeDetected: handleInvoiceBarcodeDetected,
+    enabled: true
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setCargoForm(prev => ({
@@ -39,13 +117,11 @@ const CargoLoader: React.FC<CargoLoaderProps> = ({ containerId, onAddCargo }) =>
   const handleAddCargo = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
     if (!cargoForm.invoiceNumber || !cargoForm.packageName || !cargoForm.volume || !cargoForm.weight) {
       toast.error("Please fill in all required fields");
       return;
     }
     
-    // Create cargo item
     const newCargo: ContainerCargo = {
       id: uuidv4(),
       containerId: containerId,
@@ -53,8 +129,8 @@ const CargoLoader: React.FC<CargoLoaderProps> = ({ containerId, onAddCargo }) =>
       lineNumber: cargoForm.lineNumber || `LN${Math.floor(1000 + Math.random() * 9000)}`,
       barcode: cargoForm.barcode || `BC${Math.floor(100000000 + Math.random() * 900000000)}`,
       packageName: cargoForm.packageName,
-      volume: parseFloat(cargoForm.volume),
-      weight: parseFloat(cargoForm.weight),
+      volume: parseFloat(cargoForm.volume) || 0,
+      weight: parseFloat(cargoForm.weight) || 0,
       shipper: cargoForm.shipper,
       consignee: cargoForm.consignee,
       wh: cargoForm.wh,
@@ -62,43 +138,90 @@ const CargoLoader: React.FC<CargoLoaderProps> = ({ containerId, onAddCargo }) =>
       quantity: parseInt(cargoForm.quantity) || 1
     };
     
-    // Add to parent component
     onAddCargo(newCargo);
     
-    // Reset form for invoice number only, keep other fields
     setCargoForm(prev => ({
       ...prev,
-      invoiceNumber: "",
-      lineNumber: "",
-      barcode: ""
+      barcode: "",
+      lineNumber: ""
     }));
     
-    // Show success toast
     toast.success("Cargo added successfully");
+  };
+
+  const findInvoiceByNumber = () => {
+    if (!cargoForm.invoiceNumber) {
+      toast.warning("Enter an invoice number to search");
+      return;
+    }
+
+    const invoice = invoiceList.find(inv => 
+      inv.invoiceNumber === cargoForm.invoiceNumber || 
+      inv.invoiceNumber === `GY${cargoForm.invoiceNumber}` ||
+      inv.invoiceNumber === `${cargoForm.invoiceNumber}`
+    );
+    
+    if (invoice) {
+      setCargoForm(prev => ({
+        ...prev,
+        shipper: invoice.shipper || invoice.shipper1 || "",
+        consignee: invoice.consignee || invoice.consignee1 || "",
+        packageName: invoice.packageName || "Box",
+        volume: invoice.volume?.toString() || "0",
+        weight: invoice.weight?.toString() || "0",
+        d2d: invoice.d2d || invoice.doorToDoor || false,
+        wh: invoice.warehouse || prev.wh
+      }));
+      
+      toast.success(`Invoice ${invoice.invoiceNumber} found`);
+    } else {
+      toast.error("Invoice not found in system");
+    }
   };
 
   return (
     <Card className="shadow-sm">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 flex flex-row justify-between items-center">
         <CardTitle className="text-lg flex items-center">
           <Package className="mr-2" size={18} />
           Quick Cargo Entry
         </CardTitle>
+        <Button 
+          onClick={toggleScanning} 
+          variant={scanning ? "default" : "outline"} 
+          size="sm"
+          className={scanning ? "bg-green-600 hover:bg-green-700" : ""}
+        >
+          <Barcode className="mr-2 h-4 w-4" />
+          {scanning ? "Scanner Active" : "Start Scanner"}
+        </Button>
       </CardHeader>
       
       <CardContent>
         <form onSubmit={handleAddCargo} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div>
+            <div className="relative">
               <Label htmlFor="invoiceNumber">Invoice Number*</Label>
-              <Input
-                id="invoiceNumber"
-                name="invoiceNumber"
-                value={cargoForm.invoiceNumber}
-                onChange={handleChange}
-                placeholder="e.g. INV12345"
-                required
-              />
+              <div className="flex">
+                <Input
+                  id="invoiceNumber"
+                  name="invoiceNumber"
+                  value={cargoForm.invoiceNumber}
+                  onChange={handleChange}
+                  placeholder="e.g. 13135619"
+                  required
+                  className="flex-1"
+                />
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="ml-1" 
+                  onClick={findInvoiceByNumber}
+                  title="Look up invoice"
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
             
             <div>
@@ -199,10 +322,36 @@ const CargoLoader: React.FC<CargoLoaderProps> = ({ containerId, onAddCargo }) =>
                 placeholder="e.g. XYZ Company"
               />
             </div>
+            
+            <div>
+              <Label htmlFor="wh">Warehouse</Label>
+              <Input
+                id="wh"
+                name="wh"
+                value={cargoForm.wh}
+                onChange={handleChange}
+                placeholder="e.g. WH001"
+              />
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="d2d"
+                name="d2d"
+                checked={cargoForm.d2d}
+                onCheckedChange={(checked) => {
+                  setCargoForm(prev => ({
+                    ...prev,
+                    d2d: checked
+                  }));
+                }}
+              />
+              <Label htmlFor="d2d">Door-to-Door Delivery</Label>
+            </div>
           </div>
           
           <div className="flex justify-end">
-            <Button type="submit" className="flex items-center gap-2">
+            <Button type="submit" className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
               <Plus size={16} />
               Add Cargo
             </Button>

@@ -63,6 +63,7 @@ const ContainerManagementContent: React.FC<ContainerManagementContentProps> = ({
   }
 
   const handleTabChange = (value: string) => {
+    console.log("Tab changed to:", value);
     setActiveTab(value);
   };
 

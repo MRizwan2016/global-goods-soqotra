@@ -8,6 +8,12 @@ interface InvoiceSuggestion {
   invoiceNumber: string;
   shipper: string;
   consignee: string;
+  volume?: number;
+  weight?: number;
+  packageName?: string;
+  packages?: number;
+  d2d?: boolean;
+  warehouse?: string;
   [key: string]: any;
 }
 
@@ -43,12 +49,12 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
 
   // Watch for value changes to show suggestions when typing
   useEffect(() => {
-    if (value && value.length >= 3 && bookingFormSuggestions.length > 0) {
+    if (value && value.length >= 3) {
       setShowSuggestions(true);
     } else if (value.length < 3) {
       setShowSuggestions(false);
     }
-  }, [value, bookingFormSuggestions, setShowSuggestions]);
+  }, [value, setShowSuggestions]);
 
   return (
     <div className="relative">
@@ -79,6 +85,11 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
                 <div className="text-sm text-gray-600">
                   {invoice.shipper} → {invoice.consignee}
                 </div>
+                {invoice.packages && (
+                  <div className="text-xs text-gray-500">
+                    Pkgs: {invoice.packages} | Vol: {invoice.volume?.toFixed(2) || 0} m³ | Weight: {invoice.weight?.toFixed(2) || 0} kg
+                  </div>
+                )}
               </div>
             ))
           ) : (
