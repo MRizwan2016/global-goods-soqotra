@@ -39,7 +39,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
       <div className="space-y-2">
         <label htmlFor="portOfLoading" className="block text-sm font-medium">PORT OF LOADING:</label>
         <Select 
-          value={formData.portOfLoading || "default-loading-port"} 
+          value={formData.portOfLoading || "select-loading-port"} 
           onValueChange={(value) => handleSelectChange("portOfLoading", value)}
         >
           <SelectTrigger className="w-full hover:border-blue-400 transition-colors">
@@ -55,7 +55,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
       <div className="space-y-2">
         <label htmlFor="portOfDischarge" className="block text-sm font-medium">PORT OF DISCHARGE:</label>
         <Select 
-          value={formData.portOfDischarge || "default-discharge-port"} 
+          value={formData.portOfDischarge || "select-discharge-port"} 
           onValueChange={(value) => handleSelectChange("portOfDischarge", value)}
           disabled={availablePorts.length === 0}
         >

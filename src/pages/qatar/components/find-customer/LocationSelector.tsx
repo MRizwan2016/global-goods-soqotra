@@ -83,7 +83,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
           </Button>
         </Label>
         <Select
-          value={selectedTown || "default-town"}
+          value={selectedTown || "select-town"}
           onValueChange={setSelectedTown}
         >
           <SelectTrigger id="town" className="bg-blue-600 text-white">
@@ -107,7 +107,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({
         <div>
           <Label htmlFor="location">LOCATION (STREET NO.):</Label>
           <Select
-            value={selectedLocation || "default-location"}
+            value={selectedLocation || "select-location"}
             onValueChange={setSelectedLocation}
           >
             <SelectTrigger id="location" className="bg-blue-600 text-white">

@@ -92,7 +92,7 @@ const CustomerInfoSection = ({
         <div>
           <Label htmlFor="country">COUNTRY:</Label>
           <Select 
-            value={jobData.country || "default-country"} 
+            value={jobData.country || "select-country"} 
             onValueChange={(value) => {
               // Update country and associated sector
               handleSelectChange("country", value);
@@ -110,7 +110,7 @@ const CustomerInfoSection = ({
                   </SelectItem>
                 ))
               ) : (
-                <SelectItem value="default-country">No countries available</SelectItem>
+                <SelectItem value="no-countries-available">No countries available</SelectItem>
               )}
             </SelectContent>
           </Select>
@@ -131,7 +131,7 @@ const CustomerInfoSection = ({
         <div>
           <Label htmlFor="branch">BRANCH:</Label>
           <Select 
-            value={jobData.branch || "default-branch"} 
+            value={jobData.branch || "select-branch"} 
             onValueChange={(value) => handleSelectChange("branch", value)}
             disabled={branches.length === 0}
           >
@@ -146,7 +146,7 @@ const CustomerInfoSection = ({
                   </SelectItem>
                 ))
               ) : (
-                <SelectItem value="default-branch">No branches available</SelectItem>
+                <SelectItem value="no-branches-available">No branches available</SelectItem>
               )}
             </SelectContent>
           </Select>

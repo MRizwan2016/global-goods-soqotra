@@ -44,7 +44,7 @@ const ContainerFilterBar = ({
           <SelectValue placeholder="Filter by status" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All Statuses</SelectItem>
+          <SelectItem value="all-statuses">All Statuses</SelectItem>
           <SelectItem value="Available">Available</SelectItem>
           <SelectItem value="In Transit">In Transit</SelectItem>
           <SelectItem value="Loading">Loading</SelectItem>
@@ -58,7 +58,7 @@ const ContainerFilterBar = ({
           <SelectValue placeholder="Filter by direction" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">All Directions</SelectItem>
+          <SelectItem value="all-directions">All Directions</SelectItem>
           <SelectItem value="IMPORT">Import</SelectItem>
           <SelectItem value="EXPORT">Export</SelectItem>
           <SelectItem value="MIX">Mix</SelectItem>

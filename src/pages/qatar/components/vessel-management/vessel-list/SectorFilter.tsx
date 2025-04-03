@@ -17,7 +17,7 @@ const SectorFilter: React.FC<SectorFilterProps> = ({ value, onChange }) => {
       <SelectContent>
         <SelectItem value="all">All Sectors</SelectItem>
         {SECTORS.map(sector => (
-          <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+          <SelectItem key={sector} value={sector || "unknown-sector"}>{sector || "Unknown Sector"}</SelectItem>
         ))}
       </SelectContent>
     </Select>
