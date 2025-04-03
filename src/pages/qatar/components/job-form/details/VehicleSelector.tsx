@@ -18,6 +18,10 @@ const VehicleSelector = ({ vehicle, handleSelectChange }: VehicleSelectorProps) 
   // Filter out any vehicles with empty number
   const validVehicles = mockVehicles.filter(v => v.number && v.number.trim() !== "");
   
+  // For debugging
+  console.log("VehicleSelector rendered with valid vehicles:", validVehicles);
+  console.log("Current vehicle value:", vehicle);
+  
   return (
     <div>
       <Label htmlFor="vehicle">VEHICLE:</Label>
@@ -31,7 +35,10 @@ const VehicleSelector = ({ vehicle, handleSelectChange }: VehicleSelectorProps) 
         <SelectContent>
           {validVehicles.length > 0 ? (
             validVehicles.map(vehicle => (
-              <SelectItem key={vehicle.id} value={vehicle.number || `vehicle-${vehicle.id}`}>
+              <SelectItem 
+                key={vehicle.id} 
+                value={vehicle.number || `vehicle-${vehicle.id}`}
+              >
                 {vehicle.number}/{vehicle.type}/{vehicle.description}
               </SelectItem>
             ))

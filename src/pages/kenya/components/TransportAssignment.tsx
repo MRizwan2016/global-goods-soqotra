@@ -29,6 +29,11 @@ const TransportAssignment = ({
   // Ensure we have valid values
   const safeDriverId = driverId || "no-driver";
   const safeVehicleId = vehicleId || "no-vehicle";
+
+  // For debugging
+  console.log("TransportAssignment rendered with driverId:", driverId, "vehicleId:", vehicleId);
+  console.log("Available drivers:", drivers);
+  console.log("Available vehicles:", vehicles);
   
   return (
     <Card>
@@ -51,9 +56,9 @@ const TransportAssignment = ({
             <SelectContent>
               <SelectItem value="no-driver">-- No Driver Selected --</SelectItem>
               {drivers
-                .filter(driver => driver.status === 'available')
+                .filter(driver => driver.status === 'available' && driver.id)
                 .map(driver => (
-                  <SelectItem key={driver.id} value={driver.id || `driver-${Date.now()}`}>
+                  <SelectItem key={driver.id} value={driver.id}>
                     {driver.name} - {driver.licenseNumber}
                   </SelectItem>
                 ))}
@@ -73,9 +78,9 @@ const TransportAssignment = ({
             <SelectContent>
               <SelectItem value="no-vehicle">-- No Vehicle Selected --</SelectItem>
               {vehicles
-                .filter(vehicle => vehicle.status === 'available')
+                .filter(vehicle => vehicle.status === 'available' && vehicle.id)
                 .map(vehicle => (
-                  <SelectItem key={vehicle.id} value={vehicle.id || `vehicle-${Date.now()}`}>
+                  <SelectItem key={vehicle.id} value={vehicle.id}>
                     {vehicle.registrationNumber} - {vehicle.type} ({vehicle.capacity})
                   </SelectItem>
                 ))}
