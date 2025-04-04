@@ -23,6 +23,26 @@ export const useLoadContainer = ({
   // Load existing cargo items for this container
   useEffect(() => {
     try {
+      // First try to load container-specific cargo items
+      const containerSpecificItems = localStorage.getItem(`cargoItems_${containerId}`);
+      if (containerSpecificItems) {
+        const parsedItems = JSON.parse(containerSpecificItems);
+        setCargoItems(parsedItems);
+        
+        // Track which invoice numbers are already loaded
+        const invoiceNumbers = new Set<string>();
+        parsedItems.forEach((item: ContainerCargo) => {
+          if (item.invoiceNumber) {
+            invoiceNumbers.add(item.invoiceNumber);
+          }
+        });
+        setLoadedInvoiceNumbers(invoiceNumbers);
+        
+        console.log(`Loaded ${parsedItems.length} cargo items for container ${containerId} from container-specific storage`);
+        return;
+      }
+      
+      // If no container-specific items, fall back to global cargo items
       const savedCargoItems = JSON.parse(localStorage.getItem('cargoItems') || '[]');
       const containerCargo = savedCargoItems.filter((item: any) => item.containerId === containerId);
       
@@ -37,7 +57,7 @@ export const useLoadContainer = ({
       });
       setLoadedInvoiceNumbers(invoiceNumbers);
       
-      console.log(`Loaded ${containerCargo.length} cargo items for container ${containerId}`);
+      console.log(`Loaded ${containerCargo.length} cargo items for container ${containerId} from global storage`);
     } catch (error) {
       console.error("Error loading cargo items:", error);
       toast.error("Error loading existing cargo items", {
@@ -115,6 +135,14 @@ export const useLoadContainer = ({
       setLoadedInvoiceNumbers(prev => new Set([...prev, cargo.invoiceNumber]));
     }
     
+    // Save to container-specific storage immediately
+    try {
+      localStorage.setItem(`cargoItems_${containerId}`, JSON.stringify(updatedItems));
+      console.log(`Saved ${updatedItems.length} cargo items to container-specific storage for container ${containerId}`);
+    } catch (err) {
+      console.error("Error saving cargo to container-specific storage:", err);
+    }
+    
     toast.success(`Cargo item added to container`, {
       description: `Invoice: ${cargo.invoiceNumber}, ${cargo.packageName}`
     });
@@ -129,6 +157,14 @@ export const useLoadContainer = ({
     // Update state
     const updatedItems = cargoItems.filter(item => item.id !== cargoId);
     setCargoItems(updatedItems);
+    
+    // Save updated items to container-specific storage immediately
+    try {
+      localStorage.setItem(`cargoItems_${containerId}`, JSON.stringify(updatedItems));
+      console.log(`Updated cargo items in container-specific storage after removal for container ${containerId}`);
+    } catch (err) {
+      console.error("Error updating cargo in container-specific storage after removal:", err);
+    }
     
     // Check if this was the last item for this invoice
     if (cargoToRemove.invoiceNumber) {
@@ -149,8 +185,9 @@ export const useLoadContainer = ({
   
   // Handle load completion
   const handleLoadComplete = () => {
-    // Save cargo items to localStorage
+    // Save cargo items to both global and container-specific storage
     try {
+      // Save to global cargo storage
       const savedCargoItems = JSON.parse(localStorage.getItem('cargoItems') || '[]');
       
       // Remove existing items for this container
@@ -160,6 +197,11 @@ export const useLoadContainer = ({
       const updatedCargoItems = [...filteredItems, ...cargoItems];
       localStorage.setItem('cargoItems', JSON.stringify(updatedCargoItems));
       
+      // Ensure container-specific storage is up to date
+      localStorage.setItem(`cargoItems_${containerId}`, JSON.stringify(cargoItems));
+      
+      console.log(`Saved ${cargoItems.length} cargo items for container ${containerId} to both storages`);
+      
       // Update the container in localStorage to reflect loading status
       const containers = JSON.parse(localStorage.getItem('containers') || '[]');
       const updatedContainers = containers.map((container: QatarContainer) => {
@@ -168,13 +210,20 @@ export const useLoadContainer = ({
             ...container,
             status: 'LOADED',
             packages: cargoItems.length,
-            weight: cargoItems.reduce((sum, item) => sum + (item.weight || 0), 0),
-            volume: cargoItems.reduce((sum, item) => sum + (item.volume || 0), 0),
+            weight: cargoItems.reduce((sum, item) => sum + (parseFloat(item.weight.toString()) || 0), 0),
+            volume: cargoItems.reduce((sum, item) => sum + (parseFloat(item.volume.toString()) || 0), 0),
           };
         }
         return container;
       });
       localStorage.setItem('containers', JSON.stringify(updatedContainers));
+      
+      // Find the container we just updated and save it to its specific storage too
+      const updatedContainer = updatedContainers.find((c: QatarContainer) => c.id === containerId);
+      if (updatedContainer) {
+        localStorage.setItem(`container_${containerId}`, JSON.stringify(updatedContainer));
+        console.log("Updated container data saved to container-specific storage:", updatedContainer);
+      }
       
       // Proceed to manifest
       onLoadComplete();

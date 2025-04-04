@@ -25,13 +25,17 @@ const VesselManifest: React.FC<VesselManifestProps> = ({
     vessel,
     showPrintView,
     containerData,
+    containerCargoData,
     printRef,
     printSection,
     setPrintSection,
     orientation,
     setOrientation,
     handlePrint,
-    handleConfirm
+    handleConfirm,
+    totalWeight,
+    totalVolume,
+    totalPackages
   } = useVesselManifest(vesselId, onManifestSubmitted);
   
   if (!vessel) {
@@ -45,8 +49,12 @@ const VesselManifest: React.FC<VesselManifestProps> = ({
         <PrintVesselManifest 
           vessel={vessel} 
           containerData={containerData} 
+          containerCargoData={containerCargoData}
           printSection={printSection}
           orientation={orientation}
+          totalWeight={totalWeight}
+          totalVolume={totalVolume}
+          totalPackages={totalPackages}
         />
         
         {/* Print styles */}
@@ -106,9 +114,17 @@ const VesselManifest: React.FC<VesselManifestProps> = ({
         <ManifestHeader vessel={vessel} />
         
         <CardContent className="p-6">
-          <VesselDetails vessel={vessel} />
+          <VesselDetails 
+            vessel={vessel} 
+            totalWeight={totalWeight}
+            totalVolume={totalVolume}
+            totalPackages={totalPackages}
+          />
           
-          <ContainerList containerData={containerData} />
+          <ContainerList 
+            containerData={containerData} 
+            containerCargoData={containerCargoData}
+          />
           
           <div className="flex items-center gap-4 mb-6">
             <div className="flex items-center gap-2">

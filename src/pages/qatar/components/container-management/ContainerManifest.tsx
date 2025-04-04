@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { ContainerManifestProps } from "../../types/containerTypes";
 import useContainerManifest from "../../hooks/useContainerManifest";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import TabsContentWrapper from "./manifest/TabsContentWrapper";
 
 const ContainerManifest: React.FC<ContainerManifestProps> = ({
   containerId,
@@ -21,7 +23,15 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     setActiveTab,
     printViewVisible,
     handleConfirm,
-    handlePrint
+    handlePrint,
+    formatVolume,
+    formatWeight,
+    itemList,
+    consigneeList,
+    unsettledInvoices,
+    totalVolume,
+    totalWeight,
+    totalPackages
   } = useContainerManifest(containerId, onClose);
 
   if (!container) {
@@ -49,7 +59,51 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
         </div>
       </CardHeader>
       <CardContent>
-        <p>Container manifest content will be displayed here...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6 bg-slate-50 p-4 rounded">
+          <div>
+            <p className="text-sm text-slate-500">Container Number</p>
+            <p className="font-medium">{container.containerNumber}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Status</p>
+            <p className="font-medium">{container.status}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Seal Number</p>
+            <p className="font-medium">{container.sealNumber || "Not set"}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Total Packages</p>
+            <p className="font-medium">{totalPackages}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Total Volume</p>
+            <p className="font-medium">{formatVolume(totalVolume)} m³</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500">Total Weight</p>
+            <p className="font-medium">{formatWeight(totalWeight)} kg</p>
+          </div>
+        </div>
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-4">
+            <TabsTrigger value="cargo">Cargo Items</TabsTrigger>
+            <TabsTrigger value="items">Item List</TabsTrigger>
+            <TabsTrigger value="consignees">Consignee List</TabsTrigger>
+            <TabsTrigger value="invoices">Unsettled Invoices</TabsTrigger>
+          </TabsList>
+          
+          <TabsContentWrapper 
+            activeTab={activeTab}
+            cargoItems={cargoItems}
+            itemList={itemList}
+            consigneeList={consigneeList}
+            unsettledInvoices={unsettledInvoices}
+            formatVolume={formatVolume}
+            formatWeight={formatWeight}
+          />
+        </Tabs>
         
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={onClose}>

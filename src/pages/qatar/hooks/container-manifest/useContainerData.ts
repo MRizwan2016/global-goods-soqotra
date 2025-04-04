@@ -41,22 +41,46 @@ export const useContainerData = (containerId: string) => {
             setContainer(parsedContainer);
             setVgmWeight(parsedContainer.weight?.toString() || "0");
             
-            // Check for cargo items in localStorage
-            const savedCargoItems = localStorage.getItem(`cargoItems_${containerId}`);
-            if (savedCargoItems) {
+            // Check for cargo items in container-specific localStorage first (most reliable)
+            const containerSpecificCargoItems = localStorage.getItem(`cargoItems_${containerId}`);
+            if (containerSpecificCargoItems) {
               try {
-                const parsedCargoItems = JSON.parse(savedCargoItems);
-                console.log("Cargo items found in localStorage:", parsedCargoItems);
+                const parsedCargoItems = JSON.parse(containerSpecificCargoItems);
+                console.log("Cargo items found in container-specific localStorage:", parsedCargoItems);
                 setCargoItems(parsedCargoItems);
               } catch (err) {
-                console.error("Error parsing saved cargo items:", err);
-                // If there's an error parsing, fall back to empty array
+                console.error("Error parsing container-specific saved cargo items:", err);
                 setCargoItems([]);
               }
             } else {
-              // If no saved cargo items are found, set empty array
-              setCargoItems([]);
-              console.warn("No cargo items found in localStorage for container", containerId);
+              // If no container-specific items, check in global cargoItems
+              const globalCargoItems = localStorage.getItem('cargoItems');
+              if (globalCargoItems) {
+                try {
+                  const parsedGlobalItems = JSON.parse(globalCargoItems);
+                  const relevantItems = parsedGlobalItems.filter((item: ContainerCargo) => 
+                    item.containerId === containerId
+                  );
+                  
+                  if (relevantItems.length > 0) {
+                    console.log("Cargo items found in global storage:", relevantItems);
+                    setCargoItems(relevantItems);
+                    
+                    // Also save to container-specific storage for future reference
+                    localStorage.setItem(`cargoItems_${containerId}`, JSON.stringify(relevantItems));
+                  } else {
+                    console.warn("No cargo items found in global storage for container", containerId);
+                    setCargoItems([]);
+                  }
+                } catch (err) {
+                  console.error("Error parsing global cargo items:", err);
+                  setCargoItems([]);
+                }
+              } else {
+                // If no saved cargo items are found, set empty array
+                setCargoItems([]);
+                console.warn("No cargo items found in any storage for container", containerId);
+              }
             }
             
             // Set confirm date to today if not already set
