@@ -37,8 +37,18 @@ export const useCargoSearchForm = ({ containerId, onAddCargo, existingCargo }: U
     setShipper(invoice.shipper || invoice.shipper1 || "");
     setConsignee(invoice.consignee || invoice.consignee1 || "");
     setPackageName(invoice.packageName || "Box");
-    setVolume(invoice.volume || 0);
-    setWeight(invoice.weight || 0);
+    
+    // Ensure volume and weight are properly converted to numbers
+    const invoiceVolume = typeof invoice.volume === 'string' 
+      ? parseFloat(invoice.volume) 
+      : Number(invoice.volume || 0);
+    setVolume(isNaN(invoiceVolume) ? 0 : invoiceVolume);
+    
+    const invoiceWeight = typeof invoice.weight === 'string' 
+      ? parseFloat(invoice.weight) 
+      : Number(invoice.weight || 0);
+    setWeight(isNaN(invoiceWeight) ? 0 : invoiceWeight);
+    
     setQuantity(invoice.packages || 1);
     setD2d(invoice.d2d || invoice.doorToDoor || false);
     setWarehouse(invoice.warehouse || "");
@@ -99,15 +109,20 @@ export const useCargoSearchForm = ({ containerId, onAddCargo, existingCargo }: U
       return;
     }
     
+    // Ensure numeric values are properly converted
+    const numVolume = Number(volume);
+    const numWeight = Number(weight);
+    const numQuantity = Number(quantity);
+    
     const newCargo: ContainerCargo = {
       id: uuidv4(),
       containerId,
       invoiceNumber,
       lineNumber,
       packageName: packageName || "Package",
-      volume: Number(volume) || 0,
-      weight: Number(weight) || 0,
-      quantity: Number(quantity) || 1,
+      volume: isNaN(numVolume) ? 0 : numVolume,
+      weight: isNaN(numWeight) ? 0 : numWeight,
+      quantity: isNaN(numQuantity) ? 1 : numQuantity,
       shipper,
       consignee,
       description,

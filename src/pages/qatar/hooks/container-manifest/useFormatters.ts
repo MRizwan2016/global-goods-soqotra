@@ -1,18 +1,33 @@
 
 export const useFormatters = () => {
-  const formatVolume = (volume: number | undefined) => {
+  const formatVolume = (volume: number | undefined | string) => {
     if (volume === undefined || volume === null) return "0.000";
-    return Number(volume).toFixed(3);
+    
+    // Convert to number if it's a string
+    const numValue = typeof volume === 'string' ? parseFloat(volume) : volume;
+    
+    // Check if it's a valid number
+    return !isNaN(numValue) ? numValue.toFixed(3) : "0.000";
   };
   
-  const formatWeight = (weight: number | undefined) => {
+  const formatWeight = (weight: number | undefined | string) => {
     if (weight === undefined || weight === null) return "0.00";
-    return Number(weight).toFixed(2);
+    
+    // Convert to number if it's a string
+    const numValue = typeof weight === 'string' ? parseFloat(weight) : weight;
+    
+    // Check if it's a valid number
+    return !isNaN(numValue) ? numValue.toFixed(2) : "0.00";
   };
   
-  const formatNumber = (num: number | undefined) => {
+  const formatNumber = (num: number | undefined | string) => {
     if (num === undefined || num === null) return "0";
-    return num.toString();
+    
+    // Convert to number if it's a string
+    const numValue = typeof num === 'string' ? parseFloat(num) : num;
+    
+    // Check if it's a valid number
+    return !isNaN(numValue) ? numValue.toString() : "0";
   };
   
   const formatDate = (date: string | undefined) => {

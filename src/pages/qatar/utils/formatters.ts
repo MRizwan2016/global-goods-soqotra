@@ -1,7 +1,20 @@
 
 export const formatCurrency = (amount: number | string): string => {
-  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
+  // Handle the case when amount is undefined or null
+  if (amount === undefined || amount === null) {
+    return "QAR 0.00";
+  }
   
+  let numAmount: number;
+  
+  // Convert string to number if necessary
+  if (typeof amount === 'string') {
+    numAmount = parseFloat(amount);
+  } else {
+    numAmount = amount;
+  }
+  
+  // Check if it's a valid number
   if (isNaN(numAmount)) {
     return "QAR 0.00";
   }

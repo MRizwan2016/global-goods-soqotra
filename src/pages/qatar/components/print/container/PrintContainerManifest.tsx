@@ -37,8 +37,17 @@ const PrintContainerManifest: React.FC<PrintContainerManifestProps> = ({
   unsettledInvoices = []
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
-  const formatVolume = (volume: number) => volume.toFixed(3);
-  const formatWeight = (weight: number) => weight.toFixed(2);
+  
+  // Safe formatters that handle non-numeric values
+  const formatVolume = (volume: number | string) => {
+    const numValue = typeof volume === 'string' ? parseFloat(volume) : volume;
+    return !isNaN(numValue) ? numValue.toFixed(3) : "0.000";
+  };
+  
+  const formatWeight = (weight: number | string) => {
+    const numValue = typeof weight === 'string' ? parseFloat(weight) : weight;
+    return !isNaN(numValue) ? numValue.toFixed(2) : "0.00";
+  };
   
   // When the component mounts, make sure it's visible for printing
   useEffect(() => {

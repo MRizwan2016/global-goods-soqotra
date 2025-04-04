@@ -21,7 +21,7 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  // Format number values consistently
+  // Format number values consistently and safely
   const formatNumber = (value: any): string => {
     if (value === undefined || value === null) return "0.00";
     
@@ -30,7 +30,7 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
     if (typeof value === 'string') {
       num = parseFloat(value);
     } else {
-      num = value;
+      num = Number(value);
     }
     
     return isNaN(num) ? "0.00" : num.toFixed(2);

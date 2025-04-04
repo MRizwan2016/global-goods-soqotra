@@ -14,8 +14,16 @@ interface CargoTableProps {
 const CargoTable: React.FC<CargoTableProps> = ({ 
   cargoItems, 
   onRemoveCargo,
-  formatVolume = (v) => v.toFixed(3),
-  formatWeight = (w) => w.toFixed(2)
+  formatVolume = (v) => {
+    // Ensure the value is a number before calling toFixed
+    const numValue = Number(v);
+    return !isNaN(numValue) ? numValue.toFixed(3) : "0.000";
+  },
+  formatWeight = (w) => {
+    // Ensure the value is a number before calling toFixed
+    const numValue = Number(w);
+    return !isNaN(numValue) ? numValue.toFixed(2) : "0.00";
+  }
 }) => {
   if (cargoItems.length === 0) {
     return <p className="text-gray-500">No cargo items added yet.</p>;
@@ -63,10 +71,10 @@ const CargoTable: React.FC<CargoTableProps> = ({
           <tr>
             <td colSpan={5} className="px-4 py-2 text-right">Total:</td>
             <td className="px-4 py-2 text-right">
-              {formatVolume(cargoItems.reduce((sum, item) => sum + item.volume, 0))}
+              {formatVolume(cargoItems.reduce((sum, item) => sum + Number(item.volume || 0), 0))}
             </td>
             <td className="px-4 py-2 text-right">
-              {formatWeight(cargoItems.reduce((sum, item) => sum + item.weight, 0))}
+              {formatWeight(cargoItems.reduce((sum, item) => sum + Number(item.weight || 0), 0))}
             </td>
             <td></td>
           </tr>
