@@ -33,6 +33,18 @@ const CargoFormFields: React.FC<CargoFormProps> = ({
   scanning,
   toggleScanning
 }) => {
+  // Handle switch change separately from regular input changes
+  const handleSwitchChange = (checked: boolean) => {
+    handleChange({
+      target: {
+        name: "d2d",
+        value: checked,
+        type: "checkbox",
+        checked,
+      },
+    } as React.ChangeEvent<HTMLInputElement>);
+  };
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div className="relative">
@@ -186,17 +198,7 @@ const CargoFormFields: React.FC<CargoFormProps> = ({
           id="d2d"
           name="d2d"
           checked={cargoForm.d2d}
-          onCheckedChange={(checked) => {
-            const event = {
-              target: {
-                name: "d2d",
-                value: checked,
-                type: "checkbox",
-                checked,
-              },
-            } as React.ChangeEvent<HTMLInputElement>;
-            handleChange(event);
-          }}
+          onCheckedChange={handleSwitchChange}
         />
         <Label htmlFor="d2d">Door-to-Door Delivery</Label>
       </div>
