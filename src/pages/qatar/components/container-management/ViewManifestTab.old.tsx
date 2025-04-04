@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -181,7 +180,7 @@ const ViewManifestTab: React.FC<ViewContainerManifestProps> = ({
           </TabsList>
           
           <TabsContent value="container-details" className="animate-fade-in">
-            <ContainerList containerData={containerData} />
+            <ContainerList containers={containerData} />
             
             <Card className="shadow-md hover:shadow-lg transition-shadow">
               <CardHeader className="bg-blue-600 text-white">

@@ -12,7 +12,7 @@ interface ContainerDetailsTabProps {
 const ContainerDetailsTab: React.FC<ContainerDetailsTabProps> = ({ containerData, container }) => {
   return (
     <>
-      <ContainerList containerData={containerData} />
+      <ContainerList containers={containerData} />
       
       <Card className="shadow-md hover:shadow-lg transition-shadow">
         <CardHeader className="bg-blue-600 text-white">

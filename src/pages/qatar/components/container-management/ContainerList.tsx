@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { QatarContainer } from "../../types/containerTypes";
+import { QatarContainer, ContainerListProps } from "../../types/containerTypes";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import ContainerListHeader from "./components/ContainerListHeader";
@@ -9,18 +9,6 @@ import ContainerRow from "./components/ContainerRow";
 import ContainerTableHead from "./components/ContainerTableHead";
 import NoContainersFound from "./components/NoContainersFound";
 import { PlusCircle } from "lucide-react";
-
-interface ContainerListProps {
-  containers: QatarContainer[];
-  statusFilter?: string;
-  searchText?: string;
-  onEdit?: (containerId: string) => void;
-  onDelete?: (containerId: string) => void;
-  onLoad?: (containerId: string) => void;
-  onViewManifest?: (containerId: string) => void;
-  onCreateManifest?: (containerId: string) => void;
-  onAddClick?: () => void;
-}
 
 const ContainerList: React.FC<ContainerListProps> = ({
   containers = [],
@@ -108,13 +96,15 @@ const ContainerList: React.FC<ContainerListProps> = ({
           filteredCount={filteredContainers.length} 
         />
         
-        <Button 
-          onClick={handleAddNew}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Add New Container
-        </Button>
+        {onAddClick && (
+          <Button 
+            onClick={handleAddNew}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Add New Container
+          </Button>
+        )}
       </div>
       
       <ContainerFilterBar 

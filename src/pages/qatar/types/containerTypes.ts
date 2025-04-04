@@ -80,13 +80,13 @@ export interface PrintOptions {
   orientation: "portrait" | "landscape";
 }
 
-// Add container manifest props interface
+// Update ContainerManifestProps interface
 export interface ContainerManifestProps {
   containerId: string;
   onClose: () => void;
 }
 
-// Add ViewManifestTabProps interface
+// Update ViewManifestTabProps interface to include onClose
 export interface ViewManifestTabProps {
   container: QatarContainer;
   printOptions: PrintOptions;
@@ -95,7 +95,7 @@ export interface ViewManifestTabProps {
   onClose: () => void;
 }
 
-// Add ContainerListProps interface
+// Ensure ContainerListProps has the correct properties
 export interface ContainerListProps {
   containers: QatarContainer[];
   onEdit?: (id: string) => void;
@@ -103,4 +103,7 @@ export interface ContainerListProps {
   onViewManifest?: (id: string) => void;
   onCreateManifest?: (id: string) => void;
   onAddClick?: () => void;
+  statusFilter?: string;
+  searchText?: string;
+  onDelete?: (id: string) => void;
 }

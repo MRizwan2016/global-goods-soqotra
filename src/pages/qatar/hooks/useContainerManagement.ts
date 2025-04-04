@@ -22,15 +22,19 @@ export const useContainerManagement = () => {
     saveContainersToLocalStorage
   } = useContainerData();
 
-  // Cargo operations management
+  // Cargo operations management - Update the function signature to match expected types
   const {
     cargoItems,
     handleAddCargo,
     getCurrentCargoItems,
     saveCargoItemsToLocalStorage
-  } = useCargoOperations(containers, setContainers, saveContainersToLocalStorage);
+  } = useCargoOperations(
+    containers, 
+    setContainers, 
+    () => saveContainersToLocalStorage() // Wrap in anonymous function to match expected signature
+  );
 
-  // Manifest operations management
+  // Manifest operations management - Update the function signature to match expected types
   const {
     viewManifestId,
     setViewManifestId,
@@ -42,7 +46,12 @@ export const useContainerManagement = () => {
     getItemList,
     getConsigneeList,
     getUnsettledInvoices
-  } = useManifestOperations(containers, setContainers, saveContainersToLocalStorage, getCurrentCargoItems);
+  } = useManifestOperations(
+    containers, 
+    setContainers, 
+    () => saveContainersToLocalStorage(), // Wrap in anonymous function to match expected signature
+    getCurrentCargoItems
+  );
 
   // Tab management
   const {
