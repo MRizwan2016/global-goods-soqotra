@@ -3,7 +3,7 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 
 interface InputFieldProps {
-  label: string;
+  label: React.ReactNode;
   name: string;
   value: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
@@ -23,7 +23,7 @@ const InputField: React.FC<InputFieldProps> = ({
 }) => {
   return (
     <div className="flex flex-col">
-      <label className="text-sm font-medium mb-1">{label}:</label>
+      <label className="text-sm font-medium mb-1">{label}</label>
       <Input 
         name={name}
         value={value}
