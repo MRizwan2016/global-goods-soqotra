@@ -30,9 +30,9 @@ const Landing = () => {
       <div className="w-full pt-10">
         <div className="flex justify-center">
           <img 
-            src="/lovable-uploads/bd08a72d-ffa3-4e82-8e5b-e915483b5fea.png" 
+            src="/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png" 
             alt="SOQOTRA LOGISTICS" 
-            className="h-20 w-auto"
+            className="h-32 w-auto"
           />
         </div>
       </div>
@@ -41,7 +41,7 @@ const Landing = () => {
       <div className="flex flex-col items-center justify-center">
         <div className="mb-6">
           <img 
-            src="/lovable-uploads/bd08a72d-ffa3-4e82-8e5b-e915483b5fea.png" 
+            src="/lovable-uploads/4d3c9440-58c2-4cab-8d89-7b5ff5e2d6a3.png" 
             alt="SOQOTRA INTERFACE" 
             className="max-w-xs md:max-w-md lg:max-w-lg shadow-lg rounded-md border border-gray-200 mb-8"
           />

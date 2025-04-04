@@ -18,7 +18,7 @@ const Header: React.FC<HeaderProps> = ({
     <div className="flex justify-between items-center mb-2">
       <div className="flex-1">
         <img 
-          src="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" 
+          src="/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png" 
           alt="Soqotra Shipping & Logistics" 
           className="h-10"
           onError={(e) => {
