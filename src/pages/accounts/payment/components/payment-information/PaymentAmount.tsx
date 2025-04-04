@@ -43,7 +43,7 @@ const PaymentAmount: React.FC<PaymentAmountProps> = ({
       </label>
       <div className="relative">
         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-          <span className="text-blue-500 font-semibold">{currencySymbol}</span>
+          <span className="text-blue-500 font-semibold">{currencySymbol || "QR"}</span>
         </div>
         <Input
           id="amountPaid"

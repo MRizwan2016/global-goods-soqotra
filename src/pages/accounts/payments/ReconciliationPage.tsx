@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   CheckCircle2, 
   Search, 
@@ -16,9 +17,11 @@ import {
   Clock,
   DollarSign,
   Calendar,
-  AlertTriangle
+  AlertTriangle,
+  Globe
 } from "lucide-react";
 import { toast } from "sonner";
+import { COUNTRY_CURRENCY_MAP, DEFAULT_COUNTRY } from "../payment/constants/paymentConstants";
 
 interface Payment {
   id: string;
@@ -48,25 +51,43 @@ const ReconciliationPage = () => {
   // Set active tab based on reconciliation status
   const [activeTab, setActiveTab] = useState<string>("unreconciled");
   
+  // Add country filter
+  const [countryFilter, setCountryFilter] = useState<string>("all");
+  
+  // Get all available countries
+  const countries = Object.keys(COUNTRY_CURRENCY_MAP);
+  
   // Count for each category
   const unreconciledCount = payments.filter(p => !p.reconciled).length;
   const reconciledCount = payments.filter(p => p.reconciled).length;
+  
+  // Count by country
+  const paymentsByCountry = countries.reduce((acc, country) => {
+    acc[country] = payments.filter(p => p.country === country).length;
+    return acc;
+  }, {} as Record<string, number>);
   
   useEffect(() => {
     loadPayments();
   }, []);
   
   useEffect(() => {
-    // Filter payments based on search term and tab
+    // Filter payments based on search term, tab, and country
     filterPayments();
-  }, [searchTerm, payments, activeTab, invoiceFilter]);
+  }, [searchTerm, payments, activeTab, invoiceFilter, countryFilter]);
   
   const loadPayments = () => {
     try {
       const paymentsStr = localStorage.getItem('payments');
       if (paymentsStr) {
         const loadedPayments = JSON.parse(paymentsStr);
-        setPayments(loadedPayments);
+        // Make sure all payments have a country property
+        const updatedPayments = loadedPayments.map((payment: any) => ({
+          ...payment,
+          country: payment.country || DEFAULT_COUNTRY,
+          currency: payment.currency || "QAR"
+        }));
+        setPayments(updatedPayments);
         
         // If there's an invoice filter in the URL, switch to showing all payments
         if (invoiceFilter) {
@@ -87,6 +108,11 @@ const ReconciliationPage = () => {
       filtered = filtered.filter(payment => !payment.reconciled);
     } else if (activeTab === "reconciled") {
       filtered = filtered.filter(payment => payment.reconciled);
+    }
+    
+    // Apply country filter
+    if (countryFilter !== "all") {
+      filtered = filtered.filter(payment => payment.country === countryFilter);
     }
     
     // Then apply search term filter
@@ -192,6 +218,11 @@ const ReconciliationPage = () => {
     const selectedPaymentData = payments.filter(p => selectedPayments.includes(p.id));
     console.log("Printing payments:", selectedPaymentData);
   };
+  
+  const handleCountryFilterChange = (value: string) => {
+    setCountryFilter(value);
+    setSelectedPayments([]);
+  };
 
   return (
     <Layout title="Payment Reconciliation">
@@ -226,6 +257,24 @@ const ReconciliationPage = () => {
             </div>
             
             <div className="flex flex-wrap gap-2 w-full md:w-auto justify-end">
+              {/* Country filter */}
+              <div className="flex items-center gap-2 min-w-[180px]">
+                <Globe className="h-4 w-4 text-gray-500" />
+                <Select value={countryFilter} onValueChange={handleCountryFilterChange}>
+                  <SelectTrigger className="h-9">
+                    <SelectValue placeholder="Select Country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Countries</SelectItem>
+                    {countries.map(country => (
+                      <SelectItem key={country} value={country}>
+                        {country} ({paymentsByCountry[country] || 0})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <Button variant="outline" size="sm" className="flex items-center gap-1">
                 <Filter className="h-4 w-4" />
                 <span>Filter</span>
@@ -292,6 +341,42 @@ const ReconciliationPage = () => {
         </CardContent>
       </Card>
       
+      {/* Country Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
+        {countries.map(country => {
+          const countryCount = payments.filter(p => p.country === country).length;
+          const reconciled = payments.filter(p => p.country === country && p.reconciled).length;
+          const unreconciled = countryCount - reconciled;
+          const currency = COUNTRY_CURRENCY_MAP[country]?.[0] || "QAR";
+          
+          return (
+            <Card key={country} className="bg-white">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">{country}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-between items-center">
+                  <div className="space-y-1">
+                    <p className="text-2xl font-bold">{countryCount}</p>
+                    <p className="text-xs text-gray-500">Currency: {currency}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs text-green-600 flex items-center">
+                      <CheckCircle2 className="h-3 w-3 mr-1" />
+                      {reconciled} Reconciled
+                    </p>
+                    <p className="text-xs text-amber-600 flex items-center">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {unreconciled} Pending
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+      
       {/* Reconciliation Reminder */}
       {unreconciledCount >= 10 && (
         <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
@@ -305,6 +390,9 @@ const ReconciliationPage = () => {
           </div>
         </div>
       )}
+
+      {/* Add Digital Calculator */}
+      <DigitalCalculator />
     </Layout>
   );
   
@@ -343,6 +431,7 @@ const ReconciliationPage = () => {
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Method</th>
+                <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                 <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               </tr>
@@ -383,6 +472,12 @@ const ReconciliationPage = () => {
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-600 capitalize">
                       {payment.paymentMethod}
+                    </td>
+                    <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <span className="flex items-center gap-1">
+                        <Globe className="h-3 w-3" />
+                        {payment.country || "Qatar"}
+                      </span>
                     </td>
                     <td className="px-3 py-4 whitespace-nowrap text-sm text-gray-600">
                       {new Date(payment.date).toLocaleDateString()}

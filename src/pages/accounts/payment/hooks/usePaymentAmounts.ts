@@ -5,7 +5,7 @@ import { toast } from "sonner";
 /**
  * Hook for handling payment amount changes and validation
  */
-export const usePaymentAmounts = (currencySymbol: string) => {
+export const usePaymentAmounts = (currencySymbol: string = "QR") => {
   // Handle payment amount change with validation
   const handlePaymentAmountChange = (
     e: React.ChangeEvent<HTMLInputElement>,

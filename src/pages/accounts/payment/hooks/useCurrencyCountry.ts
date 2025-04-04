@@ -8,7 +8,7 @@ import { COUNTRY_CURRENCY_MAP, CURRENCY_SYMBOLS, DEFAULT_COUNTRY, DEFAULT_CURREN
 export const useCurrencyCountry = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>(DEFAULT_COUNTRY);
   const [filteredCurrencies, setFilteredCurrencies] = useState<string[]>([DEFAULT_CURRENCY]);
-  const [currencySymbol, setCurrencySymbol] = useState<string>(CURRENCY_SYMBOLS[DEFAULT_CURRENCY] || DEFAULT_CURRENCY);
+  const [currencySymbol, setCurrencySymbol] = useState<string>(CURRENCY_SYMBOLS[DEFAULT_CURRENCY] || "QR");
   
   // All country options from the map
   const countryOptions = Object.keys(COUNTRY_CURRENCY_MAP);

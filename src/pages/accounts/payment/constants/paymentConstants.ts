@@ -62,4 +62,3 @@ export const DEFAULT_PAYMENT_FORM_VALUES = {
 // Default country and currency settings
 export const DEFAULT_COUNTRY = "Qatar";
 export const DEFAULT_CURRENCY = "QAR";
-
