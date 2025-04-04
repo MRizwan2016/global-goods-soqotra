@@ -3,10 +3,11 @@ import { adminRoutes } from "./adminRoutes";
 import { dataEntryRoutes } from "./dataEntryRoutes";
 import accountsRoutes from "./accountsRoutes"; 
 import { kenyaRoutes } from "./kenyaRoutes";
-import { qatarRoutes } from "./qatarRoutes"; // Import Qatar routes
+import { qatarRoutes } from "./qatarRoutes";
 import { reportsRoutes } from "./reportsRoutes";
 import { printDocumentsRoutes } from "./printDocumentsRoutes";
 import { paymentReceivableRoutes } from "./paymentReceivableRoutes";
+import { authRoutes } from "./authRoutes";
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
@@ -39,10 +40,11 @@ const baseRoutes: RouteConfig[] = [
 export const routes: RouteConfig[] = [
   ...baseRoutes,
   ...adminRoutes,
+  ...authRoutes,
   ...dataEntryRoutes,
   ...accountsRoutes,
   ...kenyaRoutes,
-  ...qatarRoutes, // Add Qatar routes
+  ...qatarRoutes,
   ...reportsRoutes,
   ...printDocumentsRoutes,
   ...paymentReceivableRoutes

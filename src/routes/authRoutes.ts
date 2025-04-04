@@ -1,10 +1,10 @@
 
-import Login from "@/pages/admin/Login";
 import { RouteConfig } from "./types";
+import Login from "@/pages/admin/Login";
 
 export const authRoutes: RouteConfig[] = [
   {
-    path: "/admin/login",
+    path: "/login",
     element: Login,
     private: false
   }
