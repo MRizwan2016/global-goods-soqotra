@@ -9,7 +9,7 @@ import "./App.css";
 function App() {
   return (
     <Router>
-      <div className="min-h-screen w-full bg-slate-50">
+      <div className="min-h-screen w-full bg-white">
         <Toaster position="top-right" />
         <AppRoutes />
       </div>
