@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -69,7 +70,8 @@ export default {
 					gray: '#f1f1f1',
 					dark: '#222222',
 					blue: '#2563eb',   // Professional blue color
-					navy: '#1e3a8a',   // Darker blue for contrast
+					navy: '#1e3a8a',   // Darker blue for landing page background
+					darknavy: '#1e3a8a', // Deep navy blue for landing page 
 					sky: '#93c5fd',    // Light blue for highlights
 					slate: '#475569'   // Neutral slate color for text
 				}

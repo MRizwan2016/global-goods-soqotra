@@ -168,4 +168,3 @@ const PrintVesselManifest: React.FC<PrintVesselManifestProps> = ({
 };
 
 export default PrintVesselManifest;
-

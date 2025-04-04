@@ -26,7 +26,7 @@ const Landing = () => {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-900 to-blue-700 flex flex-col">
+    <div className="min-h-screen bg-[#1e3a8a] flex flex-col">
       {/* Header */}
       <header className="p-6 flex justify-between items-center">
         <div className="flex items-center">
@@ -39,38 +39,35 @@ const Landing = () => {
         </div>
         <div>
           <Link to="/admin/login">
-            <Button variant="outline" className="bg-white hover:bg-blue-50 text-blue-900 flex items-center gap-2">
-              <LogIn size={18} />
-              <span>Login</span>
+            <Button variant="outline" className="bg-white hover:bg-blue-50 text-blue-900">
+              <LogIn size={18} className="mr-2" />
+              Login
             </Button>
           </Link>
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Hero Section - Centered content */}
       <main className="flex-grow flex flex-col items-center justify-center px-6 py-12 text-center">
         <div className={`transform transition-all duration-1000 ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
           <img 
             src="/soqotra-logo.png" 
             alt="SOQOTRA LOGISTICS" 
-            className="h-32 w-auto mx-auto mb-6 animate-pulse"
+            className="h-32 w-auto mx-auto mb-8"
           />
           
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
-            <span className="block animate-fade-in">SOQOTRA LOGISTICS</span>
+            SOQOTRA LOGISTICS
           </h1>
           
-          <h2 className="text-xl md:text-2xl font-medium text-blue-100 mb-8 opacity-90">
-            <span className="block transition-all duration-1000 delay-300 transform 
-              ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}">
-              SERVICES, TRANSPORTATION & TRADING WLL
-            </span>
+          <h2 className="text-xl md:text-2xl font-medium text-white mb-12 opacity-90">
+            SERVICES, TRANSPORTATION & TRADING WLL
           </h2>
           
-          <div className="flex flex-col md:flex-row gap-4 justify-center mt-10">
+          <div className="flex justify-center mt-8">
             <Link to="/admin/login">
-              <Button className="bg-white hover:bg-blue-50 text-blue-900 flex items-center gap-2 text-lg px-6 py-6">
-                <LogIn size={20} />
+              <Button size="lg" className="bg-white hover:bg-blue-50 text-blue-900 px-8 py-6 text-lg flex items-center gap-2">
+                <LogIn size={22} />
                 <span>Login to System</span>
               </Button>
             </Link>
@@ -78,28 +75,28 @@ const Landing = () => {
         </div>
       </main>
 
-      {/* Features */}
+      {/* Services Section */}
       <section className={`py-12 px-6 transition-all duration-1000 delay-500 transform ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           <Card className="bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-all">
-            <CardContent className="p-6 text-white text-center">
-              <Ship className="h-12 w-12 mx-auto mb-4 text-blue-200" />
+            <CardContent className="p-8 text-white text-center">
+              <Ship className="h-16 w-16 mx-auto mb-4 text-white" />
               <h3 className="text-xl font-bold mb-2">Shipping Services</h3>
               <p className="text-blue-100">Efficient shipping solutions for all your logistics needs. We handle cargo globally.</p>
             </CardContent>
           </Card>
           
           <Card className="bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-all">
-            <CardContent className="p-6 text-white text-center">
-              <Package className="h-12 w-12 mx-auto mb-4 text-blue-200" />
+            <CardContent className="p-8 text-white text-center">
+              <Package className="h-16 w-16 mx-auto mb-4 text-white" />
               <h3 className="text-xl font-bold mb-2">Container Management</h3>
               <p className="text-blue-100">Complete container tracking and management systems for operational efficiency.</p>
             </CardContent>
           </Card>
           
           <Card className="bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-all">
-            <CardContent className="p-6 text-white text-center">
-              <Truck className="h-12 w-12 mx-auto mb-4 text-blue-200" />
+            <CardContent className="p-8 text-white text-center">
+              <Truck className="h-16 w-16 mx-auto mb-4 text-white" />
               <h3 className="text-xl font-bold mb-2">Logistics Solutions</h3>
               <p className="text-blue-100">End-to-end logistics solutions including transportation, storage and delivery.</p>
             </CardContent>
@@ -108,7 +105,7 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="p-6 text-center text-blue-200 bg-blue-950">
+      <footer className="p-6 text-center text-blue-200">
         <p>© {new Date().getFullYear()} SOQOTRA LOGISTICS SERVICES. All Rights Reserved.</p>
       </footer>
     </div>
