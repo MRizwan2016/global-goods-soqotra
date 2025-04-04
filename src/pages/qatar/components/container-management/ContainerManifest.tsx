@@ -36,7 +36,7 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
 
   if (!container) {
     return (
-      <Card>
+      <Card className="shadow-md">
         <CardContent className="pt-6">
           <div className="text-center text-red-500">
             Loading container information...
@@ -47,7 +47,7 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
   }
 
   return (
-    <Card>
+    <Card className="shadow-md">
       <CardHeader className="pb-4">
         <div className="flex justify-between items-center">
           <CardTitle>

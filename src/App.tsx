@@ -9,7 +9,7 @@ import "./App.css";
 function App() {
   return (
     <Router>
-      <div className="min-h-screen w-full bg-gradient-to-br from-sky-50 to-green-50">
+      <div className="min-h-screen w-full bg-slate-100">
         <Toaster position="top-right" />
         <AppRoutes />
       </div>

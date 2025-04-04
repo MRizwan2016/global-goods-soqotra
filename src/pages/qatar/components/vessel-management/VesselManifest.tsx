@@ -48,8 +48,7 @@ const VesselManifest: React.FC<VesselManifestProps> = ({
       <div ref={printRef}>
         <PrintVesselManifest 
           vessel={vessel} 
-          containerData={containerData} 
-          containerCargoData={containerCargoData}
+          containerData={containerData}
           printSection={printSection}
           orientation={orientation}
           totalWeight={totalWeight}
@@ -115,15 +114,11 @@ const VesselManifest: React.FC<VesselManifestProps> = ({
         
         <CardContent className="p-6">
           <VesselDetails 
-            vessel={vessel} 
-            totalWeight={totalWeight}
-            totalVolume={totalVolume}
-            totalPackages={totalPackages}
+            vessel={vessel}
           />
           
           <ContainerList 
-            containerData={containerData} 
-            containerCargoData={containerCargoData}
+            containerData={containerData}
           />
           
           <div className="flex items-center gap-4 mb-6">
