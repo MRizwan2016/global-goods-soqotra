@@ -25,14 +25,14 @@ const Landing = () => {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-between bg-gray-50 text-center">
+    <div className="min-h-screen flex flex-col items-center justify-between bg-gradient-to-b from-blue-50 to-gray-100 text-center">
       {/* Logo section */}
       <div className="w-full pt-10 animate-fade-in">
         <div className="flex justify-center mb-4">
           <img 
-            src="/lovable-uploads/d86705a4-9b48-4585-b270-34e46b0d2159.png" 
+            src="/lovable-uploads/b4cd42be-7824-4f8b-a647-00c816cc0045.png" 
             alt="SOQOTRA LOGISTICS" 
-            className="h-24 w-auto hover-scale"
+            className="h-24 w-auto hover-scale pulse-animation"
           />
         </div>
       </div>
@@ -43,7 +43,7 @@ const Landing = () => {
         <div className="mb-8 hover-scale float-animation">
           <img 
             src="/lovable-uploads/10c60ae9-cab7-47d0-bc0e-cf57d5845442.png" 
-            alt="SOQOTRA Dashboard" 
+            alt="SOQOTRA DASHBOARD" 
             className="max-w-md shadow-lg rounded-md border border-gray-200"
           />
         </div>

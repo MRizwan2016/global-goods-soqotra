@@ -14,7 +14,7 @@ const Header = ({ title }: HeaderProps) => {
   const initial = username.charAt(0).toUpperCase();
 
   return (
-    <header className="bg-white border-b border-gray-200 py-4 px-6 shadow-sm animate-fade-in">
+    <header className="bg-gradient-to-r from-white to-blue-50 border-b border-gray-200 py-4 px-6 shadow-sm animate-fade-in">
       <div className="flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-gray-800 uppercase">{title}</h1>
         
