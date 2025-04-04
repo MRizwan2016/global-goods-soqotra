@@ -9,6 +9,7 @@ import PaymentPageContent from "./components/PaymentPageContent";
 import PaymentActionButtons from "./components/PaymentActionButtons";
 import ReceiptHandler, { ReceiptHandlerRef } from "./components/ReceiptHandler";
 import { toast } from "sonner";
+import DigitalCalculator from "@/components/calculator/DigitalCalculator";
 
 const AddPaymentPage = () => {
   const {
@@ -128,6 +129,9 @@ const AddPaymentPage = () => {
         formState={formState}
         customerName={selectedInvoice?.consignee1 || selectedInvoice?.consignee || ""}
       />
+      
+      {/* Add Digital Calculator */}
+      <DigitalCalculator />
     </Layout>
   );
 };

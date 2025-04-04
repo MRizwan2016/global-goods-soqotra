@@ -15,6 +15,7 @@ import InvoiceFormFields from "./payment/components/InvoiceFormFields";
 import PaymentInformation from "./payment/components/payment-information";
 import ActionButtons from "./payment/components/ActionButtons";
 import { useInvoicePayment } from "./payment/hooks/useInvoicePayment";
+import DigitalCalculator from "@/components/calculator/DigitalCalculator";
 
 const AddInvoicePayment = () => {
   const navigate = useNavigate();
@@ -157,6 +158,9 @@ const AddInvoicePayment = () => {
             selectedInvoice={selectedInvoice}
             handleSave={handleSave}
           />
+          
+          {/* Add Digital Calculator */}
+          <DigitalCalculator />
         </div>
       </Layout>
     </PrivateRoute>

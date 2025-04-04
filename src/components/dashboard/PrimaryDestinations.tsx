@@ -12,7 +12,7 @@ const PrimaryDestinations = () => {
           <h2 className="flex items-center gap-2 font-semibold text-lg mb-3 uppercase">
             <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm" style={{ background: "linear-gradient(to bottom, #000000 33%, #FFFFFF 33%, #FFFFFF 66%, #009A49 66%)" }}>
             </div>
-            KENYA
+            <span className="text-green-700">KENYA</span>
           </h2>
           <Link 
             to="/kenya" 
@@ -23,18 +23,20 @@ const PrimaryDestinations = () => {
           </Link>
         </div>
         
-        {/* Tunisia Card */}
-        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-red-600 transition-all duration-300 hover:shadow-lg">
+        {/* Sri Lanka Card */}
+        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-yellow-600 transition-all duration-300 hover:shadow-lg">
           <h2 className="flex items-center gap-2 font-semibold text-lg mb-3 uppercase">
-            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm" style={{ background: "#E70013" }}>
-              <div className="w-full h-full flex items-center justify-center">
-                <div className="w-3 h-3 rounded-full bg-white border-2 border-red-600"></div>
-              </div>
+            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm">
+              <img 
+                src="/lovable-uploads/ed0f9d99-06bf-411d-b01d-77800d19a00f.png" 
+                alt="Sri Lanka Flag" 
+                className="w-full h-full object-cover"
+              />
             </div>
-            TUNISIA
+            <span className="text-amber-700">SRI LANKA</span>
           </h2>
           <Link 
-            to="/destinations/tunisia" 
+            to="/destinations/sri-lanka" 
             className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
           >
             VIEW DETAILS 
@@ -42,15 +44,20 @@ const PrimaryDestinations = () => {
           </Link>
         </div>
         
-        {/* Uganda Card */}
-        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-yellow-500 transition-all duration-300 hover:shadow-lg">
+        {/* Somalia Card */}
+        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-blue-600 transition-all duration-300 hover:shadow-lg">
           <h2 className="flex items-center gap-2 font-semibold text-lg mb-3 uppercase">
-            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm" style={{ background: "linear-gradient(to bottom, #000000 33%, #FCDC04 33%, #FCDC04 66%, #D90000 66%)" }}>
+            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm">
+              <img 
+                src="/lovable-uploads/21983d88-cc3a-4e15-9432-668dc66e43c3.png" 
+                alt="Somalia Flag" 
+                className="w-full h-full object-cover"
+              />
             </div>
-            UGANDA
+            <span className="text-blue-700">SOMALIA</span>
           </h2>
           <Link 
-            to="/destinations/uganda" 
+            to="/destinations/somalia" 
             className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
           >
             VIEW DETAILS 

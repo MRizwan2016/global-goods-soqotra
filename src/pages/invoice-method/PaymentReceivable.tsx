@@ -8,6 +8,7 @@ import { useInvoiceData } from "./hooks/useInvoiceData";
 import { useInvoiceFilters } from "./hooks/useInvoiceFilters";
 import { toast } from "sonner";
 import PaymentReceiptHandler from "./components/PaymentReceiptHandler";
+import DigitalCalculator from "@/components/calculator/DigitalCalculator";
 
 const PaymentReceivable = () => {
   const { invoices } = useInvoiceData();
@@ -45,6 +46,9 @@ const PaymentReceivable = () => {
         
         {/* Add PaymentReceiptHandler to handle receipt generation */}
         <PaymentReceiptHandler />
+        
+        {/* Add Digital Calculator */}
+        <DigitalCalculator />
       </div>
     </Layout>
   );

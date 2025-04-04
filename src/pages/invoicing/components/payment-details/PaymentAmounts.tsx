@@ -14,7 +14,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
   return (
     <>
       <InputField 
-        label="FREIGHT"
+        label={<span className="text-blue-600">FREIGHT</span>}
         name="freight"
         value={formState.freight}
         onChange={handleInputChange}
@@ -22,7 +22,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
       />
       
       <InputField 
-        label="DESTINATION TRANSPORT"
+        label={<span className="text-purple-600">DESTINATION TRANSPORT</span>}
         name="destinationTransport"
         value={formState.destinationTransport}
         onChange={handleInputChange}
@@ -30,7 +30,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
       />
       
       <InputField 
-        label="DOCUMENT"
+        label={<span className="text-indigo-600">DOCUMENT</span>}
         name="document"
         value={formState.document}
         onChange={handleInputChange}
@@ -38,7 +38,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
       />
       
       <InputField 
-        label="LOCAL TRANSPORT"
+        label={<span className="text-teal-600">LOCAL TRANSPORT</span>}
         name="localTransport"
         value={formState.localTransport}
         onChange={handleInputChange}
@@ -46,7 +46,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
       />
       
       <InputField 
-        label="PACKING"
+        label={<span className="text-cyan-600">PACKING</span>}
         name="packing"
         value={formState.packing}
         onChange={handleInputChange}
@@ -54,7 +54,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
       />
       
       <InputField 
-        label="STORAGE"
+        label={<span className="text-emerald-600">STORAGE</span>}
         name="storage"
         value={formState.storage}
         onChange={handleInputChange}
@@ -62,7 +62,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
       />
       
       <InputField 
-        label="DESTINATION CLEARING"
+        label={<span className="text-green-600">DESTINATION CLEARING</span>}
         name="destinationClearing"
         value={formState.destinationClearing}
         onChange={handleInputChange}
@@ -70,7 +70,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
       />
       
       <InputField 
-        label="DESTINATION DOOR DELIVERY"
+        label={<span className="text-amber-600">DESTINATION DOOR DELIVERY</span>}
         name="destinationDoorDelivery"
         value={formState.destinationDoorDelivery}
         onChange={handleInputChange}
@@ -78,7 +78,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
       />
       
       <InputField 
-        label="OTHER"
+        label={<span className="text-orange-600">OTHER</span>}
         name="other"
         value={formState.other}
         onChange={handleInputChange}
@@ -86,7 +86,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
       />
       
       <InputField 
-        label="GROSS"
+        label={<span className="text-pink-600 font-semibold">GROSS</span>}
         name="gross"
         value={formState.gross}
         onChange={handleInputChange}
@@ -94,7 +94,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
       />
       
       <InputField 
-        label="DISCOUNT"
+        label={<span className="text-red-600">DISCOUNT</span>}
         name="discount"
         value={formState.discount}
         onChange={handleInputChange}
@@ -102,7 +102,7 @@ const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
       />
       
       <InputField 
-        label="NET"
+        label={<span className="text-blue-800 font-bold">NET</span>}
         name="net"
         value={formState.net}
         readOnly
