@@ -36,20 +36,6 @@ const MainNavigation: React.FC = () => {
 
   return (
     <div className="w-full p-2 animate-fade-in">
-      <div className="flex justify-center mb-6">
-        <Link to="/">
-          <img 
-            src="/lovable-uploads/056bd63a-3806-4e08-9360-0e3edff62199.png" 
-            alt="Soqotra Logo" 
-            className="h-16 hover:scale-105 transition-transform"
-          />
-        </Link>
-      </div>
-      <div className="text-center mb-6">
-        <p className="font-semibold text-sm text-gray-800 leading-tight">SOQOTRA LOGISTICS SERVICES,</p>
-        <p className="font-semibold text-sm text-gray-800 leading-tight">TRANSPORTATION & TRADING WLL</p>
-      </div>
-      
       <div className="flex flex-col space-y-2">
         {Object.entries(navigationSections).map(([key, section]) => (
           <NavigationSection

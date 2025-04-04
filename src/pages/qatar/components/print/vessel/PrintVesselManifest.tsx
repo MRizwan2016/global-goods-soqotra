@@ -1,10 +1,17 @@
 
 import React from "react";
-import { QatarVessel } from "@/pages/qatar/types/vesselTypes";
 import { QatarContainer } from "@/pages/qatar/types/containerTypes";
 
 export interface PrintVesselManifestProps {
-  vessel: QatarVessel;
+  vessel: {
+    id: string;
+    vesselName: string;
+    voyageNumber?: string;
+    voyage?: string;
+    loadingPort?: string;
+    portOfLoading?: string;
+    destination?: string;
+  };
   containerData: QatarContainer[];
   printSection?: "all" | "cargo" | "summary";
   orientation?: "portrait" | "landscape";
@@ -23,9 +30,9 @@ const PrintVesselManifest: React.FC<PrintVesselManifestProps> = ({
   totalPackages: providedTotalPackages
 }) => {
   // Calculate totals if not provided
-  const totalWeight = providedTotalWeight ?? containerData.reduce((sum, container) => sum + (container.totalWeight || 0), 0);
-  const totalVolume = providedTotalVolume ?? containerData.reduce((sum, container) => sum + (container.totalVolume || 0), 0);
-  const totalPackages = providedTotalPackages ?? containerData.reduce((sum, container) => sum + (container.totalPackages || 0), 0);
+  const totalWeight = providedTotalWeight ?? containerData.reduce((sum, container) => sum + (Number(container.weight) || 0), 0);
+  const totalVolume = providedTotalVolume ?? containerData.reduce((sum, container) => sum + (Number(container.volume) || 0), 0);
+  const totalPackages = providedTotalPackages ?? containerData.reduce((sum, container) => sum + (Number(container.packages) || 0), 0);
 
   return (
     <div className={`print-container ${orientation === "landscape" ? "landscape" : ""}`}>
@@ -34,8 +41,8 @@ const PrintVesselManifest: React.FC<PrintVesselManifestProps> = ({
         <h1>Vessel Manifest: {vessel.vesselName}</h1>
         <div className="vessel-details">
           <div>Vessel ID: {vessel.id}</div>
-          <div>Voyage: {vessel.voyageNumber}</div>
-          <div>Loading Port: {vessel.loadingPort}</div>
+          <div>Voyage: {vessel.voyageNumber || vessel.voyage}</div>
+          <div>Loading Port: {vessel.loadingPort || vessel.portOfLoading}</div>
           <div>Destination: {vessel.destination}</div>
         </div>
       </header>
@@ -86,9 +93,9 @@ const PrintVesselManifest: React.FC<PrintVesselManifestProps> = ({
                   <td>{container.containerNumber}</td>
                   <td>{container.containerType}</td>
                   <td>{container.sealNumber}</td>
-                  <td>{container.totalWeight?.toFixed(2) || '0.00'}</td>
-                  <td>{container.totalVolume?.toFixed(2) || '0.00'}</td>
-                  <td>{container.totalPackages || 0}</td>
+                  <td>{Number(container.weight)?.toFixed(2) || '0.00'}</td>
+                  <td>{Number(container.volume)?.toFixed(2) || '0.00'}</td>
+                  <td>{container.packages || 0}</td>
                 </tr>
               ))}
             </tbody>
