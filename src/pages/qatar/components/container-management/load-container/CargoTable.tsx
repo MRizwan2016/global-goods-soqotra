@@ -7,8 +7,8 @@ import { Trash2 } from "lucide-react";
 interface CargoTableProps {
   cargoItems: ContainerCargo[];
   onRemoveCargo: (cargoId: string) => void;
-  formatVolume?: (volume: number) => string;
-  formatWeight?: (volume: number) => string;
+  formatVolume?: (volume: number | string) => string;
+  formatWeight?: (weight: number | string) => string;
 }
 
 const CargoTable: React.FC<CargoTableProps> = ({ 

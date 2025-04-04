@@ -1,89 +1,93 @@
 
 import { useState, useEffect } from "react";
-import { ContainerCargo, QatarContainer } from "../../types/containerTypes";
-import { toast } from "sonner";
+import { QatarContainer, ContainerCargo } from "../../types/containerTypes";
+import { v4 as uuidv4 } from "uuid";
 import { mockCargoItems } from "../../data/mockContainers";
 
 export const useCargoOperations = (
-  containers: QatarContainer[], 
+  containers: QatarContainer[],
   setContainers: React.Dispatch<React.SetStateAction<QatarContainer[]>>,
-  saveContainersToLocalStorage: (containers: QatarContainer[]) => void
+  saveContainersToLocalStorage: () => void
 ) => {
+  // In-memory cargo items state
   const [cargoItems, setCargoItems] = useState<ContainerCargo[]>(mockCargoItems);
-
-  // Load cargo items from localStorage
+  
+  // Load cargo items from localStorage when component mounts
   useEffect(() => {
     try {
       const savedCargoItems = localStorage.getItem('cargoItems');
       if (savedCargoItems) {
-        const parsedCargoItems = JSON.parse(savedCargoItems);
-        if (Array.isArray(parsedCargoItems)) {
-          setCargoItems(parsedCargoItems);
-        }
+        setCargoItems(JSON.parse(savedCargoItems));
       }
     } catch (error) {
-      console.error("Error loading cargo items:", error);
+      console.error("Error loading cargo items from localStorage:", error);
     }
   }, []);
-
-  const saveCargoItemsToLocalStorage = (cargoItemsData: ContainerCargo[]) => {
+  
+  const saveCargoItemsToLocalStorage = () => {
     try {
-      localStorage.setItem('cargoItems', JSON.stringify(cargoItemsData));
+      localStorage.setItem('cargoItems', JSON.stringify(cargoItems));
     } catch (error) {
       console.error("Error saving cargo items to localStorage:", error);
     }
   };
-
+  
+  // Add a new cargo item to a container
   const handleAddCargo = (cargo: ContainerCargo) => {
-    // Check if this cargo is already in the container
-    const existingCargoItems = cargoItems.filter(item => item.containerId === cargo.containerId);
-    const isDuplicate = existingCargoItems.some(item => 
-      item.invoiceNumber === cargo.invoiceNumber && 
-      item.barcode === cargo.barcode
-    );
-    
-    if (isDuplicate) {
-      toast.error("This package is already loaded in the container", {
-        position: "top-center"
-      });
-      return;
+    // If cargo doesn't have an ID, generate one
+    if (!cargo.id) {
+      cargo.id = uuidv4();
     }
     
-    // Add cargo to the list
+    // Update the cargo items array
     const updatedCargoItems = [...cargoItems, cargo];
     setCargoItems(updatedCargoItems);
-    saveCargoItemsToLocalStorage(updatedCargoItems);
     
-    // Update container stats
-    const containerId = cargo.containerId;
-    const updatedContainers = containers.map(container => {
-      if (container.id === containerId) {
-        return {
-          ...container,
-          packages: (container.packages || 0) + 1,
-          weight: (container.weight || 0) + cargo.weight,
-          volume: (container.volume || 0) + cargo.volume,
-          status: "LOADED" // Update status when cargo is added
-        };
-      }
-      return container;
-    });
+    // Update the container's package count, volume, and weight
+    const containerIndex = containers.findIndex(c => c.id === cargo.containerId);
+    if (containerIndex >= 0) {
+      const container = containers[containerIndex];
+      const containerCargoItems = updatedCargoItems.filter(item => item.containerId === container.id);
+      
+      const updatedContainer = {
+        ...container,
+        packages: containerCargoItems.length,
+        volume: containerCargoItems.reduce((sum, item) => sum + (item.volume || 0), 0),
+        weight: containerCargoItems.reduce((sum, item) => sum + (item.weight || 0), 0)
+      };
+      
+      const updatedContainers = [...containers];
+      updatedContainers[containerIndex] = updatedContainer;
+      setContainers(updatedContainers);
+      
+      // Save changes to localStorage
+      saveContainersToLocalStorage();
+    }
     
-    setContainers(updatedContainers);
-    saveContainersToLocalStorage(updatedContainers);
+    // Save cargo items to localStorage
+    saveCargoItemsToLocalStorage();
     
-    toast.success("Cargo item added to container", {
-      description: `${cargo.packageName} from invoice ${cargo.invoiceNumber} added`,
-      position: "top-center",
-      className: "animate-slide-in-right"
-    });
+    return cargo;
   };
-
-  const getCurrentCargoItems = (containerId: string | null) => {
+  
+  // Get cargo items for a specific container
+  const getCurrentCargoItems = (containerId: string | null): ContainerCargo[] => {
     if (!containerId) return [];
+    
+    // Load from localStorage first if present
+    try {
+      const savedCargoItems = localStorage.getItem(`cargoItems_${containerId}`);
+      if (savedCargoItems) {
+        return JSON.parse(savedCargoItems);
+      }
+    } catch (error) {
+      console.error("Error loading specific container cargo items:", error);
+    }
+    
+    // Fall back to in-memory items
     return cargoItems.filter(item => item.containerId === containerId);
   };
-
+  
   return {
     cargoItems,
     setCargoItems,

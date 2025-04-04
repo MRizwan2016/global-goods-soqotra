@@ -1,29 +1,14 @@
 
-import React, { useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs } from "@/components/ui/tabs";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { ContainerManifestProps } from "../../types/containerTypes";
 import useContainerManifest from "../../hooks/useContainerManifest";
-import ManifestHeader from "./manifest/ManifestHeader";
-import CargoSummary from "./manifest/CargoSummary";
-import PrintOptionsSelector from "./manifest/PrintOptionsSelector";
-import ContainerDetailsSection from "./manifest/ContainerDetailsSection";
-import ManifestActionsBar from "./manifest/ManifestActionsBar";
-import ManifestTabsHeader from "./manifest/ManifestTabsHeader";
-import TabsContentWrapper from "./manifest/TabsContentWrapper";
-import PrintContainerManifest from "../print/container/PrintContainerManifest";
-import ManifestSkeleton from "./manifest/ManifestSkeleton";
-import ManifestError from "./manifest/ManifestError";
 
-interface ContainerManifestProps {
-  containerId: string;
-  onManifestSubmitted: () => void;
-  onCancel: () => void;
-}
-
-const ContainerManifest: React.FC<ContainerManifestProps> = ({ 
-  containerId, 
-  onManifestSubmitted, 
-  onCancel 
+const ContainerManifest: React.FC<ContainerManifestProps> = ({
+  containerId,
+  onClose
 }) => {
   const {
     container,
@@ -35,122 +20,47 @@ const ContainerManifest: React.FC<ContainerManifestProps> = ({
     activeTab,
     setActiveTab,
     printViewVisible,
-    setPrintViewVisible,
-    printOptions,
-    setPrintOptions,
-    isLoading,
-    error,
-    totalPackages,
-    totalVolume,
-    totalWeight,
-    itemList,
-    consigneeList,
-    unsettledInvoices,
-    formatVolume,
-    formatWeight,
     handleConfirm,
     handlePrint
-  } = useContainerManifest(containerId, onManifestSubmitted);
-  
-  console.log("Container Manifest Component - containerId:", containerId);
-  console.log("Container Manifest Component - container:", container);
-  console.log("Container Manifest Component - cargoItems:", cargoItems);
-  console.log("Container Manifest Component - error:", error);
-  
-  // Add effect to handle cleanup when component unmounts
-  useEffect(() => {
-    return () => {
-      // Remove print-only class from body when component unmounts
-      document.body.classList.remove('print-only-manifest');
-    };
-  }, []);
-  
-  // Show both print view and regular view when printing
-  // This ensures the print view is generated properly while still showing the UI
-  if (isLoading) {
-    return <ManifestSkeleton />;
-  }
-  
-  // Error state
-  if (error || !container) {
-    return <ManifestError error={error} onCancel={onCancel} />;
-  }
-  
-  return (
-    <>
-      {/* Print view - hidden by default in regular view mode, shown when printing */}
-      {printViewVisible && container && (
-        <div className="print-only" id="container-manifest-print-view">
-          <PrintContainerManifest 
-            container={container}
-            cargoItems={cargoItems}
-            itemList={itemList}
-            consigneeList={consigneeList}
-            unsettledInvoices={unsettledInvoices}
-            totalVolume={totalVolume}
-            totalWeight={totalWeight}
-            totalPackages={totalPackages}
-            confirmDate={confirmDate}
-            printOptions={printOptions}
-          />
-        </div>
-      )}
-      
-      {/* Regular view - hidden when printing */}
-      <Card className="shadow-md animate-fade-in print:hidden">
-        <ManifestHeader 
-          containerNumber={container.containerNumber}
-          status={container.status}
-          onCancel={onCancel}
-        />
-        
-        <CardContent className="p-6">
-          <CargoSummary 
-            totalPackages={totalPackages}
-            totalVolume={totalVolume}
-            totalWeight={totalWeight}
-            formatVolume={formatVolume}
-            formatWeight={formatWeight}
-          />
-          
-          <ContainerDetailsSection 
-            container={container}
-            confirmDate={confirmDate}
-            setConfirmDate={setConfirmDate}
-            vgmWeight={vgmWeight}
-            setVgmWeight={setVgmWeight}
-            totalPackages={totalPackages}
-            totalVolume={totalVolume}
-            formatVolume={formatVolume}
-          />
-          
-          <PrintOptionsSelector 
-            printOptions={printOptions}
-            setPrintOptions={setPrintOptions}
-          />
-          
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
-            <ManifestTabsHeader />
-            
-            <TabsContentWrapper
-              activeTab={activeTab}
-              cargoItems={cargoItems}
-              itemList={itemList}
-              unsettledInvoices={unsettledInvoices}
-              consigneeList={consigneeList}
-              formatVolume={formatVolume}
-              formatWeight={formatWeight}
-            />
-          </Tabs>
-          
-          <ManifestActionsBar 
-            onCancel={onCancel}
-            onConfirm={handleConfirm}
-            onPrint={handlePrint}
-          />
+  } = useContainerManifest(containerId, onClose);
+
+  if (!container) {
+    return (
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center text-red-500">
+            Loading container information...
+          </div>
         </CardContent>
       </Card>
-    </>
+    );
+  }
+
+  return (
+    <Card>
+      <CardHeader className="pb-4">
+        <div className="flex justify-between items-center">
+          <CardTitle>
+            Container Manifest - {container.containerNumber}
+          </CardTitle>
+          <Button variant="ghost" onClick={onClose}>
+            <ArrowLeft className="mr-2 h-4 w-4" /> Back
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <p>Container manifest content will be displayed here...</p>
+        
+        <div className="flex justify-end gap-2 mt-4">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={handleConfirm}>
+            Confirm Manifest
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

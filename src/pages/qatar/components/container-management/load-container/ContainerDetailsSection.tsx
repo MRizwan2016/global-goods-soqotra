@@ -17,7 +17,7 @@ const ContainerDetailsSection: React.FC<ContainerDetailsSectionProps> = ({
   onContainerChange = () => {}
 }) => {
   // Format container size
-  const containerSize = container.containerSize ? `${container.containerSize} FT` : "N/A";
+  const containerSize = container.containerType ? `${container.containerType}` : "N/A";
   
   // Format ETA and ETD dates
   const formatDate = (dateString?: string) => {
@@ -77,12 +77,12 @@ const ContainerDetailsSection: React.FC<ContainerDetailsSectionProps> = ({
           
           <div>
             <Label className="font-bold text-gray-700">Ship:</Label>
-            <div className="mt-1">{container.ship || "Not assigned"}</div>
+            <div className="mt-1">{container.vessel || "Not assigned"}</div>
           </div>
           
           <div>
             <Label className="font-bold text-gray-700">Voyage:</Label>
-            <div className="mt-1">{container.voyage || "Not assigned"}</div>
+            <div className="mt-1">{container.vesselId || "Not assigned"}</div>
           </div>
           
           <div>
@@ -108,14 +108,14 @@ const ContainerDetailsSection: React.FC<ContainerDetailsSectionProps> = ({
           
           <div>
             <Label className="font-bold text-gray-700">Created Date:</Label>
-            <div className="mt-1">{formatDate(container.createdDate) || "N/A"}</div>
+            <div className="mt-1">{formatDate(container.loadDate) || "N/A"}</div>
           </div>
         </Grid>
         
-        {container.description && (
+        {container.jobNumber && (
           <div className="mt-2">
             <Label className="font-bold text-gray-700">Description:</Label>
-            <div className="mt-1 text-gray-700">{container.description}</div>
+            <div className="mt-1 text-gray-700">{container.jobNumber}</div>
           </div>
         )}
       </CardContent>

@@ -19,6 +19,12 @@ export interface QatarContainer {
   vesselId?: string;
   jobNumber?: string;
   loadDate?: string;
+  // Add missing properties to fix type errors
+  containerSize?: string;
+  ship?: string;
+  voyage?: string;
+  createdDate?: string;
+  description?: string;
 }
 
 export interface ContainerCargo {
@@ -66,10 +72,35 @@ export interface UnsettledInvoice {
   consignee: string;
   amount: number;
   paid: boolean;
-  currency?: string; // Added the currency property as optional
+  currency?: string;
 }
 
 export interface PrintOptions {
   section: "all" | "cargo" | "items" | "consignees" | "invoices";
   orientation: "portrait" | "landscape";
+}
+
+// Add container manifest props interface
+export interface ContainerManifestProps {
+  containerId: string;
+  onClose: () => void;
+}
+
+// Add ViewManifestTabProps interface
+export interface ViewManifestTabProps {
+  container: QatarContainer;
+  printOptions: PrintOptions;
+  onPrintOptionsChange: (options: Partial<PrintOptions>) => void;
+  onPrint: () => void;
+  onClose: () => void;
+}
+
+// Add ContainerListProps interface
+export interface ContainerListProps {
+  containers: QatarContainer[];
+  onEdit?: (id: string) => void;
+  onLoad?: (id: string) => void;
+  onViewManifest?: (id: string) => void;
+  onCreateManifest?: (id: string) => void;
+  onAddClick?: () => void;
 }

@@ -113,7 +113,7 @@ const TabContent: React.FC<TabContentProps> = ({
       <TabsContent value="manifest" className="m-0">
         {currentContainer && (
           <ContainerManifest
-            container={currentContainer}
+            containerId={currentContainer.id}
             onClose={onCancelEdit}
           />
         )}

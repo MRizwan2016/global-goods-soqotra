@@ -3,7 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { PenLine, Truck, ClipboardList, FileText } from "lucide-react";
 import { motion } from "framer-motion";
-import { QatarContainer } from "../../../types/containerTypes";
+import { QatarContainer } from "../../types/containerTypes";
 
 interface ContainerRowProps {
   container: QatarContainer;

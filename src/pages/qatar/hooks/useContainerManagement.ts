@@ -4,7 +4,7 @@ import { useContainerData } from "./container-management/useContainerData";
 import { useCargoOperations } from "./container-management/useCargoOperations";
 import { useManifestOperations } from "./container-management/useManifestOperations";
 import { useTabManagement } from "./container-management/useTabManagement";
-import { QatarContainer } from "../types/containerTypes";
+import { QatarContainer, ContainerCargo, ItemListEntry, ConsigneeListItem, UnsettledInvoice } from "../types/containerTypes";
 import { toast } from "sonner";
 
 export const useContainerManagement = () => {
@@ -42,7 +42,7 @@ export const useContainerManagement = () => {
     getItemList,
     getConsigneeList,
     getUnsettledInvoices
-  } = useManifestOperations(containers, setContainers, saveContainersToLocalStorage);
+  } = useManifestOperations(containers, setContainers, saveContainersToLocalStorage, getCurrentCargoItems);
 
   // Tab management
   const {
