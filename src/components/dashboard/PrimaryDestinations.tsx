@@ -20,7 +20,7 @@ const PrimaryDestinations = () => {
             className="destination-card-link"
           >
             View Details 
-            <ArrowRight size={16} />
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
         
@@ -37,7 +37,7 @@ const PrimaryDestinations = () => {
             className="destination-card-link"
           >
             View Details 
-            <ArrowRight size={16} />
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
         
@@ -54,7 +54,7 @@ const PrimaryDestinations = () => {
             className="destination-card-link"
           >
             View Details 
-            <ArrowRight size={16} />
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
       </div>

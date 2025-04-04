@@ -13,6 +13,15 @@ body {
   justify-content: space-between;
 }
 
+/* Button Animations */
+.hover-scale {
+  transition: all 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
 /* Destination Cards Styling */
 .destination-card {
   background-color: white;
@@ -21,6 +30,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -40,13 +50,14 @@ body {
 }
 
 .destination-card .flag-icon {
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .destination-card-link {
@@ -54,13 +65,14 @@ body {
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: #666;
+  color: #3366FF;
   text-decoration: none;
   transition: color 0.2s;
 }
 
 .destination-card-link:hover {
-  color: #3366FF;
+  color: #1a44cc;
+  transform: translateX(2px);
 }
 
 /* Country-specific flag colors */
@@ -81,11 +93,41 @@ body {
 }
 
 .flag-srilanka {
-  background: #8D153A;
+  background: linear-gradient(to bottom,
+    #FFC100 20%,
+    #FFC100 20%,
+    #FF9B00 20%,
+    #FF9B00 40%,
+    #8D153A 40%,
+    #8D153A 60%,
+    #FF9B00 60%,
+    #FF9B00 80%,
+    #FFC100 80%,
+    #FFC100 100%
+  );
 }
 
 .flag-somalia {
   background-color: #4189DD;
+}
+
+/* Animation classes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.7s ease-out forwards;
+}
+
+.slide-in {
+  animation: slideIn 0.5s ease-out forwards;
 }
 
 /* Print styles for vessel manifest */

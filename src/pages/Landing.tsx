@@ -30,7 +30,7 @@ const Landing = () => {
       <div className="w-full pt-10">
         <div className="flex justify-center mb-4">
           <img 
-            src="/lovable-uploads/fe2aa70d-687c-409c-b630-c9cc9c2ce01a.png" 
+            src="/lovable-uploads/d86705a4-9b48-4585-b270-34e46b0d2159.png" 
             alt="SOQOTRA LOGISTICS" 
             className="h-24 w-auto"
           />
@@ -49,18 +49,21 @@ const Landing = () => {
         </div>
         
         {/* Company Title */}
-        <h1 className="text-4xl md:text-6xl font-bold text-[#3366FF] mb-4">
+        <h1 className="text-4xl md:text-6xl font-bold text-[#3366FF] mb-4 animate-fade-in">
           SOQOTRA LOGISTICS
         </h1>
         
         {/* Company Subtitle */}
-        <h2 className="text-xl md:text-2xl font-medium text-gray-600 mb-8">
+        <h2 className="text-xl md:text-2xl font-medium text-gray-600 mb-8 animate-fade-in">
           SERVICES, TRANSPORTATION & TRADING WLL
         </h2>
         
         {/* Login Button */}
-        <Link to="/admin/login">
-          <Button size="lg" className="bg-[#3366FF] hover:bg-blue-600 text-white py-6 px-8 text-lg flex items-center gap-2">
+        <Link to="/login" className="hover-scale">
+          <Button 
+            size="lg" 
+            className="bg-[#3366FF] hover:bg-blue-600 text-white py-6 px-8 text-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105"
+          >
             <LogIn size={24} />
             <span>Login to System</span>
           </Button>
