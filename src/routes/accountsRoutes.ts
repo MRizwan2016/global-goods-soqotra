@@ -5,42 +5,44 @@ import AddInvoicePayment from "@/pages/accounts/AddInvoicePayment";
 import PaymentMethodsPage from "@/pages/accounts/PaymentMethodsPage";
 import ReconciliationPage from "@/pages/accounts/ReconciliationPage";
 import AddPaymentPage from "@/pages/accounts/payment/AddPaymentPage";
-// Fix: Using a correct import path for PaidInvoicesPage
 import PaidInvoicesPage from "@/pages/accounts/payments/PaidInvoicesPage";
 
 const accountsRoutes: RouteConfig[] = [
   {
-    path: "payments",
+    path: "accounts/payments",
     element: PaymentsPage,
     private: true
   },
   {
-    path: "payments/add",
+    path: "accounts/payments/add",
     element: AddInvoicePayment,
     private: true
   },
   {
-    path: "payment/add",
+    path: "accounts/payment/add",
     element: AddPaymentPage,
     private: true
   },
   {
-    path: "payment-methods",
+    path: "accounts/payment-methods",
     element: PaymentMethodsPage,
-    private: true
+    private: true,
+    requiredFile: "paymentMethods"
   },
   {
-    path: "reconciliation",
+    path: "accounts/reconciliation",
     element: ReconciliationPage,
-    private: true
+    private: true,
+    requiredFile: "reconciliation"
   },
   {
-    path: "payments/reconciliation",
+    path: "accounts/payments/reconciliation",
     element: ReconciliationPage,
-    private: true
+    private: true,
+    requiredFile: "reconciliation"
   },
   {
-    path: "payments/paid",
+    path: "accounts/payments/paid",
     element: PaidInvoicesPage,
     private: true
   },

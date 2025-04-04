@@ -44,6 +44,9 @@ export const filePermissions = {
       reconciliation: { label: "Reconciliation", path: "/accounts/reconciliation" },
       profitLoss: { label: "Profit & Loss", path: "/accounts/profit-loss" },
       financialReports: { label: "Financial Reports", path: "/accounts/financial-reports" },
+      payments: { label: "Payments", path: "/accounts/payments" }, // Added payments
+      addPayment: { label: "Add Payment", path: "/accounts/payment/add" }, // Added add payment
+      paidInvoices: { label: "Paid Invoices", path: "/accounts/payments/paid" } // Added paid invoices
     }
   }
 };
