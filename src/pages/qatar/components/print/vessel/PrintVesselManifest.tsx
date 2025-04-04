@@ -1,3 +1,4 @@
+
 import React from "react";
 import { QatarContainer } from "../../../types/containerTypes";
 import { QatarVessel } from "../../../components/vessel-management/types/vesselTypes";
@@ -8,13 +9,19 @@ interface PrintVesselManifestProps {
   containerData: QatarContainer[];
   printSection?: "all" | "cargo" | "summary";
   orientation?: "portrait" | "landscape";
+  totalWeight?: number;
+  totalVolume?: number;
+  totalPackages?: number;
 }
 
 const PrintVesselManifest: React.FC<PrintVesselManifestProps> = ({ 
   vessel, 
   containerData,
   printSection = "all",
-  orientation = "portrait"
+  orientation = "portrait",
+  totalWeight,
+  totalVolume,
+  totalPackages
 }) => {
   return (
     <div className="print-container">
@@ -121,13 +128,16 @@ const PrintVesselManifest: React.FC<PrintVesselManifestProps> = ({
                 <tr className="bg-gray-100">
                   <td colSpan={4} className="border p-2 text-right font-semibold">Total:</td>
                   <td className="border p-2">
-                    {containerData.reduce((sum, c) => sum + (c.weight || 0), 0).toFixed(2)}
+                    {totalWeight !== undefined ? totalWeight.toFixed(2) : 
+                     containerData.reduce((sum, c) => sum + (c.weight || 0), 0).toFixed(2)}
                   </td>
                   <td className="border p-2">
-                    {containerData.reduce((sum, c) => sum + (c.packages || 0), 0)}
+                    {totalPackages !== undefined ? totalPackages : 
+                     containerData.reduce((sum, c) => sum + (c.packages || 0), 0)}
                   </td>
                   <td className="border p-2">
-                    {containerData.reduce((sum, c) => sum + (c.volume || 0), 0).toFixed(3)}
+                    {totalVolume !== undefined ? totalVolume.toFixed(3) : 
+                     containerData.reduce((sum, c) => sum + (c.volume || 0), 0).toFixed(3)}
                   </td>
                 </tr>
               </tfoot>
@@ -158,3 +168,4 @@ const PrintVesselManifest: React.FC<PrintVesselManifestProps> = ({
 };
 
 export default PrintVesselManifest;
+
