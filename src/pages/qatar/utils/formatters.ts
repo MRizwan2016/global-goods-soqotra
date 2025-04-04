@@ -1,8 +1,8 @@
 
-export const formatCurrency = (amount: number | string): string => {
+export const formatCurrency = (amount: number | string, currency: string = "QAR"): string => {
   // Handle the case when amount is undefined or null
   if (amount === undefined || amount === null) {
-    return "QAR 0.00";
+    return `${currency} 0.00`;
   }
   
   let numAmount: number;
@@ -16,8 +16,8 @@ export const formatCurrency = (amount: number | string): string => {
   
   // Check if it's a valid number
   if (isNaN(numAmount)) {
-    return "QAR 0.00";
+    return `${currency} 0.00`;
   }
   
-  return `QAR ${numAmount.toFixed(2)}`;
+  return `${currency} ${numAmount.toFixed(2)}`;
 };

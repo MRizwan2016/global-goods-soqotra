@@ -5,12 +5,14 @@ interface PaymentDetailsTableProps {
   isFullScreen?: boolean;
   paymentInfo?: any;
   invoice?: any;
+  currency?: string;
 }
 
 const PaymentDetailsTable: React.FC<PaymentDetailsTableProps> = ({ 
   isFullScreen = false,
   paymentInfo,
-  invoice
+  invoice,
+  currency = "QAR"
 }) => {
   const paymentDate = paymentInfo?.paymentDate || invoice?.paymentDate || '';
   const receiptNumber = paymentInfo?.receiptNumber || invoice?.receiptNumber || '';
@@ -42,7 +44,7 @@ const PaymentDetailsTable: React.FC<PaymentDetailsTableProps> = ({
               <td className="border border-gray-300 p-2 text-center">{receiptNumber || '-'}</td>
               <td className="border border-gray-300 p-2 text-center">{paymentDate || '-'}</td>
               <td className="border border-gray-300 p-2 text-center">
-                {typeof paidAmount === 'number' ? paidAmount.toFixed(2) : paidAmount} QAR
+                {typeof paidAmount === 'number' ? paidAmount.toFixed(2) : paidAmount} {currency}
               </td>
               <td className="border border-gray-300 p-2 text-center">{reconDate || '-'}</td>
               <td className="border border-gray-300 p-2 text-center">{reconNumber || '-'}</td>

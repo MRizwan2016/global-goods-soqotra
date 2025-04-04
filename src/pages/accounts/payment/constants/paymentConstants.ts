@@ -58,3 +58,8 @@ export const DEFAULT_PAYMENT_FORM_VALUES = {
   receivableAccount: "cash",
   currency: "QAR"
 };
+
+// Default country and currency settings
+export const DEFAULT_COUNTRY = "Qatar";
+export const DEFAULT_CURRENCY = "QAR";
+
