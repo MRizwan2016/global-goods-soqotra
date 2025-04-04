@@ -165,8 +165,19 @@ const createSummaryReport = (invoices: Invoice[]) => {
 const createWeeklyReport = (invoices: Invoice[]) => {
   const weeklyData = generateWeeklyData(invoices);
   
+  // Define a type for our report row to ensure type safety
+  type ReportRow = {
+    'SL.No.': string | number;
+    'Invoice Number': string;
+    'Customer': string;
+    'Date': string;
+    'Payment Date': string;
+    'Amount': string | number;
+    'Payment Method': string;
+  };
+  
   // Map invoices to the format needed for the report
-  const reportData = weeklyData.invoices.map((invoice, index) => ({
+  const reportData: ReportRow[] = weeklyData.invoices.map((invoice, index) => ({
     'SL.No.': index + 1,
     'Invoice Number': invoice.invoiceNumber,
     'Customer': invoice.customerName,
@@ -183,7 +194,7 @@ const createWeeklyReport = (invoices: Invoice[]) => {
     'Customer': '',
     'Date': '',
     'Payment Date': 'TOTAL',
-    'Amount': parseFloat(weeklyData.total.toFixed(2)),  // Convert to number
+    'Amount': weeklyData.total.toFixed(2),
     'Payment Method': ''
   });
   
@@ -201,8 +212,19 @@ const createWeeklyReport = (invoices: Invoice[]) => {
 const createMonthlyReport = (invoices: Invoice[]) => {
   const monthlyData = generateMonthlyData(invoices);
   
+  // Define a type for our report row to ensure type safety
+  type ReportRow = {
+    'SL.No.': string | number;
+    'Invoice Number': string;
+    'Customer': string;
+    'Date': string;
+    'Payment Date': string;
+    'Amount': string | number;
+    'Payment Method': string;
+  };
+  
   // Map invoices to the format needed for the report
-  const reportData = monthlyData.invoices.map((invoice, index) => ({
+  const reportData: ReportRow[] = monthlyData.invoices.map((invoice, index) => ({
     'SL.No.': index + 1,
     'Invoice Number': invoice.invoiceNumber,
     'Customer': invoice.customerName,
@@ -219,7 +241,7 @@ const createMonthlyReport = (invoices: Invoice[]) => {
     'Customer': '',
     'Date': '',
     'Payment Date': 'TOTAL',
-    'Amount': parseFloat(monthlyData.total.toFixed(2)),  // Convert to number
+    'Amount': monthlyData.total.toFixed(2),
     'Payment Method': ''
   });
   
