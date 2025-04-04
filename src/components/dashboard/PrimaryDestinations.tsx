@@ -44,20 +44,17 @@ const PrimaryDestinations = () => {
           </Link>
         </div>
         
-        {/* Somalia Card */}
-        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-blue-600 transition-all duration-300 hover:shadow-lg">
+        {/* Uganda Card (replacing Somalia) */}
+        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-red-600 transition-all duration-300 hover:shadow-lg">
           <h2 className="flex items-center gap-2 font-semibold text-lg mb-3 uppercase">
-            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm">
-              <img 
-                src="/lovable-uploads/21983d88-cc3a-4e15-9432-668dc66e43c3.png" 
-                alt="Somalia Flag" 
-                className="w-full h-full object-cover"
-              />
+            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm" style={{ 
+              background: "linear-gradient(to bottom, #000000 33%, #FFFF00 33%, #FFFF00 66%, #DE0000 66%)"
+            }}>
             </div>
-            <span className="text-blue-700">SOMALIA</span>
+            <span className="text-red-700">UGANDA</span>
           </h2>
           <Link 
-            to="/destinations/somalia" 
+            to="/destinations/uganda" 
             className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
           >
             VIEW DETAILS 
