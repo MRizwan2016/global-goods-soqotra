@@ -11,6 +11,7 @@ const Header = ({ title }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { currentUser } = useAuth();
   const username = currentUser?.fullName || "Guest";
+  const initial = username.charAt(0).toUpperCase();
 
   return (
     <header className="bg-white border-b border-gray-200 py-4 px-6 shadow-sm animate-fade-in">
@@ -30,8 +31,8 @@ const Header = ({ title }: HeaderProps) => {
           </div>
           
           <div className="flex items-center gap-2">
-            <div className="bg-soqotra-green text-white rounded-full p-2 w-8 h-8 flex items-center justify-center hover-scale">
-              {username.charAt(0)}
+            <div className="bg-green-600 text-white rounded-full p-2 w-8 h-8 flex items-center justify-center hover-scale">
+              {initial}
             </div>
             <span className="text-gray-600 font-medium">{username}</span>
           </div>

@@ -30,7 +30,7 @@ const PrintVesselManifest: React.FC<PrintVesselManifestProps> = ({
       <div className="p-8">
         {/* Header */}
         <div className="flex items-center justify-center mb-6">
-          <img src="/soqotra-logo.png" alt="Logo" className="h-16 w-auto mr-4" />
+          <img src="/lovable-uploads/a673e02e-b1ad-4d72-96c4-9d7fead8a9a4.png" alt="Logo" className="h-16 w-auto mr-4" />
         </div>
         
         <div className="text-center mb-6">

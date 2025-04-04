@@ -73,7 +73,15 @@ export default {
 					navy: '#1e3a8a',   // Darker blue for landing page background
 					darknavy: '#1e3a8a', // Deep navy blue for landing page 
 					sky: '#93c5fd',    // Light blue for highlights
-					slate: '#475569'   // Neutral slate color for text
+					slate: '#475569',   // Neutral slate color for text
+					primary: {
+						kenya: '#2563eb',     // Blue for Kenya
+						tunisia: '#dc2626',   // Red for Tunisia
+						uganda: '#16a34a',    // Green for Uganda
+						philippines: '#f59e0b', // Amber for Philippines
+						srilanka: '#ef4444',  // Red for Sri Lanka
+						somalia: '#10b981'    // Green for Somalia
+					}
 				}
 			},
 			borderRadius: {

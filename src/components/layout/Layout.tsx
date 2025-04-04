@@ -10,7 +10,7 @@ interface LayoutProps {
 
 const Layout = ({ children, title }: LayoutProps) => {
   return (
-    <div className="flex min-h-screen bg-slate-100 w-full">
+    <div className="flex min-h-screen bg-slate-50 w-full">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header title={title} />
