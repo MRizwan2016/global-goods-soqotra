@@ -25,14 +25,14 @@ const Landing = () => {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-between bg-white text-center">
+    <div className="min-h-screen flex flex-col items-center justify-between bg-gray-50 text-center">
       {/* Logo section */}
-      <div className="w-full pt-10">
+      <div className="w-full pt-10 animate-fade-in">
         <div className="flex justify-center mb-4">
           <img 
             src="/lovable-uploads/d86705a4-9b48-4585-b270-34e46b0d2159.png" 
             alt="SOQOTRA LOGISTICS" 
-            className="h-24 w-auto"
+            className="h-24 w-auto hover-scale"
           />
         </div>
       </div>
@@ -40,7 +40,7 @@ const Landing = () => {
       {/* Main Content Section */}
       <div className={`transform transition-all duration-1000 flex flex-col items-center ${loaded ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
         {/* Dashboard Preview Image */}
-        <div className="mb-8">
+        <div className="mb-8 hover-scale float-animation">
           <img 
             src="/lovable-uploads/10c60ae9-cab7-47d0-bc0e-cf57d5845442.png" 
             alt="SOQOTRA Dashboard" 
@@ -49,12 +49,12 @@ const Landing = () => {
         </div>
         
         {/* Company Title */}
-        <h1 className="text-4xl md:text-6xl font-bold text-[#3366FF] mb-4 animate-fade-in">
+        <h1 className="text-4xl md:text-6xl font-bold text-[#3366FF] mb-4 animate-fade-in uppercase">
           SOQOTRA LOGISTICS
         </h1>
         
         {/* Company Subtitle */}
-        <h2 className="text-xl md:text-2xl font-medium text-gray-600 mb-8 animate-fade-in">
+        <h2 className="text-xl md:text-2xl font-medium text-gray-600 mb-8 animate-fade-in uppercase">
           SERVICES, TRANSPORTATION & TRADING WLL
         </h2>
         
@@ -62,17 +62,17 @@ const Landing = () => {
         <Link to="/login" className="hover-scale">
           <Button 
             size="lg" 
-            className="bg-[#3366FF] hover:bg-blue-600 text-white py-6 px-8 text-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105"
+            className="bg-[#3366FF] hover:bg-blue-600 text-white py-6 px-8 text-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 pulse-animation uppercase"
           >
             <LogIn size={24} />
-            <span>Login to System</span>
+            <span>LOGIN TO SYSTEM</span>
           </Button>
         </Link>
       </div>
 
       {/* Footer */}
-      <footer className="p-6 text-gray-600 w-full">
-        <p>© {new Date().getFullYear()} SOQOTRA LOGISTICS SERVICES. All Rights Reserved.</p>
+      <footer className="p-6 text-gray-600 w-full uppercase">
+        <p>© {new Date().getFullYear()} SOQOTRA LOGISTICS SERVICES. ALL RIGHTS RESERVED.</p>
       </footer>
     </div>
   );

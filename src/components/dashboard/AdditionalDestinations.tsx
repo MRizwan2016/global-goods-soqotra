@@ -4,54 +4,54 @@ import { ArrowRight, Flag } from "lucide-react";
 
 const AdditionalDestinations = () => {
   return (
-    <div className="mb-8">
-      <h2 className="text-xl font-semibold text-gray-700 mb-4">Additional Destinations</h2>
+    <div className="mb-8 animate-fade-in">
+      <h2 className="text-xl font-semibold text-gray-700 mb-4 uppercase">ADDITIONAL DESTINATIONS</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="destination-card">
+        <div className="destination-card hover-scale">
           <h2>
             <span className="flag-icon flag-philippines">
-              <Flag size={14} />
+              <Flag size={16} />
             </span>
-            Philippines
+            PHILIPPINES
           </h2>
           <Link 
             to="/destinations/philippines" 
             className="destination-card-link"
           >
-            View Details 
-            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+            VIEW DETAILS 
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
         
-        <div className="destination-card">
+        <div className="destination-card hover-scale">
           <h2>
             <span className="flag-icon flag-srilanka">
-              <Flag size={14} />
+              <Flag size={16} />
             </span>
-            Sri Lanka
+            SRI LANKA
           </h2>
           <Link 
             to="/destinations/sri-lanka" 
             className="destination-card-link"
           >
-            View Details 
-            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+            VIEW DETAILS 
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
         
-        <div className="destination-card">
+        <div className="destination-card hover-scale">
           <h2>
             <span className="flag-icon flag-somalia">
-              <Flag size={14} />
+              <Flag size={16} />
             </span>
-            Somalia
+            SOMALIA
           </h2>
           <Link 
             to="/destinations/somalia" 
             className="destination-card-link"
           >
-            View Details 
-            <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+            VIEW DETAILS 
+            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
       </div>

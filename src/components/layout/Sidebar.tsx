@@ -8,16 +8,16 @@ const SidebarWrapper = () => {
   return (
     <div className="w-72 min-h-screen bg-white border-r border-gray-200 shadow-sm flex-shrink-0">
       <div className="flex flex-col h-full">
-        <div className="p-6 border-b border-gray-200 flex flex-col items-center">
+        <div className="p-6 border-b border-gray-200 flex flex-col items-center bg-gray-50">
           <img 
             src="/lovable-uploads/d86705a4-9b48-4585-b270-34e46b0d2159.png" 
             alt="Soqotra Logo" 
-            className="h-16 w-auto mb-4"
+            className="h-16 w-auto mb-4 animate-fade-in hover-scale"
           />
           
           <div className="text-center">
-            <p className="font-semibold text-sm text-gray-800 leading-tight">SOQOTRA LOGISTICS SERVICES,</p>
-            <p className="font-semibold text-sm text-gray-800 leading-tight">TRANSPORTATION & TRADING WLL</p>
+            <p className="font-semibold text-sm text-gray-800 leading-tight uppercase">SOQOTRA LOGISTICS SERVICES,</p>
+            <p className="font-semibold text-sm text-gray-800 leading-tight uppercase">TRANSPORTATION & TRADING WLL</p>
           </div>
         </div>
         

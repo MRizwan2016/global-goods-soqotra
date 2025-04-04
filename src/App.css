@@ -3,6 +3,7 @@
 
 body {
   font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  text-transform: uppercase;
 }
 
 .landing-page {
@@ -11,6 +12,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  background-color: #f9fafc;
 }
 
 /* Button Animations */
@@ -33,6 +35,7 @@ body {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+  border-left: 4px solid transparent;
 }
 
 .destination-card:hover {
@@ -41,23 +44,24 @@ body {
 }
 
 .destination-card h2 {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   margin: 0;
   display: flex;
   align-items: center;
   gap: 10px;
+  text-transform: uppercase;
 }
 
 .destination-card .flag-icon {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 .destination-card-link {
@@ -65,9 +69,11 @@ body {
   align-items: center;
   gap: 6px;
   font-size: 14px;
+  font-weight: 500;
   color: #3366FF;
   text-decoration: none;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
 }
 
 .destination-card-link:hover {
@@ -75,40 +81,59 @@ body {
   transform: translateX(2px);
 }
 
-/* Country-specific flag colors */
+/* Country-specific flag colors with improved design */
 .flag-kenya {
   background: linear-gradient(135deg, #000000, #006600, #FF0000);
+  border: 1px solid rgba(255,255,255,0.3);
 }
 
 .flag-tunisia {
   background-color: #E70013;
+  border: 1px solid rgba(255,255,255,0.3);
 }
 
 .flag-uganda {
   background: linear-gradient(180deg, #000000 33%, #FFFF00 33%, #FFFF00 66%, #FF0000 66%);
+  border: 1px solid rgba(255,255,255,0.3);
 }
 
 .flag-philippines {
   background: linear-gradient(135deg, #0038A8 50%, #CE1126 50%);
+  border: 1px solid rgba(255,255,255,0.3);
 }
 
 .flag-srilanka {
-  background: linear-gradient(to bottom,
-    #FFC100 20%,
-    #FFC100 20%,
-    #FF9B00 20%,
-    #FF9B00 40%,
-    #8D153A 40%,
-    #8D153A 60%,
-    #FF9B00 60%,
-    #FF9B00 80%,
-    #FFC100 80%,
-    #FFC100 100%
-  );
+  background-color: #8D153A;
+  border: 2px solid #FFC100;
+  position: relative;
+}
+
+.flag-srilanka::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: #FF9B00;
+  right: 5px;
+  border-radius: 50%;
 }
 
 .flag-somalia {
   background-color: #4189DD;
+  border: 1px solid rgba(255,255,255,0.3);
+  position: relative;
+}
+
+.flag-somalia::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background-color: white;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
 }
 
 /* Animation classes */
@@ -122,12 +147,32 @@ body {
   to { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(51, 102, 255, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(51, 102, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(51, 102, 255, 0); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+  100% { transform: translateY(0px); }
+}
+
 .animate-fade-in {
   animation: fadeIn 0.7s ease-out forwards;
 }
 
 .slide-in {
   animation: slideIn 0.5s ease-out forwards;
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+.float-animation {
+  animation: float 3s ease-in-out infinite;
 }
 
 /* Print styles for vessel manifest */
@@ -141,6 +186,7 @@ body {
   font-size: 24px;
   margin-bottom: 10px;
   text-align: center;
+  text-transform: uppercase;
 }
 
 .vessel-details {
@@ -183,6 +229,7 @@ body {
 
 .cargo-table th {
   background-color: #f2f2f2;
+  text-transform: uppercase;
 }
 
 .cargo-table tfoot {
