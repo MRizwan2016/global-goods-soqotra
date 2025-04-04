@@ -30,9 +30,14 @@ const PrintVesselManifest: React.FC<PrintVesselManifestProps> = ({
   totalPackages: providedTotalPackages
 }) => {
   // Calculate totals if not provided
-  const totalWeight = providedTotalWeight ?? containerData.reduce((sum, container) => sum + (Number(container.weight) || 0), 0);
-  const totalVolume = providedTotalVolume ?? containerData.reduce((sum, container) => sum + (Number(container.volume) || 0), 0);
-  const totalPackages = providedTotalPackages ?? containerData.reduce((sum, container) => sum + (Number(container.packages) || 0), 0);
+  const totalWeight = providedTotalWeight !== undefined ? providedTotalWeight : 
+    containerData.reduce((sum, container) => sum + (Number(container.weight) || 0), 0);
+    
+  const totalVolume = providedTotalVolume !== undefined ? providedTotalVolume : 
+    containerData.reduce((sum, container) => sum + (Number(container.volume) || 0), 0);
+    
+  const totalPackages = providedTotalPackages !== undefined ? providedTotalPackages : 
+    containerData.reduce((sum, container) => sum + (Number(container.packages) || 0), 0);
 
   return (
     <div className={`print-container ${orientation === "landscape" ? "landscape" : ""}`}>

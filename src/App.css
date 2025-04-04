@@ -12,3 +12,154 @@ body {
   align-items: center;
   justify-content: space-between;
 }
+
+/* Destination Cards Styling */
+.destination-card {
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.destination-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.destination-card h2 {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.destination-card .flag-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.destination-card-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.destination-card-link:hover {
+  color: #3366FF;
+}
+
+/* Country-specific flag colors */
+.flag-kenya {
+  background: linear-gradient(135deg, #000000, #006600, #FF0000);
+}
+
+.flag-tunisia {
+  background-color: #E70013;
+}
+
+.flag-uganda {
+  background: linear-gradient(180deg, #000000 33%, #FFFF00 33%, #FFFF00 66%, #FF0000 66%);
+}
+
+.flag-philippines {
+  background: linear-gradient(135deg, #0038A8 50%, #CE1126 50%);
+}
+
+.flag-srilanka {
+  background: #8D153A;
+}
+
+.flag-somalia {
+  background-color: #4189DD;
+}
+
+/* Print styles for vessel manifest */
+.print-container {
+  max-width: 100%;
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+}
+
+.vessel-manifest-header h1 {
+  font-size: 24px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.vessel-details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.vessel-summary {
+  margin-bottom: 20px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+.summary-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cargo-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.cargo-table th, 
+.cargo-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.cargo-table th {
+  background-color: #f2f2f2;
+}
+
+.cargo-table tfoot {
+  font-weight: bold;
+}
+
+.vessel-manifest-footer {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+}
+
+.landscape {
+  width: 100%;
+}
+
+@media print {
+  .page-break-inside-avoid {
+    page-break-inside: avoid;
+  }
+}

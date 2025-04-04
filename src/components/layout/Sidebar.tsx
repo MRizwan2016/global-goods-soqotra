@@ -10,7 +10,7 @@ const SidebarWrapper = () => {
       <div className="flex flex-col h-full">
         <div className="p-6 border-b border-gray-200 flex flex-col items-center">
           <img 
-            src="/lovable-uploads/056bd63a-3806-4e08-9360-0e3edff62199.png" 
+            src="/lovable-uploads/d86705a4-9b48-4585-b270-34e46b0d2159.png" 
             alt="Soqotra Logo" 
             className="h-16 w-auto mb-4"
           />
