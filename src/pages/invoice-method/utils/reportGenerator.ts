@@ -133,7 +133,7 @@ const createSummaryReport = (invoices: Invoice[]) => {
   const weeklyData = generateWeeklyData(invoices);
   const monthlyData = generateMonthlyData(invoices);
   
-  // Create summary data
+  // Create summary data - fixed type errors by ensuring amounts are numbers
   const summaryData = [
     { Category: 'PAID INVOICES', Count: totals.paidCount, Amount: totals.totalPaidAmount.toFixed(2) },
     { Category: 'UNPAID INVOICES', Count: totals.unpaidCount, Amount: totals.totalUnpaidAmount.toFixed(2) },
@@ -144,8 +144,15 @@ const createSummaryReport = (invoices: Invoice[]) => {
     { Category: 'MONTHLY COLLECTION', Count: monthlyData.count, Amount: monthlyData.total.toFixed(2) },
   ];
 
+  // Create type-safe data for the worksheet
+  const typeSafeSummaryData = summaryData.map(item => ({
+    Category: item.Category,
+    Count: item.Count === '-' ? 0 : item.Count, // Convert string '-' to 0 for Count
+    Amount: parseFloat(item.Amount)             // Convert string to number for Amount
+  }));
+
   const headers = ['Category', 'Count', 'Amount'];
-  const worksheet = generateExcelWorksheet(summaryData, headers);
+  const worksheet = generateExcelWorksheet(typeSafeSummaryData, headers);
   
   // Create workbook and add worksheet
   const workbook = XLSX.utils.book_new();
@@ -169,14 +176,14 @@ const createWeeklyReport = (invoices: Invoice[]) => {
     'Payment Method': invoice.paymentMethod || 'N/A'
   }));
   
-  // Add summary row at the bottom
+  // Add summary row at the bottom with type safety
   reportData.push({
     'SL.No.': '',
     'Invoice Number': '',
     'Customer': '',
     'Date': '',
     'Payment Date': 'TOTAL',
-    'Amount': weeklyData.total.toFixed(2),
+    'Amount': parseFloat(weeklyData.total.toFixed(2)),  // Convert to number
     'Payment Method': ''
   });
   
@@ -205,14 +212,14 @@ const createMonthlyReport = (invoices: Invoice[]) => {
     'Payment Method': invoice.paymentMethod || 'N/A'
   }));
   
-  // Add summary row at the bottom
+  // Add summary row at the bottom with type safety
   reportData.push({
     'SL.No.': '',
     'Invoice Number': '',
     'Customer': '',
     'Date': '',
     'Payment Date': 'TOTAL',
-    'Amount': monthlyData.total.toFixed(2),
+    'Amount': parseFloat(monthlyData.total.toFixed(2)),  // Convert to number
     'Payment Method': ''
   });
   
