@@ -35,14 +35,18 @@ const CargoFormFields: React.FC<CargoFormProps> = ({
 }) => {
   // Handle switch change separately from regular input changes
   const handleSwitchChange = (checked: boolean) => {
-    handleChange({
+    // Create a proper partial event with just the properties we need
+    // Cast to 'unknown' first and then to the desired type as suggested by TS error
+    const syntheticEvent = {
       target: {
         name: "d2d",
         value: checked,
         type: "checkbox",
         checked,
       },
-    } as React.ChangeEvent<HTMLInputElement>);
+    } as unknown as React.ChangeEvent<HTMLInputElement>;
+    
+    handleChange(syntheticEvent);
   };
 
   return (
