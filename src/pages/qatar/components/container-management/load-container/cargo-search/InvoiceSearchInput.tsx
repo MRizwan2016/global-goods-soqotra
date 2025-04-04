@@ -12,8 +12,8 @@ interface InvoiceData {
   consignee: string;
   consignee1?: string;
   warehouse?: string;
-  volume?: number;
-  weight?: number;
+  volume?: number | string;
+  weight?: number | string;
   packageName?: string;
   packages?: number;
   d2d?: boolean;
@@ -99,6 +99,27 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
     };
   }, [setShowSuggestions]);
 
+  // Format numeric values to ensure they display properly
+  const formatValue = (value: number | string | undefined): string => {
+    if (value === undefined || value === null) return "0.00";
+    
+    // If it's already a string but might be a number
+    if (typeof value === 'string') {
+      const numVal = parseFloat(value);
+      if (!isNaN(numVal)) {
+        return numVal.toFixed(2);
+      }
+      return value || "0.00";
+    }
+    
+    // If it's a number
+    if (typeof value === 'number') {
+      return value.toFixed(2);
+    }
+    
+    return "0.00";
+  };
+
   return (
     <div className="relative">
       <Label className="font-bold text-gray-700 mb-1 block">GY/INVOICE NUMBER:</Label>
@@ -139,7 +160,7 @@ const InvoiceSearchInput: React.FC<InvoiceSearchInputProps> = ({
               </div>
               {invoice.packages && (
                 <div className="text-xs text-gray-500">
-                  Pkgs: {invoice.packages} | Vol: {invoice.volume?.toFixed(2) || 0} m³ | Weight: {invoice.weight?.toFixed(2) || 0} kg
+                  Pkgs: {invoice.packages} | Vol: {formatValue(invoice.volume)} m³ | Weight: {formatValue(invoice.weight)} kg
                 </div>
               )}
             </div>
