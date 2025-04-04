@@ -6,20 +6,21 @@ import UserProfileSection from "./UserProfileSection";
 
 const SidebarWrapper = () => {
   return (
-    <div className="w-72 min-h-screen bg-gradient-to-b from-blue-50 to-gray-100 border-r border-gray-200 shadow-sm flex-shrink-0 animate-fade-in">
+    <div className="w-60 min-h-screen bg-white border-r border-gray-200 shadow-sm flex-shrink-0">
       <div className="flex flex-col h-full">
-        <div className="p-6 border-b border-gray-200 flex flex-col items-center bg-gradient-to-r from-blue-50 to-green-50">
-          <div className="hover-scale pulse-animation mb-3">
+        {/* Logo and Company Name Section */}
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex flex-col items-center mb-2">
             <img 
-              src="/lovable-uploads/b4cd42be-7824-4f8b-a647-00c816cc0045.png" 
+              src="/lovable-uploads/f541593c-cc76-4b55-83f6-856ef6f9338b.png" 
               alt="SOQOTRA LOGO" 
-              className="h-16 w-auto"
+              className="h-auto w-full mb-2"
             />
           </div>
           
           <div className="text-center">
-            <p className="font-semibold text-sm text-gray-800 leading-tight uppercase">SOQOTRA LOGISTICS SERVICES,</p>
-            <p className="font-semibold text-sm text-gray-800 leading-tight uppercase">TRANSPORTATION & TRADING WLL</p>
+            <p className="font-semibold text-xs text-gray-800 leading-tight">SOQOTRA LOGISTICS SERVICES,</p>
+            <p className="font-semibold text-xs text-gray-800 leading-tight">TRANSPORTATION & TRADING WLL</p>
           </div>
         </div>
         

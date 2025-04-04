@@ -2,8 +2,15 @@
 import { format, startOfWeek, endOfWeek, startOfMonth, endOfMonth, isSameWeek, isSameMonth } from 'date-fns';
 import { Invoice } from "../../components/status-tabs/Invoice";
 
+export interface DateReportData {
+  period: string;
+  invoices: Invoice[];
+  total: number;
+  count: number;
+}
+
 // Generate weekly report data
-export const generateWeeklyData = (invoices: Invoice[]) => {
+export const generateWeeklyData = (invoices: Invoice[]): DateReportData => {
   const now = new Date();
   const startDate = startOfWeek(now);
   const endDate = endOfWeek(now);
@@ -26,7 +33,7 @@ export const generateWeeklyData = (invoices: Invoice[]) => {
 };
 
 // Generate monthly report data
-export const generateMonthlyData = (invoices: Invoice[]) => {
+export const generateMonthlyData = (invoices: Invoice[]): DateReportData => {
   const now = new Date();
   const startDate = startOfMonth(now);
   const endDate = endOfMonth(now);

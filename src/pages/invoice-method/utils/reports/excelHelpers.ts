@@ -7,10 +7,28 @@ export const generateExcelWorksheet = (data: any[], headers: string[]) => {
   
   // Add header styling and column widths
   const range = XLSX.utils.decode_range(worksheet['!ref'] || 'A1');
-  const headerRange = {
-    s: { r: 0, c: 0 },
-    e: { r: 0, c: range.e.c }
-  };
+  
+  // Create column width configuration
+  const columnWidths = headers.map((header) => ({
+    wch: Math.max(header.length, 10)
+  }));
+  
+  worksheet['!cols'] = columnWidths;
+  
+  return worksheet;
+};
+
+// Add header row with styling to a worksheet
+export const addStyledHeader = (worksheet: XLSX.WorkSheet, headers: string[]) => {
+  // Create header cells with styling
+  headers.forEach((header, idx) => {
+    const cell = XLSX.utils.encode_cell({ r: 0, c: idx });
+    if (!worksheet[cell]) worksheet[cell] = { v: header };
+    worksheet[cell].s = {
+      font: { bold: true },
+      fill: { fgColor: { rgb: "CCCCCC" } }
+    };
+  });
   
   return worksheet;
 };
