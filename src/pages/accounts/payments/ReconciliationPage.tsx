@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { COUNTRY_CURRENCY_MAP, DEFAULT_COUNTRY } from "../payment/constants/paymentConstants";
+import DigitalCalculator from "@/components/calculator/DigitalCalculator";
 
 interface Payment {
   id: string;
@@ -48,20 +49,14 @@ const ReconciliationPage = () => {
   const [searchParams] = useSearchParams();
   const invoiceFilter = searchParams.get('invoice');
   
-  // Set active tab based on reconciliation status
   const [activeTab, setActiveTab] = useState<string>("unreconciled");
-  
-  // Add country filter
   const [countryFilter, setCountryFilter] = useState<string>("all");
   
-  // Get all available countries
   const countries = Object.keys(COUNTRY_CURRENCY_MAP);
   
-  // Count for each category
   const unreconciledCount = payments.filter(p => !p.reconciled).length;
   const reconciledCount = payments.filter(p => p.reconciled).length;
   
-  // Count by country
   const paymentsByCountry = countries.reduce((acc, country) => {
     acc[country] = payments.filter(p => p.country === country).length;
     return acc;
@@ -72,7 +67,6 @@ const ReconciliationPage = () => {
   }, []);
   
   useEffect(() => {
-    // Filter payments based on search term, tab, and country
     filterPayments();
   }, [searchTerm, payments, activeTab, invoiceFilter, countryFilter]);
   
@@ -81,7 +75,6 @@ const ReconciliationPage = () => {
       const paymentsStr = localStorage.getItem('payments');
       if (paymentsStr) {
         const loadedPayments = JSON.parse(paymentsStr);
-        // Make sure all payments have a country property
         const updatedPayments = loadedPayments.map((payment: any) => ({
           ...payment,
           country: payment.country || DEFAULT_COUNTRY,
@@ -89,7 +82,6 @@ const ReconciliationPage = () => {
         }));
         setPayments(updatedPayments);
         
-        // If there's an invoice filter in the URL, switch to showing all payments
         if (invoiceFilter) {
           setActiveTab("all");
         }
@@ -103,19 +95,16 @@ const ReconciliationPage = () => {
   const filterPayments = () => {
     let filtered = [...payments];
     
-    // First apply tab filter
     if (activeTab === "unreconciled") {
       filtered = filtered.filter(payment => !payment.reconciled);
     } else if (activeTab === "reconciled") {
       filtered = filtered.filter(payment => payment.reconciled);
     }
     
-    // Apply country filter
     if (countryFilter !== "all") {
       filtered = filtered.filter(payment => payment.country === countryFilter);
     }
     
-    // Then apply search term filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(payment => 
@@ -125,14 +114,12 @@ const ReconciliationPage = () => {
       );
     }
     
-    // Then apply invoice filter from URL if present
     if (invoiceFilter) {
       filtered = filtered.filter(payment => 
         payment.invoiceNumber === invoiceFilter
       );
     }
     
-    // Sort by timestamp descending (newest first)
     filtered.sort((a, b) => 
       new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
     );
@@ -156,10 +143,8 @@ const ReconciliationPage = () => {
   
   const handleSelectAll = () => {
     if (selectedPayments.length === filteredPayments.length) {
-      // If all are selected, unselect all
       setSelectedPayments([]);
     } else {
-      // Otherwise, select all
       setSelectedPayments(filteredPayments.map(p => p.id));
     }
   };
@@ -172,7 +157,6 @@ const ReconciliationPage = () => {
       return;
     }
     
-    // Update payments with reconciled info
     const updatedPayments = payments.map(payment => {
       if (selectedPayments.includes(payment.id)) {
         return {
@@ -185,19 +169,15 @@ const ReconciliationPage = () => {
       return payment;
     });
     
-    // Save back to localStorage
     localStorage.setItem('payments', JSON.stringify(updatedPayments));
     
-    // Update state
     setPayments(updatedPayments);
     setSelectedPayments([]);
     
-    // Show success message
     toast.success("Payments Reconciled", {
       description: `${selectedPayments.length} payment(s) have been marked as reconciled`
     });
     
-    // Refresh to update the UI
     filterPayments();
   };
   
@@ -209,12 +189,10 @@ const ReconciliationPage = () => {
       return;
     }
     
-    // In a real app, you would generate a printable report here
     toast.info("Printing Payments", {
       description: `Preparing ${selectedPayments.length} payment(s) for printing`
     });
     
-    // For demo purposes, just show what would be printed
     const selectedPaymentData = payments.filter(p => selectedPayments.includes(p.id));
     console.log("Printing payments:", selectedPaymentData);
   };
@@ -244,7 +222,6 @@ const ReconciliationPage = () => {
         </CardHeader>
         
         <CardContent className="pt-6">
-          {/* Header Controls */}
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div className="flex items-center w-full md:w-auto relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -257,7 +234,6 @@ const ReconciliationPage = () => {
             </div>
             
             <div className="flex flex-wrap gap-2 w-full md:w-auto justify-end">
-              {/* Country filter */}
               <div className="flex items-center gap-2 min-w-[180px]">
                 <Globe className="h-4 w-4 text-gray-500" />
                 <Select value={countryFilter} onValueChange={handleCountryFilterChange}>
@@ -297,7 +273,6 @@ const ReconciliationPage = () => {
             </div>
           </div>
           
-          {/* Tabs */}
           <Tabs defaultValue={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid grid-cols-3 mb-6">
               <TabsTrigger value="unreconciled" className="flex items-center gap-2">
@@ -325,7 +300,6 @@ const ReconciliationPage = () => {
               </TabsTrigger>
             </TabsList>
             
-            {/* Common table content for all tabs */}
             <TabsContent value="unreconciled">
               {renderPaymentsTable(filteredPayments, "No unreconciled payments found")}
             </TabsContent>
@@ -341,7 +315,6 @@ const ReconciliationPage = () => {
         </CardContent>
       </Card>
       
-      {/* Country Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
         {countries.map(country => {
           const countryCount = payments.filter(p => p.country === country).length;
@@ -377,7 +350,6 @@ const ReconciliationPage = () => {
         })}
       </div>
       
-      {/* Reconciliation Reminder */}
       {unreconciledCount >= 10 && (
         <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
           <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
@@ -390,13 +362,11 @@ const ReconciliationPage = () => {
           </div>
         </div>
       )}
-
-      {/* Add Digital Calculator */}
+      
       <DigitalCalculator />
     </Layout>
   );
   
-  // Helper function to render the payments table
   function renderPaymentsTable(payments: Payment[], emptyMessage: string) {
     if (payments.length === 0) {
       return (
