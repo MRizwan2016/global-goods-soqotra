@@ -2,7 +2,7 @@
 export const formatCurrency = (amount: number | string, currency: string = "QAR"): string => {
   // Handle the case when amount is undefined or null
   if (amount === undefined || amount === null) {
-    return `${currency} 0.00`;
+    return `QR 0.00`;
   }
   
   let numAmount: number;
@@ -16,7 +16,7 @@ export const formatCurrency = (amount: number | string, currency: string = "QAR"
   
   // Check if it's a valid number
   if (isNaN(numAmount)) {
-    return `${currency} 0.00`;
+    return `QR 0.00`;
   }
   
   // Get currency symbol based on currency code
@@ -37,5 +37,5 @@ export const getCurrencySymbol = (currencyCode: string): string => {
     "LKR": "Rs"
   };
   
-  return symbols[currencyCode] || currencyCode;
+  return symbols[currencyCode] || "QR"; // Default to QR if currency not found
 };

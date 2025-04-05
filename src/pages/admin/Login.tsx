@@ -5,11 +5,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/hooks/use-auth";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Form, FormField, FormItem, FormControl } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, LogIn } from "lucide-react";
+import { Eye, EyeOff, User, Lock } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -24,9 +23,10 @@ const Login = () => {
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Get the redirect path from the location state, or default to admin panel
-  const from = location.state?.from?.pathname || "/admin/control-panel";
+  const from = location.state?.from?.pathname || "/dashboard";
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -44,83 +44,129 @@ const Login = () => {
   });
 
   const onSubmit = async (values: LoginValues) => {
+    setError(null);
     setIsLoading(true);
     try {
       const success = await login(values.email, values.password);
       if (success) {
         // Navigate to the redirect path or default
         navigate(from, { replace: true });
+      } else {
+        setError("Invalid email or password. Please try again.");
       }
+    } catch (err) {
+      setError("An error occurred during login. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
-          <CardDescription className="text-center">
-            Enter your credentials to access your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="min-h-screen flex flex-col">
+      {/* Header with logo and company name */}
+      <div className="bg-[#1976d2] text-white py-8 text-center">
+        <div className="container mx-auto px-4">
+          <img 
+            src="/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png"
+            alt="Soqotra Logo" 
+            className="h-20 mx-auto mb-4 bg-white p-2 rounded"
+          />
+          <h1 className="text-3xl font-bold mb-1">SOQOTRA LOGISTICS SERVICES</h1>
+          <p className="text-xl">TRANSPORTATION & TRADING WLL.</p>
+        </div>
+      </div>
+      
+      {/* Login form */}
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="w-full max-w-md">
+          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Login to Your Account</h2>
+          
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
+              {error}
+            </div>
+          )}
+          
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="email@example.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          placeholder="******"
-                          {...field}
-                        />
-                        <button
-                          type="button"
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
-                          onClick={() => setShowPassword(!showPassword)}
-                        >
-                          {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                        </button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing In..." : "Sign In"}
-                <LogIn className="ml-2 h-4 w-4" />
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-gray-700 block mb-1">Username</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-500">
+                    <User size={20} />
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input 
+                            id="email"
+                            placeholder="Enter your email" 
+                            className="pl-10 py-6" 
+                            {...field} 
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-gray-700 block mb-1">Password</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-500">
+                    <Lock size={20} />
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <div className="relative">
+                            <Input
+                              id="password"
+                              type={showPassword ? "text" : "password"}
+                              placeholder="Enter your password"
+                              className="pl-10 py-6"
+                              {...field}
+                            />
+                            <button
+                              type="button"
+                              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500"
+                              onClick={() => setShowPassword(!showPassword)}
+                              tabIndex={-1}
+                            >
+                              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                            </button>
+                          </div>
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              
+              <Button 
+                type="submit" 
+                className="w-full py-6 bg-[#1976d2] hover:bg-blue-600 text-white text-lg font-medium"
+                disabled={isLoading}
+              >
+                {isLoading ? "LOGGING IN..." : "LOGIN"}
               </Button>
+              
+              <div className="text-center pt-2">
+                <Link to="/admin/forgot-password" className="text-blue-500 hover:underline">
+                  Forgot Password?
+                </Link>
+              </div>
             </form>
           </Form>
-        </CardContent>
-        <CardFooter className="flex justify-center gap-1 text-sm">
-          <span>Don't have an account?</span>
-          <Link to="/admin/register" className="text-blue-600 hover:underline">
-            Register now
-          </Link>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };

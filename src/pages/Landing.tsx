@@ -8,9 +8,13 @@ const Landing = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Redirect to dashboard
-    navigate("/dashboard");
-  }, [navigate]);
+    // If authenticated, redirect to dashboard, otherwise to login
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    } else {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
 
   return null; // No UI rendering, just redirect
 };
