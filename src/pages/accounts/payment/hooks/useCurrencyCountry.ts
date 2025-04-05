@@ -6,9 +6,10 @@ import { COUNTRY_CURRENCY_MAP, CURRENCY_SYMBOLS, DEFAULT_COUNTRY, DEFAULT_CURREN
  * Hook for managing country and currency selection
  */
 export const useCurrencyCountry = () => {
-  const [selectedCountry, setSelectedCountry] = useState<string>(DEFAULT_COUNTRY);
-  const [filteredCurrencies, setFilteredCurrencies] = useState<string[]>([DEFAULT_CURRENCY]);
-  const [currencySymbol, setCurrencySymbol] = useState<string>(CURRENCY_SYMBOLS[DEFAULT_CURRENCY] || "QR");
+  // Use Qatar and QAR as defaults
+  const [selectedCountry, setSelectedCountry] = useState<string>("Qatar");
+  const [filteredCurrencies, setFilteredCurrencies] = useState<string[]>(["QAR"]);
+  const [currencySymbol, setCurrencySymbol] = useState<string>("QR");
   
   // All country options from the map
   const countryOptions = Object.keys(COUNTRY_CURRENCY_MAP);
@@ -16,7 +17,7 @@ export const useCurrencyCountry = () => {
   useEffect(() => {
     // Get currencies for the selected country
     if (selectedCountry) {
-      setFilteredCurrencies(COUNTRY_CURRENCY_MAP[selectedCountry] || [DEFAULT_CURRENCY]);
+      setFilteredCurrencies(COUNTRY_CURRENCY_MAP[selectedCountry] || ["QAR"]);
     }
   }, [selectedCountry]);
   
