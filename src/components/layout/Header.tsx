@@ -1,42 +1,46 @@
 
-import { Search } from "lucide-react";
-import { useState } from "react";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { LogIn, LogOut } from "lucide-react";
 
-interface HeaderProps {
-  title: string;
-}
+const Header = ({ title }: { title: string }) => {
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
-const Header = ({ title }: HeaderProps) => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const { currentUser } = useAuth();
-  const username = currentUser?.fullName || "Guest";
-  const initial = username.charAt(0).toUpperCase();
+  const handleLogout = () => {
+    logout();
+    navigate("/admin/login");
+  };
+
+  const handleLogin = () => {
+    navigate("/admin/login");
+  };
 
   return (
-    <header className="bg-white border-b border-gray-200 py-4 px-6 shadow-sm">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-gray-800 uppercase">{title}</h1>
-        
-        <div className="flex items-center gap-4">
-          <div className="relative">
-            <input
-              type="text"
-              placeholder="SEARCH..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
-            />
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <div className="bg-green-600 text-white rounded-full p-2 w-8 h-8 flex items-center justify-center">
-              {initial}
-            </div>
-            <span className="text-gray-600 font-medium uppercase">{username}</span>
-          </div>
-        </div>
+    <header className="bg-white border-b border-b-[#e6e6e6] py-4 px-4 flex items-center justify-between">
+      <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
+      <div className="flex items-center gap-2">
+        {isAuthenticated ? (
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2 border-red-200 hover:bg-red-50 hover:text-red-600 hover:border-red-300"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Button>
+        ) : (
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2 border-blue-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
+            onClick={handleLogin}
+          >
+            <LogIn className="h-4 w-4" />
+            Login
+          </Button>
+        )}
       </div>
     </header>
   );

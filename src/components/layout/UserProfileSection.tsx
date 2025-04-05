@@ -1,16 +1,21 @@
 
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { LogOut } from "lucide-react";
+import { LogIn, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 
 const UserProfileSection = () => {
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, isAuthenticated } = useAuth();
 
   const handleLogout = () => {
     logout();
+    navigate("/admin/login");
+  };
+
+  const handleLogin = () => {
     navigate("/admin/login");
   };
 
@@ -28,22 +33,24 @@ const UserProfileSection = () => {
             </div>
           </div>
           <Separator />
-          <button
+          <Button
+            variant="ghost"
             onClick={handleLogout}
-            className="flex items-center text-sm text-gray-600 hover:text-rose-600 transition-colors duration-300 hover-scale group"
+            className="flex items-center justify-start text-sm text-gray-600 hover:text-rose-600 transition-colors duration-300 p-0 m-0 h-auto"
           >
-            <LogOut className="mr-2 h-4 w-4 group-hover:rotate-[-15deg] transition-transform duration-300" />
+            <LogOut className="mr-2 h-4 w-4" />
             Log out
-          </button>
+          </Button>
         </div>
       ) : (
-        <button
-          onClick={() => navigate("/admin/login")}
-          className="flex items-center text-sm text-gray-600 hover:text-green-600 transition-colors duration-300 hover-scale group"
+        <Button
+          variant="ghost"
+          onClick={handleLogin}
+          className="flex items-center justify-start text-sm text-gray-600 hover:text-green-600 transition-colors duration-300 p-0 m-0 h-auto w-full"
         >
-          <LogOut className="mr-2 h-4 w-4 group-hover:rotate-[-15deg] transition-transform duration-300" />
+          <LogIn className="mr-2 h-4 w-4" />
           Log in
-        </button>
+        </Button>
       )}
     </div>
   );
