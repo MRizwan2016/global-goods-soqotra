@@ -1,4 +1,3 @@
-
 // Warehouse options by country
 export const warehouseOptions: Record<string, string[]> = {
   "Kenya": ["Nairobi CFS", "Mombasa CFS"],
@@ -12,7 +11,7 @@ export const warehouseOptions: Record<string, string[]> = {
   "Uganda": ["Kampala Warehouse"],
   "Kuwait": ["Kuwait Warehouse"],
   "Oman": ["Muscat Warehouse", "Sohar Warehouse", "Salalah Warehouse"],
-  "Qatar": ["Doha Warehouse"],
+  "Qatar": ["Doha Warehouse", "Industrial Area Warehouse", "Al Khor Warehouse", "Al Wakra Warehouse"],
   "Tanzania": ["Dar es Salaam Warehouse"],
   "Mozambique": ["Maputo Warehouse"],
   "Somalia": ["Mogadishu Warehouse"],
@@ -87,3 +86,38 @@ export const KENYA_PRICING = {
   "Mombasa CFS": 14, // QAR per kg
   "Nairobi CFS": 15  // QAR per kg
 };
+
+// Qatar Towns list as requested
+export const qatarTowns: string[] = [
+  "Doha",
+  "Al Rayyan", 
+  "Wukair", 
+  "Wakra", 
+  "Al Khor",
+  "Al Saad",
+  "Mansoora", 
+  "Najma", 
+  "Madeena Khaleefa", 
+  "Garafa", 
+  "Bin Omran", 
+  "Bin Mahmoud", 
+  "Muaithar", 
+  "Baaya", 
+  "Ain Khalid", 
+  "Mathar Al Qadeem", 
+  "Al Hilal", 
+  "Thumama", 
+  "Al Waab", 
+  "Um Salaal Ali", 
+  "Um Salaal Mohamed", 
+  "Zobara", 
+  "Shamal", 
+  "Fereej Al Sudan", 
+  "Al Naasar Street", 
+  "West Bay", 
+  "Onaiza", 
+  "Karana", 
+  "Katara", 
+  "Industrial Area", 
+  "New Industrial Area"
+];

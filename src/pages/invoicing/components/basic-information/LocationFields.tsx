@@ -20,6 +20,12 @@ const LocationFields: React.FC<LocationFieldsProps> = ({
 }) => {
   // Get warehouse options based on selected country
   const countryWarehouses = formState.country ? warehouseOptions[formState.country] || [] : [];
+  
+  // Qatar-specific branches
+  const qatarBranches = ["HEAD OFFICE", "INDUSTRIAL AREA", "AL KHOR BRANCH", "WAKRA BRANCH"];
+  
+  // Qatar-specific districts
+  const qatarDistricts = ["DOHA", "AL RAYYAN", "AL KHOR", "AL SAAD", "WAKRA", "INDUSTRIAL AREA"];
 
   return (
     <>
@@ -36,12 +42,28 @@ const LocationFields: React.FC<LocationFieldsProps> = ({
 
       <div className="space-y-2">
         <Label>Branch</Label>
-        <Input
-          name="branch"
-          value={formState.branch}
-          onChange={handleInputChange}
-          className="w-full"
-        />
+        {formState.country === "Qatar" ? (
+          <Select 
+            onValueChange={(value) => handleSelectChange("branch", value)}
+            value={formState.branch || "HEAD OFFICE"}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select Branch" />
+            </SelectTrigger>
+            <SelectContent>
+              {qatarBranches.map((branch) => (
+                <SelectItem key={branch} value={branch}>{branch}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        ) : (
+          <Input
+            name="branch"
+            value={formState.branch}
+            onChange={handleInputChange}
+            className="w-full"
+          />
+        )}
       </div>
 
       <div className="space-y-2">

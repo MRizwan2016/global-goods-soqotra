@@ -35,6 +35,9 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
   // Get all available destinations (countries)
   const destinations = Object.keys(countrySectorMap);
   const freightOptions = ["Air", "Sea", "Both"];
+  
+  // Qatar-specific districts
+  const qatarDistricts = ["DOHA", "AL RAYYAN", "AL KHOR", "AL SAAD", "WAKRA", "INDUSTRIAL AREA"];
 
   return (
     <div className="border border-gray-200 rounded-md p-4">
@@ -72,16 +75,32 @@ const BasicInformation: React.FC<BasicInformationProps> = ({
           handleSelectChange={handleSelectChange}
         />
         
-        {/* Remove the destination field from here as it's in ShipperConsigneeDetails */}
+        {/* District field with dropdown for Qatar */}
         <div className="space-y-2">
           <label className="block text-sm font-medium">District</label>
-          <input
-            type="text"
-            name="district"
-            value={formState.district}
-            onChange={handleInputChange}
-            className="w-full border border-gray-300 rounded p-2"
-          />
+          {formState.country === "Qatar" ? (
+            <Select
+              onValueChange={(value) => handleSelectChange("district", value)}
+              value={formState.district || ""}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select District" />
+              </SelectTrigger>
+              <SelectContent>
+                {qatarDistricts.map((district) => (
+                  <SelectItem key={district} value={district}>{district}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          ) : (
+            <input
+              type="text"
+              name="district"
+              value={formState.district}
+              onChange={handleInputChange}
+              className="w-full border border-gray-300 rounded p-2"
+            />
+          )}
         </div>
         
         {/* Freight By with Sea/Air options */}

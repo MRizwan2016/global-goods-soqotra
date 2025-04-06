@@ -33,9 +33,18 @@ export const useFormHandling = (
     }
   }, [formState.country]);
   
-  // Update district based on warehouse for Kenya
+  // Update branch and district based on country
   useEffect(() => {
-    if (formState.country === "Kenya" && formState.warehouse) {
+    // Special handling for Qatar - set default branch
+    if (formState.country === "Qatar") {
+      setFormState(prev => ({
+        ...prev,
+        branch: prev.branch || "HEAD OFFICE",
+        district: prev.district || "DOHA"
+      }));
+    }
+    // Update district based on warehouse for Kenya
+    else if (formState.country === "Kenya" && formState.warehouse) {
       // Set district based on warehouse location
       const district = formState.warehouse.includes("Nairobi") ? "Nairobi" : 
                        formState.warehouse.includes("Mombasa") ? "Mombasa" : 
@@ -46,7 +55,7 @@ export const useFormHandling = (
         district: district
       }));
     }
-  }, [formState.country, formState.warehouse, formState.district]);
+  }, [formState.country, formState.warehouse]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -105,17 +114,25 @@ export const useFormHandling = (
       [name]: value
     }));
 
-    // If country changes, update the sector and warehouse only
-    // But DON'T update destination
+    // If country changes, update the sector, warehouse, and branch
     if (name === 'country') {
       const sectorForCountry = countrySectorMap[value as keyof typeof countrySectorMap];
       const countryWarehouses = warehouseOptions[value] || [];
       const defaultWarehouse = countryWarehouses.length > 0 ? countryWarehouses[0] : "";
       
+      // Set default branch for Qatar
+      const defaultBranch = value === "Qatar" ? "HEAD OFFICE" : "";
+      // Set default district for Qatar
+      const defaultDistrict = value === "Qatar" ? "DOHA" : "";
+      
       setFormState(prev => ({
         ...prev,
         sector: sectorForCountry || "",
         warehouse: defaultWarehouse,
+        // Set branch for Qatar
+        branch: defaultBranch || prev.branch,
+        // Set district for Qatar
+        district: defaultDistrict || prev.district,
         // Reset city selections when country changes
         shipperCity: ""
       }));
