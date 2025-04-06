@@ -127,11 +127,22 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
               <SelectTrigger className={`w-full ${isDuplicate ? 'border-red-500 bg-red-50' : ''}`}>
                 <SelectValue placeholder="Select invoice number" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-60">
                 {enhancedInvoices.map((invoice: any) => (
-                  <SelectItem key={invoice.invoiceNumber} value={invoice.invoiceNumber}>
-                    {invoice.invoiceNumber} (Book {invoice.bookNumber})
-                    {invoice.assignedTo && ` - ${invoice.assignedTo}`}
+                  <SelectItem 
+                    key={invoice.invoiceNumber} 
+                    value={invoice.invoiceNumber}
+                    className="flex justify-between items-center"
+                  >
+                    <div className="flex flex-col">
+                      <span>{invoice.invoiceNumber}</span>
+                      <span className="text-xs text-gray-500">Book {invoice.bookNumber}</span>
+                    </div>
+                    {invoice.assignedTo && (
+                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
+                        {invoice.assignedTo}
+                      </span>
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>

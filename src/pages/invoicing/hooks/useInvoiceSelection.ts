@@ -16,6 +16,7 @@ export const useInvoiceSelection = (
     
     // Get active invoice books from localStorage
     const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+    const allStoredBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
     
     if (activeBooks.length > 0) {
       // Use active books from localStorage
@@ -27,6 +28,18 @@ export const useInvoiceSelection = (
         }))
       );
       setAvailableInvoices(activeInvoices);
+    } else if (allStoredBooks.length > 0) {
+      // If no active books but we have stored books
+      const storedInvoices = allStoredBooks
+        .filter((book: any) => book.isActivated)
+        .flatMap((book: any) => 
+          book.availablePages.map((pageNumber: string) => ({
+            bookNumber: book.bookNumber,
+            invoiceNumber: pageNumber,
+            assignedTo: book.assignedTo || 'System User'
+          }))
+        );
+      setAvailableInvoices(storedInvoices);
     } else {
       // Fall back to mock data if no active books in localStorage
       const allInvoices = mockInvoiceBooks.flatMap(book => 

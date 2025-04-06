@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ import {
   BookingTableHead,
   BookingTableCell
 } from "@/components/ui/table";
-import { PenLine, UserCheck } from "lucide-react";
+import { PenLine, UserCheck, FileText } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
@@ -44,6 +44,8 @@ const mockUsers: User[] = [
   { id: "4", name: "Mr. Paulo Fernando" },
   { id: "5", name: "Mr. Edwin Mbuguo" },
   { id: "6", name: "Mr. Ali Hussain" },
+  { id: "7", name: "John Smith" },
+  { id: "8", name: "Mary Johnson" },
 ];
 
 // Initialize mock data with available pages
@@ -63,12 +65,53 @@ const initialBookData: InvoiceBook[] = Array.from({ length: 10 }, (_, i) => {
   };
 });
 
+// Preassign users to match the sample in the screenshot
+initialBookData[0].assignedTo = "John Smith";
+initialBookData[0].isActivated = true;
+initialBookData[1].assignedTo = "Mary Johnson";
+initialBookData[1].isActivated = true;
+
 const InvoiceBookStock = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [bookData, setBookData] = useState<InvoiceBook[]>(initialBookData);
+  const [bookData, setBookData] = useState<InvoiceBook[]>([]);
   const [isActivateDialogOpen, setIsActivateDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<InvoiceBook | null>(null);
   const [selectedUserId, setSelectedUserId] = useState("");
+  
+  // Load book data on component mount
+  useEffect(() => {
+    const savedBooks = localStorage.getItem('invoiceBooks');
+    if (savedBooks) {
+      try {
+        const parsedBooks = JSON.parse(savedBooks);
+        setBookData(parsedBooks);
+      } catch (error) {
+        console.error("Error parsing stored books:", error);
+        setBookData(initialBookData);
+      }
+    } else {
+      setBookData(initialBookData);
+    }
+  }, []);
+
+  // Save book data to localStorage when it changes
+  useEffect(() => {
+    if (bookData.length > 0) {
+      localStorage.setItem('invoiceBooks', JSON.stringify(bookData));
+
+      // Also save active books in the format used by invoicing components
+      const activeBooks = bookData
+        .filter(book => book.isActivated)
+        .map(book => ({
+          bookNumber: book.bookNumber,
+          assignedTo: book.assignedTo || "System User",
+          availablePages: book.availablePages,
+          pagesUsed: book.pagesUsed
+        }));
+      localStorage.setItem('activeInvoiceBooks', JSON.stringify(activeBooks));
+    }
+  }, [bookData]);
   
   // Filter booking data based on search term
   const filteredData = bookData.filter(item => {
@@ -76,7 +119,8 @@ const InvoiceBookStock = () => {
     return (
       item.bookNumber.includes(searchTerm) || 
       item.startPage.includes(searchTerm) || 
-      item.endPage.includes(searchTerm)
+      item.endPage.includes(searchTerm) ||
+      (item.assignedTo && item.assignedTo.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   });
   
@@ -84,6 +128,11 @@ const InvoiceBookStock = () => {
     setSelectedBook(book);
     setSelectedUserId("");
     setIsActivateDialogOpen(true);
+  };
+
+  const handleViewBook = (book: InvoiceBook) => {
+    setSelectedBook(book);
+    setIsViewDialogOpen(true);
   };
   
   const confirmActivation = () => {
@@ -114,16 +163,6 @@ const InvoiceBookStock = () => {
     
     setIsActivateDialogOpen(false);
     toast.success(`Book #${selectedBook.bookNumber} has been successfully activated for ${selectedUser.name}`);
-    
-    // Store activation data in localStorage for use in invoice form
-    const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
-    activeBooks.push({
-      bookNumber: selectedBook.bookNumber,
-      assignedTo: selectedUser.name,
-      availablePages: selectedBook.availablePages,
-      pagesUsed: 0
-    });
-    localStorage.setItem('activeInvoiceBooks', JSON.stringify(activeBooks));
   };
   
   return (
@@ -193,7 +232,11 @@ const InvoiceBookStock = () => {
                         <span className="text-gray-600">Inactive</span>
                       }
                     </BookingTableCell>
-                    <BookingTableCell>{item.assignedTo || "-"}</BookingTableCell>
+                    <BookingTableCell>
+                      {item.assignedTo || (
+                        <span className="text-gray-400">Not assigned</span>
+                      )}
+                    </BookingTableCell>
                     <BookingTableCell className="text-center">
                       {item.pagesUsed} / 50
                     </BookingTableCell>
@@ -209,9 +252,24 @@ const InvoiceBookStock = () => {
                           Activate
                         </Button>
                       ) : (
-                        <Button variant="ghost" size="sm" className="hover:bg-blue-100 transition-colors">
-                          <PenLine size={16} className="inline text-blue-500" />
-                        </Button>
+                        <div className="flex justify-center space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="hover:bg-blue-100 transition-colors"
+                            onClick={() => handleViewBook(item)}
+                          >
+                            <FileText size={16} className="inline text-blue-500" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="hover:bg-blue-100 transition-colors"
+                            onClick={() => handleActivateBook(item)}
+                          >
+                            <UserCheck size={16} className="inline text-green-500" />
+                          </Button>
+                        </div>
                       )}
                     </BookingTableCell>
                   </TableRow>
@@ -233,6 +291,7 @@ const InvoiceBookStock = () => {
         </div>
       </div>
 
+      {/* Activate Book Dialog */}
       <Dialog open={isActivateDialogOpen} onOpenChange={setIsActivateDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -265,6 +324,101 @@ const InvoiceBookStock = () => {
             <Button onClick={confirmActivation}>
               Activate Book
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* View Book Dialog */}
+      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Invoice Book #{selectedBook?.bookNumber} Details</DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <h3 className="font-medium text-gray-700 mb-2">Book Information</h3>
+                <dl className="divide-y divide-gray-100">
+                  <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <dt className="text-sm font-medium text-gray-500">Book Number</dt>
+                    <dd className="text-sm text-gray-900 sm:col-span-2">{selectedBook?.bookNumber}</dd>
+                  </div>
+                  <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <dt className="text-sm font-medium text-gray-500">Start Page</dt>
+                    <dd className="text-sm text-gray-900 sm:col-span-2">{selectedBook?.startPage}</dd>
+                  </div>
+                  <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <dt className="text-sm font-medium text-gray-500">End Page</dt>
+                    <dd className="text-sm text-gray-900 sm:col-span-2">{selectedBook?.endPage}</dd>
+                  </div>
+                  <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <dt className="text-sm font-medium text-gray-500">Pages Used</dt>
+                    <dd className="text-sm text-gray-900 sm:col-span-2">{selectedBook?.pagesUsed} / 50</dd>
+                  </div>
+                  <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <dt className="text-sm font-medium text-gray-500">Assigned To</dt>
+                    <dd className="text-sm text-gray-900 sm:col-span-2">
+                      {selectedBook?.assignedTo || "Not assigned"}
+                    </dd>
+                  </div>
+                  <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
+                    <dt className="text-sm font-medium text-gray-500">Status</dt>
+                    <dd className="text-sm text-gray-900 sm:col-span-2">
+                      {selectedBook?.isActivated ? 
+                        <span className="text-green-600 font-medium">Activated</span> : 
+                        <span className="text-gray-600">Inactive</span>
+                      }
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+              
+              <div>
+                <h3 className="font-medium text-gray-700 mb-2">Available Invoice Numbers</h3>
+                <div className="bg-gray-50 rounded-lg p-3 max-h-64 overflow-y-auto">
+                  <ul className="grid grid-cols-2 gap-2">
+                    {selectedBook?.availablePages.slice(0, 10).map((pageNumber, index) => (
+                      <li key={index} className="text-sm text-gray-700 py-1 px-2 bg-white rounded border border-gray-200">
+                        {pageNumber}
+                      </li>
+                    ))}
+                    {selectedBook && selectedBook.availablePages.length > 10 && (
+                      <li className="text-sm text-gray-500 py-1 px-2">
+                        ...and {selectedBook.availablePages.length - 10} more
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
+              Close
+            </Button>
+            {selectedBook?.isActivated ? (
+              <Button 
+                variant="default" 
+                className="bg-yellow-500 hover:bg-yellow-600" 
+                onClick={() => {
+                  setIsViewDialogOpen(false);
+                  handleActivateBook(selectedBook);
+                }}
+              >
+                <UserCheck className="h-4 w-4 mr-1" />
+                Reassign User
+              </Button>
+            ) : (
+              <Button onClick={() => {
+                setIsViewDialogOpen(false);
+                handleActivateBook(selectedBook!);
+              }}>
+                <UserCheck className="h-4 w-4 mr-1" />
+                Activate Book
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
