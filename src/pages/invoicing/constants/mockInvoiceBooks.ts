@@ -5,7 +5,7 @@ export const mockInvoiceBooks = [
     startPage: "13136051", 
     endPage: "13136100", 
     available: ["13136051", "13136052", "13136053"],
-    assignedTo: "John Smith"
+    assignedTo: "Mr. Lahiru"
   },
   { 
     bookNumber: "723", 

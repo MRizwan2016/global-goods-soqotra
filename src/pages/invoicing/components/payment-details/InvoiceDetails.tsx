@@ -1,6 +1,7 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import InputField from "./InputField";
+import { mockInvoiceBooks } from "../../constants/mockInvoiceBooks";
 
 interface InvoiceDetailsProps {
   formState: any;
@@ -9,6 +10,31 @@ interface InvoiceDetailsProps {
 const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
   formState,
 }) => {
+  const [assignedUser, setAssignedUser] = useState<string>("");
+  
+  // Find the assigned user whenever the invoice number changes
+  useEffect(() => {
+    if (formState.invoiceNumber) {
+      // Check localStorage first
+      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+      const bookWithInvoice = activeBooks.find((book: any) => 
+        book.availablePages.includes(formState.invoiceNumber)
+      );
+      
+      if (bookWithInvoice && bookWithInvoice.assignedTo) {
+        setAssignedUser(bookWithInvoice.assignedTo);
+      } else {
+        // Fall back to mock data
+        for (const book of mockInvoiceBooks) {
+          if (book.available.includes(formState.invoiceNumber)) {
+            setAssignedUser(book.assignedTo || '');
+            break;
+          }
+        }
+      }
+    }
+  }, [formState.invoiceNumber]);
+  
   return (
     <>
       <InputField 
@@ -31,6 +57,15 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
         value={formState.invoiceNumber}
         readOnly
       />
+      
+      {assignedUser && (
+        <InputField 
+          label="ASSIGNED TO"
+          name="assignedUser"
+          value={assignedUser}
+          readOnly
+        />
+      )}
       
       <InputField 
         label="INVOICE DATE"
