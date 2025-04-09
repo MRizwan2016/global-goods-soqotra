@@ -3,7 +3,7 @@ import React from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { warehouseOptions } from "../../constants/locationData";
+import { warehouseOptions, qatarTowns } from "../../constants/locationData";
 
 interface LocationFieldsProps {
   formState: any;

@@ -3,8 +3,11 @@ import React from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import PrivateRoute from "@/components/auth/PrivateRoute";
 import { routes } from "@/routes";
+import { usePermissions } from "@/hooks/use-permissions";
 
 const AppRoutes = () => {
+  const { hasFilePermission } = usePermissions();
+  
   return (
     <Routes>
       {routes.map((route, index) => {

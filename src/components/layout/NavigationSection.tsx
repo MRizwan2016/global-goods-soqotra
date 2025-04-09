@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavigationSectionProps } from "./types";
+import { usePermissions } from "@/hooks/use-permissions";
 
 const NavigationSection: React.FC<NavigationSectionProps> = ({
   sectionKey,
@@ -14,6 +15,7 @@ const NavigationSection: React.FC<NavigationSectionProps> = ({
   isPathActive,
 }) => {
   const Icon = section.icon;
+  const { hasFilePermission } = usePermissions();
 
   return (
     <div className="w-full mb-3">

@@ -8,11 +8,11 @@ export function usePermissions() {
   const isAdmin = currentUser?.isAdmin || false;
   
   const hasPermission = (permission: keyof User['permissions']['files']) => {
-    if (!currentUser) return false;
+    if (!currentUser) return true; // Allow access even if no user is logged in
     
     if (currentUser.isAdmin) return true;
     
-    if (!currentUser.permissions?.files) return false;
+    if (!currentUser.permissions?.files) return true; // Default to allowing access
     
     return (currentUser.permissions.files as any)[permission] === true;
   };

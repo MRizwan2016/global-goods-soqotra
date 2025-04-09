@@ -3,11 +3,13 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import NavigationSection from "./NavigationSection";
 import { navigationSections } from "./navigationConfig";
+import { usePermissions } from "@/hooks/use-permissions";
 
 const MainNavigation: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeSection, setActiveSection] = useState<string | null>(null);
+  const { hasFilePermission } = usePermissions();
 
   // Auto-expand the section based on current path
   useEffect(() => {
