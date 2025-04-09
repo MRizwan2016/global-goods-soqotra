@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation, Link } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import NavigationSection from "./NavigationSection";
 import { navigationSections } from "./navigationConfig";
 import { usePermissions } from "@/hooks/use-permissions";
@@ -29,6 +29,7 @@ const MainNavigation: React.FC = () => {
   }, [location.pathname]);
 
   const handleNavigate = (path: string) => {
+    console.log("Navigating to:", path);
     navigate(path);
   };
 

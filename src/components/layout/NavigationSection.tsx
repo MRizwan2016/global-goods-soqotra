@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavigationSectionProps } from "./types";
@@ -16,6 +16,12 @@ const NavigationSection: React.FC<NavigationSectionProps> = ({
 }) => {
   const Icon = section.icon;
   const { hasFilePermission } = usePermissions();
+  const navigate = useNavigate();
+
+  const handleNavigate = (path: string) => {
+    console.log("Navigating to:", path);
+    navigate(path);
+  };
 
   return (
     <div className="w-full mb-3">
@@ -47,21 +53,17 @@ const NavigationSection: React.FC<NavigationSectionProps> = ({
               <ul className="space-y-1">
                 {menu.items.map((item, idx) => (
                   <li key={idx}>
-                    <Link 
-                      to={item.path}
+                    <button 
+                      onClick={() => handleNavigate(item.path)}
                       className={cn(
                         "w-full block text-left px-3 py-1.5 text-sm rounded-md transition-all duration-200 transform hover:translate-x-1",
                         isPathActive(item.path)
                           ? `submenu-item-active-${sectionKey}`
                           : `submenu-item-${sectionKey} hover:bg-opacity-80`
                       )}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        onNavigate(item.path);
-                      }}
                     >
                       {item.name}
-                    </Link>
+                    </button>
                   </li>
                 ))}
               </ul>

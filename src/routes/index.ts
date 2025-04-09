@@ -8,6 +8,7 @@ import { reportsRoutes } from "./reportsRoutes";
 import { printDocumentsRoutes } from "./printDocumentsRoutes";
 import { paymentReceivableRoutes } from "./paymentReceivableRoutes";
 import { authRoutes } from "./authRoutes";
+import { masterRoutes } from "./masterRoutes";
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
@@ -47,5 +48,6 @@ export const routes: RouteConfig[] = [
   ...qatarRoutes,
   ...reportsRoutes,
   ...printDocumentsRoutes,
-  ...paymentReceivableRoutes
+  ...paymentReceivableRoutes,
+  ...masterRoutes
 ];

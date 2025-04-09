@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import { ReactNode, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
+import { usePermissions } from "@/hooks/use-permissions";
 
 interface PrivateRouteProps {
   children?: ReactNode;
@@ -17,7 +18,8 @@ const PrivateRoute = ({
   requiredFile,
   requiredPermission
 }: PrivateRouteProps) => {
-  const { isAuthenticated, isAdmin, currentUser, hasFilePermission } = useAuth();
+  const { isAuthenticated, isAdmin, currentUser } = useAuth();
+  const { hasFilePermission } = usePermissions();
 
   useEffect(() => {
     console.log("PrivateRoute: Authentication status", { 
@@ -68,7 +70,7 @@ const PrivateRoute = ({
 
   // Check if specific file permission is required
   if (requiredFile && !isAdmin) {
-    const hasPermission = hasFilePermission(currentUser, requiredFile as any);
+    const hasPermission = hasFilePermission(requiredFile as any);
     console.log(`File permission ${requiredFile} required, user has access: ${hasPermission}`);
     
     if (!hasPermission) {
