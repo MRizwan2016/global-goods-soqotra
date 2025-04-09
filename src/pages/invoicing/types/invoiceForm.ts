@@ -34,6 +34,8 @@ export interface FormState {
   prePaid: string;
   country: string;
   destination: string; // This is required now
+  currency: string; // Added currency field
+  date: string; // Added date field
   
   // Package details
   packagesName: string;
@@ -55,6 +57,7 @@ export interface FormState {
   shipper1: string;
   shipper2: string;
   shipperMobile: string;
+  shipperEmail: string; // Added for email
   shipperIdNumber: string;
   collectionAddress: string;
   shipperCity: string;
@@ -64,6 +67,7 @@ export interface FormState {
   address: string;
   consigneeCity: string;
   consigneeMobile: string;
+  consigneeEmail: string; // Added for email
   consigneeLandline: string;
   consigneeIdNumber: string;
   
@@ -87,6 +91,22 @@ export interface FormState {
   paymentStatus: string;
   paymentDate: string;
   bankingDate: string;
+  bookingFormNumber: string; // Added this field
+  airwayBillNumber: string; // Added this field
+  salesAgent: string; // Added this field
+}
+
+export interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  bookingFormNumber?: string;
+  airwayBillNumber?: string;
+  date?: string;
+  gross?: number;
+  discount?: number;
+  net?: number;
+  remarks?: string;
+  packageDetails?: PackageItem[];
 }
 
 export interface InvoiceFormReturnType {

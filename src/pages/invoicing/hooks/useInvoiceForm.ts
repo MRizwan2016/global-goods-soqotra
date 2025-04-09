@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
@@ -10,7 +11,6 @@ import { useInvoiceLoader } from "./useInvoiceLoader";
 export const useInvoiceForm = (id?: string) => {
   const navigate = useNavigate();
   const [formState, setFormState] = useState<FormState>({
-    invType: "BKC",  // Default
     currency: "QAR",  // Default
     date: new Date().toISOString().split('T')[0],
     
@@ -68,6 +68,39 @@ export const useInvoiceForm = (id?: string) => {
     packages: "0",
     weight: "0",
     volume: "0",
+    
+    // Required fields with empty defaults
+    salesRep: "",
+    doorToDoor: "",
+    driver: "",
+    catZone: "",
+    freightBy: "",
+    invoiceDate: "",
+    giftCargo: "",
+    prePaid: "",
+    selectedPackage: null,
+    cubicFeet: "",
+    volumeWeight: "",
+    handOverBy: "",
+    shipper2: "",
+    shipperIdNumber: "",
+    collectionAddress: "",
+    consignee2: "",
+    address: "",
+    consigneeLandline: "",
+    consigneeIdNumber: "",
+    freight: "",
+    destinationTransport: "",
+    document: "",
+    localTransport: "",
+    packing: "",
+    storage: "",
+    destinationClearing: "",
+    destinationDoorDelivery: "",
+    other: "",
+    agentName: "",
+    agentNumber: "",
+    subZone: "",
   });
 
   const [packageItems, setPackageItems] = useState<PackageItem[]>([]);
@@ -103,7 +136,7 @@ export const useInvoiceForm = (id?: string) => {
   };
   
   // Load invoice data if editing
-  const { loadInvoice } = useInvoiceLoader({
+  const { loadInvoice, isEditing: loaderIsEditing } = useInvoiceLoader({
     id,
     setFormState,
     setPackageItems,
@@ -146,7 +179,7 @@ export const useInvoiceForm = (id?: string) => {
     try {
       // Validate required fields
       const requiredFields = ['invoiceNumber', 'country', 'destination', 'shipper1', 'consignee1'];
-      const missingFields = requiredFields.filter(field => !formState[field]);
+      const missingFields = requiredFields.filter(field => !formState[field as keyof FormState]);
       
       if (missingFields.length > 0) {
         toast.error(`Please fill in required fields: ${missingFields.join(', ')}`);
