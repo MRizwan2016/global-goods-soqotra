@@ -3,7 +3,7 @@
  * Utility functions for working with package dimensions
  */
 
-import { PackageOption } from "@/data/packageOptions";
+import { PackageOption, packageOptions } from "@/data/packageOptions";
 
 /**
  * Set dimensions and weight based on package type
@@ -15,6 +15,20 @@ export const getDimensionsForPackage = (description: string): {
   packageWeight: string,
   price: string
 } => {
+  // Try to find the package in our updated package options
+  const selectedPackage = packageOptions.find(pkg => pkg.description === description);
+  
+  if (selectedPackage) {
+    return {
+      length: selectedPackage.dimensions.length.toString(),
+      width: selectedPackage.dimensions.width.toString(),
+      height: selectedPackage.dimensions.height.toString(),
+      packageWeight: selectedPackage.weightInKg ? selectedPackage.weightInKg.toString() : "0",
+      price: selectedPackage.price.toString()
+    };
+  }
+  
+  // If not found, use the legacy logic
   // Default values
   let length = "";
   let width = "";
@@ -105,25 +119,72 @@ export const calculateCubicMeter = (length: string, width: string, height: strin
 };
 
 /**
- * Calculate price based on cubic meters for specific destinations
+ * Calculate price based on cubic meters or weight for specific destinations
  * @param cubicMeter - volume in cubic meters
+ * @param weightInKg - weight in kilograms
  * @param destination - destination city/country
  * @returns calculated price based on destination rules
  */
-export const calculatePriceByDestination = (cubicMeter: string, destination: string): {
+export const calculatePriceByDestination = (
+  cubicMeter: string,
+  destination: string,
+  weightInKg: string = "0"
+): {
   price: string,
   documentsFee: string
 } => {
   const volume = parseFloat(cubicMeter);
-  const sriLankaSpecialCities = ["COLOMBO", "KURUNEGALA", "KANDY", "GALLE"];
+  const weight = parseFloat(weightInKg);
   
-  // Handle special pricing for specific cities in Sri Lanka
-  if (destination === "Sri Lanka" || sriLankaSpecialCities.some(city => destination.toUpperCase().includes(city))) {
-    // QAR 365/meter for special cities
+  // Volume-based pricing destinations
+  if (destination === "Sri Lanka" || destination.includes("COLOMBO") || 
+      destination.includes("KURUNEGALA") || destination.includes("KANDY") || 
+      destination.includes("GALLE")) {
+    // QAR 365/meter for Sri Lanka
     const basePrice = (volume * 365).toFixed(2);
     // Add QAR 50 documentation fee if volume > 1 cubic meter
     const docFee = volume > 1 ? "50.00" : "0.00";
     return { price: basePrice, documentsFee: docFee };
+  }
+  
+  if (destination === "Philippines" || destination.includes("MANILA") || 
+      destination.includes("CEBU")) {
+    // QAR 328.5/meter for Philippines (10% less than Sri Lanka)
+    const basePrice = (volume * 328.5).toFixed(2);
+    // Add QAR 45 documentation fee if volume > 1 cubic meter
+    const docFee = volume > 1 ? "45.00" : "0.00";
+    return { price: basePrice, documentsFee: docFee };
+  }
+  
+  // Weight-based pricing destinations
+  if (destination === "Kenya - Mombasa" || destination.includes("MOMBASA")) {
+    // QAR 7.5 per kg for Mombasa
+    const basePrice = (weight * 7.5).toFixed(2);
+    return { price: basePrice, documentsFee: "35.00" };
+  }
+  
+  if (destination === "Kenya - Nairobi" || destination.includes("NAIROBI")) {
+    // QAR 8.2 per kg for Nairobi
+    const basePrice = (weight * 8.2).toFixed(2);
+    return { price: basePrice, documentsFee: "35.00" };
+  }
+  
+  if (destination === "Eritrea - Asmara" || destination.includes("ASMARA")) {
+    // QAR 9.5 per kg for Asmara
+    const basePrice = (weight * 9.5).toFixed(2);
+    return { price: basePrice, documentsFee: "40.00" };
+  }
+  
+  if (destination === "Eritrea - Hargeisa" || destination.includes("HARGEISA")) {
+    // QAR 8.7 per kg for Hargeisa
+    const basePrice = (weight * 8.7).toFixed(2);
+    return { price: basePrice, documentsFee: "40.00" };
+  }
+  
+  if (destination === "Sudan - Port Sudan" || destination.includes("PORT SUDAN")) {
+    // QAR 10.2 per kg for Port Sudan
+    const basePrice = (weight * 10.2).toFixed(2);
+    return { price: basePrice, documentsFee: "45.00" };
   }
   
   // Default - return empty values to use existing prices

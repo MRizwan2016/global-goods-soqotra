@@ -62,7 +62,7 @@ const SalesRepList = () => {
             </div>
             
             <div className="flex gap-3">
-              <Link to="/master/sales-rep/add">
+              <Link to="/master/salesrep/new">
                 <Button className="bg-blue-500 hover:bg-blue-600 transition-colors hover:scale-105 transform duration-200">
                   Add New
                 </Button>
@@ -100,7 +100,7 @@ const SalesRepList = () => {
                     <BookingTableCell className="text-center">{rep.status}</BookingTableCell>
                     <BookingTableCell>{rep.operation}</BookingTableCell>
                     <BookingTableCell className="text-center">
-                      <Link to={`/master/sales-rep/edit/${rep.id}`}>
+                      <Link to={`/master/salesrep/edit/${rep.id}`}>
                         <Button variant="ghost" size="sm" className="hover:bg-blue-100 transition-colors">
                           <PenLine size={16} className="inline text-blue-500" />
                         </Button>

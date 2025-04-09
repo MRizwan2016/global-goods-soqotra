@@ -52,7 +52,7 @@ export const masterRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/master/package/edit",
+    path: "/master/package/edit/:id",
     element: PackageOptionForm,
     private: true
   },
@@ -62,13 +62,43 @@ export const masterRoutes: RouteConfig[] = [
     private: true
   },
   {
+    path: "/master/package-options",
+    element: PackageOptionsList,
+    private: true
+  },
+  {
+    path: "/master/package-options/add",
+    element: PackageOptionForm,
+    private: true
+  },
+  {
+    path: "/master/package-options/edit/:id",
+    element: PackageOptionForm,
+    private: true
+  },
+  {
     path: "/master/salesrep/new",
+    element: SalesRepForm,
+    private: true
+  },
+  {
+    path: "/master/salesrep/edit/:id",
     element: SalesRepForm,
     private: true
   },
   {
     path: "/master/salesrep/list",
     element: SalesRepList,
+    private: true
+  },
+  {
+    path: "/master/sales-rep/add",
+    element: SalesRepForm,
+    private: true
+  },
+  {
+    path: "/master/sales-rep/edit/:id",
+    element: SalesRepForm,
     private: true
   }
 ];

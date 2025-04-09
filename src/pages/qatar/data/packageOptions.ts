@@ -1,29 +1,6 @@
 
-export const packageOptions = [
-  "TELEVISION",
-  "TRAVELING BAG",
-  "CARTON BOX - SMALL",
-  "CARTON BOX - MEDIUM", 
-  "CARTON BOX - LARGE",
-  "CARTON BOX - EXTRA LARGE",
-  "CARTON BOX - JUMBO",
-  "CARTON BOX - SUPER JUMBO",
-  "CARTON BOX - BULILIT",
-  "TRAVELLING BAGS",
-  "WASHING MACHINE",
-  "REFRIDGERATOR",
-  "DRUM - SMALL",
-  "DRUM - BIG",
-  "WOODEN BOX - 1 METER",
-  "WOODEN BOX - 1.5 METER",
-  "WOODEN BOX - 2 METER", 
-  "WOODEN BOX - 2.5 METER",
-  "WOODEN BOX - 3 METER",
-  "WOODEN BOX - 4 METER",
-  "STEEL BOX",
-  "GYM SET",
-  "MICROWAVE OVEN",
-  "OVEN",
-  "4 BURNER",
-  "DUVET"
-];
+// Import package options from the centralized data store
+import { packageOptions as centralPackageOptions } from "@/data/packageOptions";
+
+// Extract package descriptions for use in Qatar module
+export const packageOptions = centralPackageOptions.map(pkg => pkg.description);
