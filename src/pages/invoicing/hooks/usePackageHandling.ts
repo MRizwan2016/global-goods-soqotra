@@ -24,6 +24,86 @@ export const usePackageHandling = ({
   setPackageItems
 }: PackageHandlingProps) => {
   
+  // Helper function to get country-specific pricing
+  const getCountryBasedPricing = (selectedPackage: any, weight: string, volume: string) => {
+    // Default to Sri Lanka pricing if no country is selected or pricing is not found
+    let price = "";
+    let documentsFee = "0";
+
+    // Get country and destination info
+    const country = formState.country || "";
+    const destination = formState.destination || "";
+    
+    if (!selectedPackage?.pricing) {
+      return { price, documentsFee };
+    }
+    
+    // Weight in kg
+    const weightInKg = parseFloat(weight) || 0;
+    // Volume in cubic meters
+    const volumeInM3 = parseFloat(volume) || 0;
+    
+    // Check for exact destination match first
+    if (destination.includes("Sri Lanka") || destination.includes("COLOMBO")) {
+      price = selectedPackage.pricing.sriLanka.price.toString();
+      documentsFee = selectedPackage.pricing.sriLanka.documentsFee.toString();
+    } 
+    else if (destination.includes("Philippines") || destination.includes("MANILA") || destination.includes("CEBU")) {
+      price = selectedPackage.pricing.philippines.price.toString();
+      documentsFee = selectedPackage.pricing.philippines.documentsFee.toString();
+    }
+    else if (destination.includes("Kenya") && destination.includes("Mombasa")) {
+      price = selectedPackage.pricing.kenya.mombasa.price.toString();
+      documentsFee = selectedPackage.pricing.kenya.mombasa.documentsFee.toString();
+    }
+    else if (destination.includes("Kenya") && destination.includes("Nairobi")) {
+      price = selectedPackage.pricing.kenya.nairobi.price.toString();
+      documentsFee = selectedPackage.pricing.kenya.nairobi.documentsFee.toString();
+    }
+    else if (destination.includes("Eritrea") && destination.includes("Asmara")) {
+      price = selectedPackage.pricing.eritrea.asmara.price.toString();
+      documentsFee = selectedPackage.pricing.eritrea.asmara.documentsFee.toString();
+    }
+    else if (destination.includes("Eritrea") && destination.includes("Hargeisa")) {
+      price = selectedPackage.pricing.eritrea.hargeisa.price.toString();
+      documentsFee = selectedPackage.pricing.eritrea.hargeisa.documentsFee.toString();
+    }
+    else if (destination.includes("Sudan") || destination.includes("Port Sudan")) {
+      price = selectedPackage.pricing.sudan.portSudan.price.toString();
+      documentsFee = selectedPackage.pricing.sudan.portSudan.documentsFee.toString();
+    }
+    // Fall back to country-based pricing if no specific destination matches
+    else if (country === "Sri Lanka") {
+      price = selectedPackage.pricing.sriLanka.price.toString();
+      documentsFee = selectedPackage.pricing.sriLanka.documentsFee.toString();
+    }
+    else if (country === "Philippines") {
+      price = selectedPackage.pricing.philippines.price.toString();
+      documentsFee = selectedPackage.pricing.philippines.documentsFee.toString();
+    }
+    else if (country === "Kenya") {
+      // Default to Nairobi pricing for Kenya
+      price = selectedPackage.pricing.kenya.nairobi.price.toString();
+      documentsFee = selectedPackage.pricing.kenya.nairobi.documentsFee.toString();
+    }
+    else if (country === "Eritrea") {
+      // Default to Asmara pricing for Eritrea
+      price = selectedPackage.pricing.eritrea.asmara.price.toString();
+      documentsFee = selectedPackage.pricing.eritrea.asmara.documentsFee.toString();
+    }
+    else if (country === "Sudan") {
+      price = selectedPackage.pricing.sudan.portSudan.price.toString();
+      documentsFee = selectedPackage.pricing.sudan.portSudan.documentsFee.toString();
+    }
+    // If no country-specific pricing or fallbacks match, use legacy pricing
+    else {
+      price = selectedPackage.price.toString();
+      documentsFee = selectedPackage.documentsFee.toString();
+    }
+
+    return { price, documentsFee };
+  };
+  
   // Handle selecting a package from the dropdown
   const handlePackageSelect = (description: string) => {
     // Find the package option that matches the description
@@ -32,32 +112,35 @@ export const usePackageHandling = ({
     if (selectedPackage) {
       console.log("Selected package:", selectedPackage);
       
-      // Get dimensions and price based on package type
-      const { length, width, height, packageWeight, price } = getDimensionsForPackage(description);
+      // Get dimensions and weight based on package type
+      const { length, width, height, packageWeight } = getDimensionsForPackage(description);
       
       // Calculate cubic meter based on the dimensions
       let cubicMetre = calculateCubicMeter(length, width, height);
       
-      // Calculate price based on destination if applicable
-      const destination = formState.destination || "";
-      const { price: destinationPrice, documentsFee } = calculatePriceByDestination(cubicMetre, destination);
+      // Get country-specific pricing
+      const { price, documentsFee } = getCountryBasedPricing(
+        selectedPackage, 
+        packageWeight, 
+        cubicMetre
+      );
       
-      // Use destination-specific price if available, otherwise use standard price
-      const finalPrice = destinationPrice || price || String(selectedPackage.price);
-      const finalDocFee = documentsFee || formState.documentsFee || "0";
-      
+      // Set the form state with the package details and pricing
       setFormState(prev => ({
         ...prev,
         packagesName: description,
         selectedPackage,
-        price: finalPrice,
-        documentsFee: finalDocFee,
+        price: price || String(selectedPackage.price),
+        documentsFee: documentsFee || String(selectedPackage.documentsFee),
         length,
         width,
         height,
         packageWeight,
         cubicMetre,
-        total: calculateTotal(finalPrice, finalDocFee)
+        total: calculateTotal(
+          price || String(selectedPackage.price), 
+          documentsFee || String(selectedPackage.documentsFee)
+        )
       }));
     }
   };
@@ -137,10 +220,31 @@ export const usePackageHandling = ({
     }));
   };
   
+  // Update package pricing when country or destination changes
+  const updatePackagePricingByCountry = () => {
+    if (formState.selectedPackage) {
+      const { price, documentsFee } = getCountryBasedPricing(
+        formState.selectedPackage,
+        formState.packageWeight,
+        formState.cubicMetre
+      );
+      
+      if (price) {
+        setFormState(prev => ({
+          ...prev,
+          price,
+          documentsFee,
+          total: calculateTotal(price, documentsFee)
+        }));
+      }
+    }
+  };
+  
   return {
     handlePackageSelect,
     handleManualPackage,
     handleAddPackage,
-    handleRemovePackage
+    handleRemovePackage,
+    updatePackagePricingByCountry
   };
 };

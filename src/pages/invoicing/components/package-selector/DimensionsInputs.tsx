@@ -1,65 +1,89 @@
 
 import React, { useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { generateNextBoxNumber } from "../../utils/autoGenerators";
 import { PackageItem } from "../../types/invoiceForm";
 import { calculateCubicMeter } from "../../utils/packageDimensions";
 
 interface DimensionsInputsProps {
   formState: any;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-  packageItems?: PackageItem[];
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  packageItems: PackageItem[];
 }
 
 const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
   formState,
   handleInputChange,
-  packageItems = [],
+  packageItems,
 }) => {
   // Calculate cubic meter when dimensions change
   useEffect(() => {
     if (formState.length && formState.width && formState.height) {
-      const length = formState.length;
-      const width = formState.width;
-      const height = formState.height;
+      const cubicMeter = calculateCubicMeter(
+        formState.length,
+        formState.width,
+        formState.height
+      );
       
-      // Use the updated calculation function
-      const cubicMetre = calculateCubicMeter(length, width, height);
-      
-      if (cubicMetre) {
-        const event = {
-          target: {
-            name: "cubicMetre",
-            value: cubicMetre
-          }
-        } as React.ChangeEvent<HTMLInputElement>;
-        
-        handleInputChange(event);
-      }
-    }
-  }, [formState.length, formState.width, formState.height, handleInputChange]);
-
-  // Auto-generate box number
-  useEffect(() => {
-    // Get existing box numbers
-    const existingBoxNumbers = packageItems.map(item => item.boxNumber);
-    // Generate next box number
-    const nextBoxNumber = generateNextBoxNumber(existingBoxNumbers);
-    
-    if (!formState.boxNumber) {
       const event = {
         target: {
-          name: "boxNumber",
-          value: nextBoxNumber
+          name: "cubicMetre",
+          value: cubicMeter
         }
       } as React.ChangeEvent<HTMLInputElement>;
       
       handleInputChange(event);
     }
-  }, [packageItems, formState.boxNumber, handleInputChange]);
+  }, [formState.length, formState.width, formState.height]);
+
+  // Generate box number based on package items if not set
+  useEffect(() => {
+    if (!formState.boxNumber && packageItems.length > 0) {
+      const event = {
+        target: {
+          name: "boxNumber",
+          value: String(packageItems.length + 1)
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      
+      handleInputChange(event);
+    }
+  }, [formState.boxNumber, packageItems]);
 
   return (
     <>
+      <div className="flex flex-col">
+        <label className="text-sm font-medium mb-1">LENGTH (in):</label>
+        <Input 
+          name="length"
+          value={formState.length}
+          onChange={handleInputChange}
+          className="border border-gray-300"
+          type="number"
+        />
+      </div>
+      
+      <div className="flex flex-col">
+        <label className="text-sm font-medium mb-1">WIDTH (in):</label>
+        <Input 
+          name="width"
+          value={formState.width}
+          onChange={handleInputChange}
+          className="border border-gray-300"
+          type="number"
+        />
+      </div>
+      
+      <div className="flex flex-col">
+        <label className="text-sm font-medium mb-1">HEIGHT (in):</label>
+        <Input 
+          name="height"
+          value={formState.height}
+          onChange={handleInputChange}
+          className="border border-gray-300"
+          type="number"
+        />
+      </div>
+      
       <div className="flex flex-col">
         <label className="text-sm font-medium mb-1">CUBIC METRE:</label>
         <Input 
@@ -72,52 +96,13 @@ const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
       </div>
       
       <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">LENGTH (inches):</label>
-        <Input 
-          name="length"
-          value={formState.length}
-          onChange={handleInputChange}
-          className="border border-gray-300"
-        />
-      </div>
-      
-      <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">CUBIC FEET:</label>
-        <Input 
-          name="cubicFeet"
-          value={formState.cubicFeet}
-          onChange={handleInputChange}
-          className="border border-gray-300"
-        />
-      </div>
-      
-      <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">WIDTH (inches):</label>
-        <Input 
-          name="width"
-          value={formState.width}
-          onChange={handleInputChange}
-          className="border border-gray-300"
-        />
-      </div>
-      
-      <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">WEIGHT:</label>
+        <label className="text-sm font-medium mb-1">WEIGHT (kg):</label>
         <Input 
           name="packageWeight"
           value={formState.packageWeight}
           onChange={handleInputChange}
           className="border border-gray-300"
-        />
-      </div>
-      
-      <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">HEIGHT (inches):</label>
-        <Input 
-          name="height"
-          value={formState.height}
-          onChange={handleInputChange}
-          className="border border-gray-300"
+          type="number"
         />
       </div>
       
@@ -126,18 +111,6 @@ const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
         <Input 
           name="boxNumber"
           value={formState.boxNumber}
-          onChange={handleInputChange}
-          className="border border-gray-300 bg-gray-50"
-          readOnly
-          title="Box number is automatically generated"
-        />
-      </div>
-      
-      <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">VOLUME WEIGHT:</label>
-        <Input 
-          name="volumeWeight"
-          value={formState.volumeWeight}
           onChange={handleInputChange}
           className="border border-gray-300"
         />

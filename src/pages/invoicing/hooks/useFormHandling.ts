@@ -7,7 +7,8 @@ import { warehouseOptions, cityOptions } from "../constants/locationData";
 
 export const useFormHandling = (
   formState: FormState,
-  setFormState: React.Dispatch<React.SetStateAction<FormState>>
+  setFormState: React.Dispatch<React.SetStateAction<FormState>>,
+  updatePackagePricing?: () => void
 ) => {
   // Initialize warehouse based on country if not already set
   useEffect(() => {
@@ -28,8 +29,13 @@ export const useFormHandling = (
       // Don't auto-set destination to match country
       setFormState(prev => ({
         ...prev,
-        destination: prev.destination || "Kenya" // Only set if not already set
+        destination: prev.destination || prev.country // Set to country if no destination is set
       }));
+      
+      // Update package pricing when country changes
+      if (updatePackagePricing) {
+        updatePackagePricing();
+      }
     }
   }, [formState.country]);
   
@@ -56,6 +62,13 @@ export const useFormHandling = (
       }));
     }
   }, [formState.country, formState.warehouse]);
+
+  // Update package pricing when destination changes
+  useEffect(() => {
+    if (formState.destination && updatePackagePricing) {
+      updatePackagePricing();
+    }
+  }, [formState.destination]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -133,17 +146,29 @@ export const useFormHandling = (
         branch: defaultBranch || prev.branch,
         // Set district for Qatar
         district: defaultDistrict || prev.district,
+        // Update destination to match country if not set already
+        destination: prev.destination || value,
         // Reset city selections when country changes
         shipperCity: ""
       }));
+      
+      // Update package pricing when country changes
+      if (updatePackagePricing) {
+        setTimeout(updatePackagePricing, 0);
+      }
     }
     
-    // If destination changes, reset consignee city
+    // If destination changes, reset consignee city and update package pricing
     if (name === 'destination') {
       setFormState(prev => ({
         ...prev,
         consigneeCity: ""
       }));
+      
+      // Update package pricing when destination changes
+      if (updatePackagePricing) {
+        setTimeout(updatePackagePricing, 0);
+      }
     }
     
     // If warehouse changes for Kenya, update district

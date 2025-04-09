@@ -31,6 +31,7 @@ const InvoiceForm = () => {
     handleSelectInvoice,
     handleSave,
     savedInvoiceId,
+    updatePackagePricing,
   } = useInvoiceForm(id);
   
   return (
@@ -49,6 +50,7 @@ const InvoiceForm = () => {
             handleSelectInvoice={handleSelectInvoice}
             isEditing={isEditing}
             countrySectorMap={countrySectorMap}
+            updatePackagePricing={updatePackagePricing}
           />
           
           <ShipperConsigneeDetails
@@ -60,6 +62,8 @@ const InvoiceForm = () => {
           <PaymentDetails 
             formState={formState}
             handleInputChange={handleInputChange}
+            handleSelectChange={handleSelectChange}
+            updatePackagePricing={updatePackagePricing}
           />
           
           <PackageDetailsSection 

@@ -10,6 +10,7 @@ interface LocationFieldsProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
   countrySectorMap: { [key: string]: string };
+  updatePackagePricing?: () => void;
 }
 
 const LocationFields: React.FC<LocationFieldsProps> = ({
@@ -17,6 +18,7 @@ const LocationFields: React.FC<LocationFieldsProps> = ({
   handleInputChange,
   handleSelectChange,
   countrySectorMap,
+  updatePackagePricing
 }) => {
   // Get warehouse options based on selected country
   const countryWarehouses = formState.country ? warehouseOptions[formState.country] || [] : [];
@@ -26,6 +28,16 @@ const LocationFields: React.FC<LocationFieldsProps> = ({
   
   // Qatar-specific districts
   const qatarDistricts = ["DOHA", "AL RAYYAN", "AL KHOR", "AL SAAD", "WAKRA", "INDUSTRIAL AREA"];
+
+  // Enhanced handleSelectChange to trigger package pricing updates
+  const handleLocationChange = (name: string, value: string) => {
+    handleSelectChange(name, value);
+    
+    // If country or destination changes, update package pricing
+    if ((name === 'country' || name === 'destination') && updatePackagePricing) {
+      setTimeout(updatePackagePricing, 100);
+    }
+  };
 
   return (
     <>
@@ -44,7 +56,7 @@ const LocationFields: React.FC<LocationFieldsProps> = ({
         <Label>Branch</Label>
         {formState.country === "Qatar" ? (
           <Select 
-            onValueChange={(value) => handleSelectChange("branch", value)}
+            onValueChange={(value) => handleLocationChange("branch", value)}
             value={formState.branch || "HEAD OFFICE"}
           >
             <SelectTrigger className="w-full">
@@ -69,7 +81,7 @@ const LocationFields: React.FC<LocationFieldsProps> = ({
       <div className="space-y-2">
         <Label>Warehouse</Label>
         <Select 
-          onValueChange={(value) => handleSelectChange("warehouse", value)}
+          onValueChange={(value) => handleLocationChange("warehouse", value)}
           value={formState.warehouse || ""}
         >
           <SelectTrigger className="w-full">
@@ -86,7 +98,7 @@ const LocationFields: React.FC<LocationFieldsProps> = ({
       <div className="space-y-2">
         <Label>Country (Origin)</Label>
         <Select 
-          onValueChange={(value) => handleSelectChange("country", value)}
+          onValueChange={(value) => handleLocationChange("country", value)}
           value={formState.country || ""}
         >
           <SelectTrigger className="w-full">
