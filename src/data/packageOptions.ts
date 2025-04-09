@@ -66,42 +66,42 @@ const calculateDefaultPricing = (basePrice: number, weightKg: number) => {
     sriLanka: {
       price: basePrice,
       documentsFee: basePrice > 300 ? 50 : 0,
-      isVolumeBasedPricing: true
+      isVolumeBasedPricing: true as const
     },
     philippines: {
       price: basePrice * 0.9,
       documentsFee: basePrice > 300 ? 45 : 0,
-      isVolumeBasedPricing: true
+      isVolumeBasedPricing: true as const
     },
     kenya: {
       mombasa: {
         price: weightKg * 7.5,
         documentsFee: 35,
-        isVolumeBasedPricing: false
+        isVolumeBasedPricing: false as const
       },
       nairobi: {
         price: weightKg * 8.2,
         documentsFee: 35,
-        isVolumeBasedPricing: false
+        isVolumeBasedPricing: false as const
       }
     },
     eritrea: {
       asmara: {
         price: weightKg * 9.5,
         documentsFee: 40,
-        isVolumeBasedPricing: false
+        isVolumeBasedPricing: false as const
       },
       hargeisa: {
         price: weightKg * 8.7,
         documentsFee: 40,
-        isVolumeBasedPricing: false
+        isVolumeBasedPricing: false as const
       }
     },
     sudan: {
       portSudan: {
         price: weightKg * 10.2,
         documentsFee: 45,
-        isVolumeBasedPricing: false
+        isVolumeBasedPricing: false as const
       }
     }
   };
