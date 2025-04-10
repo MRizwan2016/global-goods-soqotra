@@ -3,7 +3,7 @@ import { RouteConfig } from "./types";
 import CargoReports from "@/pages/reports/CargoReports";
 import FinancialReports from "@/pages/reports/FinancialReports";
 import CargoStatistics from "@/pages/reports/CargoStatistics";
-import Shipments from "@/pages/reports/Shipments";
+import Shipments from "@/pages/reports/shipments/Shipments";
 
 export const reportsRoutes: RouteConfig[] = [
   {
