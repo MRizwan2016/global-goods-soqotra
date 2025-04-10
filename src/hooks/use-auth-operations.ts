@@ -31,23 +31,26 @@ export function useAuthOperations(
       }
     }
 
-    // Regular user login
+    // Regular user login - first check for exact email match
     const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-    const user = users.find(u => u.email === email && u.isActive);
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.isActive);
     
     console.log("Found user:", user);
-    console.log("Password check:", user ? userPasswords[user.id] === password : false);
     
-    if (user && userPasswords[user.id] === password) {
-      // Ensure user has all required permissions properly set up
-      const userWithPermissions = ensureUserPermissions(user);
-      setCurrentUser(userWithPermissions);
-      localStorage.setItem("currentUser", JSON.stringify(userWithPermissions));
-      toast({
-        title: "Login Successful",
-        description: `Welcome back, ${user.fullName}!`,
-      });
-      return true;
+    if (user) {
+      console.log("Password check:", userPasswords[user.id] === password);
+      
+      if (userPasswords[user.id] === password) {
+        // Ensure user has all required permissions properly set up
+        const userWithPermissions = ensureUserPermissions(user);
+        setCurrentUser(userWithPermissions);
+        localStorage.setItem("currentUser", JSON.stringify(userWithPermissions));
+        toast({
+          title: "Login Successful",
+          description: `Welcome back, ${user.fullName}!`,
+        });
+        return true;
+      }
     }
     
     toast({
@@ -69,8 +72,8 @@ export function useAuthOperations(
   };
 
   const register = async (userData: Omit<User, "id" | "isActive" | "isAdmin" | "createdAt" | "permissions"> & { password: string }): Promise<boolean> => {
-    // Check if email already exists
-    if (users.some(user => user.email === userData.email)) {
+    // Check if email already exists (case-insensitive comparison)
+    if (users.some(user => user.email.toLowerCase() === userData.email.toLowerCase())) {
       toast({
         title: "Registration Failed",
         description: "This email is already registered.",

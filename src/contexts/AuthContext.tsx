@@ -41,9 +41,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         const updatedUsers = parsedUsers.map((user: any) => ensureUserPermissions(user));
         
+        // Log stored users for debugging
+        console.log("Loaded users from localStorage:", updatedUsers);
+        
         setUsers(updatedUsers);
         localStorage.setItem("users", JSON.stringify(updatedUsers));
-        console.log("Loaded users from localStorage:", updatedUsers);
       } catch (error) {
         console.error("Failed to parse users:", error);
         initializeDefaultAdmin();
@@ -51,6 +53,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } else {
       initializeDefaultAdmin();
     }
+    
+    // Debug: Log user passwords
+    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
+    console.log("Stored user passwords (ids only):", Object.keys(userPasswords));
   }, []);
 
   // Function to initialize the default admin user
@@ -101,7 +107,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("users", JSON.stringify([adminUser]));
     console.log("Initialized with admin user:", [adminUser]);
     
+    // Set admin password in localStorage
     localStorage.setItem("admin-password", ADMIN_PASSWORD);
+    
+    // Setup initial userPasswords object
+    const userPasswords = { "admin-1": ADMIN_PASSWORD };
+    localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
   };
 
   // Save users to localStorage whenever they change

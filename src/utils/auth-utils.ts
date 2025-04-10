@@ -29,7 +29,8 @@ export function ensureUserPermissions(user: User): User {
           invoiceBook: true,
           driverHelper: true,
           invoicing: true,
-          paymentReceivable: true
+          paymentReceivable: true,
+          item: true
         }
       }
     };
@@ -50,7 +51,8 @@ export function ensureUserPermissions(user: User): User {
           invoiceBook: true,
           driverHelper: true,
           invoicing: true,
-          paymentReceivable: true
+          paymentReceivable: true,
+          item: true
         }
       }
     };
@@ -76,7 +78,8 @@ export function ensureUserPermissions(user: User): User {
           invoiceBook: currentFiles.invoiceBook ?? true,
           driverHelper: currentFiles.driverHelper ?? true,
           invoicing: currentFiles.invoicing ?? true,
-          paymentReceivable: currentFiles.paymentReceivable ?? true
+          paymentReceivable: currentFiles.paymentReceivable ?? true,
+          item: currentFiles.item ?? true
         }
       }
     };
@@ -128,4 +131,19 @@ export function hasFilePermission(user: User | null, fileKey: keyof User['permis
   if (user.permissions.files[fileKey] === undefined) return true;
   
   return !!user.permissions.files[fileKey];
+}
+
+// Debug function to log user data
+export function logUserData(user: User | null, message: string = "User data"): void {
+  if (user) {
+    console.log(`${message}:`, {
+      id: user.id,
+      email: user.email,
+      isAdmin: user.isAdmin,
+      isActive: user.isActive,
+      permissions: user.permissions
+    });
+  } else {
+    console.log(`${message}: No user data available`);
+  }
 }

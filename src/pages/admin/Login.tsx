@@ -9,10 +9,11 @@ import { Form, FormField, FormItem, FormControl } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, User, Lock } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters" }),
+  email: z.string().min(1, { message: "Email is required" }),
+  password: z.string().min(1, { message: "Password is required" }),
 });
 
 type LoginValues = z.infer<typeof loginSchema>;
@@ -56,6 +57,7 @@ const Login = () => {
       }
     } catch (err) {
       setError("An error occurred during login. Please try again.");
+      console.error("Login error:", err);
     } finally {
       setIsLoading(false);
     }
@@ -79,12 +81,12 @@ const Login = () => {
       {/* Login form */}
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Login to Your Account</h2>
+          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">LOGIN TO YOUR ACCOUNT</h2>
           
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-md">
-              {error}
-            </div>
+            <Alert variant="destructive" className="mb-4">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
           
           <Form {...form}>
