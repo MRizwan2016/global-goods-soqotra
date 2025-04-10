@@ -10,7 +10,7 @@ const MainNavigation: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const { hasPermission, hasFilePermission } = usePermissions();
+  const { hasPermission } = usePermissions();
   const { currentUser } = useAuth();
 
   // Auto-expand the section based on current path
