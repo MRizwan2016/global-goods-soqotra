@@ -15,7 +15,7 @@ const NavigationSection: React.FC<NavigationSectionProps> = ({
   isPathActive,
 }) => {
   const Icon = section.icon;
-  const { hasFilePermission } = usePermissions();
+  const { hasFilePermission, isAdmin } = usePermissions();
   const navigate = useNavigate();
 
   const handleNavigate = (path: string) => {
@@ -51,21 +51,31 @@ const NavigationSection: React.FC<NavigationSectionProps> = ({
                 {menu.title}
               </h4>
               <ul className="space-y-1">
-                {menu.items.map((item, idx) => (
-                  <li key={idx}>
-                    <button 
-                      onClick={() => handleNavigate(item.path)}
-                      className={cn(
-                        "w-full block text-left px-3 py-1.5 text-sm rounded-md transition-all duration-200 transform hover:translate-x-1",
-                        isPathActive(item.path)
-                          ? `submenu-item-active-${sectionKey}`
-                          : `submenu-item-${sectionKey} hover:bg-opacity-80`
-                      )}
-                    >
-                      {item.name}
-                    </button>
-                  </li>
-                ))}
+                {menu.items.map((item, idx) => {
+                  // Check if user has permission for this specific file/feature
+                  const fileKey = item.requiredFile as keyof ReturnType<typeof usePermissions>['hasFilePermission'] extends (key: infer K) => boolean ? K : never;
+                  const canAccess = isAdmin || (fileKey ? hasFilePermission(fileKey) : true);
+                  
+                  if (!canAccess) {
+                    return null; // Don't render items user doesn't have access to
+                  }
+                  
+                  return (
+                    <li key={idx}>
+                      <button 
+                        onClick={() => handleNavigate(item.path)}
+                        className={cn(
+                          "w-full block text-left px-3 py-1.5 text-sm rounded-md transition-all duration-200 transform hover:translate-x-1",
+                          isPathActive(item.path)
+                            ? `submenu-item-active-${sectionKey}`
+                            : `submenu-item-${sectionKey} hover:bg-opacity-80`
+                        )}
+                      >
+                        {item.name}
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}

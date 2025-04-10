@@ -28,7 +28,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
-        setCurrentUser(ensureUserPermissions(parsedUser));
+        const userWithCheckedPermissions = ensureUserPermissions(parsedUser);
+        console.log("Loaded current user with permissions:", userWithCheckedPermissions);
+        setCurrentUser(userWithCheckedPermissions);
       } catch (error) {
         console.error("Failed to parse current user:", error);
         localStorage.removeItem("currentUser");

@@ -4,12 +4,14 @@ import { useNavigate, useLocation } from "react-router-dom";
 import NavigationSection from "./NavigationSection";
 import { navigationSections } from "./navigationConfig";
 import { usePermissions } from "@/hooks/use-permissions";
+import { useAuth } from "@/hooks/use-auth";
 
 const MainNavigation: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const { hasFilePermission } = usePermissions();
+  const { hasPermission, hasFilePermission } = usePermissions();
+  const { currentUser } = useAuth();
 
   // Auto-expand the section based on current path
   useEffect(() => {
@@ -40,17 +42,27 @@ const MainNavigation: React.FC = () => {
   return (
     <div className="w-full p-2 animate-fade-in">
       <div className="flex flex-col space-y-2">
-        {Object.entries(navigationSections).map(([key, section]) => (
-          <NavigationSection
-            key={key}
-            sectionKey={key}
-            section={section}
-            isActive={activeSection === key}
-            onToggle={() => setActiveSection(activeSection === key ? null : key)}
-            onNavigate={handleNavigate}
-            isPathActive={isPathActive}
-          />
-        ))}
+        {Object.entries(navigationSections).map(([key, section]) => {
+          // Only show sections the user has permission for
+          const permissionKey = key as keyof typeof currentUser?.permissions;
+          const hasAccess = currentUser?.isAdmin || hasPermission(permissionKey);
+          
+          if (!hasAccess && key !== 'dashboard') {
+            return null; // Don't render this section
+          }
+          
+          return (
+            <NavigationSection
+              key={key}
+              sectionKey={key}
+              section={section}
+              isActive={activeSection === key}
+              onToggle={() => setActiveSection(activeSection === key ? null : key)}
+              onNavigate={handleNavigate}
+              isPathActive={isPathActive}
+            />
+          );
+        })}
       </div>
     </div>
   );

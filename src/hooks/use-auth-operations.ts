@@ -82,7 +82,7 @@ export function useAuthOperations(
       return false;
     }
 
-    // Create new user with default permissions
+    // Create new user with all permissions disabled by default
     const newUser: User = {
       id: `user-${Date.now()}`,
       fullName: userData.fullName,
@@ -100,17 +100,17 @@ export function useAuthOperations(
         accounting: false,
         controlPanel: false,
         files: {
-          salesRep: true,
-          town: true,
-          item: true,
-          packageOptions: true,
-          sellingRates: true,
-          container: true,
-          vessel: true,
-          invoiceBook: true,
-          driverHelper: true,
-          invoicing: true,
-          paymentReceivable: true
+          salesRep: false,
+          town: false,
+          item: false,
+          packageOptions: false,
+          sellingRates: false,
+          container: false,
+          vessel: false,
+          invoiceBook: false,
+          driverHelper: false,
+          invoicing: false,
+          paymentReceivable: false
         }
       }
     };

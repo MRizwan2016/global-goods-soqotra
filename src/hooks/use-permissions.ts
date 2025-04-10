@@ -20,9 +20,9 @@ export function usePermissions() {
     
     if (currentUser.isAdmin) return true;
     
-    // Default to true if permissions or files aren't set
-    if (!currentUser.permissions?.files) return true;
-    if (currentUser.permissions.files[filePermission] === undefined) return true;
+    // Don't default to true if permissions or files aren't set
+    if (!currentUser.permissions?.files) return false;
+    if (currentUser.permissions.files[filePermission] === undefined) return false;
     
     return !!currentUser.permissions.files[filePermission];
   };
