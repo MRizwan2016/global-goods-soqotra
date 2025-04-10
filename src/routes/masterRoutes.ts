@@ -90,15 +90,6 @@ export const masterRoutes: RouteConfig[] = [
     path: "/master/salesrep/list",
     element: SalesRepList,
     private: true
-  },
-  {
-    path: "/master/sales-rep/add",
-    element: SalesRepForm,
-    private: true
-  },
-  {
-    path: "/master/sales-rep/edit/:id",
-    element: SalesRepForm,
-    private: true
   }
+  // Clean up the redundant routes that might cause conflicts
 ];

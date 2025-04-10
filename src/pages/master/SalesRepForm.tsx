@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -7,17 +7,33 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ArrowLeft, Save, UserPlus } from "lucide-react";
 import { motion } from "framer-motion";
+import { v4 as uuidv4 } from "uuid";
 
 const SalesRepForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [formData, setFormData] = useState({
-    id: id || `sales-rep-${Date.now()}`,
+    id: id || uuidv4(),
     name: "",
     employeeNumber: "",
     operation: "UPB - SYSTEM",
     available: "Y"
   });
+  
+  // Load existing sales rep data if editing
+  useEffect(() => {
+    if (id) {
+      try {
+        const salesReps = JSON.parse(localStorage.getItem('salesReps') || '[]');
+        const salesRep = salesReps.find((rep: any) => rep.id === id);
+        if (salesRep) {
+          setFormData(salesRep);
+        }
+      } catch (error) {
+        console.error("Failed to load sales rep data:", error);
+      }
+    }
+  }, [id]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

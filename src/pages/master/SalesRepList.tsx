@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -13,29 +13,38 @@ import {
   BookingTableCell
 } from "@/components/ui/table";
 import { PenLine } from "lucide-react";
+import { toast } from "sonner";
 
-// Mock data for sales representatives
-const mockSalesReps = [
-  { id: 1, name: "ABDUL", employeeNumber: "255", operation: "UPB", status: "Y" },
-  { id: 2, name: "ABDUL FAZEER ACHIMOHAMED", employeeNumber: "214", operation: "UPB", status: "Y" },
-  { id: 3, name: "ABDUL QADER", employeeNumber: "2", operation: "ICG", status: "Y" },
-  { id: 4, name: "ALEX", employeeNumber: "26", operation: "ICG", status: "N" },
-  { id: 5, name: "ALI HUSSAIN", employeeNumber: "1245", operation: "UPB", status: "Y" },
-  { id: 6, name: "Amila Udurawana", employeeNumber: "2", operation: "UPB", status: "N" },
-  { id: 7, name: "ASHOKA", employeeNumber: "27", operation: "UPB", status: "Y" },
-];
+interface SalesRep {
+  id: string;
+  name: string;
+  employeeNumber: string;
+  operation: string;
+  available: string;
+}
 
 const SalesRepList = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [salesReps, setSalesReps] = useState(mockSalesReps);
+  const [salesReps, setSalesReps] = useState<SalesRep[]>([]);
+  
+  // Load sales reps on component mount
+  useEffect(() => {
+    try {
+      const loadedSalesReps = JSON.parse(localStorage.getItem('salesReps') || '[]');
+      setSalesReps(loadedSalesReps);
+    } catch (error) {
+      console.error("Failed to load sales reps:", error);
+      toast.error("Failed to load sales representatives data");
+    }
+  }, []);
   
   // Filter sales reps based on search term
   const filteredData = salesReps.filter(rep => {
     if (!searchTerm) return true;
     return (
-      rep.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      rep.employeeNumber.includes(searchTerm) || 
-      rep.operation.toLowerCase().includes(searchTerm.toLowerCase())
+      rep.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      rep.employeeNumber?.includes(searchTerm) || 
+      rep.operation?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
   
@@ -92,22 +101,30 @@ const SalesRepList = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredData.map((rep) => (
-                  <TableRow key={rep.id} className="hover:bg-green-50/50 transition-colors">
-                    <BookingTableCell className="text-center">{rep.id}</BookingTableCell>
-                    <BookingTableCell>{rep.name}</BookingTableCell>
-                    <BookingTableCell>{rep.employeeNumber}</BookingTableCell>
-                    <BookingTableCell className="text-center">{rep.status}</BookingTableCell>
-                    <BookingTableCell>{rep.operation}</BookingTableCell>
-                    <BookingTableCell className="text-center">
-                      <Link to={`/master/salesrep/edit/${rep.id}`}>
-                        <Button variant="ghost" size="sm" className="hover:bg-blue-100 transition-colors">
-                          <PenLine size={16} className="inline text-blue-500" />
-                        </Button>
-                      </Link>
+                {filteredData.length > 0 ? (
+                  filteredData.map((rep, index) => (
+                    <TableRow key={rep.id} className="hover:bg-green-50/50 transition-colors">
+                      <BookingTableCell className="text-center">{index + 1}</BookingTableCell>
+                      <BookingTableCell>{rep.name}</BookingTableCell>
+                      <BookingTableCell>{rep.employeeNumber}</BookingTableCell>
+                      <BookingTableCell className="text-center">{rep.available}</BookingTableCell>
+                      <BookingTableCell>{rep.operation}</BookingTableCell>
+                      <BookingTableCell className="text-center">
+                        <Link to={`/master/salesrep/edit/${rep.id}`}>
+                          <Button variant="ghost" size="sm" className="hover:bg-blue-100 transition-colors">
+                            <PenLine size={16} className="inline text-blue-500" />
+                          </Button>
+                        </Link>
+                      </BookingTableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <BookingTableCell colSpan={6} className="text-center py-4 text-gray-500">
+                      No sales representatives found. Add a new one to get started.
                     </BookingTableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>

@@ -37,7 +37,7 @@ export const masterDataRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/master/town/edit",
+    path: "/master/town/edit/:id",
     element: TownForm,
     private: true
   },
@@ -52,7 +52,7 @@ export const masterDataRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/master/package/edit",
+    path: "/master/package/edit/:id",
     element: PackageOptionForm,
     private: true
   },
@@ -63,6 +63,11 @@ export const masterDataRoutes: RouteConfig[] = [
   },
   {
     path: "/master/salesrep/new",
+    element: SalesRepForm,
+    private: true
+  },
+  {
+    path: "/master/salesrep/edit/:id",
     element: SalesRepForm,
     private: true
   },

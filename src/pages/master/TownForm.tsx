@@ -7,12 +7,32 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { ArrowLeft, Save, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
+import { v4 as uuidv4 } from "uuid";
+
+const COUNTRIES = [
+  "Qatar", 
+  "UAE", 
+  "Saudi Arabia", 
+  "Kenya", 
+  "Sri Lanka", 
+  "Philippines"
+];
+
+// Country code prefixes
+const COUNTRY_PREFIXES: Record<string, string> = {
+  "Qatar": "QTR",
+  "UAE": "UAE",
+  "Saudi Arabia": "KSA",
+  "Kenya": "KEN",
+  "Sri Lanka": "LKA",
+  "Philippines": "PHL"
+};
 
 const TownForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [formData, setFormData] = useState({
-    id: id || `town-${Date.now()}`,
+    id: id || uuidv4(),
     name: "",
     code: "",
     country: "Qatar",
@@ -35,6 +55,26 @@ const TownForm = () => {
       }
     }
   }, [id]);
+  
+  // Generate town code when name or country changes
+  useEffect(() => {
+    if (!id && formData.name && formData.country) {
+      const prefix = COUNTRY_PREFIXES[formData.country] || formData.country.substring(0, 3).toUpperCase();
+      
+      // Get existing towns to determine the next number
+      const towns = JSON.parse(localStorage.getItem('towns') || '[]');
+      const countryTowns = towns.filter((t: any) => t.country === formData.country);
+      const nextNumber = countryTowns.length + 1;
+      
+      // Format the code as PREFIX-001, PREFIX-002, etc.
+      const code = `${prefix}-${nextNumber.toString().padStart(3, '0')}`;
+      
+      setFormData(prev => ({
+        ...prev,
+        code
+      }));
+    }
+  }, [formData.name, formData.country, id]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -81,6 +121,23 @@ const TownForm = () => {
     }
   };
   
+  // Generate city options based on selected country
+  const getCityOptions = () => {
+    if (formData.country === "Philippines") {
+      return [
+        "Metro Manila",
+        "Luzon 1",
+        "Luzon 2",
+        "Luzon 3",
+        "Visayas",
+        "Mindanao"
+      ];
+    }
+    return [];
+  };
+  
+  const cityOptions = getCityOptions();
+  
   return (
     <Layout title={id ? "Edit Town" : "Add Town"}>
       <motion.div
@@ -126,8 +183,14 @@ const TownForm = () => {
                 value={formData.code}
                 onChange={handleInputChange}
                 className="border border-gray-300 transition-colors focus:border-blue-400"
-                placeholder="Enter town code"
+                placeholder="Auto-generated code"
+                readOnly={!id} // Only allow editing for existing towns
               />
+              {!id && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Code will be auto-generated based on country and name
+                </p>
+              )}
             </motion.div>
             
             <motion.div
@@ -143,11 +206,9 @@ const TownForm = () => {
                 onChange={handleInputChange}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
-                <option value="Qatar">Qatar</option>
-                <option value="UAE">UAE</option>
-                <option value="Saudi Arabia">Saudi Arabia</option>
-                <option value="Kenya">Kenya</option>
-                <option value="Sri Lanka">Sri Lanka</option>
+                {COUNTRIES.map(country => (
+                  <option key={country} value={country}>{country}</option>
+                ))}
               </select>
             </motion.div>
             
@@ -158,13 +219,27 @@ const TownForm = () => {
               transition={{ delay: 0.4 }}
             >
               <label className="text-sm font-medium mb-1">City:</label>
-              <Input 
-                name="city"
-                value={formData.city}
-                onChange={handleInputChange}
-                className="border border-gray-300 transition-colors focus:border-blue-400"
-                placeholder="Enter city name"
-              />
+              {formData.country === "Philippines" && cityOptions.length > 0 ? (
+                <select
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="">Select City</option>
+                  {cityOptions.map(city => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              ) : (
+                <Input 
+                  name="city"
+                  value={formData.city}
+                  onChange={handleInputChange}
+                  className="border border-gray-300 transition-colors focus:border-blue-400"
+                  placeholder="Enter city name"
+                />
+              )}
             </motion.div>
             
             <motion.div
