@@ -15,6 +15,16 @@ export const findExistingInvoice = (id?: string) => {
  */
 export const initializeFormState = (existingInvoice: any): FormState => {
   return {
+    // Default values for required fields
+    currency: existingInvoice?.currency || "QAR",
+    date: existingInvoice?.date || new Date().toISOString().split('T')[0],
+    shipperEmail: existingInvoice?.shipperEmail || "",
+    consigneeEmail: existingInvoice?.consigneeEmail || "",
+    salesAgent: existingInvoice?.salesAgent || "",
+    bookingFormNumber: existingInvoice?.bookingFormNumber || "",
+    airwayBillNumber: existingInvoice?.airwayBillNumber || "",
+    
+    // Original fields
     sector: existingInvoice?.sector || "COLOMBO : C",
     branch: existingInvoice?.branch || "DOHA : HOF",
     warehouse: existingInvoice?.warehouse || "Colombo : C",
@@ -83,10 +93,10 @@ export const initializeFormState = (existingInvoice: any): FormState => {
     agentName: "",
     agentNumber: "0",
     subZone: "1 : Colombo",
-    paymentMethod: "",
-    paymentStatus: "",
-    paymentDate: "",
-    bankingDate: "",
+    paymentMethod: existingInvoice?.paymentMethod || "",
+    paymentStatus: existingInvoice?.paymentStatus || "",
+    paymentDate: existingInvoice?.paymentDate || new Date().toISOString().split('T')[0],
+    bankingDate: existingInvoice?.bankingDate || new Date().toISOString().split('T')[0],
   };
 };
 
