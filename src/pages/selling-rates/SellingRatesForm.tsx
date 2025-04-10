@@ -1,5 +1,5 @@
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { useSellingRateForm } from "./hooks/useSellingRateForm";
 import { Form } from "@/components/ui/form";
@@ -10,6 +10,7 @@ import FormActions from "./components/FormActions";
 
 const SellingRatesForm = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   
   const {
     isEditing,

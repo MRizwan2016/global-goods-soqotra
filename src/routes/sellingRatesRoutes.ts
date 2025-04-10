@@ -10,7 +10,7 @@ export const sellingRatesRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/data-entry/selling-rates",  // This route was available but no changes were being made
+    path: "/data-entry/selling-rates",
     element: SellingRatesList,
     private: true
   },
@@ -20,17 +20,17 @@ export const sellingRatesRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/data-entry/selling-rates/new",  // Add this route
+    path: "/data-entry/selling-rates/new",
     element: SellingRatesForm,
     private: true
   },
   {
-    path: "/selling-rates/edit/:id",  // Fix: Change from /selling-rates/edit to include the :id parameter
+    path: "/selling-rates/edit/:id",
     element: SellingRatesForm,
     private: true
   },
   {
-    path: "/data-entry/selling-rates/edit/:id",  // Add this route with the :id parameter
+    path: "/data-entry/selling-rates/edit/:id",
     element: SellingRatesForm,
     private: true
   }
