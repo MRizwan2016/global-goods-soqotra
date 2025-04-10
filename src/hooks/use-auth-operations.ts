@@ -3,6 +3,7 @@ import { useState } from "react";
 import { User } from "@/types/auth";
 import { toast } from "@/hooks/use-toast";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "@/constants/auth";
+import { ensureUserPermissions } from "@/utils/auth-utils";
 
 export function useAuthOperations(
   users: User[], 
@@ -38,8 +39,10 @@ export function useAuthOperations(
     console.log("Password check:", user ? userPasswords[user.id] === password : false);
     
     if (user && userPasswords[user.id] === password) {
-      setCurrentUser(user);
-      localStorage.setItem("currentUser", JSON.stringify(user));
+      // Ensure user has all required permissions properly set up
+      const userWithPermissions = ensureUserPermissions(user);
+      setCurrentUser(userWithPermissions);
+      localStorage.setItem("currentUser", JSON.stringify(userWithPermissions));
       toast({
         title: "Login Successful",
         description: `Welcome back, ${user.fullName}!`,
@@ -76,7 +79,7 @@ export function useAuthOperations(
       return false;
     }
 
-    // Create new user
+    // Create new user with default permissions
     const newUser: User = {
       id: `user-${Date.now()}`,
       fullName: userData.fullName,
@@ -93,7 +96,19 @@ export function useAuthOperations(
         downloads: false,
         accounting: false,
         controlPanel: false,
-        files: {}
+        files: {
+          salesRep: true,
+          town: true,
+          item: true,
+          packageOptions: true,
+          sellingRates: true,
+          container: true,
+          vessel: true,
+          invoiceBook: true,
+          driverHelper: true,
+          invoicing: true,
+          paymentReceivable: true
+        }
       }
     };
 
@@ -107,8 +122,8 @@ export function useAuthOperations(
     setUsers(updatedUsers);
     localStorage.setItem("users", JSON.stringify(updatedUsers));
     
-    console.log("User registered:", newUser); // Debug log
-    console.log("Updated users list:", updatedUsers); // Debug log
+    console.log("User registered:", newUser);
+    console.log("Updated users list:", updatedUsers);
     
     toast({
       title: "Registration Successful",

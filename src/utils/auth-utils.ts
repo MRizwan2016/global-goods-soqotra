@@ -19,7 +19,18 @@ export function ensureUserPermissions(user: User): User {
         downloads: user.isAdmin ? true : false,
         accounting: user.isAdmin ? true : false,
         controlPanel: user.isAdmin ? true : false,
-        files: {}
+        files: {
+          salesRep: true,
+          town: true,
+          packageOptions: true,
+          sellingRates: true,
+          container: true,
+          vessel: true,
+          invoiceBook: true,
+          driverHelper: true,
+          invoicing: true,
+          paymentReceivable: true
+        }
       }
     };
   } else if (!user.permissions.files) {
@@ -29,17 +40,44 @@ export function ensureUserPermissions(user: User): User {
         ...user.permissions,
         accounting: user.permissions.accounting ?? user.isAdmin,
         controlPanel: user.permissions.controlPanel ?? user.isAdmin,
-        files: {}
+        files: {
+          salesRep: true,
+          town: true,
+          packageOptions: true,
+          sellingRates: true,
+          container: true,
+          vessel: true,
+          invoiceBook: true,
+          driverHelper: true,
+          invoicing: true,
+          paymentReceivable: true
+        }
       }
     };
   } else {
-    // Ensure new permissions exist
+    // Ensure all file permissions exist with defaults
+    const currentFiles = user.permissions.files || {};
+    
+    // Set default file permissions if not present
     return {
       ...user,
       permissions: {
         ...user.permissions,
         accounting: user.permissions.accounting ?? user.isAdmin,
         controlPanel: user.permissions.controlPanel ?? user.isAdmin,
+        files: {
+          ...currentFiles,
+          salesRep: currentFiles.salesRep ?? true,
+          town: currentFiles.town ?? true,
+          packageOptions: currentFiles.packageOptions ?? true,
+          sellingRates: currentFiles.sellingRates ?? true,
+          container: currentFiles.container ?? true,
+          vessel: currentFiles.vessel ?? true,
+          invoiceBook: currentFiles.invoiceBook ?? true,
+          driverHelper: currentFiles.driverHelper ?? true,
+          invoicing: currentFiles.invoicing ?? true,
+          paymentReceivable: currentFiles.paymentReceivable ?? true
+        }
       }
     };
   }
@@ -85,5 +123,9 @@ export function hasFilePermission(user: User | null, fileKey: keyof User['permis
   if (!user) return false;
   if (user.isAdmin) return true; // Admins have access to everything
   
-  return !!user.permissions?.files?.[fileKey];
+  // Default to true if file permissions aren't specifically set
+  if (!user.permissions?.files) return true;
+  if (user.permissions.files[fileKey] === undefined) return true;
+  
+  return !!user.permissions.files[fileKey];
 }

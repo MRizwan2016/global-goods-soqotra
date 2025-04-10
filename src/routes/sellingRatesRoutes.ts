@@ -7,31 +7,37 @@ export const sellingRatesRoutes: RouteConfig[] = [
   {
     path: "/selling-rates",
     element: SellingRatesList,
-    private: true
+    private: true,
+    requiredFile: "sellingRates"
   },
   {
     path: "/data-entry/selling-rates",
     element: SellingRatesList,
-    private: true
+    private: true,
+    requiredFile: "sellingRates"
   },
   {
     path: "/selling-rates/new",
     element: SellingRatesForm,
-    private: true
+    private: true,
+    requiredFile: "sellingRates"
   },
   {
     path: "/data-entry/selling-rates/new",
     element: SellingRatesForm,
-    private: true
+    private: true,
+    requiredFile: "sellingRates"
   },
   {
     path: "/selling-rates/edit/:id",
     element: SellingRatesForm,
-    private: true
+    private: true,
+    requiredFile: "sellingRates"
   },
   {
     path: "/data-entry/selling-rates/edit/:id",
     element: SellingRatesForm,
-    private: true
+    private: true,
+    requiredFile: "sellingRates"
   }
 ];

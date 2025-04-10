@@ -7,18 +7,24 @@ export function usePermissions() {
   
   const isAdmin = currentUser?.isAdmin || false;
   
-  const hasPermission = (permission: keyof User['permissions']['files']) => {
-    if (!currentUser) return true; // Allow access even if no user is logged in
+  const hasPermission = (permission: keyof User['permissions']) => {
+    if (!currentUser) return false;
     
     if (currentUser.isAdmin) return true;
     
-    if (!currentUser.permissions?.files) return true; // Default to allowing access
-    
-    return (currentUser.permissions.files as any)[permission] === true;
+    return currentUser.permissions[permission] === true;
   };
   
   const hasFilePermission = (filePermission: keyof User['permissions']['files']) => {
-    return hasPermission(filePermission);
+    if (!currentUser) return false;
+    
+    if (currentUser.isAdmin) return true;
+    
+    // Default to true if permissions or files aren't set
+    if (!currentUser.permissions?.files) return true;
+    if (currentUser.permissions.files[filePermission] === undefined) return true;
+    
+    return !!currentUser.permissions.files[filePermission];
   };
   
   return {

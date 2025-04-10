@@ -70,13 +70,15 @@ const PrivateRoute = ({
 
   // Check if specific file permission is required
   if (requiredFile && !isAdmin) {
-    const hasPermission = hasFilePermission(requiredFile as any);
+    // Make sure requiredFile is a string before checking permissions
+    const fileKey = requiredFile as keyof typeof currentUser.permissions.files;
+    const hasPermission = hasFilePermission(fileKey);
     console.log(`File permission ${requiredFile} required, user has access: ${hasPermission}`);
     
     if (!hasPermission) {
       toast({
         title: "Access Denied",
-        description: "You do not have permission to access this page.",
+        description: `You do not have permission to access ${requiredFile}.`,
         variant: "destructive",
       });
       return <Navigate to="/" replace />;
