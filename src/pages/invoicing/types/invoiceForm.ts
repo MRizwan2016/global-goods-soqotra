@@ -1,4 +1,3 @@
-
 export interface PackageItem {
   id: string;
   name: string;
@@ -107,6 +106,8 @@ export interface Invoice {
   net?: number;
   remarks?: string;
   packageDetails?: PackageItem[];
+  consignee1?: string;  // Adding these fields for display in selectors
+  consignee?: string;   // Alternative field name sometimes used
 }
 
 export interface InvoiceFormReturnType {

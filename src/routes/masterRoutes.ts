@@ -37,7 +37,7 @@ export const masterRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/master/town/edit",
+    path: "/master/town/edit/:id",
     element: TownForm,
     private: true
   },

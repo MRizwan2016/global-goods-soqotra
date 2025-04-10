@@ -7,6 +7,7 @@ import { PackageItem, FormState, Invoice } from "../types/invoiceForm";
 import { useFormHandling } from "./useFormHandling";
 import { usePackageHandling } from "./usePackageHandling";
 import { useInvoiceLoader } from "./useInvoiceLoader";
+import { countrySectorMap } from "../constants/countrySectorMap";
 
 export const useInvoiceForm = (id?: string) => {
   const navigate = useNavigate();
@@ -105,7 +106,7 @@ export const useInvoiceForm = (id?: string) => {
 
   const [packageItems, setPackageItems] = useState<PackageItem[]>([]);
   const [showInvoiceSelector, setShowInvoiceSelector] = useState(false);
-  const [availableInvoices, setAvailableInvoices] = useState<any[]>([]);
+  const [availableInvoices, setAvailableInvoices] = useState<Invoice[]>([]);
   const [savedInvoiceId, setSavedInvoiceId] = useState<string>("");
   const [isEditing, setIsEditing] = useState<boolean>(!!id);
 
@@ -135,8 +136,8 @@ export const useInvoiceForm = (id?: string) => {
     updatePackagePricingByCountry();
   };
   
-  // Load invoice data if editing
-  const { loadInvoice, isEditing: loaderIsEditing } = useInvoiceLoader({
+  // Set up invoice loader with required parameters
+  const { loadInvoice } = useInvoiceLoader({
     id,
     setFormState,
     setPackageItems,
@@ -148,7 +149,7 @@ export const useInvoiceForm = (id?: string) => {
     if (id) {
       loadInvoice(id);
     }
-  }, [id]);
+  }, [id, loadInvoice]);
 
   // Wrap the package select handler to ensure proper updates
   const handlePackageSelect = (description: string) => {
@@ -264,5 +265,6 @@ export const useInvoiceForm = (id?: string) => {
     handleSave,
     savedInvoiceId,
     updatePackagePricing,
+    countrySectorMap,
   };
 };

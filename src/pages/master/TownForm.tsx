@@ -5,19 +5,36 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { ArrowLeft, Save, MapPin } from "lucide-react";
+import { motion } from "framer-motion";
 
 const TownForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const isEditMode = Boolean(id);
-  
   const [formData, setFormData] = useState({
+    id: id || `town-${Date.now()}`,
+    name: "",
+    code: "",
     country: "Qatar",
-    city: "DOHA",
-    warehouse: "",
-    sector: "",
-    townName: "",
+    city: "",
+    district: "",
+    active: "Y"
   });
+  
+  // Load existing town data if editing
+  useEffect(() => {
+    if (id) {
+      try {
+        const towns = JSON.parse(localStorage.getItem('towns') || '[]');
+        const town = towns.find((t: any) => t.id === id);
+        if (town) {
+          setFormData(town);
+        }
+      } catch (error) {
+        console.error("Failed to load town data:", error);
+      }
+    }
+  }, [id]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -25,156 +42,185 @@ const TownForm = () => {
       ...formData,
       [name]: value
     });
-    
-    // Reset dependent fields when country changes
-    if (name === "country") {
-      setFormData(prev => ({
-        ...prev,
-        city: value === "Qatar" ? "DOHA" : "MOMBASA WAREHOUSE",
-        warehouse: "",
-        sector: "",
-        townName: ""
-      }));
-    }
-    
-    // Reset sector when warehouse changes
-    if (name === "warehouse") {
-      setFormData(prev => ({
-        ...prev,
-        sector: "",
-        townName: ""
-      }));
-    }
   };
   
   const handleSave = () => {
-    if (!formData.townName.trim()) {
+    if (!formData.name.trim()) {
       toast.error("Please enter a town name");
       return;
     }
     
-    toast.success("Town added successfully");
-    navigate("/master/town");
+    if (!formData.code.trim()) {
+      toast.error("Please enter a town code");
+      return;
+    }
+    
+    try {
+      // Save to localStorage for persistence
+      const existingTowns = JSON.parse(localStorage.getItem('towns') || '[]');
+      
+      if (id) {
+        // Update existing
+        const index = existingTowns.findIndex((t: any) => t.id === id);
+        if (index !== -1) {
+          existingTowns[index] = formData;
+        } else {
+          existingTowns.push(formData);
+        }
+      } else {
+        // Add new
+        existingTowns.push(formData);
+      }
+      
+      localStorage.setItem('towns', JSON.stringify(existingTowns));
+      toast.success("Town saved successfully");
+      navigate("/master/town");
+    } catch (error) {
+      console.error("Error saving town:", error);
+      toast.error("Failed to save town");
+    }
   };
-  
-  // Kenya warehouse options
-  const kenyaWarehouses = [
-    "MOMBASA WAREHOUSE", 
-    "NAIROBI WAREHOUSE"
-  ];
-  
-  // Kenya sectors based on warehouse
-  const kenyaSectors: Record<string, string[]> = {
-    "MOMBASA WAREHOUSE": ["NORTH COAST", "SOUTH COAST"],
-    "NAIROBI WAREHOUSE": ["NAIROBI NORTH", "NAIROBI WEST", "NAIROBI SOUTH", "NAIROBI EAST", "SOUTH EAST"]
-  };
-  
-  // Qatar city options
-  const qatarCities = ["DOHA", "AL RAYYAN", "AL WAKRAH"];
   
   return (
-    <Layout title={isEditMode ? "Edit Town" : "Add Town"}>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 animate-fade-in">
-        <div className="p-4 bg-green-50 border-b border-green-100">
-          <h3 className="text-lg font-medium text-green-800">
-            {isEditMode ? "Edit Town" : "Add Town"}
+    <Layout title={id ? "Edit Town" : "Add Town"}>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="bg-white rounded-lg shadow-sm border border-gray-200"
+      >
+        <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-b border-blue-100">
+          <h3 className="text-lg font-medium text-blue-800 flex items-center">
+            <MapPin className="mr-2 h-5 w-5 text-blue-700" />
+            {id ? "Update" : "Add"} Town
           </h3>
         </div>
         
         <div className="p-6">
-          <div className="grid grid-cols-1 gap-6 max-w-3xl">
-            <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">COUNTRY:</label>
-              <select 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
+            <motion.div
+              className="flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
+              <label className="text-sm font-medium mb-1">Town Name:</label>
+              <Input 
+                name="name"
+                value={formData.name}
+                onChange={handleInputChange}
+                className="border border-gray-300 transition-colors focus:border-blue-400"
+                placeholder="Enter town name"
+              />
+            </motion.div>
+            
+            <motion.div
+              className="flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              <label className="text-sm font-medium mb-1">Town Code:</label>
+              <Input 
+                name="code"
+                value={formData.code}
+                onChange={handleInputChange}
+                className="border border-gray-300 transition-colors focus:border-blue-400"
+                placeholder="Enter town code"
+              />
+            </motion.div>
+            
+            <motion.div
+              className="flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <label className="text-sm font-medium mb-1">Country:</label>
+              <select
                 name="country"
                 value={formData.country}
                 onChange={handleInputChange}
-                className="flex h-10 w-full rounded-md border border-blue-500 bg-blue-500 text-white px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
                 <option value="Qatar">Qatar</option>
+                <option value="UAE">UAE</option>
+                <option value="Saudi Arabia">Saudi Arabia</option>
                 <option value="Kenya">Kenya</option>
+                <option value="Sri Lanka">Sri Lanka</option>
               </select>
-            </div>
+            </motion.div>
             
-            {formData.country === "Qatar" ? (
-              <div className="flex flex-col">
-                <label className="text-sm font-medium mb-1">CITY:</label>
-                <select 
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  className="flex h-10 w-full rounded-md border border-blue-500 bg-blue-500 text-white px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                >
-                  {qatarCities.map(city => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
-              </div>
-            ) : (
-              <>
-                <div className="flex flex-col">
-                  <label className="text-sm font-medium mb-1">WAREHOUSE:</label>
-                  <select 
-                    name="warehouse"
-                    value={formData.warehouse}
-                    onChange={handleInputChange}
-                    className="flex h-10 w-full rounded-md border border-blue-500 bg-blue-500 text-white px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  >
-                    <option value="">Select Warehouse</option>
-                    {kenyaWarehouses.map(warehouse => (
-                      <option key={warehouse} value={warehouse}>{warehouse}</option>
-                    ))}
-                  </select>
-                </div>
-                
-                {formData.warehouse && (
-                  <div className="flex flex-col">
-                    <label className="text-sm font-medium mb-1">SECTOR:</label>
-                    <select 
-                      name="sector"
-                      value={formData.sector}
-                      onChange={handleInputChange}
-                      className="flex h-10 w-full rounded-md border border-blue-500 bg-blue-500 text-white px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                    >
-                      <option value="">Select Sector</option>
-                      {kenyaSectors[formData.warehouse]?.map(sector => (
-                        <option key={sector} value={sector}>{sector}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </>
-            )}
-            
-            <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">TOWN NAME:</label>
+            <motion.div
+              className="flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
+              <label className="text-sm font-medium mb-1">City:</label>
               <Input 
-                name="townName"
-                value={formData.townName}
+                name="city"
+                value={formData.city}
                 onChange={handleInputChange}
-                className="border border-gray-300 transition-colors focus:border-green-400"
-                placeholder="Enter town name"
+                className="border border-gray-300 transition-colors focus:border-blue-400"
+                placeholder="Enter city name"
               />
-            </div>
+            </motion.div>
+            
+            <motion.div
+              className="flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <label className="text-sm font-medium mb-1">District:</label>
+              <Input 
+                name="district"
+                value={formData.district}
+                onChange={handleInputChange}
+                className="border border-gray-300 transition-colors focus:border-blue-400"
+                placeholder="Enter district"
+              />
+            </motion.div>
+            
+            <motion.div
+              className="flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 }}
+            >
+              <label className="text-sm font-medium mb-1">Active:</label>
+              <select
+                name="active"
+                value={formData.active}
+                onChange={handleInputChange}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              >
+                <option value="Y">Yes</option>
+                <option value="N">No</option>
+              </select>
+            </motion.div>
           </div>
           
           <div className="mt-8 flex gap-3">
             <Button 
               onClick={handleSave}
-              className="bg-blue-500 hover:bg-blue-600 transition-colors hover:scale-105 transform duration-200"
+              className="bg-blue-600 hover:bg-blue-700 transition-colors hover:scale-105 transform duration-200 flex items-center"
             >
-              Save
+              <Save className="mr-2 h-4 w-4" />
+              Save Town
             </Button>
             <Button 
               onClick={() => navigate("/master/town")}
               variant="outline"
-              className="border-gray-300 transition-colors hover:border-blue-400"
+              className="border-gray-300 transition-colors hover:border-blue-400 flex items-center"
             >
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Go Back
             </Button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </Layout>
   );
 };

@@ -1,14 +1,18 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { ArrowLeft, Save, UserPlus } from "lucide-react";
+import { motion } from "framer-motion";
 
 const SalesRepForm = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [formData, setFormData] = useState({
+    id: id || `sales-rep-${Date.now()}`,
     name: "",
     employeeNumber: "",
     operation: "UPB - SYSTEM",
@@ -34,22 +38,55 @@ const SalesRepForm = () => {
       return;
     }
     
-    toast.success("Sales representative added successfully");
-    navigate("/master/sales-rep");
+    try {
+      // Save to localStorage for persistence
+      const existingSalesReps = JSON.parse(localStorage.getItem('salesReps') || '[]');
+      
+      if (id) {
+        // Update existing
+        const index = existingSalesReps.findIndex((rep: any) => rep.id === id);
+        if (index !== -1) {
+          existingSalesReps[index] = formData;
+        } else {
+          existingSalesReps.push(formData);
+        }
+      } else {
+        // Add new
+        existingSalesReps.push(formData);
+      }
+      
+      localStorage.setItem('salesReps', JSON.stringify(existingSalesReps));
+      toast.success("Sales representative saved successfully");
+      navigate("/master/salesrep/list");
+    } catch (error) {
+      console.error("Error saving sales rep:", error);
+      toast.error("Failed to save sales representative");
+    }
   };
   
   return (
     <Layout title="Add Sales Representative">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 animate-fade-in">
-        <div className="p-4 bg-green-50 border-b border-green-100">
-          <h3 className="text-lg font-medium text-green-800">
-            Add Sales Representative
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="bg-white rounded-lg shadow-sm border border-gray-200 animate-fade-in"
+      >
+        <div className="p-4 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-green-100">
+          <h3 className="text-lg font-medium text-green-800 flex items-center">
+            <UserPlus className="mr-2 h-5 w-5 text-green-700" />
+            {id ? "Update" : "Add"} Sales Representative
           </h3>
         </div>
         
         <div className="p-6">
           <div className="grid grid-cols-1 gap-6 max-w-3xl">
-            <div className="flex flex-col">
+            <motion.div
+              className="flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
               <label className="text-sm font-medium mb-1">NAME:</label>
               <Input 
                 name="name"
@@ -58,9 +95,14 @@ const SalesRepForm = () => {
                 className="border border-gray-300 transition-colors focus:border-green-400"
                 placeholder="Enter name"
               />
-            </div>
+            </motion.div>
             
-            <div className="flex flex-col">
+            <motion.div
+              className="flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               <label className="text-sm font-medium mb-1">EMPLOYEE NUMBER:</label>
               <Input 
                 name="employeeNumber"
@@ -69,9 +111,14 @@ const SalesRepForm = () => {
                 className="border border-gray-300 transition-colors focus:border-green-400"
                 placeholder="Enter employee number"
               />
-            </div>
+            </motion.div>
             
-            <div className="flex flex-col">
+            <motion.div
+              className="flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               <label className="text-sm font-medium mb-1">OPERATION:</label>
               <select
                 name="operation"
@@ -83,9 +130,14 @@ const SalesRepForm = () => {
                 <option value="ICG">ICG</option>
                 <option value="OTHER">OTHER</option>
               </select>
-            </div>
+            </motion.div>
             
-            <div className="flex flex-col">
+            <motion.div
+              className="flex flex-col"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4 }}
+            >
               <label className="text-sm font-medium mb-1">AVAILABLE:</label>
               <select
                 name="available"
@@ -96,26 +148,28 @@ const SalesRepForm = () => {
                 <option value="Y">Y</option>
                 <option value="N">N</option>
               </select>
-            </div>
+            </motion.div>
           </div>
           
           <div className="mt-8 flex gap-3">
             <Button 
               onClick={handleSave}
-              className="bg-blue-500 hover:bg-blue-600 transition-colors hover:scale-105 transform duration-200"
+              className="bg-green-600 hover:bg-green-700 transition-colors hover:scale-105 transform duration-200 flex items-center"
             >
+              <Save className="mr-2 h-4 w-4" />
               Save
             </Button>
             <Button 
-              onClick={() => navigate("/master/sales-rep")}
+              onClick={() => navigate("/master/salesrep/list")}
               variant="outline"
-              className="border-gray-300 transition-colors hover:border-blue-400"
+              className="border-gray-300 transition-colors hover:border-green-400 flex items-center"
             >
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Go Back
             </Button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </Layout>
   );
 };
