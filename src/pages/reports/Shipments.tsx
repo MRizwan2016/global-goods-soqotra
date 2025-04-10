@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
@@ -34,8 +33,13 @@ const Shipments = () => {
     // Load invoice data and convert to shipments
     const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
     
-    // Extract unique countries
-    const uniqueCountries = Array.from(new Set(invoices.map((invoice: any) => invoice.destination || 'Unknown')));
+    // Extract unique countries and ensure they are strings
+    const uniqueCountries = Array.from(
+      new Set(
+        invoices.map((invoice: any) => invoice.destination || 'Unknown')
+      )
+    ).map(country => String(country));
+    
     setCountries(uniqueCountries);
     
     // Generate random statuses for demo
