@@ -38,13 +38,17 @@ export const JobStorageService = {
 
   // Save a new job
   saveJob: (jobData: Partial<QatarJob>): QatarJob => {
+    // Ensure job has a job number
+    if (!jobData.jobNumber) {
+      jobData.jobNumber = JobNumberService.generateJobNumber();
+    }
+    
     // Create a new job with generated ID and default status
     const newJob: QatarJob = {
       id: uuidv4(),
       status: 'PENDING',
       date: new Date().toLocaleDateString("en-GB"),
-      // Use the job number from jobData if present, or generate a new one
-      jobNumber: jobData.jobNumber || JobNumberService.generateJobNumber(),
+      jobNumber: jobData.jobNumber,
       ...jobData,
     } as QatarJob;
 

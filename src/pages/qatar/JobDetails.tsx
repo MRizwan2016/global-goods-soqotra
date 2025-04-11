@@ -3,9 +3,9 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { toast } from "sonner";
-import { mockJobs } from "./data/mockJobData";
 import { QatarJob } from "./types/jobTypes";
 import JobForm from "./components/JobForm";
+import { JobStorageService } from "./services/JobStorageService";
 
 const JobDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -14,33 +14,43 @@ const JobDetails = () => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
-    // In a real application, you would fetch the job data from an API
-    // For now, we'll simulate this with our mock data
+    // Fetch the job data from JobStorageService
     const fetchJob = () => {
       setLoading(true);
-      setTimeout(() => {
-        const foundJob = mockJobs.find(j => j.id === id);
+      
+      if (id) {
+        const foundJob = JobStorageService.getJobById(id);
         if (foundJob) {
           setJob(foundJob);
         } else {
           toast.error("Job not found!");
           navigate("/qatar");
         }
-        setLoading(false);
-      }, 300);
+      }
+      
+      setLoading(false);
     };
     
     fetchJob();
   }, [id, navigate]);
   
   const handleUpdateJob = (jobData: any) => {
+    if (!id) return;
+    
     console.log("Updating job:", jobData);
     
-    // Here you would normally submit the data to an API
-    // For now, we'll just simulate success and navigate back
-    
-    toast.success("Job updated successfully!");
-    navigate("/qatar");
+    try {
+      const updatedJob = JobStorageService.updateJob(id, jobData);
+      if (updatedJob) {
+        toast.success("Job updated successfully!");
+        navigate("/qatar");
+      } else {
+        toast.error("Failed to update job");
+      }
+    } catch (error) {
+      console.error("Error updating job:", error);
+      toast.error("An error occurred while updating the job");
+    }
   };
   
   if (loading) {
