@@ -18,6 +18,9 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
           /* Reset all elements to ensure proper printing */
           * {
             box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
           }
           
           /* Make sure everything is visible in print */
@@ -61,9 +64,6 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
           /* Make headings and text print with the right colors */
           h1, h2, h3, h4, h5, h6, p, table, div {
             color: black !important;
-            color-adjust: exact !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
           }
           
           /* Ensure tables print properly */
@@ -88,13 +88,12 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
             page-break-after: auto;
           }
           
-          /* Add page breaks if needed */
-          .page-break-before {
-            page-break-before: always;
-          }
-          
-          .page-break-after {
-            page-break-after: always;
+          /* Badge styles for print */
+          .badge, [class*="badge-"], .badge-outline, [class*="-badge"] {
+            background-color: white !important;
+            color: black !important;
+            border: 1px solid #333 !important;
+            text-shadow: none !important;
           }
           
           /* Special formatting for the container header */
@@ -114,6 +113,13 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
           img {
             max-width: 100% !important;
             page-break-inside: avoid;
+          }
+          
+          /* QR code specific styles */
+          svg, canvas, .qrcode {
+            background-color: white !important;
+            display: block !important;
+            visibility: visible !important;
           }
         }
       `}

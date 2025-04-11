@@ -40,19 +40,22 @@ const ScheduleContainer: React.FC<ScheduleContainerProps> = ({
       printRef.current.style.visibility = "visible";
     }
     
-    // Always allow printing even if data validation fails
-    try {
-      validateScheduleData(scheduleData);
-      window.print();
-    } catch (error) {
-      console.warn("Print proceeded with validation warnings:", error);
-      window.print();
-    }
+    // Add a slight delay to ensure styles are applied
+    setTimeout(() => {
+      // Always allow printing even if data validation fails
+      try {
+        validateScheduleData(scheduleData);
+        window.print();
+      } catch (error) {
+        console.warn("Print proceeded with validation warnings:", error);
+        window.print();
+      }
+    }, 300);
   };
   
   return (
     <div className="min-h-screen bg-white print-container">
-      <PrintStyles />
+      <PrintStyles orientation="landscape" />
       
       <PrintScheduleControls 
         handleBack={handleBack}

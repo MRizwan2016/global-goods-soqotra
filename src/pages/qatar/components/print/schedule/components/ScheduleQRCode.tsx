@@ -13,7 +13,7 @@ const ScheduleQRCode: React.FC<ScheduleQRCodeProps> = ({ scheduleNumber }) => {
   const currentDate = new Date().toISOString().split('T')[0];
   
   // Format: URL with parameters for proper routing
-  const qrValue = `${baseUrl}/qatar/jobs/print?schedule=${scheduleNumber}&date=${currentDate}&verified=true`;
+  const qrValue = `${baseUrl}/qatar/jobs/schedule?id=${scheduleNumber}&date=${currentDate}&verified=true`;
   
   return (
     <div className="print:block" style={{ width: "80px", height: "80px" }}>
@@ -22,6 +22,7 @@ const ScheduleQRCode: React.FC<ScheduleQRCodeProps> = ({ scheduleNumber }) => {
         size={80}
         level="H"
         includeMargin={true}
+        className="bg-white" // Ensure white background for better contrast
       />
       <div className="text-xs text-center mt-1 text-gray-500">
         Scan to verify

@@ -72,12 +72,14 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
     // Look for job number using our JobNumberService
     const jobNum = JobNumberService.getJobNumberByInvoice(invoiceNumber);
     if (jobNum) {
+      console.log("Found job number from service:", jobNum);
       setJobNumber(jobNum);
     } else {
       // As a fallback, look for linked job number in jobs directly
-      const jobNumber = JobStorageService.getJobNumberByInvoiceNumber(invoiceNumber);
-      if (jobNumber) {
-        setJobNumber(jobNumber);
+      const foundJobNumber = JobStorageService.getJobNumberByInvoiceNumber(invoiceNumber);
+      if (foundJobNumber) {
+        console.log("Found job number from storage:", foundJobNumber);
+        setJobNumber(foundJobNumber);
       } else if (formState.country) {
         // If we have a country but no job number yet, show a preview
         const previewJobNumber = JobNumberService.peekNextJobNumber(formState.country);
@@ -116,6 +118,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
         name="jobNumber"
         value={formState.jobNumber || jobNumber}
         readOnly
+        className="font-bold text-black"
       />
       
       {assignedUser && (

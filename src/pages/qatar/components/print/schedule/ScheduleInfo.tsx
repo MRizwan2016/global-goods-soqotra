@@ -52,7 +52,7 @@ const ScheduleInfo: React.FC<ScheduleInfoProps> = ({ scheduleData }) => {
           <div className="col-span-2 md:col-span-3">
             <strong>CITY:</strong> {city}
             {cityVehicleMapping[city]?.length > 0 && (
-              <Badge className="ml-2">
+              <Badge variant="outline" className="ml-2 bg-white text-black border border-black">
                 Recommended Truck: {cityVehicleMapping[city][0]}
               </Badge>
             )}
@@ -63,7 +63,13 @@ const ScheduleInfo: React.FC<ScheduleInfoProps> = ({ scheduleData }) => {
           <div className="col-span-2 md:col-span-3">
             <strong>RECOMMENDED FOR CITIES:</strong> {' '}
             {vehicleCities.map(cityCode => (
-              <Badge key={cityCode} className="mr-1">{cityCode}</Badge>
+              <Badge 
+                key={cityCode} 
+                variant="outline" 
+                className="mr-1 bg-white text-black border border-black print:bg-white print:text-black"
+              >
+                {cityCode}
+              </Badge>
             ))}
           </div>
         )}

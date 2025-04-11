@@ -1,36 +1,44 @@
 
 import React from "react";
-import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 interface InputFieldProps {
-  label: React.ReactNode;
+  label: string;
   name: string;
-  value: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  value: string | number;
   readOnly?: boolean;
-  type?: string;
   className?: string;
 }
 
-const InputField: React.FC<InputFieldProps> = ({
-  label,
-  name,
-  value,
-  onChange,
+const InputField: React.FC<InputFieldProps> = ({ 
+  label, 
+  name, 
+  value, 
   readOnly = false,
-  type = "text",
-  className = "",
+  className
 }) => {
+  const isJobNumber = name === 'jobNumber' || name === 'jobNumberDisplay';
+  
   return (
-    <div className="flex flex-col">
-      <label className="text-sm font-medium mb-1">{label}</label>
-      <Input 
+    <div className="mb-3">
+      <label 
+        htmlFor={name} 
+        className="block text-xs text-gray-500 uppercase mb-1"
+      >
+        {label}
+      </label>
+      <input
+        type="text"
+        id={name}
         name={name}
-        value={value}
-        onChange={onChange}
+        value={value || ''}
         readOnly={readOnly}
-        className={`border border-gray-300 ${readOnly ? 'bg-gray-50' : ''} ${className}`}
-        type={type}
+        className={cn(
+          "w-full p-2 border border-gray-300 rounded text-sm",
+          readOnly ? "bg-gray-50" : "",
+          isJobNumber ? "font-bold text-black" : "",
+          className
+        )}
       />
     </div>
   );
