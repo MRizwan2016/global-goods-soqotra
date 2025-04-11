@@ -48,10 +48,11 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
     if (jobId) {
       const existingJob = JobStorageService.getJobById(jobId);
       if (existingJob) {
-        setJobData(prev => ({
-          ...prev,
-          ...existingJob
-        }));
+        setJobData({
+          ...existingJob,
+          // Ensure advanceAmount is a string for form handling
+          advanceAmount: existingJob.advanceAmount?.toString() || ""
+        });
         setIsJobNumberGenerated(true);
       }
     }
@@ -95,7 +96,9 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
     
     onSubmit({
       ...jobData,
-      items: jobItems
+      items: jobItems,
+      // Convert advance amount to number for storage
+      advanceAmount: parseFloat(jobData.advanceAmount) || 0
     });
   };
   

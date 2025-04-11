@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { FormState, PackageItem } from "../types/invoiceForm";
 import { useInvoiceSubmit } from "./useInvoiceSubmit";
+import { JobStorageService } from "@/pages/qatar/services/JobStorageService";
 
 // Define the input interface for better type safety
 interface SaveInvoiceProps {
@@ -53,9 +54,21 @@ export const useSaveInvoice = ({
     try {
       console.log("Saving invoice with data:", { formState, packageItems, isEditing, id });
       
-      // Add updatedAt timestamp for sorting in invoice list
+      // Check for linked jobs to get job number
+      let jobNumber = formState.jobNumber || "";
+      if (!jobNumber) {
+        // Try to find if this invoice is already linked to a job
+        const allJobs = JobStorageService.getAllJobs();
+        const linkedJob = allJobs.find(job => job.invoiceNumber === formState.invoiceNumber);
+        if (linkedJob && linkedJob.jobNumber) {
+          jobNumber = linkedJob.jobNumber;
+        }
+      }
+      
+      // Add updatedAt timestamp and job number for sorting in invoice list
       const updatedFormState = {
         ...formState,
+        jobNumber: jobNumber,
         updatedAt: new Date().toISOString()
       };
       

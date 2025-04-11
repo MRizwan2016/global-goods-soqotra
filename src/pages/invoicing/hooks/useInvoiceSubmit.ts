@@ -1,6 +1,7 @@
 
 import { toast } from "sonner";
 import { FormState, PackageItem } from "../types/invoiceForm";
+import { JobStorageService } from "@/pages/qatar/services/JobStorageService";
 
 export const useInvoiceSubmit = () => {
   const handleSubmit = async (formState: FormState, packageItems: PackageItem[], isEditing: boolean, id?: string): Promise<string> => {
@@ -40,9 +41,21 @@ export const useInvoiceSubmit = () => {
     // Get existing invoices from localStorage
     const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
     
+    // Check for linked jobs to get job number
+    let jobNumber = formState.jobNumber || "";
+    if (!jobNumber) {
+      // Try to find if this invoice is already linked to a job
+      const allJobs = JobStorageService.getAllJobs();
+      const linkedJob = allJobs.find(job => job.invoiceNumber === formState.invoiceNumber);
+      if (linkedJob && linkedJob.jobNumber) {
+        jobNumber = linkedJob.jobNumber;
+      }
+    }
+    
     // Create the complete invoice object
     const completeInvoice = { 
       ...formState, 
+      jobNumber,
       id: invoiceId, 
       packageDetails: packageItems,
       updatedAt: new Date().toISOString()
@@ -82,6 +95,23 @@ export const useInvoiceSubmit = () => {
       localStorage.setItem('usedInvoiceNumbers', JSON.stringify(invoiceNumbers));
     } catch (error) {
       console.error("Error saving invoice numbers list:", error);
+    }
+    
+    // Update related job if it exists
+    try {
+      if (completeInvoice.invoiceNumber) {
+        const allJobs = JobStorageService.getAllJobs();
+        const relatedJob = allJobs.find(job => job.invoiceNumber === completeInvoice.invoiceNumber);
+        
+        if (relatedJob && completeInvoice.jobNumber !== relatedJob.jobNumber) {
+          JobStorageService.updateJob(relatedJob.id, {
+            ...relatedJob,
+            jobNumber: completeInvoice.jobNumber
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error updating related job:", error);
     }
     
     console.log(`Invoice ${isEditing ? 'updated' : 'created'} with ID: ${invoiceId}`);

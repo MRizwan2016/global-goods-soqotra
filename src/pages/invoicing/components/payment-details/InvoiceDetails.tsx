@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import InputField from "./InputField";
 import { mockInvoiceBooks } from "../../constants/mockInvoiceBooks";
+import { JobStorageService } from "@/pages/qatar/services/JobStorageService";
 
 interface InvoiceDetailsProps {
   formState: any;
@@ -11,6 +12,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
   formState,
 }) => {
   const [assignedUser, setAssignedUser] = useState<string>("");
+  const [jobNumber, setJobNumber] = useState<string>("");
   
   // Find the assigned user whenever the invoice number changes
   useEffect(() => {
@@ -49,6 +51,23 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
       }
       
       setAssignedUser(foundUser);
+
+      // Look for linked job number in existing invoices
+      const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+      const matchingInvoice = existingInvoices.find((inv: any) => inv.invoiceNumber === formState.invoiceNumber);
+      
+      if (matchingInvoice && matchingInvoice.jobNumber) {
+        setJobNumber(matchingInvoice.jobNumber);
+      } else {
+        // Try to find job by invoice number
+        const allJobs = JobStorageService.getAllJobs();
+        const matchingJob = allJobs.find(job => job.invoiceNumber === formState.invoiceNumber);
+        if (matchingJob) {
+          setJobNumber(matchingJob.jobNumber);
+        } else {
+          setJobNumber("");
+        }
+      }
     }
   }, [formState.invoiceNumber]);
   
@@ -74,6 +93,15 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
         value={formState.invoiceNumber}
         readOnly
       />
+      
+      {jobNumber && (
+        <InputField 
+          label="JOB NUMBER"
+          name="jobNumber"
+          value={jobNumber}
+          readOnly
+        />
+      )}
       
       {assignedUser && (
         <InputField 

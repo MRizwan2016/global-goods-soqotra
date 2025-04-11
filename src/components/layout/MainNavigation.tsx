@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { NavigationSection } from './NavigationSection';
+import NavigationSection from './NavigationSection';
 import { navigationConfig } from './navigationConfig';
 import { useAuth } from '@/hooks/use-auth';
 import { usePermissions } from '@/hooks/use-permissions';
@@ -74,3 +74,5 @@ export const MainNavigation: React.FC = () => {
     </nav>
   );
 };
+
+export default MainNavigation;

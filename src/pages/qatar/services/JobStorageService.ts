@@ -5,7 +5,6 @@ import { JobNumberService } from "@/services/JobNumberService";
 
 // Storage key for localStorage
 const STORAGE_KEY = 'qatar_jobs';
-const JOB_COUNTER_KEY = 'qatar_job_counter';
 
 // Get initial jobs by combining mock data with any stored jobs
 const getInitialJobs = (): QatarJob[] => {
@@ -36,6 +35,11 @@ export const JobStorageService = {
     return jobs.find(job => job.id === id);
   },
 
+  // Get job by job number
+  getJobByNumber: (jobNumber: string): QatarJob | undefined => {
+    return jobs.find(job => job.jobNumber === jobNumber);
+  },
+
   // Save a new job
   saveJob: (jobData: Partial<QatarJob>): QatarJob => {
     // Ensure job has a job number
@@ -48,8 +52,11 @@ export const JobStorageService = {
       id: uuidv4(),
       status: 'PENDING',
       date: new Date().toLocaleDateString("en-GB"),
-      jobNumber: jobData.jobNumber,
       ...jobData,
+      // Ensure advanceAmount is a number
+      advanceAmount: parseFloat(jobData.advanceAmount as unknown as string) || 0,
+      entryBy: "System User",
+      entryDate: new Date().toISOString()
     } as QatarJob;
 
     // Add to jobs array
@@ -63,6 +70,20 @@ export const JobStorageService = {
       JobNumberService.addUsedJobNumber(newJob.jobNumber);
     }
     
+    // Sync with invoice data if invoiceNumber is provided
+    if (newJob.invoiceNumber) {
+      try {
+        const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+        const matchingInvoice = invoices.find((inv: any) => inv.invoiceNumber === newJob.invoiceNumber);
+        if (matchingInvoice) {
+          matchingInvoice.jobNumber = newJob.jobNumber;
+          localStorage.setItem('invoices', JSON.stringify(invoices));
+        }
+      } catch (error) {
+        console.error('Error syncing job number with invoice:', error);
+      }
+    }
+    
     return newJob;
   },
 
@@ -72,11 +93,31 @@ export const JobStorageService = {
     
     if (index === -1) return null;
     
-    const updatedJob = { ...jobs[index], ...jobData };
+    const updatedJob = { 
+      ...jobs[index], 
+      ...jobData,
+      // Ensure advanceAmount is a number
+      advanceAmount: parseFloat(jobData.advanceAmount as unknown as string) || jobs[index].advanceAmount || 0
+    };
+    
     jobs = [...jobs.slice(0, index), updatedJob, ...jobs.slice(index + 1)];
     
     // Save to localStorage
     localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
+    
+    // Sync with invoice data if invoiceNumber is provided
+    if (updatedJob.invoiceNumber) {
+      try {
+        const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+        const matchingInvoice = invoices.find((inv: any) => inv.invoiceNumber === updatedJob.invoiceNumber);
+        if (matchingInvoice) {
+          matchingInvoice.jobNumber = updatedJob.jobNumber;
+          localStorage.setItem('invoices', JSON.stringify(invoices));
+        }
+      } catch (error) {
+        console.error('Error syncing job number with invoice:', error);
+      }
+    }
     
     return updatedJob;
   },

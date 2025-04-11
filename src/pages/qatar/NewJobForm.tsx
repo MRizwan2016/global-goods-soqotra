@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Save, ArrowLeft, Truck } from "lucide-react";
 import { JobStorageService } from "./services/JobStorageService";
+import { JobNumberService } from "@/services/JobNumberService";
 
 const NewJobForm = () => {
   const navigate = useNavigate();
@@ -23,14 +24,23 @@ const NewJobForm = () => {
     }
     
     try {
-      // Clear the job number if it was provided - let the service generate a unique one
-      if (jobData.jobNumber) {
-        delete jobData.jobNumber;
-      }
-      
       // Save the job using our storage service
       const savedJob = JobStorageService.saveJob(jobData);
       console.log("Job saved successfully:", savedJob);
+
+      // If there's an invoice number, update the invoice to include the job number
+      if (savedJob.invoiceNumber) {
+        try {
+          const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+          const matchingInvoice = invoices.find((inv: any) => inv.invoiceNumber === savedJob.invoiceNumber);
+          if (matchingInvoice) {
+            matchingInvoice.jobNumber = savedJob.jobNumber;
+            localStorage.setItem('invoices', JSON.stringify(invoices));
+          }
+        } catch (error) {
+          console.error('Error linking job number with invoice:', error);
+        }
+      }
       
       setTimeout(() => {
         toast.success("Job created successfully!");
