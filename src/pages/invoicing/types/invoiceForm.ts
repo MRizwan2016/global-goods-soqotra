@@ -78,7 +78,7 @@ export interface FormState {
   catZone?: string;
   giftCargo?: string;
   prePaid?: string;
-  selectedPackage?: any | null; // Changed from string to any to support both string and object
+  selectedPackage?: any; // Changed from string to any to support both string and object
   cubicFeet?: string;
   volumeWeight?: string;
   handOverBy?: string;

@@ -6,7 +6,7 @@ import UserProfileSection from "./UserProfileSection";
 
 const SidebarWrapper = () => {
   return (
-    <div className="w-60 min-h-screen bg-white border-r border-gray-200 shadow-sm flex-shrink-0">
+    <div className="w-72 min-h-screen bg-white border-r border-gray-200 shadow-sm flex-shrink-0">
       <div className="flex flex-col h-full">
         {/* Logo and Company Name Section */}
         <div className="p-4 border-b border-gray-200">
