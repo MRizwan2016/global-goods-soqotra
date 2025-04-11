@@ -1,12 +1,12 @@
 
 import React, { RefObject } from "react";
-import { QatarJob } from "../../../../types/jobTypes";
-import PrintHeader from "../../schedule/PrintHeader";
-import ScheduleInfo from "../../schedule/ScheduleInfo";
-import JobItem from "../../schedule/JobItem";
-import JobSummary from "../../schedule/JobSummary";
-import { useJobSummaryCalculations } from "../../schedule/useJobSummaryCalculations";
-import { useUserInfo } from "../../schedule/useUserInfo";
+import { QatarJob } from "../../../types/jobTypes";
+import PrintHeader from "./PrintHeader";
+import ScheduleInfo from "./ScheduleInfo";
+import JobItem from "./JobItem";
+import JobSummary from "./JobSummary";
+import { useJobSummaryCalculations } from "./useJobSummaryCalculations";
+import { useUserInfo } from "./useUserInfo";
 
 interface ScheduleContentProps {
   jobs: QatarJob[];
