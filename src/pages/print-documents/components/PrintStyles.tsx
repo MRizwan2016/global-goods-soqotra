@@ -9,11 +9,25 @@ const PrintStyles: React.FC = () => {
           size: A4 portrait;
           margin: 5mm; /* Reduced margin for more content space */
         }
+        
         body {
-          -webkit-print-color-adjust: exact;
-          print-color-adjust: exact;
+          -webkit-print-color-adjust: exact !important;
+          color-adjust: exact !important;
+          print-color-adjust: exact !important;
           background-color: white !important;
+          width: 100% !important;
+          height: auto !important;
+          visibility: visible !important;
+          margin: 0 !important;
+          padding: 0 !important;
+          font-family: Arial, sans-serif !important;
         }
+        
+        /* Force everything to be visible for print */
+        * {
+          visibility: visible !important;
+        }
+        
         .print\\:hidden {
           display: none !important;
         }
@@ -127,6 +141,19 @@ const PrintStyles: React.FC = () => {
         /* Force white background and black text */
         .bg-soqotra-blue, .bg-gray-50, .bg-gradient-to-br {
           background: white !important;
+          background-color: white !important;
+          color: black !important;
+        }
+
+        /* Special fixes for print containers */
+        .print-container, 
+        .print-content, 
+        #print-job-schedule-wrapper,
+        #print-container-manifest {
+          display: block !important;
+          visibility: visible !important;
+          width: 100% !important;
+          overflow: visible !important;
           background-color: white !important;
           color: black !important;
         }

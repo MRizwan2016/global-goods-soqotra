@@ -34,6 +34,12 @@ const ScheduleContainer: React.FC<ScheduleContainerProps> = ({
     console.log("Print triggered, schedule data:", scheduleData);
     console.log("Jobs to print:", jobs);
     
+    // Force all content to be visible before printing
+    if (printRef.current) {
+      printRef.current.style.display = "block";
+      printRef.current.style.visibility = "visible";
+    }
+    
     // Always allow printing even if data validation fails
     try {
       validateScheduleData(scheduleData);
@@ -45,7 +51,7 @@ const ScheduleContainer: React.FC<ScheduleContainerProps> = ({
   };
   
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white print-container">
       <PrintStyles />
       
       <PrintScheduleControls 

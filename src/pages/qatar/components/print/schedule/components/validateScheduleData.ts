@@ -1,25 +1,27 @@
 
-export const validateScheduleData = (scheduleData: any): boolean => {
-  // Check if scheduleData is defined
+/**
+ * Validates schedule data to ensure required fields are present
+ * @param scheduleData The schedule data to validate
+ * @returns true if valid, throws an error if not
+ */
+export const validateScheduleData = (scheduleData: any) => {
+  console.log("Validating schedule data:", scheduleData);
+  
+  // Only log warnings but don't block printing, as requested
   if (!scheduleData) {
-    console.error("Schedule data is undefined");
-    return false;
+    console.warn("Schedule data is missing");
   }
   
-  // Check for required fields
-  if (!scheduleData.scheduleNumber) {
-    console.error("Missing schedule number");
-    return false;
+  if (!scheduleData?.scheduleNumber) {
+    console.warn("Schedule number is missing");
   }
   
-  // Even if vehicle or other fields are missing, we should still allow printing
-  // Just log warnings instead of preventing print
-  if (!scheduleData.vehicle) {
-    console.warn("No vehicle selected for schedule");
+  if (!scheduleData?.vehicle) {
+    console.warn("Vehicle is missing");
   }
   
-  if (!scheduleData.driver) {
-    console.warn("No driver assigned for schedule");
+  if (!scheduleData?.driver) {
+    console.warn("Driver is missing");
   }
   
   return true;

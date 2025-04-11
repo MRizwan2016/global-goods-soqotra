@@ -110,7 +110,17 @@ const InvoicePrint = () => {
   const totalWeight = invoice ? (parseFloat(invoice.weight) || 0).toFixed(2) : "0.00";
   
   const handlePrint = () => {
-    window.print();
+    console.log("Print button clicked, preparing document");
+    if (printRef.current) {
+      // Make sure the print container is visible
+      printRef.current.style.display = "block";
+      printRef.current.style.visibility = "visible";
+    }
+    
+    // Add slight delay to ensure styles are applied
+    setTimeout(() => {
+      window.print();
+    }, 300);
   };
   
   const handleBack = () => {
@@ -149,7 +159,7 @@ const InvoicePrint = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50 print-container">
       {/* Toolbar - hidden when printing */}
       <PrintModeToolbar 
         handleBack={handleBack}
@@ -160,9 +170,10 @@ const InvoicePrint = () => {
       />
       
       {/* Invoice Content */}
-      <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center">
+      <div className="flex-1 overflow-auto p-4 md:p-8 flex justify-center print-content">
         <div 
           ref={printRef} 
+          id="print-invoice-content"
           className="w-full max-w-[210mm] mx-auto bg-white text-black text-sm shadow-lg print:shadow-none"
           style={{ minHeight: '297mm' }}
         >

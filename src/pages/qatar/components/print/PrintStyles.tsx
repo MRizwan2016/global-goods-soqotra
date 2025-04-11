@@ -20,30 +20,16 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
             box-sizing: border-box;
           }
           
-          /* Hide everything by default */
-          body * {
-            visibility: hidden;
-          }
-          
-          /* Then only show what we want to print */
-          .print-container, 
-          .print-container *,
-          .print-only, 
-          .print-only * {
+          /* Make sure everything is visible in print */
+          body, html {
             visibility: visible !important;
             overflow: visible !important;
-          }
-          
-          /* Position the print container properly */
-          .print-container, .print-only {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
-            width: 100% !important;
-            height: auto !important;
-            overflow: visible !important;
-            z-index: 9999 !important;
             background-color: white !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            color: black !important;
+            font-family: Arial, sans-serif !important;
           }
           
           /* Hide non-printable elements */
@@ -58,14 +44,18 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
             visibility: hidden !important;
           }
           
-          /* Basic styling for print content */
-          body {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            background-color: white !important;
-            margin: 0 !important;
-            padding: 0 !important;
+          /* Make sure the print container is visible */
+          .print-container, 
+          .print-content,
+          #print-container-manifest {
+            display: block !important;
+            visibility: visible !important;
+            position: relative !important;
+            width: 100% !important;
+            overflow: visible !important;
+            page-break-inside: avoid !important;
             color: black !important;
+            background-color: white !important;
           }
           
           /* Make headings and text print with the right colors */
@@ -120,47 +110,10 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
             font-weight: bold !important;
           }
           
-          /* For landscape mode, adjust table layout */
-          .landscape table {
-            font-size: 0.9em;
-          }
-          
           /* Ensure images print */
           img {
             max-width: 100% !important;
             page-break-inside: avoid;
-          }
-        }
-        
-        /* Styles for print preview mode on screen */
-        .print-only {
-          display: none;
-        }
-        
-        @media screen {
-          body.print-only-manifest .print-only {
-            display: block !important;
-            visibility: visible !important;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: white;
-            z-index: 9000;
-            padding: 20px;
-            min-height: 100vh;
-          }
-          
-          body.print-only-manifest .print\\:hidden {
-            display: none !important;
-          }
-          
-          .print-manifest {
-            background: white;
-            padding: 20px;
-            border: 1px solid #ddd;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
           }
         }
       `}

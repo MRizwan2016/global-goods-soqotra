@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useJobFiltering } from "./hooks/useJobFiltering";
 import { useJobSelection } from "./hooks/useJobSelection";
@@ -19,12 +18,9 @@ const JobGeneratePage: React.FC = () => {
   const [jobsData, setJobsData] = useState<QatarJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Load jobs from storage
   useEffect(() => {
-    // Get all jobs from storage
     let allJobs = JobStorageService.getAllJobs();
     
-    // If no jobs are in storage, initialize with mock data
     if (allJobs.length === 0) {
       console.log("No jobs found in storage, initializing with mock data");
       mockJobs.forEach(job => {
@@ -39,7 +35,6 @@ const JobGeneratePage: React.FC = () => {
     setIsLoading(false);
   }, []);
   
-  // Use our custom hooks
   const {
     selectedJobs,
     isPrintMode,
@@ -90,15 +85,17 @@ const JobGeneratePage: React.FC = () => {
   
   if (isPrintMode) {
     return (
-      <PrintJobSchedule 
-        jobs={jobsForSchedule.map((job, index) => ({...job, sequenceNum: index + 1}))}
-        scheduleData={{
-          ...scheduleData, 
-          vehicle: selectedVehicle || scheduleData.vehicle,
-          city: selectedCity || ''
-        }}
-        onBack={handleBackFromPrint}
-      />
+      <div id="print-job-schedule-wrapper" className="print-job-schedule-container">
+        <PrintJobSchedule 
+          jobs={jobsForSchedule.map((job, index) => ({...job, sequenceNum: index + 1}))}
+          scheduleData={{
+            ...scheduleData, 
+            vehicle: selectedVehicle || scheduleData.vehicle,
+            city: selectedCity || ''
+          }}
+          onBack={handleBackFromPrint}
+        />
+      </div>
     );
   }
 
@@ -125,7 +122,6 @@ const JobGeneratePage: React.FC = () => {
         <div className="max-w-full mx-auto">
           <JobGenerateHeader title="SOQOTRA LOGISTICS - JOB SCHEDULE GENERATION" />
           
-          {/* Filters */}
           <JobFilters
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
@@ -139,14 +135,12 @@ const JobGeneratePage: React.FC = () => {
             onEditSchedule={handleScheduleEdit}
           />
           
-          {/* Status display */}
           {jobsData.length === 0 && (
             <div className="bg-amber-50 p-4 rounded-md border border-amber-200 my-4">
               <p className="text-amber-800">No jobs available. Please add jobs in the job management section.</p>
             </div>
           )}
           
-          {/* Grouping Toggle Buttons */}
           <GroupControlPanel 
             selectedJobs={selectedJobs}
             showVehicleView={showVehicleView}
@@ -162,7 +156,7 @@ const JobGeneratePage: React.FC = () => {
           <JobGenerateLayout 
             scheduleData={scheduleData}
             setScheduleData={setScheduleData}
-            handleScheduleSubmit={handleScheduleEdit} // Change submit to edit mode
+            handleScheduleSubmit={handleScheduleEdit}
             jobsForSchedule={jobsForSchedule}
             filteredJobs={filteredJobs}
             selectedJobs={selectedJobs}
