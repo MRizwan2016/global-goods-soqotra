@@ -8,6 +8,8 @@ import PackageDescriptionSection from "./PackageDescriptionSection";
 import { Save, ArrowLeft, Hash } from "lucide-react";
 import { JobStorageService } from "../../services/JobStorageService";
 import { JobNumberService } from "@/services/JobNumberService";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 interface JobFormProps {
   jobId?: string;
@@ -17,6 +19,7 @@ interface JobFormProps {
 }
 
 const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFormProps) => {
+  const navigate = useNavigate();
   const [jobData, setJobData] = useState({
     jobType: "COLLECTION",
     jobNumber: "",
@@ -149,13 +152,27 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
   };
   
   const handleAddItem = (newItem: JobItem) => {
-    // Ensure jobId is added to the item
-    const itemWithJobId = {
-      ...newItem,
-      jobId: jobData.jobNumber || jobId || `temp-${Date.now()}`
-    };
+    if (newItem.quantity < 0) {
+      // Handle item deletion
+      setJobItems(prev => prev.filter(item => item.id !== newItem.id));
+      return;
+    }
     
-    setJobItems(prev => [...prev, itemWithJobId]);
+    // Check if this is an edit of an existing item
+    if (jobItems.some(item => item.id === newItem.id)) {
+      // Update existing item
+      setJobItems(prev => prev.map(item => 
+        item.id === newItem.id ? { ...newItem, jobId: jobData.jobNumber || jobId || `temp-${Date.now()}` } : item
+      ));
+    } else {
+      // Add new item
+      const itemWithJobId = {
+        ...newItem,
+        jobId: jobData.jobNumber || jobId || `temp-${Date.now()}`
+      };
+      
+      setJobItems(prev => [...prev, itemWithJobId]);
+    }
   };
   
   const handleGenerateJobNumber = () => {
@@ -168,13 +185,14 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
     }));
     
     setIsJobNumberGenerated(true);
+    toast.success(`Job number generated: ${newJobNumber}`);
   };
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!isJobNumberGenerated && isNewJob) {
-      alert("Please generate a Job Number first");
+      toast.error("Please generate a Job Number first");
       return;
     }
     
@@ -184,6 +202,10 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
       // Convert advance amount to number for storage
       advanceAmount: parseFloat(jobData.advanceAmount) || 0
     });
+  };
+
+  const handleCancel = () => {
+    navigate("/qatar");
   };
   
   return (
@@ -237,16 +259,19 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
         />
       </div>
       
-      {isNewJob && (
-        <PackageDescriptionSection 
-          jobItems={jobItems}
-          onAddItem={handleAddItem}
-          isEnabled={isJobNumberGenerated}
-        />
-      )}
+      <PackageDescriptionSection 
+        jobItems={jobItems}
+        onAddItem={handleAddItem}
+        isEnabled={isJobNumberGenerated}
+      />
       
       <div className="flex justify-end gap-2 mt-6">
-        <Button type="button" variant="outline" className="flex items-center gap-2">
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="flex items-center gap-2"
+          onClick={handleCancel}
+        >
           <ArrowLeft size={16} />
           CANCEL
         </Button>

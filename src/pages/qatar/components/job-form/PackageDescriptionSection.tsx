@@ -15,6 +15,7 @@ import {
   DialogClose
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface PackageDescriptionSectionProps {
   jobItems: JobItem[];
@@ -24,26 +25,26 @@ interface PackageDescriptionSectionProps {
 
 // Common package descriptions for personal effects
 const COMMON_ITEMS = [
-  "Large Carton Box Personal Effects",
-  "Medium Carton Box Personal Effects",
-  "Small Carton Box Personal Effects",
-  "Suitcase Personal Effects",
-  "Trunk Personal Effects",
-  "Furniture - Table",
-  "Furniture - Bed",
-  "Furniture - Chair",
-  "Furniture - Sofa",
-  "Furniture - Cabinet",
-  "Furniture - Chest of Drawers",
-  "Electronic - Television",
-  "Electronic - Refrigerator",
-  "Electronic - Washing Machine",
-  "Electronic - Air Conditioner",
-  "Electronic - Computer",
-  "Kitchen - Microwave",
-  "Kitchen - Cookware Set",
-  "Kitchen - Dishware Set",
-  "Miscellaneous Goods"
+  "LARGE CARTON BOX PERSONAL EFFECTS",
+  "MEDIUM CARTON BOX PERSONAL EFFECTS",
+  "SMALL CARTON BOX PERSONAL EFFECTS",
+  "SUITCASE PERSONAL EFFECTS",
+  "TRUNK PERSONAL EFFECTS",
+  "FURNITURE - TABLE",
+  "FURNITURE - BED",
+  "FURNITURE - CHAIR",
+  "FURNITURE - SOFA",
+  "FURNITURE - CABINET",
+  "FURNITURE - CHEST OF DRAWERS",
+  "ELECTRONIC - TELEVISION",
+  "ELECTRONIC - REFRIGERATOR",
+  "ELECTRONIC - WASHING MACHINE",
+  "ELECTRONIC - AIR CONDITIONER",
+  "ELECTRONIC - COMPUTER",
+  "KITCHEN - MICROWAVE",
+  "KITCHEN - COOKWARE SET",
+  "KITCHEN - DISHWARE SET",
+  "MISCELLANEOUS GOODS"
 ];
 
 const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: PackageDescriptionSectionProps) => {
@@ -61,7 +62,8 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
   const [isPackageDialogOpen, setIsPackageDialogOpen] = useState(false);
 
   const handleItemNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setItemName(e.target.value);
+    // Convert to uppercase
+    setItemName(e.target.value.toUpperCase());
   };
 
   const handleSellPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,7 +82,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
 
   const handleAddItem = () => {
     if (!itemName || !sellPrice) {
-      alert("Please enter item description and sell price");
+      toast.error("Please enter item description and sell price");
       return;
     }
 
@@ -93,7 +95,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
       const updatedItem: JobItem = {
         id: editingItemId,
         jobId: 'temp', // Will be set by parent component
-        itemName,
+        itemName: itemName.toUpperCase(), // Ensure uppercase
         sellPrice: parsedSellPrice,
         quantity: parsedQuantity,
       };
@@ -104,29 +106,31 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
       
       // Reset form
       resetForm();
+      toast.success("Item updated successfully");
     } else {
       // Add new item
       const newItem: JobItem = {
         id: uuidv4(),
         jobId: 'temp', // Will be set by parent component
-        itemName,
+        itemName: itemName.toUpperCase(), // Ensure uppercase
         sellPrice: parsedSellPrice,
         quantity: parsedQuantity,
       };
       
       onAddItem(newItem);
       resetForm();
+      toast.success("Item added successfully");
     }
   };
 
   const addCustomPackage = () => {
     if (!length || !width || !height || !sellPrice) {
-      alert("Please enter dimensions and price");
+      toast.error("Please enter dimensions and price");
       return;
     }
 
     const dimensions = `${length}cm x ${width}cm x ${height}cm ${weight ? `(${weight}kg)` : ''}`;
-    const packageName = `Custom Package: ${dimensions}`;
+    const packageName = `CUSTOM PACKAGE: ${dimensions}`.toUpperCase();
     
     const newItem: JobItem = {
       id: uuidv4(),
@@ -139,6 +143,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
     onAddItem(newItem);
     setIsPackageDialogOpen(false);
     resetPackageDimensions();
+    toast.success("Custom package added");
   };
 
   const resetForm = () => {
@@ -177,12 +182,13 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
       quantity: -1, // Negative quantity signals deletion
     };
     onAddItem(deletedItem);
+    toast.success("Item removed");
   };
 
   const handleItemSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value;
     if (selectedValue) {
-      setItemName(selectedValue);
+      setItemName(selectedValue.toUpperCase());
     }
   };
 
@@ -205,12 +211,12 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
           <div className="flex space-x-2">
             <select 
               id="itemSelect" 
-              className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+              className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors uppercase"
               onChange={handleItemSelect}
               value=""
               disabled={!isEnabled}
             >
-              <option value="">--- Select common item ---</option>
+              <option value="">--- SELECT COMMON ITEM ---</option>
               {COMMON_ITEMS.map((item, index) => (
                 <option key={index} value={item}>{item}</option>
               ))}
@@ -222,8 +228,8 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
             name="itemName"
             value={itemName}
             onChange={handleItemNameChange}
-            className="mt-2 border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
-            placeholder="Enter item description"
+            className="mt-2 border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors uppercase"
+            placeholder="ENTER ITEM DESCRIPTION"
             disabled={!isEnabled}
           />
         </div>

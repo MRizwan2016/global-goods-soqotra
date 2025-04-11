@@ -21,8 +21,8 @@ const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
   if (validItems.length === 0) {
     return (
       <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200 animate-fade-in">
-        <p className="text-gray-500">No items added yet</p>
-        <p className="text-sm text-gray-400 mt-1">Add items using the form above or click "NEW PACKAGE" to add with dimensions</p>
+        <p className="text-gray-500">NO ITEMS ADDED YET</p>
+        <p className="text-sm text-gray-400 mt-1">ADD ITEMS USING THE FORM ABOVE OR CLICK "NEW PACKAGE" TO ADD WITH DIMENSIONS</p>
       </div>
     );
   }
@@ -52,7 +52,7 @@ const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
         <tbody className="bg-white divide-y divide-gray-200">
           {validItems.map((item, index) => (
             <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-              <td className="px-4 py-3 whitespace-nowrap">
+              <td className="px-4 py-3 whitespace-nowrap uppercase">
                 {item.itemName}
               </td>
               <td className="px-4 py-3 whitespace-nowrap">
