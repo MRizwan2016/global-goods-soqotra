@@ -1,170 +1,202 @@
 
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { countrySectorMap } from "@/pages/invoicing/constants/countrySectorMap";
-import { warehouseOptions } from "@/pages/invoicing/constants/locationData";
+import React from "react";
+import { Select } from "@/components/ui/select";
 
 interface CustomerInfoSectionProps {
   jobData: any;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
+  isEnabled?: boolean;
 }
 
-const CustomerInfoSection = ({ 
-  jobData, 
-  handleInputChange, 
-  handleSelectChange 
-}: CustomerInfoSectionProps) => {
-  // Get list of countries from countrySectorMap
-  const countries = Object.keys(countrySectorMap).filter(country => country.trim() !== "");
-  
-  // Get branches for selected country if any
-  const getBranchesForCountry = (country: string) => {
-    if (!country) return [];
-    
-    // Use warehouse options as branches for simplicity
-    return (warehouseOptions[country] || []).filter(branch => branch && branch.trim() !== "");
-  };
-  
-  const branches = jobData.country ? getBranchesForCountry(jobData.country) : [];
-
+const CustomerInfoSection = ({ jobData, handleInputChange, handleSelectChange, isEnabled = true }: CustomerInfoSectionProps) => {
   return (
-    <Card>
-      <CardHeader className="bg-gray-50 pb-2">
-        <CardTitle className="text-md">PERSONAL EFFECTS CUSTOMER INFORMATION</CardTitle>
-      </CardHeader>
+    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <h3 className="font-medium text-gray-900 mb-4">Customer Information</h3>
       
-      <CardContent className="p-4 grid grid-cols-2 gap-4">
-        <div className="col-span-2 sm:col-span-1">
-          <Label htmlFor="jobNumber">JOB NUMBER:</Label>
-          <Input 
-            id="jobNumber"
-            name="jobNumber"
-            value={jobData.jobNumber}
-            onChange={handleInputChange}
-            readOnly={true}
-            className="bg-gray-100"
-          />
-        </div>
-        
-        <div className="col-span-2 sm:col-span-1">
-          <Label htmlFor="customer">CUSTOMER:</Label>
-          <Input 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="customer" className="block text-sm font-medium text-gray-700 mb-1">
+            Customer Name
+          </label>
+          <input
+            type="text"
             id="customer"
             name="customer"
             value={jobData.customer}
             onChange={handleInputChange}
-            placeholder="CUSTOMER NAME"
+            className="border border-gray-300 px-3 py-2 rounded w-full"
+            disabled={!isEnabled}
           />
         </div>
         
         <div>
-          <Label htmlFor="mobileNumber">MOBILE NUMBER:</Label>
-          <Input 
+          <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 mb-1">
+            Mobile Number
+          </label>
+          <input
+            type="text"
             id="mobileNumber"
             name="mobileNumber"
             value={jobData.mobileNumber}
             onChange={handleInputChange}
-            placeholder="MOBILE NUMBER"
+            className="border border-gray-300 px-3 py-2 rounded w-full"
+            disabled={!isEnabled}
           />
         </div>
         
         <div>
-          <Label htmlFor="landNumber">LAND NUMBER:</Label>
-          <Input 
+          <label htmlFor="landNumber" className="block text-sm font-medium text-gray-700 mb-1">
+            Land Number (Optional)
+          </label>
+          <input
+            type="text"
             id="landNumber"
             name="landNumber"
             value={jobData.landNumber}
             onChange={handleInputChange}
-            placeholder="LAND NUMBER"
+            className="border border-gray-300 px-3 py-2 rounded w-full"
+            disabled={!isEnabled}
           />
         </div>
         
         <div>
-          <Label htmlFor="country">COUNTRY:</Label>
-          <Select 
-            value={jobData.country || "select-country"} 
-            onValueChange={(value) => {
-              // Update country and associated sector
-              handleSelectChange("country", value);
-              handleSelectChange("sector", countrySectorMap[value] || "");
-            }}
+          <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+            Country
+          </label>
+          <Select
+            value={jobData.country}
+            onValueChange={(value) => handleSelectChange("country", value)}
+            disabled={!isEnabled}
           >
-            <SelectTrigger id="country" className="bg-blue-600 text-white">
-              <SelectValue placeholder="SELECT COUNTRY" />
-            </SelectTrigger>
-            <SelectContent>
-              {countries.length > 0 ? (
-                countries.map(country => (
-                  <SelectItem key={country} value={country}>
-                    {country}
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem value="no-countries-available">No countries available</SelectItem>
-              )}
-            </SelectContent>
+            <option value="">Select Country</option>
+            <option value="QATAR">Qatar</option>
+            <option value="UAE">UAE</option>
+            <option value="KSA">Saudi Arabia</option>
           </Select>
         </div>
         
         <div>
-          <Label htmlFor="sector">SECTOR:</Label>
-          <Input 
+          <label htmlFor="sector" className="block text-sm font-medium text-gray-700 mb-1">
+            Sector
+          </label>
+          <input
+            type="text"
             id="sector"
             name="sector"
-            value={jobData.sector || ""}
+            value={jobData.sector}
             onChange={handleInputChange}
-            readOnly={true}
-            className="bg-gray-100"
+            className="border border-gray-300 px-3 py-2 rounded w-full"
+            disabled={!isEnabled}
           />
         </div>
         
         <div>
-          <Label htmlFor="branch">BRANCH:</Label>
-          <Select 
-            value={jobData.branch || "select-branch"} 
-            onValueChange={(value) => handleSelectChange("branch", value)}
-            disabled={branches.length === 0}
-          >
-            <SelectTrigger id="branch" className="bg-blue-600 text-white">
-              <SelectValue placeholder="SELECT BRANCH" />
-            </SelectTrigger>
-            <SelectContent>
-              {branches.length > 0 ? (
-                branches.map(branch => (
-                  <SelectItem key={branch} value={branch}>
-                    {branch}
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem value="no-branches-available">No branches available</SelectItem>
-              )}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="col-span-2">
-          <Label htmlFor="remarks">REMARKS:</Label>
-          <Textarea 
-            id="remarks"
-            name="remarks"
-            value={jobData.remarks || ""}
+          <label htmlFor="branch" className="block text-sm font-medium text-gray-700 mb-1">
+            Branch
+          </label>
+          <input
+            type="text"
+            id="branch"
+            name="branch"
+            value={jobData.branch}
             onChange={handleInputChange}
-            placeholder="ENTER ANY ADDITIONAL INFORMATION ABOUT PERSONAL EFFECTS OR HOUSEHOLD GOODS"
-            rows={3}
+            className="border border-gray-300 px-3 py-2 rounded w-full"
+            disabled={!isEnabled}
           />
         </div>
-      </CardContent>
-    </Card>
+        
+        <div>
+          <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
+            City
+          </label>
+          <input
+            type="text"
+            id="city"
+            name="city"
+            value={jobData.city}
+            onChange={handleInputChange}
+            className="border border-gray-300 px-3 py-2 rounded w-full"
+            disabled={!isEnabled}
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="town" className="block text-sm font-medium text-gray-700 mb-1">
+            Town
+          </label>
+          <input
+            type="text"
+            id="town"
+            name="town"
+            value={jobData.town}
+            onChange={handleInputChange}
+            className="border border-gray-300 px-3 py-2 rounded w-full"
+            disabled={!isEnabled}
+          />
+        </div>
+        
+        <div className="md:col-span-2">
+          <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+            Location / Address
+          </label>
+          <textarea
+            id="location"
+            name="location"
+            value={jobData.location}
+            onChange={handleInputChange}
+            rows={2}
+            className="border border-gray-300 px-3 py-2 rounded w-full"
+            disabled={!isEnabled}
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="advanceAmount" className="block text-sm font-medium text-gray-700 mb-1">
+            Advance Amount (Optional)
+          </label>
+          <input
+            type="text"
+            id="advanceAmount"
+            name="advanceAmount"
+            value={jobData.advanceAmount}
+            onChange={handleInputChange}
+            className="border border-gray-300 px-3 py-2 rounded w-full"
+            disabled={!isEnabled}
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="collectDate" className="block text-sm font-medium text-gray-700 mb-1">
+            Collection Date
+          </label>
+          <input
+            type="text"
+            id="collectDate"
+            name="collectDate"
+            value={jobData.collectDate}
+            onChange={handleInputChange}
+            className="border border-gray-300 px-3 py-2 rounded w-full"
+            disabled={!isEnabled}
+          />
+        </div>
+        
+        <div className="md:col-span-2">
+          <label htmlFor="remarks" className="block text-sm font-medium text-gray-700 mb-1">
+            Remarks (Optional)
+          </label>
+          <textarea
+            id="remarks"
+            name="remarks"
+            value={jobData.remarks}
+            onChange={handleInputChange}
+            rows={2}
+            className="border border-gray-300 px-3 py-2 rounded w-full"
+            disabled={!isEnabled}
+          />
+        </div>
+      </div>
+    </div>
   );
 };
 

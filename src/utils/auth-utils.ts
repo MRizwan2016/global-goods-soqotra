@@ -25,7 +25,7 @@ export function ensureUserPermissions(user: User): User {
           salesRep: user.isAdmin ? true : false,
           town: user.isAdmin ? true : false,
           packageOptions: user.isAdmin ? true : false,
-          sellingRates: user.isAdmin ? true : false,
+          sellingRates: user.isAdmin ? true : true, // Always enable selling rates
           container: user.isAdmin ? true : false,
           vessel: user.isAdmin ? true : false,
           invoiceBook: user.isAdmin ? true : false,
@@ -49,7 +49,7 @@ export function ensureUserPermissions(user: User): User {
           salesRep: user.isAdmin ? true : false,
           town: user.isAdmin ? true : false,
           packageOptions: user.isAdmin ? true : false,
-          sellingRates: user.isAdmin ? true : false,
+          sellingRates: user.isAdmin ? true : true, // Always enable selling rates
           container: user.isAdmin ? true : false,
           vessel: user.isAdmin ? true : false,
           invoiceBook: user.isAdmin ? true : false,
@@ -77,7 +77,7 @@ export function ensureUserPermissions(user: User): User {
           salesRep: currentFiles.salesRep ?? (user.isAdmin ? true : false),
           town: currentFiles.town ?? (user.isAdmin ? true : false),
           packageOptions: currentFiles.packageOptions ?? (user.isAdmin ? true : false),
-          sellingRates: currentFiles.sellingRates ?? (user.isAdmin ? true : false),
+          sellingRates: true, // Always enable selling rates
           container: currentFiles.container ?? (user.isAdmin ? true : false),
           vessel: currentFiles.vessel ?? (user.isAdmin ? true : false),
           invoiceBook: currentFiles.invoiceBook ?? (user.isAdmin ? true : false),

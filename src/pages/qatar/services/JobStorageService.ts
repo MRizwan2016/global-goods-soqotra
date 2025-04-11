@@ -1,6 +1,7 @@
 
 import { QatarJob } from "../types/jobTypes";
 import { v4 as uuidv4 } from 'uuid';
+import { JobNumberService } from "@/services/JobNumberService";
 
 // Storage key for localStorage
 const STORAGE_KEY = 'qatar_jobs';
@@ -18,27 +19,6 @@ const getInitialJobs = (): QatarJob[] => {
   } catch (error) {
     console.error('Error loading jobs from storage:', error);
     return [];
-  }
-};
-
-// Get the next available job number (5-digit format)
-const getNextJobNumber = (): string => {
-  try {
-    const currentCounter = localStorage.getItem(JOB_COUNTER_KEY);
-    // Start from 10000 to ensure 5 digits
-    let counterValue = currentCounter ? parseInt(currentCounter, 10) + 1 : 10000;
-    
-    // Reset to 10000 if it exceeds 99999
-    if (counterValue > 99999) {
-      counterValue = 10000;
-    }
-    
-    localStorage.setItem(JOB_COUNTER_KEY, counterValue.toString());
-    return counterValue.toString();
-  } catch (error) {
-    console.error('Error generating job number:', error);
-    // Fallback to random 5-digit number
-    return (10000 + Math.floor(Math.random() * 89999)).toString();
   }
 };
 
@@ -63,8 +43,8 @@ export const JobStorageService = {
       id: uuidv4(),
       status: 'PENDING',
       date: new Date().toLocaleDateString("en-GB"),
-      // Always generate a unique job number
-      jobNumber: getNextJobNumber(),
+      // Use the job number from jobData if present, or generate a new one
+      jobNumber: jobData.jobNumber || JobNumberService.generateJobNumber(),
       ...jobData,
     } as QatarJob;
 
@@ -73,6 +53,11 @@ export const JobStorageService = {
     
     // Save to localStorage
     localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
+    
+    // Make sure job number is registered as used
+    if (newJob.jobNumber) {
+      JobNumberService.addUsedJobNumber(newJob.jobNumber);
+    }
     
     return newJob;
   },
