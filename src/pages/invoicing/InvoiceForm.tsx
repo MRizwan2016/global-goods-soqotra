@@ -4,6 +4,9 @@ import Layout from "@/components/layout/Layout";
 import { useInvoiceForm } from "./hooks/useInvoiceForm";
 import { packageOptions } from "@/data/packageOptions";
 import { countrySectorMap } from "./constants/countrySectorMap";
+import { useEffect } from "react";
+import { ensureInvoiceAvailability } from "./utils/invoiceNumberGenerator";
+import { toast } from "sonner";
 
 // Import components
 import InvoiceFormHeader from "./components/InvoiceFormHeader";
@@ -33,6 +36,18 @@ const InvoiceForm = () => {
     savedInvoiceId,
     updatePackagePricing,
   } = useInvoiceForm(id);
+  
+  // Ensure invoice numbers are available when the form loads
+  useEffect(() => {
+    if (!isEditing) {
+      try {
+        ensureInvoiceAvailability();
+      } catch (error) {
+        console.error("Error ensuring invoice availability:", error);
+        toast.error("There was an issue loading invoice numbers. You may need to enter them manually.");
+      }
+    }
+  }, [isEditing]);
   
   return (
     <Layout title={isEditing ? "Update Invoice" : "Add Invoice"}>

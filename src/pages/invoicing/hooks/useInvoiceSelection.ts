@@ -15,6 +15,12 @@ export const useInvoiceSelection = (
   useEffect(() => {
     if (isEditing) return;
     
+    loadAvailableInvoices();
+  }, [isEditing]);
+  
+  const loadAvailableInvoices = () => {
+    console.log("Loading available invoices...");
+    
     // Get active invoice books from localStorage
     const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
     const allStoredBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
@@ -30,61 +36,76 @@ export const useInvoiceSelection = (
     // Combine all used numbers
     const allUsedNumbers = [...usedInvoiceNumbers, ...generatedInvoiceNumbers];
     
+    let invoiceList: any[] = [];
+    
     if (activeBooks.length > 0) {
       // Use active books from localStorage
-      const activeInvoices = activeBooks.flatMap((book: any) => {
-        // Filter out already used invoice numbers
-        const availablePages = book.availablePages.filter(
-          (page: string) => !allUsedNumbers.includes(page)
-        );
-        
-        return availablePages.map((pageNumber: string) => ({
-          bookNumber: book.bookNumber,
-          invoiceNumber: pageNumber,
-          assignedTo: book.assignedTo || 'Unassigned'
-        }));
-      });
-      
-      console.log("Available active invoices:", activeInvoices);
-      setAvailableInvoices(activeInvoices);
-    } else if (allStoredBooks.length > 0) {
-      // If no active books but we have stored books
-      const storedInvoices = allStoredBooks
-        .filter((book: any) => book.isActivated)
-        .flatMap((book: any) => {
+      activeBooks.forEach((book: any) => {
+        if (book.availablePages) {
           // Filter out already used invoice numbers
           const availablePages = book.availablePages.filter(
             (page: string) => !allUsedNumbers.includes(page)
           );
           
-          return availablePages.map((pageNumber: string) => ({
-            bookNumber: book.bookNumber,
-            invoiceNumber: pageNumber,
-            assignedTo: book.assignedTo || 'System User'
-          }));
-        });
-      
-      console.log("Available stored invoices:", storedInvoices);
-      setAvailableInvoices(storedInvoices);
-    } else {
-      // Fall back to mock data if no active books in localStorage
-      const allInvoices = mockInvoiceBooks.flatMap(book => {
-        // Filter out already used invoice numbers
-        const availablePages = book.available.filter(
-          (page) => !allUsedNumbers.includes(page)
-        );
-        
-        return availablePages.map(num => ({
-          bookNumber: book.bookNumber,
-          invoiceNumber: num,
-          assignedTo: book.assignedTo || 'Default User'
-        }));
+          invoiceList = [
+            ...invoiceList,
+            ...availablePages.map((pageNumber: string) => ({
+              bookNumber: book.bookNumber,
+              invoiceNumber: pageNumber,
+              assignedTo: book.assignedTo || 'Unassigned'
+            }))
+          ];
+        }
       });
-      
-      console.log("Available mock invoices:", allInvoices);
-      setAvailableInvoices(allInvoices);
+    } 
+    
+    if (invoiceList.length === 0 && allStoredBooks.length > 0) {
+      // If no active books but we have stored books
+      allStoredBooks
+        .filter((book: any) => book.isActivated)
+        .forEach((book: any) => {
+          if (book.availablePages) {
+            // Filter out already used invoice numbers
+            const availablePages = book.availablePages.filter(
+              (page: string) => !allUsedNumbers.includes(page)
+            );
+            
+            invoiceList = [
+              ...invoiceList,
+              ...availablePages.map((pageNumber: string) => ({
+                bookNumber: book.bookNumber,
+                invoiceNumber: pageNumber,
+                assignedTo: book.assignedTo || 'System User'
+              }))
+            ];
+          }
+        });
     }
-  }, [isEditing]);
+    
+    if (invoiceList.length === 0) {
+      // Create mock invoice books if none found
+      // Generate GY-prefixed invoice numbers
+      const mockInvoices = [];
+      for (let i = 1; i <= 100; i++) {
+        const num = i.toString().padStart(6, '0');
+        mockInvoices.push(`GY${num}`);
+      }
+      
+      // Filter out used invoice numbers
+      const availableMockInvoices = mockInvoices
+        .filter(invoiceNo => !allUsedNumbers.includes(invoiceNo))
+        .map(invoiceNo => ({
+          invoiceNumber: invoiceNo,
+          bookNumber: "Default",
+          assignedTo: 'System User'
+        }));
+      
+      invoiceList = availableMockInvoices;
+    }
+    
+    console.log("Available invoices:", invoiceList);
+    setAvailableInvoices(invoiceList);
+  };
   
   const handleSelectInvoice = (invoiceNumber: string) => {
     // Find the selected invoice in our available invoices
