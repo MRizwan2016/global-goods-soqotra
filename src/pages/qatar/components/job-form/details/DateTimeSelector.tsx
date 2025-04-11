@@ -33,7 +33,7 @@ const DateTimeSelector = ({
   return (
     <>
       <div>
-        <Label htmlFor="jobDate">JOB DATE:</Label>
+        <Label htmlFor="jobDate" className="font-medium text-gray-700 mb-1 block">DATE:</Label>
         <Input 
           id="jobDate"
           name="date"
@@ -41,61 +41,66 @@ const DateTimeSelector = ({
           value={date}
           onChange={handleInputChange}
           placeholder="DD/MM/YYYY"
+          className="focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
         />
       </div>
       
-      <div>
-        <Label htmlFor="jobTime">JOB TIME:</Label>
-        <Input 
-          id="jobTime"
-          name="time"
-          value={time}
-          onChange={handleInputChange}
-          placeholder="00:00"
-        />
+      <div className="grid grid-cols-3 gap-4">
+        <div className="col-span-2">
+          <Label htmlFor="jobTime" className="font-medium text-gray-700 mb-1 block">TIME:</Label>
+          <Input 
+            id="jobTime"
+            name="time"
+            value={time}
+            onChange={handleInputChange}
+            placeholder="HH:MM"
+            className="focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+          />
+        </div>
+        
+        <div>
+          <Label htmlFor="amPm" className="font-medium text-gray-700 mb-1 block">AM/PM:</Label>
+          <Select 
+            value={amPm || "AM"} 
+            onValueChange={(value) => handleSelectChange("amPm", value)}
+          >
+            <SelectTrigger id="amPm" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors h-[38px]">
+              <SelectValue placeholder="Select AM/PM" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="AM">AM</SelectItem>
+              <SelectItem value="PM">PM</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
       
       <div>
-        <Label htmlFor="amPm">AM/PM:</Label>
-        <Select 
-          value={amPm || "AM"} 
-          onValueChange={(value) => handleSelectChange("amPm", value)}
-        >
-          <SelectTrigger id="amPm" className="bg-blue-600 text-white">
-            <SelectValue placeholder="Select AM/PM" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="AM">AM</SelectItem>
-            <SelectItem value="PM">PM</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div>
-        <Label htmlFor="sameDay">SAME DAY JOB:</Label>
+        <Label htmlFor="sameDay" className="font-medium text-gray-700 mb-1 block">SAME DAY SERVICE:</Label>
         <Select 
           value={sameDay || "N"} 
           onValueChange={(value) => handleSelectChange("sameDay", value)}
         >
-          <SelectTrigger id="sameDay" className="bg-blue-600 text-white">
+          <SelectTrigger id="sameDay" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
             <SelectValue placeholder="Select Same Day" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="Y">YES</SelectItem>
             <SelectItem value="N">NO</SelectItem>
+            <SelectItem value="Y">YES</SelectItem>
           </SelectContent>
         </Select>
       </div>
       
       {jobType === "COLLECTION" && (
         <div>
-          <Label htmlFor="collectDate">COLLECT DATE:</Label>
+          <Label htmlFor="collectDate" className="font-medium text-gray-700 mb-1 block">COLLECT DATE:</Label>
           <Input 
             id="collectDate"
             name="collectDate"
             value={collectDate || ""}
             onChange={handleInputChange}
             placeholder="DD/MM/YYYY"
+            className="focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
           />
         </div>
       )}

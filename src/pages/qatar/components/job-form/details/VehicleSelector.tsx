@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockVehicles } from "../../../data/mockVehicles";
 
 interface VehicleSelectorProps {
   vehicle: string;
@@ -15,36 +14,21 @@ interface VehicleSelectorProps {
 }
 
 const VehicleSelector = ({ vehicle = "", handleSelectChange }: VehicleSelectorProps) => {
-  // Filter out any vehicles with empty number and ensure there are no empty string values
-  const validVehicles = (mockVehicles || []).filter(v => v && v.number && v.number.trim() !== "");
-  
-  // For debugging
-  console.log("VehicleSelector rendered with valid vehicles:", validVehicles);
-  console.log("Current vehicle value:", vehicle);
-  
   return (
     <div>
-      <Label htmlFor="vehicle">VEHICLE:</Label>
+      <Label htmlFor="vehicle" className="font-medium text-gray-700 mb-1 block">VEHICLE:</Label>
       <Select 
         value={vehicle || "default"} 
         onValueChange={(value) => handleSelectChange("vehicle", value)}
       >
-        <SelectTrigger id="vehicle" className="bg-blue-600 text-white">
+        <SelectTrigger id="vehicle" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
           <SelectValue placeholder="SELECT VEHICLE" />
         </SelectTrigger>
         <SelectContent>
-          {validVehicles.length > 0 ? (
-            validVehicles.map(vehicle => (
-              <SelectItem 
-                key={vehicle.id} 
-                value={vehicle.number ? vehicle.number : `vehicle-${vehicle.id}`}
-              >
-                {vehicle.number}/{vehicle.type}/{vehicle.description}
-              </SelectItem>
-            ))
-          ) : (
-            <SelectItem value="no-vehicles-available">No vehicles available</SelectItem>
-          )}
+          <SelectItem value="default">SELECT VEHICLE</SelectItem>
+          <SelectItem value="V1">VEHICLE 1</SelectItem>
+          <SelectItem value="V2">VEHICLE 2</SelectItem>
+          <SelectItem value="V3">VEHICLE 3</SelectItem>
         </SelectContent>
       </Select>
     </div>

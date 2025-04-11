@@ -56,7 +56,7 @@ const NewJobForm = () => {
   
   return (
     <Layout title="Create New Qatar Job">
-      <div className="space-y-6">
+      <div className="space-y-6 bg-white p-8 rounded-lg shadow-sm animate-fade-in">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold">ADD NEW JOB</h1>
@@ -66,14 +66,14 @@ const NewJobForm = () => {
             <Button 
               variant="outline" 
               onClick={() => navigate("/qatar")}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 transition-colors"
             >
               <ArrowLeft size={16} />
               Back
             </Button>
             <Button 
               onClick={() => document.getElementById('job-form')?.dispatchEvent(new Event('submit', { bubbles: true }))}
-              className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+              className="bg-green-600 hover:bg-green-700 flex items-center gap-2 transition-colors"
             >
               <Save size={16} />
               Save Job

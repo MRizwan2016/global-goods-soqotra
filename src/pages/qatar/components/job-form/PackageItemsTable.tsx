@@ -1,34 +1,90 @@
 
+import React from "react";
+import { Trash2, Edit } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { JobItem } from "../../types/jobTypes";
-import { formatCurrency } from "../../utils/formatters";
 
 interface PackageItemsTableProps {
   items: JobItem[];
+  onEdit?: (item: JobItem) => void;
+  onDelete?: (id: string) => void;
 }
 
-const PackageItemsTable = ({ items }: PackageItemsTableProps) => {
+const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
+  items = [],
+  onEdit,
+  onDelete
+}) => {
   if (items.length === 0) {
-    return null;
+    return (
+      <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+        <p className="text-gray-500">No items added yet</p>
+        <p className="text-sm text-gray-400 mt-1">Add items using the form above</p>
+      </div>
+    );
   }
-  
+
   return (
-    <div className="mt-4 overflow-x-auto">
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border p-2 text-left">ITEM</th>
-            <th className="border p-2 text-left">PRICE</th>
-            <th className="border p-2 text-left">QTY</th>
-            <th className="border p-2 text-left">TOTAL</th>
+    <div className="overflow-x-auto">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-50">
+          <tr>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              ITEM DESCRIPTION
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              SELL PRICE
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              QUANTITY
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              TOTAL
+            </th>
+            <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+              ACTIONS
+            </th>
           </tr>
         </thead>
-        <tbody>
-          {items.map(item => (
-            <tr key={item.id} className="border-b">
-              <td className="border p-2">{item.itemName}</td>
-              <td className="border p-2">{formatCurrency(item.sellPrice)}</td>
-              <td className="border p-2">{item.quantity}</td>
-              <td className="border p-2">{formatCurrency(item.sellPrice * item.quantity)}</td>
+        <tbody className="bg-white divide-y divide-gray-200">
+          {items.map((item, index) => (
+            <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+              <td className="px-4 py-3 whitespace-nowrap">
+                {item.itemName}
+              </td>
+              <td className="px-4 py-3 whitespace-nowrap">
+                {item.sellPrice.toFixed(2)}
+              </td>
+              <td className="px-4 py-3 whitespace-nowrap">
+                {item.quantity}
+              </td>
+              <td className="px-4 py-3 whitespace-nowrap">
+                {(item.sellPrice * item.quantity).toFixed(2)}
+              </td>
+              <td className="px-4 py-3 whitespace-nowrap text-right">
+                <div className="flex justify-end gap-2">
+                  {onEdit && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => onEdit(item)}
+                      className="bg-amber-50 text-amber-600 hover:bg-amber-100 border-amber-200"
+                    >
+                      <Edit size={16} />
+                    </Button>
+                  )}
+                  {onDelete && (
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => onDelete(item.id)}
+                      className="bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
+                    >
+                      <Trash2 size={16} />
+                    </Button>
+                  )}
+                </div>
+              </td>
             </tr>
           ))}
         </tbody>

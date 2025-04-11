@@ -1,9 +1,10 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, X } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { JobItem } from "../../types/jobTypes";
 import { v4 as uuidv4 } from "uuid";
+import PackageItemsTable from "./PackageItemsTable";
 
 interface PackageDescriptionSectionProps {
   jobItems: JobItem[];
@@ -11,158 +12,103 @@ interface PackageDescriptionSectionProps {
   isEnabled?: boolean;
 }
 
-const PackageDescriptionSection: React.FC<PackageDescriptionSectionProps> = ({ jobItems, onAddItem, isEnabled = true }) => {
-  const [newItem, setNewItem] = useState<JobItem>({
-    id: "",
-    jobId: "",
-    itemName: "",
-    sellPrice: 0,
-    quantity: 1
-  });
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    
-    if (name === 'sellPrice' || name === 'quantity') {
-      setNewItem(prev => ({
-        ...prev,
-        [name]: parseFloat(value) || 0
-      }));
-    } else {
-      setNewItem(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-  };
+const PackageDescriptionSection: React.FC<PackageDescriptionSectionProps> = ({
+  jobItems = [],
+  onAddItem,
+  isEnabled = true
+}) => {
+  const [itemName, setItemName] = useState("");
+  const [sellPrice, setSellPrice] = useState("");
+  const [quantity, setQuantity] = useState("1");
 
   const handleAddItem = () => {
-    if (!newItem.itemName) {
-      alert("Please enter item name");
+    if (!itemName || !sellPrice) {
+      alert("Please enter item name and price");
       return;
     }
-    
-    const itemToAdd = {
-      ...newItem,
+
+    const newItem: JobItem = {
       id: uuidv4(),
-      jobId: "" // This will be set when the job is created
-    };
-    
-    onAddItem(itemToAdd);
-    
-    // Reset the form
-    setNewItem({
-      id: "",
       jobId: "",
-      itemName: "",
-      sellPrice: 0,
-      quantity: 1
-    });
+      itemName,
+      sellPrice: parseFloat(sellPrice),
+      quantity: parseInt(quantity, 10) || 1
+    };
+
+    onAddItem(newItem);
+    
+    // Clear form fields
+    setItemName("");
+    setSellPrice("");
+    setQuantity("1");
   };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 mt-6">
-      <h3 className="font-medium text-gray-900 mb-4">Package Description</h3>
+    <div className="mt-6 bg-white p-6 rounded-lg shadow-sm border border-gray-200 animate-fade-in">
+      <h3 className="font-bold text-lg text-gray-800 mb-5 border-b pb-2">PACKAGE DESCRIPTION</h3>
       
-      <div className="grid grid-cols-12 gap-3 mb-3">
-        <div className="col-span-5">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Item Description</label>
-        </div>
-        <div className="col-span-3">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Sell Price</label>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
         <div className="col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
-        </div>
-        <div className="col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Actions</label>
-        </div>
-      </div>
-      
-      {/* Item input row */}
-      <div className="grid grid-cols-12 gap-3 mb-4">
-        <div className="col-span-5">
+          <label htmlFor="itemDescription" className="block text-sm font-medium text-gray-700 mb-1">
+            ITEM DESCRIPTION
+          </label>
           <input
+            id="itemDescription"
             type="text"
-            name="itemName"
-            value={newItem.itemName}
-            onChange={handleInputChange}
-            className="border border-gray-300 px-3 py-2 rounded w-full"
+            value={itemName}
+            onChange={(e) => setItemName(e.target.value)}
             placeholder="Enter item description"
+            className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
             disabled={!isEnabled}
           />
         </div>
-        <div className="col-span-3">
+        
+        <div>
+          <label htmlFor="sellPrice" className="block text-sm font-medium text-gray-700 mb-1">
+            SELL PRICE
+          </label>
           <input
+            id="sellPrice"
             type="number"
-            name="sellPrice"
-            value={newItem.sellPrice || ''}
-            onChange={handleInputChange}
-            className="border border-gray-300 px-3 py-2 rounded w-full"
+            value={sellPrice}
+            onChange={(e) => setSellPrice(e.target.value)}
             placeholder="0.00"
+            className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+            step="0.01"
+            min="0"
             disabled={!isEnabled}
           />
         </div>
-        <div className="col-span-2">
+        
+        <div>
+          <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 mb-1">
+            QUANTITY
+          </label>
           <input
+            id="quantity"
             type="number"
-            name="quantity"
-            value={newItem.quantity || 1}
-            onChange={handleInputChange}
-            className="border border-gray-300 px-3 py-2 rounded w-full"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            placeholder="1"
+            className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
             min="1"
             disabled={!isEnabled}
           />
         </div>
-        <div className="col-span-2">
-          <Button 
-            type="button"
-            onClick={handleAddItem}
-            className="bg-blue-600 hover:bg-blue-700 w-full"
-            disabled={!isEnabled}
-          >
-            <Plus size={16} className="mr-1" /> Add
-          </Button>
-        </div>
       </div>
       
-      {/* Added items list */}
-      <div className="border rounded-md overflow-hidden">
-        {jobItems.length === 0 ? (
-          <div className="p-4 text-center text-gray-500">
-            No items added yet
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {jobItems.map((item, index) => (
-                <tr key={index}>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm">{item.itemName}</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm">{item.sellPrice.toFixed(2)}</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm">{item.quantity}</td>
-                  <td className="px-4 py-2 whitespace-nowrap text-sm">{(item.sellPrice * item.quantity).toFixed(2)}</td>
-                </tr>
-              ))}
-            </tbody>
-            <tfoot className="bg-gray-50">
-              <tr>
-                <td colSpan={3} className="px-4 py-2 text-right font-medium">Total:</td>
-                <td className="px-4 py-2 font-bold">
-                  {jobItems.reduce((total, item) => total + (item.sellPrice * item.quantity), 0).toFixed(2)}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-        )}
+      <div className="flex justify-end mb-6">
+        <Button
+          type="button"
+          onClick={handleAddItem}
+          className="bg-blue-600 hover:bg-blue-700 text-white transition-all flex items-center gap-2"
+          disabled={!isEnabled}
+        >
+          <Plus size={16} /> ADD ITEM
+        </Button>
       </div>
+      
+      <PackageItemsTable items={jobItems} />
     </div>
   );
 };

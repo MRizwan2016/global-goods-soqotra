@@ -1,7 +1,13 @@
 
 import React from "react";
-import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 interface CustomerInfoSectionProps {
@@ -18,14 +24,14 @@ const CustomerInfoSection = ({
   isEnabled = true
 }: CustomerInfoSectionProps) => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-      <h3 className="font-medium text-gray-900 mb-4">Personal Effects Customer Information</h3>
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 animate-fade-in">
+      <h3 className="font-bold text-lg text-gray-800 mb-5 border-b pb-2">PERSONAL EFFECTS CUSTOMER INFORMATION</h3>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label htmlFor="jobNumberDisplay" className="block text-sm font-medium text-gray-700 mb-1">
+          <Label htmlFor="jobNumberDisplay" className="font-medium text-gray-700 mb-1 block">
             JOB NUMBER:
-          </label>
+          </Label>
           <input
             type="text"
             id="jobNumberDisplay"
@@ -37,114 +43,126 @@ const CustomerInfoSection = ({
         </div>
         
         <div>
-          <label htmlFor="customer" className="block text-sm font-medium text-gray-700 mb-1">
+          <Label htmlFor="customer" className="font-medium text-gray-700 mb-1 block">
             CUSTOMER:
-          </label>
+          </Label>
           <input
             type="text"
             id="customer"
             name="customer"
             value={jobData.customer}
             onChange={handleInputChange}
-            className="border border-gray-300 px-3 py-2 rounded w-full"
+            className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
             placeholder="Customer name"
             disabled={!isEnabled}
           />
         </div>
         
         <div>
-          <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 mb-1">
+          <Label htmlFor="mobileNumber" className="font-medium text-gray-700 mb-1 block">
             MOBILE NUMBER:
-          </label>
+          </Label>
           <input
             type="text"
             id="mobileNumber"
             name="mobileNumber"
             value={jobData.mobileNumber}
             onChange={handleInputChange}
-            className="border border-gray-300 px-3 py-2 rounded w-full"
+            className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
             placeholder="Customer mobile number"
             disabled={!isEnabled}
           />
         </div>
         
         <div>
-          <label htmlFor="landNumber" className="block text-sm font-medium text-gray-700 mb-1">
+          <Label htmlFor="landNumber" className="font-medium text-gray-700 mb-1 block">
             LAND NUMBER:
-          </label>
+          </Label>
           <input
             type="text"
             id="landNumber"
             name="landNumber"
             value={jobData.landNumber}
             onChange={handleInputChange}
-            className="border border-gray-300 px-3 py-2 rounded w-full"
+            className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
             placeholder="Land line number"
             disabled={!isEnabled}
           />
         </div>
         
         <div>
-          <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-1">
+          <Label htmlFor="country" className="font-medium text-gray-700 mb-1 block">
             COUNTRY:
-          </label>
+          </Label>
           <Select
             value={jobData.country}
             onValueChange={(value) => handleSelectChange("country", value)}
             disabled={!isEnabled}
           >
-            <option value="">Select Country</option>
-            <option value="Qatar">Qatar</option>
-            <option value="UAE">UAE</option>
-            <option value="Bahrain">Bahrain</option>
-            <option value="Saudi Arabia">Saudi Arabia</option>
-            <option value="Sri Lanka">Sri Lanka</option>
+            <SelectTrigger id="country" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+              <SelectValue placeholder="SELECT COUNTRY" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Qatar">QATAR</SelectItem>
+              <SelectItem value="UAE">UAE</SelectItem>
+              <SelectItem value="Bahrain">BAHRAIN</SelectItem>
+              <SelectItem value="Saudi Arabia">SAUDI ARABIA</SelectItem>
+              <SelectItem value="Sri Lanka">SRI LANKA</SelectItem>
+            </SelectContent>
           </Select>
         </div>
         
         <div>
-          <label htmlFor="sector" className="block text-sm font-medium text-gray-700 mb-1">
+          <Label htmlFor="sector" className="font-medium text-gray-700 mb-1 block">
             SECTOR:
-          </label>
+          </Label>
           <Select
             value={jobData.sector}
             onValueChange={(value) => handleSelectChange("sector", value)}
             disabled={!isEnabled}
           >
-            <option value="">Select Sector</option>
-            <option value="COLOMBO : C">COLOMBO : C</option>
-            <option value="GAMPAHA : G">GAMPAHA : G</option>
-            <option value="KALUTARA : K">KALUTARA : K</option>
+            <SelectTrigger id="sector" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+              <SelectValue placeholder="SELECT SECTOR" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="COLOMBO : C">COLOMBO : C</SelectItem>
+              <SelectItem value="GAMPAHA : G">GAMPAHA : G</SelectItem>
+              <SelectItem value="KALUTARA : K">KALUTARA : K</SelectItem>
+            </SelectContent>
           </Select>
         </div>
         
         <div>
-          <label htmlFor="branch" className="block text-sm font-medium text-gray-700 mb-1">
+          <Label htmlFor="branch" className="font-medium text-gray-700 mb-1 block">
             BRANCH:
-          </label>
+          </Label>
           <Select
             value={jobData.branch}
             onValueChange={(value) => handleSelectChange("branch", value)}
             disabled={!isEnabled}
           >
-            <option value="">Select Branch</option>
-            <option value="Head Office">Head Office</option>
-            <option value="Branch 1">Branch 1</option>
-            <option value="Branch 2">Branch 2</option>
+            <SelectTrigger id="branch" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+              <SelectValue placeholder="SELECT BRANCH" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Head Office">HEAD OFFICE</SelectItem>
+              <SelectItem value="Branch 1">BRANCH 1</SelectItem>
+              <SelectItem value="Branch 2">BRANCH 2</SelectItem>
+            </SelectContent>
           </Select>
         </div>
         
         <div className="md:col-span-2">
-          <label htmlFor="remarks" className="block text-sm font-medium text-gray-700 mb-1">
+          <Label htmlFor="remarks" className="font-medium text-gray-700 mb-1 block">
             REMARKS:
-          </label>
+          </Label>
           <Textarea
             id="remarks"
             name="remarks"
             value={jobData.remarks}
             onChange={handleInputChange}
             placeholder="Enter any additional information about personal effects or household goods"
-            className="border border-gray-300 rounded w-full h-24 resize-none"
+            className="border border-gray-300 rounded w-full h-24 resize-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
             disabled={!isEnabled}
           />
         </div>

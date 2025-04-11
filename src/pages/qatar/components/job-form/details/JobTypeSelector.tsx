@@ -15,20 +15,20 @@ interface JobTypeSelectorProps {
 
 const JobTypeSelector = ({ jobType, handleSelectChange }: JobTypeSelectorProps) => {
   return (
-    <div className="col-span-2 sm:col-span-1">
-      <Label htmlFor="jobType">PERSONAL EFFECTS JOB TYPE:</Label>
+    <div>
+      <Label htmlFor="jobType" className="font-medium text-gray-700 mb-1 block">JOB TYPE:</Label>
       <Select 
         value={jobType || "COLLECTION"} 
         onValueChange={(value) => handleSelectChange("jobType", value)}
       >
-        <SelectTrigger id="jobType" className="bg-blue-600 text-white">
+        <SelectTrigger id="jobType" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
           <SelectValue placeholder="SELECT TYPE" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="COLLECTION">COLLECTION OF PERSONAL EFFECTS</SelectItem>
-          <SelectItem value="DELIVERY">DELIVERY OF HOUSEHOLD GOODS</SelectItem>
-          <SelectItem value="PACKING">PACKING OF HOUSEHOLD ITEMS</SelectItem>
-          <SelectItem value="UNPACKING">UNPACKING OF PERSONAL EFFECTS</SelectItem>
+          <SelectItem value="COLLECTION">COLLECTION</SelectItem>
+          <SelectItem value="DELIVERY">DELIVERY</SelectItem>
+          <SelectItem value="PACKING">PACKING</SelectItem>
+          <SelectItem value="UNPACKING">UNPACKING</SelectItem>
         </SelectContent>
       </Select>
     </div>

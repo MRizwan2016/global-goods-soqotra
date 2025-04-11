@@ -56,6 +56,11 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
           advanceAmount: existingJob.advanceAmount?.toString() || ""
         });
         setIsJobNumberGenerated(!!existingJob.jobNumber);
+        
+        // Load job items if they exist
+        if (existingJob.items && existingJob.items.length > 0) {
+          setJobItems(existingJob.items);
+        }
       }
     }
   }, [jobId]);
@@ -115,7 +120,7 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
             <div className="flex items-center space-x-3">
               <div className="flex-1">
                 <label htmlFor="jobNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                  Job Number
+                  JOB NUMBER
                 </label>
                 <input
                   type="text"
@@ -133,7 +138,7 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
                   <Button
                     type="button"
                     onClick={handleGenerateJobNumber}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    className="bg-blue-600 hover:bg-blue-700 transition-colors"
                   >
                     <Hash className="mr-1 h-4 w-4" /> Generate Job No
                   </Button>
@@ -166,14 +171,14 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
         />
       )}
       
-      <div className="flex justify-end gap-2 mt-4">
+      <div className="flex justify-end gap-2 mt-6">
         <Button type="button" variant="outline" className="flex items-center gap-2">
           <ArrowLeft size={16} />
           CANCEL
         </Button>
         <Button 
           type="submit" 
-          className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+          className="bg-green-600 hover:bg-green-700 flex items-center gap-2 transition-colors"
           disabled={isSaving || (!isJobNumberGenerated && isNewJob)}
         >
           <Save size={16} />
