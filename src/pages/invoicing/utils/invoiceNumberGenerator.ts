@@ -57,6 +57,8 @@ export const createDefaultInvoiceBook = (): void => {
  * Ensure there are available invoice numbers in the system
  */
 export const ensureInvoiceAvailability = (): void => {
+  console.log("Ensuring invoice number availability...");
+  
   // Create default invoice book if none exists
   createDefaultInvoiceBook();
   
@@ -86,6 +88,7 @@ export const ensureInvoiceAvailability = (): void => {
         
         if (availableInvoices.length > 0) {
           needsMoreInvoices = false;
+          console.log(`Found ${availableInvoices.length} available invoice numbers in book ${book.bookNumber}`);
           break;
         }
       }
@@ -94,6 +97,8 @@ export const ensureInvoiceAvailability = (): void => {
   
   // Generate more invoice numbers if needed
   if (needsMoreInvoices) {
+    console.log("Generating new invoice numbers...");
+    
     const maxUsedNumber = allUsedNumbers
       .filter((num: string) => num.startsWith('GY'))
       .map((num: string) => parseInt(num.replace('GY', '')) || 0)

@@ -108,6 +108,8 @@ export const useInvoiceSelection = (
   };
   
   const handleSelectInvoice = (invoiceNumber: string) => {
+    console.log(`Selecting invoice number: ${invoiceNumber}`);
+    
     // Find the selected invoice in our available invoices
     const selectedInvoice = availableInvoices.find(
       invoice => invoice.invoiceNumber === invoiceNumber
@@ -116,6 +118,7 @@ export const useInvoiceSelection = (
     // Get any linked job number
     const jobNumber = JobStorageService.getJobNumberByInvoiceNumber(invoiceNumber) || "";
     
+    // Update form state with the selected invoice number
     setFormState(prev => ({
       ...prev,
       invoiceNumber,

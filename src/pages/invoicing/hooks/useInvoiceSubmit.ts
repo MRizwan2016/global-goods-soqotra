@@ -5,6 +5,8 @@ import { JobStorageService } from "@/pages/qatar/services/JobStorageService";
 
 export const useInvoiceSubmit = () => {
   const handleSubmit = async (formState: FormState, packageItems: PackageItem[], isEditing: boolean, id?: string): Promise<string> => {
+    console.log("Submitting invoice with form state:", formState);
+    
     if (!formState.invoiceNumber) {
       toast.error("Please select an invoice number");
       throw new Error("Invoice number is required");

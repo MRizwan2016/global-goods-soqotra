@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
@@ -101,6 +102,100 @@ export const useInvoiceForm = (id?: string) => {
   const [savedInvoiceId, setSavedInvoiceId] = useState<string>("");
   const [isEditing, setIsEditing] = useState<boolean>(!!id);
 
+  // Load available invoice numbers
+  useEffect(() => {
+    if (!isEditing) {
+      try {
+        // Get active invoice books from localStorage
+        const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+        const allStoredBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+        
+        // Get used invoice numbers to filter them out
+        const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+        const usedInvoiceNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
+        
+        // Also check generated invoices if they exist
+        const generatedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
+        const generatedInvoiceNumbers = generatedInvoices.map((inv: any) => inv.invoiceNumber);
+        
+        // Combine all used numbers
+        const allUsedNumbers = [...usedInvoiceNumbers, ...generatedInvoiceNumbers];
+        
+        let invoiceList: any[] = [];
+        
+        if (activeBooks.length > 0) {
+          // Use active books from localStorage
+          activeBooks.forEach((book: any) => {
+            if (book.availablePages) {
+              // Filter out already used invoice numbers
+              const availablePages = book.availablePages.filter(
+                (page: string) => !allUsedNumbers.includes(page)
+              );
+              
+              invoiceList = [
+                ...invoiceList,
+                ...availablePages.map((pageNumber: string) => ({
+                  bookNumber: book.bookNumber,
+                  invoiceNumber: pageNumber,
+                  assignedTo: book.assignedTo || 'Unassigned'
+                }))
+              ];
+            }
+          });
+        } 
+        
+        if (invoiceList.length === 0 && allStoredBooks.length > 0) {
+          // If no active books but we have stored books
+          allStoredBooks
+            .filter((book: any) => book.isActivated)
+            .forEach((book: any) => {
+              if (book.availablePages) {
+                // Filter out already used invoice numbers
+                const availablePages = book.availablePages.filter(
+                  (page: string) => !allUsedNumbers.includes(page)
+                );
+                
+                invoiceList = [
+                  ...invoiceList,
+                  ...availablePages.map((pageNumber: string) => ({
+                    bookNumber: book.bookNumber,
+                    invoiceNumber: pageNumber,
+                    assignedTo: book.assignedTo || 'System User'
+                  }))
+                ];
+              }
+            });
+        }
+        
+        if (invoiceList.length === 0) {
+          // Create mock invoice books if none found
+          // Generate GY-prefixed invoice numbers
+          const mockInvoices = [];
+          for (let i = 1; i <= 100; i++) {
+            const num = i.toString().padStart(6, '0');
+            mockInvoices.push(`GY${num}`);
+          }
+          
+          // Filter out used invoice numbers
+          const availableMockInvoices = mockInvoices
+            .filter(invoiceNo => !allUsedNumbers.includes(invoiceNo))
+            .map(invoiceNo => ({
+              invoiceNumber: invoiceNo,
+              bookNumber: "Default",
+              assignedTo: 'System User'
+            }));
+          
+          invoiceList = availableMockInvoices;
+        }
+        
+        console.log("Available invoices in form:", invoiceList);
+        setAvailableInvoices(invoiceList);
+      } catch (error) {
+        console.error("Error loading available invoices:", error);
+      }
+    }
+  }, [isEditing]);
+
   const { 
     handlePackageSelect: baseHandlePackageSelect,
     handleManualPackage,
@@ -154,25 +249,20 @@ export const useInvoiceForm = (id?: string) => {
     baseHandlePackageSelect(description);
   };
 
-  const handleSelectInvoice = (invoice: Invoice) => {
-    const jobNumber = invoice.jobNumber || JobNumberService.getJobNumberByInvoice(invoice.invoiceNumber);
+  const handleSelectInvoice = (invoiceNumber: string) => {
+    console.log("Setting invoice number:", invoiceNumber);
+    
+    const jobNumber = JobNumberService.getJobNumberByInvoice(invoiceNumber);
     
     setFormState(prev => ({
       ...prev,
-      invoiceNumber: invoice.invoiceNumber,
-      bookingFormNumber: invoice.bookingFormNumber || "",
-      airwayBillNumber: invoice.airwayBillNumber || "",
-      date: invoice.date || new Date().toISOString().split('T')[0],
-      gross: String(invoice.gross || 0),
-      discount: String(invoice.discount || 0),
-      net: String(invoice.net || 0),
-      jobNumber: jobNumber || "",
-      remarks: invoice.remarks || ""
+      invoiceNumber: invoiceNumber,
+      jobNumber: jobNumber || ""
     }));
     
     setShowInvoiceSelector(false);
     
-    if (!jobNumber && invoice.invoiceNumber && formState.country) {
+    if (!jobNumber && invoiceNumber && formState.country) {
       const newJobNumber = JobNumberService.generateJobNumber(formState.country);
       
       setFormState(prev => ({
@@ -180,12 +270,21 @@ export const useInvoiceForm = (id?: string) => {
         jobNumber: newJobNumber
       }));
       
-      JobNumberService.linkJobToInvoice(newJobNumber, invoice.invoiceNumber);
+      JobNumberService.linkJobToInvoice(newJobNumber, invoiceNumber);
     }
+    
+    toast.success(`Invoice number ${invoiceNumber} selected`);
   };
 
   const handleSave = () => {
     try {
+      console.log("Saving form with state:", formState);
+      
+      if (!formState.invoiceNumber) {
+        toast.error("Please select an invoice number");
+        return;
+      }
+      
       const requiredFields = ['invoiceNumber', 'country', 'destination', 'shipper1', 'consignee1'];
       const missingFields = requiredFields.filter(field => !formState[field as keyof FormState]);
       
@@ -223,6 +322,18 @@ export const useInvoiceForm = (id?: string) => {
       
       if (storedInvoicesString) {
         storedInvoices = JSON.parse(storedInvoicesString);
+      }
+      
+      // Check for duplicate invoice number if creating a new invoice
+      if (!isEditing) {
+        const isDuplicate = storedInvoices.some((invoice: any) => 
+          invoice.invoiceNumber === formState.invoiceNumber
+        );
+        
+        if (isDuplicate) {
+          toast.error(`Invoice number ${formState.invoiceNumber} is already assigned to another customer`);
+          return;
+        }
       }
       
       if (id) {

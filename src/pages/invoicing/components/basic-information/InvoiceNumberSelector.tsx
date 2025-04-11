@@ -228,7 +228,11 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
     
     checkForDuplicateInvoice(formattedNumber);
     handleSelectInvoice(formattedNumber);
+    setManualInvoiceNumber("");
     setShowManualEntry(false);
+    
+    // Show success toast
+    toast.success(`Invoice number ${formattedNumber} selected manually`);
   };
 
   return (
