@@ -7,6 +7,7 @@ import { countrySectorMap } from "./constants/countrySectorMap";
 import { useEffect } from "react";
 import { ensureInvoiceAvailability } from "./utils/invoiceNumberGenerator";
 import { toast } from "sonner";
+import { JobNumberService } from "@/services/JobNumberService";
 
 // Import components
 import InvoiceFormHeader from "./components/InvoiceFormHeader";
@@ -36,6 +37,23 @@ const InvoiceForm = () => {
     savedInvoiceId,
     updatePackagePricing,
   } = useInvoiceForm(id);
+
+  // Check if the invoice has a job number but it's not in formState
+  useEffect(() => {
+    if (formState.invoiceNumber && !formState.jobNumber) {
+      const jobNumber = JobNumberService.getJobNumberByInvoice(formState.invoiceNumber);
+      
+      if (jobNumber) {
+        console.log(`Found job number ${jobNumber} for invoice ${formState.invoiceNumber}`);
+        handleInputChange({
+          target: { 
+            name: 'jobNumber',
+            value: jobNumber
+          }
+        } as React.ChangeEvent<HTMLInputElement>);
+      }
+    }
+  }, [formState.invoiceNumber, formState.jobNumber]);
   
   return (
     <Layout title={isEditing ? "Update Invoice" : "Add Invoice"}>

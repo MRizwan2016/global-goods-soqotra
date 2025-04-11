@@ -118,19 +118,22 @@ export const useInvoiceSelection = (
     // Get any linked job number
     const jobNumber = JobStorageService.getJobNumberByInvoiceNumber(invoiceNumber) || "";
     
-    // Update form state with the selected invoice number
+    // Update form state with the selected invoice number and job number if available
     setFormState(prev => ({
       ...prev,
       invoiceNumber,
       jobNumber
     }));
     
-    // Show toast with user assignment if available
+    // Show toast with user assignment and job number if available
+    let toastMessage = `Invoice number ${invoiceNumber} selected`;
     if (selectedInvoice && selectedInvoice.assignedTo) {
-      toast.success(`Invoice number ${invoiceNumber} selected (assigned to ${selectedInvoice.assignedTo})`);
-    } else {
-      toast.success(`Invoice number ${invoiceNumber} selected`);
+      toastMessage += ` (assigned to ${selectedInvoice.assignedTo})`;
     }
+    if (jobNumber) {
+      toastMessage += ` - Job #${jobNumber}`;
+    }
+    toast.success(toastMessage);
     
     setShowInvoiceSelector(false);
   };
@@ -139,6 +142,7 @@ export const useInvoiceSelection = (
     showInvoiceSelector,
     setShowInvoiceSelector,
     availableInvoices,
-    handleSelectInvoice
+    handleSelectInvoice,
+    loadAvailableInvoices
   };
 };

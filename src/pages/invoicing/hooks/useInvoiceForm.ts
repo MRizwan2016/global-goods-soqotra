@@ -125,19 +125,29 @@ export const useInvoiceForm = (id?: string) => {
     console.log("Current form state:", formState);
   }, [formState]);
   
-  // Generate job number when invoice number and country change
+  // Generate or retrieve job number when invoice number changes
   useEffect(() => {
-    if (!isEditing && !formState.jobNumber && formState.country) {
-      const existingJobNumber = JobNumberService.getJobNumberByInvoice(formState.invoiceNumber);
+    if (formState.invoiceNumber && !formState.jobNumber) {
+      const linkedJobNumber = JobNumberService.getJobNumberByInvoice(formState.invoiceNumber);
       
-      if (existingJobNumber) {
+      if (linkedJobNumber) {
+        console.log(`Found linked job number: ${linkedJobNumber} for invoice: ${formState.invoiceNumber}`);
         setFormState(prev => ({
           ...prev,
-          jobNumber: existingJobNumber
+          jobNumber: linkedJobNumber
+        }));
+      } else if (formState.country) {
+        // If no job number is linked but we have a country, generate a preview job number
+        const previewJobNumber = JobNumberService.peekNextJobNumber(formState.country);
+        console.log(`Generated preview job number: ${previewJobNumber} for country: ${formState.country}`);
+        
+        setFormState(prev => ({
+          ...prev,
+          jobNumber: previewJobNumber
         }));
       }
     }
-  }, [formState.country, formState.invoiceNumber, isEditing, formState.jobNumber]);
+  }, [formState.invoiceNumber, formState.country]);
 
   const { 
     handlePackageSelect: baseHandlePackageSelect,

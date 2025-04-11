@@ -21,7 +21,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
       updateAssignedUser(formState.invoiceNumber);
       updateJobNumber(formState.invoiceNumber);
     }
-  }, [formState.invoiceNumber]);
+  }, [formState.invoiceNumber, formState.jobNumber]);
   
   // Function to update assigned user
   const updateAssignedUser = (invoiceNumber: string) => {
@@ -63,7 +63,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
 
   // Function to update job number
   const updateJobNumber = (invoiceNumber: string) => {
-    // First check if jobNumber is already in formState
+    // First use formState jobNumber if available (this is the most up-to-date value)
     if (formState.jobNumber) {
       setJobNumber(formState.jobNumber);
       return;
@@ -78,8 +78,12 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
       const jobNumber = JobStorageService.getJobNumberByInvoiceNumber(invoiceNumber);
       if (jobNumber) {
         setJobNumber(jobNumber);
+      } else if (formState.country) {
+        // If we have a country but no job number yet, show a preview
+        const previewJobNumber = JobNumberService.peekNextJobNumber(formState.country);
+        setJobNumber(`${previewJobNumber} (Preview)`);
       } else {
-        setJobNumber("");
+        setJobNumber("Will be generated");
       }
     }
   };
