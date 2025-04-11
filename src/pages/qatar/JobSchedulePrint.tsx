@@ -16,9 +16,15 @@ const JobSchedulePrint: React.FC = () => {
   
   // Load jobs from storage
   useEffect(() => {
-    const jobs = JobStorageService.getAllJobs();
-    setAllJobs(jobs);
-    setIsLoading(false);
+    try {
+      const jobs = JobStorageService.getAllJobs();
+      setAllJobs(jobs);
+    } catch (error) {
+      console.error("Error loading jobs:", error);
+      setAllJobs([]);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
   
   // Group jobs by vehicle and city

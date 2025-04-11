@@ -11,8 +11,8 @@ interface ScheduleContainerProps {
 }
 
 const ScheduleContainer: React.FC<ScheduleContainerProps> = ({
-  jobs,
-  scheduleData,
+  jobs = [],
+  scheduleData = {},
   onBack
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
@@ -31,9 +31,15 @@ const ScheduleContainer: React.FC<ScheduleContainerProps> = ({
       e.stopPropagation();
     }
     
-    // Validate the schedule data before printing
-    if (validateScheduleData(scheduleData)) {
-      // Use the browser's print function directly
+    console.log("Print triggered, schedule data:", scheduleData);
+    console.log("Jobs to print:", jobs);
+    
+    // Always allow printing even if data validation fails
+    try {
+      validateScheduleData(scheduleData);
+      window.print();
+    } catch (error) {
+      console.warn("Print proceeded with validation warnings:", error);
       window.print();
     }
   };

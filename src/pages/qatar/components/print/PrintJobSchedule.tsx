@@ -10,14 +10,17 @@ interface PrintJobScheduleProps {
 }
 
 const PrintJobSchedule: React.FC<PrintJobScheduleProps> = ({ 
-  jobs, 
+  jobs = [], 
   scheduleData,
   onBack 
 }) => {
+  // Add default empty array to prevent null/undefined issues
+  const safeJobs = Array.isArray(jobs) ? jobs : [];
+  
   return (
     <ScheduleContainer 
-      jobs={jobs}
-      scheduleData={scheduleData}
+      jobs={safeJobs}
+      scheduleData={scheduleData || {}}
       onBack={onBack}
     />
   );
