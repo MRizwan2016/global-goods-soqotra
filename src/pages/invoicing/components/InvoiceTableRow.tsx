@@ -85,6 +85,7 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
       </InvoiceTableCell>
       <InvoiceTableCell>{formatDate(item.date || item.invoiceDate)}</InvoiceTableCell>
       <InvoiceTableCell>{ensureValue(item.invoiceNumber)}</InvoiceTableCell>
+      <InvoiceTableCell className="font-bold">{ensureValue(item.jobNumber)}</InvoiceTableCell>
       <InvoiceTableCell>{ensureValue(item.shipper1)}</InvoiceTableCell>
       <InvoiceTableCell>{ensureValue(item.consignee1)}</InvoiceTableCell>
       <InvoiceTableCell className="text-center">{ensureValue(item.salesAgent)}</InvoiceTableCell>

@@ -30,6 +30,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             <InvoiceTableHead className="w-20">Modify</InvoiceTableHead>
             <InvoiceTableHead className="w-28">Inv. Date</InvoiceTableHead>
             <InvoiceTableHead className="w-28">Inv. Number</InvoiceTableHead>
+            <InvoiceTableHead className="w-28">Job Number</InvoiceTableHead>
             <InvoiceTableHead>Shipper</InvoiceTableHead>
             <InvoiceTableHead>Consignee</InvoiceTableHead>
             <InvoiceTableHead className="w-16">S/A</InvoiceTableHead>
@@ -63,7 +64,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             ))
           ) : (
             <TableRow>
-              <InvoiceTableCell colSpan={22} className="text-center py-4">
+              <InvoiceTableCell colSpan={23} className="text-center py-4">
                 No data available in table
               </InvoiceTableCell>
             </TableRow>

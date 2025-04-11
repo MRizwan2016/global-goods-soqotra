@@ -114,11 +114,11 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
       />
       
       <InputField 
-        label="JOB NUMBER"
+        label={<span className="font-bold text-green-800">JOB NUMBER</span>}
         name="jobNumber"
         value={formState.jobNumber || jobNumber}
         readOnly
-        className="font-bold text-black"
+        className="font-bold text-black border-2 border-green-100 bg-green-50"
       />
       
       {assignedUser && (
