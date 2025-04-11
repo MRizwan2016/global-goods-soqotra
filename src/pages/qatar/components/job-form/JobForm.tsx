@@ -50,6 +50,9 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
       if (existingJob) {
         setJobData({
           ...existingJob,
+          // Ensure jobNumber is properly formatted as 5 digits
+          jobNumber: existingJob.jobNumber ? 
+                     existingJob.jobNumber.toString().padStart(5, '0') : "",
           // Ensure advanceAmount is a string for form handling
           advanceAmount: existingJob.advanceAmount?.toString() || ""
         });
@@ -118,7 +121,7 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
                   name="jobNumber"
                   value={jobData.jobNumber}
                   onChange={handleInputChange}
-                  className="border border-gray-300 px-3 py-2 rounded w-full bg-gray-50"
+                  className="border border-gray-300 px-3 py-2 rounded w-full bg-gray-50 font-bold text-lg"
                   readOnly
                   placeholder={isJobNumberGenerated ? "" : "Job number will be auto-generated"}
                 />

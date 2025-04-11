@@ -2,15 +2,38 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import NavigationSection from './NavigationSection';
-import { navigationConfig } from './navigationConfig';
 import { useAuth } from '@/hooks/use-auth';
 import { usePermissions } from '@/hooks/use-permissions';
 import { hasFilePermission } from '@/utils/auth-utils';
 import { ChevronDown } from 'lucide-react';
 
+// Define navigation config directly in this file since there's an import error
+const navigationConfig = [
+  {
+    key: 'operations',
+    title: 'Operations',
+    icon: () => <span className="w-5 h-5 flex items-center justify-center">🛠️</span>,
+    alwaysExpanded: true,
+    children: [
+      { title: 'Dashboard', path: '/' },
+      { title: 'Jobs', path: '/qatar' },
+      { title: 'Invoicing', path: '/data-entry/invoicing' }
+    ]
+  },
+  {
+    key: 'admin',
+    title: 'Admin',
+    icon: () => <span className="w-5 h-5 flex items-center justify-center">👤</span>,
+    children: [
+      { title: 'Booking Form Stock', path: '/invoice-method/booking-form-stock' },
+      { title: 'Payment Collection', path: '/accounts/payment' }
+    ]
+  }
+];
+
 export const MainNavigation: React.FC = () => {
   const location = useLocation();
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const { hasPermission } = usePermissions();
 
@@ -35,7 +58,7 @@ export const MainNavigation: React.FC = () => {
       children: section.children?.filter((item) => {
         // For file permissions
         if (item.filePermission) {
-          return hasFilePermission(user, item.filePermission);
+          return hasFilePermission(currentUser, item.filePermission);
         }
 
         // For other permissions
@@ -67,7 +90,10 @@ export const MainNavigation: React.FC = () => {
           </div>
 
           {(expandedSections[section.key] || section.alwaysExpanded) && section.children && (
-            <NavigationSection items={section.children} basePath={section.basePath} />
+            <NavigationSection 
+              navigationItems={section.children} 
+              basePath={section.basePath} 
+            />
           )}
         </div>
       ))}

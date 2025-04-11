@@ -92,9 +92,13 @@ export const useInvoiceSelection = (
       invoice => invoice.invoiceNumber === invoiceNumber
     );
     
+    // Get any linked job number
+    const jobNumber = JobStorageService.getJobNumberByInvoiceNumber(invoiceNumber) || "";
+    
     setFormState(prev => ({
       ...prev,
-      invoiceNumber
+      invoiceNumber,
+      jobNumber
     }));
     
     // Show toast with user assignment if available

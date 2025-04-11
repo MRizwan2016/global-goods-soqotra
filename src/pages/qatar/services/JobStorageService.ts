@@ -1,150 +1,177 @@
 
-import { QatarJob } from "../types/jobTypes";
-import { v4 as uuidv4 } from 'uuid';
-import { JobNumberService } from "@/services/JobNumberService";
+/**
+ * Service to handle job storage operations
+ */
+export class JobStorageService {
+  private static STORAGE_KEY = 'jobs';
 
-// Storage key for localStorage
-const STORAGE_KEY = 'qatar_jobs';
-
-// Get initial jobs by combining mock data with any stored jobs
-const getInitialJobs = (): QatarJob[] => {
-  try {
-    // Try to get jobs from local storage
-    const storedJobs = localStorage.getItem(STORAGE_KEY);
-    if (storedJobs) {
-      return JSON.parse(storedJobs);
+  /**
+   * Get all jobs from storage
+   */
+  static getAllJobs() {
+    try {
+      const jobs = localStorage.getItem(this.STORAGE_KEY);
+      return jobs ? JSON.parse(jobs) : [];
+    } catch (error) {
+      console.error('Error retrieving jobs:', error);
+      return [];
     }
-    return [];
-  } catch (error) {
-    console.error('Error loading jobs from storage:', error);
-    return [];
   }
-};
 
-// Initialize jobs array with data from localStorage
-let jobs: QatarJob[] = getInitialJobs();
+  /**
+   * Get a job by ID
+   */
+  static getJobById(id: string) {
+    const jobs = this.getAllJobs();
+    return jobs.find((job: any) => job.id === id) || null;
+  }
 
-export const JobStorageService = {
-  // Get all jobs
-  getAllJobs: (): QatarJob[] => {
-    return jobs;
-  },
+  /**
+   * Get a job number by invoice number
+   */
+  static getJobNumberByInvoiceNumber(invoiceNumber: string) {
+    const jobs = this.getAllJobs();
+    const job = jobs.find((job: any) => job.invoiceNumber === invoiceNumber);
+    return job ? job.jobNumber : '';
+  }
 
-  // Get job by ID
-  getJobById: (id: string): QatarJob | undefined => {
-    return jobs.find(job => job.id === id);
-  },
-
-  // Get job by job number
-  getJobByNumber: (jobNumber: string): QatarJob | undefined => {
-    return jobs.find(job => job.jobNumber === jobNumber);
-  },
-
-  // Save a new job
-  saveJob: (jobData: Partial<QatarJob>): QatarJob => {
-    // Ensure job has a job number
-    if (!jobData.jobNumber) {
-      jobData.jobNumber = JobNumberService.generateJobNumber();
-    }
-    
-    // Create a new job with generated ID and default status
-    const newJob: QatarJob = {
-      id: uuidv4(),
-      status: 'PENDING',
-      date: new Date().toLocaleDateString("en-GB"),
-      ...jobData,
-      // Ensure advanceAmount is a number
-      advanceAmount: parseFloat(jobData.advanceAmount as unknown as string) || 0,
-      entryBy: "System User",
-      entryDate: new Date().toISOString()
-    } as QatarJob;
-
-    // Add to jobs array
-    jobs = [...jobs, newJob];
-    
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
-    
-    // Make sure job number is registered as used
-    if (newJob.jobNumber) {
-      JobNumberService.addUsedJobNumber(newJob.jobNumber);
-    }
-    
-    // Sync with invoice data if invoiceNumber is provided
-    if (newJob.invoiceNumber) {
-      try {
-        const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-        const matchingInvoice = invoices.find((inv: any) => inv.invoiceNumber === newJob.invoiceNumber);
-        if (matchingInvoice) {
-          matchingInvoice.jobNumber = newJob.jobNumber;
-          localStorage.setItem('invoices', JSON.stringify(invoices));
-        }
-      } catch (error) {
-        console.error('Error syncing job number with invoice:', error);
+  /**
+   * Save a new job
+   */
+  static saveJob(jobData: any) {
+    try {
+      const jobs = this.getAllJobs();
+      
+      // Ensure job number is 5 digits
+      if (!jobData.jobNumber || jobData.jobNumber.length !== 5) {
+        const nextJobNumber = this.generateNextJobNumber();
+        jobData.jobNumber = nextJobNumber;
       }
-    }
-    
-    return newJob;
-  },
-
-  // Update an existing job
-  updateJob: (jobId: string, jobData: Partial<QatarJob>): QatarJob | null => {
-    const index = jobs.findIndex(job => job.id === jobId);
-    
-    if (index === -1) return null;
-    
-    const updatedJob = { 
-      ...jobs[index], 
-      ...jobData,
-      // Ensure advanceAmount is a number
-      advanceAmount: parseFloat(jobData.advanceAmount as unknown as string) || jobs[index].advanceAmount || 0
-    };
-    
-    jobs = [...jobs.slice(0, index), updatedJob, ...jobs.slice(index + 1)];
-    
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
-    
-    // Sync with invoice data if invoiceNumber is provided
-    if (updatedJob.invoiceNumber) {
-      try {
-        const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-        const matchingInvoice = invoices.find((inv: any) => inv.invoiceNumber === updatedJob.invoiceNumber);
-        if (matchingInvoice) {
-          matchingInvoice.jobNumber = updatedJob.jobNumber;
-          localStorage.setItem('invoices', JSON.stringify(invoices));
-        }
-      } catch (error) {
-        console.error('Error syncing job number with invoice:', error);
+      
+      // Add an ID if it doesn't exist
+      if (!jobData.id) {
+        jobData.id = `job-${Date.now()}`;
       }
+      
+      // Add timestamp
+      jobData.timestamp = new Date().toISOString();
+      
+      jobs.push(jobData);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(jobs));
+      
+      // Update invoices with the job number if there's an invoice number
+      if (jobData.invoiceNumber) {
+        this.updateInvoiceWithJobNumber(jobData.invoiceNumber, jobData.jobNumber);
+      }
+      
+      return jobData;
+    } catch (error) {
+      console.error('Error saving job:', error);
+      throw new Error('Failed to save job');
     }
-    
-    return updatedJob;
-  },
+  }
 
-  // Delete a job
-  deleteJob: (jobId: string): boolean => {
-    const initialLength = jobs.length;
-    jobs = jobs.filter(job => job.id !== jobId);
-    
-    // Save to localStorage if a job was removed
-    if (jobs.length < initialLength) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
+  /**
+   * Update an existing job
+   */
+  static updateJob(id: string, updatedJobData: any) {
+    try {
+      const jobs = this.getAllJobs();
+      const jobIndex = jobs.findIndex((job: any) => job.id === id);
+      
+      if (jobIndex === -1) {
+        throw new Error(`Job with ID ${id} not found`);
+      }
+      
+      // Update the job
+      jobs[jobIndex] = {
+        ...jobs[jobIndex],
+        ...updatedJobData,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(jobs));
+      
+      // Update invoices with the job number if there's an invoice number
+      if (updatedJobData.invoiceNumber) {
+        this.updateInvoiceWithJobNumber(updatedJobData.invoiceNumber, updatedJobData.jobNumber);
+      }
+      
+      return jobs[jobIndex];
+    } catch (error) {
+      console.error('Error updating job:', error);
+      throw new Error('Failed to update job');
+    }
+  }
+
+  /**
+   * Delete a job
+   */
+  static deleteJob(id: string) {
+    try {
+      const jobs = this.getAllJobs();
+      const updatedJobs = jobs.filter((job: any) => job.id !== id);
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(updatedJobs));
       return true;
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      return false;
     }
-    
-    return false;
-  },
-
-  // Mark jobs as scheduled
-  markJobsAsScheduled: (jobIds: string[]): void => {
-    jobs = jobs.map(job => 
-      jobIds.includes(job.id) 
-        ? { ...job, status: 'SCHEDULED' } 
-        : job
-    );
-    
-    // Save to localStorage
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(jobs));
   }
-};
+
+  /**
+   * Update an invoice with a job number
+   */
+  private static updateInvoiceWithJobNumber(invoiceNumber: string, jobNumber: string) {
+    try {
+      // Get stored invoices
+      const storedInvoices = localStorage.getItem('invoices');
+      
+      if (storedInvoices) {
+        const invoices = JSON.parse(storedInvoices);
+        
+        // Find the invoice with the matching invoice number
+        const invoiceIndex = invoices.findIndex((invoice: any) => 
+          invoice.invoiceNumber === invoiceNumber
+        );
+        
+        if (invoiceIndex !== -1) {
+          // Update the invoice with the job number
+          invoices[invoiceIndex].jobNumber = jobNumber;
+          
+          // Save back to localStorage
+          localStorage.setItem('invoices', JSON.stringify(invoices));
+        }
+      }
+    } catch (error) {
+      console.error('Error updating invoice with job number:', error);
+    }
+  }
+
+  /**
+   * Generate a 5-digit job number
+   */
+  private static generateNextJobNumber(): string {
+    const jobs = this.getAllJobs();
+    
+    // Find the highest job number
+    let highestNumber = 10000; // Start at 10000 so first job will be 10001
+    
+    jobs.forEach((job: any) => {
+      if (job.jobNumber) {
+        const jobNum = parseInt(job.jobNumber);
+        if (!isNaN(jobNum) && jobNum > highestNumber) {
+          highestNumber = jobNum;
+        }
+      }
+    });
+    
+    // Generate next job number
+    const nextNumber = highestNumber + 1;
+    
+    // Format as 5-digit string with leading zeros if needed
+    return nextNumber.toString().padStart(5, '0');
+  }
+}
+
+export default JobStorageService;

@@ -1,129 +1,123 @@
 export interface PackageItem {
   id: string;
-  name: string;
-  length: string;
-  width: string;
-  height: string;
-  volume: string;
-  weight: string;
-  boxNumber: string;
-  volumeWeight: string;
-  price: string;
-  documentsFee: string;
-  total: string;
+  description: string;
+  price: number;
+  quantity: number;
+  total: number;
 }
 
 export interface FormState {
-  sector: string;
-  branch: string;
-  warehouse: string;
-  salesRep: string;
-  doorToDoor: string;
-  driver: string;
-  district: string;
-  volume: string;
-  catZone: string;
-  weight: string;
-  freightBy: string;
-  packages: string;
-  invoiceNumber: string;
-  remarks: string;
-  invoiceDate: string;
-  giftCargo: string;
-  prePaid: string;
-  country: string;
-  destination: string; // This is required now
-  currency: string; // Added currency field
-  date: string; // Added date field
+  [key: string]: any;
   
-  // Package details
-  packagesName: string;
-  selectedPackage: any | null;
-  length: string;
-  width: string;
-  height: string;
-  cubicMetre: string;
-  cubicFeet: string;
-  packageWeight: string;
-  boxNumber: string;
-  volumeWeight: string;
-  price: string;
-  documentsFee: string;
-  total: string;
-  
-  // Shipping details
-  handOverBy: string;
-  shipper1: string;
-  shipper2: string;
-  shipperMobile: string;
-  shipperEmail: string; // Added for email
-  shipperIdNumber: string;
-  collectionAddress: string;
-  shipperCity: string;
-  
-  consignee1: string;
-  consignee2: string;
-  address: string;
-  consigneeCity: string;
-  consigneeMobile: string;
-  consigneeEmail: string; // Added for email
-  consigneeLandline: string;
-  consigneeIdNumber: string;
-  
-  // Payment details
-  freight: string;
-  destinationTransport: string;
-  document: string;
-  localTransport: string;
-  packing: string;
-  storage: string;
-  destinationClearing: string;
-  destinationDoorDelivery: string;
-  other: string;
-  gross: string;
-  discount: string;
-  net: string;
-  agentName: string;
-  agentNumber: string;
-  subZone: string;
-  paymentMethod: string;
-  paymentStatus: string;
-  paymentDate: string;
-  bankingDate: string;
-  bookingFormNumber: string; // Added this field
-  airwayBillNumber: string; // Added this field
-  salesAgent: string; // Added this field
-}
-
-export interface Invoice {
-  id: string;
   invoiceNumber: string;
   bookingFormNumber?: string;
   airwayBillNumber?: string;
-  date?: string;
+  date: string;
+  destination?: string;
+  salesAgent?: string;
+  remarks?: string;
+  
+  jobNumber?: string;
+  
+  shipper1: string;
+  shipperMobile?: string;
+  shipperEmail?: string;
+  shipperCity?: string;
+  
+  consignee1: string;
+  consigneeMobile?: string;
+  consigneeEmail?: string;
+  consigneeCity?: string;
+  
+  packagesName?: string;
+  length?: string;
+  width?: string;
+  height?: string;
+  cubicMetre?: string;
+  packageWeight?: string;
+  boxNumber?: string;
+  price?: string;
+  documentsFee?: string;
+  total?: string;
+  
+  paymentMethod?: string;
+  paymentStatus?: string;
+  paymentDate?: string;
+  bankingDate?: string;
+  
+  gross: string;
+  discount: string;
+  net: string;
+  
+  country: string;
+  sector: string;
+  branch: string;
+  warehouse: string;
+  district?: string;
+  
+  packages?: string;
+  weight?: string;
+  volume?: string;
+  doorToDoor?: string;
+  freightBy?: string;
+  invoiceDate?: string;
+
+  salesRep?: string;
+  driver?: string;
+  catZone?: string;
+  giftCargo?: string;
+  prePaid?: string;
+  selectedPackage?: string | null;
+  cubicFeet?: string;
+  volumeWeight?: string;
+  handOverBy?: string;
+  shipper2?: string;
+  shipperIdNumber?: string;
+  collectionAddress?: string;
+  consignee2?: string;
+  address?: string;
+  consigneeLandline?: string;
+  consigneeIdNumber?: string;
+  freight?: string;
+  destinationTransport?: string;
+  document?: string;
+  localTransport?: string;
+  packing?: string;
+  storage?: string;
+  destinationClearing?: string;
+  destinationDoorDelivery?: string;
+  other?: string;
+  agentName?: string;
+  agentNumber?: string;
+  subZone?: string;
+  currency?: string;
+}
+
+export interface Invoice {
+  id?: string;
+  invoiceNumber: string;
+  bookingFormNumber?: string;
+  bookingForm?: string;
+  bookNumber?: string;
   gross?: number;
   discount?: number;
   net?: number;
+  date?: string;
+  grossAmount?: number;
+  netAmount?: number;
+  totalPaid?: number;
+  balanceToPay?: number;
+  shipper?: string;
+  shipper1?: string;
+  consignee?: string;
+  consignee1?: string;
+  freightType?: string;
+  shipmentType?: string;
+  warehouse?: string;
+  jobNumber?: string;
+  currency?: string;
+  country?: string;
   remarks?: string;
-  packageDetails?: PackageItem[];
-  consignee1?: string;  // Adding these fields for display in selectors
-  consignee?: string;   // Alternative field name sometimes used
-}
-
-export interface InvoiceFormReturnType {
-  formState: FormState;
-  packageItems: PackageItem[];
-  showInvoiceSelector: boolean;
-  setShowInvoiceSelector: (show: boolean) => void;
-  availableInvoices: any[];
-  isEditing: boolean;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-  handleSelectChange: (name: string, value: string) => void;
-  handlePackageSelect: (description: string) => void;
-  handleManualPackage: (packageName: string, price: string) => void;
-  handleAddPackage: () => void;
-  handleRemovePackage: (id: string) => void;
-  handleSelectInvoice: (invoiceNumber: string) => void;
-  handleSave: () => void;
-  countrySectorMap: typeof import('../constants/countrySectorMap').countrySectorMap;
+  amount?: number;
+  paid?: boolean;
 }

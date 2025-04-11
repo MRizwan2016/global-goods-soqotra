@@ -1,86 +1,63 @@
 
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { NavigationSectionProps } from "./types";
-import { usePermissions } from "@/hooks/use-permissions";
+import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { cn } from '@/lib/utils';
 
-const NavigationSection: React.FC<NavigationSectionProps> = ({
-  sectionKey,
-  section,
-  isActive,
-  onToggle,
-  onNavigate,
-  isPathActive,
-}) => {
-  const Icon = section.icon;
-  const { hasFilePermission, isAdmin } = usePermissions();
-  const navigate = useNavigate();
+interface NavigationItem {
+  title: string;
+  path: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  requiresPermission?: string;
+  filePermission?: string;
+}
 
-  const handleNavigate = (path: string) => {
-    console.log("Navigating to:", path);
-    navigate(path);
+interface NavigationSectionProps {
+  navigationItems: NavigationItem[];
+  basePath?: string;
+}
+
+const NavigationSection: React.FC<NavigationSectionProps> = ({ navigationItems, basePath = "" }) => {
+  const location = useLocation();
+  
+  const isActive = (path: string): boolean => {
+    // Modify to handle empty paths or home routes
+    if (path === "/" && location.pathname === "/") {
+      return true;
+    }
+    
+    // Handle exact matches
+    if (path === location.pathname) {
+      return true;
+    }
+    
+    // Check if the current path starts with the given path (for nested routes)
+    // But only if the path is not the root
+    if (path !== "/" && path !== "") {
+      return location.pathname.startsWith(path);
+    }
+    
+    return false;
   };
 
   return (
-    <div className="w-full mb-3">
-      <button
-        className={cn(
-          "flex items-center justify-between w-full px-4 py-2.5 rounded-md text-left focus:outline-none",
-          `nav-button-gradient-${sectionKey}`,
-          isActive ? "shadow-md" : ""
-        )}
-        onClick={onToggle}
-      >
-        <div className="flex items-center">
-          <Icon className={cn("mr-3 h-5 w-5", section.iconColor)} />
-          <span className="font-bold">{section.title}</span>
-        </div>
-        {isActive ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-      </button>
-      
-      {isActive && (
-        <div className="ml-6 mt-2 space-y-3 animate-accordion-down">
-          {section.submenu.map((menu, index) => (
-            <div key={index} className="space-y-1.5">
-              <h4 className={cn(
-                "font-semibold text-sm px-2 py-1 rounded", 
-                `submenu-header-${sectionKey}`
-              )}>
-                {menu.title}
-              </h4>
-              <ul className="space-y-1">
-                {menu.items.map((item, idx) => {
-                  // Check if user has permission for this specific file/feature
-                  const fileKey = item.requiredFile as keyof ReturnType<typeof usePermissions>['hasFilePermission'] extends (key: infer K) => boolean ? K : never;
-                  const canAccess = isAdmin || (fileKey ? hasFilePermission(fileKey) : true);
-                  
-                  if (!canAccess) {
-                    return null; // Don't render items user doesn't have access to
-                  }
-                  
-                  return (
-                    <li key={idx}>
-                      <button 
-                        onClick={() => handleNavigate(item.path)}
-                        className={cn(
-                          "w-full block text-left px-3 py-1.5 text-sm rounded-md transition-all duration-200 transform hover:translate-x-1",
-                          isPathActive(item.path)
-                            ? `submenu-item-active-${sectionKey}`
-                            : `submenu-item-${sectionKey} hover:bg-opacity-80`
-                        )}
-                      >
-                        {item.name}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
+    <div className="space-y-1 pl-6">
+      {navigationItems.map((item, index) => {
+        const fullPath = item.path.startsWith("/") ? item.path : `${basePath}/${item.path}`;
+        
+        return (
+          <Link
+            key={index}
+            to={fullPath}
+            className={cn(
+              "flex items-center text-sm px-3 py-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100",
+              isActive(item.path) && "bg-gray-100 text-gray-900 font-medium"
+            )}
+          >
+            {item.icon && <item.icon className="h-4 w-4 mr-2" />}
+            <span>{item.title}</span>
+          </Link>
+        );
+      })}
     </div>
   );
 };

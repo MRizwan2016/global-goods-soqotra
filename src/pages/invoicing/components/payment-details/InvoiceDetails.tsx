@@ -14,62 +14,76 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
   const [assignedUser, setAssignedUser] = useState<string>("");
   const [jobNumber, setJobNumber] = useState<string>("");
   
-  // Find the assigned user whenever the invoice number changes
+  // Find the assigned user and job number whenever the invoice number changes
   useEffect(() => {
     if (formState.invoiceNumber) {
-      // Check localStorage first
-      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
-      let foundUser = "";
-      
-      // Look through all active books to find the one containing this invoice number
-      for (const book of activeBooks) {
-        if (book.availablePages && book.availablePages.includes(formState.invoiceNumber)) {
+      updateAssignedUser(formState.invoiceNumber);
+      updateJobNumber(formState.invoiceNumber);
+    }
+  }, [formState.invoiceNumber]);
+  
+  // Function to update assigned user
+  const updateAssignedUser = (invoiceNumber: string) => {
+    // Check localStorage first
+    const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+    let foundUser = "";
+    
+    // Look through all active books to find the one containing this invoice number
+    for (const book of activeBooks) {
+      if (book.availablePages && book.availablePages.includes(invoiceNumber)) {
+        foundUser = book.assignedTo || '';
+        break;
+      }
+    }
+    
+    // If not found in active books, check stored books
+    if (!foundUser) {
+      const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+      for (const book of storedBooks) {
+        if (book.availablePages && book.availablePages.includes(invoiceNumber)) {
           foundUser = book.assignedTo || '';
           break;
         }
       }
-      
-      // If not found in active books, check stored books
-      if (!foundUser) {
-        const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
-        for (const book of storedBooks) {
-          if (book.availablePages && book.availablePages.includes(formState.invoiceNumber)) {
-            foundUser = book.assignedTo || '';
-            break;
-          }
-        }
-      }
-      
-      // If still not found, check mock data as fallback
-      if (!foundUser) {
-        for (const book of mockInvoiceBooks) {
-          if (book.available.includes(formState.invoiceNumber)) {
-            foundUser = book.assignedTo || '';
-            break;
-          }
-        }
-      }
-      
-      setAssignedUser(foundUser);
-
-      // Look for linked job number in existing invoices
-      const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-      const matchingInvoice = existingInvoices.find((inv: any) => inv.invoiceNumber === formState.invoiceNumber);
-      
-      if (matchingInvoice && matchingInvoice.jobNumber) {
-        setJobNumber(matchingInvoice.jobNumber);
-      } else {
-        // Try to find job by invoice number
-        const allJobs = JobStorageService.getAllJobs();
-        const matchingJob = allJobs.find(job => job.invoiceNumber === formState.invoiceNumber);
-        if (matchingJob) {
-          setJobNumber(matchingJob.jobNumber);
-        } else {
-          setJobNumber("");
+    }
+    
+    // If still not found, check mock data as fallback
+    if (!foundUser) {
+      for (const book of mockInvoiceBooks) {
+        if (book.available.includes(invoiceNumber)) {
+          foundUser = book.assignedTo || '';
+          break;
         }
       }
     }
-  }, [formState.invoiceNumber]);
+    
+    setAssignedUser(foundUser);
+  };
+
+  // Function to update job number
+  const updateJobNumber = (invoiceNumber: string) => {
+    // First check if jobNumber is already in formState
+    if (formState.jobNumber) {
+      setJobNumber(formState.jobNumber);
+      return;
+    }
+
+    // Look for linked job number in existing invoices
+    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const matchingInvoice = existingInvoices.find((inv: any) => inv.invoiceNumber === invoiceNumber);
+    
+    if (matchingInvoice && matchingInvoice.jobNumber) {
+      setJobNumber(matchingInvoice.jobNumber);
+    } else {
+      // Try to find job by invoice number
+      const jobNum = JobStorageService.getJobNumberByInvoiceNumber(invoiceNumber);
+      if (jobNum) {
+        setJobNumber(jobNum);
+      } else {
+        setJobNumber("");
+      }
+    }
+  };
   
   return (
     <>

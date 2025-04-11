@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { AlertCircle } from "lucide-react";
+import { mockInvoiceBooks } from "../../constants/mockInvoiceBooks";
 
 interface InvoiceNumberSelectorProps {
   formState: any;
@@ -47,6 +48,17 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
       }
     }
     
+    // If not found in active books, check in invoiceBooks
+    if (!foundUser) {
+      const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+      for (const book of storedBooks) {
+        if (book.availablePages && book.availablePages.includes(invoiceNumber)) {
+          foundUser = book.assignedTo || "";
+          break;
+        }
+      }
+    }
+    
     // If not found in active books, check available invoices
     if (!foundUser) {
       const selectedInvoice = availableInvoices.find(
@@ -55,6 +67,16 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
       
       if (selectedInvoice && selectedInvoice.assignedTo) {
         foundUser = selectedInvoice.assignedTo;
+      }
+    }
+    
+    // If still not found, check mock data
+    if (!foundUser) {
+      for (const book of mockInvoiceBooks) {
+        if (book.available.includes(invoiceNumber)) {
+          foundUser = book.assignedTo || '';
+          break;
+        }
       }
     }
     

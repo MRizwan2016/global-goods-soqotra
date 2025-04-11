@@ -23,18 +23,16 @@ const CustomerInfoSection = ({
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="jobNumber" className="block text-sm font-medium text-gray-700 mb-1">
+          <label htmlFor="jobNumberDisplay" className="block text-sm font-medium text-gray-700 mb-1">
             JOB NUMBER:
           </label>
           <input
             type="text"
-            id="customerJobNumber"
-            name="jobNumber"
+            id="jobNumberDisplay"
+            name="jobNumberDisplay"
             value={jobData.jobNumber}
-            onChange={handleInputChange}
-            className="border border-gray-300 px-3 py-2 rounded w-full font-semibold bg-gray-50"
+            className="border border-gray-300 px-3 py-2 rounded w-full font-semibold bg-gray-50 text-lg"
             readOnly
-            placeholder="Job number will be displayed here"
           />
         </div>
         
