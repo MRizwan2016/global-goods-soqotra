@@ -12,13 +12,13 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
     jobNumber,
     id,
     sequenceNum,
-    consigneeName,
-    address,
-    contactNumber,
+    customer, // Using customer instead of consigneeName
+    location, // Using location instead of address
+    mobileNumber, // Using mobileNumber instead of contactNumber
     jobType,
-    amount,
+    advanceAmount, // Using advanceAmount instead of amount
     status,
-    awbNumber
+    invoiceNumber // Using invoiceNumber instead of awbNumber
   } = job;
 
   const displayJobNumber = jobNumber || id || "N/A";
@@ -32,36 +32,36 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
             <span className="font-bold">
               Job #: <span className="text-black print:text-black">{displayJobNumber}</span>
             </span>
-            {awbNumber && (
+            {invoiceNumber && (
               <span className="ml-2 text-sm">
-                (AWB: {awbNumber})
+                (AWB: {invoiceNumber})
               </span>
             )}
             <Badge 
-              variant={jobType === "Delivery" ? "default" : "secondary"}
+              variant={jobType === "DELIVERY" ? "default" : "secondary"}
               className="ml-2 print:bg-gray-200 print:text-black"
             >
               {jobType || "Unknown"}
             </Badge>
           </div>
           <div className="mt-1">
-            <span className="font-medium">{consigneeName || "No Name"}</span>
+            <span className="font-medium">{customer || "No Name"}</span>
           </div>
           <div className="text-sm">
-            <span>{address || "No Address"}</span>
+            <span>{location || "No Address"}</span>
           </div>
           <div className="text-sm">
-            <span>Phone: {contactNumber || "No Contact"}</span>
+            <span>Phone: {mobileNumber || "No Contact"}</span>
           </div>
         </div>
         <div className="text-right">
           <div className="font-semibold">
-            {amount ? `${Number(amount).toFixed(2)} QAR` : "0.00 QAR"}
+            {advanceAmount ? `${Number(advanceAmount).toFixed(2)} QAR` : "0.00 QAR"}
           </div>
           <Badge 
-            variant={status === "Completed" ? "outline" : "destructive"}
+            variant={status === "COMPLETED" ? "outline" : "destructive"}
             className={`mt-1 print:border print:border-black ${
-              status === "Completed" ? "print:bg-white print:text-black" : "print:bg-gray-200 print:text-black"
+              status === "COMPLETED" ? "print:bg-white print:text-black" : "print:bg-gray-200 print:text-black"
             }`}
           >
             {status || "Pending"}

@@ -3,11 +3,13 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 interface InputFieldProps {
-  label: string;
+  label: React.ReactNode; // Changed from string to ReactNode to allow elements
   name: string;
   value: string | number;
   readOnly?: boolean;
   className?: string;
+  type?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const InputField: React.FC<InputFieldProps> = ({ 
@@ -15,7 +17,9 @@ const InputField: React.FC<InputFieldProps> = ({
   name, 
   value, 
   readOnly = false,
-  className
+  className,
+  type = "text",
+  onChange
 }) => {
   const isJobNumber = name === 'jobNumber' || name === 'jobNumberDisplay';
   
@@ -28,11 +32,12 @@ const InputField: React.FC<InputFieldProps> = ({
         {label}
       </label>
       <input
-        type="text"
+        type={type}
         id={name}
         name={name}
         value={value || ''}
         readOnly={readOnly}
+        onChange={onChange}
         className={cn(
           "w-full p-2 border border-gray-300 rounded text-sm",
           readOnly ? "bg-gray-50" : "",
