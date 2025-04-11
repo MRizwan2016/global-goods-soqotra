@@ -20,7 +20,8 @@ const JobTracking = () => {
     totalPages,
     indexOfLastEntry,
     indexOfFirstEntry,
-    currentEntries
+    currentEntries,
+    refreshJobs
   } = useJobTracking();
 
   return (
@@ -40,7 +41,10 @@ const JobTracking = () => {
           />
           
           {/* Job Table */}
-          <JobTable currentEntries={currentEntries} />
+          <JobTable 
+            currentEntries={currentEntries} 
+            refreshJobs={refreshJobs} 
+          />
           
           {/* Pagination */}
           <TablePagination 

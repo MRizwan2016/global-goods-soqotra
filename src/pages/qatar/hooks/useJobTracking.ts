@@ -12,9 +12,13 @@ export const useJobTracking = () => {
   const entriesPerPage = 10;
 
   // Load jobs from storage
-  useEffect(() => {
+  const loadJobs = () => {
     const allJobs = JobStorageService.getAllJobs();
     setJobs(allJobs);
+  };
+
+  useEffect(() => {
+    loadJobs();
   }, []);
 
   // Filter jobs based on search text and selected filters
@@ -45,9 +49,13 @@ export const useJobTracking = () => {
 
   // Refresh jobs from storage
   const refreshJobs = () => {
-    const allJobs = JobStorageService.getAllJobs();
-    setJobs(allJobs);
+    loadJobs();
   };
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchText, statusFilter, typeFilter]);
 
   return {
     searchText,
