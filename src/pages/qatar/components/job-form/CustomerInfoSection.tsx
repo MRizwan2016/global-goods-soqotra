@@ -9,20 +9,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useJobForm } from "./context/JobFormContext";
 
-interface CustomerInfoSectionProps {
-  jobData: any;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleSelectChange: (name: string, value: string) => void;
-  isEnabled?: boolean;
-}
-
-const CustomerInfoSection = ({
-  jobData,
-  handleInputChange,
-  handleSelectChange,
-  isEnabled = true
-}: CustomerInfoSectionProps) => {
+const CustomerInfoSection = () => {
+  const { jobData, handleInputChange, handleSelectChange, isJobNumberGenerated } = useJobForm();
+  
   // Define sectors by country
   const getSectorByCountry = (countryName: string) => {
     switch(countryName) {
@@ -118,7 +109,7 @@ const CustomerInfoSection = ({
             onChange={handleInputChange}
             className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
             placeholder="Customer name"
-            disabled={!isEnabled}
+            disabled={!isJobNumberGenerated}
           />
         </div>
         
@@ -134,7 +125,7 @@ const CustomerInfoSection = ({
             onChange={handleInputChange}
             className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
             placeholder="Customer mobile number"
-            disabled={!isEnabled}
+            disabled={!isJobNumberGenerated}
           />
         </div>
         
@@ -150,7 +141,7 @@ const CustomerInfoSection = ({
             onChange={handleInputChange}
             className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
             placeholder="Land line number"
-            disabled={!isEnabled}
+            disabled={!isJobNumberGenerated}
           />
         </div>
         
@@ -161,7 +152,7 @@ const CustomerInfoSection = ({
           <Select
             value={jobData.country}
             onValueChange={(value) => handleSelectChange("country", value)}
-            disabled={!isEnabled}
+            disabled={!isJobNumberGenerated}
           >
             <SelectTrigger id="country" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
               <SelectValue placeholder="SELECT COUNTRY" />
@@ -189,7 +180,7 @@ const CustomerInfoSection = ({
           <Select
             value={jobData.sector}
             onValueChange={(value) => handleSelectChange("sector", value)}
-            disabled={!isEnabled || !jobData.country}
+            disabled={!isJobNumberGenerated || !jobData.country}
           >
             <SelectTrigger id="sector" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
               <SelectValue placeholder="SELECT SECTOR" />
@@ -213,7 +204,7 @@ const CustomerInfoSection = ({
           <Select
             value={jobData.branch}
             onValueChange={(value) => handleSelectChange("branch", value)}
-            disabled={!isEnabled || !jobData.country}
+            disabled={!isJobNumberGenerated || !jobData.country}
           >
             <SelectTrigger id="branch" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
               <SelectValue placeholder="SELECT BRANCH" />
@@ -241,7 +232,7 @@ const CustomerInfoSection = ({
             onChange={handleInputChange}
             placeholder="Enter any additional information about personal effects or household goods"
             className="border border-gray-300 rounded w-full h-24 resize-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
-            disabled={!isEnabled}
+            disabled={!isJobNumberGenerated}
           />
         </div>
       </div>

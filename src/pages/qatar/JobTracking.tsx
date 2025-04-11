@@ -1,6 +1,6 @@
 
 import Layout from "@/components/layout/Layout";
-import { useJobTracking } from "./components/job-tracking/useJobTracking";
+import { useJobTracking } from "./hooks/useJobTracking";
 import JobTrackingHeader from "./components/job-tracking/JobTrackingHeader";
 import JobFilters from "./components/job-tracking/JobFilters";
 import JobTable from "./components/job-tracking/JobTable";

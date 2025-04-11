@@ -16,12 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-
-interface PackageDescriptionSectionProps {
-  jobItems: JobItem[];
-  onAddItem: (item: JobItem) => void;
-  isEnabled?: boolean;
-}
+import { useJobForm } from "./context/JobFormContext";
 
 // Common package descriptions for personal effects
 const COMMON_ITEMS = [
@@ -47,7 +42,9 @@ const COMMON_ITEMS = [
   "MISCELLANEOUS GOODS"
 ];
 
-const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: PackageDescriptionSectionProps) => {
+const PackageDescriptionSection = () => {
+  const { jobItems, handleAddItem, isJobNumberGenerated } = useJobForm();
+  
   const [itemName, setItemName] = useState("");
   const [sellPrice, setSellPrice] = useState("");
   const [quantity, setQuantity] = useState("1");
@@ -80,7 +77,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
     }
   };
 
-  const handleAddItem = () => {
+  const handleAddItemClick = () => {
     if (!itemName || !sellPrice) {
       toast.error("Please enter item description and sell price");
       return;
@@ -100,9 +97,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
         quantity: parsedQuantity,
       };
       
-      // Here we would need to update the parent's state. Since we can't directly modify the parent's array,
-      // we're simulating the update by removing the old item and adding the updated one.
-      onAddItem(updatedItem);
+      handleAddItem(updatedItem);
       
       // Reset form
       resetForm();
@@ -117,7 +112,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
         quantity: parsedQuantity,
       };
       
-      onAddItem(newItem);
+      handleAddItem(newItem);
       resetForm();
       toast.success("Item added successfully");
     }
@@ -140,7 +135,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
       quantity: parseInt(quantity || "1"),
     };
     
-    onAddItem(newItem);
+    handleAddItem(newItem);
     setIsPackageDialogOpen(false);
     resetPackageDimensions();
     toast.success("Custom package added");
@@ -172,16 +167,15 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
   };
 
   const handleDeleteItem = (id: string) => {
-    // Since we can't directly modify the parent's array,
-    // we're adding a deleted item with negative quantity to effectively remove it
+    // Add a deleted item with negative quantity to effectively remove it
     const deletedItem: JobItem = {
       id,
-      jobId: 'temp', // Will be overwritten by parent component
+      jobId: 'temp',
       itemName: 'DELETED_ITEM',
       sellPrice: 0,
       quantity: -1, // Negative quantity signals deletion
     };
-    onAddItem(deletedItem);
+    handleAddItem(deletedItem);
     toast.success("Item removed");
   };
 
@@ -214,7 +208,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
               className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors uppercase"
               onChange={handleItemSelect}
               value=""
-              disabled={!isEnabled}
+              disabled={!isJobNumberGenerated}
             >
               <option value="">--- SELECT COMMON ITEM ---</option>
               {COMMON_ITEMS.map((item, index) => (
@@ -230,7 +224,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
             onChange={handleItemNameChange}
             className="mt-2 border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors uppercase"
             placeholder="ENTER ITEM DESCRIPTION"
-            disabled={!isEnabled}
+            disabled={!isJobNumberGenerated}
           />
         </div>
         
@@ -246,7 +240,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
             onChange={handleSellPriceChange}
             className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
             placeholder="0.00"
-            disabled={!isEnabled}
+            disabled={!isJobNumberGenerated}
           />
         </div>
         
@@ -263,14 +257,14 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
               onChange={handleQuantityChange}
               className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
               placeholder="1"
-              disabled={!isEnabled}
+              disabled={!isJobNumberGenerated}
             />
             
             <Button
               type="button"
-              onClick={handleAddItem}
+              onClick={handleAddItemClick}
               className="bg-blue-600 hover:bg-blue-700 transition-colors"
-              disabled={!isEnabled}
+              disabled={!isJobNumberGenerated}
             >
               {isEditing ? <Edit className="mr-1 h-4 w-4" /> : <Plus className="mr-1 h-4 w-4" />}
               {isEditing ? 'UPDATE ITEM' : 'ADD ITEM'}
@@ -281,7 +275,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
                 type="button"
                 onClick={resetForm}
                 className="bg-gray-500 hover:bg-gray-600 transition-colors"
-                disabled={!isEnabled}
+                disabled={!isJobNumberGenerated}
               >
                 <X className="mr-1 h-4 w-4" />
                 CANCEL
@@ -294,7 +288,7 @@ const PackageDescriptionSection = ({ jobItems, onAddItem, isEnabled = true }: Pa
                   type="button"
                   variant="outline"
                   className="bg-green-600 text-white hover:bg-green-700 transition-colors border-green-600"
-                  disabled={!isEnabled}
+                  disabled={!isJobNumberGenerated}
                 >
                   <Package className="mr-1 h-4 w-4" />
                   NEW PACKAGE

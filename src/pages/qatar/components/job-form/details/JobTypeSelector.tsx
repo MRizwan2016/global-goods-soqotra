@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -7,24 +8,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useJobForm } from "../context/JobFormContext";
 
-interface JobTypeSelectorProps {
-  jobType: string;
-  handleSelectChange: (name: string, value: string) => void;
-  isEnabled?: boolean;
-}
+const JobTypeSelector = () => {
+  const { jobData, handleSelectChange, isJobNumberGenerated } = useJobForm();
 
-const JobTypeSelector = ({ jobType, handleSelectChange, isEnabled = true }: JobTypeSelectorProps) => {
   return (
     <div>
-      <Label htmlFor="jobType" className="font-medium text-gray-700 mb-1 block">JOB TYPE:</Label>
-      <Select 
-        value={jobType || "COLLECTION"} 
+      <Label htmlFor="jobType" className="font-medium text-gray-700 mb-1 block">
+        JOB TYPE
+      </Label>
+      <Select
+        value={jobData.jobType}
         onValueChange={(value) => handleSelectChange("jobType", value)}
-        disabled={!isEnabled}
+        disabled={!isJobNumberGenerated}
       >
-        <SelectTrigger id="jobType" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
-          <SelectValue placeholder="SELECT TYPE" />
+        <SelectTrigger id="jobType" className="border border-gray-300 bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+          <SelectValue placeholder="SELECT JOB TYPE" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="COLLECTION">COLLECTION</SelectItem>

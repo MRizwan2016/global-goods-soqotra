@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -7,34 +8,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useJobForm } from "../context/JobFormContext";
 
-interface VehicleSelectorProps {
-  vehicle: string;
-  handleSelectChange: (name: string, value: string) => void;
-  isEnabled?: boolean;
-}
+const VehicleSelector = () => {
+  const { jobData, handleSelectChange, isJobNumberGenerated } = useJobForm();
 
-const VehicleSelector = ({ vehicle = "", handleSelectChange, isEnabled = true }: VehicleSelectorProps) => {
+  const vehicles = [
+    "PICKUP",
+    "SUZUKI",
+    "HIACE VAN",
+    "3 TON TRUCK",
+    "7 TON TRUCK"
+  ];
+
   return (
     <div>
-      <Label htmlFor="vehicle" className="font-medium text-gray-700 mb-1 block">VEHICLE:</Label>
-      <Select 
-        value={vehicle || ""} 
+      <Label htmlFor="vehicle" className="font-medium text-gray-700 mb-1 block">
+        VEHICLE
+      </Label>
+      <Select
+        value={jobData.vehicle}
         onValueChange={(value) => handleSelectChange("vehicle", value)}
-        disabled={!isEnabled}
+        disabled={!isJobNumberGenerated}
       >
-        <SelectTrigger id="vehicle" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+        <SelectTrigger id="vehicle" className="border border-gray-300 bg-white hover:bg-gray-50 transition-colors">
           <SelectValue placeholder="SELECT VEHICLE" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="default">SELECT VEHICLE</SelectItem>
-          <SelectItem value="41067">41067 - LORRY</SelectItem>
-          <SelectItem value="41070">41070 - LORRY</SelectItem>
-          <SelectItem value="41073">41073 - LORRY</SelectItem>
-          <SelectItem value="514005">514005 - MITSUBISHI FUSO</SelectItem>
-          <SelectItem value="119927">119927 - PETROL MANUAL</SelectItem>
-          <SelectItem value="74827">74827 - TATA LORRY</SelectItem>
-          <SelectItem value="1254681854">FORK LIFT - WAREHOUSE</SelectItem>
+          {vehicles.map((vehicle, index) => (
+            <SelectItem key={index} value={vehicle}>{vehicle}</SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>
