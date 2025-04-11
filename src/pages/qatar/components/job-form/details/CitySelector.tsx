@@ -65,7 +65,7 @@ const CitySelector = ({ city, country, handleSelectChange, isEnabled = true }: C
               <SelectItem key={index} value={cityName}>{cityName.toUpperCase()}</SelectItem>
             ))
           ) : (
-            <SelectItem value="" disabled>Select a country first</SelectItem>
+            <SelectItem value="no-selection-available">Select a country first</SelectItem>
           )}
         </SelectContent>
       </Select>

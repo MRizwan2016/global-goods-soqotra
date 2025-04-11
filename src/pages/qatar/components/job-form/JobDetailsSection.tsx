@@ -107,7 +107,7 @@ const JobDetailsSection = ({ jobData, handleInputChange, handleSelectChange, isE
                   <SelectItem key={index} value={invoice}>{invoice}</SelectItem>
                 ))
               ) : (
-                <SelectItem value="" disabled>No available invoice numbers</SelectItem>
+                <SelectItem value="no-invoices-available">No available invoice numbers</SelectItem>
               )}
             </SelectContent>
           </Select>

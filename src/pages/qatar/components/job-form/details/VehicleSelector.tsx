@@ -27,7 +27,7 @@ const VehicleSelector = ({ vehicle = "", handleSelectChange, isEnabled = true }:
           <SelectValue placeholder="SELECT VEHICLE" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">SELECT VEHICLE</SelectItem>
+          <SelectItem value="default">SELECT VEHICLE</SelectItem>
           <SelectItem value="41067">41067 - LORRY</SelectItem>
           <SelectItem value="41070">41070 - LORRY</SelectItem>
           <SelectItem value="41073">41073 - LORRY</SelectItem>
