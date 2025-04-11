@@ -17,21 +17,38 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
     if (formState.invoiceNumber) {
       // Check localStorage first
       const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
-      const bookWithInvoice = activeBooks.find((book: any) => 
-        book.availablePages.includes(formState.invoiceNumber)
-      );
+      let foundUser = "";
       
-      if (bookWithInvoice && bookWithInvoice.assignedTo) {
-        setAssignedUser(bookWithInvoice.assignedTo);
-      } else {
-        // Fall back to mock data
-        for (const book of mockInvoiceBooks) {
-          if (book.available.includes(formState.invoiceNumber)) {
-            setAssignedUser(book.assignedTo || '');
+      // Look through all active books to find the one containing this invoice number
+      for (const book of activeBooks) {
+        if (book.availablePages && book.availablePages.includes(formState.invoiceNumber)) {
+          foundUser = book.assignedTo || '';
+          break;
+        }
+      }
+      
+      // If not found in active books, check stored books
+      if (!foundUser) {
+        const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+        for (const book of storedBooks) {
+          if (book.availablePages && book.availablePages.includes(formState.invoiceNumber)) {
+            foundUser = book.assignedTo || '';
             break;
           }
         }
       }
+      
+      // If still not found, check mock data as fallback
+      if (!foundUser) {
+        for (const book of mockInvoiceBooks) {
+          if (book.available.includes(formState.invoiceNumber)) {
+            foundUser = book.assignedTo || '';
+            break;
+          }
+        }
+      }
+      
+      setAssignedUser(foundUser);
     }
   }, [formState.invoiceNumber]);
   

@@ -1,71 +1,76 @@
 
-import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import NavigationSection from "./NavigationSection";
-import { navigationSections } from "./navigationConfig";
-import { usePermissions } from "@/hooks/use-permissions";
-import { useAuth } from "@/hooks/use-auth";
+import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { NavigationSection } from './NavigationSection';
+import { navigationConfig } from './navigationConfig';
+import { useAuth } from '@/hooks/use-auth';
+import { usePermissions } from '@/hooks/use-permissions';
+import { hasFilePermission } from '@/utils/auth-utils';
+import { ChevronDown } from 'lucide-react';
 
-const MainNavigation: React.FC = () => {
-  const navigate = useNavigate();
+export const MainNavigation: React.FC = () => {
   const location = useLocation();
-  const [activeSection, setActiveSection] = useState<string | null>(null);
+  const { user } = useAuth();
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
   const { hasPermission } = usePermissions();
-  const { currentUser } = useAuth();
 
-  // Auto-expand the section based on current path
-  useEffect(() => {
-    const currentPath = location.pathname;
-    
-    // Find which section contains the current path
-    for (const [key, section] of Object.entries(navigationSections)) {
-      for (const menu of section.submenu) {
-        for (const item of menu.items) {
-          if (currentPath.startsWith(item.path)) {
-            setActiveSection(key);
-            return;
-          }
-        }
+  const toggleSection = (key: string) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  // Filter navigation items based on user permissions
+  const filteredNavigation = navigationConfig
+    .filter((section) => {
+      // If section requires permission, check if user has it
+      if (section.requiresPermission) {
+        return hasPermission(section.requiresPermission);
       }
-    }
-  }, [location.pathname]);
+      return true;
+    })
+    .map((section) => ({
+      ...section,
+      children: section.children?.filter((item) => {
+        // For file permissions
+        if (item.filePermission) {
+          return hasFilePermission(user, item.filePermission);
+        }
 
-  const handleNavigate = (path: string) => {
-    console.log("Navigating to:", path);
-    navigate(path);
-  };
+        // For other permissions
+        if (item.requiresPermission) {
+          return hasPermission(item.requiresPermission);
+        }
 
-  const isPathActive = (path: string) => {
-    return location.pathname.startsWith(path);
-  };
+        return true;
+      }),
+    }));
 
   return (
-    <div className="w-full p-2 animate-fade-in">
-      <div className="flex flex-col space-y-2">
-        {Object.entries(navigationSections).map(([key, section]) => {
-          // Only show sections the user has permission for
-          const permissionKey = key as keyof typeof currentUser?.permissions;
-          const hasAccess = currentUser?.isAdmin || hasPermission(permissionKey);
-          
-          if (!hasAccess && key !== 'dashboard') {
-            return null; // Don't render this section
-          }
-          
-          return (
-            <NavigationSection
-              key={key}
-              sectionKey={key}
-              section={section}
-              isActive={activeSection === key}
-              onToggle={() => setActiveSection(activeSection === key ? null : key)}
-              onNavigate={handleNavigate}
-              isPathActive={isPathActive}
+    <nav className="w-full space-y-1">
+      {filteredNavigation.map((section) => (
+        <div key={section.key} className="mb-4">
+          <div
+            className="flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 cursor-pointer"
+            onClick={() => toggleSection(section.key)}
+          >
+            <span className="flex items-center">
+              {section.icon && <section.icon className="mr-2 h-5 w-5" />}
+              {section.title}
+            </span>
+            <ChevronDown
+              className={`h-4 w-4 transition-transform ${
+                expandedSections[section.key] ? 'rotate-180' : ''
+              }`}
             />
-          );
-        })}
-      </div>
-    </div>
+          </div>
+
+          {(expandedSections[section.key] || section.alwaysExpanded) && section.children && (
+            <NavigationSection items={section.children} basePath={section.basePath} />
+          )}
+        </div>
+      ))}
+    </nav>
   );
 };
-
-export default MainNavigation;

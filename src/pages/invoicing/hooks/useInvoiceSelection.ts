@@ -18,57 +18,74 @@ export const useInvoiceSelection = (
     const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
     const allStoredBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
     
+    // Get used invoice numbers to filter them out
+    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const usedInvoiceNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
+    
+    // Also check generated invoices if they exist
+    const generatedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
+    const generatedInvoiceNumbers = generatedInvoices.map((inv: any) => inv.invoiceNumber);
+    
+    // Combine all used numbers
+    const allUsedNumbers = [...usedInvoiceNumbers, ...generatedInvoiceNumbers];
+    
     if (activeBooks.length > 0) {
       // Use active books from localStorage
-      const activeInvoices = activeBooks.flatMap((book: any) => 
-        book.availablePages.map((pageNumber: string) => ({
+      const activeInvoices = activeBooks.flatMap((book: any) => {
+        // Filter out already used invoice numbers
+        const availablePages = book.availablePages.filter(
+          (page: string) => !allUsedNumbers.includes(page)
+        );
+        
+        return availablePages.map((pageNumber: string) => ({
           bookNumber: book.bookNumber,
           invoiceNumber: pageNumber,
-          assignedTo: book.assignedTo
-        }))
-      );
+          assignedTo: book.assignedTo || 'Unassigned'
+        }));
+      });
+      
+      console.log("Available active invoices:", activeInvoices);
       setAvailableInvoices(activeInvoices);
     } else if (allStoredBooks.length > 0) {
       // If no active books but we have stored books
       const storedInvoices = allStoredBooks
         .filter((book: any) => book.isActivated)
-        .flatMap((book: any) => 
-          book.availablePages.map((pageNumber: string) => ({
+        .flatMap((book: any) => {
+          // Filter out already used invoice numbers
+          const availablePages = book.availablePages.filter(
+            (page: string) => !allUsedNumbers.includes(page)
+          );
+          
+          return availablePages.map((pageNumber: string) => ({
             bookNumber: book.bookNumber,
             invoiceNumber: pageNumber,
             assignedTo: book.assignedTo || 'System User'
-          }))
-        );
+          }));
+        });
+      
+      console.log("Available stored invoices:", storedInvoices);
       setAvailableInvoices(storedInvoices);
     } else {
       // Fall back to mock data if no active books in localStorage
-      const allInvoices = mockInvoiceBooks.flatMap(book => 
-        book.available.map(num => ({
+      const allInvoices = mockInvoiceBooks.flatMap(book => {
+        // Filter out already used invoice numbers
+        const availablePages = book.available.filter(
+          (page) => !allUsedNumbers.includes(page)
+        );
+        
+        return availablePages.map(num => ({
           bookNumber: book.bookNumber,
           invoiceNumber: num,
           assignedTo: book.assignedTo || 'Default User'
-        }))
-      );
+        }));
+      });
+      
+      console.log("Available mock invoices:", allInvoices);
       setAvailableInvoices(allInvoices);
     }
   }, [isEditing]);
   
   const handleSelectInvoice = (invoiceNumber: string) => {
-    // Check if this invoice number is already used
-    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    const isDuplicate = existingInvoices.some((inv: any) => inv.invoiceNumber === invoiceNumber);
-    
-    // Also check generated invoices
-    const generatedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
-    const isDuplicateInGenerated = generatedInvoices.some((inv: any) => inv.invoiceNumber === invoiceNumber);
-    
-    if (isDuplicate || isDuplicateInGenerated) {
-      toast.warning("Duplicate Invoice Number", { 
-        description: `Invoice number ${invoiceNumber} is already assigned to another customer`,
-        duration: 5000
-      });
-    }
-    
     // Find the selected invoice in our available invoices
     const selectedInvoice = availableInvoices.find(
       invoice => invoice.invoiceNumber === invoiceNumber
