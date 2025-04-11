@@ -7,39 +7,53 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mockCities } from "../../../data/mockLocations";
 
 interface CitySelectorProps {
   city: string;
+  country: string;
   handleSelectChange: (name: string, value: string) => void;
+  isEnabled?: boolean;
 }
 
-const CitySelector = ({ city, handleSelectChange }: CitySelectorProps) => {
-  // Filter out any city that might have empty code
-  const validCities = mockCities.filter(city => city.code && city.code.trim() !== "");
-
-  // Ensure we have a valid city value
-  const safeCity = city || "default";
+const CitySelector = ({ city, country, handleSelectChange, isEnabled = true }: CitySelectorProps) => {
+  // Define city options based on country
+  const getCitiesByCountry = (countryName: string) => {
+    switch(countryName) {
+      case "Sri Lanka":
+        return ["Colombo", "Kurunegala", "Galle", "Addalachennai", "Ninthavur", "Dambulla"];
+      case "Qatar":
+        return ["Doha", "Al Rayyan", "Al Khor", "Al Wakrah", "Dukhan", "Mesaieed"];
+      case "UAE":
+        return ["Dubai", "Abu Dhabi", "Sharjah", "Ajman", "Ras Al Khaimah", "Fujairah"];
+      case "Bahrain":
+        return ["Manama", "Riffa", "Muharraq", "Hamad Town", "A'ali"];
+      case "Saudi Arabia":
+        return ["Riyadh", "Jeddah", "Mecca", "Medina", "Dammam", "Taif"];
+      default:
+        return [];
+    }
+  };
+  
+  const cityOptions = getCitiesByCountry(country);
 
   return (
-    <div className="col-span-2 sm:col-span-1">
-      <Label htmlFor="city">CITY:</Label>
+    <div>
+      <Label htmlFor="city" className="font-medium text-gray-700 mb-1 block">CITY:</Label>
       <Select 
-        value={safeCity} 
+        value={city || ""} 
         onValueChange={(value) => handleSelectChange("city", value)}
+        disabled={!isEnabled || !country}
       >
-        <SelectTrigger id="city" className="bg-blue-600 text-white">
+        <SelectTrigger id="city" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
           <SelectValue placeholder="SELECT CITY" />
         </SelectTrigger>
         <SelectContent>
-          {validCities.length > 0 ? (
-            validCities.map(city => (
-              <SelectItem key={city.id} value={city.code || `city-${city.id}`}>
-                {city.name} - {city.code}
-              </SelectItem>
+          {cityOptions.length > 0 ? (
+            cityOptions.map((cityName, index) => (
+              <SelectItem key={index} value={cityName}>{cityName.toUpperCase()}</SelectItem>
             ))
           ) : (
-            <SelectItem value="no-cities-available">No cities available</SelectItem>
+            <SelectItem value="no-city" disabled>Select a country first</SelectItem>
           )}
         </SelectContent>
       </Select>

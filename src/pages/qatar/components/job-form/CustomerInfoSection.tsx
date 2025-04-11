@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -23,6 +23,46 @@ const CustomerInfoSection = ({
   handleSelectChange,
   isEnabled = true
 }: CustomerInfoSectionProps) => {
+  // Define sectors by country
+  const getSectorByCountry = (countryName: string) => {
+    switch(countryName) {
+      case "Sri Lanka":
+        return ["COLOMBO : C", "GAMPAHA : G", "KALUTARA : K"];
+      case "Qatar":
+        return ["DOHA : D", "AL RAYYAN : R", "AL WAKRAH : W"];
+      case "UAE":
+        return ["DUBAI : D", "ABU DHABI : A", "SHARJAH : S"];
+      case "Bahrain":
+        return ["MANAMA : M", "RIFFA : R"];
+      case "Saudi Arabia":
+        return ["RIYADH : R", "JEDDAH : J", "DAMMAM : D"];
+      default:
+        return [];
+    }
+  };
+
+  // Define branches by country
+  const getBranchesByCountry = (countryName: string) => {
+    switch(countryName) {
+      case "Sri Lanka":
+        return ["HEAD OFFICE", "COLOMBO BRANCH", "KANDY BRANCH"];
+      case "Qatar":
+        return ["HEAD OFFICE", "INDUSTRIAL AREA", "AL KHOR BRANCH", "WAKRA BRANCH"];
+      case "UAE":
+        return ["HEAD OFFICE", "DUBAI BRANCH", "ABU DHABI BRANCH"];
+      case "Bahrain":
+        return ["HEAD OFFICE", "MANAMA BRANCH"];
+      case "Saudi Arabia":
+        return ["HEAD OFFICE", "RIYADH BRANCH", "JEDDAH BRANCH"];
+      default:
+        return [];
+    }
+  };
+
+  // Get available sectors and branches based on selected country
+  const availableSectors = getSectorByCountry(jobData.country);
+  const availableBranches = getBranchesByCountry(jobData.country);
+  
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 animate-fade-in">
       <h3 className="font-bold text-lg text-gray-800 mb-5 border-b pb-2">PERSONAL EFFECTS CUSTOMER INFORMATION</h3>
@@ -103,11 +143,11 @@ const CustomerInfoSection = ({
               <SelectValue placeholder="SELECT COUNTRY" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="Sri Lanka">SRI LANKA</SelectItem>
               <SelectItem value="Qatar">QATAR</SelectItem>
               <SelectItem value="UAE">UAE</SelectItem>
               <SelectItem value="Bahrain">BAHRAIN</SelectItem>
               <SelectItem value="Saudi Arabia">SAUDI ARABIA</SelectItem>
-              <SelectItem value="Sri Lanka">SRI LANKA</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -119,15 +159,19 @@ const CustomerInfoSection = ({
           <Select
             value={jobData.sector}
             onValueChange={(value) => handleSelectChange("sector", value)}
-            disabled={!isEnabled}
+            disabled={!isEnabled || !jobData.country}
           >
             <SelectTrigger id="sector" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
               <SelectValue placeholder="SELECT SECTOR" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="COLOMBO : C">COLOMBO : C</SelectItem>
-              <SelectItem value="GAMPAHA : G">GAMPAHA : G</SelectItem>
-              <SelectItem value="KALUTARA : K">KALUTARA : K</SelectItem>
+              {availableSectors.length > 0 ? (
+                availableSectors.map((sector, index) => (
+                  <SelectItem key={index} value={sector}>{sector}</SelectItem>
+                ))
+              ) : (
+                <SelectItem value="no-sector" disabled>Select a country first</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -139,15 +183,19 @@ const CustomerInfoSection = ({
           <Select
             value={jobData.branch}
             onValueChange={(value) => handleSelectChange("branch", value)}
-            disabled={!isEnabled}
+            disabled={!isEnabled || !jobData.country}
           >
             <SelectTrigger id="branch" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
               <SelectValue placeholder="SELECT BRANCH" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Head Office">HEAD OFFICE</SelectItem>
-              <SelectItem value="Branch 1">BRANCH 1</SelectItem>
-              <SelectItem value="Branch 2">BRANCH 2</SelectItem>
+              {availableBranches.length > 0 ? (
+                availableBranches.map((branch, index) => (
+                  <SelectItem key={index} value={branch}>{branch}</SelectItem>
+                ))
+              ) : (
+                <SelectItem value="no-branch" disabled>Select a country first</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>

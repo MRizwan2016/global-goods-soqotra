@@ -8,6 +8,7 @@ import PackageDescriptionSection from "./PackageDescriptionSection";
 import { Save, ArrowLeft, Hash } from "lucide-react";
 import { JobStorageService } from "../../services/JobStorageService";
 import { JobNumberService } from "@/services/JobNumberService";
+import { mockInvoiceBooks } from "@/pages/invoicing/constants/mockInvoiceBooks";
 
 interface JobFormProps {
   jobId?: string;
@@ -42,6 +43,55 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
   
   const [jobItems, setJobItems] = useState<JobItem[]>([]);
   const [isJobNumberGenerated, setIsJobNumberGenerated] = useState(false);
+  const [availableInvoices, setAvailableInvoices] = useState<string[]>([]);
+  
+  // Load available invoice numbers from active books
+  useEffect(() => {
+    // Get active invoice books from localStorage
+    const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+    const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+    
+    // Get used invoice numbers to filter them out
+    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const usedInvoiceNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
+    
+    let allAvailableInvoices: string[] = [];
+    
+    // Get invoices from active books
+    if (activeBooks.length > 0) {
+      activeBooks.forEach((book: any) => {
+        if (book.availablePages) {
+          // Filter out already used invoice numbers
+          const availableFromBook = book.availablePages.filter(
+            (invoice: string) => !usedInvoiceNumbers.includes(invoice)
+          );
+          allAvailableInvoices = [...allAvailableInvoices, ...availableFromBook];
+        }
+      });
+    } else if (storedBooks.length > 0) {
+      // If no active books, try stored books
+      storedBooks.forEach((book: any) => {
+        if (book.isActivated && book.availablePages) {
+          // Filter out already used invoice numbers
+          const availableFromBook = book.availablePages.filter(
+            (invoice: string) => !usedInvoiceNumbers.includes(invoice)
+          );
+          allAvailableInvoices = [...allAvailableInvoices, ...availableFromBook];
+        }
+      });
+    } else {
+      // Fallback to mock data
+      mockInvoiceBooks.forEach(book => {
+        // Filter out already used invoice numbers
+        const availableFromBook = book.available.filter(
+          (invoice) => !usedInvoiceNumbers.includes(invoice)
+        );
+        allAvailableInvoices = [...allAvailableInvoices, ...availableFromBook];
+      });
+    }
+    
+    setAvailableInvoices(allAvailableInvoices);
+  }, []);
   
   // Load existing job data if editing
   useEffect(() => {
@@ -65,6 +115,48 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
     }
   }, [jobId]);
   
+  // Set sector and branch when country changes
+  useEffect(() => {
+    if (jobData.country) {
+      // Set default sector based on country
+      let defaultSector = "";
+      let defaultBranch = "";
+      
+      switch(jobData.country) {
+        case "Sri Lanka":
+          defaultSector = "COLOMBO : C";
+          defaultBranch = "HEAD OFFICE";
+          break;
+        case "Qatar":
+          defaultSector = "DOHA : D";
+          defaultBranch = "HEAD OFFICE";
+          break;
+        case "UAE":
+          defaultSector = "DUBAI : D";
+          defaultBranch = "HEAD OFFICE";
+          break;
+        case "Bahrain":
+          defaultSector = "MANAMA : M";
+          defaultBranch = "HEAD OFFICE";
+          break;
+        case "Saudi Arabia":
+          defaultSector = "RIYADH : R";
+          defaultBranch = "HEAD OFFICE";
+          break;
+        default:
+          break;
+      }
+      
+      if (defaultSector && !jobData.sector) {
+        setJobData(prev => ({
+          ...prev,
+          sector: defaultSector,
+          branch: defaultBranch
+        }));
+      }
+    }
+  }, [jobData.country]);
+  
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setJobData(prev => ({
@@ -78,6 +170,11 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
       ...prev,
       [name]: value
     }));
+    
+    // If country changes, reset sector, branch and city
+    if (name === 'country') {
+      // Will be set by useEffect
+    }
   };
   
   const handleAddItem = (newItem: JobItem) => {

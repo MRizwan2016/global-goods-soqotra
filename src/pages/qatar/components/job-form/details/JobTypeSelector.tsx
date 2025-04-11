@@ -11,15 +11,17 @@ import {
 interface JobTypeSelectorProps {
   jobType: string;
   handleSelectChange: (name: string, value: string) => void;
+  isEnabled?: boolean;
 }
 
-const JobTypeSelector = ({ jobType, handleSelectChange }: JobTypeSelectorProps) => {
+const JobTypeSelector = ({ jobType, handleSelectChange, isEnabled = true }: JobTypeSelectorProps) => {
   return (
     <div>
       <Label htmlFor="jobType" className="font-medium text-gray-700 mb-1 block">JOB TYPE:</Label>
       <Select 
         value={jobType || "COLLECTION"} 
         onValueChange={(value) => handleSelectChange("jobType", value)}
+        disabled={!isEnabled}
       >
         <SelectTrigger id="jobType" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
           <SelectValue placeholder="SELECT TYPE" />

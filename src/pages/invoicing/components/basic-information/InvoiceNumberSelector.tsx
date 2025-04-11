@@ -25,6 +25,79 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
 }) => {
   const [activeInvoiceUser, setActiveInvoiceUser] = useState<string>("");
   const [isDuplicate, setIsDuplicate] = useState<boolean>(false);
+  const [availableInvoiceList, setAvailableInvoiceList] = useState<any[]>([]);
+  
+  // Load available invoice numbers on component mount
+  useEffect(() => {
+    // Get active invoice books from localStorage
+    const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+    const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+    
+    // Get used invoice numbers to filter them out
+    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const usedInvoiceNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
+    
+    // Also check generated invoices if they exist
+    const generatedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
+    const generatedInvoiceNumbers = generatedInvoices.map((inv: any) => inv.invoiceNumber);
+    
+    // Combine all used numbers
+    const allUsedNumbers = [...usedInvoiceNumbers, ...generatedInvoiceNumbers];
+    
+    let invoiceList: any[] = [];
+    
+    // Get invoices from active books
+    if (activeBooks.length > 0) {
+      activeBooks.forEach((book: any) => {
+        if (book.availablePages && book.assignedTo) {
+          // Filter out already used invoice numbers
+          const availableFromBook = book.availablePages
+            .filter((invoiceNo: string) => !allUsedNumbers.includes(invoiceNo))
+            .map((invoiceNo: string) => ({
+              invoiceNumber: invoiceNo,
+              bookNumber: book.bookNumber,
+              assignedTo: book.assignedTo
+            }));
+            
+          invoiceList = [...invoiceList, ...availableFromBook];
+        }
+      });
+    } else if (storedBooks.length > 0) {
+      // If no active books, try stored books
+      storedBooks.forEach((book: any) => {
+        if (book.isActivated && book.availablePages) {
+          // Filter out already used invoice numbers
+          const availableFromBook = book.availablePages
+            .filter((invoiceNo: string) => !allUsedNumbers.includes(invoiceNo))
+            .map((invoiceNo: string) => ({
+              invoiceNumber: invoiceNo,
+              bookNumber: book.bookNumber,
+              assignedTo: book.assignedTo || 'System User'
+            }));
+            
+          invoiceList = [...invoiceList, ...availableFromBook];
+        }
+      });
+    } 
+    
+    if (invoiceList.length === 0) {
+      // Fallback to mock data if no invoices found in storage
+      mockInvoiceBooks.forEach(book => {
+        // Filter out already used invoice numbers
+        const availableFromBook = book.available
+          .filter((invoiceNo) => !allUsedNumbers.includes(invoiceNo))
+          .map((invoiceNo) => ({
+            invoiceNumber: invoiceNo,
+            bookNumber: book.bookNumber,
+            assignedTo: book.assignedTo || 'Default User'
+          }));
+          
+        invoiceList = [...invoiceList, ...availableFromBook];
+      });
+    }
+    
+    setAvailableInvoiceList(invoiceList);
+  }, []);
   
   // Check for duplicate invoice numbers when form state changes
   useEffect(() => {
@@ -81,7 +154,6 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
     }
     
     setActiveInvoiceUser(foundUser);
-    console.log("Assigned user for invoice", invoiceNumber, "is", foundUser);
   };
 
   // Function to check if the invoice number is already in use
@@ -119,50 +191,10 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
     }
   };
 
-  // Filter out already used invoice numbers unless in editing mode
-  const getAvailableInvoices = () => {
-    if (isEditing) {
-      // In editing mode, we only need the current invoice
-      return formState.invoiceNumber ? 
-        [{ invoiceNumber: formState.invoiceNumber, bookNumber: "CURRENT", assignedTo: activeInvoiceUser }] 
-        : [];
-    }
-    
-    // Get existing invoices from localStorage
-    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    const usedNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
-    
-    // Also check in generated invoices
-    const generatedInvoices = JSON.parse(localStorage.getItem('generatedInvoices') || '[]');
-    const generatedNumbers = generatedInvoices.map((inv: any) => inv.invoiceNumber);
-    
-    // Combine all used numbers
-    const allUsedNumbers = [...usedNumbers, ...generatedNumbers];
-    
-    // Filter out used numbers from available invoices
-    const filteredInvoices = availableInvoices.filter(
-      invoice => !allUsedNumbers.includes(invoice.invoiceNumber)
-    );
-    
-    return filteredInvoices.length > 0 ? filteredInvoices : generateDefaultInvoices();
-  };
-  
-  // Generate default invoices if none are available
-  const generateDefaultInvoices = () => {
-    return Array.from({ length: 10 }, (_, i) => ({
-      invoiceNumber: `GY ${(13136051 + i).toString()}`,
-      bookNumber: "DEFAULT",
-      assignedTo: "System"
-    }));
-  };
-
-  // Get filtered available invoices
-  const filteredInvoices = getAvailableInvoices();
-
   // Custom handler for invoice selection
   const onInvoiceSelect = (value: string) => {
     // Display user immediately on selection
-    const selectedInvoice = availableInvoices.find(inv => inv.invoiceNumber === value);
+    const selectedInvoice = availableInvoiceList.find(inv => inv.invoiceNumber === value);
     if (selectedInvoice && selectedInvoice.assignedTo) {
       setActiveInvoiceUser(selectedInvoice.assignedTo);
     }
@@ -194,7 +226,7 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
                 <SelectValue placeholder="Select invoice number" />
               </SelectTrigger>
               <SelectContent className="max-h-60">
-                {filteredInvoices.map((invoice: any) => (
+                {availableInvoiceList.map((invoice: any) => (
                   <SelectItem 
                     key={invoice.invoiceNumber} 
                     value={invoice.invoiceNumber}

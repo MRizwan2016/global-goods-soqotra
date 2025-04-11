@@ -17,7 +17,7 @@ const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
 }) => {
   if (items.length === 0) {
     return (
-      <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200">
+      <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200 animate-fade-in">
         <p className="text-gray-500">No items added yet</p>
         <p className="text-sm text-gray-400 mt-1">Add items using the form above</p>
       </div>
@@ -25,7 +25,7 @@ const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto animate-fade-in">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>

@@ -37,6 +37,9 @@ const NewJobForm = () => {
             matchingInvoice.jobNumber = savedJob.jobNumber;
             localStorage.setItem('invoices', JSON.stringify(invoices));
           }
+          
+          // Also link via the JobNumberService
+          JobNumberService.linkJobToInvoice(savedJob.jobNumber, savedJob.invoiceNumber);
         } catch (error) {
           console.error('Error linking job number with invoice:', error);
         }

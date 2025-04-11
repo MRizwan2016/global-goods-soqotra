@@ -11,6 +11,7 @@ import {
 import DateTimeSelector from "./details/DateTimeSelector";
 import JobTypeSelector from "./details/JobTypeSelector";
 import VehicleSelector from "./details/VehicleSelector";
+import CitySelector from "./details/CitySelector";
 
 interface JobDetailsSectionProps {
   jobData: any;
@@ -28,22 +29,30 @@ const JobDetailsSection = ({ jobData, handleInputChange, handleSelectChange, isE
         <JobTypeSelector 
           jobType={jobData.jobType} 
           handleSelectChange={handleSelectChange}
+          isEnabled={isEnabled}
         />
         
         <div>
           <Label htmlFor="invoiceNumber" className="font-medium text-gray-700 mb-1 block">
             INVOICE NUMBER
           </Label>
-          <input
-            type="text"
-            id="invoiceNumber"
-            name="invoiceNumber"
-            value={jobData.invoiceNumber}
-            onChange={handleInputChange}
-            className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
-            placeholder="Enter invoice number"
+          <Select
+            value={jobData.invoiceNumber || ""}
+            onValueChange={(value) => handleSelectChange("invoiceNumber", value)}
             disabled={!isEnabled}
-          />
+          >
+            <SelectTrigger id="invoiceNumber" className="border border-gray-300 bg-white hover:bg-gray-50 transition-colors">
+              <SelectValue placeholder="SELECT INVOICE NUMBER" />
+            </SelectTrigger>
+            <SelectContent>
+              {/* Get invoice numbers from active books */}
+              <SelectItem value="GY 13136051">GY 13136051</SelectItem>
+              <SelectItem value="GY 13136052">GY 13136052</SelectItem>
+              <SelectItem value="GY 13136053">GY 13136053</SelectItem>
+              <SelectItem value="GY 13136054">GY 13136054</SelectItem>
+              <SelectItem value="GY 13136055">GY 13136055</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         
         <DateTimeSelector 
@@ -55,12 +64,23 @@ const JobDetailsSection = ({ jobData, handleInputChange, handleSelectChange, isE
           jobType={jobData.jobType}
           handleInputChange={handleInputChange}
           handleSelectChange={handleSelectChange}
+          isEnabled={isEnabled}
         />
         
-        <VehicleSelector 
-          vehicle={jobData.vehicle} 
-          handleSelectChange={handleSelectChange}
-        />
+        <div className="grid grid-cols-2 gap-4">
+          <VehicleSelector 
+            vehicle={jobData.vehicle} 
+            handleSelectChange={handleSelectChange}
+            isEnabled={isEnabled}
+          />
+          
+          <CitySelector 
+            city={jobData.city} 
+            handleSelectChange={handleSelectChange}
+            isEnabled={isEnabled}
+            country={jobData.country}
+          />
+        </div>
       </div>
     </div>
   );
