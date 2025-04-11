@@ -28,7 +28,7 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
     customer: "",
     mobileNumber: "",
     landNumber: "",
-    country: "",
+    country: "Qatar", // Default country
     sector: "",
     branch: "",
     city: "",
@@ -50,13 +50,12 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
       if (existingJob) {
         setJobData({
           ...existingJob,
-          // Ensure jobNumber is properly formatted as 5 digits
-          jobNumber: existingJob.jobNumber ? 
-                     existingJob.jobNumber.toString().padStart(5, '0') : "",
+          // Ensure jobNumber is properly formatted
+          jobNumber: existingJob.jobNumber || "",
           // Ensure advanceAmount is a string for form handling
           advanceAmount: existingJob.advanceAmount?.toString() || ""
         });
-        setIsJobNumberGenerated(true);
+        setIsJobNumberGenerated(!!existingJob.jobNumber);
       }
     }
   }, [jobId]);
@@ -81,11 +80,14 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
   };
   
   const handleGenerateJobNumber = () => {
-    const newJobNumber = JobNumberService.generateJobNumber();
+    // Generate job number based on country
+    const newJobNumber = JobNumberService.generateJobNumber(jobData.country);
+    
     setJobData(prev => ({
       ...prev,
       jobNumber: newJobNumber
     }));
+    
     setIsJobNumberGenerated(true);
   };
   

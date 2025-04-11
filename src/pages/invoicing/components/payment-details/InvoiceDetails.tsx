@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import InputField from "./InputField";
 import { mockInvoiceBooks } from "../../constants/mockInvoiceBooks";
 import { JobStorageService } from "@/pages/qatar/services/JobStorageService";
+import { JobNumberService } from "@/services/JobNumberService";
 
 interface InvoiceDetailsProps {
   formState: any;
@@ -68,17 +69,15 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
       return;
     }
 
-    // Look for linked job number in existing invoices
-    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    const matchingInvoice = existingInvoices.find((inv: any) => inv.invoiceNumber === invoiceNumber);
-    
-    if (matchingInvoice && matchingInvoice.jobNumber) {
-      setJobNumber(matchingInvoice.jobNumber);
+    // Look for job number using our JobNumberService
+    const jobNum = JobNumberService.getJobNumberByInvoice(invoiceNumber);
+    if (jobNum) {
+      setJobNumber(jobNum);
     } else {
-      // Try to find job by invoice number
-      const jobNum = JobStorageService.getJobNumberByInvoiceNumber(invoiceNumber);
-      if (jobNum) {
-        setJobNumber(jobNum);
+      // As a fallback, look for linked job number in jobs directly
+      const jobNumber = JobStorageService.getJobNumberByInvoiceNumber(invoiceNumber);
+      if (jobNumber) {
+        setJobNumber(jobNumber);
       } else {
         setJobNumber("");
       }
@@ -108,14 +107,12 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
         readOnly
       />
       
-      {jobNumber && (
-        <InputField 
-          label="JOB NUMBER"
-          name="jobNumber"
-          value={jobNumber}
-          readOnly
-        />
-      )}
+      <InputField 
+        label="JOB NUMBER"
+        name="jobNumber"
+        value={formState.jobNumber || jobNumber}
+        readOnly
+      />
       
       {assignedUser && (
         <InputField 

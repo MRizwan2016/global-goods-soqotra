@@ -28,7 +28,7 @@ export interface FormState {
   salesAgent?: string;
   remarks?: string;
   
-  jobNumber?: string;
+  jobNumber?: string; // Ensure this is consistently defined
   
   shipper1: string;
   shipperMobile?: string;
@@ -125,7 +125,7 @@ export interface Invoice {
   freightType?: string;
   shipmentType?: string;
   warehouse?: string;
-  jobNumber?: string;
+  jobNumber?: string; // Ensure job number is consistently defined
   currency?: string;
   country?: string;
   remarks?: string;

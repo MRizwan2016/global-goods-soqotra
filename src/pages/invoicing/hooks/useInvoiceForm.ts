@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
@@ -8,6 +7,7 @@ import { useFormHandling } from "./useFormHandling";
 import { usePackageHandling } from "./usePackageHandling";
 import { useInvoiceLoader } from "./useInvoiceLoader";
 import { countrySectorMap } from "../constants/countrySectorMap";
+import { JobNumberService } from "@/services/JobNumberService";
 
 export const useInvoiceForm = (id?: string) => {
   const navigate = useNavigate();
@@ -15,27 +15,24 @@ export const useInvoiceForm = (id?: string) => {
     currency: "QAR",  // Default
     date: new Date().toISOString().split('T')[0],
     
-    // Other fields will be initialized based on whether we're editing or creating
     invoiceNumber: "",
     bookingFormNumber: "",
     airwayBillNumber: "",
     destination: "",
     salesAgent: "",
     remarks: "",
+    jobNumber: "",
     
-    // Shipper details
     shipper1: "",
     shipperMobile: "",
     shipperEmail: "",
     shipperCity: "",
     
-    // Consignee details
     consignee1: "",
     consigneeMobile: "",
     consigneeEmail: "",
     consigneeCity: "",
     
-    // Package details
     packagesName: "",
     length: "",
     width: "",
@@ -47,36 +44,30 @@ export const useInvoiceForm = (id?: string) => {
     documentsFee: "",
     total: "",
     
-    // Payment details
     paymentMethod: "CASH",
     paymentStatus: "PAID",
     paymentDate: new Date().toISOString().split('T')[0],
     bankingDate: new Date().toISOString().split('T')[0],
     
-    // Amounts
     gross: "0",
     discount: "0",
     net: "0",
     
-    // Location data
     country: "",
     sector: "",
     branch: "",
     warehouse: "",
     district: "",
     
-    // Additional
     packages: "0",
     weight: "0",
     volume: "0",
-    
-    // Required fields with empty defaults
-    salesRep: "",
     doorToDoor: "",
-    driver: "",
-    catZone: "",
     freightBy: "",
     invoiceDate: "",
+    salesRep: "",
+    driver: "",
+    catZone: "",
     giftCargo: "",
     prePaid: "",
     selectedPackage: null,
@@ -110,7 +101,6 @@ export const useInvoiceForm = (id?: string) => {
   const [savedInvoiceId, setSavedInvoiceId] = useState<string>("");
   const [isEditing, setIsEditing] = useState<boolean>(!!id);
 
-  // Initialize package handling
   const { 
     handlePackageSelect: baseHandlePackageSelect,
     handleManualPackage,
@@ -123,20 +113,30 @@ export const useInvoiceForm = (id?: string) => {
     packageItems,
     setPackageItems
   });
-  
-  // Initialize form handling with package pricing update
+
   const { handleInputChange, handleSelectChange } = useFormHandling(
     formState, 
     setFormState,
     updatePackagePricingByCountry
   );
 
-  // Expose package pricing update function for components
+  useEffect(() => {
+    if (!isEditing && !formState.jobNumber && formState.country) {
+      const existingJobNumber = JobNumberService.getJobNumberByInvoice(formState.invoiceNumber);
+      
+      if (existingJobNumber) {
+        setFormState(prev => ({
+          ...prev,
+          jobNumber: existingJobNumber
+        }));
+      }
+    }
+  }, [formState.country, formState.invoiceNumber, isEditing, formState.jobNumber]);
+
   const updatePackagePricing = () => {
     updatePackagePricingByCountry();
   };
-  
-  // Set up invoice loader with required parameters
+
   const { loadInvoice } = useInvoiceLoader({
     id,
     setFormState,
@@ -144,21 +144,19 @@ export const useInvoiceForm = (id?: string) => {
     setIsEditing
   });
 
-  // Load invoice data on mount if ID is provided
   useEffect(() => {
     if (id) {
       loadInvoice(id);
     }
   }, [id, loadInvoice]);
 
-  // Wrap the package select handler to ensure proper updates
   const handlePackageSelect = (description: string) => {
     baseHandlePackageSelect(description);
   };
 
-  // Handle selecting an invoice from the list
   const handleSelectInvoice = (invoice: Invoice) => {
-    // Set form state with the selected invoice data
+    const jobNumber = invoice.jobNumber || JobNumberService.getJobNumberByInvoice(invoice.invoiceNumber);
+    
     setFormState(prev => ({
       ...prev,
       invoiceNumber: invoice.invoiceNumber,
@@ -168,17 +166,26 @@ export const useInvoiceForm = (id?: string) => {
       gross: String(invoice.gross || 0),
       discount: String(invoice.discount || 0),
       net: String(invoice.net || 0),
+      jobNumber: jobNumber || "",
       remarks: invoice.remarks || ""
     }));
     
-    // Hide the invoice selector
     setShowInvoiceSelector(false);
+    
+    if (!jobNumber && invoice.invoiceNumber && formState.country) {
+      const newJobNumber = JobNumberService.generateJobNumber(formState.country);
+      
+      setFormState(prev => ({
+        ...prev,
+        jobNumber: newJobNumber
+      }));
+      
+      JobNumberService.linkJobToInvoice(newJobNumber, invoice.invoiceNumber);
+    }
   };
 
-  // Handle saving the invoice
   const handleSave = () => {
     try {
-      // Validate required fields
       const requiredFields = ['invoiceNumber', 'country', 'destination', 'shipper1', 'consignee1'];
       const missingFields = requiredFields.filter(field => !formState[field as keyof FormState]);
       
@@ -187,24 +194,30 @@ export const useInvoiceForm = (id?: string) => {
         return;
       }
       
-      // Validate package items
       if (packageItems.length === 0) {
         toast.error("Please add at least one package");
         return;
       }
       
-      // Create unique ID for new invoice
+      let jobNumber = formState.jobNumber;
+      if (!jobNumber && formState.country) {
+        jobNumber = JobNumberService.generateJobNumber(formState.country);
+        
+        setFormState(prev => ({
+          ...prev,
+          jobNumber
+        }));
+      }
+      
       const invoiceId = id || uuidv4();
       
-      // Prepare invoice data
       const invoiceData = {
         id: invoiceId,
         ...formState,
-        packageDetails: packageItems,
-        // Add any additional fields needed for the invoice
+        jobNumber,
+        packageDetails: packageItems
       };
       
-      // Save to local storage
       let storedInvoices: any[] = [];
       const storedInvoicesString = localStorage.getItem('invoices');
       
@@ -212,7 +225,6 @@ export const useInvoiceForm = (id?: string) => {
         storedInvoices = JSON.parse(storedInvoicesString);
       }
       
-      // Update existing or add new
       if (id) {
         const index = storedInvoices.findIndex(inv => inv.id === id);
         if (index !== -1) {
@@ -224,22 +236,17 @@ export const useInvoiceForm = (id?: string) => {
         storedInvoices.push(invoiceData);
       }
       
-      // Save back to local storage
       localStorage.setItem('invoices', JSON.stringify(storedInvoices));
       
-      // Show success message
       toast.success(id ? "Invoice updated successfully" : "Invoice created successfully", {
-        description: `Invoice ${formState.invoiceNumber} has been ${id ? 'updated' : 'created'}.`
+        description: `Invoice ${formState.invoiceNumber} has been ${id ? 'updated' : 'created'} with Job Number: ${jobNumber}`,
       });
       
-      // Store saved invoice ID 
       setSavedInvoiceId(invoiceId);
       
-      // If creating a new invoice, reset or navigate
       if (!id) {
         navigate("/data-entry/invoicing");
       }
-      
     } catch (error) {
       console.error("Error saving invoice:", error);
       toast.error("Failed to save invoice", {

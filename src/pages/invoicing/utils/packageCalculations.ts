@@ -22,8 +22,14 @@ export const calculateTotalsFromPackages = (packages: PackageItem[]): {
   
   packages.forEach(pkg => {
     // Handle numeric conversion properly
-    totalVolume += parseFloat(pkg.volume || "0");
-    totalWeight += parseFloat(pkg.weight || "0");
+    if (pkg.volume) {
+      totalVolume += parseFloat(pkg.volume.toString() || "0");
+    }
+    
+    if (pkg.weight) {
+      totalWeight += parseFloat(pkg.weight.toString() || "0");
+    }
+    
     totalAmount += pkg.total || 0; // Use number directly if available
   });
   

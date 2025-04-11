@@ -2,6 +2,8 @@
 /**
  * Service to handle job storage operations
  */
+import { JobNumberService } from '@/services/JobNumberService';
+
 export class JobStorageService {
   private static STORAGE_KEY = 'jobs';
 
@@ -42,9 +44,9 @@ export class JobStorageService {
     try {
       const jobs = this.getAllJobs();
       
-      // Ensure job number is 5 digits
-      if (!jobData.jobNumber || jobData.jobNumber.length !== 5) {
-        const nextJobNumber = this.generateNextJobNumber();
+      // Generate job number if not provided
+      if (!jobData.jobNumber) {
+        const nextJobNumber = JobNumberService.generateJobNumber(jobData.country);
         jobData.jobNumber = nextJobNumber;
       }
       
@@ -178,28 +180,10 @@ export class JobStorageService {
   }
 
   /**
-   * Generate a 5-digit job number
+   * Generate a job number using JobNumberService based on country
    */
-  private static generateNextJobNumber(): string {
-    const jobs = this.getAllJobs();
-    
-    // Find the highest job number
-    let highestNumber = 10000; // Start at 10000 so first job will be 10001
-    
-    jobs.forEach((job: any) => {
-      if (job.jobNumber) {
-        const jobNum = parseInt(job.jobNumber);
-        if (!isNaN(jobNum) && jobNum > highestNumber) {
-          highestNumber = jobNum;
-        }
-      }
-    });
-    
-    // Generate next job number
-    const nextNumber = highestNumber + 1;
-    
-    // Format as 5-digit string with leading zeros if needed
-    return nextNumber.toString().padStart(5, '0');
+  private static generateJobNumber(country?: string): string {
+    return JobNumberService.generateJobNumber(country);
   }
 }
 
