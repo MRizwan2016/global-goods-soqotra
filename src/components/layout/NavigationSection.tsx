@@ -40,7 +40,7 @@ const NavigationSection: React.FC<NavigationSectionProps> = ({ navigationItems, 
   };
 
   return (
-    <div className="space-y-1 pl-6">
+    <div className="space-y-1 pl-10 mt-2">
       {navigationItems.map((item, index) => {
         const fullPath = item.path.startsWith("/") ? item.path : `${basePath}/${item.path}`;
         

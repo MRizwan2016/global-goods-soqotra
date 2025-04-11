@@ -5,34 +5,36 @@ import NavigationSection from './NavigationSection';
 import { useAuth } from '@/hooks/use-auth';
 import { usePermissions } from '@/hooks/use-permissions';
 import { hasFilePermission } from '@/utils/auth-utils';
-import { ChevronDown } from 'lucide-react';
+import { ChevronRight, Database, DollarSign, Settings, Truck } from 'lucide-react';
 
-// Updated navigation config with optional properties
+// Types for navigation items
 interface NavigationItem {
   title: string;
   path: string;
   icon?: React.ComponentType<{ className?: string }>;
-  filePermission?: string;
-  requiresPermission?: string;
+  filePermission?: string | undefined;
+  requiresPermission?: string | undefined;
 }
 
 interface NavigationSection {
   key: string;
   title: string;
-  icon: () => React.ReactNode;
-  alwaysExpanded?: boolean;
+  icon: React.ReactNode;
+  color: string;
+  iconColor: string;
   basePath?: string;
-  requiresPermission?: string;
+  requiresPermission?: string | undefined;
   children: NavigationItem[];
 }
 
-// Define navigation config directly in this file since there's an import error
+// Define navigation config using the navigationSections format
 const navigationConfig: NavigationSection[] = [
   {
-    key: 'operations',
-    title: 'Operations',
-    icon: () => <span className="w-5 h-5 flex items-center justify-center">🛠️</span>,
-    alwaysExpanded: true,
+    key: 'upb',
+    title: 'UPB',
+    icon: <Database className="h-5 w-5" />,
+    color: 'text-green-800',
+    iconColor: 'text-green-700',
     children: [
       { title: 'Dashboard', path: '/' },
       { title: 'Jobs', path: '/qatar' },
@@ -40,12 +42,35 @@ const navigationConfig: NavigationSection[] = [
     ]
   },
   {
+    key: 'accounts',
+    title: 'ACCOUNTS',
+    icon: <DollarSign className="h-5 w-5" />,
+    color: 'text-purple-800',
+    iconColor: 'text-purple-700',
+    children: [
+      { title: 'Payment Collection', path: '/accounts/payment' }
+    ]
+  },
+  {
     key: 'admin',
-    title: 'Admin',
-    icon: () => <span className="w-5 h-5 flex items-center justify-center">👤</span>,
+    title: 'ADMIN',
+    icon: <Settings className="h-5 w-5" />,
+    color: 'text-rose-800',
+    iconColor: 'text-rose-700',
     children: [
       { title: 'Booking Form Stock', path: '/invoice-method/booking-form-stock' },
-      { title: 'Payment Collection', path: '/accounts/payment' }
+      { title: 'Control Panel', path: '/admin/control-panel' }
+    ]
+  },
+  {
+    key: 'cargo',
+    title: 'CARGO COLLECTION & DELIVERY',
+    icon: <Truck className="h-5 w-5" />,
+    color: 'text-sky-800',
+    iconColor: 'text-sky-700',
+    children: [
+      { title: 'Dashboard', path: '/qatar' },
+      { title: 'Jobs', path: '/qatar/jobs' }
     ]
   }
 ];
@@ -92,23 +117,25 @@ export const MainNavigation: React.FC = () => {
   return (
     <nav className="w-full space-y-1">
       {filteredNavigation.map((section) => (
-        <div key={section.key} className="mb-4">
+        <div key={section.key} className="mb-6">
           <div
-            className="flex items-between px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 cursor-pointer"
+            className={`flex items-center justify-between px-3 py-2 text-sm font-bold ${section.color} hover:opacity-90 cursor-pointer`}
             onClick={() => toggleSection(section.key)}
           >
-            <span className="flex items-center">
-              {section.icon && <section.icon />}
-              {section.title}
-            </span>
-            <ChevronDown
+            <div className="flex items-center gap-3">
+              <span className={`flex items-center justify-center p-1 rounded-md bg-white/10 ${section.iconColor}`}>
+                {section.icon}
+              </span>
+              <span className="uppercase">{section.title}</span>
+            </div>
+            <ChevronRight
               className={`h-4 w-4 transition-transform ${
-                expandedSections[section.key] ? 'rotate-180' : ''
+                expandedSections[section.key] ? 'rotate-90' : ''
               }`}
             />
           </div>
 
-          {(expandedSections[section.key] || section.alwaysExpanded) && section.children && (
+          {(expandedSections[section.key]) && section.children && (
             <NavigationSection 
               navigationItems={section.children} 
               basePath={section.basePath || ""} 
