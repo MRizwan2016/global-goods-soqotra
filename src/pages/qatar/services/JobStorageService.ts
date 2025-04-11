@@ -120,6 +120,35 @@ export class JobStorageService {
   }
 
   /**
+   * Mark jobs as scheduled
+   */
+  static markJobsAsScheduled(jobIds: string[]) {
+    try {
+      const jobs = this.getAllJobs();
+      let updated = false;
+
+      // Update status for each job ID
+      jobIds.forEach(id => {
+        const jobIndex = jobs.findIndex((job: any) => job.id === id);
+        if (jobIndex !== -1) {
+          jobs[jobIndex].status = 'SCHEDULED';
+          jobs[jobIndex].lastUpdated = new Date().toISOString();
+          updated = true;
+        }
+      });
+
+      if (updated) {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(jobs));
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error marking jobs as scheduled:', error);
+      return false;
+    }
+  }
+
+  /**
    * Update an invoice with a job number
    */
   private static updateInvoiceWithJobNumber(invoiceNumber: string, jobNumber: string) {

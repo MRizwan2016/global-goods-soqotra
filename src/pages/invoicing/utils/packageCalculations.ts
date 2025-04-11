@@ -21,9 +21,10 @@ export const calculateTotalsFromPackages = (packages: PackageItem[]): {
   let packageCount = packages.length;
   
   packages.forEach(pkg => {
+    // Handle numeric conversion properly
     totalVolume += parseFloat(pkg.volume || "0");
     totalWeight += parseFloat(pkg.weight || "0");
-    totalAmount += parseFloat(pkg.total || "0");
+    totalAmount += parseFloat(String(pkg.total) || "0"); // Convert to string before parsing
   });
   
   return {
@@ -54,6 +55,7 @@ export const createPackageItemFromForm = (
   return {
     id,
     name,
+    description: name, // Map name to description for compatibility
     length,
     width,
     height,
@@ -61,8 +63,9 @@ export const createPackageItemFromForm = (
     weight,
     boxNumber,
     volumeWeight,
-    price,
+    price: parseFloat(price || "0"), // Convert string to number
     documentsFee,
-    total
+    quantity: 1, // Default quantity
+    total: parseFloat(total || "0")  // Convert string to number
   };
 };

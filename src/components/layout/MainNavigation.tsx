@@ -7,8 +7,27 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { hasFilePermission } from '@/utils/auth-utils';
 import { ChevronDown } from 'lucide-react';
 
+// Updated navigation config with optional properties
+interface NavigationItem {
+  title: string;
+  path: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  filePermission?: string;
+  requiresPermission?: string;
+}
+
+interface NavigationSection {
+  key: string;
+  title: string;
+  icon: () => React.ReactNode;
+  alwaysExpanded?: boolean;
+  basePath?: string;
+  requiresPermission?: string;
+  children: NavigationItem[];
+}
+
 // Define navigation config directly in this file since there's an import error
-const navigationConfig = [
+const navigationConfig: NavigationSection[] = [
   {
     key: 'operations',
     title: 'Operations',
@@ -75,11 +94,11 @@ export const MainNavigation: React.FC = () => {
       {filteredNavigation.map((section) => (
         <div key={section.key} className="mb-4">
           <div
-            className="flex items-center justify-between px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 cursor-pointer"
+            className="flex items-between px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-800 cursor-pointer"
             onClick={() => toggleSection(section.key)}
           >
             <span className="flex items-center">
-              {section.icon && <section.icon className="mr-2 h-5 w-5" />}
+              {section.icon && <section.icon />}
               {section.title}
             </span>
             <ChevronDown
@@ -92,7 +111,7 @@ export const MainNavigation: React.FC = () => {
           {(expandedSections[section.key] || section.alwaysExpanded) && section.children && (
             <NavigationSection 
               navigationItems={section.children} 
-              basePath={section.basePath} 
+              basePath={section.basePath || ""} 
             />
           )}
         </div>

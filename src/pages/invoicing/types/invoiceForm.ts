@@ -1,9 +1,20 @@
+
 export interface PackageItem {
   id: string;
   description: string;
   price: number;
   quantity: number;
   total: number;
+  // Added missing properties referenced in packageCalculations.ts
+  volume?: string;
+  weight?: string;
+  length?: string;
+  width?: string;
+  height?: string;
+  boxNumber?: string;
+  volumeWeight?: string;
+  documentsFee?: string;
+  name?: string; // For compatibility with older code
 }
 
 export interface FormState {
@@ -67,7 +78,7 @@ export interface FormState {
   catZone?: string;
   giftCargo?: string;
   prePaid?: string;
-  selectedPackage?: string | null;
+  selectedPackage?: any | null; // Changed from string to any to support both string and object
   cubicFeet?: string;
   volumeWeight?: string;
   handOverBy?: string;
@@ -120,4 +131,5 @@ export interface Invoice {
   remarks?: string;
   amount?: number;
   paid?: boolean;
+  airwayBillNumber?: string; // Added this to fix error in useInvoiceForm.ts
 }
