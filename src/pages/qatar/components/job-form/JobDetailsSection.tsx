@@ -12,7 +12,18 @@ import DateTimeSelector from "./details/DateTimeSelector";
 import JobTypeSelector from "./details/JobTypeSelector";
 import VehicleSelector from "./details/VehicleSelector";
 import CitySelector from "./details/CitySelector";
-import { BookItem } from "@/pages/invoicing/types/invoiceForm";
+
+// Replace BookItem with the proper interface
+interface InvoiceBook {
+  id: string;
+  bookNumber: string;
+  startNumber: string;
+  endNumber: string;
+  availablePages: string[];
+  isActivated: boolean;
+  country: string;
+  branch?: string;
+}
 
 interface JobDetailsSectionProps {
   jobData: any;
@@ -28,8 +39,8 @@ const JobDetailsSection = ({ jobData, handleInputChange, handleSelectChange, isE
   useEffect(() => {
     const fetchAvailableInvoices = () => {
       // Get active invoice books from localStorage
-      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]') as BookItem[];
-      const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]') as BookItem[];
+      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]') as InvoiceBook[];
+      const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]') as InvoiceBook[];
       
       // Get used invoice numbers to filter them out
       const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
