@@ -37,24 +37,6 @@ const InvoiceForm = () => {
     updatePackagePricing,
   } = useInvoiceForm(id);
   
-  // Ensure invoice numbers are available when the form loads
-  useEffect(() => {
-    if (!isEditing) {
-      try {
-        ensureInvoiceAvailability();
-        console.log("Invoice availability ensured");
-      } catch (error) {
-        console.error("Error ensuring invoice availability:", error);
-        toast.error("There was an issue loading invoice numbers. You may need to enter them manually.");
-      }
-    }
-  }, [isEditing]);
-  
-  // Debug logs to track form state
-  useEffect(() => {
-    console.log("Current form state:", formState);
-  }, [formState]);
-  
   return (
     <Layout title={isEditing ? "Update Invoice" : "Add Invoice"}>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
