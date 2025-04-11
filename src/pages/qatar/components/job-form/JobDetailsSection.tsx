@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -12,6 +12,7 @@ import DateTimeSelector from "./details/DateTimeSelector";
 import JobTypeSelector from "./details/JobTypeSelector";
 import VehicleSelector from "./details/VehicleSelector";
 import CitySelector from "./details/CitySelector";
+import { BookItem } from "@/pages/invoicing/types/invoiceForm";
 
 interface JobDetailsSectionProps {
   jobData: any;
@@ -21,6 +22,51 @@ interface JobDetailsSectionProps {
 }
 
 const JobDetailsSection = ({ jobData, handleInputChange, handleSelectChange, isEnabled = true }: JobDetailsSectionProps) => {
+  const [availableInvoices, setAvailableInvoices] = useState<string[]>([]);
+
+  // Load available invoice numbers from active books
+  useEffect(() => {
+    const fetchAvailableInvoices = () => {
+      // Get active invoice books from localStorage
+      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]') as BookItem[];
+      const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]') as BookItem[];
+      
+      // Get used invoice numbers to filter them out
+      const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+      const usedInvoiceNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
+      
+      let allAvailableInvoices: string[] = [];
+      
+      // Get invoices from active books
+      if (activeBooks.length > 0) {
+        activeBooks.forEach((book: any) => {
+          if (book.availablePages) {
+            // Filter out already used invoice numbers
+            const availableFromBook = book.availablePages.filter(
+              (invoice: string) => !usedInvoiceNumbers.includes(invoice)
+            );
+            allAvailableInvoices = [...allAvailableInvoices, ...availableFromBook];
+          }
+        });
+      } else if (storedBooks.length > 0) {
+        // If no active books, try stored books
+        storedBooks.forEach((book: any) => {
+          if (book.isActivated && book.availablePages) {
+            // Filter out already used invoice numbers
+            const availableFromBook = book.availablePages.filter(
+              (invoice: string) => !usedInvoiceNumbers.includes(invoice)
+            );
+            allAvailableInvoices = [...allAvailableInvoices, ...availableFromBook];
+          }
+        });
+      }
+      
+      setAvailableInvoices(allAvailableInvoices);
+    };
+    
+    fetchAvailableInvoices();
+  }, []);
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 animate-fade-in">
       <h3 className="font-bold text-lg text-gray-800 mb-5 border-b pb-2">JOB DETAILS</h3>
@@ -45,12 +91,13 @@ const JobDetailsSection = ({ jobData, handleInputChange, handleSelectChange, isE
               <SelectValue placeholder="SELECT INVOICE NUMBER" />
             </SelectTrigger>
             <SelectContent>
-              {/* Get invoice numbers from active books */}
-              <SelectItem value="GY 13136051">GY 13136051</SelectItem>
-              <SelectItem value="GY 13136052">GY 13136052</SelectItem>
-              <SelectItem value="GY 13136053">GY 13136053</SelectItem>
-              <SelectItem value="GY 13136054">GY 13136054</SelectItem>
-              <SelectItem value="GY 13136055">GY 13136055</SelectItem>
+              {availableInvoices.length > 0 ? (
+                availableInvoices.map((invoice, index) => (
+                  <SelectItem key={index} value={invoice}>{invoice}</SelectItem>
+                ))
+              ) : (
+                <SelectItem value="" disabled>No available invoice numbers</SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>

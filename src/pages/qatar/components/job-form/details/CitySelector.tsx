@@ -29,6 +29,18 @@ const CitySelector = ({ city, country, handleSelectChange, isEnabled = true }: C
         return ["Manama", "Riffa", "Muharraq", "Hamad Town", "A'ali"];
       case "Saudi Arabia":
         return ["Riyadh", "Jeddah", "Mecca", "Medina", "Dammam", "Taif"];
+      case "Tunisia":
+        return ["Tunis", "Sfax", "Sousse", "Kairouan", "Bizerte"];
+      case "Uganda":
+        return ["Kampala", "Entebbe", "Jinja", "Gulu", "Mbarara"];
+      case "Somalia":
+        return ["Mogadishu", "Hargeisa", "Kismayo", "Bosaso", "Marka"];
+      case "Ethiopia":
+        return ["Addis Ababa", "Dire Dawa", "Gondar", "Bahir Dar", "Hawassa"];
+      case "Philippines":
+        return ["Manila", "Cebu", "Davao", "Quezon City", "Makati"];
+      case "Oman":
+        return ["Muscat", "Salalah", "Sohar", "Sur", "Nizwa"];
       default:
         return [];
     }
@@ -53,7 +65,7 @@ const CitySelector = ({ city, country, handleSelectChange, isEnabled = true }: C
               <SelectItem key={index} value={cityName}>{cityName.toUpperCase()}</SelectItem>
             ))
           ) : (
-            <SelectItem value="no-city" disabled>Select a country first</SelectItem>
+            <SelectItem value="" disabled>Select a country first</SelectItem>
           )}
         </SelectContent>
       </Select>

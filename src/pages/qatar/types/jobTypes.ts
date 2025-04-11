@@ -1,8 +1,9 @@
+
 export interface QatarJob {
   id: string;
   jobNumber: string;
   invoiceNumber: string;
-  jobType: "COLLECTION" | "DELIVERY";
+  jobType: "COLLECTION" | "DELIVERY" | "PACKING" | "UNPACKING";
   date: string;
   time: string;
   amPm: "AM" | "PM";
@@ -24,11 +25,12 @@ export interface QatarJob {
   entryBy: string;
   entryDate: string;
   sequenceNum?: number;
+  country?: string;
 }
 
 export interface JobItem {
   id: string;
-  jobId: string;
+  jobId?: string; // Make jobId optional for better form handling
   itemName: string;
   sellPrice: number;
   quantity: number;

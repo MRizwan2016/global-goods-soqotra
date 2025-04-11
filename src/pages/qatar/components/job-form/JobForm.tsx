@@ -8,7 +8,6 @@ import PackageDescriptionSection from "./PackageDescriptionSection";
 import { Save, ArrowLeft, Hash } from "lucide-react";
 import { JobStorageService } from "../../services/JobStorageService";
 import { JobNumberService } from "@/services/JobNumberService";
-import { mockInvoiceBooks } from "@/pages/invoicing/constants/mockInvoiceBooks";
 
 interface JobFormProps {
   jobId?: string;
@@ -43,55 +42,6 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
   
   const [jobItems, setJobItems] = useState<JobItem[]>([]);
   const [isJobNumberGenerated, setIsJobNumberGenerated] = useState(false);
-  const [availableInvoices, setAvailableInvoices] = useState<string[]>([]);
-  
-  // Load available invoice numbers from active books
-  useEffect(() => {
-    // Get active invoice books from localStorage
-    const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
-    const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
-    
-    // Get used invoice numbers to filter them out
-    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    const usedInvoiceNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
-    
-    let allAvailableInvoices: string[] = [];
-    
-    // Get invoices from active books
-    if (activeBooks.length > 0) {
-      activeBooks.forEach((book: any) => {
-        if (book.availablePages) {
-          // Filter out already used invoice numbers
-          const availableFromBook = book.availablePages.filter(
-            (invoice: string) => !usedInvoiceNumbers.includes(invoice)
-          );
-          allAvailableInvoices = [...allAvailableInvoices, ...availableFromBook];
-        }
-      });
-    } else if (storedBooks.length > 0) {
-      // If no active books, try stored books
-      storedBooks.forEach((book: any) => {
-        if (book.isActivated && book.availablePages) {
-          // Filter out already used invoice numbers
-          const availableFromBook = book.availablePages.filter(
-            (invoice: string) => !usedInvoiceNumbers.includes(invoice)
-          );
-          allAvailableInvoices = [...allAvailableInvoices, ...availableFromBook];
-        }
-      });
-    } else {
-      // Fallback to mock data
-      mockInvoiceBooks.forEach(book => {
-        // Filter out already used invoice numbers
-        const availableFromBook = book.available.filter(
-          (invoice) => !usedInvoiceNumbers.includes(invoice)
-        );
-        allAvailableInvoices = [...allAvailableInvoices, ...availableFromBook];
-      });
-    }
-    
-    setAvailableInvoices(allAvailableInvoices);
-  }, []);
   
   // Load existing job data if editing
   useEffect(() => {
@@ -143,6 +93,30 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
           defaultSector = "RIYADH : R";
           defaultBranch = "HEAD OFFICE";
           break;
+        case "Tunisia":
+          defaultSector = "TUNIS : T";
+          defaultBranch = "HEAD OFFICE";
+          break;
+        case "Uganda":
+          defaultSector = "KAMPALA : K";
+          defaultBranch = "HEAD OFFICE";
+          break;
+        case "Somalia":
+          defaultSector = "MOGADISHU : M";
+          defaultBranch = "HEAD OFFICE";
+          break;
+        case "Ethiopia":
+          defaultSector = "ADDIS ABABA : A";
+          defaultBranch = "HEAD OFFICE";
+          break;
+        case "Philippines":
+          defaultSector = "MANILA : M";
+          defaultBranch = "HEAD OFFICE";
+          break;
+        case "Oman":
+          defaultSector = "MUSCAT : M";
+          defaultBranch = "HEAD OFFICE";
+          break;
         default:
           break;
       }
@@ -171,14 +145,17 @@ const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFor
       [name]: value
     }));
     
-    // If country changes, reset sector, branch and city
-    if (name === 'country') {
-      // Will be set by useEffect
-    }
+    // If country changes, city will be reset by the CitySelector component
   };
   
   const handleAddItem = (newItem: JobItem) => {
-    setJobItems(prev => [...prev, newItem]);
+    // Ensure jobId is added to the item
+    const itemWithJobId = {
+      ...newItem,
+      jobId: jobData.jobNumber || jobId || `temp-${Date.now()}`
+    };
+    
+    setJobItems(prev => [...prev, itemWithJobId]);
   };
   
   const handleGenerateJobNumber = () => {

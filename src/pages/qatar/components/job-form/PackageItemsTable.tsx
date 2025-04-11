@@ -15,11 +15,14 @@ const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
   onEdit,
   onDelete
 }) => {
-  if (items.length === 0) {
+  // Filter out items with negative quantity (marked for deletion)
+  const validItems = items.filter(item => item.quantity > 0);
+
+  if (validItems.length === 0) {
     return (
       <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200 animate-fade-in">
         <p className="text-gray-500">No items added yet</p>
-        <p className="text-sm text-gray-400 mt-1">Add items using the form above</p>
+        <p className="text-sm text-gray-400 mt-1">Add items using the form above or click "NEW PACKAGE" to add with dimensions</p>
       </div>
     );
   }
@@ -47,7 +50,7 @@ const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {items.map((item, index) => (
+          {validItems.map((item, index) => (
             <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
               <td className="px-4 py-3 whitespace-nowrap">
                 {item.itemName}

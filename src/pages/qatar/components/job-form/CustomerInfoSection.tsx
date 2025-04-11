@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -36,6 +36,18 @@ const CustomerInfoSection = ({
         return ["MANAMA : M", "RIFFA : R"];
       case "Saudi Arabia":
         return ["RIYADH : R", "JEDDAH : J", "DAMMAM : D"];
+      case "Tunisia":
+        return ["TUNIS : T", "SFAX : S", "SOUSSE : O"];
+      case "Uganda":
+        return ["KAMPALA : K", "ENTEBBE : E", "JINJA : J"];
+      case "Somalia":
+        return ["MOGADISHU : M", "HARGEISA : H", "KISMAYO : K"];
+      case "Ethiopia":
+        return ["ADDIS ABABA : A", "DIRE DAWA : D", "GONDAR : G"];
+      case "Philippines":
+        return ["MANILA : M", "CEBU : C", "DAVAO : D"];
+      case "Oman":
+        return ["MUSCAT : M", "SALALAH : S", "SOHAR : H"];
       default:
         return [];
     }
@@ -54,6 +66,18 @@ const CustomerInfoSection = ({
         return ["HEAD OFFICE", "MANAMA BRANCH"];
       case "Saudi Arabia":
         return ["HEAD OFFICE", "RIYADH BRANCH", "JEDDAH BRANCH"];
+      case "Tunisia":
+        return ["HEAD OFFICE", "TUNIS BRANCH", "SFAX BRANCH"];
+      case "Uganda":
+        return ["HEAD OFFICE", "KAMPALA BRANCH", "ENTEBBE BRANCH"];
+      case "Somalia":
+        return ["HEAD OFFICE", "MOGADISHU BRANCH", "HARGEISA BRANCH"];
+      case "Ethiopia":
+        return ["HEAD OFFICE", "ADDIS ABABA BRANCH", "DIRE DAWA BRANCH"];
+      case "Philippines":
+        return ["HEAD OFFICE", "MANILA BRANCH", "CEBU BRANCH"];
+      case "Oman":
+        return ["HEAD OFFICE", "MUSCAT BRANCH", "SALALAH BRANCH"];
       default:
         return [];
     }
@@ -148,6 +172,12 @@ const CustomerInfoSection = ({
               <SelectItem value="UAE">UAE</SelectItem>
               <SelectItem value="Bahrain">BAHRAIN</SelectItem>
               <SelectItem value="Saudi Arabia">SAUDI ARABIA</SelectItem>
+              <SelectItem value="Tunisia">TUNISIA</SelectItem>
+              <SelectItem value="Uganda">UGANDA</SelectItem>
+              <SelectItem value="Somalia">SOMALIA</SelectItem>
+              <SelectItem value="Ethiopia">ETHIOPIA</SelectItem>
+              <SelectItem value="Philippines">PHILIPPINES</SelectItem>
+              <SelectItem value="Oman">OMAN</SelectItem>
             </SelectContent>
           </Select>
         </div>

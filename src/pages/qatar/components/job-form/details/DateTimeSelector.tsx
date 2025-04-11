@@ -1,6 +1,6 @@
 
+import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -16,95 +16,105 @@ interface DateTimeSelectorProps {
   sameDay: string;
   collectDate?: string;
   jobType: string;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
+  isEnabled?: boolean;
 }
 
-const DateTimeSelector = ({ 
-  date, 
-  time, 
-  amPm, 
-  sameDay, 
-  collectDate, 
+const DateTimeSelector = ({
+  date,
+  time,
+  amPm,
+  sameDay,
+  collectDate,
   jobType,
-  handleInputChange, 
-  handleSelectChange 
+  handleInputChange,
+  handleSelectChange,
+  isEnabled = true
 }: DateTimeSelectorProps) => {
+  const [showCollectDate, setShowCollectDate] = useState(jobType === "DELIVERY" && sameDay === "N");
+
+  useEffect(() => {
+    setShowCollectDate(jobType === "DELIVERY" && sameDay === "N");
+  }, [jobType, sameDay]);
+
   return (
-    <>
+    <div className="col-span-1 md:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
       <div>
-        <Label htmlFor="jobDate" className="font-medium text-gray-700 mb-1 block">DATE:</Label>
-        <Input 
-          id="jobDate"
+        <Label htmlFor="date" className="font-medium text-gray-700 mb-1 block">DATE:</Label>
+        <input
+          type="date"
+          id="date"
           name="date"
-          type="text"
           value={date}
           onChange={handleInputChange}
-          placeholder="DD/MM/YYYY"
-          className="focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+          className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+          disabled={!isEnabled}
         />
       </div>
       
-      <div className="grid grid-cols-3 gap-4">
-        <div className="col-span-2">
-          <Label htmlFor="jobTime" className="font-medium text-gray-700 mb-1 block">TIME:</Label>
-          <Input 
-            id="jobTime"
-            name="time"
-            value={time}
-            onChange={handleInputChange}
-            placeholder="HH:MM"
-            className="focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
-          />
-        </div>
-        
-        <div>
-          <Label htmlFor="amPm" className="font-medium text-gray-700 mb-1 block">AM/PM:</Label>
-          <Select 
-            value={amPm || "AM"} 
-            onValueChange={(value) => handleSelectChange("amPm", value)}
-          >
-            <SelectTrigger id="amPm" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors h-[38px]">
-              <SelectValue placeholder="Select AM/PM" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="AM">AM</SelectItem>
-              <SelectItem value="PM">PM</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+      <div>
+        <Label htmlFor="time" className="font-medium text-gray-700 mb-1 block">TIME:</Label>
+        <input
+          type="time"
+          id="time"
+          name="time"
+          value={time}
+          onChange={handleInputChange}
+          className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+          disabled={!isEnabled}
+        />
       </div>
       
       <div>
-        <Label htmlFor="sameDay" className="font-medium text-gray-700 mb-1 block">SAME DAY SERVICE:</Label>
-        <Select 
-          value={sameDay || "N"} 
-          onValueChange={(value) => handleSelectChange("sameDay", value)}
+        <Label htmlFor="amPm" className="font-medium text-gray-700 mb-1 block">AM/PM:</Label>
+        <Select
+          value={amPm}
+          onValueChange={(value) => handleSelectChange("amPm", value)}
+          disabled={!isEnabled}
         >
-          <SelectTrigger id="sameDay" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
-            <SelectValue placeholder="Select Same Day" />
+          <SelectTrigger id="amPm" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+            <SelectValue placeholder="AM/PM" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="N">NO</SelectItem>
-            <SelectItem value="Y">YES</SelectItem>
+            <SelectItem value="AM">AM</SelectItem>
+            <SelectItem value="PM">PM</SelectItem>
           </SelectContent>
         </Select>
       </div>
       
-      {jobType === "COLLECTION" && (
-        <div>
+      <div>
+        <Label htmlFor="sameDay" className="font-medium text-gray-700 mb-1 block">SAME DAY SERVICE:</Label>
+        <Select
+          value={sameDay}
+          onValueChange={(value) => handleSelectChange("sameDay", value)}
+          disabled={!isEnabled}
+        >
+          <SelectTrigger id="sameDay" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+            <SelectValue placeholder="SAME DAY?" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Y">YES</SelectItem>
+            <SelectItem value="N">NO</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      {showCollectDate && (
+        <div className="col-span-2">
           <Label htmlFor="collectDate" className="font-medium text-gray-700 mb-1 block">COLLECT DATE:</Label>
-          <Input 
+          <input
+            type="date"
             id="collectDate"
             name="collectDate"
-            value={collectDate || ""}
+            value={collectDate}
             onChange={handleInputChange}
-            placeholder="DD/MM/YYYY"
-            className="focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+            className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+            disabled={!isEnabled}
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
 
