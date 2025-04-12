@@ -1,3 +1,4 @@
+
 import { Database, DollarSign, Settings, Truck } from "lucide-react";
 import { NavigationSections } from "./types";
 
@@ -96,6 +97,17 @@ export const navigationSections: NavigationSections = {
           { name: "DRIVERS", path: "/qatar/drivers" },
           { name: "FIND CUSTOMER", path: "/qatar/find-customer" },
           { name: "CONTAINERS", path: "/qatar/containers" },
+        ],
+      },
+      {
+        title: "REPORTS",
+        items: [
+          { name: "01 PRINT JOB SCHEDULE", path: "/qatar/jobs/print" },
+          { name: "02 COMPLETED JOBS", path: "/qatar/completed-jobs" },
+          { name: "03 CANCELED JOBS", path: "/qatar/cancelled-jobs" },
+          { name: "04 STOCK MOVEMENT", path: "/reports/cargo" },
+          { name: "05 STOCK BALANCE", path: "/reports/cargo/statistics" },
+          { name: "06 JOB STATUS", path: "/qatar/job-status" },
         ],
       },
     ],

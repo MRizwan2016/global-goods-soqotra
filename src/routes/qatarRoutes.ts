@@ -12,6 +12,9 @@ import FindCustomer from "@/pages/qatar/FindCustomer";
 import ContainerManagement from "@/pages/qatar/ContainerManagement";
 import VesselManagement from "@/pages/qatar/VesselManagement";
 import CargoManifest from "@/pages/qatar/CargoManifest";
+import CompletedJobs from "@/pages/qatar/CompletedJobs";
+import CancelledJobs from "@/pages/qatar/CancelledJobs";
+import JobStatusList from "@/pages/qatar/JobStatusList";
 import { RouteConfig } from "./types";
 
 // Define the routes for the Qatar section
@@ -74,6 +77,22 @@ export const qatarRoutes: RouteConfig[] = [
   {
     path: "/qatar/cargo-manifest",
     element: CargoManifest,
+    private: true
+  },
+  // New routes for reports
+  {
+    path: "/qatar/completed-jobs",
+    element: CompletedJobs,
+    private: true
+  },
+  {
+    path: "/qatar/cancelled-jobs",
+    element: CancelledJobs,
+    private: true
+  },
+  {
+    path: "/qatar/job-status",
+    element: JobStatusList,
     private: true
   }
 ];
