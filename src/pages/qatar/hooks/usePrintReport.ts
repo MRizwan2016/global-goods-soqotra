@@ -15,7 +15,7 @@ export function usePrintReport(documentTitle: string) {
 
   return {
     printRef,
-    handlePrint: () => {
+    handlePrint: (): Promise<void> => {
       // Always return a Promise<void> to satisfy TypeScript
       return new Promise<void>((resolve) => {
         try {
@@ -23,13 +23,12 @@ export function usePrintReport(documentTitle: string) {
           if (typeof handlePrintOriginal === 'function') {
             const result = handlePrintOriginal();
             
-            // Safely check if the result is a Promise-like object
+            // Check if the result is a Promise-like object
             if (result && 
                 typeof result === 'object' && 
-                result !== null && 
                 'then' in result && 
                 typeof result.then === 'function') {
-              // If it's a Promise, chain our own promise to it
+              // If it's a Promise, chain our resolver to it
               (result as Promise<void>).then(() => {
                 resolve();
               }).catch((error) => {
