@@ -28,6 +28,7 @@ interface FilterBarProps {
   setVehicleFilter?: (value: string) => void;
   jobTypeFilter?: string;
   setJobTypeFilter?: (value: string) => void;
+  additionalFilters?: React.ReactNode;
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({
@@ -46,7 +47,8 @@ const FilterBar: React.FC<FilterBarProps> = ({
   vehicleFilter,
   setVehicleFilter,
   jobTypeFilter,
-  setJobTypeFilter
+  setJobTypeFilter,
+  additionalFilters
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
@@ -115,8 +117,8 @@ const FilterBar: React.FC<FilterBarProps> = ({
         <div className="flex">
           <Input
             placeholder="Search..."
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="rounded-r-none"
           />
           <Button className="rounded-l-none" variant="default">
@@ -148,6 +150,12 @@ const FilterBar: React.FC<FilterBarProps> = ({
           <Printer size={16} className="mr-2" /> Print
         </Button>
       </div>
+      
+      {additionalFilters && (
+        <div className="col-span-1 md:col-span-2 lg:col-span-5 flex flex-wrap gap-2">
+          {additionalFilters}
+        </div>
+      )}
     </div>
   );
 };

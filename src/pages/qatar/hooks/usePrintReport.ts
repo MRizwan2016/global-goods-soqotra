@@ -17,9 +17,16 @@ export function usePrintReport(documentTitle: string) {
     printRef,
     handlePrint: (): Promise<void> => {
       if (handlePrintOriginal) {
-        // Since useReactToPrint's return type is not guaranteed to be a Promise<void>,
-        // we need to wrap it in Promise.resolve() to ensure we always return a Promise<void>
-        return Promise.resolve(handlePrintOriginal());
+        // Always return a Promise<void> to satisfy TypeScript
+        return new Promise<void>((resolve) => {
+          const result = handlePrintOriginal();
+          // If result is already a promise, return it, otherwise wrap in resolved promise
+          if (result instanceof Promise) {
+            result.then(() => resolve()).catch(() => resolve());
+          } else {
+            resolve();
+          }
+        });
       }
       return Promise.resolve();
     }
