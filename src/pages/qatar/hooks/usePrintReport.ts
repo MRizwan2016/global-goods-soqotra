@@ -20,17 +20,18 @@ export function usePrintReport(documentTitle: string) {
         try {
           // Call the original handler if it exists
           if (typeof handlePrintOriginal === 'function') {
-            // Execute the print function and capture the result
-            // TypeScript doesn't recognize that handlePrintOriginal() might return void or Promise<void>
-            const result = handlePrintOriginal();
+            // Execute the print function
+            const printResult = handlePrintOriginal();
             
-            // Check if the result is a Promise-like object with proper null checks
-            if (result && 
-                typeof result === 'object' && 
-                'then' in result && 
-                typeof (result as { then: unknown }).then === 'function') {
+            // Since handlePrintOriginal can return void or Promise<void>,
+            // we need to check if it's a Promise using type guards
+            if (printResult !== undefined && 
+                printResult !== null && 
+                typeof printResult === 'object' && 
+                'then' in printResult && 
+                typeof printResult.then === 'function') {
               // If it returns a Promise, wait for it to complete
-              (result as Promise<void>).then(() => {
+              (printResult as Promise<void>).then(() => {
                 resolve();
               }).catch((error) => {
                 console.error("Print error:", error);
