@@ -13,8 +13,8 @@ export function usePrintReport(documentTitle: string) {
     onAfterPrint: () => console.log("Print completed"),
   });
 
-  // Fix: The issue is with how useReactToPrint's return type is being handled
-  const handlePrint = () => {
+  // Fix: Make sure the function explicitly returns Promise<void>
+  const handlePrint = (): Promise<void> => {
     // Explicitly return a Promise that resolves after printing
     return new Promise<void>((resolve) => {
       if (handlePrintOriginal) {
