@@ -16,12 +16,15 @@ export function usePrintReport(documentTitle: string) {
     printRef,
     handlePrint: (): Promise<void> => {
       if (handlePrint) {
-        const result = handlePrint();
-        // Ensure we always return a Promise
-        if (result instanceof Promise) {
-          return result;
+        // Call the handler and wrap the result in Promise.resolve() to ensure it's always a Promise
+        try {
+          const result = handlePrint();
+          // Since we can't check instanceof Promise reliably, we use Promise.resolve to ensure
+          // we always return a Promise regardless of what handlePrint returns
+          return Promise.resolve(result);
+        } catch (error) {
+          return Promise.reject(error);
         }
-        return Promise.resolve();
       }
       return Promise.resolve();
     }
