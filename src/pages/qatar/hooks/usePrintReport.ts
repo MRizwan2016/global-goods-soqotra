@@ -5,7 +5,7 @@ import { useReactToPrint } from "react-to-print";
 export function usePrintReport(documentTitle: string) {
   const printRef = useRef<HTMLDivElement>(null);
   
-  // Get the original handler from useReactToPrint
+  // Get the handler from useReactToPrint
   const handlePrintOriginal = useReactToPrint({
     content: () => printRef.current,
     documentTitle,
@@ -16,19 +16,20 @@ export function usePrintReport(documentTitle: string) {
   return {
     printRef,
     handlePrint: (): Promise<void> => {
-      // Always return a Promise<void> to satisfy TypeScript
       return new Promise<void>((resolve) => {
         try {
-          // Call the original handler and handle its result
+          // Call the original handler if it exists
           if (typeof handlePrintOriginal === 'function') {
+            // Execute the print function
             const result = handlePrintOriginal();
             
-            // Check if the result is a Promise-like object
-            if (result && 
+            // We need to check the result properly to avoid TypeScript errors
+            if (result !== undefined && 
+                result !== null && 
                 typeof result === 'object' && 
                 'then' in result && 
                 typeof result.then === 'function') {
-              // If it's a Promise, chain our resolver to it
+              // If it returns a Promise, wait for it to complete
               (result as Promise<void>).then(() => {
                 resolve();
               }).catch((error) => {
@@ -36,11 +37,12 @@ export function usePrintReport(documentTitle: string) {
                 resolve(); // Always resolve our promise
               });
             } else {
-              // If it's not a Promise, assume it completed synchronously
+              // If it's not a Promise or is void, resolve immediately
               resolve();
             }
           } else {
             // If handlePrintOriginal is not available, just resolve
+            console.warn("Print handler not available");
             resolve();
           }
         } catch (error) {
