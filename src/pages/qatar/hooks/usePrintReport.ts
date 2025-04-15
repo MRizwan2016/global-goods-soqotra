@@ -15,25 +15,28 @@ export function usePrintReport(documentTitle: string) {
 
   return {
     printRef,
+    // Always return a Promise from handlePrint
     handlePrint: (): Promise<void> => {
       return new Promise<void>((resolve) => {
         try {
           // Call the original handler if it exists
           if (typeof handlePrintOriginal === 'function') {
             // Execute the print function
-            const result = handlePrintOriginal();
+            const printResult = handlePrintOriginal();
             
-            // Check if result is a Promise
-            if (result && typeof result === 'object' && 'then' in result) {
+            // Check if the result is a Promise using a proper type guard
+            if (printResult && 
+                typeof printResult === 'object' && 
+                typeof (printResult as any).then === 'function') {
               // If it's a Promise, wait for it to complete
-              result.then(() => {
+              (printResult as Promise<void>).then(() => {
                 resolve();
               }).catch((error) => {
                 console.error("Print error:", error);
                 resolve(); // Always resolve our promise
               });
             } else {
-              // If it's not a Promise, resolve immediately
+              // If it's not a Promise or is void, resolve immediately
               resolve();
             }
           } else {
