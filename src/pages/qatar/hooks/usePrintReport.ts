@@ -14,9 +14,14 @@ export function usePrintReport(documentTitle: string) {
 
   return {
     printRef,
-    handlePrint: () => {
+    handlePrint: (): Promise<void> => {
       if (handlePrint) {
-        return handlePrint();
+        const result = handlePrint();
+        // Ensure we always return a Promise
+        if (result instanceof Promise) {
+          return result;
+        }
+        return Promise.resolve();
       }
       return Promise.resolve();
     }
