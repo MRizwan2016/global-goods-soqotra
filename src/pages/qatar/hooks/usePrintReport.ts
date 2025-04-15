@@ -5,7 +5,7 @@ import { useReactToPrint } from "react-to-print";
 export function usePrintReport(documentTitle: string) {
   const printRef = useRef<HTMLDivElement>(null);
   
-  // Get the handler from useReactToPrint with explicitly defined type
+  // Get the handler from useReactToPrint
   const handlePrintOriginal = useReactToPrint({
     content: () => printRef.current,
     documentTitle,
@@ -21,24 +21,19 @@ export function usePrintReport(documentTitle: string) {
           // Call the original handler if it exists
           if (typeof handlePrintOriginal === 'function') {
             // Execute the print function
-            const printResult = handlePrintOriginal();
+            const result = handlePrintOriginal();
             
-            // Since handlePrintOriginal can return void or Promise<void>,
-            // we need to check if it's a Promise using type guards
-            if (printResult !== undefined && 
-                typeof printResult === 'object' && 
-                printResult !== null && 
-                'then' in printResult && 
-                typeof printResult.then === 'function') {
-              // If it returns a Promise, wait for it to complete
-              (printResult as Promise<void>).then(() => {
+            // Check if result is a Promise
+            if (result && typeof result === 'object' && 'then' in result) {
+              // If it's a Promise, wait for it to complete
+              result.then(() => {
                 resolve();
               }).catch((error) => {
                 console.error("Print error:", error);
                 resolve(); // Always resolve our promise
               });
             } else {
-              // If it's not a Promise or is void, resolve immediately
+              // If it's not a Promise, resolve immediately
               resolve();
             }
           } else {
