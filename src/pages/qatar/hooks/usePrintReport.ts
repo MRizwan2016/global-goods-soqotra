@@ -13,22 +13,37 @@ export function usePrintReport(documentTitle: string) {
     onAfterPrint: () => console.log("Print completed"),
   });
 
-  // Fix: Make sure the function explicitly returns Promise<void>
+  // The issue is that handlePrint needs to return a Promise<void>
   const handlePrint = (): Promise<void> => {
-    // Explicitly return a Promise that resolves after printing
+    console.log("Starting print process...");
+    
+    // Create and return a new Promise to ensure the function returns Promise<void>
     return new Promise<void>((resolve) => {
       if (handlePrintOriginal) {
-        console.log("Starting print process...");
         // Execute the print handler
-        handlePrintOriginal();
-        // Resolve after a small delay to ensure print dialog has time to open
-        setTimeout(() => {
-          console.log("Print process initiated");
-          resolve();
-        }, 100);
+        const printResult = handlePrintOriginal();
+        
+        // Since handlePrintOriginal might not return a Promise,
+        // we ensure we're returning a Promise<void>
+        if (printResult instanceof Promise) {
+          // If it returns a Promise, chain our resolve to it
+          printResult.then(() => {
+            console.log("Print process completed");
+            resolve();
+          }).catch(() => {
+            console.log("Print process failed or canceled");
+            resolve(); // Still resolve our Promise even if printing fails
+          });
+        } else {
+          // If it doesn't return a Promise, resolve after a small delay
+          setTimeout(() => {
+            console.log("Print process initiated");
+            resolve();
+          }, 100);
+        }
       } else {
         console.warn("Print handler not available");
-        resolve();
+        resolve(); // Resolve the Promise even if handler isn't available
       }
     });
   };
