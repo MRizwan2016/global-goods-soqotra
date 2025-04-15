@@ -3,8 +3,12 @@ import React from "react";
 import { useJobForm } from "./context/JobFormContext";
 import JobFormHeader from "./JobFormHeader";
 
-const JobNumberSection: React.FC = () => {
-  const { isNewJob = true } = useJobForm();
+interface JobNumberSectionProps {
+  isNewJob?: boolean;
+}
+
+const JobNumberSection: React.FC<JobNumberSectionProps> = ({ isNewJob = true }) => {
+  const jobFormContext = useJobForm();
   
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">

@@ -28,7 +28,8 @@ export function usePrintReport(documentTitle: string) {
 
         // Call the original print handler
         if (handlePrintOriginal) {
-          const printResult = handlePrintOriginal();
+          // Make sure to handle the result of handlePrintOriginal
+          const result = handlePrintOriginal();
           
           // Wait a bit to make sure print dialog appears and then resolve
           setTimeout(() => {

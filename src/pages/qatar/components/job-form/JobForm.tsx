@@ -1,10 +1,11 @@
 
 import React from "react";
 import { JobFormProvider } from "./context/JobFormContext";
-import JobFormHeader from "./JobFormHeader";
+import JobHeader from "./JobHeader";
+import JobNumberSection from "./JobNumberSection";
 import JobDetailsSection from "./JobDetailsSection";
 import CustomerInfoSection from "./CustomerInfoSection";
-import { Button } from "@/components/ui/button";
+import JobFooter from "./JobFooter";
 
 interface JobFormProps {
   isNewJob?: boolean;
@@ -22,27 +23,13 @@ const JobForm: React.FC<JobFormProps> = ({ isNewJob = true, jobId, onSubmit, isS
       isSaving={isSaving}
     >
       <div className="max-w-5xl mx-auto p-4">
-        <JobFormHeader isNewJob={isNewJob} />
+        <JobHeader />
         <div className="space-y-6 mt-6">
+          <JobNumberSection isNewJob={isNewJob} />
           <JobDetailsSection />
           <CustomerInfoSection />
         </div>
-        <div className="mt-8 flex justify-end space-x-4">
-          <Button 
-            type="button" 
-            variant="outline"
-            className="px-6"
-          >
-            Cancel
-          </Button>
-          <Button 
-            type="submit"
-            className="bg-blue-600 hover:bg-blue-700 px-6"
-            disabled={isSaving}
-          >
-            {isSaving ? 'Saving...' : 'Save Job'}
-          </Button>
-        </div>
+        <JobFooter />
       </div>
     </JobFormProvider>
   );
