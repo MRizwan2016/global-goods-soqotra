@@ -1,4 +1,3 @@
-
 export interface QatarJob {
   id: string;
   jobNumber: string;
@@ -26,11 +25,17 @@ export interface QatarJob {
   entryDate: string;
   sequenceNum?: number;
   country?: string;
+  invoiceAmount?: number;
+  completionDate?: string;
+  completionNotes?: string;
+  cancellationReason?: string;
+  cancellationDate?: string;
+  lastUpdated?: string;
 }
 
 export interface JobItem {
   id: string;
-  jobId?: string; // Make jobId optional for better form handling
+  jobId?: string;
   itemName: string;
   sellPrice: number;
   quantity: number;

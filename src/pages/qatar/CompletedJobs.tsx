@@ -63,7 +63,7 @@ const CompletedJobs = () => {
   const currentEntries = filteredJobs.slice(indexOfFirstEntry, indexOfLastEntry);
   const totalPages = Math.ceil(filteredJobs.length / entriesPerPage);
   
-  // Handle printing
+  // Handle printing - fixed to return a Promise<void>
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     documentTitle: `Completed Jobs Report - ${new Date().toLocaleDateString()}`,
@@ -141,8 +141,10 @@ const CompletedJobs = () => {
               </div>
             </div>
             
+            {/* Fixed button to properly use the handlePrint function */}
             <Button 
-              onClick={handlePrint}
+              type="button"
+              onClick={() => handlePrint()}
               className="bg-blue-600 hover:bg-blue-700 transition-all flex items-center gap-2"
             >
               <Printer size={16} />
