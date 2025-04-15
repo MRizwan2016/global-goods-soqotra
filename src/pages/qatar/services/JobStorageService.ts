@@ -151,6 +151,39 @@ export class JobStorageService {
   }
 
   /**
+   * Complete a job - marks status as COMPLETED and adds completion details
+   */
+  static completeJob(id: string, completionDetails?: { notes?: string, date?: string }) {
+    try {
+      const jobs = this.getAllJobs();
+      const jobIndex = jobs.findIndex((job: any) => job.id === id);
+      
+      if (jobIndex === -1) {
+        throw new Error(`Job with ID ${id} not found`);
+      }
+      
+      const completionDate = completionDetails?.date || new Date().toISOString();
+      const completionNotes = completionDetails?.notes || "Job completed successfully";
+      
+      // Update the job status and add completion details
+      jobs[jobIndex] = {
+        ...jobs[jobIndex],
+        status: 'COMPLETED',
+        completionDate,
+        completionNotes,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(jobs));
+      
+      return jobs[jobIndex];
+    } catch (error) {
+      console.error('Error completing job:', error);
+      throw new Error('Failed to complete job');
+    }
+  }
+
+  /**
    * Update an invoice with a job number
    */
   private static updateInvoiceWithJobNumber(invoiceNumber: string, jobNumber: string) {

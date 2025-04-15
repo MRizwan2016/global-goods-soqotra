@@ -1,16 +1,31 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { JobStorageService } from "../../services/JobStorageService";
 import JobListPage from "../../components/job-list/JobListPage";
 import CompletedJobsTable from "../../components/completed-jobs/CompletedJobsTable";
 
 const CompletedJobsPage = () => {
-  const [jobs] = useState(() => {
+  const [jobs, setJobs] = useState(() => {
     const allJobs = JobStorageService.getAllJobs();
     return allJobs.filter(job => job.status === "COMPLETED");
   });
 
   const sectors = ["ALL SECTORS", "MANILA", "COLOMBO", "DOHA", "DUBAI"];
+  
+  // Refresh jobs when needed
+  const refreshJobs = () => {
+    const allJobs = JobStorageService.getAllJobs();
+    setJobs(allJobs.filter(job => job.status === "COMPLETED"));
+  };
+  
+  // Set up automatic refresh every minute
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      refreshJobs();
+    }, 60000); // Refresh every minute
+    
+    return () => clearInterval(intervalId);
+  }, []);
 
   return (
     <JobListPage
@@ -28,6 +43,7 @@ const CompletedJobsPage = () => {
           indexOfFirstEntry={indexOfFirstEntry}
         />
       )}
+      refreshJobs={refreshJobs}
     />
   );
 };

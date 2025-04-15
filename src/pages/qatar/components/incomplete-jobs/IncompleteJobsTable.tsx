@@ -1,12 +1,14 @@
 
 import React, { useState } from "react";
 import { Table, TableBody, TableHeader, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Edit2, XCircle, Eye } from "lucide-react";
+import { Edit2, XCircle, Eye, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { QatarJob } from "../../types/jobTypes";
 import JobStatusBadge from "../job-tracking/JobStatusBadge";
 import JobCloseDialog from "../job-tracking/JobCloseDialog";
+import { JobStorageService } from "../../services/JobStorageService";
+import { toast } from "sonner";
 
 interface IncompleteJobsTableProps {
   currentEntries: QatarJob[];
@@ -38,6 +40,20 @@ const IncompleteJobsTable: React.FC<IncompleteJobsTableProps> = ({
     setSelectedJob(job);
     setShowCloseDialog(true);
   };
+  
+  // Handle complete job
+  const handleCompleteJob = (job: QatarJob) => {
+    try {
+      JobStorageService.completeJob(job.id, {
+        notes: "Marked as completed from incomplete jobs list"
+      });
+      toast.success(`Job ${job.jobNumber} marked as completed`);
+      refreshJobs(); // Refresh the job list
+    } catch (error) {
+      toast.error("Failed to complete job");
+      console.error("Error completing job:", error);
+    }
+  };
 
   // Handle job closed successfully
   const handleJobClosed = () => {
@@ -63,6 +79,7 @@ const IncompleteJobsTable: React.FC<IncompleteJobsTableProps> = ({
               <TableHead className="w-20">SCHED. NUM</TableHead>
               <TableHead className="w-16">MODIFY</TableHead>
               <TableHead className="w-16">CANCEL</TableHead>
+              <TableHead className="w-16">COMPLETE</TableHead>
               <TableHead className="w-16">DISPLAY</TableHead>
             </TableRow>
           </TableHeader>
@@ -105,6 +122,16 @@ const IncompleteJobsTable: React.FC<IncompleteJobsTableProps> = ({
                     <Button 
                       variant="ghost" 
                       size="sm"
+                      className="h-8 w-8 p-0 text-green-500"
+                      onClick={() => handleCompleteJob(job)}
+                    >
+                      <CheckCircle size={18} />
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
                       className="h-8 w-8 p-0 text-indigo-500"
                       onClick={() => handleViewJob(job.id)}
                     >
@@ -115,7 +142,7 @@ const IncompleteJobsTable: React.FC<IncompleteJobsTableProps> = ({
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={14} className="h-32 text-center">
+                <TableCell colSpan={15} className="h-32 text-center">
                   NO INCOMPLETE JOBS FOUND
                 </TableCell>
               </TableRow>
