@@ -5,7 +5,8 @@ import { useReactToPrint } from "react-to-print";
 export function usePrintReport(documentTitle: string) {
   const printRef = useRef<HTMLDivElement>(null);
   
-  const handlePrint = useReactToPrint({
+  // The original handlePrint function from useReactToPrint
+  const handlePrintOriginal = useReactToPrint({
     content: () => printRef.current,
     documentTitle,
     onBeforePrint: () => console.log("Preparing print..."),
@@ -15,10 +16,10 @@ export function usePrintReport(documentTitle: string) {
   return {
     printRef,
     handlePrint: (): Promise<void> => {
-      if (handlePrint) {
+      if (handlePrintOriginal) {
         // Call the handler and wrap the result in Promise.resolve() to ensure it's always a Promise
         try {
-          const result = handlePrint();
+          const result = handlePrintOriginal();
           // Since we can't check instanceof Promise reliably, we use Promise.resolve to ensure
           // we always return a Promise regardless of what handlePrint returns
           return Promise.resolve(result);
