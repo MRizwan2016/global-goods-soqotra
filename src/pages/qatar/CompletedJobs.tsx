@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -63,13 +62,13 @@ const CompletedJobs = () => {
   const currentEntries = filteredJobs.slice(indexOfFirstEntry, indexOfLastEntry);
   const totalPages = Math.ceil(filteredJobs.length / entriesPerPage);
   
-  // Handle printing - fixed to return a Promise<void>
+  // Fix: Explicitly type the return value of useReactToPrint as () => Promise<void>
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     documentTitle: `Completed Jobs Report - ${new Date().toLocaleDateString()}`,
     onBeforePrint: () => console.log("Preparing print..."),
     onAfterPrint: () => console.log("Print completed"),
-  });
+  }) as () => Promise<void>;
 
   return (
     <Layout title="Completed Jobs">
@@ -141,10 +140,10 @@ const CompletedJobs = () => {
               </div>
             </div>
             
-            {/* Fixed button to properly use the handlePrint function */}
+            {/* Fixed button to use the handlePrint function properly */}
             <Button 
               type="button"
-              onClick={() => handlePrint()}
+              onClick={handlePrint}
               className="bg-blue-600 hover:bg-blue-700 transition-all flex items-center gap-2"
             >
               <Printer size={16} />
