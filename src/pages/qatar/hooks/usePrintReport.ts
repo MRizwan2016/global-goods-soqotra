@@ -13,31 +13,32 @@ export function usePrintReport(documentTitle: string) {
     onAfterPrint: () => console.log("Print completed"),
   });
 
+  // The function returned by useReactToPrint has a return type of void
+  // but we want to wrap it in a Promise<void>
+  const handlePrint = (): Promise<void> => {
+    return new Promise<void>((resolve) => {
+      try {
+        // Call the original handler if it exists
+        if (typeof handlePrintOriginal === 'function') {
+          // Call the original handler which returns void
+          handlePrintOriginal();
+          
+          // After calling the print handler, resolve the promise
+          resolve();
+        } else {
+          // If handlePrintOriginal is not available, just resolve
+          console.warn("Print handler not available");
+          resolve();
+        }
+      } catch (error) {
+        console.error("Error during print:", error);
+        resolve(); // Always resolve the promise even if there's an error
+      }
+    });
+  };
+
   return {
     printRef,
-    // Always return a Promise from handlePrint
-    handlePrint: () => {
-      return new Promise<void>((resolve) => {
-        try {
-          // Call the original handler if it exists
-          if (typeof handlePrintOriginal === 'function') {
-            // Call the original handler
-            const result = handlePrintOriginal();
-            
-            // Always resolve the promise, regardless of the result
-            // We don't need to check if result is a promise since
-            // we're not trying to chain off it
-            resolve();
-          } else {
-            // If handlePrintOriginal is not available, just resolve
-            console.warn("Print handler not available");
-            resolve();
-          }
-        } catch (error) {
-          console.error("Error during print:", error);
-          resolve(); // Always resolve the promise even if there's an error
-        }
-      });
-    }
+    handlePrint
   };
 }
