@@ -21,22 +21,35 @@ export function usePrintReport(documentTitle: string) {
         try {
           // Call the original handler if it exists
           if (typeof handlePrintOriginal === 'function') {
-            // Execute the print function
-            const printResult = handlePrintOriginal();
+            // Execute the print function but don't store the result in a variable initially
+            // This avoids the "testing void for truthiness" error
             
-            // Check if the result is a Promise using a proper type guard
-            if (printResult && 
-                typeof printResult === 'object' && 
-                typeof (printResult as any).then === 'function') {
-              // If it's a Promise, wait for it to complete
-              (printResult as Promise<void>).then(() => {
+            try {
+              // Call the original handler directly within Promise handling
+              const result = handlePrintOriginal();
+              
+              // We need to handle both cases:
+              // 1. When it returns void (nothing)
+              // 2. When it returns a Promise
+              
+              // Check if result is defined and looks like a Promise
+              if (result !== undefined && 
+                  result !== null && 
+                  typeof result === 'object' && 
+                  typeof (result as any).then === 'function') {
+                // It's a Promise, so we can chain it
+                (result as Promise<void>).then(() => {
+                  resolve();
+                }).catch((error) => {
+                  console.error("Print error:", error);
+                  resolve(); // Always resolve our promise
+                });
+              } else {
+                // It returned void or something that's not a Promise
                 resolve();
-              }).catch((error) => {
-                console.error("Print error:", error);
-                resolve(); // Always resolve our promise
-              });
-            } else {
-              // If it's not a Promise or is void, resolve immediately
+              }
+            } catch (error) {
+              console.error("Error calling print handler:", error);
               resolve();
             }
           } else {
