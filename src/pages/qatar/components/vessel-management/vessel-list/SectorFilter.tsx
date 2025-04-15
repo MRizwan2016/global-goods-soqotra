@@ -16,9 +16,11 @@ const SectorFilter: React.FC<SectorFilterProps> = ({ value, onChange }) => {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">All Sectors</SelectItem>
-        {SECTORS.map(sector => (
-          <SelectItem key={sector} value={sector || "unknown-sector"}>{sector || "Unknown Sector"}</SelectItem>
+        {SECTORS.filter(sector => sector !== "").map(sector => (
+          <SelectItem key={sector} value={sector}>{sector || "Unknown Sector"}</SelectItem>
         ))}
+        {/* Add a specific item for unknown sectors if needed */}
+        <SelectItem value="unknown-sector">Unknown Sector</SelectItem>
       </SelectContent>
     </Select>
   );

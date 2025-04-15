@@ -1,40 +1,24 @@
 
 import React from "react";
 import { JobFormProvider } from "./context/JobFormContext";
-import JobFormHeader from "./JobFormHeader";
+import JobHeader from "./JobHeader";
+import JobNumberSection from "./JobNumberSection";
 import JobDetailsSection from "./JobDetailsSection";
-import CustomerInfoSection from "./CustomerInfoSection";
-import PackageDescriptionSection from "./PackageDescriptionSection";
-import JobFormActions from "./JobFormActions";
+import CustomerDetailsSection from "./CustomerDetailsSection";
+import JobFooter from "./JobFooter";
 
-interface JobFormProps {
-  jobId?: string;
-  isNewJob?: boolean;
-  onSubmit: (data: any) => void;
-  isSaving?: boolean;
-}
-
-const JobForm = ({ jobId, isNewJob = false, onSubmit, isSaving = false }: JobFormProps) => {
+const JobForm: React.FC = () => {
   return (
-    <JobFormProvider 
-      jobId={jobId} 
-      isNewJob={isNewJob} 
-      onSubmit={onSubmit} 
-      isSaving={isSaving}
-    >
-      <form id="job-form" className="animate-fade-in">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-          <JobFormHeader isNewJob={isNewJob} />
-          
+    <JobFormProvider>
+      <div className="max-w-5xl mx-auto p-4">
+        <JobHeader />
+        <div className="space-y-6 mt-6">
+          <JobNumberSection />
           <JobDetailsSection />
-          
-          <CustomerInfoSection />
+          <CustomerDetailsSection />
         </div>
-        
-        <PackageDescriptionSection />
-        
-        <JobFormActions isNewJob={isNewJob} onSubmit={onSubmit} />
-      </form>
+        <JobFooter />
+      </div>
     </JobFormProvider>
   );
 };

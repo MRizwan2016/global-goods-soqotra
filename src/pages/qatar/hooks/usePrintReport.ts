@@ -25,7 +25,7 @@ export function usePrintReport(documentTitle: string) {
         
         // Since handlePrintOriginal might not return a Promise,
         // we ensure we're returning a Promise<void>
-        if (printResult instanceof Promise) {
+        if (printResult && typeof printResult.then === 'function') {
           // If it returns a Promise, chain our resolve to it
           printResult.then(() => {
             console.log("Print process completed");

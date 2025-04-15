@@ -83,53 +83,49 @@ const ShippingLineSelector: React.FC<ShippingLineSelectorProps> = ({
         <Select value={validValue} onValueChange={onChange}>
           <SelectTrigger 
             id="shippingLine" 
-            className="bg-blue-500 text-white font-semibold border-0 hover:bg-blue-600 transition-colors"
+            className="bg-white border border-gray-300 w-full"
           >
-            <SelectValue placeholder="Select Shipping Line" />
+            <SelectValue placeholder="Select shipping line" />
           </SelectTrigger>
-          <SelectContent className="max-h-[200px] bg-white z-50">
+          <SelectContent>
             {shippingLines.map(line => (
-              <SelectItem 
-                key={line.id} 
-                value={line.id}
-                className="py-2 hover:bg-blue-50 transition-colors"
-              >
-                <div className="flex items-center">
-                  <Ship className="mr-2 h-4 w-4 text-blue-500" />
-                  {line.name}
-                </div>
-              </SelectItem>
+              <SelectItem key={line.id} value={line.id}>{line.name}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-
+        
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button type="button" variant="outline" className="border-blue-500 text-blue-500 hover:bg-blue-50">
-              <Plus className="mr-1 h-4 w-4" />
-              Add New
+            <Button 
+              type="button" 
+              variant="outline" 
+              size="icon" 
+              className="flex-shrink-0 border-blue-300"
+            >
+              <Plus size={18} />
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
               <DialogTitle>Add New Shipping Line</DialogTitle>
             </DialogHeader>
-            <div className="py-4">
-              <Label htmlFor="new-shipping-line" className="mb-2 block">Shipping Line Name</Label>
+            <div className="mt-4">
               <Input
-                id="new-shipping-line"
                 value={newShippingLine}
                 onChange={(e) => setNewShippingLine(e.target.value)}
                 placeholder="Enter shipping line name"
-                className="w-full"
               />
             </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+            <DialogFooter className="mt-4">
+              <Button 
+                type="button" 
+                variant="ghost" 
+                onClick={() => setDialogOpen(false)}
+              >
                 Cancel
               </Button>
               <Button 
-                type="button"
+                type="button" 
                 onClick={handleAddShippingLine}
                 className="bg-blue-600 hover:bg-blue-700"
               >

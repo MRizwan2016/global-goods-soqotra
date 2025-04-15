@@ -38,9 +38,10 @@ const VesselDetailsForm: React.FC<VesselDetailsFormProps> = ({
             <SelectValue placeholder="Select Sector" />
           </SelectTrigger>
           <SelectContent>
-            {SECTORS.map(sector => (
-              <SelectItem key={sector} value={sector || "unknown-sector"}>{sector || "Unknown Sector"}</SelectItem>
+            {SECTORS.filter(sector => sector !== "").map(sector => (
+              <SelectItem key={sector} value={sector}>{sector}</SelectItem>
             ))}
+            <SelectItem key="unknown-sector" value="unknown-sector">Unknown Sector</SelectItem>
           </SelectContent>
         </Select>
       </div>
