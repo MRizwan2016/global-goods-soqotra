@@ -15,6 +15,7 @@ import CargoManifest from "@/pages/qatar/CargoManifest";
 import CompletedJobs from "@/pages/qatar/CompletedJobs";
 import CancelledJobs from "@/pages/qatar/CancelledJobs";
 import JobStatusList from "@/pages/qatar/JobStatusList";
+import IncompleteJobs from "@/pages/qatar/IncompleteJobs";
 import { RouteConfig } from "./types";
 
 // Define the routes for the Qatar section
@@ -79,7 +80,12 @@ export const qatarRoutes: RouteConfig[] = [
     element: CargoManifest,
     private: true
   },
-  // New routes for reports
+  // Job status reports
+  {
+    path: "/qatar/incomplete-jobs",
+    element: IncompleteJobs,
+    private: true
+  },
   {
     path: "/qatar/completed-jobs",
     element: CompletedJobs,

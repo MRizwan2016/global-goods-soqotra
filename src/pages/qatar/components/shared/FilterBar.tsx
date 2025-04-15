@@ -2,18 +2,14 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
-import { 
-  Printer,
-  Search,
-  Calendar
-} from "lucide-react";
+import { Search, Calendar, Printer } from "lucide-react";
 
 interface FilterBarProps {
   searchTerm: string;
@@ -28,7 +24,10 @@ interface FilterBarProps {
   setEndDate: (value: string) => void;
   sectors: string[];
   handlePrint: () => Promise<void>;
-  additionalFilters?: React.ReactNode;
+  vehicleFilter?: string;
+  setVehicleFilter?: (value: string) => void;
+  jobTypeFilter?: string;
+  setJobTypeFilter?: (value: string) => void;
 }
 
 const FilterBar: React.FC<FilterBarProps> = ({
@@ -44,17 +43,20 @@ const FilterBar: React.FC<FilterBarProps> = ({
   setEndDate,
   sectors,
   handlePrint,
-  additionalFilters
+  vehicleFilter,
+  setVehicleFilter,
+  jobTypeFilter,
+  setJobTypeFilter
 }) => {
   return (
-    <div className="flex flex-wrap gap-4 mb-6">
-      <div className="min-w-[150px]">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <div className="relative">
         <Select value={sectorFilter} onValueChange={setSectorFilter}>
-          <SelectTrigger className="w-full bg-blue-600 text-white">
-            <SelectValue placeholder="ALL SECTORS" />
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="All Sectors" />
           </SelectTrigger>
           <SelectContent>
-            {sectors.map(sector => (
+            {sectors.map((sector) => (
               <SelectItem key={sector} value={sector}>
                 {sector}
               </SelectItem>
@@ -62,61 +64,90 @@ const FilterBar: React.FC<FilterBarProps> = ({
           </SelectContent>
         </Select>
       </div>
-      
-      <div className="min-w-[150px]">
+
+      {setVehicleFilter && (
+        <div className="relative">
+          <Select value={vehicleFilter} onValueChange={setVehicleFilter}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="All Vehicles" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL VEHICLES">ALL VEHICLES</SelectItem>
+              <SelectItem value="Car">Car</SelectItem>
+              <SelectItem value="Van">Van</SelectItem>
+              <SelectItem value="Truck">Truck</SelectItem>
+              <SelectItem value="Lorry">Lorry</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      {setJobTypeFilter && (
+        <div className="relative">
+          <Select value={jobTypeFilter} onValueChange={setJobTypeFilter}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="All Jobs" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ALL JOBS">ALL JOBS</SelectItem>
+              <SelectItem value="COLLECTION">COLLECTION</SelectItem>
+              <SelectItem value="DELIVERY">DELIVERY</SelectItem>
+              <SelectItem value="PACKING">PACKING</SelectItem>
+              <SelectItem value="UNPACKING">UNPACKING</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
+      <div className="relative">
         <Select value={jobNumberFilter} onValueChange={setJobNumberFilter}>
-          <SelectTrigger className="w-full bg-blue-600 text-white">
-            <SelectValue placeholder="JOB NUMBER" />
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Job Number" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="asc">ASCENDING</SelectItem>
-            <SelectItem value="desc">DESCENDING</SelectItem>
+            <SelectItem value="">All Job Numbers</SelectItem>
+            {/* Job number options would be populated here */}
           </SelectContent>
         </Select>
       </div>
-      
-      <div className="flex items-center gap-2">
-        <Calendar size={16} className="text-blue-600" />
-        <Input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="w-[150px]"
-          placeholder="Start Date"
-        />
-        <span>to</span>
-        <Input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="w-[150px]"
-          placeholder="End Date"
-        />
-      </div>
 
-      {additionalFilters}
-      
-      <div className="flex-grow">
-        <div className="relative">
-          <Input 
-            type="text"
+      <div className="relative col-span-1 md:col-span-2 lg:col-span-1">
+        <div className="flex">
+          <Input
             placeholder="Search..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="rounded-r-none"
           />
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+          <Button className="rounded-l-none" variant="default">
+            <Search size={16} />
+          </Button>
         </div>
       </div>
-      
-      <Button 
-        type="button"
-        onClick={handlePrint}
-        className="bg-blue-600 hover:bg-blue-700 transition-all flex items-center gap-2"
-      >
-        <Printer size={16} />
-        PRINT REPORT
-      </Button>
+
+      <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+        <div className="flex items-center gap-2">
+          <Calendar size={16} />
+          <Input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            placeholder="Start Date"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Calendar size={16} />
+          <Input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            placeholder="End Date"
+          />
+        </div>
+        <Button variant="outline" onClick={handlePrint}>
+          <Printer size={16} className="mr-2" /> Print
+        </Button>
+      </div>
     </div>
   );
 };

@@ -17,15 +17,9 @@ export function usePrintReport(documentTitle: string) {
     printRef,
     handlePrint: (): Promise<void> => {
       if (handlePrintOriginal) {
-        // Call the handler and wrap the result in Promise.resolve() to ensure it's always a Promise
-        try {
-          const result = handlePrintOriginal();
-          // Since we can't check instanceof Promise reliably, we use Promise.resolve to ensure
-          // we always return a Promise regardless of what handlePrint returns
-          return Promise.resolve(result);
-        } catch (error) {
-          return Promise.reject(error);
-        }
+        // Since useReactToPrint's return type is not guaranteed to be a Promise<void>,
+        // we need to wrap it in Promise.resolve() to ensure we always return a Promise<void>
+        return Promise.resolve(handlePrintOriginal());
       }
       return Promise.resolve();
     }
