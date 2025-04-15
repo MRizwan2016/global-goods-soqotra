@@ -28,7 +28,6 @@ export function usePrintReport(documentTitle: string) {
 
         // Call the original print handler
         if (handlePrintOriginal) {
-          // The original handler doesn't return a Promise, we just call it
           handlePrintOriginal();
           
           // Wait a bit to make sure print dialog appears and then resolve

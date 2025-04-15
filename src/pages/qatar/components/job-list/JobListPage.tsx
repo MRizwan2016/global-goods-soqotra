@@ -19,6 +19,7 @@ interface JobListPageProps {
   showVehicleFilter?: boolean;
   showJobTypeFilter?: boolean;
   initialStatus?: string;
+  extraFilters?: React.ReactNode; // Added this prop to fix the error
   renderTable: ({ 
     currentEntries, 
     indexOfFirstEntry 
