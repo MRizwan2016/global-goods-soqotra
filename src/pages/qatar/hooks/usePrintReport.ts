@@ -13,26 +13,22 @@ export function usePrintReport(documentTitle: string) {
     onAfterPrint: () => console.log("Print completed"),
   });
 
-  // The function returned by useReactToPrint has a return type of void
-  // but we want to wrap it in a Promise<void>
-  const handlePrint = (): Promise<void> => {
+  // Create a wrapper function that explicitly returns Promise<void>
+  const handlePrint = async (): Promise<void> => {
     return new Promise<void>((resolve) => {
       try {
-        // Call the original handler if it exists
-        if (typeof handlePrintOriginal === 'function') {
-          // Call the original handler which returns void
+        // Call the original handler
+        if (handlePrintOriginal) {
           handlePrintOriginal();
-          
-          // After calling the print handler, resolve the promise
-          resolve();
         } else {
-          // If handlePrintOriginal is not available, just resolve
           console.warn("Print handler not available");
-          resolve();
         }
+        // Always resolve the promise
+        resolve();
       } catch (error) {
         console.error("Error during print:", error);
-        resolve(); // Always resolve the promise even if there's an error
+        // Always resolve even on error
+        resolve();
       }
     });
   };
