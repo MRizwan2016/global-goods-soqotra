@@ -26,8 +26,8 @@ export function usePrintReport(documentTitle: string) {
             // Since handlePrintOriginal can return void or Promise<void>,
             // we need to check if it's a Promise using type guards
             if (printResult !== undefined && 
-                printResult !== null && 
                 typeof printResult === 'object' && 
+                printResult !== null && 
                 'then' in printResult && 
                 typeof printResult.then === 'function') {
               // If it returns a Promise, wait for it to complete
