@@ -19,15 +19,20 @@ export function usePrintReport(documentTitle: string) {
       // Always return a Promise<void> to satisfy TypeScript
       return new Promise<void>((resolve) => {
         try {
-          // Call the original handler and handle its result
-          // According to the documentation, the function can either return undefined or a Promise
+          // Call the original handler
           if (handlePrintOriginal) {
+            // TypeScript doesn't know what handlePrintOriginal returns
+            // So we need to explicitly cast it or handle it carefully
             const result = handlePrintOriginal();
             
-            // Check if result exists and has a then method (is Promise-like)
-            if (result && typeof result === 'object' && 'then' in result) {
+            // Safely check if the result is a Promise-like object
+            if (result && 
+                typeof result === 'object' && 
+                result !== null && 
+                'then' in result && 
+                typeof result.then === 'function') {
               // If it's a Promise, chain our own promise to it
-              result.then(() => {
+              (result as Promise<void>).then(() => {
                 resolve();
               }).catch((error) => {
                 console.error("Print error:", error);
