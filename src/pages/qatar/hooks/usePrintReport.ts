@@ -13,16 +13,19 @@ export function usePrintReport(documentTitle: string) {
     onAfterPrint: () => console.log("Print completed"),
   });
 
-  // Create a wrapper function that properly returns Promise<void>
-  const handlePrint = (): Promise<void> => {
-    // Using a Promise constructor to explicitly return Promise<void>
+  // Fix: The issue is with how useReactToPrint's return type is being handled
+  const handlePrint = () => {
+    // Explicitly return a Promise that resolves after printing
     return new Promise<void>((resolve) => {
-      // Execute the print operation
       if (handlePrintOriginal) {
-        // Call the print handler first
+        console.log("Starting print process...");
+        // Execute the print handler
         handlePrintOriginal();
-        // Then resolve the promise
-        setTimeout(() => resolve(), 100);
+        // Resolve after a small delay to ensure print dialog has time to open
+        setTimeout(() => {
+          console.log("Print process initiated");
+          resolve();
+        }, 100);
       } else {
         console.warn("Print handler not available");
         resolve();
