@@ -1,19 +1,23 @@
 
 import { useState } from "react";
-import { AlertTriangle, CheckCircle2, LockKeyhole, Loader2 } from "lucide-react";
-import {
+import { 
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { JobStorageService } from "../../services/JobStorageService";
+import { toast } from "sonner";
 
 interface JobCloseDialogProps {
   isOpen: boolean;
@@ -25,120 +29,192 @@ interface JobCloseDialogProps {
 
 const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobCloseDialogProps) => {
   const [invoiceNumber, setInvoiceNumber] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
+  const [invoiceAmount, setInvoiceAmount] = useState("");
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [reason, setReason] = useState("");
+  const [action, setAction] = useState<"COMPLETE" | "CANCEL">("COMPLETE");
+  const [loading, setLoading] = useState(false);
 
-  const handleClose = () => {
-    setInvoiceNumber("");
-    setError("");
-    onClose();
+  const handleComplete = () => {
+    setLoading(true);
+    
+    try {
+      const job = JobStorageService.getJobById(jobId);
+      if (!job) {
+        toast.error("Job not found!");
+        onClose();
+        return;
+      }
+      
+      // Update job with completion details
+      const updatedJob = {
+        ...job,
+        status: "COMPLETED",
+        invoiceNumber: invoiceNumber || job.invoiceNumber,
+        invoiceAmount: invoiceAmount ? parseFloat(invoiceAmount) : job.advanceAmount,
+        completionDate: date ? format(date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
+        completionNotes: "Job completed successfully",
+        lastUpdated: new Date().toISOString()
+      };
+      
+      JobStorageService.updateJob(jobId, updatedJob);
+      toast.success(`Job ${jobNumber} marked as completed`);
+      onSuccess();
+      onClose();
+    } catch (error) {
+      console.error("Error completing job:", error);
+      toast.error("Failed to complete job");
+    } finally {
+      setLoading(false);
+    }
   };
-
-  const handleSubmit = () => {
-    // Validate invoice number
-    if (!invoiceNumber.trim()) {
-      setError("Invoice number is required to close this job");
+  
+  const handleCancel = () => {
+    setLoading(true);
+    
+    if (!reason.trim()) {
+      toast.error("Please provide a reason for cancellation");
+      setLoading(false);
       return;
     }
-
-    setIsSubmitting(true);
-    setError("");
-
-    // Process job closing
-    setTimeout(() => {
-      try {
-        // Update job status and add invoice number
-        JobStorageService.updateJob(jobId, {
-          status: "COMPLETED",
-          invoiceNumber: invoiceNumber.trim(),
-          completedDate: new Date().toISOString(),
-        });
-
-        setIsSubmitting(false);
-        toast.success(`Job ${jobNumber} has been closed successfully`, {
-          description: `Invoice Number: ${invoiceNumber}`,
-        });
-        onSuccess();
-        handleClose();
-      } catch (err) {
-        setIsSubmitting(false);
-        setError("Failed to close the job. Please try again.");
-        toast.error("Failed to close the job");
+    
+    try {
+      const job = JobStorageService.getJobById(jobId);
+      if (!job) {
+        toast.error("Job not found!");
+        onClose();
+        return;
       }
-    }, 800); // Simulate API call
+      
+      // Update job with cancellation details
+      const updatedJob = {
+        ...job,
+        status: "CANCELLED",
+        cancellationReason: reason,
+        cancellationDate: format(new Date(), "yyyy-MM-dd"),
+        lastUpdated: new Date().toISOString()
+      };
+      
+      JobStorageService.updateJob(jobId, updatedJob);
+      toast.success(`Job ${jobNumber} marked as cancelled`);
+      onSuccess();
+      onClose();
+    } catch (error) {
+      console.error("Error cancelling job:", error);
+      toast.error("Failed to cancel job");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md animate-fade-in">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-center text-lg font-bold flex items-center justify-center gap-2">
-            <LockKeyhole className="h-5 w-5 text-blue-500 animate-pulse" />
-            CLOSE JOB #{jobNumber}
+          <DialogTitle>
+            {action === "COMPLETE" ? "Complete Job" : "Cancel Job"} - {jobNumber}
           </DialogTitle>
-          <DialogDescription className="text-center">
-            Enter invoice number to complete and close this job.
+          <DialogDescription>
+            {action === "COMPLETE" 
+              ? "Update invoice details and mark this job as complete." 
+              : "Provide a reason for cancelling this job."}
           </DialogDescription>
         </DialogHeader>
-
+        
         <div className="space-y-4 py-4">
-          {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-md flex items-center gap-2 text-sm animate-fade-in">
-              <AlertTriangle className="h-4 w-4" />
-              {error}
+          {/* Action selector */}
+          <div className="flex gap-2">
+            <Button 
+              variant={action === "COMPLETE" ? "default" : "outline"}
+              onClick={() => setAction("COMPLETE")} 
+              className="flex-1"
+            >
+              Complete Job
+            </Button>
+            <Button 
+              variant={action === "CANCEL" ? "default" : "outline"}
+              onClick={() => setAction("CANCEL")} 
+              className="flex-1"
+            >
+              Cancel Job
+            </Button>
+          </div>
+          
+          {action === "COMPLETE" ? (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="invoiceNumber">Invoice Number</Label>
+                  <Input
+                    id="invoiceNumber"
+                    value={invoiceNumber}
+                    onChange={(e) => setInvoiceNumber(e.target.value)}
+                    placeholder="Enter invoice number"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="invoiceAmount">Invoice Amount</Label>
+                  <Input
+                    id="invoiceAmount"
+                    value={invoiceAmount}
+                    onChange={(e) => setInvoiceAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    type="number"
+                  />
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Completion Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </>
+          ) : (
+            <div className="space-y-2">
+              <Label htmlFor="reason">Reason for Cancellation</Label>
+              <Input
+                id="reason"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                placeholder="Please provide the reason"
+              />
             </div>
           )}
-
-          <div className="space-y-2">
-            <Label htmlFor="invoiceNumber" className="text-sm font-medium">
-              INVOICE NUMBER <span className="text-red-500">*</span>
-            </Label>
-            <Input
-              id="invoiceNumber"
-              value={invoiceNumber}
-              onChange={(e) => setInvoiceNumber(e.target.value)}
-              placeholder="ENTER INVOICE NUMBER"
-              className="bg-blue-50 border-blue-200 focus:border-blue-400 uppercase"
-              autoComplete="off"
-              autoFocus
-            />
-          </div>
-
-          <div className="bg-amber-50 p-3 rounded-md text-amber-700 text-sm flex items-start gap-2 animate-fade-in">
-            <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
-            <span>
-              This action cannot be undone. The job status will be changed to COMPLETED and an
-              invoice will be linked to this job.
-            </span>
-          </div>
         </div>
-
-        <DialogFooter className="sm:justify-between gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClose}
-            className="flex-1 sm:flex-none"
-          >
-            CANCEL
+        
+        <DialogFooter className="sm:justify-end">
+          <Button variant="outline" onClick={onClose} disabled={loading}>
+            Cancel
           </Button>
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="flex-1 sm:flex-none bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white hover-scale transition-all duration-300 uppercase tracking-wide"
+          <Button 
+            onClick={action === "COMPLETE" ? handleComplete : handleCancel}
+            disabled={loading}
+            className={action === "COMPLETE" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}
           >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                PROCESSING
-              </>
-            ) : (
-              <>
-                <CheckCircle2 className="mr-2 h-4 w-4" />
-                CLOSE JOB
-              </>
-            )}
+            {loading && <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></span>}
+            {action === "COMPLETE" ? "Complete Job" : "Cancel Job"}
           </Button>
         </DialogFooter>
       </DialogContent>

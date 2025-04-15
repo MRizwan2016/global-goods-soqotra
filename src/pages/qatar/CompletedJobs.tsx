@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,13 +10,24 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
+import { 
+  Printer,
+  Search,
+  FileDown,
+  ArrowLeft,
+  Calendar
+} from "lucide-react";
 import { JobStorageService } from "./services/JobStorageService";
 import { QatarJob } from "./types/jobTypes";
+import { useReactToPrint } from "react-to-print";
 
 const CompletedJobs = () => {
+  const printRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [sectorFilter, setSectorFilter] = useState("ALL SECTORS");
   const [jobNumberFilter, setJobNumberFilter] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [entriesPerPage, setEntriesPerPage] = useState(50);
   const [jobs, setJobs] = useState<QatarJob[]>(() => {
@@ -34,7 +45,16 @@ const CompletedJobs = () => {
     
     const sectorMatch = sectorFilter === "ALL SECTORS" || job.sector === sectorFilter;
     
-    return (jobNumberMatch || customerMatch || phoneMatch) && sectorMatch;
+    // Date filtering
+    let dateMatch = true;
+    if (startDate && endDate) {
+      const jobDate = new Date(job.date);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      dateMatch = jobDate >= start && jobDate <= end;
+    }
+    
+    return (jobNumberMatch || customerMatch || phoneMatch) && sectorMatch && dateMatch;
   });
   
   // Calculate pagination
@@ -42,6 +62,14 @@ const CompletedJobs = () => {
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
   const currentEntries = filteredJobs.slice(indexOfFirstEntry, indexOfLastEntry);
   const totalPages = Math.ceil(filteredJobs.length / entriesPerPage);
+  
+  // Handle printing
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    documentTitle: `Completed Jobs Report - ${new Date().toLocaleDateString()}`,
+    onBeforePrint: () => console.log("Preparing print..."),
+    onAfterPrint: () => console.log("Print completed"),
+  });
 
   return (
     <Layout title="Completed Jobs">
@@ -81,15 +109,45 @@ const CompletedJobs = () => {
               </Select>
             </div>
             
-            <div className="flex-grow">
-              <Input 
-                type="text"
-                placeholder="Search..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full"
+            <div className="flex items-center gap-2">
+              <Calendar size={16} className="text-blue-600" />
+              <Input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-[150px]"
+                placeholder="Start Date"
+              />
+              <span>to</span>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-[150px]"
+                placeholder="End Date"
               />
             </div>
+            
+            <div className="flex-grow">
+              <div className="relative">
+                <Input 
+                  type="text"
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10"
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={16} />
+              </div>
+            </div>
+            
+            <Button 
+              onClick={handlePrint}
+              className="bg-blue-600 hover:bg-blue-700 transition-all flex items-center gap-2"
+            >
+              <Printer size={16} />
+              PRINT REPORT
+            </Button>
           </div>
           
           {/* Entries control */}
@@ -111,37 +169,53 @@ const CompletedJobs = () => {
             </div>
             
             <div className="flex items-center gap-2">
-              <span className="text-sm">Search:</span>
-              <Input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-[200px]"
-              />
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-1"
+                onClick={() => window.history.back()}
+              >
+                <ArrowLeft size={16} />
+                BACK
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-1"
+                onClick={() => {
+                  // Export to CSV functionality could be added here
+                  alert("Export functionality will be implemented here");
+                }}
+              >
+                <FileDown size={16} />
+                EXPORT
+              </Button>
             </div>
           </div>
           
           {/* Jobs Table */}
-          <div className="overflow-x-auto">
+          <div ref={printRef} className="overflow-x-auto">
+            <div className="print:text-center print:mb-4 hidden print:block">
+              <h2 className="text-xl font-bold">COMPLETED JOBS REPORT</h2>
+              <p>Date: {new Date().toLocaleDateString()}</p>
+              {startDate && endDate && (
+                <p>Period: {startDate} to {endDate}</p>
+              )}
+            </div>
+            
             <table className="w-full border-collapse">
               <thead>
                 <tr className="bg-blue-600 text-white">
                   <th className="p-2 text-left border border-blue-700">Num</th>
-                  <th className="p-2 text-left border border-blue-700">JOB ID</th>
                   <th className="p-2 text-left border border-blue-700">JOB NUMBER</th>
                   <th className="p-2 text-left border border-blue-700">JOB DATE</th>
                   <th className="p-2 text-left border border-blue-700">JOB TYPE</th>
                   <th className="p-2 text-left border border-blue-700">SECTOR</th>
                   <th className="p-2 text-left border border-blue-700">CUSTOMER</th>
                   <th className="p-2 text-left border border-blue-700">MOBILE NUMBER</th>
-                  <th className="p-2 text-left border border-blue-700">LAND NUM</th>
-                  <th className="p-2 text-left border border-blue-700">POST CODE</th>
                   <th className="p-2 text-left border border-blue-700">INVOICE</th>
-                  <th className="p-2 text-left border border-blue-700">ADVANCE</th>
-                  <th className="p-2 text-left border border-blue-700">SCHED. NUM</th>
-                  <th className="p-2 text-left border border-blue-700">SCHED. DATE</th>
+                  <th className="p-2 text-left border border-blue-700">AMOUNT</th>
                   <th className="p-2 text-left border border-blue-700">COMPLETE BY</th>
-                  <th className="p-2 text-left border border-blue-700">DISPLAY</th>
+                  <th className="p-2 text-left border border-blue-700">COMPLETION DATE</th>
+                  <th className="p-2 text-left border border-blue-700 print:hidden">DISPLAY</th>
                 </tr>
               </thead>
               <tbody>
@@ -149,21 +223,17 @@ const CompletedJobs = () => {
                   currentEntries.map((job, index) => (
                     <tr key={job.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                       <td className="p-2 border border-gray-200">{indexOfFirstEntry + index + 1}</td>
-                      <td className="p-2 border border-gray-200">{job.id}</td>
                       <td className="p-2 border border-gray-200">{job.jobNumber}</td>
                       <td className="p-2 border border-gray-200">{job.date}</td>
                       <td className="p-2 border border-gray-200">{job.jobType}</td>
                       <td className="p-2 border border-gray-200">{job.sector}</td>
                       <td className="p-2 border border-gray-200">{job.customer}</td>
                       <td className="p-2 border border-gray-200">{job.mobileNumber}</td>
-                      <td className="p-2 border border-gray-200">{job.landNumber || "0"}</td>
-                      <td className="p-2 border border-gray-200"></td>
-                      <td className="p-2 border border-gray-200">{job.invoiceNumber || "0"}</td>
-                      <td className="p-2 border border-gray-200">{job.advanceAmount || "0"}</td>
-                      <td className="p-2 border border-gray-200">{job.sequenceNum || ""}</td>
-                      <td className="p-2 border border-gray-200">{job.date}</td>
+                      <td className="p-2 border border-gray-200">{job.invoiceNumber || "-"}</td>
+                      <td className="p-2 border border-gray-200">{job.invoiceAmount || job.advanceAmount || "0"}</td>
                       <td className="p-2 border border-gray-200">{job.entryBy}</td>
-                      <td className="p-2 border border-gray-200">
+                      <td className="p-2 border border-gray-200">{job.completionDate || job.date}</td>
+                      <td className="p-2 border border-gray-200 print:hidden">
                         <Button 
                           size="sm" 
                           variant="ghost" 
@@ -177,11 +247,34 @@ const CompletedJobs = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={16} className="p-4 text-center">No completed jobs found</td>
+                    <td colSpan={12} className="p-4 text-center">No completed jobs found</td>
                   </tr>
                 )}
               </tbody>
             </table>
+          </div>
+          
+          {/* Pagination */}
+          <div className="flex justify-between items-center mt-4">
+            <div>
+              Showing {indexOfFirstEntry + 1} to {Math.min(indexOfLastEntry, filteredJobs.length)} of {filteredJobs.length} entries
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              >
+                Previous
+              </Button>
+              <Button 
+                variant="outline"
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </div>
       </div>

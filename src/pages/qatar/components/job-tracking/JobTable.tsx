@@ -16,7 +16,8 @@ import {
   PhoneCall,
   Calendar,
   Edit,
-  LockKeyhole,
+  CheckCircle,
+  XCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { QatarJob } from "../../types/jobTypes";
@@ -40,6 +41,18 @@ const JobTable = ({ currentEntries, refreshJobs }: JobTableProps) => {
 
   // Open close job dialog
   const handleOpenCloseDialog = (job: QatarJob) => {
+    setSelectedJob(job);
+    setShowCloseDialog(true);
+  };
+
+  // Handle job completion
+  const handleCompleteJob = (job: QatarJob) => {
+    setSelectedJob(job);
+    setShowCloseDialog(true);
+  };
+
+  // Handle job cancellation
+  const handleCancelJob = (job: QatarJob) => {
     setSelectedJob(job);
     setShowCloseDialog(true);
   };
@@ -77,7 +90,7 @@ const JobTable = ({ currentEntries, refreshJobs }: JobTableProps) => {
                   <TableCell>
                     <div className="flex items-center">
                       <User size={14} className="mr-1 text-gray-500" />
-                      {job.customer === "--" ? "Unnamed" : job.customer}
+                      {job.customer}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -112,15 +125,26 @@ const JobTable = ({ currentEntries, refreshJobs }: JobTableProps) => {
                         EDIT
                       </Button>
                       
-                      {job.status !== "COMPLETED" && (
-                        <Button 
-                          size="sm"
-                          className="h-7 px-2 text-xs bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 hover-scale transition-all duration-300"
-                          onClick={() => handleOpenCloseDialog(job)}
-                        >
-                          <LockKeyhole size={12} className="mr-1" />
-                          JOB CLOSE
-                        </Button>
+                      {job.status !== "COMPLETED" && job.status !== "CANCELLED" && (
+                        <>
+                          <Button 
+                            size="sm"
+                            className="h-7 px-2 text-xs bg-green-600 hover:bg-green-700"
+                            onClick={() => handleCompleteJob(job)}
+                          >
+                            <CheckCircle size={12} className="mr-1" />
+                            COMPLETE
+                          </Button>
+                          
+                          <Button 
+                            size="sm"
+                            className="h-7 px-2 text-xs bg-red-600 hover:bg-red-700"
+                            onClick={() => handleCancelJob(job)}
+                          >
+                            <XCircle size={12} className="mr-1" />
+                            CANCEL
+                          </Button>
+                        </>
                       )}
                     </div>
                   </TableCell>
