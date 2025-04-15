@@ -5,7 +5,7 @@ import { useReactToPrint } from "react-to-print";
 export function usePrintReport(documentTitle: string) {
   const printRef = useRef<HTMLDivElement>(null);
   
-  // The original handlePrint function from useReactToPrint
+  // Get the original handler from useReactToPrint
   const handlePrintOriginal = useReactToPrint({
     content: () => printRef.current,
     documentTitle,
@@ -19,10 +19,8 @@ export function usePrintReport(documentTitle: string) {
       // Always return a Promise<void> to satisfy TypeScript
       return new Promise<void>((resolve) => {
         try {
-          // Call the original handler
-          if (handlePrintOriginal) {
-            // TypeScript doesn't know what handlePrintOriginal returns
-            // So we need to explicitly cast it or handle it carefully
+          // Call the original handler and handle its result
+          if (typeof handlePrintOriginal === 'function') {
             const result = handlePrintOriginal();
             
             // Safely check if the result is a Promise-like object
