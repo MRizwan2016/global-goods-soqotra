@@ -13,21 +13,18 @@ export function usePrintReport(documentTitle: string) {
     onAfterPrint: () => console.log("Print completed"),
   });
 
-  // Create a wrapper function that explicitly returns Promise<void>
-  const handlePrint = async (): Promise<void> => {
+  // Create a wrapper function that properly returns Promise<void>
+  const handlePrint = (): Promise<void> => {
+    // Using a Promise constructor to explicitly return Promise<void>
     return new Promise<void>((resolve) => {
-      try {
-        // Call the original handler
-        if (handlePrintOriginal) {
-          handlePrintOriginal();
-        } else {
-          console.warn("Print handler not available");
-        }
-        // Always resolve the promise
-        resolve();
-      } catch (error) {
-        console.error("Error during print:", error);
-        // Always resolve even on error
+      // Execute the print operation
+      if (handlePrintOriginal) {
+        // Call the print handler first
+        handlePrintOriginal();
+        // Then resolve the promise
+        setTimeout(() => resolve(), 100);
+      } else {
+        console.warn("Print handler not available");
         resolve();
       }
     });
