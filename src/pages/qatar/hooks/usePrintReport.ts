@@ -22,11 +22,10 @@ export function usePrintReport(documentTitle: string) {
           if (typeof handlePrintOriginal === 'function') {
             // Execute the print function and capture the result
             // TypeScript doesn't recognize that handlePrintOriginal() might return void or Promise<void>
-            const result: unknown = handlePrintOriginal();
+            const result = handlePrintOriginal();
             
             // Check if the result is a Promise-like object with proper null checks
-            if (result !== undefined && 
-                result !== null && 
+            if (result && 
                 typeof result === 'object' && 
                 'then' in result && 
                 typeof (result as { then: unknown }).then === 'function') {
