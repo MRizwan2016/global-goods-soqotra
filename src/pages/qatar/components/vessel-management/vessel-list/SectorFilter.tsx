@@ -9,6 +9,9 @@ interface SectorFilterProps {
 }
 
 const SectorFilter: React.FC<SectorFilterProps> = ({ value, onChange }) => {
+  // Filter out any empty string sectors
+  const validSectors = SECTORS.filter(sector => sector !== "");
+  
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger className="hover:border-blue-400 transition-colors">
@@ -16,10 +19,9 @@ const SectorFilter: React.FC<SectorFilterProps> = ({ value, onChange }) => {
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">All Sectors</SelectItem>
-        {SECTORS.filter(sector => sector !== "").map(sector => (
-          <SelectItem key={sector} value={sector}>{sector || "Unknown Sector"}</SelectItem>
+        {validSectors.map(sector => (
+          <SelectItem key={sector} value={sector}>{sector}</SelectItem>
         ))}
-        {/* Add a specific item for unknown sectors if needed */}
         <SelectItem value="unknown-sector">Unknown Sector</SelectItem>
       </SelectContent>
     </Select>
