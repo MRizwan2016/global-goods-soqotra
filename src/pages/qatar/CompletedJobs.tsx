@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,13 +62,15 @@ const CompletedJobs = () => {
   const currentEntries = filteredJobs.slice(indexOfFirstEntry, indexOfLastEntry);
   const totalPages = Math.ceil(filteredJobs.length / entriesPerPage);
   
-  // Fix: Explicitly type the return value of useReactToPrint as () => Promise<void>
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-    documentTitle: `Completed Jobs Report - ${new Date().toLocaleDateString()}`,
-    onBeforePrint: () => console.log("Preparing print..."),
-    onAfterPrint: () => console.log("Print completed"),
-  }) as () => Promise<void>;
+  // Fix: Create a properly typed function that returns Promise<void>
+  const handlePrint = React.useCallback(() => {
+    return useReactToPrint({
+      content: () => printRef.current,
+      documentTitle: `Completed Jobs Report - ${new Date().toLocaleDateString()}`,
+      onBeforePrint: () => console.log("Preparing print..."),
+      onAfterPrint: () => console.log("Print completed"),
+    })();
+  }, [printRef]);
 
   return (
     <Layout title="Completed Jobs">
