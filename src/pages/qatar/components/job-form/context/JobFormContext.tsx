@@ -1,235 +1,149 @@
 
-import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { JobItem } from "../../../types/jobTypes";
-import { JobStorageService } from "../../../services/JobStorageService";
-import { JobNumberService } from "@/services/JobNumberService";
-import { toast } from "sonner";
+import React, { createContext, useContext, useState } from "react";
 
+// Define the job data interface
+interface JobData {
+  jobNumber: string;
+  customer: string;
+  mobileNumber: string;
+  landNumber: string;
+  country: string;
+  sector: string;
+  branch: string;
+  vehicle: string;
+  jobType: string;
+  location: string;
+  city: string;
+  date: string;
+  time: string;
+  advanceAmount: string;
+  remarks: string;
+  packageDetails: string;
+  // Add other fields as needed
+}
+
+// Define the context interface
 interface JobFormContextType {
-  jobData: any;
-  setJobData: React.Dispatch<React.SetStateAction<any>>;
-  jobItems: JobItem[];
-  setJobItems: React.Dispatch<React.SetStateAction<JobItem[]>>;
+  jobData: JobData;
   isJobNumberGenerated: boolean;
-  setIsJobNumberGenerated: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsJobNumberGenerated: (value: boolean) => void;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  handleSelectChange: (name: string, value: string) => void;
-  handleAddItem: (newItem: JobItem) => void;
-  handleGenerateJobNumber: () => void;
-  isSaving: boolean;
-  setIsSaving: React.Dispatch<React.SetStateAction<boolean>>;
+  handleSelectChange: (field: keyof JobData, value: string) => void;
+  setJobData: React.Dispatch<React.SetStateAction<JobData>>;
+  generateJobNumber: () => void;
 }
 
-const JobFormContext = createContext<JobFormContextType | undefined>(undefined);
-
-interface JobFormProviderProps {
-  children: ReactNode;
-  jobId?: string;
-  isNewJob?: boolean;
-  onSubmit: (data: any) => void;
-  isSaving?: boolean;
-}
-
-export const JobFormProvider = ({
-  children,
-  jobId,
-  isNewJob = false,
-  onSubmit,
-  isSaving: externalIsSaving = false,
-}: JobFormProviderProps) => {
-  const [jobData, setJobData] = useState({
-    jobType: "COLLECTION",
+// Create context with a default value
+const JobFormContext = createContext<JobFormContextType>({
+  jobData: {
     jobNumber: "",
-    invoiceNumber: "",
-    date: new Date().toLocaleDateString("en-GB"),
-    time: "",
-    amPm: "AM",
-    sameDay: "N",
     customer: "",
     mobileNumber: "",
     landNumber: "",
-    country: "Qatar", // Default country
+    country: "",
     sector: "",
     branch: "",
-    city: "",
-    town: "",
-    location: "",
     vehicle: "",
+    jobType: "",
+    location: "",
+    city: "",
+    date: "",
+    time: "",
     advanceAmount: "",
     remarks: "",
-    collectDate: new Date().toLocaleDateString("en-GB")
+    packageDetails: "",
+  },
+  isJobNumberGenerated: false,
+  setIsJobNumberGenerated: () => {},
+  handleInputChange: () => {},
+  handleSelectChange: () => {},
+  setJobData: () => {},
+  generateJobNumber: () => {},
+});
+
+export const JobFormProvider: React.FC<{ 
+  children: React.ReactNode;
+  initialJobData?: Partial<JobData>;
+  isEditMode?: boolean;
+}> = ({ children, initialJobData = {}, isEditMode = false }) => {
+  // Initialize state with default values or provided initial data
+  const [jobData, setJobData] = useState<JobData>({
+    jobNumber: initialJobData.jobNumber || "",
+    customer: initialJobData.customer || "",
+    mobileNumber: initialJobData.mobileNumber || "",
+    landNumber: initialJobData.landNumber || "",
+    country: initialJobData.country || "",
+    sector: initialJobData.sector || "",
+    branch: initialJobData.branch || "",
+    vehicle: initialJobData.vehicle || "",
+    jobType: initialJobData.jobType || "Collection",
+    location: initialJobData.location || "",
+    city: initialJobData.city || "",
+    date: initialJobData.date || "",
+    time: initialJobData.time || "",
+    advanceAmount: initialJobData.advanceAmount || "",
+    remarks: initialJobData.remarks || "",
+    packageDetails: initialJobData.packageDetails || "",
   });
-  
-  const [jobItems, setJobItems] = useState<JobItem[]>([]);
-  const [isJobNumberGenerated, setIsJobNumberGenerated] = useState(false);
-  const [isSaving, setIsSaving] = useState(externalIsSaving);
-  
-  // Load existing job data if editing
-  useEffect(() => {
-    if (jobId) {
-      const existingJob = JobStorageService.getJobById(jobId);
-      if (existingJob) {
-        setJobData({
-          ...existingJob,
-          // Ensure jobNumber is properly formatted
-          jobNumber: existingJob.jobNumber || "",
-          // Ensure advanceAmount is a string for form handling
-          advanceAmount: existingJob.advanceAmount?.toString() || ""
-        });
-        setIsJobNumberGenerated(!!existingJob.jobNumber);
-        
-        // Load job items if they exist
-        if (existingJob.items && existingJob.items.length > 0) {
-          setJobItems(existingJob.items);
-        }
-      }
-    }
-  }, [jobId]);
-  
-  // Set sector and branch when country changes
-  useEffect(() => {
-    if (jobData.country) {
-      // Set default sector based on country
-      let defaultSector = "";
-      let defaultBranch = "";
+
+  const [isJobNumberGenerated, setIsJobNumberGenerated] = useState(
+    isEditMode || !!initialJobData.jobNumber || false
+  );
+
+  // Generate a job number
+  const generateJobNumber = () => {
+    if (!isJobNumberGenerated) {
+      const date = new Date();
+      const year = date.getFullYear().toString().slice(-2); // Last 2 digits of year
+      const month = String(date.getMonth() + 1).padStart(2, "0"); // Month (1-12)
+      const day = String(date.getDate()).padStart(2, "0"); // Day
+      const random = Math.floor(Math.random() * 9000) + 1000; // Random 4-digit number
+
+      const newJobNumber = `QAT-${year}${month}${day}-${random}`;
       
-      switch(jobData.country) {
-        case "Sri Lanka":
-          defaultSector = "COLOMBO : C";
-          defaultBranch = "HEAD OFFICE";
-          break;
-        case "Qatar":
-          defaultSector = "DOHA : D";
-          defaultBranch = "HEAD OFFICE";
-          break;
-        case "UAE":
-          defaultSector = "DUBAI : D";
-          defaultBranch = "HEAD OFFICE";
-          break;
-        case "Bahrain":
-          defaultSector = "MANAMA : M";
-          defaultBranch = "HEAD OFFICE";
-          break;
-        case "Saudi Arabia":
-          defaultSector = "RIYADH : R";
-          defaultBranch = "HEAD OFFICE";
-          break;
-        case "Tunisia":
-          defaultSector = "TUNIS : T";
-          defaultBranch = "HEAD OFFICE";
-          break;
-        case "Uganda":
-          defaultSector = "KAMPALA : K";
-          defaultBranch = "HEAD OFFICE";
-          break;
-        case "Somalia":
-          defaultSector = "MOGADISHU : M";
-          defaultBranch = "HEAD OFFICE";
-          break;
-        case "Ethiopia":
-          defaultSector = "ADDIS ABABA : A";
-          defaultBranch = "HEAD OFFICE";
-          break;
-        case "Philippines":
-          defaultSector = "MANILA : M";
-          defaultBranch = "HEAD OFFICE";
-          break;
-        case "Oman":
-          defaultSector = "MUSCAT : M";
-          defaultBranch = "HEAD OFFICE";
-          break;
-        default:
-          break;
-      }
+      setJobData(prevData => ({
+        ...prevData,
+        jobNumber: newJobNumber
+      }));
       
-      if (defaultSector && !jobData.sector) {
-        setJobData(prev => ({
-          ...prev,
-          sector: defaultSector,
-          branch: defaultBranch
-        }));
-      }
+      setIsJobNumberGenerated(true);
     }
-  }, [jobData.country]);
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setJobData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  
-  const handleSelectChange = (name: string, value: string) => {
-    setJobData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-  
-  const handleAddItem = (newItem: JobItem) => {
-    if (newItem.quantity < 0) {
-      // Handle item deletion
-      setJobItems(prev => prev.filter(item => item.id !== newItem.id));
-      return;
-    }
-    
-    // Check if this is an edit of an existing item
-    if (jobItems.some(item => item.id === newItem.id)) {
-      // Update existing item
-      setJobItems(prev => prev.map(item => 
-        item.id === newItem.id ? { ...newItem, jobId: jobData.jobNumber || jobId || `temp-${Date.now()}` } : item
-      ));
-    } else {
-      // Add new item
-      const itemWithJobId = {
-        ...newItem,
-        jobId: jobData.jobNumber || jobId || `temp-${Date.now()}`
-      };
-      
-      setJobItems(prev => [...prev, itemWithJobId]);
-    }
-  };
-  
-  const handleGenerateJobNumber = () => {
-    // Generate job number based on country
-    const newJobNumber = JobNumberService.generateJobNumber(jobData.country);
-    
-    setJobData(prev => ({
-      ...prev,
-      jobNumber: newJobNumber
-    }));
-    
-    setIsJobNumberGenerated(true);
-    toast.success(`Job number generated: ${newJobNumber}`);
   };
 
-  const value = {
-    jobData,
-    setJobData,
-    jobItems,
-    setJobItems,
-    isJobNumberGenerated,
-    setIsJobNumberGenerated,
-    handleInputChange,
-    handleSelectChange,
-    handleAddItem,
-    handleGenerateJobNumber,
-    isSaving,
-    setIsSaving
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setJobData(prevData => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  // Handle select changes
+  const handleSelectChange = (field: keyof JobData, value: string) => {
+    setJobData(prevData => ({
+      ...prevData,
+      [field]: value
+    }));
   };
 
   return (
-    <JobFormContext.Provider value={value}>
+    <JobFormContext.Provider
+      value={{
+        jobData,
+        isJobNumberGenerated,
+        setIsJobNumberGenerated,
+        handleInputChange,
+        handleSelectChange,
+        setJobData,
+        generateJobNumber,
+      }}
+    >
       {children}
     </JobFormContext.Provider>
   );
 };
 
-export const useJobForm = () => {
-  const context = useContext(JobFormContext);
-  if (context === undefined) {
-    throw new Error("useJobForm must be used within a JobFormProvider");
-  }
-  return context;
-};
+export const useJobForm = () => useContext(JobFormContext);
+
+export default JobFormContext;

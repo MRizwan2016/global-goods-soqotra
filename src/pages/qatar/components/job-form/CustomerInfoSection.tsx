@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -11,11 +10,22 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useJobForm } from "./context/JobFormContext";
 import PackageButton from "./details/PackageButton";
+import { toast } from "sonner";
+
+interface PackageInfo {
+  sr_no: number;
+  description: string;
+  dimensions: string;
+  volume_in_meters: number;
+  price: string;
+  documents_fee: string;
+  total: string;
+}
 
 const CustomerInfoSection = () => {
   const { jobData, handleInputChange, handleSelectChange, isJobNumberGenerated } = useJobForm();
+  const [selectedPackage, setSelectedPackage] = useState<PackageInfo | null>(null);
   
-  // Define sectors by country
   const getSectorByCountry = (countryName: string) => {
     switch(countryName) {
       case "Sri Lanka":
@@ -45,7 +55,6 @@ const CustomerInfoSection = () => {
     }
   };
 
-  // Define branches by country
   const getBranchesByCountry = (countryName: string) => {
     switch(countryName) {
       case "Sri Lanka":
@@ -75,7 +84,25 @@ const CustomerInfoSection = () => {
     }
   };
 
-  // Get available sectors and branches based on selected country
+  const handlePackageSelect = (pkg: PackageInfo) => {
+    setSelectedPackage(pkg);
+    
+    if (handleInputChange) {
+      const packageInfo = `${pkg.description} (${pkg.dimensions}) - ${pkg.total}`;
+      
+      const syntheticEvent = {
+        target: {
+          name: 'packageDetails',
+          value: packageInfo
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      
+      handleInputChange(syntheticEvent);
+    }
+    
+    toast.success(`Package selected: ${pkg.description}`);
+  };
+
   const availableSectors = getSectorByCountry(jobData.country);
   const availableBranches = getBranchesByCountry(jobData.country);
   
@@ -223,9 +250,19 @@ const CustomerInfoSection = () => {
             </Select>
           </div>
           <div className="pt-7">
-            <PackageButton />
+            <PackageButton onSelectPackage={handlePackageSelect} />
           </div>
         </div>
+        
+        {selectedPackage && (
+          <div className="md:col-span-2 p-3 bg-blue-50 rounded-md border border-blue-100">
+            <h4 className="font-medium text-blue-800 mb-1">Selected Package:</h4>
+            <div className="text-sm text-blue-700">
+              <p><strong>{selectedPackage.description}</strong> - Dimensions: {selectedPackage.dimensions}</p>
+              <p>Volume: {selectedPackage.volume_in_meters} m³ - Price: {selectedPackage.price} - Total: {selectedPackage.total}</p>
+            </div>
+          </div>
+        )}
         
         <div className="md:col-span-2">
           <Label htmlFor="remarks" className="font-medium text-gray-700 mb-1 block">

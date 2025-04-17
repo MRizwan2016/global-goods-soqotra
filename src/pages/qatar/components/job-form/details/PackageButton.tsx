@@ -19,7 +19,11 @@ interface PackageInfo {
   total: string;
 }
 
-const PackageButton = () => {
+interface PackageButtonProps {
+  onSelectPackage?: (pkg: PackageInfo) => void;
+}
+
+const PackageButton = ({ onSelectPackage }: PackageButtonProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const packageOptions: PackageInfo[] = [
@@ -160,8 +164,14 @@ const PackageButton = () => {
     }
   ];
 
+  const handlePackageSelect = (pkg: PackageInfo) => {
+    if (onSelectPackage) {
+      onSelectPackage(pkg);
+    }
+  };
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
       <DropdownMenuTrigger asChild>
         <Button className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2">
           <Package size={16} />
@@ -184,7 +194,11 @@ const PackageButton = () => {
             </thead>
             <tbody>
               {packageOptions.map((pkg) => (
-                <tr key={pkg.sr_no} className="hover:bg-gray-50 text-xs">
+                <tr 
+                  key={pkg.sr_no} 
+                  className="hover:bg-gray-50 text-xs cursor-pointer"
+                  onClick={() => handlePackageSelect(pkg)}
+                >
                   <td className="px-2 py-2 text-center border-r border-b border-gray-200">{pkg.sr_no}</td>
                   <td className="px-2 py-2 border-r border-b border-gray-200">{pkg.description}</td>
                   <td className="px-2 py-2 text-center border-r border-b border-gray-200">{pkg.dimensions}</td>
