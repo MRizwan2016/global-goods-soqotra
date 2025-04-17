@@ -42,7 +42,7 @@ const VehicleSelector = () => {
         <SelectTrigger id="vehicle" className="border border-gray-300 bg-white hover:bg-gray-50 transition-colors">
           <SelectValue placeholder="SELECT VEHICLE" />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white">
           {vehicles.map((vehicle) => (
             <SelectItem key={vehicle.id} value={vehicle.id} className="flex items-center justify-between">
               <div className="flex items-center gap-2">

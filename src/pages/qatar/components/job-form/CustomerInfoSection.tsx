@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useJobForm } from "./context/JobFormContext";
+import PackageButton from "./details/PackageButton";
 
 const CustomerInfoSection = () => {
   const { jobData, handleInputChange, handleSelectChange, isJobNumberGenerated } = useJobForm();
@@ -157,7 +158,7 @@ const CustomerInfoSection = () => {
             <SelectTrigger id="country" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
               <SelectValue placeholder="SELECT COUNTRY" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               <SelectItem value="Sri Lanka">SRI LANKA</SelectItem>
               <SelectItem value="Qatar">QATAR</SelectItem>
               <SelectItem value="UAE">UAE</SelectItem>
@@ -185,7 +186,7 @@ const CustomerInfoSection = () => {
             <SelectTrigger id="sector" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
               <SelectValue placeholder="SELECT SECTOR" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
               {availableSectors.length > 0 ? (
                 availableSectors.map((sector, index) => (
                   <SelectItem key={index} value={sector}>{sector}</SelectItem>
@@ -197,28 +198,33 @@ const CustomerInfoSection = () => {
           </Select>
         </div>
         
-        <div>
-          <Label htmlFor="branch" className="font-medium text-gray-700 mb-1 block">
-            BRANCH:
-          </Label>
-          <Select
-            value={jobData.branch}
-            onValueChange={(value) => handleSelectChange("branch", value)}
-            disabled={!isJobNumberGenerated || !jobData.country}
-          >
-            <SelectTrigger id="branch" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
-              <SelectValue placeholder="SELECT BRANCH" />
-            </SelectTrigger>
-            <SelectContent>
-              {availableBranches.length > 0 ? (
-                availableBranches.map((branch, index) => (
-                  <SelectItem key={index} value={branch}>{branch}</SelectItem>
-                ))
-              ) : (
-                <SelectItem value="no-branch" disabled>Select a country first</SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+        <div className="flex gap-2 items-start">
+          <div className="flex-1">
+            <Label htmlFor="branch" className="font-medium text-gray-700 mb-1 block">
+              BRANCH:
+            </Label>
+            <Select
+              value={jobData.branch}
+              onValueChange={(value) => handleSelectChange("branch", value)}
+              disabled={!isJobNumberGenerated || !jobData.country}
+            >
+              <SelectTrigger id="branch" className="bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+                <SelectValue placeholder="SELECT BRANCH" />
+              </SelectTrigger>
+              <SelectContent className="bg-white">
+                {availableBranches.length > 0 ? (
+                  availableBranches.map((branch, index) => (
+                    <SelectItem key={index} value={branch}>{branch}</SelectItem>
+                  ))
+                ) : (
+                  <SelectItem value="no-branch" disabled>Select a country first</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="pt-7">
+            <PackageButton />
+          </div>
         </div>
         
         <div className="md:col-span-2">
