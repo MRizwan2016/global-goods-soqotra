@@ -14,16 +14,29 @@ const NewJobForm = () => {
   const [isSaving, setIsSaving] = useState(false);
   
   const handleCreateJob = (jobData: any) => {
-    setIsSaving(true);
-    console.log("Creating new job:", jobData);
-    
-    // Add location-based vehicle assignment
-    if (jobData.city && !jobData.vehicle) {
-      const cityMapping = require('./data/cityVehicleMapping').cityVehicleMapping;
-      jobData.vehicle = cityMapping[jobData.city]?.[0] || "";
-    }
-    
     try {
+      setIsSaving(true);
+      console.log("Creating new job:", jobData);
+      
+      // Validate essential fields
+      if (!jobData.jobNumber) {
+        toast.error("Job number is required");
+        setIsSaving(false);
+        return;
+      }
+      
+      if (!jobData.customer) {
+        toast.error("Customer name is required");
+        setIsSaving(false);
+        return;
+      }
+      
+      // Add location-based vehicle assignment
+      if (jobData.city && !jobData.vehicle) {
+        const cityMapping = require('./data/cityVehicleMapping').cityVehicleMapping;
+        jobData.vehicle = cityMapping[jobData.city]?.[0] || "";
+      }
+      
       // Save the job using our storage service
       const savedJob = JobStorageService.saveJob(jobData);
       console.log("Job saved successfully:", savedJob);
@@ -52,9 +65,14 @@ const NewJobForm = () => {
       }, 800);
     } catch (error) {
       console.error("Error saving job:", error);
-      toast.error("Failed to save job. Please try again.");
+      toast.error(`Failed to save job: ${error instanceof Error ? error.message : "Unknown error"}`);
       setIsSaving(false);
     }
+  };
+  
+  const handleClickSaveJob = () => {
+    console.log("Save button clicked");
+    document.getElementById('job-form')?.dispatchEvent(new Event('submit', { bubbles: true }));
   };
   
   return (
@@ -75,11 +93,12 @@ const NewJobForm = () => {
               Back
             </Button>
             <Button 
-              onClick={() => document.getElementById('job-form')?.dispatchEvent(new Event('submit', { bubbles: true }))}
+              onClick={handleClickSaveJob}
               className="bg-green-600 hover:bg-green-700 flex items-center gap-2 transition-colors"
+              disabled={isSaving}
             >
               <Save size={16} />
-              Save Job
+              {isSaving ? 'Saving...' : 'Save Job'}
             </Button>
           </div>
         </div>

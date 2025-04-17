@@ -5,7 +5,7 @@ import JobHeader from "./JobHeader";
 import JobNumberSection from "./JobNumberSection";
 import JobDetailsSection from "./JobDetailsSection";
 import CustomerInfoSection from "./CustomerInfoSection";
-import JobFooter from "./JobFooter";
+import JobFormActions from "./JobFormActions";
 
 interface JobFormProps {
   isNewJob?: boolean;
@@ -22,15 +22,15 @@ const JobForm: React.FC<JobFormProps> = ({ isNewJob = true, jobId, onSubmit, isS
       onSubmit={onSubmit}
       isSaving={isSaving}
     >
-      <div className="max-w-5xl mx-auto p-4">
+      <form id="job-form" className="max-w-5xl mx-auto p-4">
         <JobHeader />
         <div className="space-y-6 mt-6">
           <JobNumberSection isNewJob={isNewJob} />
           <JobDetailsSection />
           <CustomerInfoSection />
         </div>
-        <JobFooter />
-      </div>
+        <JobFormActions isNewJob={isNewJob} onSubmit={onSubmit} />
+      </form>
     </JobFormProvider>
   );
 };

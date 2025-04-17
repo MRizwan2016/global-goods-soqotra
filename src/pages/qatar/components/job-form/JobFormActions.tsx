@@ -23,16 +23,26 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({ isNewJob, onSubmit }) =
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate required fields
     if (!isJobNumberGenerated && isNewJob) {
       toast.error("Please generate a Job Number first");
       return;
     }
     
+    if (!jobData.customer) {
+      toast.error("Please enter customer name");
+      return;
+    }
+    
+    // Proceed with submission
+    console.log("Submitting job form data:", jobData);
     onSubmit({
       ...jobData,
       items: jobItems,
       // Convert advance amount to number for storage
-      advanceAmount: parseFloat(jobData.advanceAmount) || 0
+      advanceAmount: parseFloat(jobData.advanceAmount) || 0,
+      // Set default status if not already set
+      status: jobData.status || 'PENDING'
     });
   };
 
