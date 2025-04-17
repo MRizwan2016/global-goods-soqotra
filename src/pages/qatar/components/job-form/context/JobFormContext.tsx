@@ -19,18 +19,27 @@ interface JobData {
   advanceAmount: string;
   remarks: string;
   packageDetails: string;
-  // Add other fields as needed
+  // Add additional fields needed by the components
+  invoiceNumber?: string;
+  amPm?: string;
+  sameDay?: string;
+  collectDate?: string;
+  status?: string;
 }
 
 // Define the context interface
 interface JobFormContextType {
   jobData: JobData;
   isJobNumberGenerated: boolean;
+  isSaving?: boolean;
+  jobItems?: any[];
   setIsJobNumberGenerated: (value: boolean) => void;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleSelectChange: (field: keyof JobData, value: string) => void;
   setJobData: React.Dispatch<React.SetStateAction<JobData>>;
   generateJobNumber: () => void;
+  handleGenerateJobNumber?: () => void;
+  handleAddItem?: () => void;
 }
 
 // Create context with a default value
@@ -65,7 +74,11 @@ export const JobFormProvider: React.FC<{
   children: React.ReactNode;
   initialJobData?: Partial<JobData>;
   isEditMode?: boolean;
-}> = ({ children, initialJobData = {}, isEditMode = false }) => {
+  jobId?: string;
+  isNewJob?: boolean;
+  onSubmit?: (data: any) => void;
+  isSaving?: boolean;
+}> = ({ children, initialJobData = {}, isEditMode = false, isNewJob = true, onSubmit = () => {}, isSaving = false, jobId }) => {
   // Initialize state with default values or provided initial data
   const [jobData, setJobData] = useState<JobData>({
     jobNumber: initialJobData.jobNumber || "",
@@ -84,11 +97,19 @@ export const JobFormProvider: React.FC<{
     advanceAmount: initialJobData.advanceAmount || "",
     remarks: initialJobData.remarks || "",
     packageDetails: initialJobData.packageDetails || "",
+    invoiceNumber: initialJobData.invoiceNumber || "",
+    amPm: initialJobData.amPm || "AM",
+    sameDay: initialJobData.sameDay || "Y",
+    collectDate: initialJobData.collectDate || "",
+    status: initialJobData.status || "PENDING",
   });
 
   const [isJobNumberGenerated, setIsJobNumberGenerated] = useState(
     isEditMode || !!initialJobData.jobNumber || false
   );
+
+  // Mock job items for type safety
+  const [jobItems, setJobItems] = useState<any[]>([]);
 
   // Generate a job number
   const generateJobNumber = () => {
@@ -127,16 +148,28 @@ export const JobFormProvider: React.FC<{
     }));
   };
 
+  // Mock handleAddItem function for types
+  const handleAddItem = () => {
+    console.log("Add item functionality would go here");
+  };
+
+  // Alias for generateJobNumber for compatibility
+  const handleGenerateJobNumber = generateJobNumber;
+
   return (
     <JobFormContext.Provider
       value={{
         jobData,
         isJobNumberGenerated,
+        isSaving,
+        jobItems,
         setIsJobNumberGenerated,
         handleInputChange,
         handleSelectChange,
         setJobData,
         generateJobNumber,
+        handleGenerateJobNumber,
+        handleAddItem,
       }}
     >
       {children}

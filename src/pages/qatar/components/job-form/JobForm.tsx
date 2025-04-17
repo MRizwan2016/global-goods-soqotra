@@ -14,11 +14,11 @@ interface JobFormProps {
   isSaving?: boolean;
 }
 
-const JobForm: React.FC<JobFormProps> = ({ isNewJob = true, jobId, onSubmit, isSaving }) => {
+const JobForm: React.FC<JobFormProps> = ({ isNewJob = true, jobId, onSubmit, isSaving = false }) => {
   return (
     <JobFormProvider
-      jobId={jobId}
       isNewJob={isNewJob}
+      jobId={jobId}
       onSubmit={onSubmit}
       isSaving={isSaving}
     >
