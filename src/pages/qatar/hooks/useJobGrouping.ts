@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { QatarJob } from "../types/jobTypes";
+import { cityVehicleMapping } from "../data/cityVehicleMapping";
 
 export const useJobGrouping = (selectedJobs: QatarJob[]) => {
   const [showVehicleView, setShowVehicleView] = useState(false);
@@ -8,72 +9,31 @@ export const useJobGrouping = (selectedJobs: QatarJob[]) => {
   const [selectedVehicle, setSelectedVehicle] = useState<string | null>(null);
   const [selectedCity, setSelectedCity] = useState<string | null>(null);
   
-  // Update vehicle/city selection when jobs change
-  useEffect(() => {
-    // If we're showing vehicles but don't have one selected
-    if (showVehicleView && !selectedVehicle && selectedJobs.length > 0) {
-      // Get all vehicles from selected jobs
-      const vehicles = selectedJobs
-        .map(job => job.vehicle)
-        .filter(Boolean);
-      const uniqueVehicles = [...new Set(vehicles)];
-      
-      if (uniqueVehicles.length > 0) {
-        setSelectedVehicle(uniqueVehicles[0]);
-      }
-    }
-    
-    // If we're showing cities but don't have one selected
-    if (showCityView && !selectedCity && selectedJobs.length > 0) {
-      // Get all cities from selected jobs
-      const cities = selectedJobs
-        .map(job => job.city)
-        .filter(Boolean);
-      const uniqueCities = [...new Set(cities)];
-      
-      if (uniqueCities.length > 0) {
-        setSelectedCity(uniqueCities[0]);
-      }
-    }
-  }, [selectedJobs, showVehicleView, showCityView, selectedVehicle, selectedCity]);
-  
-  // Get jobs for the selected vehicle
-  const getSelectedVehicleJobs = () => {
-    if (!selectedVehicle) return [];
-    
-    return selectedJobs
-      .filter(job => job.vehicle === selectedVehicle)
-      .map((job, index) => ({ ...job, sequenceNum: index + 1 }));
-  };
-  
-  // Get jobs for the selected city
-  const getSelectedCityJobs = () => {
-    if (!selectedCity) return [];
-    
-    return selectedJobs
-      .filter(job => job.city === selectedCity)
-      .map((job, index) => ({ ...job, sequenceNum: index + 1 }));
-  };
-  
-  // Determine which jobs to use based on current view mode
-  const getJobsForSchedule = () => {
-    if (showVehicleView && selectedVehicle) {
-      return getSelectedVehicleJobs();
-    } else if (showCityView && selectedCity) {
-      return getSelectedCityJobs();
+  // Make sure to display all jobs when selecting a vehicle
+  const jobsForSchedule = selectedJobs.filter(job => {
+    if (selectedVehicle) {
+      // Show all jobs that either match the selected vehicle OR have no vehicle assigned yet
+      return job.vehicle === selectedVehicle || !job.vehicle;
+    } else if (selectedCity) {
+      return job.city === selectedCity;
     } else {
-      return selectedJobs;
+      return true;
     }
-  };
+  });
   
-  const jobsForSchedule = getJobsForSchedule();
+  // Auto-recommend vehicle for a city
+  useEffect(() => {
+    if (selectedCity && !selectedVehicle) {
+      const recommendedVehicle = cityVehicleMapping[selectedCity]?.[0];
+      if (recommendedVehicle) {
+        setSelectedVehicle(recommendedVehicle);
+      }
+    }
+  }, [selectedCity]);
   
-  // Determine if form should be disabled
-  const isFormDisabled = () => {
-    return (showVehicleView && !selectedVehicle) || 
-           (showCityView && !selectedCity) || 
-           selectedJobs.length === 0;
-  };
+  // Check if form should be disabled
+  const isFormDisabled = selectedJobs.length === 0 || 
+                        (jobsForSchedule.length === 0);
   
   return {
     showVehicleView,
@@ -85,6 +45,6 @@ export const useJobGrouping = (selectedJobs: QatarJob[]) => {
     selectedCity,
     setSelectedCity,
     jobsForSchedule,
-    isFormDisabled: isFormDisabled()
+    isFormDisabled
   };
 };

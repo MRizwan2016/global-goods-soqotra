@@ -1,8 +1,9 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { QatarJob } from "../../types/jobTypes";
-import { Truck } from "lucide-react";
+import { Truck, Circle } from "lucide-react";
 import { getCitiesForVehicle } from "../../data/cityVehicleMapping";
 
 interface VehicleSelectionProps {
@@ -17,7 +18,17 @@ const VehicleSelection: React.FC<VehicleSelectionProps> = ({
   setSelectedVehicle 
 }) => {
   // Use specific vehicle numbers as requested
-  const specificVehicles = ["41067", "41073", "514005", "119927", "74827", "41070"];
+  const specificVehicles = ["41067", "41073", "41070", "514005", "119927", "74827"];
+  
+  // Vehicle availability status (in real app, this would come from backend)
+  const vehicleStatus: Record<string, boolean> = {
+    "41067": true,  // available
+    "41073": true,
+    "41070": true,
+    "514005": false, // busy
+    "119927": false,
+    "74827": true,
+  };
   
   // Filter jobs by these specific vehicles
   const vehicleJobCounts = specificVehicles.map(vehicle => {
@@ -40,7 +51,13 @@ const VehicleSelection: React.FC<VehicleSelectionProps> = ({
       vehicleLabel += " (International)";
     }
     
-    return { vehicle, vehicleLabel, jobCount: jobs.length, cityCount: cities.length };
+    return { 
+      vehicle, 
+      vehicleLabel, 
+      jobCount: jobs.length, 
+      cityCount: cities.length, 
+      isAvailable: vehicleStatus[vehicle] || false
+    };
   });
 
   return (
@@ -48,13 +65,16 @@ const VehicleSelection: React.FC<VehicleSelectionProps> = ({
       <h3 className="text-lg font-medium mb-2">Select Vehicle:</h3>
       <div className="flex flex-wrap gap-2">
         {vehicleJobCounts.length > 0 ? (
-          vehicleJobCounts.map(({ vehicle, vehicleLabel, jobCount, cityCount }) => (
+          vehicleJobCounts.map(({ vehicle, vehicleLabel, jobCount, cityCount, isAvailable }) => (
             <Button
               key={vehicle}
               variant={selectedVehicle === vehicle ? "default" : "outline"}
               onClick={() => setSelectedVehicle(vehicle)}
               className="mb-2"
             >
+              <Circle 
+                className={`mr-1 h-3 w-3 ${isAvailable ? 'text-green-500 fill-green-500' : 'text-red-500 fill-red-500'}`}
+              />
               <Truck className="mr-2 h-4 w-4" />
               {vehicleLabel} ({jobCount} jobs, {cityCount} locations)
             </Button>
