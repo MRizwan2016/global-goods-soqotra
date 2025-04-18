@@ -57,7 +57,7 @@ interface JobListPageProps {
   showVehicleFilter?: boolean;
   showJobTypeFilter?: boolean;
   extraFilters?: React.ReactNode;
-  renderTable: ({ currentEntries, indexOfFirstEntry }: { currentEntries: any[]; indexOfFirstEntry: number }) => React.ReactNode;
+  renderTable: (props: { currentEntries: any[]; indexOfFirstEntry: number }) => React.ReactNode;
   refreshJobs?: () => void;
 }
 
@@ -189,7 +189,14 @@ const JobListPage: React.FC<JobListPageProps> = ({
   // Handler for the print button click that wraps the handlePrint function
   const handlePrintButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    handlePrint();
+    e.stopPropagation();
+    
+    // Add small delay before print to ensure the UI is ready
+    setTimeout(() => {
+      handlePrint();
+    }, 50);
+    
+    return false;
   };
 
   return (
