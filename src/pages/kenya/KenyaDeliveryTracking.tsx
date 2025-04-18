@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -35,6 +34,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CargoDelivery } from "./types/deliveryTracking";
+import { getStatusBadge, getPaymentBadge } from "./utils/statusUtils";
 
 const KenyaDeliveryTracking = () => {
   const navigate = useNavigate();
@@ -75,42 +75,6 @@ const KenyaDeliveryTracking = () => {
   const indexOfLastEntry = currentPage * entriesPerPage;
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
   const currentEntries = filteredDeliveries.slice(indexOfFirstEntry, indexOfLastEntry);
-
-  // Get status badge style
-  const getStatusBadge = (status: string) => {
-    switch(status) {
-      case 'pending':
-        return <Badge className="bg-yellow-500">Pending</Badge>;
-      case 'processing':
-        return <Badge className="bg-blue-500">Processing</Badge>;
-      case 'in-transit':
-        return <Badge className="bg-orange-500">In Transit</Badge>;
-      case 'at-warehouse':
-        return <Badge className="bg-purple-500">At Warehouse</Badge>;
-      case 'out-for-delivery':
-        return <Badge className="bg-indigo-500">Out for Delivery</Badge>;
-      case 'delivered':
-        return <Badge className="bg-green-500">Delivered</Badge>;
-      case 'failed':
-        return <Badge className="bg-red-500">Failed</Badge>;
-      default:
-        return <Badge className="bg-gray-500">{status}</Badge>;
-    }
-  };
-
-  // Get payment status badge
-  const getPaymentBadge = (status: string) => {
-    switch(status) {
-      case 'completed':
-        return <Badge className="bg-green-500">Paid</Badge>;
-      case 'partial':
-        return <Badge className="bg-amber-500">Partial</Badge>;
-      case 'pending':
-        return <Badge className="bg-red-500">Unpaid</Badge>;
-      default:
-        return <Badge className="bg-gray-500">{status}</Badge>;
-    }
-  };
 
   // View delivery details
   const handleViewDelivery = (deliveryId: string) => {
