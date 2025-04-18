@@ -8,7 +8,7 @@ import JobListFilters from "./components/JobListFilters";
 import ViewJobModal from "./components/ViewJobModal";
 import { useJobDialogs } from "./hooks/useJobDialogs";
 import { useJobPrint } from "./hooks/useJobPrint";
-import TablePagination from "../shared/TablePagination";
+import TablePagination from "../../components/job-tracking/TablePagination";
 
 interface JobListPageProps {
   title?: string;
@@ -48,7 +48,7 @@ const JobListPage: React.FC<JobListPageProps> = ({
     indexOfLastEntry,
     indexOfFirstEntry,
     currentEntries
-  } = useJobTracking(jobs, initialStatus);
+  } = useJobTracking();
 
   const {
     jobToDelete,
