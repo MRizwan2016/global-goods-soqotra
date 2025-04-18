@@ -17,6 +17,7 @@ export interface JobScheduleFormProps {
   setFormData: React.Dispatch<React.SetStateAction<JobScheduleFormData>>;
   selectedJobs: QatarJob[];
   disabled: boolean;
+  onVehicleChange?: (vehicle: string) => void;
 }
 
 export interface ScheduleFieldsProps {
@@ -25,6 +26,7 @@ export interface ScheduleFieldsProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
   handleDateChange: (date: string) => void;
+  onVehicleChange?: (vehicle: string) => void;
 }
 
 export interface ScheduleNumberFieldProps {
