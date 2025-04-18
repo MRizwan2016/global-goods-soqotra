@@ -46,7 +46,7 @@ const JobStatusTable: React.FC<JobStatusTableProps> = ({
               <td className="p-2 border border-gray-200">{job.customer}</td>
               <td className="p-2 border border-gray-200">{job.mobileNumber}</td>
               <td className="p-2 border border-gray-200">{job.town}</td>
-              <td className="p-2 border border-gray-200">{job.vehicle}</td>
+              <td className="p-2 border border-gray-200">{job.vehicle || "N/A"}</td>
               <td className="p-2 border border-gray-200">{job.invoiceNumber || "-"}</td>
               <td className="p-2 border border-gray-200 print:hidden">
                 <Button 

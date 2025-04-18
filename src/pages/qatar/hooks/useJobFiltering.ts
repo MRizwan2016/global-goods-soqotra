@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { QatarJob } from "../types/jobTypes";
 
 export const useJobFiltering = (jobs: QatarJob[]) => {
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("PENDING"); // Default to PENDING instead of "all"
   const [sortBy, setSortBy] = useState("newest");
   const [filterDate, setFilterDate] = useState<string>(new Date().toISOString().split('T')[0]);
   
@@ -11,7 +11,7 @@ export const useJobFiltering = (jobs: QatarJob[]) => {
   const filteredJobs = useMemo(() => {
     return jobs.filter(job => {
       // Status filter
-      if (statusFilter !== "all" && job.status !== statusFilter) {
+      if (statusFilter !== "all" && statusFilter !== "ALL" && job.status !== statusFilter) {
         return false;
       }
       

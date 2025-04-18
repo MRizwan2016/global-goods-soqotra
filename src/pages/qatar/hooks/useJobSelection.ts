@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { QatarJob } from "../types/jobTypes";
 import { toast } from "sonner";
@@ -56,6 +57,8 @@ export const useJobSelection = () => {
     } else {
       setSelectedJobs([...selectedJobs, job]);
     }
+    
+    console.log("Toggled job selection:", job.id, "isSelected now:", !isSelected);
   };
 
   const handleScheduleEdit = () => {

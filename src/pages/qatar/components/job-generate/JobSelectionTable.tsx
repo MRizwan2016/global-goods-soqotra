@@ -24,6 +24,8 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
     !job.isAssigned
   );
 
+  console.log("Available jobs for scheduling:", availableJobs.length);
+
   if (availableJobs.length === 0) {
     return (
       <Card className="border border-gray-200 shadow-sm">

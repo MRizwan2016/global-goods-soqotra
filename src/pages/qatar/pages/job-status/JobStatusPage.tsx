@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
   Select,
@@ -8,13 +9,14 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { Filter } from "lucide-react";
+import { Filter, ArrowLeft } from "lucide-react";
 import { JobStorageService } from "../../services/JobStorageService";
 import JobListPage from "../../components/job-list/JobListPage";
 import JobStatusTable from "../../components/job-status/JobStatusTable";
 import JobStatusSummaryView from "../../components/job-list/JobStatusSummaryView";
 
 const JobStatusPage = () => {
+  const navigate = useNavigate();
   const [jobs] = useState(() => {
     return JobStorageService.getAllJobs();
   });
@@ -93,27 +95,40 @@ const JobStatusPage = () => {
   );
 
   return (
-    <JobListPage
-      title="Job Status List"
-      headerTitle="VIEW JOB STATUS LIST"
-      headerSubtitle="Record Listed."
-      headerClassName="bg-blue-50 border-blue-100"
-      reportTitle="JOB STATUS REPORT"
-      jobs={jobs}
-      sectors={sectors}
-      showVehicleFilter={true}
-      showJobTypeFilter={true}
-      extraFilters={additionalFilters}
-      renderTable={({ currentEntries, indexOfFirstEntry }) => (
-        <>
-          <JobStatusSummaryView jobs={jobs} />
-          <JobStatusTable
-            currentEntries={currentEntries}
-            indexOfFirstEntry={indexOfFirstEntry}
-          />
-        </>
-      )}
-    />
+    <>
+      <div className="mb-6 flex items-center">
+        <Button 
+          variant="outline" 
+          onClick={() => navigate("/qatar")}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Dashboard
+        </Button>
+      </div>
+      
+      <JobListPage
+        title="Job Status List"
+        headerTitle="VIEW JOB STATUS LIST"
+        headerSubtitle="Record Listed."
+        headerClassName="bg-blue-50 border-blue-100"
+        reportTitle="JOB STATUS REPORT"
+        jobs={jobs}
+        sectors={sectors}
+        showVehicleFilter={true}
+        showJobTypeFilter={true}
+        extraFilters={additionalFilters}
+        renderTable={({ currentEntries, indexOfFirstEntry }) => (
+          <>
+            <JobStatusSummaryView jobs={jobs} />
+            <JobStatusTable
+              currentEntries={currentEntries}
+              indexOfFirstEntry={indexOfFirstEntry}
+            />
+          </>
+        )}
+      />
+    </>
   );
 };
 
