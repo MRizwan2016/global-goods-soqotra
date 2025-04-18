@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { QatarJob } from "../types/jobTypes";
 import { toast } from "sonner";
@@ -113,7 +112,16 @@ export const useJobSelection = () => {
       const selectedJobIds = selectedJobs.map(job => job.id);
       
       // Mark the jobs as scheduled
-      JobStorageService.markJobsAsScheduled(selectedJobIds);
+      selectedJobIds.forEach(id => {
+        JobStorageService.updateJob(id, { 
+          status: 'SCHEDULED',
+          isAssigned: true,
+          vehicle: data.vehicle,
+          driver: data.driver,
+          helper: data.helper,
+          scheduleNumber: formDataWithUniqueSchedule.scheduleNumber
+        });
+      });
       
       console.log("Saving schedule with jobs:", formDataWithUniqueSchedule, selectedJobs);
       
@@ -140,7 +148,11 @@ export const useJobSelection = () => {
       
       // Mark the jobs as closed/completed
       selectedJobIds.forEach(id => {
-        JobStorageService.updateJob(id, { status: 'COMPLETED' });
+        JobStorageService.updateJob(id, { 
+          status: 'COMPLETED',
+          isAssigned: true,
+          completionDate: new Date().toISOString().split('T')[0]
+        });
       });
       
       console.log(`Closing ${selectedJobs.length} jobs`);
@@ -158,6 +170,11 @@ export const useJobSelection = () => {
     // Validate required data
     if (!scheduleData.vehicle) {
       toast.error("Please select a vehicle before printing");
+      return;
+    }
+    
+    if (selectedJobs.length === 0) {
+      toast.error("Please select at least one job before printing");
       return;
     }
     

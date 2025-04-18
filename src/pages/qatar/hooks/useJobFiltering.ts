@@ -3,15 +3,21 @@ import { useState, useMemo } from "react";
 import { QatarJob } from "../types/jobTypes";
 
 export const useJobFiltering = (jobs: QatarJob[]) => {
-  const [statusFilter, setStatusFilter] = useState("PENDING"); // Default to PENDING instead of "all"
+  const [statusFilter, setStatusFilter] = useState("ALL"); // Changed from "PENDING" to "ALL" to show all jobs initially
   const [sortBy, setSortBy] = useState("newest");
   const [filterDate, setFilterDate] = useState<string>(new Date().toISOString().split('T')[0]);
   
   // Filtered and sorted jobs
   const filteredJobs = useMemo(() => {
+    // Add more detailed logging
+    console.log('Filtering jobs with the following criteria:');
+    console.log('- Status filter:', statusFilter);
+    console.log('- Date filter:', filterDate);
+    console.log('- Sort by:', sortBy);
+    
     return jobs.filter(job => {
-      // Status filter
-      if (statusFilter !== "all" && statusFilter !== "ALL" && job.status !== statusFilter) {
+      // Status filter - only apply if not "ALL" or "all"
+      if (statusFilter && statusFilter !== "all" && statusFilter !== "ALL" && job.status !== statusFilter) {
         return false;
       }
       
@@ -46,11 +52,21 @@ export const useJobFiltering = (jobs: QatarJob[]) => {
     });
   }, [jobs, statusFilter, sortBy, filterDate]);
 
-  // Debug the filtering process
+  // Enhanced debugging
   console.log('Total jobs:', jobs.length);
+  console.log('Pending jobs:', jobs.filter(job => job.status === 'PENDING').length);
   console.log('Selected date:', filterDate);
   console.log('Status filter:', statusFilter);
   console.log('Filtered jobs:', filteredJobs.length);
+  
+  // Log each pending job for debugging
+  const pendingJobs = jobs.filter(job => job.status === 'PENDING');
+  console.log('Pending jobs details:', pendingJobs.map(job => ({
+    id: job.id,
+    jobNumber: job.jobNumber,
+    date: job.date,
+    isAssigned: job.isAssigned
+  })));
 
   return {
     statusFilter,

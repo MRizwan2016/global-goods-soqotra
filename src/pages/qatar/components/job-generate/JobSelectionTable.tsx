@@ -18,19 +18,27 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
   selectedJobs,
   onToggleSelect,
 }) => {
-  // Filter to show only pending jobs that aren't already assigned
+  // Ensure we only show pending jobs that aren't already assigned
   const availableJobs = jobs.filter(job => 
     job.status === 'PENDING' && 
-    !job.isAssigned
+    job.isAssigned !== true
   );
 
+  console.log("Total jobs passed to JobSelectionTable:", jobs.length);
   console.log("Available jobs for scheduling:", availableJobs.length);
+  console.log("Available jobs details:", availableJobs);
 
   if (availableJobs.length === 0) {
     return (
       <Card className="border border-gray-200 shadow-sm">
+        <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 px-4">
+          <CardTitle className="text-lg font-bold flex items-center">
+            <Truck size={20} className="mr-2" />
+            Job Selection (0)
+          </CardTitle>
+        </CardHeader>
         <CardContent className="p-8 text-center">
-          <p className="text-gray-500">No pending jobs available for scheduling.</p>
+          <p className="text-gray-500">No pending jobs available for scheduling. Try creating new jobs or changing filter settings.</p>
         </CardContent>
       </Card>
     );

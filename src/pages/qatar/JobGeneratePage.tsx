@@ -24,8 +24,11 @@ const JobGeneratePage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Load all jobs
     let allJobs = JobStorageService.getAllJobs();
+    console.log("Initial job load:", allJobs.length);
     
+    // If no jobs exist, initialize with mock data
     if (allJobs.length === 0) {
       console.log("No jobs found in storage, initializing with mock data");
       mockJobs.forEach(job => {
@@ -33,6 +36,7 @@ const JobGeneratePage: React.FC = () => {
         const jobToSave = { ...job };
         if (Math.random() > 0.5) {
           jobToSave.status = 'PENDING';
+          jobToSave.isAssigned = false;
         }
         JobStorageService.saveJob(jobToSave);
       });
@@ -40,20 +44,26 @@ const JobGeneratePage: React.FC = () => {
       toast.success("Sample jobs loaded successfully");
     }
     
-    // Make sure we have at least a few pending jobs
-    const pendingJobs = allJobs.filter(job => job.status === 'PENDING');
+    // Make sure we have at least a few pending jobs for scheduling
+    const pendingJobs = allJobs.filter(job => job.status === 'PENDING' && !job.isAssigned);
     if (pendingJobs.length === 0) {
-      // If no pending jobs, convert some jobs to pending
+      console.log("No pending jobs found, converting some to pending");
+      // Convert at least 3 jobs to pending status
       const jobsToConvert = allJobs.slice(0, 3);
       jobsToConvert.forEach(job => {
-        JobStorageService.updateJob(job.id, { status: 'PENDING', isAssigned: false });
+        JobStorageService.updateJob(job.id, { 
+          status: 'PENDING', 
+          isAssigned: false 
+        });
       });
+      
+      // Reload all jobs after modifications
       allJobs = JobStorageService.getAllJobs();
-      toast.success("Added some pending jobs for scheduling");
+      toast.success("Added pending jobs for scheduling");
     }
     
     console.log("Loaded jobs:", allJobs.length);
-    console.log("Pending jobs:", allJobs.filter(job => job.status === 'PENDING').length);
+    console.log("Pending jobs:", allJobs.filter(job => job.status === 'PENDING' && !job.isAssigned).length);
     setJobsData(allJobs);
     setIsLoading(false);
   }, []);
@@ -73,6 +83,7 @@ const JobGeneratePage: React.FC = () => {
     handleDirectPrint
   } = useJobSelection();
   
+  // Initialize with ALL to see all jobs, then user can filter as needed
   const {
     statusFilter,
     setStatusFilter,
@@ -139,8 +150,9 @@ const JobGeneratePage: React.FC = () => {
     );
   }
   
-  const pendingJobs = filteredJobs.filter(job => job.status === 'PENDING' && !job.isAssigned);
-  const hasPendingJobs = pendingJobs.length > 0;
+  // Get unassigned pending jobs
+  const pendingJobs = jobsData.filter(job => job.status === 'PENDING' && job.isAssigned !== true);
+  console.log("Pending unassigned jobs:", pendingJobs.length);
   
   return (
     <Layout title="Job Schedule Generation">
@@ -181,12 +193,6 @@ const JobGeneratePage: React.FC = () => {
             </div>
           )}
           
-          {!hasPendingJobs && (
-            <div className="bg-amber-50 p-4 rounded-md border border-amber-200 my-4">
-              <p className="text-amber-800">No pending jobs available for scheduling. Please create new jobs or change existing job status to pending.</p>
-            </div>
-          )}
-          
           <GroupControlPanel 
             selectedJobs={selectedJobs}
             showVehicleView={showVehicleView}
@@ -204,7 +210,7 @@ const JobGeneratePage: React.FC = () => {
             setScheduleData={setScheduleData}
             handleScheduleSubmit={handleScheduleEdit}
             jobsForSchedule={jobsForSchedule}
-            filteredJobs={hasPendingJobs ? pendingJobs : filteredJobs}
+            filteredJobs={pendingJobs}
             selectedJobs={selectedJobs}
             onToggleSelect={toggleJobSelection}
             disabled={isFormDisabled}
