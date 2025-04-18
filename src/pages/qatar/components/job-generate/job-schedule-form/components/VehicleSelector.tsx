@@ -41,6 +41,12 @@ const VehicleSelector: React.FC<VehicleSelectorProps> = ({
     if (!aIsSpecific && bIsSpecific) return 1;
     return 0;
   });
+  
+  // Get vehicle type for the selected vehicle
+  const selectedVehicle = filteredVehicles.find(vehicle => vehicle.number === value);
+  const vehicleDisplayText = value ? 
+    `${value} - ${selectedVehicle?.type || 'VEHICLE'}` : 
+    "SELECT VEHICLE";
 
   return (
     <div className="mb-3">
@@ -55,7 +61,7 @@ const VehicleSelector: React.FC<VehicleSelectorProps> = ({
         >
           <div className="flex items-center gap-2">
             <Truck size={16} />
-            <SelectValue placeholder="SELECT VEHICLE" />
+            <SelectValue placeholder="SELECT VEHICLE">{vehicleDisplayText}</SelectValue>
           </div>
         </SelectTrigger>
         <SelectContent className="max-h-[300px]">
@@ -100,11 +106,15 @@ const VehicleSelector: React.FC<VehicleSelectorProps> = ({
           )}
         </SelectContent>
       </Select>
-      {uniqueCities.length > 0 && (
+      {value ? (
+        <p className="text-xs text-gray-500 mt-1 animate-fade-in">
+          {selectedJobs.length} jobs selected for vehicle #{value}
+        </p>
+      ) : uniqueCities.length > 0 ? (
         <p className="text-xs text-gray-500 mt-1 animate-fade-in">
           Showing vehicles for {uniqueCities.join(', ')} ({selectedJobs.length} jobs selected)
         </p>
-      )}
+      ) : null}
     </div>
   );
 };

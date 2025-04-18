@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { QatarJob } from "../../../types/jobTypes";
 import JobScheduleForm from "../job-schedule-form";
 import JobSelectionTable from "../JobSelectionTable";
@@ -27,6 +27,13 @@ const JobGenerateLayout: React.FC<JobGenerateLayoutProps> = ({
   disabled
 }) => {
   const [selectedVehicleNumber, setSelectedVehicleNumber] = useState<string | undefined>(scheduleData.vehicle || undefined);
+  
+  // Update selected vehicle when schedule data changes
+  useEffect(() => {
+    if (scheduleData.vehicle) {
+      setSelectedVehicleNumber(scheduleData.vehicle);
+    }
+  }, [scheduleData.vehicle]);
   
   // Handle vehicle change from the form
   const handleVehicleChange = (vehicle: string) => {

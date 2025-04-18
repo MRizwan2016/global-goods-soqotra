@@ -1,180 +1,169 @@
 
 import React from "react";
-import { QatarJob } from "../../types/jobTypes";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
+import { QatarJob } from "../../types/jobTypes";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Truck, Calendar, MapPin } from "lucide-react";
+import { MapPin, Calendar, Phone, Truck } from "lucide-react";
 
 interface JobSelectionTableProps {
   jobs: QatarJob[];
   selectedJobs: QatarJob[];
   onToggleSelect: (job: QatarJob) => void;
-  selectedVehicleNumber?: string;
+  selectedVehicleNumber?: string | null;
 }
-
-// Vehicle type to number mapping
-const vehicleNumberMap: { [key: string]: string } = {
-  "CAR": "41070",
-  "TRUCK": "41067",
-  "VAN": "41073",
-  "PICKUP": "514005",
-  "LORRY": "119927",
-  "HIACE": "74827"
-};
-
-// Reverse mapping from vehicle number to type
-const vehicleTypeMap: { [key: string]: string } = Object.entries(vehicleNumberMap).reduce(
-  (acc, [type, number]) => ({ ...acc, [number]: type }), {}
-);
 
 const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
   jobs,
   selectedJobs,
   onToggleSelect,
-  selectedVehicleNumber,
+  selectedVehicleNumber
 }) => {
-  // Filter jobs based on status and vehicle matching
-  const availableJobs = jobs.filter(job => {
-    const isAvailable = job.status === 'PENDING' && job.isAssigned !== true;
-    
-    // If a vehicle number is selected, filter jobs by matching vehicle type
-    if (selectedVehicleNumber && isAvailable) {
-      const expectedVehicleType = vehicleTypeMap[selectedVehicleNumber];
-      if (expectedVehicleType) {
-        return job.vehicle?.toUpperCase() === expectedVehicleType;
-      }
-    }
-    
-    return isAvailable;
-  });
+  // Filter jobs based on selected vehicle number if provided
+  const displayJobs = selectedVehicleNumber 
+    ? jobs.filter(job => !job.vehicle || job.vehicle === selectedVehicleNumber)
+    : jobs;
 
-  // Function to get vehicle number based on vehicle type
-  const getVehicleNumber = (vehicleType: string) => {
-    return vehicleNumberMap[vehicleType.toUpperCase()] || vehicleType;
+  const isSelected = (job: QatarJob) => {
+    return selectedJobs.some(selectedJob => selectedJob.id === job.id);
   };
 
-  if (availableJobs.length === 0) {
-    return (
-      <Card className="border-0 shadow-md animate-fade-in">
-        <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 px-4">
-          <CardTitle className="text-lg font-bold flex items-center">
-            <Truck size={20} className="mr-2" />
-            Job Selection (0)
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-8 text-center">
-          <p className="text-gray-500">
-            {selectedVehicleNumber 
-              ? `No pending jobs available for vehicle #${selectedVehicleNumber}. Try selecting a different vehicle.`
-              : "No pending jobs available for scheduling. Try creating new jobs or changing filter settings."
-            }
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Format the date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
 
   return (
-    <Card className="border-0 shadow-md animate-fade-in">
-      <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 px-4">
-        <CardTitle className="text-lg font-bold flex items-center">
-          <Truck size={20} className="mr-2" />
-          Job Selection ({availableJobs.length})
-          {selectedVehicleNumber && (
-            <Badge className="ml-2 bg-blue-700">
-              Vehicle #{selectedVehicleNumber}
-            </Badge>
-          )}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="bg-gray-100">
-              <TableRow>
-                <TableHead className="w-10 text-center">#</TableHead>
-                <TableHead className="w-10"></TableHead>
-                <TableHead>Job #</TableHead>
-                <TableHead>
-                  <div className="flex items-center">
-                    <Calendar size={14} className="mr-1" />
-                    Date
-                  </div>
-                </TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Mobile</TableHead>
-                <TableHead className="min-w-[140px]">Vehicle/Number</TableHead>
-                <TableHead>
-                  <div className="flex items-center">
-                    <MapPin size={14} className="mr-1" />
-                    Location
-                  </div>
-                </TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Sector</TableHead>
-                <TableHead>City</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {availableJobs.map((job, index) => {
-                const isSelected = selectedJobs.some((j) => j.id === job.id);
-                const vehicleNumber = getVehicleNumber(job.vehicle || '');
-                return (
-                  <TableRow 
-                    key={job.id}
-                    className={`${isSelected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'} cursor-pointer transition-colors`}
-                    onClick={() => onToggleSelect(job)}
-                  >
-                    <TableCell className="text-center font-medium">{index + 1}</TableCell>
-                    <TableCell>
-                      <Checkbox 
-                        checked={isSelected} 
-                        onCheckedChange={() => onToggleSelect(job)}
-                        className="data-[state=checked]:bg-blue-600"
-                      />
-                    </TableCell>
-                    <TableCell className="font-medium">{job.jobNumber}</TableCell>
-                    <TableCell>{job.date}</TableCell>
-                    <TableCell>{job.customer}</TableCell>
-                    <TableCell>{job.mobileNumber}</TableCell>
-                    <TableCell>
-                      {job.vehicle ? (
-                        <div className="flex flex-col gap-1">
-                          <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
-                            {job.vehicle}
-                          </Badge>
-                          <Badge variant="outline" className="bg-gray-50 text-gray-800 border-gray-200 text-xs">
-                            #{vehicleNumber}
-                          </Badge>
-                        </div>
-                      ) : (
-                        <span className="text-gray-500 text-sm">Not assigned</span>
-                      )}
-                    </TableCell>
-                    <TableCell>{job.location || "N/A"}</TableCell>
-                    <TableCell>
-                      <Badge className={job.jobType === "COLLECTION" ? "bg-green-100 text-green-800 hover:bg-green-200" : "bg-amber-100 text-amber-800 hover:bg-amber-200"}>
-                        {job.jobType}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{job.sector || "N/A"}</TableCell>
-                    <TableCell>
-                      {job.city && (
-                        <Badge variant="outline" className="bg-gray-50">
-                          {job.city}
-                        </Badge>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+    <div className="border rounded-md shadow-sm animate-fade-in">
+      <div className="bg-blue-600 text-white p-4 font-semibold flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Truck size={18} />
+          <h2>JOB SELECTION ({displayJobs.length})</h2>
         </div>
-      </CardContent>
-    </Card>
+        {selectedVehicleNumber && (
+          <Badge className="bg-blue-700 text-white px-3 py-1 text-sm">
+            VEHICLE #{selectedVehicleNumber}
+          </Badge>
+        )}
+      </div>
+      
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader className="bg-gray-50">
+            <TableRow>
+              <TableHead className="w-12 text-center">#</TableHead>
+              <TableHead className="w-12 text-center">
+                <Checkbox 
+                  checked={displayJobs.length > 0 && displayJobs.every(job => isSelected(job))}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      displayJobs.forEach(job => {
+                        if (!isSelected(job)) {
+                          onToggleSelect(job);
+                        }
+                      });
+                    } else {
+                      displayJobs.forEach(job => {
+                        if (isSelected(job)) {
+                          onToggleSelect(job);
+                        }
+                      });
+                    }
+                  }}
+                />
+              </TableHead>
+              <TableHead>JOB #</TableHead>
+              <TableHead>
+                <div className="flex items-center gap-1">
+                  <Calendar size={14} />
+                  <span>DATE</span>
+                </div>
+              </TableHead>
+              <TableHead>CUSTOMER</TableHead>
+              <TableHead>
+                <div className="flex items-center gap-1">
+                  <Phone size={14} />
+                  <span>MOBILE</span>
+                </div>
+              </TableHead>
+              <TableHead>VEHICLE/NUMBER</TableHead>
+              <TableHead>
+                <div className="flex items-center gap-1">
+                  <MapPin size={14} />
+                  <span>LOCATION</span>
+                </div>
+              </TableHead>
+              <TableHead>TYPE</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {displayJobs.length > 0 ? (
+              displayJobs.map((job, index) => (
+                <TableRow 
+                  key={job.id} 
+                  className={`
+                    ${isSelected(job) ? 'bg-blue-50' : 'hover:bg-gray-50'} 
+                    cursor-pointer transition-colors
+                  `}
+                  onClick={() => onToggleSelect(job)}
+                >
+                  <TableCell className="text-center font-medium">{index + 1}</TableCell>
+                  <TableCell className="text-center">
+                    <Checkbox 
+                      checked={isSelected(job)}
+                      onCheckedChange={() => onToggleSelect(job)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </TableCell>
+                  <TableCell className="font-medium">{job.jobNumber}</TableCell>
+                  <TableCell>{formatDate(job.date)}</TableCell>
+                  <TableCell>{job.customerName}</TableCell>
+                  <TableCell>{job.phone}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-col">
+                      <Badge variant={selectedVehicleNumber === job.vehicle ? "default" : "outline"} className="w-fit">
+                        {job.vehicleType || "TRUCK"}
+                      </Badge>
+                      {job.vehicle && (
+                        <span className="text-xs text-gray-600 mt-1">#{job.vehicle}</span>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>{job.location}</TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={`
+                      ${job.type === 'DELIVERY' ? 'bg-amber-50 text-amber-800 border-amber-200' : 
+                       job.type === 'PICKUP' ? 'bg-green-50 text-green-800 border-green-200' : 
+                       'bg-blue-50 text-blue-800 border-blue-200'}
+                    `}>
+                      {job.type || 'DELIVERY'}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={9} className="text-center py-8 text-gray-500">
+                  {selectedVehicleNumber ? (
+                    <div className="flex flex-col items-center gap-2">
+                      <p>No jobs assigned to vehicle #{selectedVehicleNumber} yet</p>
+                      <p className="text-sm text-gray-400">Select jobs to assign to this vehicle</p>
+                    </div>
+                  ) : (
+                    <p>No jobs available for selection</p>
+                  )}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 };
 
