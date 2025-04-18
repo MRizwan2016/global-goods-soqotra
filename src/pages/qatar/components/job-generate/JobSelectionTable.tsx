@@ -1,10 +1,9 @@
-
 import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { QatarJob } from "../../types/jobTypes";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Phone, Truck } from "lucide-react";
+import { MapPin, Calendar, Phone, Truck, CarFront, Van } from "lucide-react";
 
 interface JobSelectionTableProps {
   jobs: QatarJob[];
@@ -36,6 +35,17 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
       month: '2-digit',
       day: '2-digit'
     });
+  };
+
+  const getVehicleIcon = (vehicleType: string) => {
+    switch(vehicleType?.toLowerCase()) {
+      case 'truck':
+        return <Truck size={14} />;
+      case 'van':
+        return <Van size={14} />;
+      default:
+        return <CarFront size={14} />;
+    }
   };
 
   return (
@@ -126,11 +136,15 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
                   <TableCell>{job.mobileNumber}</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
-                      <Badge variant={selectedVehicleNumber === job.vehicle ? "default" : "outline"} className="w-fit">
-                        {job.vehicle ? "VEHICLE" : "TRUCK"}
+                      <Badge variant={selectedVehicleNumber === job.vehicle ? "default" : "outline"} 
+                             className="w-fit flex items-center gap-1">
+                        {getVehicleIcon(job.vehicleType)}
+                        {job.vehicle ? "VEHICLE" : "UNASSIGNED"}
                       </Badge>
                       {job.vehicle && (
-                        <span className="text-xs text-gray-600 mt-1">#{job.vehicle}</span>
+                        <span className="text-xs text-gray-600 mt-1 flex items-center gap-1">
+                          #{job.vehicle}
+                        </span>
                       )}
                     </div>
                   </TableCell>
