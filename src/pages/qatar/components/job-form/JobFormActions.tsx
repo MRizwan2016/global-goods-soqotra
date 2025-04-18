@@ -53,7 +53,7 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
       ...jobData,
       items: jobItems,
       // Convert advance amount to number for storage
-      advanceAmount: parseFloat(jobData.advanceAmount) || 0,
+      advanceAmount: parseFloat(String(jobData.advanceAmount)) || 0,
       // Set default status if not already set
       status: jobData.status || 'PENDING'
     });
