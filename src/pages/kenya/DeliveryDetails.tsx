@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -46,15 +45,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { DeliveryStatus } from "./types/deliveryTracking";
-import { toast } from "sonner";
+import DocumentsTab from "./components/delivery-details/DocumentsTab";
 
 const DeliveryDetails = () => {
   const { id } = useParams();
@@ -62,7 +53,6 @@ const DeliveryDetails = () => {
   const [newStatus, setNewStatus] = useState<string>("processing");
   const [statusNotes, setStatusNotes] = useState("");
   
-  // Find the delivery based on ID from mock data
   const delivery = mockDeliveries.find(d => d.id === id);
   
   if (!delivery) {
@@ -83,15 +73,12 @@ const DeliveryDetails = () => {
     );
   }
 
-  // Get the latest status
   const latestStatus = delivery.deliveryStatuses[delivery.deliveryStatuses.length - 1];
   
-  // Format status label
   const formatStatusLabel = (status: string): string => {
     return status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
   
-  // Get status badge color
   const getStatusBadge = (status: string) => {
     switch(status) {
       case 'pending':
@@ -113,7 +100,6 @@ const DeliveryDetails = () => {
     }
   };
   
-  // Get payment status badge
   const getPaymentBadge = (status: string) => {
     switch(status) {
       case 'completed':
@@ -127,13 +113,11 @@ const DeliveryDetails = () => {
     }
   };
 
-  // Handle updating delivery status
   const handleUpdateStatus = () => {
     toast.success(`Status updated to ${formatStatusLabel(newStatus)}`);
     setStatusUpdateOpen(false);
   };
   
-  // Arrange delivery
   const handleArrangeDelivery = () => {
     if (delivery.paymentStatus !== 'completed') {
       toast.error("Cannot arrange delivery: Payment is not completed");
@@ -145,7 +129,6 @@ const DeliveryDetails = () => {
   return (
     <Layout title={`Delivery #${delivery.invoiceNumber}`}>
       <div className="space-y-6">
-        {/* Header with basic info */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex justify-between items-start">
             <div>
@@ -235,7 +218,6 @@ const DeliveryDetails = () => {
           </div>
         </div>
         
-        {/* Main content with tabs */}
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="bg-white border border-gray-200 rounded-md p-1">
             <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -244,10 +226,8 @@ const DeliveryDetails = () => {
             <TabsTrigger value="documents">Documents</TabsTrigger>
           </TabsList>
           
-          {/* Overview Tab */}
           <TabsContent value="overview" className="mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Sender & Receiver */}
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg">Sender & Receiver</CardTitle>
@@ -279,7 +259,6 @@ const DeliveryDetails = () => {
                 </CardContent>
               </Card>
               
-              {/* Delivery Location */}
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg">Delivery Location</CardTitle>
@@ -311,7 +290,6 @@ const DeliveryDetails = () => {
                 </CardContent>
               </Card>
               
-              {/* Transport Details */}
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg">Transport Details</CardTitle>
@@ -351,7 +329,6 @@ const DeliveryDetails = () => {
                 </CardContent>
               </Card>
               
-              {/* Payment & Schedules */}
               <Card>
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg">Payment & Schedules</CardTitle>
@@ -399,7 +376,6 @@ const DeliveryDetails = () => {
             </div>
           </TabsContent>
           
-          {/* Timeline Tab */}
           <TabsContent value="timeline" className="mt-4">
             <Card>
               <CardHeader>
@@ -446,7 +422,6 @@ const DeliveryDetails = () => {
             </Card>
           </TabsContent>
           
-          {/* Cargo Details Tab */}
           <TabsContent value="cargo" className="mt-4">
             <Card>
               <CardHeader>
@@ -504,39 +479,8 @@ const DeliveryDetails = () => {
             </Card>
           </TabsContent>
           
-          {/* Documents Tab */}
           <TabsContent value="documents" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle>Documents</CardTitle>
-                <CardDescription>View and print related documents</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Link to={`/data-entry/invoicing/print/${delivery.invoiceId}`} target="_blank">
-                    <Button variant="outline" className="w-full justify-start gap-2">
-                      <FileText size={16} />
-                      View Invoice #{delivery.invoiceNumber}
-                    </Button>
-                  </Link>
-                  
-                  <Button variant="outline" className="justify-start gap-2">
-                    <FileText size={16} />
-                    Delivery Note
-                  </Button>
-                  
-                  <Button variant="outline" className="justify-start gap-2">
-                    <FileText size={16} />
-                    Cargo Manifest
-                  </Button>
-                  
-                  <Button variant="outline" className="justify-start gap-2">
-                    <FileText size={16} />
-                    Proof of Delivery
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <DocumentsTab />
           </TabsContent>
         </Tabs>
       </div>
