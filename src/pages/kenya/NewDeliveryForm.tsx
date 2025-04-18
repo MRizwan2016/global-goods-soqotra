@@ -1,9 +1,9 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { toast } from "sonner";
 import { mockDrivers, mockVehicles } from "./data/mockDeliveryData";
+import { mockInvoiceData } from "@/data/mockData";
 
 // Import components
 import FormHeader from "./components/FormHeader";
@@ -15,9 +15,6 @@ import CargoDetails from "./components/CargoDetails";
 import WarehouseSchedule from "./components/WarehouseSchedule";
 import TransportAssignment from "./components/TransportAssignment";
 import FormActions from "./components/FormActions";
-
-// Import types
-import { mockInvoiceData } from "@/data/mockData";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const NewDeliveryForm = () => {
@@ -78,7 +75,7 @@ const NewDeliveryForm = () => {
     }));
   };
   
-  // Load invoice data
+  // Handle invoice selection and auto-fill form
   const handleInvoiceSelect = (invoiceNumber: string) => {
     const selectedInvoice = mockInvoiceData.find(inv => inv.invoiceNumber === invoiceNumber);
     
