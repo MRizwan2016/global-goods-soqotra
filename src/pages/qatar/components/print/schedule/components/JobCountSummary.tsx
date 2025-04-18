@@ -11,16 +11,21 @@ const JobCountSummary: React.FC<JobCountSummaryProps> = ({
   collectionCount 
 }) => {
   return (
-    <div className="border border-blue-300 mb-4">
-      <table className="w-full text-sm">
+    <div className="border p-3 rounded-md mb-2">
+      <h3 className="font-bold mb-2">Job Summary</h3>
+      <table className="w-full">
         <tbody>
-          <tr className="border-b border-blue-300">
-            <td className="p-2 font-bold border-r border-blue-300">NUMBER OF DELIVERIES</td>
-            <td className="p-2 text-right">{deliveryCount}</td>
+          <tr>
+            <td className="py-1">Number of Deliveries</td>
+            <td className="text-right py-1">{deliveryCount}</td>
           </tr>
           <tr>
-            <td className="p-2 font-bold border-r border-blue-300">NUMBER OF COLLECTIONS</td>
-            <td className="p-2 text-right">{collectionCount}</td>
+            <td className="py-1">Number of Collections</td>
+            <td className="text-right py-1">{collectionCount}</td>
+          </tr>
+          <tr>
+            <td className="py-1 font-semibold">Total Jobs</td>
+            <td className="text-right py-1 font-semibold">{deliveryCount + collectionCount}</td>
           </tr>
         </tbody>
       </table>

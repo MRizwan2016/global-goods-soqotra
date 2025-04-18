@@ -16,6 +16,7 @@ interface JobSummaryProps {
 }
 
 const JobSummary: React.FC<JobSummaryProps> = ({ 
+  jobs,
   deliveryCount, 
   collectionCount, 
   totalDeliveryAmount, 

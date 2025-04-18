@@ -2,7 +2,7 @@
 import { useMemo } from "react";
 import { QatarJob, JobItem } from "../../../types/jobTypes";
 
-export const useJobSummaryCalculations = (jobs: QatarJob[]) => {
+export const useJobSummaryCalculations = (jobs: QatarJob[] = []) => {
   // Calculate job type counts
   const deliveryCount = useMemo(() => 
     jobs.filter(job => job.jobType === "DELIVERY").length, [jobs]);
@@ -14,13 +14,13 @@ export const useJobSummaryCalculations = (jobs: QatarJob[]) => {
   const totalCollectionAmount = useMemo(() => 
     jobs
       .filter(job => job.jobType === "COLLECTION")
-      .reduce((total, job) => total + (job.advanceAmount || 0), 0), 
+      .reduce((total, job) => total + (Number(job.advanceAmount) || 0), 0), 
     [jobs]);
     
   const totalDeliveryAmount = useMemo(() => 
     jobs
       .filter(job => job.jobType === "DELIVERY")
-      .reduce((total, job) => total + (job.advanceAmount || 0), 0), 
+      .reduce((total, job) => total + (Number(job.advanceAmount) || 0), 0), 
     [jobs]);
     
   const totalAmount = useMemo(() => 
@@ -31,15 +31,15 @@ export const useJobSummaryCalculations = (jobs: QatarJob[]) => {
   const itemCounts: Record<string, number> = useMemo(() => {
     const counts: Record<string, number> = {};
     jobs.forEach(job => {
-      if (job.items) {
+      if (job.items && Array.isArray(job.items)) {
         job.items.forEach(item => {
-          const itemName = item.itemName || item.name;
-          if (itemName) {
-            if (counts[itemName]) {
-              counts[itemName] += item.quantity;
-            } else {
-              counts[itemName] = item.quantity;
-            }
+          const itemName = item.itemName || item.name || "Unknown Item";
+          const quantity = Number(item.quantity) || 0;
+          
+          if (counts[itemName]) {
+            counts[itemName] += quantity;
+          } else {
+            counts[itemName] = quantity;
           }
         });
       }

@@ -31,6 +31,16 @@ const ScheduleContent: React.FC<ScheduleContentProps> = ({
   
   const { userName, formattedDate, formattedTime } = useUserInfo();
   
+  // Add debug logging
+  console.log("Rendering ScheduleContent with jobs:", jobs);
+  console.log("Job items:", jobs.map(job => job.items));
+  console.log("Item counts:", itemCounts);
+  console.log("Financial data:", {
+    totalCollectionAmount, 
+    totalDeliveryAmount, 
+    totalAmount
+  });
+  
   return (
     <div className="p-4 w-full max-w-[1200px] mx-auto print-content" ref={printRef}>
       <div className="bg-white p-6 shadow-md print:shadow-none">
@@ -43,7 +53,7 @@ const ScheduleContent: React.FC<ScheduleContentProps> = ({
         />
 
         {/* Schedule Info */}
-        <ScheduleInfo scheduleData={scheduleData || {}} />
+        <ScheduleInfo scheduleData={scheduleData} />
 
         {/* Job Details */}
         {jobs && jobs.length > 0 ? (
@@ -58,7 +68,7 @@ const ScheduleContent: React.FC<ScheduleContentProps> = ({
 
         {/* Summary Stats */}
         <JobSummary
-          jobs={jobs || []}
+          jobs={jobs}
           deliveryCount={deliveryCount}
           collectionCount={collectionCount}
           totalDeliveryAmount={totalDeliveryAmount}

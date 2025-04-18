@@ -12,16 +12,22 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
     jobNumber,
     id,
     sequenceNum,
-    customer, // Using customer instead of consigneeName
-    location, // Using location instead of address
-    mobileNumber, // Using mobileNumber instead of contactNumber
+    customer, 
+    location, 
+    mobileNumber, 
     jobType,
-    advanceAmount, // Using advanceAmount instead of amount
+    advanceAmount, 
     status,
-    invoiceNumber // Using invoiceNumber instead of awbNumber
+    invoiceNumber,
+    items = []
   } = job;
 
   const displayJobNumber = jobNumber || id || "N/A";
+  
+  // Format currency to always show 2 decimal places
+  const formattedAmount = advanceAmount !== undefined && advanceAmount !== null
+    ? `${Number(advanceAmount).toFixed(2)} QAR`
+    : "0.00 QAR";
   
   return (
     <div className="mb-3 p-3 border rounded bg-gray-50 print:bg-white">
@@ -53,10 +59,21 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
           <div className="text-sm">
             <span>Phone: {mobileNumber || "No Contact"}</span>
           </div>
+          {items && items.length > 0 && (
+            <div className="text-sm mt-1">
+              <span className="font-medium">Items: </span>
+              {items.map((item, index) => (
+                <span key={index} className="mr-2">
+                  {item.itemName || item.name}: {item.quantity}
+                  {index < items.length - 1 ? ", " : ""}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         <div className="text-right">
           <div className="font-semibold">
-            {advanceAmount ? `${Number(advanceAmount).toFixed(2)} QAR` : "0.00 QAR"}
+            {formattedAmount}
           </div>
           <Badge 
             variant={status === "COMPLETED" ? "outline" : "destructive"}
@@ -64,7 +81,7 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
               status === "COMPLETED" ? "print:bg-white print:text-black" : "print:bg-gray-200 print:text-black"
             }`}
           >
-            {status || "Pending"}
+            {status || "PENDING"}
           </Badge>
         </div>
       </div>

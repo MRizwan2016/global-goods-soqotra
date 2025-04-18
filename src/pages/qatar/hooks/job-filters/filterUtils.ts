@@ -6,43 +6,37 @@ export const filterJobs = (
   statusFilter: string,
   filterDate: string,
   sortBy: string
-) => {
-  console.log('Filtering jobs with the following criteria:');
-  console.log('- Status filter:', statusFilter);
-  console.log('- Date filter:', filterDate);
-  console.log('- Sort by:', sortBy);
+): QatarJob[] => {
+  // Filter by status if not "ALL"
+  let filteredJobs = statusFilter === "ALL" 
+    ? [...jobs]
+    : jobs.filter(job => job.status === statusFilter);
+  
+  // Filter by date if specified
+  if (filterDate) {
+    filteredJobs = filteredJobs.filter(job => job.date === filterDate);
+  }
+  
+  // Sort the filtered jobs based on the sortBy parameter
+  switch (sortBy) {
+    case "oldest":
+      filteredJobs.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      break;
+    case "newest":
+      filteredJobs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      break;
+    case "amountAsc":
+      filteredJobs.sort((a, b) => (a.advanceAmount || 0) - (b.advanceAmount || 0));
+      break;
+    case "amountDesc":
+      filteredJobs.sort((a, b) => (b.advanceAmount || 0) - (a.advanceAmount || 0));
+      break;
+    default:
+      // Default sort by sequence number if available
+      filteredJobs.sort((a, b) => 
+        (a.sequenceNum || 0) - (b.sequenceNum || 0)
+      );
+  }
 
-  return jobs.filter(job => {
-    // Status filter - only apply if not "ALL" or "all"
-    if (statusFilter && statusFilter !== "all" && statusFilter !== "ALL" && job.status !== statusFilter) {
-      return false;
-    }
-    
-    // Date filter - only if filterDate is provided
-    if (filterDate) {
-      const jobDate = new Date(job.date);
-      const filterDateObj = new Date(filterDate);
-      
-      // Check if the dates match by comparing year, month, and day
-      if (
-        jobDate.getFullYear() !== filterDateObj.getFullYear() ||
-        jobDate.getMonth() !== filterDateObj.getMonth() ||
-        jobDate.getDate() !== filterDateObj.getDate()
-      ) {
-        return false;
-      }
-    }
-    
-    return true;
-  }).sort((a, b) => {
-    // Sorting
-    if (sortBy === "newest") {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    } else if (sortBy === "oldest") {
-      return new Date(a.date).getTime() - new Date(b.date).getTime();
-    } else if (sortBy === "jobNumber") {
-      return a.jobNumber.localeCompare(b.jobNumber);
-    }
-    return 0;
-  });
+  return filteredJobs;
 };

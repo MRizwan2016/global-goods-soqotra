@@ -12,21 +12,27 @@ const FinancialSummary: React.FC<FinancialSummaryProps> = ({
   totalCollectionAmount, 
   totalAmount 
 }) => {
+  // Format currency function
+  const formatCurrency = (amount: number): string => {
+    return `${amount.toFixed(2)} QAR`;
+  };
+
   return (
-    <div className="border border-blue-300">
-      <table className="w-full text-sm">
+    <div className="border p-3 rounded-md">
+      <h3 className="font-bold mb-2">Financial Summary</h3>
+      <table className="w-full">
         <tbody>
-          <tr className="border-b border-blue-300">
-            <td className="p-2 font-bold border-r border-blue-300">TOTAL DELIVERY AMOUNT</td>
-            <td className="p-2 text-right">{totalDeliveryAmount}</td>
-          </tr>
-          <tr className="border-b border-blue-300">
-            <td className="p-2 font-bold border-r border-blue-300">TOTAL COLLECTION AMOUNT</td>
-            <td className="p-2 text-right">{totalCollectionAmount}</td>
+          <tr>
+            <td className="py-1">Total Delivery Amount</td>
+            <td className="text-right py-1">{formatCurrency(totalDeliveryAmount)}</td>
           </tr>
           <tr>
-            <td className="p-2 font-bold border-r border-blue-300">TOTAL AMOUNT</td>
-            <td className="p-2 text-right">{totalAmount}</td>
+            <td className="py-1">Total Collection Amount</td>
+            <td className="text-right py-1">{formatCurrency(totalCollectionAmount)}</td>
+          </tr>
+          <tr className="border-t border-gray-300">
+            <td className="py-1 font-semibold">Total Amount</td>
+            <td className="text-right py-1 font-semibold">{formatCurrency(totalAmount)}</td>
           </tr>
         </tbody>
       </table>
