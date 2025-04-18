@@ -44,9 +44,39 @@ import { JobStorageService } from "../../services/JobStorageService";
 import { QatarJob } from "../../types/jobTypes";
 import usePrintReport from "../../hooks/usePrintReport";
 
-const JobListPage = () => {
+interface JobListPageProps {
+  title?: string;
+  headerTitle?: string;
+  headerSubtitle?: string;
+  headerClassName?: string;
+  reportTitle?: string;
+  jobs?: any[];
+  sectors?: string[];
+  initialStatus?: string;
+  showVehicleFilter?: boolean;
+  showJobTypeFilter?: boolean;
+  extraFilters?: React.ReactNode;
+  renderTable: ({ currentEntries, indexOfFirstEntry }: { currentEntries: any[]; indexOfFirstEntry: number }) => React.ReactNode;
+  refreshJobs?: () => void;
+}
+
+const JobListPage: React.FC<JobListPageProps> = ({
+  title = "Job List",
+  headerTitle = "VIEW JOB LIST",
+  headerSubtitle = "Record Listed.",
+  headerClassName = "",
+  reportTitle = "JOB REPORT",
+  jobs = [],
+  sectors = [],
+  initialStatus = "all",
+  showVehicleFilter = false,
+  showJobTypeFilter = false,
+  extraFilters,
+  renderTable,
+  refreshJobs
+}) => {
   const printRef = useRef<HTMLDivElement>(null);
-  const handlePrint = usePrintReport(printRef, { documentTitle: "Job List" });
+  const handlePrint = usePrintReport(printRef);
   const navigate = useNavigate();
   const {
     searchText,
@@ -62,10 +92,10 @@ const JobListPage = () => {
     indexOfLastEntry,
     indexOfFirstEntry,
     currentEntries
-  } = useJobTracking();
+  } = useJobTracking(jobs, initialStatus);
   const [jobToDelete, setJobToDelete] = useState<string | null>(null);
   const [showCancellationDialog, setShowCancellationDialog] = useState(false);
-	const [cancellationReason, setCancellationReason] = useState("");
+  const [cancellationReason, setCancellationReason] = useState("");
   const [selectedJob, setSelectedJob] = useState<QatarJob | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
@@ -102,6 +132,7 @@ const JobListPage = () => {
         setJobToDelete(null); // Clear the job to delete
         // Refresh the job list by resetting the search text
         setSearchText(searchText);
+        if (refreshJobs) refreshJobs();
       } catch (error) {
         console.error("Error deleting job:", error);
         toast.error("Failed to delete job.");
@@ -130,6 +161,7 @@ const JobListPage = () => {
         setSelectedJob(null);
         // Refresh the job list by resetting the search text
         setSearchText(searchText);
+        if (refreshJobs) refreshJobs();
       } catch (error) {
         console.error("Error cancelling job:", error);
         toast.error("Failed to cancel job.");
@@ -156,7 +188,7 @@ const JobListPage = () => {
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Job List</h1>
+        <h1 className="text-2xl font-bold">{title}</h1>
         <Button onClick={() => navigate("/qatar/new")} className="bg-blue-600 hover:bg-blue-700 text-white">
           Create New Job
         </Button>
@@ -198,8 +230,8 @@ const JobListPage = () => {
         </Select>
       </div>
 
-      <div className="overflow-x-auto">
-        <Table ref={printRef}>
+      <div className="overflow-x-auto" ref={printRef}>
+        <Table>
           <TableCaption>A list of your recent jobs.</TableCaption>
           <TableHeader>
             <TableRow>
@@ -325,7 +357,10 @@ const JobListPage = () => {
 
       {/* Print Button */}
       <div className="flex justify-end mt-4">
-        <Button onClick={handlePrint} className="bg-gray-700 hover:bg-gray-800 text-white">
+        <Button 
+          onClick={() => handlePrint()} 
+          className="bg-gray-700 hover:bg-gray-800 text-white"
+        >
           <Printer className="h-4 w-4 mr-2" />
           Print Job List
         </Button>

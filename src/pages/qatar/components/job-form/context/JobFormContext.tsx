@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState } from "react";
 
 // Define the job data interface
-interface JobData {
+export interface JobData {
   jobNumber: string;
   customer: string;
   mobileNumber: string;
@@ -39,7 +39,7 @@ interface JobFormContextType {
   setJobData: React.Dispatch<React.SetStateAction<JobData>>;
   generateJobNumber: () => void;
   handleGenerateJobNumber?: () => void;
-  handleAddItem?: () => void;
+  handleAddItem?: (item: any) => void;
 }
 
 // Create context with a default value
@@ -148,9 +148,9 @@ export const JobFormProvider: React.FC<{
     }));
   };
 
-  // Mock handleAddItem function for types
-  const handleAddItem = () => {
-    console.log("Add item functionality would go here");
+  // Mock handleAddItem function - updated to accept an item
+  const handleAddItem = (item: any) => {
+    setJobItems(prev => [...prev, item]);
   };
 
   // Alias for generateJobNumber for compatibility

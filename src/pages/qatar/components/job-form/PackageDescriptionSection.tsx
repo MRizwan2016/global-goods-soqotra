@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { JobItem } from "../../types/jobTypes";
 import PackageItemsTable from "./PackageItemsTable";
@@ -17,18 +18,22 @@ const PackageDescriptionSection = () => {
   };
 
   const handleDeleteItem = (id: string) => {
-    handleAddItem({ id, type: 'delete' });
-    toast.success("Item removed");
+    if (handleAddItem) {
+      handleAddItem({ id, type: 'delete' });
+      toast.success("Item removed");
+    }
   };
 
   const handleAddOrUpdateItem = (item: JobItem) => {
-    handleAddItem({ ...item, type: isEditing ? 'update' : 'add' });
-    if (isEditing) {
-      setIsEditing(false);
-      setEditingItem(null);
-      toast.success("Item updated successfully");
-    } else {
-      toast.success("Item added successfully");
+    if (handleAddItem) {
+      handleAddItem({ ...item, type: isEditing ? 'update' : 'add' });
+      if (isEditing) {
+        setIsEditing(false);
+        setEditingItem(null);
+        toast.success("Item updated successfully");
+      } else {
+        toast.success("Item added successfully");
+      }
     }
   };
 
@@ -58,7 +63,7 @@ const PackageDescriptionSection = () => {
         </div>
         
         <PackageItemsTable 
-          items={jobItems} 
+          items={jobItems || []} 
           onEdit={handleEditItem}
           onDelete={handleDeleteItem}
         />
