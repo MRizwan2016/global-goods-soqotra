@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import {
   Table,
@@ -76,7 +77,7 @@ const JobListPage: React.FC<JobListPageProps> = ({
   refreshJobs
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
-  const handlePrint = usePrintReport(printRef);
+  const handlePrint = usePrintReport(printRef, { documentTitle: reportTitle });
   const navigate = useNavigate();
   const {
     searchText,
@@ -231,95 +232,7 @@ const JobListPage: React.FC<JobListPageProps> = ({
       </div>
 
       <div className="overflow-x-auto" ref={printRef}>
-        <Table>
-          <TableCaption>A list of your recent jobs.</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Job #</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Mobile</TableHead>
-              <TableHead>Job Type</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Time</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {currentEntries.map((job) => (
-              <TableRow key={job.id}>
-                <TableCell className="font-medium">{job.jobNumber}</TableCell>
-                <TableCell>{job.customer}</TableCell>
-                <TableCell>{job.mobileNumber}</TableCell>
-                <TableCell>{job.jobType}</TableCell>
-                <TableCell>{job.date}</TableCell>
-                <TableCell>{job.time} {job.amPm}</TableCell>
-                <TableCell>{job.status}</TableCell>
-                <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="24"
-                          height="24"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="h-4 w-4"
-                        >
-                          <path d="M3 12h18M3 6h18M3 18h18" />
-                        </svg>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <Button onClick={() => handleViewJob(job)} variant="ghost" className="flex items-center"><Eye className="mr-2 h-4 w-4" /> View</Button>
-                      <Button onClick={() => navigate(`/qatar/edit/${job.id}`)} variant="ghost" className="flex items-center"><Edit className="mr-2 h-4 w-4" /> Edit</Button>
-                      {job.status !== "CANCELLED" && (
-                        <Button onClick={() => handleCancellationConfirmation(job)} variant="ghost" className="flex items-center text-red-600"><RefreshCcw className="mr-2 h-4 w-4" /> Cancel</Button>
-                      )}
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="ghost" className="flex items-center text-red-600"><svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="h-4 w-4 mr-2"
-                          >
-                            <line x1="18" y1="6" x2="6" y2="18" />
-                            <line x1="6" y1="6" x2="18" y2="18" />
-                          </svg> Delete</Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. Are you sure you want to permanently delete <span className="font-medium">{job.customer}'s</span> job?
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel onClick={handleCancelDelete}>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteConfirmation(job.id)}>Continue</AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {renderTable({ currentEntries, indexOfFirstEntry })}
       </div>
 
       <div className="flex justify-between items-center mt-4">
@@ -358,7 +271,7 @@ const JobListPage: React.FC<JobListPageProps> = ({
       {/* Print Button */}
       <div className="flex justify-end mt-4">
         <Button 
-          onClick={() => handlePrint()} 
+          onClick={handlePrint} 
           className="bg-gray-700 hover:bg-gray-800 text-white"
         >
           <Printer className="h-4 w-4 mr-2" />
