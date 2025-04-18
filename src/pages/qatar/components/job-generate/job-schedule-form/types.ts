@@ -1,4 +1,3 @@
-
 import { QatarJob } from "../../../types/jobTypes";
 import { ChangeEvent } from "react";
 
@@ -28,4 +27,10 @@ export interface ScheduleFieldsProps {
   handleSelectChange: (name: string, value: string) => void;
   handleDateChange: (date: string) => void;
   onVehicleChange?: (vehicle: string) => void;
+}
+
+export interface ScheduleNumberFieldProps {
+  value: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  readonly?: boolean;
 }
