@@ -122,12 +122,12 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
                   </TableCell>
                   <TableCell className="font-medium">{job.jobNumber}</TableCell>
                   <TableCell>{formatDate(job.date)}</TableCell>
-                  <TableCell>{job.customerName}</TableCell>
-                  <TableCell>{job.phone}</TableCell>
+                  <TableCell>{job.customer}</TableCell>
+                  <TableCell>{job.mobileNumber}</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
                       <Badge variant={selectedVehicleNumber === job.vehicle ? "default" : "outline"} className="w-fit">
-                        {job.vehicleType || "TRUCK"}
+                        {job.vehicle ? "VEHICLE" : "TRUCK"}
                       </Badge>
                       {job.vehicle && (
                         <span className="text-xs text-gray-600 mt-1">#{job.vehicle}</span>
@@ -137,11 +137,11 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
                   <TableCell>{job.location}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className={`
-                      ${job.type === 'DELIVERY' ? 'bg-amber-50 text-amber-800 border-amber-200' : 
-                       job.type === 'PICKUP' ? 'bg-green-50 text-green-800 border-green-200' : 
+                      ${job.jobType === 'DELIVERY' ? 'bg-amber-50 text-amber-800 border-amber-200' : 
+                       job.jobType === 'COLLECTION' ? 'bg-green-50 text-green-800 border-green-200' : 
                        'bg-blue-50 text-blue-800 border-blue-200'}
                     `}>
-                      {job.type || 'DELIVERY'}
+                      {job.jobType || 'DELIVERY'}
                     </Badge>
                   </TableCell>
                 </TableRow>
