@@ -1,11 +1,12 @@
 
 import { Badge } from "@/components/ui/badge";
+import React from 'react';
 
 export const formatStatusLabel = (status: string): string => {
   return status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 
-export const getStatusBadge = (status: string) => {
+export const getStatusBadge = (status: string): React.ReactNode => {
   switch(status) {
     case 'pending':
       return <Badge className="bg-yellow-500">Pending</Badge>;
@@ -22,11 +23,11 @@ export const getStatusBadge = (status: string) => {
     case 'failed':
       return <Badge className="bg-red-500">Failed</Badge>;
     default:
-      return <Badge className="bg-gray-500">{status}</Badge>;
+      return <Badge className="bg-gray-500">{formatStatusLabel(status)}</Badge>;
   }
 };
 
-export const getPaymentBadge = (status: string) => {
+export const getPaymentBadge = (status: string): React.ReactNode => {
   switch(status) {
     case 'completed':
       return <Badge className="bg-green-500">Paid</Badge>;
@@ -35,6 +36,6 @@ export const getPaymentBadge = (status: string) => {
     case 'pending':
       return <Badge className="bg-red-500">Unpaid</Badge>;
     default:
-      return <Badge className="bg-gray-500">{status}</Badge>;
+      return <Badge className="bg-gray-500">{formatStatusLabel(status)}</Badge>;
   }
 };
