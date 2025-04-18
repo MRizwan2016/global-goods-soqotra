@@ -13,11 +13,14 @@ import { QatarJob } from "./types/jobTypes";
 import ScheduleDetailsEditor from "./components/job-generate/schedule-details/ScheduleDetailsEditor";
 import { mockJobs } from "./data/mockJobData";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
+import { Button, ArrowLeft } from "@/components/ui";
 
 const JobGeneratePage: React.FC = () => {
   const [jobsData, setJobsData] = useState<QatarJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+  const navigate = useNavigate();
+
   useEffect(() => {
     let allJobs = JobStorageService.getAllJobs();
     
@@ -120,8 +123,22 @@ const JobGeneratePage: React.FC = () => {
     <Layout title="Job Schedule Generation">
       <div className="w-full">
         <div className="max-w-full mx-auto">
-          <JobGenerateHeader title="SOQOTRA LOGISTICS - JOB SCHEDULE GENERATION" />
-          
+          <div className="mb-6 flex items-center justify-between">
+            <Button 
+              variant="outline" 
+              onClick={() => navigate("/qatar")}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Button>
+          </div>
+
+          <div className="bg-blue-600 text-white p-6 rounded-lg mb-6">
+            <h1 className="text-2xl font-medium mb-2">Soqotra Logistics - Job Schedule</h1>
+            <p className="text-blue-100">Create and manage job schedules for your vehicles and drivers</p>
+          </div>
+
           <JobFilters
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
@@ -134,7 +151,7 @@ const JobGeneratePage: React.FC = () => {
             onPrintJobs={handleDirectPrint}
             onEditSchedule={handleScheduleEdit}
           />
-          
+
           {jobsData.length === 0 && (
             <div className="bg-amber-50 p-4 rounded-md border border-amber-200 my-4">
               <p className="text-amber-800">No jobs available. Please add jobs in the job management section.</p>

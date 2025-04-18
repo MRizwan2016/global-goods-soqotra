@@ -18,11 +18,18 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
   selectedJobs,
   onToggleSelect,
 }) => {
-  if (jobs.length === 0) {
+  // Filter out jobs that are already assigned or completed
+  const availableJobs = jobs.filter(job => 
+    job.status !== 'COMPLETED' && 
+    job.status !== 'CANCELLED' && 
+    !job.isAssigned
+  );
+
+  if (availableJobs.length === 0) {
     return (
       <Card className="border border-gray-200 shadow-sm">
         <CardContent className="p-8 text-center">
-          <p className="text-gray-500">No jobs available for selection.</p>
+          <p className="text-gray-500">No pending jobs available for scheduling.</p>
         </CardContent>
       </Card>
     );

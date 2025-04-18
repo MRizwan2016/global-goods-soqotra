@@ -1,6 +1,11 @@
 
 import React from "react";
+import { format } from "date-fns";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon, Clock } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -13,50 +18,87 @@ import { useJobForm } from "../context/JobFormContext";
 const DateTimeSelector = () => {
   const { jobData, handleInputChange, handleSelectChange, isJobNumberGenerated } = useJobForm();
 
+  const generateTimeOptions = () => {
+    const options = [];
+    for (let hour = 0; hour < 12; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        options.push(timeString);
+      }
+    }
+    return options;
+  };
+
   return (
-    <>
-      <div className="grid grid-cols-3 gap-2 items-end">
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-4">
         <div>
-          <Label htmlFor="date" className="font-medium text-gray-700 mb-1 block">
-            DATE
+          <Label htmlFor="date" className="font-medium text-gray-700">
+            Date
           </Label>
-          <input
-            type="text"
-            id="date"
-            name="date"
-            value={jobData.date}
-            onChange={handleInputChange}
-            className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
-            placeholder="DD/MM/YYYY"
-            disabled={!isJobNumberGenerated}
-          />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                disabled={!isJobNumberGenerated}
+                className={`w-full justify-start text-left font-normal ${!isJobNumberGenerated ? 'opacity-50' : ''}`}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {jobData.date || "Select date"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={jobData.date ? new Date(jobData.date) : undefined}
+                onSelect={(date) => handleInputChange({
+                  target: { name: 'date', value: date ? format(date, 'dd/MM/yyyy') : '' }
+                } as any)}
+                initialFocus
+                className="p-3 pointer-events-auto"
+              />
+            </PopoverContent>
+          </Popover>
         </div>
+
         <div>
-          <Label htmlFor="time" className="font-medium text-gray-700 mb-1 block">
-            TIME
+          <Label htmlFor="time" className="font-medium text-gray-700">
+            Time
           </Label>
-          <input
-            type="text"
-            id="time"
-            name="time"
+          <Select
+            disabled={!isJobNumberGenerated}
             value={jobData.time}
-            onChange={handleInputChange}
-            className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
-            placeholder="HH:MM"
-            disabled={!isJobNumberGenerated}
-          />
+            onValueChange={(value) => handleSelectChange("time", value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select time">
+                <div className="flex items-center">
+                  <Clock className="mr-2 h-4 w-4" />
+                  {jobData.time || "Select time"}
+                </div>
+              </SelectValue>
+            </SelectTrigger>
+            <SelectContent>
+              {generateTimeOptions().map((time) => (
+                <SelectItem key={time} value={time}>
+                  {time}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
+
         <div>
-          <Label htmlFor="amPm" className="font-medium text-gray-700 mb-1 block">
+          <Label htmlFor="amPm" className="font-medium text-gray-700">
             AM/PM
           </Label>
           <Select
+            disabled={!isJobNumberGenerated}
             value={jobData.amPm}
             onValueChange={(value) => handleSelectChange("amPm", value)}
-            disabled={!isJobNumberGenerated}
           >
-            <SelectTrigger id="amPm" className="border border-gray-300 bg-white hover:bg-gray-50 transition-colors">
-              <SelectValue placeholder="AM/PM" />
+            <SelectTrigger id="amPm">
+              <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="AM">AM</SelectItem>
@@ -67,44 +109,26 @@ const DateTimeSelector = () => {
       </div>
 
       {jobData.jobType === "COLLECTION" && (
-        <div className="mt-4">
-          <Label htmlFor="sameDay" className="font-medium text-gray-700 mb-1 block">
-            SAME-DAY DELIVERY
+        <div>
+          <Label htmlFor="sameDay" className="font-medium text-gray-700">
+            Same-day Delivery
           </Label>
           <Select
             value={jobData.sameDay}
             onValueChange={(value) => handleSelectChange("sameDay", value)}
             disabled={!isJobNumberGenerated}
           >
-            <SelectTrigger id="sameDay" className="border border-gray-300 bg-white hover:bg-gray-50 transition-colors">
+            <SelectTrigger id="sameDay">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Y">YES</SelectItem>
-              <SelectItem value="N">NO</SelectItem>
+              <SelectItem value="Y">Yes</SelectItem>
+              <SelectItem value="N">No</SelectItem>
             </SelectContent>
           </Select>
         </div>
       )}
-
-      {jobData.jobType === "DELIVERY" && (
-        <div className="mt-4">
-          <Label htmlFor="collectDate" className="font-medium text-gray-700 mb-1 block">
-            COLLECT DATE
-          </Label>
-          <input
-            type="text"
-            id="collectDate"
-            name="collectDate"
-            value={jobData.collectDate}
-            onChange={handleInputChange}
-            className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
-            placeholder="DD/MM/YYYY"
-            disabled={!isJobNumberGenerated}
-          />
-        </div>
-      )}
-    </>
+    </div>
   );
 };
 
