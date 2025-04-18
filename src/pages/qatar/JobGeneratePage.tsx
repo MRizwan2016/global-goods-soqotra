@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useJobFiltering } from "./hooks/useJobFiltering";
 import { useJobSelection } from "./hooks/useJobSelection";
@@ -14,7 +15,8 @@ import ScheduleDetailsEditor from "./components/job-generate/schedule-details/Sc
 import { mockJobs } from "./data/mockJobData";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { Button, ArrowLeft } from "@/components/ui";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 const JobGeneratePage: React.FC = () => {
   const [jobsData, setJobsData] = useState<QatarJob[]>([]);

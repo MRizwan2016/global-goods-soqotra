@@ -22,7 +22,8 @@ const DateTimeSelector = () => {
     const options = [];
     for (let hour = 0; hour < 12; hour++) {
       for (let minute = 0; minute < 60; minute += 30) {
-        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+        const hourDisplay = hour === 0 ? '12' : hour.toString().padStart(2, '0');
+        const timeString = `${hourDisplay}:${minute.toString().padStart(2, '0')}`;
         options.push(timeString);
       }
     }
@@ -95,7 +96,7 @@ const DateTimeSelector = () => {
           <Select
             disabled={!isJobNumberGenerated}
             value={jobData.amPm}
-            onValueChange={(value) => handleSelectChange("amPm", value)}
+            onValueChange={(value) => handleSelectChange("amPm", value as "AM" | "PM")}
           >
             <SelectTrigger id="amPm">
               <SelectValue placeholder="Select" />
@@ -119,7 +120,7 @@ const DateTimeSelector = () => {
             disabled={!isJobNumberGenerated}
           >
             <SelectTrigger id="sameDay">
-              <SelectValue />
+              <SelectValue placeholder="Select" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="Y">Yes</SelectItem>

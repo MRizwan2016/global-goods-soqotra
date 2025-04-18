@@ -18,10 +18,9 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
   selectedJobs,
   onToggleSelect,
 }) => {
-  // Filter out jobs that are already assigned or completed
+  // Filter to show only pending jobs that aren't already assigned
   const availableJobs = jobs.filter(job => 
-    job.status !== 'COMPLETED' && 
-    job.status !== 'CANCELLED' && 
+    job.status === 'PENDING' && 
     !job.isAssigned
   );
 
@@ -40,7 +39,7 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
       <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 px-4">
         <CardTitle className="text-lg font-bold flex items-center">
           <Truck size={20} className="mr-2" />
-          JOB SELECTION ({jobs.length})
+          Job Selection ({availableJobs.length})
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -67,7 +66,7 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {jobs.map((job, index) => {
+              {availableJobs.map((job, index) => {
                 const isSelected = selectedJobs.some((j) => j.id === job.id);
                 return (
                   <TableRow 
