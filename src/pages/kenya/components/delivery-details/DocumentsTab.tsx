@@ -2,6 +2,7 @@
 import { FileText, FileCheck, Package, ClipboardCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 interface DocumentsTabProps {
   invoiceNumber: string;
@@ -9,9 +10,29 @@ interface DocumentsTabProps {
 }
 
 const DocumentsTab = ({ invoiceNumber, deliveryId }: DocumentsTabProps) => {
+  const navigate = useNavigate();
+
   const handleViewDocument = (documentType: string) => {
-    // In a real app, this would open the document
-    console.log(`Opening ${documentType} for delivery ${deliveryId}`);
+    switch (documentType) {
+      case "invoice":
+        // Navigate to the invoice print page with this invoice number
+        navigate(`/invoicing/print/${invoiceNumber}`);
+        break;
+      case "delivery-note":
+        // In a real app, this would open the delivery note document
+        console.log(`Opening delivery note for delivery ${deliveryId}`);
+        break;
+      case "cargo-manifest":
+        // In a real app, this would open the cargo manifest
+        console.log(`Opening cargo manifest for delivery ${deliveryId}`);
+        break;
+      case "proof-of-delivery":
+        // In a real app, this would open the proof of delivery
+        console.log(`Opening proof of delivery for delivery ${deliveryId}`);
+        break;
+      default:
+        console.log(`Opening ${documentType} for delivery ${deliveryId}`);
+    }
   };
 
   return (

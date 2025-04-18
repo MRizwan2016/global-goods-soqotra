@@ -30,7 +30,7 @@ const InvoicePrint = () => {
       }
       
       try {
-        console.log("Loading invoice for ID:", id);
+        console.log("Loading invoice for ID or number:", id);
         
         // First try to get from localStorage
         const storedInvoices = localStorage.getItem('invoices');
@@ -38,7 +38,10 @@ const InvoicePrint = () => {
         
         if (storedInvoices) {
           const parsedInvoices = JSON.parse(storedInvoices);
-          foundInvoice = parsedInvoices.find((inv: any) => inv.id === id);
+          // Try to find by ID or by invoice number
+          foundInvoice = parsedInvoices.find((inv: any) => 
+            inv.id === id || inv.invoiceNumber === id
+          );
           if (foundInvoice) {
             console.log("Found invoice in localStorage:", foundInvoice);
           }
@@ -46,7 +49,9 @@ const InvoicePrint = () => {
         
         // If not found in localStorage, check mock data
         if (!foundInvoice) {
-          foundInvoice = mockInvoiceData.find(inv => inv.id === id);
+          foundInvoice = mockInvoiceData.find(inv => 
+            inv.id === id || inv.invoiceNumber === id
+          );
           if (foundInvoice) {
             console.log("Found invoice in mock data:", foundInvoice);
           }
@@ -69,7 +74,7 @@ const InvoicePrint = () => {
             gross: 250.00,
             discount: 0.00,
             net: 250.00,
-            paid: false,
+            paid: true,
             packageDetails: [
               {
                 packageName: "Carton Box",
@@ -85,7 +90,7 @@ const InvoicePrint = () => {
         if (foundInvoice) {
           setInvoice(foundInvoice);
         } else {
-          console.error("Invoice not found with ID:", id);
+          console.error("Invoice not found with ID or number:", id);
           setError("Invoice not found");
           toast.error("Invoice not found");
         }
@@ -124,15 +129,13 @@ const InvoicePrint = () => {
   };
   
   const handleBack = () => {
-    if (id) {
-      // Try to go back to referring page instead of hardcoding
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        navigate(`/data-entry/invoicing`);
-      }
+    if (id && id.includes("13136051")) {
+      // Go back to Kenya delivery details for 13136051
+      navigate(`/kenya/delivery/DEL001`);
+    } else if (window.history.length > 1) {
+      window.history.back();
     } else {
-      navigate("/data-entry/invoicing");
+      navigate(`/data-entry/invoicing`);
     }
   };
 
@@ -166,7 +169,7 @@ const InvoicePrint = () => {
         handlePrint={handlePrint}
         setMode={setMode}
         mode={mode}
-        invoiceNumber={invoice.invoiceNumber}
+        invoiceNumber={invoice?.invoiceNumber || id || ""}
       />
       
       {/* Invoice Content */}
@@ -177,31 +180,44 @@ const InvoicePrint = () => {
           className="w-full max-w-[210mm] mx-auto bg-white text-black text-sm shadow-lg print:shadow-none"
           style={{ minHeight: '297mm' }}
         >
-          {mode === "invoice" && (
+          {mode === "invoice" && invoice && (
             <InvoiceMode 
               invoice={invoice}
-              packageDetails={packageDetails}
-              totalWeight={totalWeight}
-              totalVolume={totalVolume}
+              packageDetails={invoice.packageDetails || []}
+              totalWeight={invoice.weight || "0.00"}
+              totalVolume={invoice.volume || "0.000"}
             />
           )}
           
-          {mode === "bl" && (
+          {mode === "bl" && invoice && (
             <BillOfLadingMode 
               invoice={invoice}
-              packageDetails={packageDetails}
-              totalWeight={totalWeight}
-              totalVolume={totalVolume}
+              packageDetails={invoice.packageDetails || []}
+              totalWeight={invoice.weight || "0.00"}
+              totalVolume={invoice.volume || "0.000"}
             />
           )}
           
-          {mode === "certificate" && (
+          {mode === "certificate" && invoice && (
             <CertificateMode 
               invoice={invoice}
-              packageDetails={packageDetails}
-              totalWeight={totalWeight}
-              totalVolume={totalVolume}
+              packageDetails={invoice.packageDetails || []}
+              totalWeight={invoice.weight || "0.00"}
+              totalVolume={invoice.volume || "0.000"}
             />
+          )}
+
+          {!invoice && !loading && (
+            <div className="p-8 text-center">
+              <h2 className="text-xl text-red-600">Invoice data not available</h2>
+              <p>The requested invoice could not be loaded.</p>
+            </div>
+          )}
+
+          {loading && (
+            <div className="p-8 text-center">
+              <p>Loading invoice data...</p>
+            </div>
           )}
         </div>
       </div>

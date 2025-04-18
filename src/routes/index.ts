@@ -14,6 +14,7 @@ import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
 import Index from "@/pages/Index";
 import Landing from "@/pages/Landing";
+import InvoicePrint from "@/pages/invoicing/InvoicePrint";
 
 const baseRoutes: RouteConfig[] = [
   {
@@ -29,6 +30,11 @@ const baseRoutes: RouteConfig[] = [
   {
     path: "/dashboard",
     element: Dashboard,
+    private: true
+  },
+  {
+    path: "/invoicing/print/:id",
+    element: InvoicePrint,
     private: true
   },
   {
