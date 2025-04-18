@@ -35,7 +35,7 @@ export interface QatarJob {
 
 export interface JobItem {
   id: string;
-  name: string;
+  name?: string; // Making name optional since many items use itemName instead
   quantity: number;
   description?: string;
   weight?: number;

@@ -32,15 +32,20 @@ export const useJobItems = () => {
                 }
               : item
           );
-        case 'add':
+        case 'add': {
+          // Ensure both name and itemName are set to the same value
+          const itemName = action.itemName || action.name || '';
+          const name = action.name || action.itemName || '';
+          
           return [...prevItems, { 
             id: action.id,
-            name: action.name || action.itemName || '',
-            itemName: action.itemName || action.name || '',
+            name,
+            itemName,
             jobId: action.jobId || 'temp',
             sellPrice: action.sellPrice || 0,
             quantity: action.quantity || 1
           }];
+        }
         default:
           return prevItems;
       }

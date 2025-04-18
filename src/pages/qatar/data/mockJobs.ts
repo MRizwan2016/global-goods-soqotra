@@ -25,8 +25,8 @@ export const mockJobs: QatarJob[] = [
     sameDay: "Y",
     collectDate: "2023-07-01",
     items: [
-      { id: "item1", jobId: "1", itemName: "Laptop", sellPrice: 500, quantity: 1 },
-      { id: "item2", jobId: "1", itemName: "Documents", sellPrice: 100, quantity: 5 }
+      { id: "item1", jobId: "1", name: "Laptop", itemName: "Laptop", sellPrice: 500, quantity: 1 },
+      { id: "item2", jobId: "1", name: "Documents", itemName: "Documents", sellPrice: 100, quantity: 5 }
     ],
     entryBy: "John Doe",
     entryDate: "2023-06-30"
@@ -54,8 +54,8 @@ export const mockJobs: QatarJob[] = [
     sameDay: "Y",
     collectDate: "2023-07-01",
     items: [
-      { id: "item3", jobId: "2", itemName: "Files", sellPrice: 80, quantity: 10 },
-      { id: "item4", jobId: "2", itemName: "Sealed Box", sellPrice: 120, quantity: 2 }
+      { id: "item3", jobId: "2", name: "Files", itemName: "Files", sellPrice: 80, quantity: 10 },
+      { id: "item4", jobId: "2", name: "Sealed Box", itemName: "Sealed Box", sellPrice: 120, quantity: 2 }
     ],
     entryBy: "Jane Smith",
     entryDate: "2023-06-30"
@@ -83,8 +83,8 @@ export const mockJobs: QatarJob[] = [
     sameDay: "N",
     collectDate: "2023-07-02",
     items: [
-      { id: "item5", jobId: "3", itemName: "Spare Parts", sellPrice: 200, quantity: 3 },
-      { id: "item6", jobId: "3", itemName: "Tools", sellPrice: 150, quantity: 4 }
+      { id: "item5", jobId: "3", name: "Spare Parts", itemName: "Spare Parts", sellPrice: 200, quantity: 3 },
+      { id: "item6", jobId: "3", name: "Tools", itemName: "Tools", sellPrice: 150, quantity: 4 }
     ],
     entryBy: "David Johnson",
     entryDate: "2023-07-01"
@@ -112,8 +112,8 @@ export const mockJobs: QatarJob[] = [
     sameDay: "Y",
     collectDate: "2023-07-02",
     items: [
-      { id: "item7", jobId: "4", itemName: "Blood Samples", sellPrice: 100, quantity: 2 },
-      { id: "item8", jobId: "4", itemName: "Lab Reports", sellPrice: 50, quantity: 6 }
+      { id: "item7", jobId: "4", name: "Blood Samples", itemName: "Blood Samples", sellPrice: 100, quantity: 2 },
+      { id: "item8", jobId: "4", name: "Lab Reports", itemName: "Lab Reports", sellPrice: 50, quantity: 6 }
     ],
     entryBy: "Sarah Williams",
     entryDate: "2023-07-01"
@@ -141,8 +141,8 @@ export const mockJobs: QatarJob[] = [
     sameDay: "N",
     collectDate: "2023-07-03",
     items: [
-      { id: "item9", jobId: "5", itemName: "Textbooks", sellPrice: 60, quantity: 8 },
-      { id: "item10", jobId: "5", itemName: "Journals", sellPrice: 40, quantity: 12 }
+      { id: "item9", jobId: "5", name: "Textbooks", itemName: "Textbooks", sellPrice: 60, quantity: 8 },
+      { id: "item10", jobId: "5", name: "Journals", itemName: "Journals", sellPrice: 40, quantity: 12 }
     ],
     entryBy: "Michael Brown",
     entryDate: "2023-07-02"
@@ -170,8 +170,8 @@ export const mockJobs: QatarJob[] = [
     sameDay: "Y",
     collectDate: "2023-07-03",
     items: [
-      { id: "item11", jobId: "6", itemName: "Documents", sellPrice: 70, quantity: 7 },
-      { id: "item12", jobId: "6", itemName: "Tapes", sellPrice: 90, quantity: 3 }
+      { id: "item11", jobId: "6", name: "Documents", itemName: "Documents", sellPrice: 70, quantity: 7 },
+      { id: "item12", jobId: "6", name: "Tapes", itemName: "Tapes", sellPrice: 90, quantity: 3 }
     ],
     entryBy: "Linda Davis",
     entryDate: "2023-07-02"
@@ -199,8 +199,8 @@ export const mockJobs: QatarJob[] = [
     sameDay: "Y",
     collectDate: "2023-07-04",
     items: [
-      { id: "item13", jobId: "7", itemName: "Reports", sellPrice: 80, quantity: 9 },
-      { id: "item14", jobId: "7", itemName: "Statements", sellPrice: 60, quantity: 11 }
+      { id: "item13", jobId: "7", name: "Reports", itemName: "Reports", sellPrice: 80, quantity: 9 },
+      { id: "item14", jobId: "7", name: "Statements", itemName: "Statements", sellPrice: 60, quantity: 11 }
     ],
     entryBy: "Robert Wilson",
     entryDate: "2023-07-03"
@@ -228,8 +228,8 @@ export const mockJobs: QatarJob[] = [
     sameDay: "N",
     collectDate: "2023-07-04",
     items: [
-      { id: "item15", jobId: "8", itemName: "Equipment", sellPrice: 120, quantity: 4 },
-      { id: "item16", jobId: "8", itemName: "Uniforms", sellPrice: 70, quantity: 13 }
+      { id: "item15", jobId: "8", name: "Equipment", itemName: "Equipment", sellPrice: 120, quantity: 4 },
+      { id: "item16", jobId: "8", name: "Uniforms", itemName: "Uniforms", sellPrice: 70, quantity: 13 }
     ],
     entryBy: "Karen Taylor",
     entryDate: "2023-07-03"
@@ -257,8 +257,8 @@ export const mockJobs: QatarJob[] = [
     sameDay: "Y",
     collectDate: "2023-07-05",
     items: [
-      { id: "item17", jobId: "9", itemName: "Artifacts", sellPrice: 250, quantity: 2 },
-      { id: "item18", jobId: "9", itemName: "Display Cases", sellPrice: 150, quantity: 3 }
+      { id: "item17", jobId: "9", name: "Artifacts", itemName: "Artifacts", sellPrice: 250, quantity: 2 },
+      { id: "item18", jobId: "9", name: "Display Cases", itemName: "Display Cases", sellPrice: 150, quantity: 3 }
     ],
     entryBy: "Thomas Anderson",
     entryDate: "2023-07-04"
@@ -286,8 +286,8 @@ export const mockJobs: QatarJob[] = [
     sameDay: "N",
     collectDate: "2023-07-05",
     items: [
-      { id: "item19", jobId: "10", itemName: "Samples", sellPrice: 90, quantity: 5 },
-      { id: "item20", jobId: "10", itemName: "Instruments", sellPrice: 110, quantity: 4 }
+      { id: "item19", jobId: "10", name: "Samples", itemName: "Samples", sellPrice: 90, quantity: 5 },
+      { id: "item20", jobId: "10", name: "Instruments", itemName: "Instruments", sellPrice: 110, quantity: 4 }
     ],
     entryBy: "Jessica White",
     entryDate: "2023-07-04"

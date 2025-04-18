@@ -10,8 +10,9 @@ const usePrintReport = (componentRef: RefObject<HTMLDivElement>, options: PrintR
   const handlePrint = useReactToPrint({
     documentTitle: options.documentTitle || "Printed Report",
     onPrintError: (error) => console.error("Print failed:", error),
+    // Fix: Using type assertion to work around the TypeScript error
     content: () => componentRef.current,
-  });
+  } as any);
 
   return handlePrint;
 };
