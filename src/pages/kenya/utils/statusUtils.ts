@@ -9,33 +9,33 @@ export const formatStatusLabel = (status: string): string => {
 export const getStatusBadge = (status: string): React.ReactNode => {
   switch(status) {
     case 'pending':
-      return <Badge className="bg-yellow-500">Pending</Badge>;
+      return <Badge variant="default" className="bg-yellow-500">Pending</Badge>;
     case 'processing':
-      return <Badge className="bg-blue-500">Processing</Badge>;
+      return <Badge variant="default" className="bg-blue-500">Processing</Badge>;
     case 'in-transit':
-      return <Badge className="bg-orange-500">In Transit</Badge>;
+      return <Badge variant="default" className="bg-orange-500">In Transit</Badge>;
     case 'at-warehouse':
-      return <Badge className="bg-purple-500">At Warehouse</Badge>;
+      return <Badge variant="default" className="bg-purple-500">At Warehouse</Badge>;
     case 'out-for-delivery':
-      return <Badge className="bg-indigo-500">Out for Delivery</Badge>;
+      return <Badge variant="default" className="bg-indigo-500">Out for Delivery</Badge>;
     case 'delivered':
-      return <Badge className="bg-green-500">Delivered</Badge>;
+      return <Badge variant="default" className="bg-green-500">Delivered</Badge>;
     case 'failed':
-      return <Badge className="bg-red-500">Failed</Badge>;
+      return <Badge variant="default" className="bg-red-500">Failed</Badge>;
     default:
-      return <Badge className="bg-gray-500">{formatStatusLabel(status)}</Badge>;
+      return <Badge variant="default" className="bg-gray-500">{formatStatusLabel(status)}</Badge>;
   }
 };
 
 export const getPaymentBadge = (status: string): React.ReactNode => {
   switch(status) {
     case 'completed':
-      return <Badge className="bg-green-500">Paid</Badge>;
+      return <Badge variant="default" className="bg-green-500">Paid</Badge>;
     case 'partial':
-      return <Badge className="bg-amber-500">Partial</Badge>;
+      return <Badge variant="default" className="bg-amber-500">Partial</Badge>;
     case 'pending':
-      return <Badge className="bg-red-500">Unpaid</Badge>;
+      return <Badge variant="default" className="bg-red-500">Unpaid</Badge>;
     default:
-      return <Badge className="bg-gray-500">{formatStatusLabel(status)}</Badge>;
+      return <Badge variant="default" className="bg-gray-500">{formatStatusLabel(status)}</Badge>;
   }
 };
