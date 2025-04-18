@@ -9,19 +9,32 @@ import { toast } from "sonner";
 interface JobFormActionsProps {
   isNewJob: boolean;
   onSubmit: (data: any) => void;
+  disabled?: boolean;
 }
 
-const JobFormActions: React.FC<JobFormActionsProps> = ({ isNewJob, onSubmit }) => {
+const JobFormActions: React.FC<JobFormActionsProps> = ({ 
+  isNewJob, 
+  onSubmit,
+  disabled = false
+}) => {
   const navigate = useNavigate();
   const { 
     jobData, 
     jobItems, 
     isJobNumberGenerated, 
-    isSaving 
+    isSaving,
+    readOnly
   } = useJobForm();
+
+  const isFormDisabled = disabled || readOnly || isSaving || (!isJobNumberGenerated && isNewJob);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (disabled || readOnly) {
+      toast.error("This job cannot be modified");
+      return;
+    }
     
     // Validate required fields
     if (!isJobNumberGenerated && isNewJob) {
@@ -59,18 +72,20 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({ isNewJob, onSubmit }) =
         onClick={handleCancel}
       >
         <ArrowLeft size={16} />
-        CANCEL
+        BACK
       </Button>
-      <Button 
-        type="submit" 
-        className="bg-green-600 hover:bg-green-700 flex items-center gap-2 transition-colors"
-        disabled={isSaving || (!isJobNumberGenerated && isNewJob)}
-        onClick={handleSubmit}
-      >
-        <Save size={16} />
-        {isNewJob ? 'CREATE JOB' : 'UPDATE JOB'}
-        {isSaving && <span className="ml-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></span>}
-      </Button>
+      {!disabled && !readOnly && (
+        <Button 
+          type="submit" 
+          className="bg-green-600 hover:bg-green-700 flex items-center gap-2 transition-colors"
+          disabled={isFormDisabled}
+          onClick={handleSubmit}
+        >
+          <Save size={16} />
+          {isNewJob ? 'CREATE JOB' : 'UPDATE JOB'}
+          {isSaving && <span className="ml-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></span>}
+        </Button>
+      )}
     </div>
   );
 };

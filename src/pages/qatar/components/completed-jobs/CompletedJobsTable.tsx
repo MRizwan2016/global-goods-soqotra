@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { QatarJob } from "../../types/jobTypes";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import ViewJobModal from "../job-list/components/ViewJobModal";
 
 interface CompletedJobsTableProps {
   currentEntries: QatarJob[];
@@ -18,6 +19,8 @@ const CompletedJobsTable: React.FC<CompletedJobsTableProps> = ({
   indexOfFirstEntry 
 }) => {
   const navigate = useNavigate();
+  const [isViewModalOpen, setIsViewModalOpen] = React.useState(false);
+  const [selectedJob, setSelectedJob] = React.useState<QatarJob | null>(null);
 
   // Format date to display in readable format
   const formatDate = (dateString: string | undefined) => {
@@ -30,8 +33,9 @@ const CompletedJobsTable: React.FC<CompletedJobsTableProps> = ({
   };
 
   // Handle view job details
-  const handleViewJob = (jobId: string) => {
-    navigate(`/qatar/job/${jobId}`);
+  const handleViewJob = (job: QatarJob) => {
+    setSelectedJob(job);
+    setIsViewModalOpen(true);
   };
 
   // Show notes dialog
@@ -91,7 +95,7 @@ const CompletedJobsTable: React.FC<CompletedJobsTableProps> = ({
                     variant="ghost" 
                     size="sm"
                     className="h-8 w-8 p-0 text-indigo-500"
-                    onClick={() => handleViewJob(job.id)}
+                    onClick={() => handleViewJob(job)}
                   >
                     <Eye size={18} />
                   </Button>
@@ -107,6 +111,17 @@ const CompletedJobsTable: React.FC<CompletedJobsTableProps> = ({
           )}
         </TableBody>
       </Table>
+      
+      {selectedJob && (
+        <ViewJobModal
+          isOpen={isViewModalOpen}
+          job={selectedJob}
+          onClose={() => {
+            setIsViewModalOpen(false);
+            setSelectedJob(null);
+          }}
+        />
+      )}
     </div>
   );
 };
