@@ -10,9 +10,9 @@ import CommonItems from "./CommonItems";
 import { ItemFormProps } from "./types";
 
 const ItemForm = ({ onSubmit, isJobNumberGenerated, initialState, isEditing, onCancelEdit }: ItemFormProps) => {
-  const [itemName, setItemName] = useState(initialState?.itemName || "");
-  const [sellPrice, setSellPrice] = useState(initialState?.sellPrice.toString() || "");
-  const [quantity, setQuantity] = useState(initialState?.quantity.toString() || "1");
+  const [itemName, setItemName] = useState(initialState?.itemName || initialState?.name || "");
+  const [sellPrice, setSellPrice] = useState(initialState?.sellPrice ? initialState.sellPrice.toString() : "");
+  const [quantity, setQuantity] = useState(initialState?.quantity ? initialState.quantity.toString() : "1");
 
   const handleItemNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setItemName(e.target.value.toUpperCase());
@@ -32,6 +32,12 @@ const ItemForm = ({ onSubmit, isJobNumberGenerated, initialState, isEditing, onC
     }
   };
 
+  const resetForm = () => {
+    setItemName("");
+    setSellPrice("");
+    setQuantity("1");
+  };
+
   const handleSubmit = () => {
     if (!itemName || !sellPrice) {
       toast.error("Please enter item description and sell price");
@@ -40,16 +46,15 @@ const ItemForm = ({ onSubmit, isJobNumberGenerated, initialState, isEditing, onC
 
     onSubmit({
       id: initialState?.id || uuidv4(),
-      jobId: 'temp',
+      name: itemName.toUpperCase(),
       itemName: itemName.toUpperCase(),
+      jobId: initialState?.jobId || 'temp',
       sellPrice: parseFloat(sellPrice),
       quantity: parseInt(quantity || "1"),
     });
 
     if (!isEditing) {
-      setItemName("");
-      setSellPrice("");
-      setQuantity("1");
+      resetForm();
     }
   };
 

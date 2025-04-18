@@ -33,11 +33,13 @@ export const useJobSummaryCalculations = (jobs: QatarJob[]) => {
     jobs.forEach(job => {
       if (job.items) {
         job.items.forEach(item => {
-          const itemName = item.itemName;
-          if (counts[itemName]) {
-            counts[itemName] += item.quantity;
-          } else {
-            counts[itemName] = item.quantity;
+          const itemName = item.itemName || item.name;
+          if (itemName) {
+            if (counts[itemName]) {
+              counts[itemName] += item.quantity;
+            } else {
+              counts[itemName] = item.quantity;
+            }
           }
         });
       }

@@ -25,16 +25,16 @@ const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
           {validItems.map((item, index) => (
             <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
               <td className="px-4 py-3 whitespace-nowrap uppercase">
-                {item.itemName}
+                {item.itemName || item.name}
               </td>
               <td className="px-4 py-3 whitespace-nowrap">
-                {item.sellPrice.toFixed(2)}
+                {(item.sellPrice || 0).toFixed(2)}
               </td>
               <td className="px-4 py-3 whitespace-nowrap">
                 {item.quantity}
               </td>
               <td className="px-4 py-3 whitespace-nowrap">
-                {(item.sellPrice * item.quantity).toFixed(2)}
+                {((item.sellPrice || 0) * item.quantity).toFixed(2)}
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-right">
                 <ActionButtons 

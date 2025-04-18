@@ -42,6 +42,11 @@ export interface JobItem {
   length?: number;
   width?: number;
   height?: number;
+  
+  // Additional properties used in the application
+  itemName?: string;
+  sellPrice?: number;
+  jobId?: string;
 }
 
 // Types used in dashboard components

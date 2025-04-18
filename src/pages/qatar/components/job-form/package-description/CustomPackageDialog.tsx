@@ -72,13 +72,20 @@ const CustomPackageDialog = ({ isJobNumberGenerated, onAddPackage }: CustomPacka
     const dimensionsStr = `${length}cm x ${width}cm x ${height}cm ${weight ? `(${weight}kg)` : ''}`;
     const packageName = `CUSTOM PACKAGE: ${dimensionsStr}`.toUpperCase();
     
-    onAddPackage({
+    const newItem: JobItem = {
       id: uuidv4(),
-      jobId: 'temp',
+      name: packageName,
       itemName: packageName,
+      jobId: 'temp',
       sellPrice: parseFloat(sellPrice),
       quantity: parseInt(quantity || "1"),
-    });
+      length: parseFloat(length),
+      width: parseFloat(width),
+      height: parseFloat(height),
+      weight: weight ? parseFloat(weight) : undefined,
+    };
+    
+    onAddPackage(newItem);
     
     resetForm();
     toast.success("Custom package added");

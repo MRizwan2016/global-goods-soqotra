@@ -20,7 +20,7 @@ const JobItemDetails: React.FC<JobItemDetailsProps> = ({ job }) => {
         {job.items && job.items.length > 0
           ? job.items.map((item, i) => (
               <span key={i}>
-                {item.itemName}: {item.quantity}
+                {item.itemName || item.name}: {item.quantity}
                 {i < job.items!.length - 1 ? ", " : ""}
               </span>
             ))

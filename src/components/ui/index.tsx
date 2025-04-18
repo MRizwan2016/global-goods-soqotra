@@ -32,7 +32,7 @@ export {
   PieChart,
   Database,
   BarChart3,
-  Grid,
+  Grid as LucideGrid,
   Users,
   Bell,
   Mail,
@@ -49,5 +49,5 @@ export {
 // Export Skeleton
 export { Skeleton } from './skeleton';
 
-// Export Grid
-export { Grid } from './grid';
+// Export Grid as UIGrid to avoid naming conflict with lucide-react's Grid
+export { Grid as UIGrid } from './grid';

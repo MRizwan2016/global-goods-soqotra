@@ -55,7 +55,7 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
     if (selectedItem) {
       const newItem: JobItem = {
         id: uuidv4(),
-        jobId: "",
+        name: selectedItem,
         itemName: selectedItem,
         sellPrice,
         quantity
