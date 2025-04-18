@@ -1,323 +1,430 @@
-import React, { useState, useEffect } from "react";
-import Layout from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
-import { Download, RefreshCw } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { ArrowDown, ArrowUp, RefreshCcw, File, Edit, Eye, Printer } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useJobTracking } from "../job-tracking/useJobTracking";
+import { JobStorageService } from "../../services/JobStorageService";
 import { QatarJob } from "../../types/jobTypes";
 import usePrintReport from "../../hooks/usePrintReport";
-import { Input } from "@/components/ui/input";
 
-interface JobListPageProps {
-  title: string;
-  headerTitle: string;
-  headerSubtitle: string;
-  headerClassName?: string;
-  reportTitle: string;
-  jobs: QatarJob[];
-  sectors: string[];
-  showVehicleFilter?: boolean;
-  showJobTypeFilter?: boolean;
-  initialStatus?: string;
-  extraFilters?: React.ReactNode; // Added this prop to fix the error
-  renderTable: ({ 
-    currentEntries, 
-    indexOfFirstEntry 
-  }: { 
-    currentEntries: QatarJob[], 
-    indexOfFirstEntry: number 
-  }) => React.ReactNode;
-  refreshJobs?: () => void;
-}
+const JobListPage = () => {
+  const printRef = useRef<HTMLDivElement>(null);
+  const handlePrint = usePrintReport(printRef, { documentTitle: "Job List" });
+  const navigate = useNavigate();
+  const {
+    searchText,
+    setSearchText,
+    currentPage,
+    setCurrentPage,
+    statusFilter,
+    setStatusFilter,
+    typeFilter,
+    setTypeFilter,
+    filteredJobs,
+    totalPages,
+    indexOfLastEntry,
+    indexOfFirstEntry,
+    currentEntries
+  } = useJobTracking();
+  const [jobToDelete, setJobToDelete] = useState<string | null>(null);
+  const [showCancellationDialog, setShowCancellationDialog] = useState(false);
+	const [cancellationReason, setCancellationReason] = useState("");
+  const [selectedJob, setSelectedJob] = useState<QatarJob | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
-const JobListPage: React.FC<JobListPageProps> = ({
-  title,
-  headerTitle,
-  headerSubtitle,
-  headerClassName = "bg-white",
-  reportTitle,
-  jobs,
-  sectors,
-  showVehicleFilter = false,
-  showJobTypeFilter = false,
-  initialStatus = "",
-  renderTable,
-  refreshJobs
-}) => {
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
-  const [filteredJobs, setFilteredJobs] = useState<QatarJob[]>(jobs);
-  
-  // Filters
-  const [sectorFilter, setSectorFilter] = useState("ALL SECTORS");
-  const [statusFilter, setStatusFilter] = useState(initialStatus);
-  const [vehicleFilter, setVehicleFilter] = useState("");
-  const [jobTypeFilter, setJobTypeFilter] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  
-  // Print functionality
-  const { printRef, handlePrint } = usePrintReport(reportTitle);
-  
-  useEffect(() => {
-    let result = jobs;
-    
-    // Apply sector filter
-    if (sectorFilter && sectorFilter !== "ALL SECTORS") {
-      result = result.filter(job => job.sector && job.sector.startsWith(sectorFilter.split(" : ")[0]));
-    }
-    
-    // Apply status filter
-    if (statusFilter) {
-      result = result.filter(job => job.status === statusFilter);
-    }
-    
-    // Apply vehicle filter
-    if (vehicleFilter) {
-      result = result.filter(job => job.vehicle === vehicleFilter);
-    }
-    
-    // Apply job type filter
-    if (jobTypeFilter) {
-      result = result.filter(job => job.jobType === jobTypeFilter);
-    }
-    
-    // Apply search filter
-    if (searchTerm) {
-      const search = searchTerm.toLowerCase();
-      result = result.filter(job => 
-        (job.jobNumber && job.jobNumber.toLowerCase().includes(search)) ||
-        (job.customer && job.customer.toLowerCase().includes(search)) ||
-        (job.town && job.town.toLowerCase().includes(search)) ||
-        (job.location && job.location.toLowerCase().includes(search))
-      );
-    }
-    
-    setFilteredJobs(result);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [jobs, sectorFilter, statusFilter, vehicleFilter, jobTypeFilter, searchTerm]);
-  
-  // Get unique vehicles
-  const vehicles = [...new Set(jobs.map(job => job.vehicle))].filter(Boolean).sort();
-  
-  // Get current entries for pagination
-  const indexOfLastEntry = currentPage * entriesPerPage;
-  const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
-  const currentEntries = filteredJobs.slice(indexOfFirstEntry, indexOfLastEntry);
-  
-  // Calculate page numbers
-  const totalPages = Math.ceil(filteredJobs.length / entriesPerPage);
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
-  
-  // Export data to Excel
-  const exportToExcel = () => {
-    toast.info("Exporting to Excel...");
-    // Excel export functionality would be implemented here
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+    setCurrentPage(1); // Reset to the first page when searching
   };
-  
-  // Handle print report
-  const printReport = async () => {
-    toast.info("Preparing print...");
-    try {
-      await handlePrint();
-    } catch (error) {
-      console.error("Print error:", error);
-      toast.error("Failed to print report");
+
+  const handleStatusFilter = (status: string) => {
+    setStatusFilter(status);
+    setCurrentPage(1); // Reset to the first page when filtering
+  };
+
+  const handleTypeFilter = (type: string) => {
+    setTypeFilter(type);
+    setCurrentPage(1); // Reset to the first page when filtering
+  };
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+
+  const handleDeleteConfirmation = (jobId: string) => {
+    setJobToDelete(jobId);
+  };
+
+  const handleDelete = () => {
+    if (jobToDelete) {
+      try {
+        JobStorageService.deleteJob(jobToDelete);
+        toast.success("Job deleted successfully!");
+        setJobToDelete(null); // Clear the job to delete
+        // Refresh the job list by resetting the search text
+        setSearchText(searchText);
+      } catch (error) {
+        console.error("Error deleting job:", error);
+        toast.error("Failed to delete job.");
+      }
     }
   };
-  
-  // Handle manual refresh
-  const handleRefresh = () => {
-    if (refreshJobs) {
-      refreshJobs();
-      toast.success("Job list refreshed");
+
+  const handleCancelDelete = () => {
+    setJobToDelete(null); // Clear the job to delete
+  };
+
+  const handleCancellationConfirmation = (job: QatarJob) => {
+    setSelectedJob(job);
+    setShowCancellationDialog(true);
+  };
+
+  const handleCancelJob = async () => {
+    if (selectedJob) {
+      try {
+        // Update job status to "CANCELLED" and add cancellation reason
+        const updatedJob = { ...selectedJob, status: "CANCELLED", cancellationReason: cancellationReason, cancellationDate: new Date().toLocaleDateString() };
+        JobStorageService.updateJob(updatedJob);
+        toast.success("Job cancelled successfully!");
+        setShowCancellationDialog(false);
+        setCancellationReason("");
+        setSelectedJob(null);
+        // Refresh the job list by resetting the search text
+        setSearchText(searchText);
+      } catch (error) {
+        console.error("Error cancelling job:", error);
+        toast.error("Failed to cancel job.");
+      }
     }
+  };
+
+  const handleCloseCancellationDialog = () => {
+    setShowCancellationDialog(false);
+    setCancellationReason("");
+    setSelectedJob(null);
+  };
+
+  const handleViewJob = (job: QatarJob) => {
+    setSelectedJob(job);
+    setIsViewModalOpen(true);
+  };
+
+  const handleCloseViewModal = () => {
+    setIsViewModalOpen(false);
+    setSelectedJob(null);
   };
 
   return (
-    <Layout title={title}>
-      <div className="space-y-4">
-        {/* Header */}
-        <div className={`p-6 rounded-lg shadow-sm border ${headerClassName}`}>
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold">{headerTitle}</h1>
-              <p className="text-gray-500">{headerSubtitle}</p>
-            </div>
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                className="flex items-center gap-1"
-                onClick={exportToExcel}
-              >
-                <Download size={18} />
-                EXPORT
-              </Button>
-              {refreshJobs && (
-                <Button 
-                  variant="outline" 
-                  className="flex items-center gap-1"
-                  onClick={handleRefresh}
-                >
-                  <RefreshCw size={18} />
-                  REFRESH
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-        
-        {/* Filters */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <div className="flex flex-col md:flex-row justify-between gap-3 mb-4">
-            <div className="flex flex-col md:flex-row gap-2 items-center">
-              {/* Sector Filter */}
-              <select 
-                className="border border-gray-300 rounded px-3 py-2 text-sm"
-                value={sectorFilter}
-                onChange={(e) => setSectorFilter(e.target.value)}
-              >
-                {sectors.map((sector, index) => (
-                  <option key={index} value={sector}>{sector}</option>
-                ))}
-              </select>
-              
-              {/* Vehicle Filter */}
-              {showVehicleFilter && (
-                <select 
-                  className="border border-gray-300 rounded px-3 py-2 text-sm"
-                  value={vehicleFilter}
-                  onChange={(e) => setVehicleFilter(e.target.value)}
-                >
-                  <option value="">ALL VEHICLES</option>
-                  {vehicles.map((vehicle, index) => (
-                    <option key={index} value={vehicle}>{vehicle}</option>
-                  ))}
-                </select>
-              )}
-              
-              {/* Job Type Filter */}
-              {showJobTypeFilter && (
-                <select 
-                  className="border border-gray-300 rounded px-3 py-2 text-sm"
-                  value={jobTypeFilter}
-                  onChange={(e) => setJobTypeFilter(e.target.value)}
-                >
-                  <option value="">ALL JOB TYPES</option>
-                  <option value="COLLECTION">COLLECTION</option>
-                  <option value="DELIVERY">DELIVERY</option>
-                  <option value="PACKING">PACKING</option>
-                  <option value="UNPACKING">UNPACKING</option>
-                </select>
-              )}
-            </div>
-            
-            {/* Search */}
-            <div className="flex-1 max-w-md">
-              <Input
-                type="text"
-                placeholder="Search by job number, customer, town or location..."
-                className="w-full"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          {/* Results summary */}
-          <div className="flex justify-between items-center text-sm text-gray-600">
-            <div>
-              Showing {indexOfFirstEntry + 1} to {Math.min(indexOfLastEntry, filteredJobs.length)} of {filteredJobs.length} entries
-            </div>
-            <div>
-              <select 
-                className="border border-gray-300 rounded px-2 py-1 text-sm"
-                value={entriesPerPage}
-                onChange={(e) => setEntriesPerPage(Number(e.target.value))}
-              >
-                <option value={10}>10</option>
-                <option value={25}>25</option>
-                <option value={50}>50</option>
-                <option value={100}>100</option>
-              </select>
-              <span className="ml-2">entries per page</span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Table */}
-        <div>
-          {renderTable({ currentEntries, indexOfFirstEntry })}
-          
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-4">
-              <div className="flex gap-1">
-                <button 
-                  className={`px-3 py-1 border rounded ${currentPage === 1 ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-gray-100'}`}
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  Prev
-                </button>
-                
-                {pageNumbers.map(number => (
-                  <button 
-                    key={number}
-                    className={`px-3 py-1 border rounded ${currentPage === number ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}`}
-                    onClick={() => setCurrentPage(number)}
-                  >
-                    {number}
-                  </button>
-                ))}
-                
-                <button 
-                  className={`px-3 py-1 border rounded ${currentPage === totalPages ? 'bg-gray-100 cursor-not-allowed' : 'hover:bg-gray-100'}`}
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        
-        {/* Printable content - hidden until print */}
-        <div className="hidden">
-          <div ref={printRef} className="p-8">
-            <h1 className="text-2xl font-bold mb-4">{reportTitle}</h1>
-            {/* Printable table content would go here */}
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border p-2 text-left">Job Number</th>
-                  <th className="border p-2 text-left">Date</th>
-                  <th className="border p-2 text-left">Customer</th>
-                  <th className="border p-2 text-left">Location</th>
-                  <th className="border p-2 text-left">Vehicle</th>
-                  <th className="border p-2 text-left">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredJobs.map(job => (
-                  <tr key={job.id} className="border-b">
-                    <td className="border p-2">{job.jobNumber}</td>
-                    <td className="border p-2">{job.date}</td>
-                    <td className="border p-2">{job.customer}</td>
-                    <td className="border p-2">{job.location || "-"}</td>
-                    <td className="border p-2">{job.vehicle}</td>
-                    <td className="border p-2">{job.status}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+    <div className="container mx-auto py-6">
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-2xl font-bold">Job List</h1>
+        <Button onClick={() => navigate("/qatar/new")} className="bg-blue-600 hover:bg-blue-700 text-white">
+          Create New Job
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <Input
+          type="text"
+          placeholder="Search by Job Number, Customer, Mobile, or Town..."
+          value={searchText}
+          onChange={handleSearch}
+        />
+
+        <Select value={statusFilter} onValueChange={handleStatusFilter}>
+          <SelectTrigger>
+            <SelectValue placeholder="Filter by Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Statuses</SelectItem>
+            <SelectItem value="PENDING">Pending</SelectItem>
+            <SelectItem value="COMPLETED">Completed</SelectItem>
+            <SelectItem value="SCHEDULED">Scheduled</SelectItem>
+            <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
+            <SelectItem value="CANCELLED">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={typeFilter} onValueChange={handleTypeFilter}>
+          <SelectTrigger>
+            <SelectValue placeholder="Filter by Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="COLLECTION">Collection</SelectItem>
+            <SelectItem value="DELIVERY">Delivery</SelectItem>
+            <SelectItem value="PACKING">Packing</SelectItem>
+            <SelectItem value="UNPACKING">Unpacking</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="overflow-x-auto">
+        <Table ref={printRef}>
+          <TableCaption>A list of your recent jobs.</TableCaption>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Job #</TableHead>
+              <TableHead>Customer</TableHead>
+              <TableHead>Mobile</TableHead>
+              <TableHead>Job Type</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Time</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {currentEntries.map((job) => (
+              <TableRow key={job.id}>
+                <TableCell className="font-medium">{job.jobNumber}</TableCell>
+                <TableCell>{job.customer}</TableCell>
+                <TableCell>{job.mobileNumber}</TableCell>
+                <TableCell>{job.jobType}</TableCell>
+                <TableCell>{job.date}</TableCell>
+                <TableCell>{job.time} {job.amPm}</TableCell>
+                <TableCell>{job.status}</TableCell>
+                <TableCell className="text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <span className="sr-only">Open menu</span>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="h-4 w-4"
+                        >
+                          <path d="M3 12h18M3 6h18M3 18h18" />
+                        </svg>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <Button onClick={() => handleViewJob(job)} variant="ghost" className="flex items-center"><Eye className="mr-2 h-4 w-4" /> View</Button>
+                      <Button onClick={() => navigate(`/qatar/edit/${job.id}`)} variant="ghost" className="flex items-center"><Edit className="mr-2 h-4 w-4" /> Edit</Button>
+                      {job.status !== "CANCELLED" && (
+                        <Button onClick={() => handleCancellationConfirmation(job)} variant="ghost" className="flex items-center text-red-600"><RefreshCcw className="mr-2 h-4 w-4" /> Cancel</Button>
+                      )}
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="ghost" className="flex items-center text-red-600"><svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="h-4 w-4 mr-2"
+                          >
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                          </svg> Delete</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              This action cannot be undone. Are you sure you want to permanently delete <span className="font-medium">{job.customer}'s</span> job?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel onClick={handleCancelDelete}>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteConfirmation(job.id)}>Continue</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex justify-between items-center mt-4">
+        <p className="text-sm text-gray-500">
+          Showing {indexOfFirstEntry + 1} to {indexOfLastEntry > filteredJobs.length ? filteredJobs.length : indexOfLastEntry} of {filteredJobs.length} entries
+        </p>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            <ArrowDown className="h-4 w-4" />
+          </Button>
+          {pageNumbers.map((page) => (
+            <Button
+              key={page}
+              variant={currentPage === page ? "default" : "outline"}
+              onClick={() => handlePageChange(page)}
+            >
+              {page}
+            </Button>
+          ))}
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages || totalPages === 0}
+          >
+            <ArrowUp className="h-4 w-4" />
+          </Button>
         </div>
       </div>
-    </Layout>
+
+      {/* Print Button */}
+      <div className="flex justify-end mt-4">
+        <Button onClick={handlePrint} className="bg-gray-700 hover:bg-gray-800 text-white">
+          <Printer className="h-4 w-4 mr-2" />
+          Print Job List
+        </Button>
+      </div>
+
+      {/* Cancellation Confirmation Dialog */}
+      <AlertDialog open={showCancellationDialog} onOpenChange={setShowCancellationDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cancel Job</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to cancel this job? Please provide a reason for cancellation.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="grid gap-2">
+            <Label htmlFor="reason">Cancellation Reason</Label>
+            <Textarea
+              id="reason"
+              placeholder="Reason for cancellation"
+              value={cancellationReason}
+              onChange={(e) => setCancellationReason(e.target.value)}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCloseCancellationDialog}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleCancelJob}>Confirm Cancellation</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* View Job Modal */}
+      {selectedJob && (
+        <div
+          className={`fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 ${isViewModalOpen ? 'block' : 'none'}`}
+        >
+          <div className="relative w-full max-w-md p-4 mx-auto mt-20">
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">Job Details</h2>
+                <Button onClick={handleCloseViewModal} variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">Close</span>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <Label>Job Number:</Label>
+                  <p>{selectedJob.jobNumber}</p>
+                </div>
+                <div>
+                  <Label>Customer:</Label>
+                  <p>{selectedJob.customer}</p>
+                </div>
+                <div>
+                  <Label>Mobile Number:</Label>
+                  <p>{selectedJob.mobileNumber}</p>
+                </div>
+                <div>
+                  <Label>Job Type:</Label>
+                  <p>{selectedJob.jobType}</p>
+                </div>
+                <div>
+                  <Label>Date:</Label>
+                  <p>{selectedJob.date}</p>
+                </div>
+                <div>
+                  <Label>Time:</Label>
+                  <p>{selectedJob.time} {selectedJob.amPm}</p>
+                </div>
+                <div>
+                  <Label>Status:</Label>
+                  <p>{selectedJob.status}</p>
+                </div>
+                {selectedJob.cancellationReason && (
+                  <div>
+                    <Label>Cancellation Reason:</Label>
+                    <p>{selectedJob.cancellationReason}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { JobItem } from "../../types/jobTypes";
 import PackageItemsTable from "./PackageItemsTable";
@@ -18,19 +17,12 @@ const PackageDescriptionSection = () => {
   };
 
   const handleDeleteItem = (id: string) => {
-    const deletedItem: JobItem = {
-      id,
-      jobId: 'temp',
-      itemName: 'DELETED_ITEM',
-      sellPrice: 0,
-      quantity: -1,
-    };
-    handleAddItem(deletedItem);
+    handleAddItem({ id, type: 'delete' });
     toast.success("Item removed");
   };
 
   const handleAddOrUpdateItem = (item: JobItem) => {
-    handleAddItem(item);
+    handleAddItem({ ...item, type: isEditing ? 'update' : 'add' });
     if (isEditing) {
       setIsEditing(false);
       setEditingItem(null);
