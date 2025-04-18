@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Truck, ClipboardEdit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { formatStatusLabel } from "../../utils/statusUtils";
 import {
   Dialog,
   DialogContent,
