@@ -1,9 +1,10 @@
+
 import React from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { QatarJob } from "../../types/jobTypes";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Calendar, Phone, Truck, CarFront, Van } from "lucide-react";
+import { MapPin, Calendar, Phone, Truck, CarFront, Car } from "lucide-react";
 
 interface JobSelectionTableProps {
   jobs: QatarJob[];
@@ -37,14 +38,18 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
     });
   };
 
-  const getVehicleIcon = (vehicleType: string) => {
-    switch(vehicleType?.toLowerCase()) {
-      case 'truck':
+  const getVehicleIcon = (vehicle: string | undefined) => {
+    if (!vehicle) return <CarFront size={14} />;
+    
+    // Determine icon based on the first character of the vehicle number
+    // Trucks typically start with T, Cars with C, etc.
+    const firstChar = vehicle.charAt(0).toLowerCase();
+    
+    switch(firstChar) {
+      case 't':
         return <Truck size={14} />;
-      case 'van':
-        return <Van size={14} />;
       default:
-        return <CarFront size={14} />;
+        return <Car size={14} />;
     }
   };
 
@@ -138,7 +143,7 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
                     <div className="flex flex-col">
                       <Badge variant={selectedVehicleNumber === job.vehicle ? "default" : "outline"} 
                              className="w-fit flex items-center gap-1">
-                        {getVehicleIcon(job.vehicleType)}
+                        {getVehicleIcon(job.vehicle)}
                         {job.vehicle ? "VEHICLE" : "UNASSIGNED"}
                       </Badge>
                       {job.vehicle && (
