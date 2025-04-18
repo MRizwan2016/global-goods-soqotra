@@ -6,6 +6,7 @@ import JobNumberSection from "./JobNumberSection";
 import JobDetailsSection from "./JobDetailsSection";
 import CustomerInfoSection from "./CustomerInfoSection";
 import JobFormActions from "./JobFormActions";
+import PackageDescriptionSection from "./PackageDescriptionSection";
 
 interface JobFormProps {
   isNewJob?: boolean;
@@ -36,6 +37,7 @@ const JobForm: React.FC<JobFormProps> = ({
           <JobNumberSection isNewJob={isNewJob} />
           <JobDetailsSection />
           <CustomerInfoSection />
+          <PackageDescriptionSection />
         </div>
         <JobFormActions isNewJob={isNewJob} onSubmit={onSubmit} disabled={readOnly} />
       </form>
