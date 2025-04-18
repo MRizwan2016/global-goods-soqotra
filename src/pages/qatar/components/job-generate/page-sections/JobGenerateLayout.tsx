@@ -38,6 +38,11 @@ const JobGenerateLayout: React.FC<JobGenerateLayoutProps> = ({
   // Handle vehicle change from the form
   const handleVehicleChange = (vehicle: string) => {
     setSelectedVehicleNumber(vehicle);
+    // Also update the scheduleData to ensure it's saved
+    setScheduleData(prev => ({
+      ...prev,
+      vehicle
+    }));
   };
 
   return (

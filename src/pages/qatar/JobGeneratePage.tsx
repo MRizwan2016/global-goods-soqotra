@@ -11,6 +11,7 @@ import JobPageHeader from "./components/job-generate/page-sections/JobGenerateHe
 import GroupControlPanel from "./components/job-generate/page-sections/GroupControlPanel";
 import JobGenerateLayout from "./components/job-generate/page-sections/JobGenerateLayout";
 import ScheduleDetailsEditor from "./components/job-generate/schedule-details/ScheduleDetailsEditor";
+import { toast } from "sonner";
 
 const JobGeneratePage: React.FC = () => {
   const { jobsData, isLoading, pendingJobs } = useJobGenerate();
@@ -52,6 +53,26 @@ const JobGeneratePage: React.FC = () => {
     jobsForSchedule,
     isFormDisabled
   } = useJobGrouping(selectedJobs);
+  
+  // Validate required fields before printing
+  const validateBeforePrint = () => {
+    if (!scheduleData.vehicle) {
+      toast.error("Please select a vehicle");
+      return false;
+    }
+    if (selectedJobs.length === 0) {
+      toast.error("Please select at least one job");
+      return false;
+    }
+    return true;
+  };
+  
+  // Enhanced direct print handler with validation
+  const handleEnhancedDirectPrint = () => {
+    if (validateBeforePrint()) {
+      handleDirectPrint();
+    }
+  };
   
   if (isLoading) {
     return (
@@ -111,7 +132,7 @@ const JobGeneratePage: React.FC = () => {
             setFilterDate={setFilterDate}
             selectedJobs={selectedJobs}
             onCloseJobs={handleCloseJobs}
-            onPrintJobs={handleDirectPrint}
+            onPrintJobs={handleEnhancedDirectPrint}
             onEditSchedule={handleScheduleEdit}
           />
 

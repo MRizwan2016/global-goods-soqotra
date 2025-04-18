@@ -31,7 +31,29 @@ export const useScheduleActions = (
     }
     
     setIsEditMode(false);
-    toast.success("Schedule details have been saved");
+    
+    // Save schedule data with jobs
+    try {
+      const updatedJobs = selectedJobs.map(job => ({
+        ...job,
+        vehicle: scheduleData.vehicle,
+        driver: scheduleData.driver,
+        helper: scheduleData.helper,
+        scheduleNumber: scheduleData.scheduleNumber,
+        status: 'SCHEDULED',
+        isAssigned: true
+      }));
+      
+      // Update each job in storage
+      updatedJobs.forEach(job => {
+        JobStorageService.updateJob(job.id, job);
+      });
+      
+      toast.success("Schedule details have been saved");
+    } catch (error) {
+      console.error("Error saving schedule details:", error);
+      toast.error("Failed to save schedule details");
+    }
   };
 
   const handleScheduleSubmit = (data: JobScheduleFormData) => {
@@ -56,20 +78,23 @@ export const useScheduleActions = (
     setScheduleData(formDataWithUniqueSchedule);
     
     try {
-      const selectedJobIds = selectedJobs.map(job => job.id);
+      // Save all jobs with vehicle and schedule info
+      const updatedJobs = selectedJobs.map(job => ({
+        ...job,
+        status: 'SCHEDULED',
+        isAssigned: true,
+        vehicle: data.vehicle,
+        driver: data.driver,
+        helper: data.helper,
+        scheduleNumber: formDataWithUniqueSchedule.scheduleNumber
+      }));
       
-      selectedJobIds.forEach(id => {
-        JobStorageService.updateJob(id, { 
-          status: 'SCHEDULED',
-          isAssigned: true,
-          vehicle: data.vehicle,
-          driver: data.driver,
-          helper: data.helper,
-          scheduleNumber: formDataWithUniqueSchedule.scheduleNumber
-        });
+      // Update each job in storage
+      updatedJobs.forEach(job => {
+        JobStorageService.updateJob(job.id, job);
       });
       
-      console.log("Saving schedule with jobs:", formDataWithUniqueSchedule, selectedJobs);
+      console.log("Saving schedule with jobs:", formDataWithUniqueSchedule, updatedJobs);
       
       toast.success(`Schedule ${formDataWithUniqueSchedule.scheduleNumber} generated successfully`);
       setIsPrintMode(true);
@@ -95,9 +120,34 @@ export const useScheduleActions = (
       return;
     }
     
-    setTimeout(() => {
-      setIsPrintMode(true);
-    }, 100);
+    // Save schedule data before printing
+    try {
+      const updatedJobs = selectedJobs.map(job => ({
+        ...job,
+        vehicle: scheduleData.vehicle,
+        driver: scheduleData.driver,
+        helper: scheduleData.helper,
+        scheduleNumber: scheduleData.scheduleNumber,
+        status: 'SCHEDULED',
+        isAssigned: true
+      }));
+      
+      // Update each job in storage
+      updatedJobs.forEach(job => {
+        JobStorageService.updateJob(job.id, job);
+      });
+      
+      // Show a success message
+      toast.success(`Schedule ${scheduleData.scheduleNumber} saved. Preparing print view...`);
+      
+      // Set print mode after a short delay
+      setTimeout(() => {
+        setIsPrintMode(true);
+      }, 100);
+    } catch (error) {
+      console.error("Error saving schedule before print:", error);
+      toast.error("Failed to prepare schedule for printing");
+    }
   };
 
   return {
