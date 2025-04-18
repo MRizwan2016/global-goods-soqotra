@@ -21,7 +21,9 @@ import {
   DollarSign,
   ChevronLeft,
   ChevronRight,
-  Filter
+  Filter,
+  CarFront,
+  UserRoundCog
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,9 +47,7 @@ const KenyaDeliveryTracking = () => {
   const [paymentFilter, setPaymentFilter] = useState("all");
   const entriesPerPage = 10;
 
-  // Filter deliveries based on search text and selected filters
   const filteredDeliveries = mockDeliveries.filter((delivery) => {
-    // Search filter
     const searchMatch = 
       delivery.invoiceNumber.toLowerCase().includes(searchText.toLowerCase()) ||
       delivery.receiver.name.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -55,28 +55,23 @@ const KenyaDeliveryTracking = () => {
       delivery.receiver.contactNumber.includes(searchText) ||
       delivery.deliveryLocation.county.toLowerCase().includes(searchText.toLowerCase());
 
-    // Status filter - get the latest status
     const latestStatus = delivery.deliveryStatuses[delivery.deliveryStatuses.length - 1]?.status || "";
     const statusMatch = statusFilter === "all" || latestStatus === statusFilter;
 
-    // Warehouse filter
     const warehouseMatch = 
       warehouseFilter === "all" || 
       delivery.destinationWarehouse.includes(warehouseFilter === "mombasa" ? "Mombasa" : "Nairobi");
 
-    // Payment filter
     const paymentMatch = paymentFilter === "all" || delivery.paymentStatus === paymentFilter;
 
     return searchMatch && statusMatch && warehouseMatch && paymentMatch;
   });
 
-  // Pagination
   const totalPages = Math.ceil(filteredDeliveries.length / entriesPerPage);
   const indexOfLastEntry = currentPage * entriesPerPage;
   const indexOfFirstEntry = indexOfLastEntry - entriesPerPage;
   const currentEntries = filteredDeliveries.slice(indexOfFirstEntry, indexOfLastEntry);
 
-  // View delivery details
   const handleViewDelivery = (deliveryId: string) => {
     navigate(`/kenya/delivery/${deliveryId}`);
   };
@@ -87,14 +82,18 @@ const KenyaDeliveryTracking = () => {
         <div className="p-4 bg-green-50 border-b border-green-100 flex justify-between items-center">
           <h3 className="text-lg font-medium text-green-800">Kenya Cargo Collection & Delivery Management</h3>
           <div className="flex gap-2">
-            <Button variant="outline" className="flex items-center gap-1">
-              <Truck size={14} />
-              Manage Vehicles
-            </Button>
-            <Button variant="outline" className="flex items-center gap-1">
-              <User size={14} />
-              Manage Drivers
-            </Button>
+            <Link to="/kenya/vehicles">
+              <Button variant="outline" className="flex items-center gap-1">
+                <CarFront size={14} />
+                Manage Vehicles
+              </Button>
+            </Link>
+            <Link to="/kenya/drivers">
+              <Button variant="outline" className="flex items-center gap-1">
+                <UserRoundCog size={14} />
+                Manage Drivers
+              </Button>
+            </Link>
             <Link to="/kenya/delivery/new">
               <Button className="bg-green-600 hover:bg-green-700">Add New Delivery</Button>
             </Link>
@@ -102,7 +101,6 @@ const KenyaDeliveryTracking = () => {
         </div>
         
         <div className="p-4 flex flex-col gap-4">
-          {/* Filters */}
           <div className="flex flex-wrap gap-2 items-center">
             <div className="flex items-center gap-1">
               <Filter size={14} className="text-gray-500" />
@@ -160,7 +158,6 @@ const KenyaDeliveryTracking = () => {
             </div>
           </div>
           
-          {/* Delivery Table */}
           <div className="overflow-x-auto border border-gray-200 rounded-md">
             <Table>
               <TableHeader>
@@ -233,7 +230,6 @@ const KenyaDeliveryTracking = () => {
             </Table>
           </div>
           
-          {/* Pagination */}
           <div className="flex justify-between items-center mt-2">
             <div className="text-sm text-gray-500">
               Showing {filteredDeliveries.length > 0 ? indexOfFirstEntry + 1 : 0} to {Math.min(indexOfLastEntry, filteredDeliveries.length)} of {filteredDeliveries.length} entries
