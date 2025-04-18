@@ -13,7 +13,8 @@ const JobScheduleForm: React.FC<JobScheduleFormProps> = ({
   formData, 
   setFormData,
   selectedJobs,
-  disabled
+  disabled,
+  onVehicleChange
 }) => {
   const {
     handleInputChange,
@@ -34,6 +35,7 @@ const JobScheduleForm: React.FC<JobScheduleFormProps> = ({
             handleInputChange={handleInputChange}
             handleSelectChange={handleSelectChange}
             handleDateChange={handleDateChange}
+            onVehicleChange={onVehicleChange}
           />
           
           <FormActions 

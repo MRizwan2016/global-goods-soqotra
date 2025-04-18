@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { mockVehicles } from "../../../data/mockVehicles";
 import { mockSalesReps, mockDrivers, mockHelpers } from "../../../data/mockSalesReps";
@@ -27,7 +28,8 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
   selectedJobs,
   handleInputChange, 
   handleSelectChange,
-  handleDateChange 
+  handleDateChange,
+  onVehicleChange 
 }) => {
   // Extract cities and vehicle types from selected jobs
   const uniqueCities = extractUniqueCities(selectedJobs);
@@ -42,6 +44,7 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
         const recommendedVehicleNumber = vehicleNumberMap[vehicleType];
         if (recommendedVehicleNumber) {
           handleSelectChange("vehicle", recommendedVehicleNumber);
+          if (onVehicleChange) onVehicleChange(recommendedVehicleNumber);
         }
       }
     }
@@ -49,6 +52,12 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
 
   // Filter vehicles based on vehicle types from selected jobs
   const filteredVehicles = filterVehicles(mockVehicles, selectedJobs, uniqueCities);
+
+  // Handle vehicle change with notification
+  const handleVehicleChange = (value: string) => {
+    handleSelectChange("vehicle", value);
+    if (onVehicleChange) onVehicleChange(value);
+  };
   
   return (
     <>
@@ -60,7 +69,7 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
       
       <VehicleSelector
         value={formData.vehicle}
-        onChange={(value) => handleSelectChange("vehicle", value)}
+        onChange={handleVehicleChange}
         filteredVehicles={filteredVehicles}
         uniqueCities={uniqueCities}
         selectedJobs={selectedJobs}

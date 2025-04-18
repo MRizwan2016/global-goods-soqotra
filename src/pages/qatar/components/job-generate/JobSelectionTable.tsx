@@ -11,6 +11,7 @@ interface JobSelectionTableProps {
   jobs: QatarJob[];
   selectedJobs: QatarJob[];
   onToggleSelect: (job: QatarJob) => void;
+  selectedVehicleNumber?: string;
 }
 
 // Vehicle type to number mapping
@@ -23,15 +24,31 @@ const vehicleNumberMap: { [key: string]: string } = {
   "HIACE": "74827"
 };
 
+// Reverse mapping from vehicle number to type
+const vehicleTypeMap: { [key: string]: string } = Object.entries(vehicleNumberMap).reduce(
+  (acc, [type, number]) => ({ ...acc, [number]: type }), {}
+);
+
 const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
   jobs,
   selectedJobs,
   onToggleSelect,
+  selectedVehicleNumber,
 }) => {
-  const availableJobs = jobs.filter(job => 
-    job.status === 'PENDING' && 
-    job.isAssigned !== true
-  );
+  // Filter jobs based on status and vehicle matching
+  const availableJobs = jobs.filter(job => {
+    const isAvailable = job.status === 'PENDING' && job.isAssigned !== true;
+    
+    // If a vehicle number is selected, filter jobs by matching vehicle type
+    if (selectedVehicleNumber && isAvailable) {
+      const expectedVehicleType = vehicleTypeMap[selectedVehicleNumber];
+      if (expectedVehicleType) {
+        return job.vehicle?.toUpperCase() === expectedVehicleType;
+      }
+    }
+    
+    return isAvailable;
+  });
 
   // Function to get vehicle number based on vehicle type
   const getVehicleNumber = (vehicleType: string) => {
@@ -40,7 +57,7 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
 
   if (availableJobs.length === 0) {
     return (
-      <Card className="border border-gray-200 shadow-sm">
+      <Card className="border-0 shadow-md animate-fade-in">
         <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-500 text-white py-3 px-4">
           <CardTitle className="text-lg font-bold flex items-center">
             <Truck size={20} className="mr-2" />
@@ -48,7 +65,12 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent className="p-8 text-center">
-          <p className="text-gray-500">No pending jobs available for scheduling. Try creating new jobs or changing filter settings.</p>
+          <p className="text-gray-500">
+            {selectedVehicleNumber 
+              ? `No pending jobs available for vehicle #${selectedVehicleNumber}. Try selecting a different vehicle.`
+              : "No pending jobs available for scheduling. Try creating new jobs or changing filter settings."
+            }
+          </p>
         </CardContent>
       </Card>
     );
@@ -60,6 +82,11 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
         <CardTitle className="text-lg font-bold flex items-center">
           <Truck size={20} className="mr-2" />
           Job Selection ({availableJobs.length})
+          {selectedVehicleNumber && (
+            <Badge className="ml-2 bg-blue-700">
+              Vehicle #{selectedVehicleNumber}
+            </Badge>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">

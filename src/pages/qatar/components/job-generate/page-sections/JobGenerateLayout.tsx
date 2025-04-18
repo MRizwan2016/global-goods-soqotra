@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { QatarJob } from "../../../types/jobTypes";
 import JobScheduleForm from "../job-schedule-form";
 import JobSelectionTable from "../JobSelectionTable";
@@ -26,6 +26,13 @@ const JobGenerateLayout: React.FC<JobGenerateLayoutProps> = ({
   onToggleSelect,
   disabled
 }) => {
+  const [selectedVehicleNumber, setSelectedVehicleNumber] = useState<string | undefined>(scheduleData.vehicle || undefined);
+  
+  // Handle vehicle change from the form
+  const handleVehicleChange = (vehicle: string) => {
+    setSelectedVehicleNumber(vehicle);
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6 animate-fade-in">
       <div className="lg:col-span-1">
@@ -36,6 +43,7 @@ const JobGenerateLayout: React.FC<JobGenerateLayoutProps> = ({
             setFormData={setScheduleData}
             selectedJobs={jobsForSchedule}
             disabled={disabled}
+            onVehicleChange={handleVehicleChange}
           />
         </div>
       </div>
@@ -45,6 +53,7 @@ const JobGenerateLayout: React.FC<JobGenerateLayoutProps> = ({
           jobs={filteredJobs} 
           selectedJobs={selectedJobs}
           onToggleSelect={onToggleSelect}
+          selectedVehicleNumber={selectedVehicleNumber}
         />
       </div>
     </div>
