@@ -10,7 +10,7 @@ const usePrintReport = (componentRef: RefObject<HTMLDivElement>, options: PrintR
   const handlePrint = useReactToPrint({
     documentTitle: options.documentTitle || "Printed Report",
     onPrintError: (error) => console.error("Print failed:", error),
-    // The content property expects a function that returns the component ref
+    // The content property is now correctly typed as a function returning the ref's current value
     content: () => componentRef.current,
   });
 

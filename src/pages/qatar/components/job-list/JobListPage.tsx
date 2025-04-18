@@ -186,6 +186,12 @@ const JobListPage: React.FC<JobListPageProps> = ({
     setSelectedJob(null);
   };
 
+  // Handler for the print button click that wraps the handlePrint function
+  const handlePrintButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    handlePrint();
+  };
+
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-4">
@@ -271,7 +277,7 @@ const JobListPage: React.FC<JobListPageProps> = ({
       {/* Print Button */}
       <div className="flex justify-end mt-4">
         <Button 
-          onClick={handlePrint} 
+          onClick={handlePrintButtonClick} 
           className="bg-gray-700 hover:bg-gray-800 text-white"
         >
           <Printer className="h-4 w-4 mr-2" />
