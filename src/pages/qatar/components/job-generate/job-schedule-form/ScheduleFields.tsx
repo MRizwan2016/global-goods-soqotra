@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { mockVehicles } from "../../../data/mockVehicles";
 import { mockSalesReps, mockDrivers, mockHelpers } from "../../../data/mockSalesReps";
@@ -13,6 +12,16 @@ import {
   CityDisplay
 } from "./components";
 
+// Vehicle type to number mapping
+const vehicleNumberMap: { [key: string]: string } = {
+  "CAR": "41070",
+  "TRUCK": "41067",
+  "VAN": "41073",
+  "PICKUP": "514005",
+  "LORRY": "119927",
+  "HIACE": "74827"
+};
+
 const ScheduleFields: React.FC<ScheduleFieldsProps> = ({ 
   formData, 
   selectedJobs,
@@ -20,28 +29,26 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
   handleSelectChange,
   handleDateChange 
 }) => {
-  // Extract cities from selected jobs
+  // Extract cities and vehicle types from selected jobs
   const uniqueCities = extractUniqueCities(selectedJobs);
+  const selectedVehicleTypes = [...new Set(selectedJobs.map(job => job.vehicle))];
   
-  // Auto select vehicle based on city
+  // Auto select vehicle based on selected jobs
   useEffect(() => {
-    if (uniqueCities.length === 1 && !formData.vehicle) {
-      const city = uniqueCities[0];
-      const recommendedVehicles = cityVehicleMapping[city] || [];
-      if (recommendedVehicles.length > 0) {
-        handleSelectChange("vehicle", recommendedVehicles[0]);
+    if (selectedJobs.length > 0 && !formData.vehicle) {
+      // If all selected jobs have the same vehicle type, use its corresponding number
+      if (selectedVehicleTypes.length === 1 && selectedVehicleTypes[0]) {
+        const vehicleType = selectedVehicleTypes[0].toUpperCase();
+        const recommendedVehicleNumber = vehicleNumberMap[vehicleType];
+        if (recommendedVehicleNumber) {
+          handleSelectChange("vehicle", recommendedVehicleNumber);
+        }
       }
     }
-  }, [uniqueCities, formData.vehicle]);
-  
-  // Filter vehicles based on cities and job assignments
-  const filteredVehicles = filterVehicles(mockVehicles, selectedJobs, uniqueCities);
+  }, [selectedJobs, formData.vehicle]);
 
-  // Focus on specific vehicle numbers
-  const specificVehicleNumbers = ["41070", "41067", "41073", "514005", "119927", "74827"];
-  const prioritizedVehicles = mockVehicles.filter(
-    vehicle => specificVehicleNumbers.includes(vehicle.number)
-  );
+  // Filter vehicles based on vehicle types from selected jobs
+  const filteredVehicles = filterVehicles(mockVehicles, selectedJobs, uniqueCities);
   
   return (
     <>
@@ -54,7 +61,7 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
       <VehicleSelector
         value={formData.vehicle}
         onChange={(value) => handleSelectChange("vehicle", value)}
-        filteredVehicles={prioritizedVehicles.length > 0 ? prioritizedVehicles : filteredVehicles}
+        filteredVehicles={filteredVehicles}
         uniqueCities={uniqueCities}
         selectedJobs={selectedJobs}
       />

@@ -13,20 +13,30 @@ interface JobSelectionTableProps {
   onToggleSelect: (job: QatarJob) => void;
 }
 
+// Vehicle type to number mapping
+const vehicleNumberMap: { [key: string]: string } = {
+  "CAR": "41070",
+  "TRUCK": "41067",
+  "VAN": "41073",
+  "PICKUP": "514005",
+  "LORRY": "119927",
+  "HIACE": "74827"
+};
+
 const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
   jobs,
   selectedJobs,
   onToggleSelect,
 }) => {
-  // Ensure we only show pending jobs that aren't already assigned
   const availableJobs = jobs.filter(job => 
     job.status === 'PENDING' && 
     job.isAssigned !== true
   );
 
-  console.log("Total jobs passed to JobSelectionTable:", jobs.length);
-  console.log("Available jobs for scheduling:", availableJobs.length);
-  console.log("Available jobs details:", availableJobs);
+  // Function to get vehicle number based on vehicle type
+  const getVehicleNumber = (vehicleType: string) => {
+    return vehicleNumberMap[vehicleType.toUpperCase()] || vehicleType;
+  };
 
   if (availableJobs.length === 0) {
     return (
@@ -68,7 +78,7 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
                 </TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Mobile</TableHead>
-                <TableHead className="min-w-[120px]">Vehicle/Number</TableHead>
+                <TableHead className="min-w-[140px]">Vehicle/Number</TableHead>
                 <TableHead>
                   <div className="flex items-center">
                     <MapPin size={14} className="mr-1" />
@@ -83,6 +93,7 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
             <TableBody>
               {availableJobs.map((job, index) => {
                 const isSelected = selectedJobs.some((j) => j.id === job.id);
+                const vehicleNumber = getVehicleNumber(job.vehicle || '');
                 return (
                   <TableRow 
                     key={job.id}
@@ -103,9 +114,14 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
                     <TableCell>{job.mobileNumber}</TableCell>
                     <TableCell>
                       {job.vehicle ? (
-                        <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
-                          {job.vehicle}
-                        </Badge>
+                        <div className="flex flex-col gap-1">
+                          <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
+                            {job.vehicle}
+                          </Badge>
+                          <Badge variant="outline" className="bg-gray-50 text-gray-800 border-gray-200 text-xs">
+                            #{vehicleNumber}
+                          </Badge>
+                        </div>
                       ) : (
                         <span className="text-gray-500 text-sm">Not assigned</span>
                       )}
