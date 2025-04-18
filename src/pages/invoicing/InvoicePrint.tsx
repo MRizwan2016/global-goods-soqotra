@@ -57,9 +57,9 @@ const InvoicePrint = () => {
           }
         }
         
-        // Special case for invoice #13136051 - create it if not found
+        // Special case for Kenya invoice #13136051 - create it if not found
         if (!foundInvoice && id.includes("13136051")) {
-          console.log("Creating special invoice #13136051");
+          console.log("Creating special Kenya invoice #13136051");
           foundInvoice = {
             id: id,
             invoiceNumber: "13136051",
@@ -67,8 +67,8 @@ const InvoicePrint = () => {
             shipper1: "ADAM",
             consignee1: "MRS. FERNANDO",
             address: "NO 47/2, KOTADENIYA",
-            country: "SRI LANKA",
-            sector: "SL",
+            country: "Kenya",
+            sector: "KE",
             weight: "10.00",
             volume: "0.500",
             gross: 250.00,
