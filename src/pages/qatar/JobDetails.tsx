@@ -37,6 +37,12 @@ const JobDetails = () => {
   const handleUpdateJob = (jobData: any) => {
     if (!id) return;
     
+    // Prevent updating if job is completed or cancelled
+    if (job?.status === "COMPLETED" || job?.status === "CANCELLED") {
+      toast.error("Cannot update a completed or cancelled job");
+      return;
+    }
+    
     console.log("Updating job:", jobData);
     
     try {
@@ -72,6 +78,8 @@ const JobDetails = () => {
       </Layout>
     );
   }
+
+  const isJobReadOnly = job.status === "COMPLETED" || job.status === "CANCELLED";
   
   return (
     <Layout title={`Job ${job.jobNumber} - ${job.jobType}`}>
@@ -80,12 +88,18 @@ const JobDetails = () => {
           <div>
             <h1 className="text-2xl font-bold">JOB DETAILS: {job.jobNumber}</h1>
             <p className="text-gray-500">{job.jobType} JOB - {job.date}</p>
+            {isJobReadOnly && (
+              <p className="text-amber-600 mt-1 font-semibold">
+                This job is {job.status.toLowerCase()} and cannot be modified
+              </p>
+            )}
           </div>
         </div>
         
         <JobForm 
           jobId={job.id}
           onSubmit={handleUpdateJob}
+          readOnly={isJobReadOnly}
         />
       </div>
     </Layout>
