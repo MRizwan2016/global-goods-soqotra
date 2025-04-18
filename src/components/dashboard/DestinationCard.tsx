@@ -10,14 +10,14 @@ interface DestinationCardProps {
 
 const DestinationCard = ({ country, bgColor, to }: DestinationCardProps) => {
   return (
-    <div className={`rounded-md p-5 ${bgColor} text-white flex justify-between items-center`}>
-      <h3 className="text-xl font-semibold">{country}</h3>
+    <div className={`glass rounded-lg p-5 ${bgColor} flex justify-between items-center card-hover`}>
+      <h3 className="text-xl font-semibold text-gray-800">{country}</h3>
       <Link 
         to={to} 
-        className="flex items-center gap-1 text-sm font-medium hover:underline"
+        className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors duration-300"
       >
         View Details 
-        <ArrowRight size={16} />
+        <ArrowRight className="w-4 h-4 animate-slide-in" />
       </Link>
     </div>
   );
