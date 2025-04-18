@@ -1,11 +1,9 @@
 
 import React from "react";
 import { FormState } from "../../types";
-import PaymentDatePicker from "./PaymentDatePicker";
-import PaymentMethodSelector from "./PaymentMethodSelector";
-import PaymentAmount from "./PaymentAmount";
+import PaymentSummary from "./PaymentSummary";
+import PaymentInputs from "./PaymentInputs";
 import PaymentControls from "./PaymentControls";
-import AmountsSummary from "./AmountsSummary";
 
 interface PaymentInformationProps {
   formState: FormState;
@@ -30,29 +28,20 @@ const PaymentInformation: React.FC<PaymentInformationProps> = ({
     <div className="space-y-6 bg-white p-6 rounded-lg border border-gray-200">
       <h3 className="text-lg font-semibold text-gray-800">Payment Information</h3>
       
-      <AmountsSummary
+      <PaymentSummary
         formState={formState}
         currencySymbol={currencySymbol}
       />
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <PaymentAmount
-          formState={formState}
-          currencySymbol={currencySymbol}
-          handleInputChange={handleInputChange}
-          handlePaymentAmountChange={handlePaymentAmountChange}
-        />
-        
-        <PaymentDatePicker
-          date={date}
-          handleDateSelect={handleDateSelect}
-        />
-        
-        <PaymentMethodSelector
-          formState={formState}
-          handleSelectChange={handleSelectChange}
-        />
-      </div>
+      <PaymentInputs
+        formState={formState}
+        currencySymbol={currencySymbol}
+        date={date}
+        handleInputChange={handleInputChange}
+        handleDateSelect={handleDateSelect}
+        handleSelectChange={handleSelectChange}
+        handlePaymentAmountChange={handlePaymentAmountChange}
+      />
       
       <PaymentControls
         formState={formState}
