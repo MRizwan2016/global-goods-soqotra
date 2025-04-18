@@ -1,14 +1,9 @@
 
 import React from "react";
-import { Trash2, Edit } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { JobItem } from "../../types/jobTypes";
-
-interface PackageItemsTableProps {
-  items: JobItem[];
-  onEdit?: (item: JobItem) => void;
-  onDelete?: (id: string) => void;
-}
+import { PackageItemsTableProps } from "./package-items/types";
+import EmptyState from "./package-items/EmptyState";
+import TableHeader from "./package-items/TableHeader";
+import ActionButtons from "./package-items/ActionButtons";
 
 const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
   items = [],
@@ -19,36 +14,13 @@ const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
   const validItems = items.filter(item => item.quantity > 0);
 
   if (validItems.length === 0) {
-    return (
-      <div className="text-center py-8 bg-gray-50 rounded-lg border border-gray-200 animate-fade-in">
-        <p className="text-gray-500">NO ITEMS ADDED YET</p>
-        <p className="text-sm text-gray-400 mt-1">ADD ITEMS USING THE FORM ABOVE OR CLICK "NEW PACKAGE" TO ADD WITH DIMENSIONS</p>
-      </div>
-    );
+    return <EmptyState />;
   }
 
   return (
     <div className="overflow-x-auto animate-fade-in">
       <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              ITEM DESCRIPTION
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              SELL PRICE
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              QUANTITY
-            </th>
-            <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              TOTAL
-            </th>
-            <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-              ACTIONS
-            </th>
-          </tr>
-        </thead>
+        <TableHeader />
         <tbody className="bg-white divide-y divide-gray-200">
           {validItems.map((item, index) => (
             <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
@@ -65,28 +37,11 @@ const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
                 {(item.sellPrice * item.quantity).toFixed(2)}
               </td>
               <td className="px-4 py-3 whitespace-nowrap text-right">
-                <div className="flex justify-end gap-2">
-                  {onEdit && (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => onEdit(item)}
-                      className="bg-amber-50 text-amber-600 hover:bg-amber-100 border-amber-200"
-                    >
-                      <Edit size={16} />
-                    </Button>
-                  )}
-                  {onDelete && (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => onDelete(item.id)}
-                      className="bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  )}
-                </div>
+                <ActionButtons 
+                  item={item}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                />
               </td>
             </tr>
           ))}
