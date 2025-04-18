@@ -11,6 +11,7 @@ export const useInvoicePrintData = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   // Parse the mode from URL query parameters
   const queryParams = new URLSearchParams(location.search);
@@ -22,7 +23,9 @@ export const useInvoicePrintData = () => {
   
   useEffect(() => {
     if (!id) {
-      toast.error("No invoice ID provided");
+      const errorMsg = "No invoice ID provided";
+      setError(errorMsg);
+      toast.error(errorMsg);
       setTimeout(() => {
         navigate("/data-entry/invoicing", { replace: true });
       }, 2000);
@@ -49,14 +52,18 @@ export const useInvoicePrintData = () => {
         setInvoice(foundInvoice);
         setLoading(false);
       } else {
-        console.error("Invoice not found with ID:", id);
+        const errorMsg = "Invoice not found with ID: " + id;
+        setError(errorMsg);
+        console.error(errorMsg);
         toast.error("Invoice not found. Please check the invoice ID.");
         setTimeout(() => {
           navigate("/data-entry/invoicing", { replace: true });
         }, 2000);
       }
-    } catch (error) {
-      console.error("Error loading invoice:", error);
+    } catch (err) {
+      const errorMsg = "Error loading invoice: " + err;
+      setError(errorMsg);
+      console.error(errorMsg);
       toast.error("Error loading invoice data");
       setLoading(false);
     }
@@ -100,5 +107,6 @@ export const useInvoicePrintData = () => {
     loading,
     handlePrint,
     handleBack,
+    error
   };
 };

@@ -8,9 +8,11 @@ import CargoDetails from "../CargoDetails";
 import WarehouseSchedule from "../WarehouseSchedule";
 import TransportAssignment from "../TransportAssignment";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { mockDrivers, mockVehicles } from "../../data/mockDeliveryData";
+import { DeliveryFormState } from "../../types/deliveryForm";
 
 interface DeliveryFormContentProps {
-  formState: any; // Using any temporarily, should be properly typed
+  formState: DeliveryFormState;
   onInputChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onCheckboxChange: (checked: boolean) => void;
   onSelectChange: (name: string, value: string) => void;
