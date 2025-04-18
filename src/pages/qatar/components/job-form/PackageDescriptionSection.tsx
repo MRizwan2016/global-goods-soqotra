@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, X, Edit, Package } from "lucide-react";
@@ -18,7 +17,6 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { useJobForm } from "./context/JobFormContext";
 
-// Common package descriptions for personal effects
 const COMMON_ITEMS = [
   "LARGE CARTON BOX PERSONAL EFFECTS",
   "MEDIUM CARTON BOX PERSONAL EFFECTS",
@@ -51,7 +49,6 @@ const PackageDescriptionSection = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   
-  // For custom package dimensions
   const [length, setLength] = useState("");
   const [width, setWidth] = useState("");
   const [height, setHeight] = useState("");
@@ -59,7 +56,6 @@ const PackageDescriptionSection = () => {
   const [isPackageDialogOpen, setIsPackageDialogOpen] = useState(false);
 
   const handleItemNameChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    // Convert to uppercase
     setItemName(e.target.value.toUpperCase());
   };
 
@@ -87,32 +83,25 @@ const PackageDescriptionSection = () => {
     const parsedQuantity = parseInt(quantity || "1");
 
     if (isEditing && editingItemId) {
-      // Inform parent component of the edit, typically you would need to implement
-      // this in the parent component
-      const updatedItem: JobItem = {
+      handleAddItem({
         id: editingItemId,
-        jobId: 'temp', // Will be set by parent component
-        itemName: itemName.toUpperCase(), // Ensure uppercase
+        jobId: 'temp',
+        itemName: itemName.toUpperCase(),
         sellPrice: parsedSellPrice,
         quantity: parsedQuantity,
-      };
+      });
       
-      handleAddItem(updatedItem);
-      
-      // Reset form
       resetForm();
       toast.success("Item updated successfully");
     } else {
-      // Add new item
-      const newItem: JobItem = {
+      handleAddItem({
         id: uuidv4(),
-        jobId: 'temp', // Will be set by parent component
-        itemName: itemName.toUpperCase(), // Ensure uppercase
+        jobId: 'temp',
+        itemName: itemName.toUpperCase(),
         sellPrice: parsedSellPrice,
         quantity: parsedQuantity,
-      };
+      });
       
-      handleAddItem(newItem);
       resetForm();
       toast.success("Item added successfully");
     }
@@ -129,7 +118,7 @@ const PackageDescriptionSection = () => {
     
     const newItem: JobItem = {
       id: uuidv4(),
-      jobId: 'temp', // Will be set by parent component
+      jobId: 'temp',
       itemName: packageName,
       sellPrice: parseFloat(sellPrice),
       quantity: parseInt(quantity || "1"),
@@ -167,13 +156,12 @@ const PackageDescriptionSection = () => {
   };
 
   const handleDeleteItem = (id: string) => {
-    // Add a deleted item with negative quantity to effectively remove it
     const deletedItem: JobItem = {
       id,
       jobId: 'temp',
       itemName: 'DELETED_ITEM',
       sellPrice: 0,
-      quantity: -1, // Negative quantity signals deletion
+      quantity: -1,
     };
     handleAddItem(deletedItem);
     toast.success("Item removed");

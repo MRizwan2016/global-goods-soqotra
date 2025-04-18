@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Download, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { QatarJob } from "../../types/jobTypes";
-import { usePrintReport } from "../../hooks/usePrintReport";
+import usePrintReport from "../../hooks/usePrintReport";
 import { Input } from "@/components/ui/input";
 
 interface JobListPageProps {
