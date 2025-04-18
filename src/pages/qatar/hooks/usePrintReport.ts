@@ -1,19 +1,19 @@
 
 import { useReactToPrint } from "react-to-print";
+import { RefObject } from "react";
 
-const usePrintReport = (componentRef: React.RefObject<HTMLDivElement>) => {
+interface PrintReportOptions {
+  documentTitle?: string;
+}
+
+const usePrintReport = (componentRef: RefObject<HTMLDivElement>, options: PrintReportOptions = {}) => {
   const handlePrint = useReactToPrint({
-    documentTitle: "Printed Report",
+    documentTitle: options.documentTitle || "Printed Report",
     onPrintError: (error) => console.error("Print failed:", error),
-    contentRef: componentRef,
+    content: () => componentRef.current,
   });
 
-  return (): Promise<void> => {
-    return new Promise<void>((resolve) => {
-      handlePrint();
-      setTimeout(resolve, 100);
-    });
-  };
+  return handlePrint;
 };
 
 export default usePrintReport;
