@@ -1,72 +1,19 @@
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useJobGenerate } from "./hooks/job-generate/useJobGenerate";
 import { useJobFiltering } from "./hooks/useJobFiltering";
 import { useJobSelection } from "./hooks/useJobSelection";
 import { useJobGrouping } from "./hooks/useJobGrouping";
 import Layout from "@/components/layout/Layout";
 import PrintJobSchedule from "./components/print/PrintJobSchedule";
 import JobFilters from "./components/job-generate/JobFilters";
-import JobGenerateHeader from "./components/job-generate/page-sections/JobGenerateHeader";
+import JobPageHeader from "./components/job-generate/page-sections/JobGenerateHeader";
 import GroupControlPanel from "./components/job-generate/page-sections/GroupControlPanel";
 import JobGenerateLayout from "./components/job-generate/page-sections/JobGenerateLayout";
-import { JobStorageService } from "./services/JobStorageService";
-import { QatarJob } from "./types/jobTypes";
 import ScheduleDetailsEditor from "./components/job-generate/schedule-details/ScheduleDetailsEditor";
-import { mockJobs } from "./data/mockJobData";
-import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 
 const JobGeneratePage: React.FC = () => {
-  const [jobsData, setJobsData] = useState<QatarJob[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    // Load all jobs
-    let allJobs = JobStorageService.getAllJobs();
-    console.log("Initial job load:", allJobs.length);
-    
-    // If no jobs exist, initialize with mock data
-    if (allJobs.length === 0) {
-      console.log("No jobs found in storage, initializing with mock data");
-      mockJobs.forEach(job => {
-        // Ensure we have PENDING jobs for schedule generation
-        const jobToSave = { ...job };
-        if (Math.random() > 0.5) {
-          jobToSave.status = 'PENDING';
-          jobToSave.isAssigned = false;
-        }
-        JobStorageService.saveJob(jobToSave);
-      });
-      allJobs = JobStorageService.getAllJobs();
-      toast.success("Sample jobs loaded successfully");
-    }
-    
-    // Make sure we have at least a few pending jobs for scheduling
-    const pendingJobs = allJobs.filter(job => job.status === 'PENDING' && !job.isAssigned);
-    if (pendingJobs.length === 0) {
-      console.log("No pending jobs found, converting some to pending");
-      // Convert at least 3 jobs to pending status
-      const jobsToConvert = allJobs.slice(0, 3);
-      jobsToConvert.forEach(job => {
-        JobStorageService.updateJob(job.id, { 
-          status: 'PENDING', 
-          isAssigned: false 
-        });
-      });
-      
-      // Reload all jobs after modifications
-      allJobs = JobStorageService.getAllJobs();
-      toast.success("Added pending jobs for scheduling");
-    }
-    
-    console.log("Loaded jobs:", allJobs.length);
-    console.log("Pending jobs:", allJobs.filter(job => job.status === 'PENDING' && !job.isAssigned).length);
-    setJobsData(allJobs);
-    setIsLoading(false);
-  }, []);
+  const { jobsData, isLoading, pendingJobs } = useJobGenerate();
   
   const {
     selectedJobs,
@@ -83,7 +30,6 @@ const JobGeneratePage: React.FC = () => {
     handleDirectPrint
   } = useJobSelection();
   
-  // Initialize with ALL to see all jobs, then user can filter as needed
   const {
     statusFilter,
     setStatusFilter,
@@ -150,30 +96,12 @@ const JobGeneratePage: React.FC = () => {
     );
   }
   
-  // Get unassigned pending jobs
-  const pendingJobs = jobsData.filter(job => job.status === 'PENDING' && job.isAssigned !== true);
-  console.log("Pending unassigned jobs:", pendingJobs.length);
-  
   return (
     <Layout title="Job Schedule Generation">
       <div className="w-full">
         <div className="max-w-full mx-auto">
-          <div className="mb-6 flex items-center justify-between">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate("/qatar")}
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Button>
-          </div>
-
-          <div className="bg-blue-600 text-white p-6 rounded-lg mb-6">
-            <h1 className="text-2xl font-medium mb-2">Soqotra Logistics - Job Schedule</h1>
-            <p className="text-blue-100">Create and manage job schedules for your vehicles and drivers</p>
-          </div>
-
+          <JobPageHeader />
+          
           <JobFilters
             statusFilter={statusFilter}
             setStatusFilter={setStatusFilter}
