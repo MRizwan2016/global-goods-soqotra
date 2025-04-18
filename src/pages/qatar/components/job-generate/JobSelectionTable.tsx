@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Truck, Calendar } from "lucide-react";
+import { Truck, Calendar, MapPin } from "lucide-react";
 
 interface JobSelectionTableProps {
   jobs: QatarJob[];
@@ -68,8 +68,13 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
                 </TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Mobile</TableHead>
-                <TableHead>Town</TableHead>
-                <TableHead>Location</TableHead>
+                <TableHead className="min-w-[120px]">Vehicle/Number</TableHead>
+                <TableHead>
+                  <div className="flex items-center">
+                    <MapPin size={14} className="mr-1" />
+                    Location
+                  </div>
+                </TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Sector</TableHead>
                 <TableHead>City</TableHead>
@@ -96,14 +101,22 @@ const JobSelectionTable: React.FC<JobSelectionTableProps> = ({
                     <TableCell>{job.date}</TableCell>
                     <TableCell>{job.customer}</TableCell>
                     <TableCell>{job.mobileNumber}</TableCell>
-                    <TableCell>{job.town}</TableCell>
-                    <TableCell>{job.location}</TableCell>
+                    <TableCell>
+                      {job.vehicle ? (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-800 border-blue-200">
+                          {job.vehicle}
+                        </Badge>
+                      ) : (
+                        <span className="text-gray-500 text-sm">Not assigned</span>
+                      )}
+                    </TableCell>
+                    <TableCell>{job.location || "N/A"}</TableCell>
                     <TableCell>
                       <Badge className={job.jobType === "COLLECTION" ? "bg-green-100 text-green-800 hover:bg-green-200" : "bg-amber-100 text-amber-800 hover:bg-amber-200"}>
                         {job.jobType}
                       </Badge>
                     </TableCell>
-                    <TableCell>{job.sector}</TableCell>
+                    <TableCell>{job.sector || "N/A"}</TableCell>
                     <TableCell>
                       {job.city && (
                         <Badge variant="outline" className="bg-gray-50">
