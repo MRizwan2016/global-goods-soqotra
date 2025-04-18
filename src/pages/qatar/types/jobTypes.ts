@@ -10,6 +10,7 @@ export interface QatarJob {
   city: string;
   town?: string;
   sector?: string;
+  branch?: string; // Added the branch property
   mobileNumber: string;
   jobType: 'COLLECTION' | 'DELIVERY';
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'SCHEDULED';
@@ -31,11 +32,13 @@ export interface QatarJob {
   remarks?: string;
   entryBy?: string;
   items?: JobItem[];
+  collectDate?: string; // Added this as it's used in mockJobs.ts
+  entryDate?: string; // Added this as it's used in mockJobs.ts
 }
 
 export interface JobItem {
   id: string;
-  name?: string; // Making name optional since many items use itemName instead
+  name?: string;
   quantity: number;
   description?: string;
   weight?: number;
