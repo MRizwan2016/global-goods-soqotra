@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -62,14 +61,7 @@ export const useSellingRateForm = (rateId?: string) => {
     : null;
   
   // React Hook Form setup with Zod validation
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors, isSubmitting },
-    reset
-  } = useForm<SellingRateFormValues>({
+  const methods = useForm<SellingRateFormValues>({
     resolver: zodResolver(sellingRateSchema),
     defaultValues: {
       tariffNumber: existingRate?.tariffNumber || "",
@@ -79,6 +71,15 @@ export const useSellingRateForm = (rateId?: string) => {
       country: existingRate?.country || "Sri Lanka",
     }
   });
+  
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+    reset
+  } = methods;
   
   // Watch for country changes to update districts and rate boxes
   const watchedCountry = watch("country");
@@ -167,6 +168,7 @@ export const useSellingRateForm = (rateId?: string) => {
     handleInputChange,
     handleRateChange,
     onSubmit,
-    watch, // Add watch to the returned object
+    watch,
+    methods,
   };
 };

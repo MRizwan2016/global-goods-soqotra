@@ -26,6 +26,7 @@ const SellingRatesForm = () => {
     handleRateChange,
     onSubmit,
     watch,
+    methods // This should include the React Hook Form methods
   } = useSellingRateForm(id);
   
   // Watch the country value to pass to FormHeader
@@ -39,8 +40,8 @@ const SellingRatesForm = () => {
           country={country}
         />
         
-        {/* Form tag with native onSubmit handler */}
-        <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Wrap the entire form content with the Form (FormProvider) from React Hook Form */}
+        <Form {...methods}>
           <div className="p-6">
             <TariffDetailsForm 
               register={register}
@@ -63,7 +64,7 @@ const SellingRatesForm = () => {
               onSubmit={onSubmit}
             />
           </div>
-        </form>
+        </Form>
       </div>
     </Layout>
   );
