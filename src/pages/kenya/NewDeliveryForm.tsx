@@ -1,32 +1,16 @@
 
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 import Layout from "@/components/layout/Layout";
-import { useDeliveryForm } from "./hooks/useDeliveryForm";
-
-// Import components
-import FormHeader from "./components/FormHeader";
-import DeliveryFormContent from "./components/delivery-form/DeliveryFormContent";
-import FormActions from "./components/FormActions";
+import BackButton from "@/components/ui/back-button";
 
 const NewDeliveryForm = () => {
-  const navigate = useNavigate();
-  const { formState, handleInputChange, handleCheckboxChange, handleSelectChange, handleSubmit } = useDeliveryForm(navigate);
-
   return (
-    <Layout title="Create New Delivery">
-      <div className="space-y-6">
-        <FormHeader />
-        
-        <form onSubmit={handleSubmit}>
-          <DeliveryFormContent 
-            formState={formState}
-            onInputChange={handleInputChange}
-            onCheckboxChange={handleCheckboxChange}
-            onSelectChange={handleSelectChange}
-          />
-          <FormActions onSubmit={handleSubmit} />
-        </form>
+    <Layout title="New Delivery">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="mb-4">
+          <BackButton to="/kenya/deliveries" />
+        </div>
+        <h1>New Delivery Form Content</h1>
       </div>
     </Layout>
   );

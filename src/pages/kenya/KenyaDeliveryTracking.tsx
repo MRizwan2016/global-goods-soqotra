@@ -37,6 +37,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { CargoDelivery } from "./types/deliveryTracking";
 import { getStatusBadge, getPaymentBadge } from "./utils/statusUtils";
+import BackButton from "@/components/ui/back-button";
 
 const KenyaDeliveryTracking = () => {
   const navigate = useNavigate();
@@ -80,7 +81,10 @@ const KenyaDeliveryTracking = () => {
     <Layout title="Kenya Cargo Delivery Tracking">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-4 bg-green-50 border-b border-green-100 flex justify-between items-center">
-          <h3 className="text-lg font-medium text-green-800">Kenya Cargo Collection & Delivery Management</h3>
+          <div className="flex items-center gap-4">
+            <BackButton to="/kenya" />
+            <h3 className="text-lg font-medium text-green-800">Kenya Cargo Collection & Delivery Management</h3>
+          </div>
           <div className="flex gap-2">
             <Link to="/kenya/vehicles">
               <Button variant="outline" className="flex items-center gap-1">

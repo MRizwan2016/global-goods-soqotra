@@ -1,19 +1,16 @@
 
 import React from "react";
 import Layout from "@/components/layout/Layout";
-import DriverManagementHeader from "./components/driver-management/DriverManagementHeader";
-import DriverList from "./components/driver-management/DriverList";
-import DriverFilters from "./components/driver-management/DriverFilters";
+import BackButton from "@/components/ui/back-button";
 
-const DriverManagement: React.FC = () => {
+const DriverManagement = () => {
   return (
-    <Layout title="Qatar Driver Management">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <DriverManagementHeader />
-        <div className="p-4 flex flex-col gap-4">
-          <DriverFilters />
-          <DriverList />
+    <Layout title="Driver Management">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="mb-4">
+          <BackButton to="/kenya/deliveries" />
         </div>
+        <h1>Driver Management Content</h1>
       </div>
     </Layout>
   );
