@@ -1,7 +1,8 @@
 
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useFullScreen } from './invoice-details/useFullScreen';
+import { toast } from 'sonner';
 import InvoiceDetailsHeader from './invoice-details/InvoiceDetailsHeader';
 import InvoiceFinancialDetails from './invoice-details/InvoiceFinancialDetails';
 import ShippingDetails from './invoice-details/ShippingDetails';
@@ -10,36 +11,101 @@ import PaymentDetailsTable from './invoice-details/PaymentDetailsTable';
 import CargoDetailsTable from './invoice-details/CargoDetailsTable';
 import ShippingTrackingInfo from './invoice-details/ShippingTrackingInfo';
 import ActionButtons from './invoice-details/ActionButtons';
+import { mockInvoiceData } from '@/data/mockData';
 
-interface InvoiceDetailsViewProps {
-  invoice: any;
-  onClose?: () => void;
-}
-
-export const InvoiceDetailsView: React.FC<InvoiceDetailsViewProps> = ({ invoice, onClose }) => {
+export const InvoiceDetailsView: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [invoice, setInvoice] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
   const { isFullScreen, toggleFullScreen, exitFullScreen } = useFullScreen();
+
+  useEffect(() => {
+    const fetchInvoiceData = async () => {
+      try {
+        // First try to get from localStorage for real data
+        const storedInvoices = localStorage.getItem('invoices');
+        let foundInvoice = null;
+        
+        if (storedInvoices) {
+          const parsedInvoices = JSON.parse(storedInvoices);
+          foundInvoice = parsedInvoices.find((inv: any) => inv.id === id);
+        }
+        
+        // If not found in localStorage, check mock data
+        if (!foundInvoice) {
+          foundInvoice = mockInvoiceData.find(inv => inv.id === id);
+        }
+        
+        if (foundInvoice) {
+          console.log("Found invoice:", foundInvoice);
+          setInvoice(foundInvoice);
+        } else {
+          toast.error("Invoice not found");
+          setTimeout(() => navigate("/reports/cargo"), 1000);
+        }
+      } catch (error) {
+        console.error("Error fetching invoice:", error);
+        toast.error("Error loading invoice data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchInvoiceData();
+    }
+  }, [id, navigate]);
 
   const handleBack = () => {
     if (isFullScreen) {
       exitFullScreen();
     }
-    if (onClose) {
-      onClose();
-    } else {
-      navigate("/reports/cargo");
-    }
+    navigate("/reports/cargo");
   };
 
   const containerClasses = isFullScreen 
     ? "fixed inset-0 z-50 bg-white p-6 overflow-y-auto animate-fade-in" 
     : "invoice-details-container space-y-6";
 
+  // Show loading state while fetching invoice
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading invoice details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if invoice not found
+  if (!invoice) {
+    return (
+      <div className="p-6 bg-white rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold text-red-600 mb-2">Invoice Not Found</h2>
+        <p className="text-gray-600 mb-4">The requested invoice could not be loaded.</p>
+        <button 
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          onClick={() => navigate('/reports/cargo')}
+        >
+          Return to Cargo Reports
+        </button>
+      </div>
+    );
+  }
+
+  // Safely check if packageDetails exists and has items
+  const hasPackageDetails = invoice.packageDetails && Array.isArray(invoice.packageDetails) && invoice.packageDetails.length > 0;
+  
   // Check if cargo is loaded by looking for container info in package details
-  const isCargoLoaded = invoice.packageDetails?.some((pkg: any) => pkg.containerNo && pkg.vesselName);
+  const isCargoLoaded = hasPackageDetails && 
+    invoice.packageDetails.some((pkg: any) => pkg.containerNo && pkg.vesselName);
   
   // Get shipping info from the first loaded package
-  const loadedPackage = invoice.packageDetails?.find((pkg: any) => pkg.containerNo && pkg.vesselName);
+  const loadedPackage = hasPackageDetails ? 
+    invoice.packageDetails.find((pkg: any) => pkg.containerNo && pkg.vesselName) : null;
   
   const containerNo = loadedPackage?.containerNo;
   const vesselName = loadedPackage?.vesselName;
@@ -58,7 +124,7 @@ export const InvoiceDetailsView: React.FC<InvoiceDetailsViewProps> = ({ invoice,
         vesselName={vesselName}
         voyage={voyage}
         eta={eta}
-        isLoaded={isCargoLoaded}
+        isLoaded={isCargoLoaded || false}
       />
       
       <InvoiceFinancialDetails 
@@ -97,4 +163,3 @@ export const InvoiceDetailsView: React.FC<InvoiceDetailsViewProps> = ({ invoice,
     </div>
   );
 };
-
