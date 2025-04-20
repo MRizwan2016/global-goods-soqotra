@@ -45,7 +45,7 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
           />
         </div>
         <ReceiptActions 
-          onPrint={() => handlePrint()}
+          onPrint={handlePrint}
           onDownload={handleDownloadPDF}
           onShare={handleShare}
         />

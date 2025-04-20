@@ -20,14 +20,18 @@ interface ReceiptContentProps {
 }
 
 const ReceiptContent: React.FC<ReceiptContentProps> = ({ receiptData, currencySymbol }) => {
+  // Generate proper QR data with receipt details
   const qrData = JSON.stringify({
     receiptNumber: receiptData.receiptNumber,
     invoiceNumber: receiptData.invoiceNumber,
     amount: receiptData.amount,
     currency: receiptData.currency,
     date: receiptData.date,
+    customer: receiptData.customer,
     verified: true
   });
+
+  console.log("Generating QR code with data:", qrData);
 
   return (
     <div className="p-6">
