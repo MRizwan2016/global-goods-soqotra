@@ -1,27 +1,55 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { sellingRateSchema, SellingRateFormValues, districtRateSchema } from "../schema/sellingRateSchema";
 import { SellingRatesService } from "@/services/SellingRatesService";
 
-// Define BoxType as an exported type
 export type BoxType = {
   id: string;
   name: string;
 };
 
-// Export the useSellingRateForm hook
+export type CurrencyOption = {
+  code: string;
+  name: string;
+  symbol: string;
+};
+
+export type RateWithPromo = {
+  baseRate: string;
+  promoRate?: string;
+  promoStartDate?: string;
+  promoEndDate?: string;
+};
+
 export const useSellingRateForm = (id?: string) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditing] = useState(!!id);
   const [districts, setDistricts] = useState<string[]>([]);
   const [rateBoxes, setRateBoxes] = useState<BoxType[]>([]);
-  const [districtRates, setDistrictRates] = useState<{[key: string]: {[key: string]: string}}>({});
+  const [districtRates, setDistrictRates] = useState<{[key: string]: {[key: string]: {
+    baseRate: string;
+    promoRate?: string;
+    promoStartDate?: string;
+    promoEndDate?: string;
+  }}}>({});
   const [isDistrictRatesValid, setIsDistrictRatesValid] = useState(true);
   const [sectors, setSectors] = useState<string[]>([]);
 
-  // Setup form with react-hook-form and zod validation
+  const [selectedCurrency, setSelectedCurrency] = useState<CurrencyOption>({
+    code: 'QAR',
+    name: 'Qatari Riyal',
+    symbol: 'QR'
+  });
+
+  const currencies: CurrencyOption[] = [
+    { code: 'QAR', name: 'Qatari Riyal', symbol: 'QR' },
+    { code: 'USD', name: 'US Dollar', symbol: '$' },
+    { code: 'AED', name: 'UAE Dirham', symbol: 'د.إ' },
+    { code: 'SAR', name: 'Saudi Riyal', symbol: '﷼' },
+    { code: 'EGP', name: 'Egyptian Pound', symbol: 'E£' }
+  ];
+
   const methods = useForm<SellingRateFormValues>({
     resolver: zodResolver(sellingRateSchema),
     defaultValues: {
@@ -37,7 +65,6 @@ export const useSellingRateForm = (id?: string) => {
   const { register, handleSubmit, watch, setValue, formState: { errors } } = methods;
   const watchedCountry = watch("country");
 
-  // Generate a tariff number
   function generateTariffNumber() {
     const prefix = "TR";
     const timestamp = Date.now().toString().slice(-6);
@@ -45,24 +72,20 @@ export const useSellingRateForm = (id?: string) => {
     return `${prefix}${timestamp}${random}`;
   }
 
-  // Initialize form data when in edit mode
   useEffect(() => {
     if (isEditing && id) {
-      // In a real app, fetch data from API
-      // Simulate fetching data
       setTimeout(() => {
         const mockSellingRates = {
           id: "1",
           freightType: "S",
           tariffNumber: "TR123456",
           effectiveFrom: "2023-01-01",
-          effectiveUntil: "2023-12-31", // Make sure effectiveUntil exists
+          effectiveUntil: "2023-12-31",
           district: "Central",
           country: "Kenya",
           sector: "Nairobi",
         };
 
-        // Populate form fields with fetched data
         setValue("tariffNumber", mockSellingRates.tariffNumber);
         setValue("freightType", mockSellingRates.freightType as any);
         setValue("sector", mockSellingRates.sector);
@@ -73,9 +96,7 @@ export const useSellingRateForm = (id?: string) => {
     }
   }, [isEditing, id, setValue]);
 
-  // Load initial data for rate boxes (package types) and districts
   useEffect(() => {
-    // Default rate boxes (package types)
     setRateBoxes([
       { id: "S", name: "SMALL" },
       { id: "M", name: "MEDIUM" },
@@ -84,17 +105,14 @@ export const useSellingRateForm = (id?: string) => {
       { id: "XXL", name: "DOUBLE XL" }
     ]);
 
-    // Set initial districts based on selected country
     updateDistrictsByCountry(watchedCountry);
   }, []);
 
-  // Update districts when country changes
   useEffect(() => {
     updateDistrictsByCountry(watchedCountry);
     updateSectorsByCountry(watchedCountry);
   }, [watchedCountry]);
 
-  // Update sectors based on selected country
   const updateSectorsByCountry = (country: string) => {
     switch(country) {
       case "Kenya":
@@ -138,7 +156,6 @@ export const useSellingRateForm = (id?: string) => {
     }
   };
 
-  // Update districts based on selected country
   const updateDistrictsByCountry = (country: string) => {
     switch(country) {
       case "Kenya":
@@ -166,7 +183,7 @@ export const useSellingRateForm = (id?: string) => {
         setDistricts(["Tunis", "Ariana", "Ben Arous", "Manouba", "Nabeul", "Zaghouan"]);
         break;
       case "Philippines":
-        setDistricts(["Metro Manila", "Cebu", "Davao", "Cagayan", "Iloilo", "Bacolod"]);
+        setDistricts(["Luzon 1", "Luzon 2", "Luzon 3", "Visayas", "Mindanao"]);
         break;
       case "Mozambique":
         setDistricts(["Maputo City", "Maputo Province", "Gaza", "Inhambane", "Sofala", "Manica"]);
@@ -180,45 +197,94 @@ export const useSellingRateForm = (id?: string) => {
       default:
         setDistricts([]);
     }
-
-    // Reset district rates when the country changes
-    setDistrictRates({});
   };
 
-  // Handle input changes for basic form fields
+  const handleCurrencyChange = (currencyCode: string) => {
+    const newCurrency = currencies.find(c => c.code === currencyCode) || currencies[0];
+    setSelectedCurrency(newCurrency);
+  };
+
+  const handleRateChange = (
+    district: string, 
+    boxId: string, 
+    value: string, 
+    type: 'baseRate' | 'promoRate' = 'baseRate'
+  ) => {
+    const updatedRates = { ...districtRates };
+    
+    if (!updatedRates[district]) {
+      updatedRates[district] = {};
+    }
+    
+    if (!updatedRates[district][boxId]) {
+      updatedRates[district][boxId] = {
+        baseRate: '',
+        promoRate: '',
+        promoStartDate: '',
+        promoEndDate: ''
+      };
+    }
+
+    if (type === 'baseRate') {
+      updatedRates[district][boxId].baseRate = value;
+    } else {
+      updatedRates[district][boxId].promoRate = value;
+    }
+    
+    setDistrictRates(updatedRates);
+    validateDistrictRates(updatedRates);
+  };
+
+  const handlePromoDateChange = (
+    district: string,
+    boxId: string,
+    startDate: string | undefined,
+    endDate: string | undefined
+  ) => {
+    const updatedRates = { ...districtRates };
+    
+    if (!updatedRates[district]) {
+      updatedRates[district] = {};
+    }
+    
+    if (!updatedRates[district][boxId]) {
+      updatedRates[district][boxId] = {
+        baseRate: '',
+        promoRate: '',
+        promoStartDate: '',
+        promoEndDate: ''
+      };
+    }
+
+    updatedRates[district][boxId].promoStartDate = startDate || '';
+    updatedRates[district][boxId].promoEndDate = endDate || '';
+    
+    setDistrictRates(updatedRates);
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setValue(name as keyof SellingRateFormValues, value);
   };
 
-  // Handle rate changes for districts
-  const handleRateChange = (district: string, boxId: string, value: string) => {
-    // Create a deep copy of current district rates
-    const updatedRates = JSON.parse(JSON.stringify(districtRates));
-    
-    // Initialize district if it doesn't exist
-    if (!updatedRates[district]) {
-      updatedRates[district] = {};
-    }
-    
-    // Set the rate value
-    updatedRates[district][boxId] = value;
-    
-    // Update state
-    setDistrictRates(updatedRates);
-    
-    // Validate all rates
-    validateDistrictRates(updatedRates);
-  };
-
-  // Validate that all district rates are positive numbers or empty
-  const validateDistrictRates = (rates: {[key: string]: {[key: string]: string}}) => {
+  const validateDistrictRates = (rates: {[key: string]: {[key: string]: {
+    baseRate: string;
+    promoRate?: string;
+    promoStartDate?: string;
+    promoEndDate?: string;
+  }}}) => {
     let isValid = true;
     
     Object.keys(rates).forEach(district => {
       Object.keys(rates[district]).forEach(boxId => {
-        const value = rates[district][boxId];
-        if (value !== "" && (isNaN(parseFloat(value)) || parseFloat(value) < 0)) {
+        const baseRate = rates[district][boxId].baseRate;
+        const promoRate = rates[district][boxId].promoRate;
+
+        if (baseRate !== "" && (isNaN(parseFloat(baseRate)) || parseFloat(baseRate) < 0)) {
+          isValid = false;
+        }
+
+        if (promoRate !== undefined && promoRate !== "" && (isNaN(parseFloat(promoRate)) || parseFloat(promoRate) < 0)) {
           isValid = false;
         }
       });
@@ -227,13 +293,11 @@ export const useSellingRateForm = (id?: string) => {
     setIsDistrictRatesValid(isValid);
   };
 
-  // Add a custom package to the rate boxes
   const addCustomPackage = (packageName: string) => {
     const id = `CUSTOM_${Date.now()}`;
     setRateBoxes(prev => [...prev, { id, name: packageName.toUpperCase() }]);
   };
 
-  // Submit form data
   const onSubmit = async (data: SellingRateFormValues) => {
     if (!isDistrictRatesValid) {
       return false;
@@ -242,13 +306,11 @@ export const useSellingRateForm = (id?: string) => {
     setIsSubmitting(true);
     
     try {
-      // Prepare data for saving
       const formattedData = {
         ...data,
         districtRates,
       };
       
-      // Save data using the SellingRatesService
       const result = await SellingRatesService.saveSellingRates(formattedData);
       
       setIsSubmitting(false);
@@ -276,6 +338,10 @@ export const useSellingRateForm = (id?: string) => {
     watch,
     methods,
     sectors,
-    addCustomPackage
+    addCustomPackage,
+    currencies,
+    selectedCurrency,
+    handleCurrencyChange,
+    handlePromoDateChange
   };
 };

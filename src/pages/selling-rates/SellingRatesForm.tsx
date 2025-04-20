@@ -1,4 +1,3 @@
-
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { useSellingRateForm } from "./hooks/useSellingRateForm";
@@ -29,10 +28,13 @@ const SellingRatesForm = () => {
     watch,
     methods,
     sectors,
-    addCustomPackage
+    addCustomPackage,
+    currencies,
+    selectedCurrency,
+    handleCurrencyChange,
+    handlePromoDateChange
   } = useSellingRateForm(id);
   
-  // Watch the country value to pass to FormHeader
   const country = watch("country");
 
   const handleFormSubmit = async (data: any) => {
@@ -54,7 +56,6 @@ const SellingRatesForm = () => {
           country={country}
         />
         
-        {/* Wrap the entire form content with the Form (FormProvider) from React Hook Form */}
         <Form {...methods}>
           <div className="p-6">
             <TariffDetailsForm 
@@ -62,6 +63,9 @@ const SellingRatesForm = () => {
               errors={errors}
               handleInputChange={handleInputChange}
               sectors={sectors}
+              currencies={currencies}
+              selectedCurrency={selectedCurrency}
+              onCurrencyChange={handleCurrencyChange}
             />
             
             <RatesTable 
@@ -69,8 +73,10 @@ const SellingRatesForm = () => {
               rateBoxes={rateBoxes}
               districtRates={districtRates}
               handleRateChange={handleRateChange}
+              handlePromoDateChange={handlePromoDateChange}
               isDistrictRatesValid={isDistrictRatesValid}
               addCustomPackage={addCustomPackage}
+              selectedCurrency={selectedCurrency}
             />
             
             <FormActions 

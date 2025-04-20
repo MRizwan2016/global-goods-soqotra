@@ -16,13 +16,19 @@ interface TariffDetailsFormProps {
   errors: FieldErrors<SellingRateFormValues>;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   sectors: string[];
+  currencies: CurrencyOption[];
+  selectedCurrency: CurrencyOption;
+  onCurrencyChange: (currencyCode: string) => void;
 }
 
 const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({ 
   register, 
   errors, 
   handleInputChange,
-  sectors
+  sectors,
+  currencies,
+  selectedCurrency,
+  onCurrencyChange
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
@@ -101,6 +107,23 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
             {errors.effectiveFrom.message}
           </FormMessage>
         )}
+      </FormItem>
+
+      <FormItem className="flex flex-col">
+        <FormLabel className="text-sm font-medium mb-1 text-soqotra-slate">CURRENCY:</FormLabel>
+        <FormControl>
+          <select
+            value={selectedCurrency.code}
+            onChange={(e) => onCurrencyChange(e.target.value)}
+            className="bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors"
+          >
+            {currencies.map(currency => (
+              <option key={currency.code} value={currency.code}>
+                {currency.code} - {currency.name}
+              </option>
+            ))}
+          </select>
+        </FormControl>
       </FormItem>
 
       <FormItem className="flex flex-col">
