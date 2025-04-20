@@ -63,7 +63,7 @@ const BranchSelector: React.FC<BranchSelectorProps> = ({
           <SelectValue placeholder="Select Branch" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Select Branch</SelectItem>
+          {/* Replace empty string with a placeholder value */}
           {availableBranches.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}

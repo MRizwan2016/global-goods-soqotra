@@ -16,7 +16,6 @@ interface SectorSelectorProps {
 
 const SectorSelector: React.FC<SectorSelectorProps> = ({ sector, onSectorChange }) => {
   const sectors = [
-    { value: "", label: "Select Sector" },
     { value: "north", label: "North" },
     { value: "south", label: "South" },
     { value: "east", label: "East" },
