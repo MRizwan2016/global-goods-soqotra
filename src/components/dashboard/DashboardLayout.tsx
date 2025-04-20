@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { ReactNode } from 'react';
 import DashboardCard from './DashboardCard';
 import ShipmentAnalytics from './ShipmentAnalytics';
 import PrimaryDestinations from './PrimaryDestinations';
