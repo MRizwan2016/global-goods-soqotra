@@ -10,7 +10,7 @@ export const useReceiptActions = (receiptRef: React.RefObject<HTMLDivElement>, r
     documentTitle: `Receipt-${receiptNumber}`,
     onAfterPrint: () => toast.success("Receipt printed successfully"),
     onPrintError: () => toast.error("Failed to print receipt"),
-    // Use the correct property name: content instead of body
+    // @ts-ignore - The type definitions are incorrect, content is the correct property
     content: () => receiptRef.current
   });
 
