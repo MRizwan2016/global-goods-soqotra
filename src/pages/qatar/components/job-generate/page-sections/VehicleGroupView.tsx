@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Truck } from "lucide-react";
+import { Truck, Circle } from "lucide-react";
 import { QatarJob } from "../../../types/jobTypes";
 
 interface VehicleGroupViewProps {
@@ -21,6 +21,16 @@ const VehicleGroupView: React.FC<VehicleGroupViewProps> = ({
   jobsByVehicle,
   vehicleNumbers,
 }) => {
+  // Vehicle status mapping
+  const vehicleStatus: Record<string, boolean> = {
+    "41067": true,  // available
+    "41073": true,
+    "41070": true,
+    "514005": false, // busy
+    "119927": false,
+    "74827": true,
+  };
+
   return (
     <>
       <Button 
@@ -46,7 +56,10 @@ const VehicleGroupView: React.FC<VehicleGroupViewProps> = ({
                   className="mb-2"
                   size="sm"
                 >
-                  {vehicle} ({jobsByVehicle[vehicle].length} jobs)
+                  <Circle 
+                    className={`mr-1 h-3 w-3 ${vehicleStatus[vehicle] ? 'text-green-500 fill-green-500' : 'text-red-500 fill-red-500'}`} 
+                  />
+                  {vehicle} ({jobsByVehicle[vehicle]?.length || 0} jobs)
                 </Button>
               ))
             ) : (

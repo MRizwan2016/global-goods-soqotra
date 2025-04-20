@@ -16,9 +16,9 @@ const VehicleSelector = () => {
 
   // Updated vehicles list with specific vehicle numbers
   const vehicles = [
-    { id: "41073", name: "41073 - LORRY", status: "available" },
     { id: "41067", name: "41067 - LORRY", status: "available" },
     { id: "41070", name: "41070 - LORRY", status: "available" },
+    { id: "41073", name: "41073 - LORRY", status: "available" },
     { id: "514005", name: "514005 - LORRY", status: "busy" },
     { id: "74827", name: "74827 - TRUCK", status: "available" },
     { id: "119927", name: "119927 - TRUCK", status: "busy" },
