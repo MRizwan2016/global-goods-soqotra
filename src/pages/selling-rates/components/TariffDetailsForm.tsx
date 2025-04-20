@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/form";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { SellingRateFormValues } from '../schema/sellingRateSchema';
+import { CurrencyOption } from '../hooks/useSellingRateForm';
 
 interface TariffDetailsFormProps {
   register: UseFormRegister<SellingRateFormValues>;

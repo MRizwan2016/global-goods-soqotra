@@ -345,3 +345,5 @@ export const useSellingRateForm = (id?: string) => {
     handlePromoDateChange
   };
 };
+
+export default useSellingRateForm;
