@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useFullScreen } from './invoice-details/useFullScreen';
@@ -96,3 +97,4 @@ export const InvoiceDetailsView: React.FC<InvoiceDetailsViewProps> = ({ invoice,
     </div>
   );
 };
+
