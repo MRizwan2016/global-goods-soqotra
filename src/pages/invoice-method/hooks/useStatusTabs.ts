@@ -45,9 +45,9 @@ export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
 
   const handleViewInvoice = (id: string) => {
     console.log("View invoice details for ID:", id);
-    // Navigate to invoice preview page
-    navigate(`/data-entry/print-documents/invoice-preview/${id}`);
-    toast.success("Opening invoice preview");
+    // Navigate to the InvoiceDetailsView component instead of print preview
+    navigate(`/reports/cargo/invoice/${id}`);
+    toast.success("Opening invoice details");
   };
 
   const handleClosePaymentDetails = () => {

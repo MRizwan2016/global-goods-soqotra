@@ -79,7 +79,8 @@ export const useInvoiceList = () => {
   };
   
   const handleViewInvoice = (id: string) => {
-    navigate(`/data-entry/invoicing/view/${id}`);
+    navigate(`/reports/cargo/invoice/${id}`);
+    toast.success("Opening invoice details");
   };
   
   return {

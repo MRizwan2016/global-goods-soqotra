@@ -55,10 +55,10 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
   // Ensure NIC number is displayed
   const nicNumber = item.nic || (item.id === "inv-13136051" ? "QAT987654" : "");
   
-  // Handle view invoice - navigate to print preview
+  // Handle view invoice - navigate to invoice details view
   const handleViewInvoice = () => {
-    navigate(`/data-entry/print-documents/invoice-print/${item.id}`);
-    toast.success("Opening print preview for invoice");
+    navigate(`/reports/cargo/invoice/${item.id}`);
+    toast.success("Opening invoice details");
   };
   
   // Handle delete - placeholder for delete functionality

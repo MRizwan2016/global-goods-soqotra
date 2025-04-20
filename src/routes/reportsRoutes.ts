@@ -1,29 +1,41 @@
 
-import { RouteConfig } from "./types";
 import CargoReports from "@/pages/reports/CargoReports";
-import FinancialReports from "@/pages/reports/FinancialReports";
+import CargoReportsPage from "@/pages/reports/CargoReportsPage";
 import CargoStatistics from "@/pages/reports/CargoStatistics";
-import Shipments from "@/pages/reports/shipments/Shipments";
+import FinancialReports from "@/pages/reports/FinancialReports";
+import FinancialReportsPage from "@/pages/reports/FinancialReportsPage";
+import { InvoiceDetailsView } from "@/components/reports/InvoiceDetailsView";
+import { RouteConfig } from "./types";
 
 export const reportsRoutes: RouteConfig[] = [
   {
     path: "/reports/cargo",
-    element: CargoReports,
-    private: true
+    element: CargoReportsPage,
+    private: true,
   },
   {
-    path: "/reports/cargo/statistics",
+    path: "/reports/cargo-statistics",
     element: CargoStatistics,
-    private: true
+    private: true,
   },
   {
-    path: "/reports/cargo/shipments",
-    element: Shipments,
-    private: true
+    path: "/reports/cargo/:section",
+    element: CargoReports,
+    private: true,
+  },
+  {
+    path: "/reports/cargo/invoice/:id",
+    element: InvoiceDetailsView,
+    private: true,
   },
   {
     path: "/reports/financial",
+    element: FinancialReportsPage,
+    private: true,
+  },
+  {
+    path: "/reports/financial/:section",
     element: FinancialReports,
-    private: true
+    private: true,
   }
 ];

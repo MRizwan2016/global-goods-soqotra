@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, DollarSign, CheckCircle2 } from "lucide-react";
+import { FileText, DollarSign, CheckCircle2, Eye } from "lucide-react";
 
 type ButtonType = "pay" | "details" | "view";
 
@@ -37,7 +37,7 @@ const InvoiceActionButton: React.FC<InvoiceActionButtonProps> = ({
       case "view":
         return {
           text: "View",
-          icon: <FileText className="h-4 w-4 mr-1" />,
+          icon: <Eye className="h-4 w-4 mr-1" />,
           variant: "outline",
           classes: "",
         };

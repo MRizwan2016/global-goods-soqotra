@@ -46,9 +46,9 @@ const UnsettledInvoicesTab: React.FC<UnsettledInvoicesTabProps> = ({
 
   const handleViewInvoice = (invoice: UnsettledInvoice) => {
     console.log("View invoice:", invoice);
-    // Navigate to invoice preview page
-    navigate(`/data-entry/print-documents/invoice-preview/${invoice.id}`);
-    toast.success(`Opening invoice preview for ${invoice.invoiceNumber || 'invoice'}`);
+    // Navigate to invoice details view instead of preview
+    navigate(`/reports/cargo/invoice/${invoice.id}`);
+    toast.success(`Opening invoice details for ${invoice.invoiceNumber || 'invoice'}`);
   };
 
   return (
