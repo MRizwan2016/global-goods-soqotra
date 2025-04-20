@@ -8,7 +8,10 @@ import { toast } from "sonner";
 export const useReceiptActions = (receiptRef: React.RefObject<HTMLDivElement>, receiptNumber: string) => {
   const handlePrint = useReactToPrint({
     documentTitle: `Receipt-${receiptNumber}`,
-    onBeforePrint: () => console.log("Preparing to print receipt:", receiptRef.current),
+    onBeforePrint: async () => {
+      console.log("Preparing to print receipt:", receiptRef.current);
+      return Promise.resolve();
+    },
     onAfterPrint: () => toast.success("Receipt printed successfully"),
     onPrintError: (error) => {
       console.error("Print error:", error);
