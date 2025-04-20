@@ -1,82 +1,68 @@
 
 import React from 'react';
-import { Input } from "@/components/ui/input";
-import { 
-  Table, 
-  TableBody, 
-  TableHeader, 
-  TableRow,
-  InvoiceTableHead,
-  InvoiceTableCell
-} from "@/components/ui/table";
 import { BoxType } from '../hooks/useSellingRateForm';
+import CustomPackageForm from './CustomPackageForm';
 
 interface RatesTableProps {
   districts: string[];
   rateBoxes: BoxType[];
   districtRates: {[key: string]: {[key: string]: string}};
   handleRateChange: (district: string, boxId: string, value: string) => void;
-  isDistrictRatesValid?: boolean;
+  isDistrictRatesValid: boolean;
+  addCustomPackage: (packageName: string) => void;
 }
 
-const RatesTable: React.FC<RatesTableProps> = ({ 
-  districts, 
-  rateBoxes, 
-  districtRates, 
+const RatesTable: React.FC<RatesTableProps> = ({
+  districts,
+  rateBoxes,
+  districtRates,
   handleRateChange,
-  isDistrictRatesValid = true
+  isDistrictRatesValid,
+  addCustomPackage
 }) => {
   return (
     <div className="mt-8">
-      <div className="mb-2">
-        <h3 className="text-md font-medium text-soqotra-slate">DISTRICT RATES:</h3>
-        {!isDistrictRatesValid && (
-          <p className="text-red-500 text-xs mt-1">
-            Please ensure all rates are valid positive numbers
-          </p>
-        )}
+      <div className="flex justify-between items-center mb-2">
+        <h2 className="text-lg font-semibold">District Rates</h2>
+        <CustomPackageForm onAddPackage={addCustomPackage} />
       </div>
+      
+      {!isDistrictRatesValid && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          Please ensure all rates are valid numbers.
+        </div>
+      )}
+      
       <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-soqotra-navy text-white hover:bg-soqotra-navy/90">
-              <InvoiceTableHead className="w-48 text-white">DISTRICT/ZONE</InvoiceTableHead>
+        <table className="min-w-full border-collapse">
+          <thead>
+            <tr className="bg-soqotra-blue text-white">
+              <th className="text-left px-4 py-2">District</th>
               {rateBoxes.map(box => (
-                <InvoiceTableHead key={box.id} className="text-white">
-                  {box.name}
-                </InvoiceTableHead>
+                <th key={box.id} className="px-4 py-2 whitespace-normal">{box.name}</th>
               ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+            </tr>
+          </thead>
+          <tbody>
             {districts.map(district => (
-              <TableRow key={district} className="hover:bg-blue-50">
-                <InvoiceTableCell className="font-medium text-soqotra-slate">{district}</InvoiceTableCell>
-                {rateBoxes.map(box => {
-                  // Validate the input value
-                  const value = districtRates[district]?.[box.id] || "0";
-                  const isInvalid = value !== "" && (isNaN(Number(value)) || Number(value) < 0);
-                  
-                  return (
-                    <InvoiceTableCell key={box.id}>
-                      <Input
-                        type="number"
-                        value={value}
-                        onChange={(e) => handleRateChange(district, box.id, e.target.value)}
-                        className={`border ${isInvalid ? 'border-red-500' : 'border-gray-300'} w-full focus:border-soqotra-blue focus:ring-1 focus:ring-soqotra-blue`}
-                      />
-                      {isInvalid && (
-                        <p className="text-red-500 text-xs mt-1">
-                          Must be a positive number
-                        </p>
-                      )}
-                    </InvoiceTableCell>
-                  );
-                })}
-              </TableRow>
+              <tr key={district} className="border-b">
+                <td className="px-4 py-2 font-semibold">{district}</td>
+                {rateBoxes.map(box => (
+                  <td key={`${district}-${box.id}`} className="px-4 py-2">
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={districtRates[district]?.[box.id] || ""}
+                      onChange={(e) => handleRateChange(district, box.id, e.target.value)}
+                      className="border border-gray-300 rounded w-full p-2 text-right"
+                    />
+                  </td>
+                ))}
+              </tr>
             ))}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       </div>
     </div>
   );

@@ -138,6 +138,10 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
             <option value="United Arab Emirates">UNITED ARAB EMIRATES</option>
             <option value="Somalia">SOMALIA</option>
             <option value="Tunisia">TUNISIA</option>
+            <option value="Philippines">PHILIPPINES</option>
+            <option value="Mozambique">MOZAMBIQUE</option>
+            <option value="Uganda">UGANDA</option>
+            <option value="Tanzania">TANZANIA</option>
           </select>
         </FormControl>
         {errors.country && (

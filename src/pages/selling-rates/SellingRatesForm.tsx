@@ -7,6 +7,7 @@ import FormHeader from "./components/FormHeader";
 import TariffDetailsForm from "./components/TariffDetailsForm";
 import RatesTable from "./components/RatesTable";
 import FormActions from "./components/FormActions";
+import { toast } from "sonner";
 
 const SellingRatesForm = () => {
   const { id } = useParams();
@@ -27,11 +28,23 @@ const SellingRatesForm = () => {
     onSubmit,
     watch,
     methods,
-    sectors // Make sure to get sectors from the hook
+    sectors,
+    addCustomPackage
   } = useSellingRateForm(id);
   
   // Watch the country value to pass to FormHeader
   const country = watch("country");
+
+  const handleFormSubmit = async (data: any) => {
+    const result = await onSubmit(data);
+    if (result) {
+      toast.success("Selling rates saved successfully!");
+      toast.info("Rates have been applied to all related modules: Invoicing, Jobs, and Manifests.");
+      setTimeout(() => {
+        navigate("/selling-rates");
+      }, 1500);
+    }
+  };
   
   return (
     <Layout title={isEditing ? "Update Selling Tariff" : "Add Selling Tariff"}>
@@ -48,7 +61,7 @@ const SellingRatesForm = () => {
               register={register}
               errors={errors}
               handleInputChange={handleInputChange}
-              sectors={sectors} // Pass the sectors prop to TariffDetailsForm
+              sectors={sectors}
             />
             
             <RatesTable 
@@ -57,13 +70,14 @@ const SellingRatesForm = () => {
               districtRates={districtRates}
               handleRateChange={handleRateChange}
               isDistrictRatesValid={isDistrictRatesValid}
+              addCustomPackage={addCustomPackage}
             />
             
             <FormActions 
               isSubmitting={isSubmitting}
               isDistrictRatesValid={isDistrictRatesValid}
               handleSubmit={handleSubmit}
-              onSubmit={onSubmit}
+              onSubmit={handleFormSubmit}
             />
           </div>
         </Form>
