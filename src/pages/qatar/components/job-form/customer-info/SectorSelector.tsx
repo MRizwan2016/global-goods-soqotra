@@ -1,7 +1,13 @@
 
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface SectorSelectorProps {
   sector: string;
@@ -21,18 +27,17 @@ const SectorSelector: React.FC<SectorSelectorProps> = ({ sector, onSectorChange 
   return (
     <div className="form-group">
       <Label htmlFor="sector" className="font-medium">Sector</Label>
-      <Select
-        id="sector"
-        value={sector}
-        onValueChange={onSectorChange}
-        placeholder="Select Sector"
-        className="w-full mt-1"
-      >
-        {sectors.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
+      <Select value={sector} onValueChange={onSectorChange}>
+        <SelectTrigger id="sector" className="w-full mt-1">
+          <SelectValue placeholder="Select Sector" />
+        </SelectTrigger>
+        <SelectContent>
+          {sectors.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
       </Select>
     </div>
   );

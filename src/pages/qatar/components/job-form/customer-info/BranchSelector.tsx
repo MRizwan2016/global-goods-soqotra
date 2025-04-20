@@ -1,7 +1,13 @@
 
 import React, { useMemo } from "react";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface BranchSelectorProps {
   sector: string;
@@ -48,20 +54,22 @@ const BranchSelector: React.FC<BranchSelectorProps> = ({
   return (
     <div className="form-group">
       <Label htmlFor="branch" className="font-medium">Branch</Label>
-      <Select
-        id="branch"
-        value={branch}
+      <Select 
+        value={branch} 
         onValueChange={onBranchChange}
-        placeholder="Select Branch"
         disabled={!sector}
-        className="w-full mt-1"
       >
-        <option value="">Select Branch</option>
-        {availableBranches.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
+        <SelectTrigger id="branch" className="w-full mt-1">
+          <SelectValue placeholder="Select Branch" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="">Select Branch</SelectItem>
+          {availableBranches.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
       </Select>
     </div>
   );
