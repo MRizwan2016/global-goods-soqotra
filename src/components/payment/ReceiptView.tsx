@@ -1,7 +1,8 @@
+
 import React, { useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Printer, Download, Share2 } from "lucide-react";
+import { Printer, Download, Share2, X } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
@@ -32,10 +33,11 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
   const receiptRef = useRef<HTMLDivElement>(null);
 
   const handlePrint = useReactToPrint({
-    content: () => receiptRef.current,
     documentTitle: `Receipt-${receiptData.receiptNumber}`,
     onAfterPrint: () => toast.success("Receipt printed successfully"),
-    onPrintError: () => toast.error("Failed to print receipt")
+    onPrintError: () => toast.error("Failed to print receipt"),
+    // Fixed: changed 'content' to 'body' which is the correct property
+    body: () => receiptRef.current
   });
 
   const handleDownloadPDF = async () => {
@@ -200,7 +202,7 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
         <DialogFooter className="p-4 bg-gray-50 print:hidden">
           <div className="flex gap-2 w-full">
             <Button 
-              onClick={handlePrint} 
+              onClick={() => handlePrint()}
               className="flex-1 bg-blue-600 hover:bg-blue-700"
             >
               <Printer className="mr-2" size={16} />
