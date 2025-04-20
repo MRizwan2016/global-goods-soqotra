@@ -15,14 +15,17 @@ export const useDistrictRates = () => {
 
   const updateDistrictsByCountry = (country: string) => {
     switch(country) {
-      case "Kenya":
-        setDistricts(["Central", "Nairobi", "Coast", "Eastern", "Nyanza", "Rift Valley", "Western"]);
-        break;
       case "Sri Lanka":
-        setDistricts(["Colombo", "Gampaha", "Kalutara", "Kandy", "Matale", "Nuwara Eliya"]);
+        setDistricts(["Colombo", "Kandy", "Kurunegala", "Galle", "Addalachennai", "Nindavur"]);
+        break;
+      case "Tunisia":
+        setDistricts(["Rades", "Tunis", "Sfax", "Sousse", "Gabes"]);
         break;
       case "Eritrea":
-        setDistricts(["Anseba", "Debub", "Gash-Barka", "Maekel", "Northern Red Sea", "Southern Red Sea"]);
+        setDistricts(["Anseba", "Debub", "Gash-Barka", "Maekel", "Northern Red Sea", "Southern Red Sea", "Mussawa", "Assab", "Hargeisa"]);
+        break;
+      case "Kenya":
+        setDistricts(["Central", "Nairobi", "Coast", "Eastern", "Nyanza", "Rift Valley", "Western"]);
         break;
       case "Sudan":
         setDistricts(["Khartoum", "North Darfur", "South Darfur", "West Darfur", "Blue Nile"]);
@@ -35,9 +38,6 @@ export const useDistrictRates = () => {
         break;
       case "Somalia":
         setDistricts(["Banaadir", "Galguduud", "Hiiraan", "Mudug", "Nugaal"]);
-        break;
-      case "Tunisia":
-        setDistricts(["Tunis", "Ariana", "Ben Arous", "Manouba", "Nabeul", "Zaghouan"]);
         break;
       case "Philippines":
         setDistricts(["Luzon 1", "Luzon 2", "Luzon 3", "Visayas", "Mindanao"]);
