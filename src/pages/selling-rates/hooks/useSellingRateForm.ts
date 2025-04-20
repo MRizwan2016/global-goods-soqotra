@@ -1,18 +1,28 @@
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { sellingRateSchema, SellingRateFormValues } from "../schema/sellingRateSchema";
 import { SellingRatesService } from "@/services/SellingRatesService";
+import { SellingRateFormValues } from "../schema/sellingRateSchema";
 import { useCurrencyHandling } from "./useCurrencyHandling";
 import { useDistrictRates } from "./useDistrictRates";
+import { useSellingRateFormHandling } from "./useSellingRateFormHandling";
 import { BoxType, CurrencyOption } from "../types/sellingRates";
 
-export { BoxType, CurrencyOption };
+// Re-export types using 'export type' to fix the isolatedModules error
+export type { BoxType, CurrencyOption };
 
 export const useSellingRateForm = (id?: string) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditing] = useState(!!id);
   const [sectors, setSectors] = useState<string[]>([]);
+
+  const {
+    methods,
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    errors,
+    handleInputChange
+  } = useSellingRateFormHandling();
 
   const {
     currencies,
@@ -31,27 +41,12 @@ export const useSellingRateForm = (id?: string) => {
     addCustomPackage
   } = useDistrictRates();
 
-  const methods = useForm<SellingRateFormValues>({
-    resolver: zodResolver(sellingRateSchema),
-    defaultValues: {
-      tariffNumber: generateTariffNumber(),
-      freightType: "S",
-      sector: "",
-      effectiveFrom: new Date().toISOString().split('T')[0],
-      effectiveUntil: "",
-      country: ""
-    }
-  });
-
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = methods;
   const watchedCountry = watch("country");
 
-  function generateTariffNumber() {
-    const prefix = "TR";
-    const timestamp = Date.now().toString().slice(-6);
-    const random = Math.floor(Math.random() * 100).toString().padStart(2, '0');
-    return `${prefix}${timestamp}${random}`;
-  }
+  useEffect(() => {
+    updateDistrictsByCountry(watchedCountry);
+    updateSectorsByCountry(watchedCountry);
+  }, [watchedCountry]);
 
   useEffect(() => {
     if (isEditing && id) {
@@ -76,11 +71,6 @@ export const useSellingRateForm = (id?: string) => {
       }, 500);
     }
   }, [isEditing, id, setValue]);
-
-  useEffect(() => {
-    updateDistrictsByCountry(watchedCountry);
-    updateSectorsByCountry(watchedCountry);
-  }, [watchedCountry]);
 
   const updateSectorsByCountry = (country: string) => {
     switch(country) {
@@ -123,11 +113,6 @@ export const useSellingRateForm = (id?: string) => {
       default:
         setSectors([]);
     }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setValue(name as keyof SellingRateFormValues, value);
   };
 
   const onSubmit = async (data: SellingRateFormValues) => {
