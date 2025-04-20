@@ -16,7 +16,7 @@ const SignatureSection: React.FC = () => {
       </div>
       <div className="mt-8 text-center text-sm text-gray-500">
         <p>Thank you for your business!</p>
-        <p className="mt-1">For any questions, please contact support@soqotra.com</p>
+        <p className="mt-1">Email: accounts@soqotralogistics.com</p>
       </div>
     </div>
   );

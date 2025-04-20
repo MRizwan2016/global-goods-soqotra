@@ -21,8 +21,8 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({ logo }) => {
           }}
         />
         <div>
-          <h2 className="font-bold text-gray-800 text-lg">SOQOTRA</h2>
-          <p className="text-sm text-gray-600">Shipping & Logistics</p>
+          <h2 className="font-bold text-gray-800 text-lg">SOQOTRA LOGISTICS SERVICES,</h2>
+          <p className="text-sm text-gray-600">TRANSPORTATION & TRADING WLL.</p>
         </div>
       </div>
     </div>
