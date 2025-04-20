@@ -23,10 +23,8 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
         return false;
       }
       
-      if (formState.amountPaid <= 0) {
-        toast.error("Payment amount must be greater than zero");
-        return false;
-      }
+      // Allow zero payments to handle special cases
+      const paymentAmount = formState.amountPaid || 0;
       
       // Create payment object
       const payment = {
@@ -34,7 +32,7 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
         invoiceNumber: formState.invoiceNumber,
         customerName: formState.consignee || formState.customerName || "Unknown",
         date: formState.paymentCollectDate || new Date().toISOString().split('T')[0],
-        amount: formState.amountPaid,
+        amount: paymentAmount,
         currency: formState.currency || "QAR",
         method: formState.receivableAccount || "cash",
         remarks: formState.remarks || "",
@@ -60,7 +58,7 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
         if (invoice.invoiceNumber === formState.invoiceNumber) {
           // Calculate total paid amount including this payment
           const previousPaid = invoice.totalPaid || 0;
-          const newTotalPaid = previousPaid + formState.amountPaid;
+          const newTotalPaid = previousPaid + paymentAmount;
           const invoiceAmount = invoice.net || invoice.amount || 0;
           
           // Update invoice payment status
@@ -81,7 +79,7 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
       window.dispatchEvent(new Event('storage'));
       
       toast.success("Payment Saved", {
-        description: `Payment of ${currencySymbol} ${formState.amountPaid.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded`,
+        description: `Payment of ${currencySymbol} ${paymentAmount.toFixed(2)} for invoice ${formState.invoiceNumber} has been recorded`,
       });
       
       return true;

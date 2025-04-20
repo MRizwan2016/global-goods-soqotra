@@ -26,10 +26,10 @@ const PaymentAmount: React.FC<PaymentAmountProps> = ({
     }
   };
 
-  // Ensure amountPaid is a number or empty string
+  // Convert to string for input value
   const amountPaidValue = formState.amountPaid !== undefined && formState.amountPaid !== null 
-    ? formState.amountPaid.toString()
-    : "";
+    ? String(formState.amountPaid) 
+    : "0";
     
   // Log current value  
   useEffect(() => {

@@ -115,7 +115,7 @@ const AddPaymentPage = () => {
             
             <PaymentActionButtons
               selectedInvoice={selectedInvoice}
-              amountPaid={formState.amountPaid}
+              amountPaid={formState.amountPaid || 0}
               onSave={handleSave}
               onSaveWithReceipt={handleSaveWithReceipt}
             />

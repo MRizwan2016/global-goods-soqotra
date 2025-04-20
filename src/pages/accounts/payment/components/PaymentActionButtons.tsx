@@ -28,14 +28,14 @@ const PaymentActionButtons: React.FC<PaymentActionButtonsProps> = ({
       </button>
       <button
         onClick={onSave}
-        className="w-full md:w-1/4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+        className={`w-full md:w-1/4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors ${(!selectedInvoice || amountPaid <= 0) ? 'opacity-50 cursor-not-allowed' : ''}`}
         disabled={!selectedInvoice || amountPaid <= 0}
       >
         Save Payment
       </button>
       <button
         onClick={onSaveWithReceipt}
-        className="w-full md:w-2/4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center"
+        className={`w-full md:w-2/4 bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center ${(!selectedInvoice || amountPaid <= 0) ? 'opacity-50 cursor-not-allowed' : ''}`}
         disabled={!selectedInvoice || amountPaid <= 0}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
