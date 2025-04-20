@@ -17,8 +17,8 @@ export const useReceiptActions = (receiptRef: React.RefObject<HTMLDivElement>, r
       console.error("Print error:", error);
       toast.error("Failed to print receipt");
     },
-    // Using the correct property name based on the latest react-to-print types
-    printableElement: () => receiptRef.current
+    // According to react-to-print types, this is the correct property
+    content: () => receiptRef.current
   });
 
   const handleDownloadPDF = async () => {
