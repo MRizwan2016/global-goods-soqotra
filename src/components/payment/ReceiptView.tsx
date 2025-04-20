@@ -1,10 +1,13 @@
-
 import React, { useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Printer, Download, X, Share2 } from "lucide-react";
+import { Printer, Download, Share2 } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { QRCodeSVG } from "qrcode.react";
+import { toast } from "sonner";
+import { useReactToPrint } from "react-to-print";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface ReceiptViewProps {
   isOpen: boolean;
@@ -27,15 +30,60 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
   receiptData,
 }) => {
   const receiptRef = useRef<HTMLDivElement>(null);
-  
-  const handlePrint = () => {
-    window.print();
+
+  const handlePrint = useReactToPrint({
+    content: () => receiptRef.current,
+    documentTitle: `Receipt-${receiptData.receiptNumber}`,
+    onAfterPrint: () => toast.success("Receipt printed successfully"),
+    onPrintError: () => toast.error("Failed to print receipt")
+  });
+
+  const handleDownloadPDF = async () => {
+    if (receiptRef.current) {
+      try {
+        const canvas = await html2canvas(receiptRef.current, {
+          scale: 2,
+          logging: false,
+          useCORS: true
+        });
+        
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const pdf = new jsPDF({
+          orientation: 'portrait',
+          unit: 'mm',
+          format: 'a4'
+        });
+        
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
+        pdf.save(`Receipt-${receiptData.receiptNumber}.pdf`);
+        
+        toast.success("PDF downloaded successfully");
+      } catch (error) {
+        console.error("PDF generation failed:", error);
+        toast.error("Failed to generate PDF");
+      }
+    }
   };
 
-  const handleDownloadPDF = () => {
-    // In a real application, this would use a PDF generation library
-    // For now, we'll just show a toast message
-    alert("PDF download functionality would be implemented here");
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Payment Receipt',
+          text: `Receipt #${receiptData.receiptNumber} for ${receiptData.customer}`,
+          url: window.location.href
+        });
+      } catch (error) {
+        if (error instanceof Error && error.name !== 'AbortError') {
+          toast.error("Failed to share receipt");
+        }
+      }
+    } else {
+      toast.error("Sharing is not supported on this device");
+    }
   };
 
   const currencySymbol = receiptData.currency === "USD" ? "$" : 
@@ -43,7 +91,6 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
                          receiptData.currency === "QAR" ? "QR" : 
                          receiptData.currency === "AED" ? "AED" : "";
 
-  // Generate QR code data
   const qrData = JSON.stringify({
     receiptNumber: receiptData.receiptNumber,
     invoiceNumber: receiptData.invoiceNumber,
@@ -67,7 +114,6 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
           </DialogHeader>
           
           <div className="p-6">
-            {/* Company Header */}
             <div className="flex items-center justify-between mb-6 border-b pb-4">
               <div className="flex items-center">
                 <img 
@@ -92,7 +138,6 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
               </div>
             </div>
             
-            {/* Receipt Details */}
             <div className="space-y-3 mb-6 bg-gray-50 p-4 rounded-md">
               <div className="flex justify-between">
                 <span className="text-gray-600">Invoice Number:</span>
@@ -118,7 +163,6 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
               )}
             </div>
 
-            {/* QR Code Section */}
             <div className="flex justify-center mt-4 mb-6">
               <div className="text-center">
                 <QRCodeSVG 
@@ -133,7 +177,6 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
               </div>
             </div>
             
-            {/* Signature Section */}
             <div className="mt-6 border-t pt-4">
               <div className="flex justify-between">
                 <div>
@@ -147,7 +190,6 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
               </div>
             </div>
             
-            {/* Footer */}
             <div className="mt-8 text-center text-sm text-gray-500">
               <p>Thank you for your business!</p>
               <p className="mt-1">For any questions, please contact support@soqotra.com</p>
@@ -157,15 +199,26 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
         
         <DialogFooter className="p-4 bg-gray-50 print:hidden">
           <div className="flex gap-2 w-full">
-            <Button onClick={handlePrint} className="flex-1 bg-blue-600 hover:bg-blue-700">
-              <Printer size={16} className="mr-2" />
+            <Button 
+              onClick={handlePrint} 
+              className="flex-1 bg-blue-600 hover:bg-blue-700"
+            >
+              <Printer className="mr-2" size={16} />
               Print Receipt
             </Button>
-            <Button variant="outline" className="flex-1" onClick={handleDownloadPDF}>
-              <Download size={16} className="mr-2" />
+            <Button 
+              onClick={handleDownloadPDF} 
+              variant="outline" 
+              className="flex-1"
+            >
+              <Download className="mr-2" size={16} />
               Download PDF
             </Button>
-            <Button variant="outline" size="icon">
+            <Button 
+              onClick={handleShare}
+              variant="outline" 
+              className="w-10 p-0"
+            >
               <Share2 size={16} />
             </Button>
           </div>
