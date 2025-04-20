@@ -74,11 +74,13 @@ export const useInvoiceList = () => {
   
   const handlePrintInvoice = (id: string) => {
     // Navigate to the print page with the correct ID
+    console.log("Print invoice clicked for ID:", id);
     navigate(`/data-entry/print-documents/invoice-print/${id}`);
     toast.success("Opening invoice for printing");
   };
   
   const handleViewInvoice = (id: string) => {
+    console.log("View invoice clicked for ID:", id);
     navigate(`/reports/cargo/invoice/${id}`);
     toast.success("Opening invoice details");
   };

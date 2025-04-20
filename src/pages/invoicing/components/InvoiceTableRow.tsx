@@ -57,6 +57,7 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
   
   // Handle view invoice - navigate to invoice details view
   const handleViewInvoice = () => {
+    console.log("View invoice clicked:", item.id);
     navigate(`/reports/cargo/invoice/${item.id}`);
     toast.success("Opening invoice details");
   };
