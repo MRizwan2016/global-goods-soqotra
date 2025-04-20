@@ -188,7 +188,7 @@ const InvoiceBookStock = () => {
             </div>
             
             <div className="flex gap-3">
-              <Link to="/master/invoice-book/add">
+              <Link to="/master/book/new">
                 <Button className="bg-blue-500 hover:bg-blue-600 transition-colors hover:scale-105 transform duration-200">
                   Add New Book
                 </Button>

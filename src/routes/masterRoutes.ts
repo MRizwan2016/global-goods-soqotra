@@ -17,7 +17,12 @@ export const masterRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/master/book/edit",
+    path: "/master/book/edit/:id",
+    element: InvoiceBookForm,
+    private: true
+  },
+  {
+    path: "/master/invoice-book/add",
     element: InvoiceBookForm,
     private: true
   },
@@ -91,5 +96,4 @@ export const masterRoutes: RouteConfig[] = [
     element: SalesRepList,
     private: true
   }
-  // Clean up the redundant routes that might cause conflicts
 ];
