@@ -7,7 +7,7 @@ export const useSellingRateFormHandling = () => {
   const methods = useForm<SellingRateFormValues>({
     resolver: zodResolver(sellingRateSchema),
     defaultValues: {
-      tariffNumber: generateTariffNumber(),
+      tariffNumber: "",
       freightType: "S",
       sector: "",
       effectiveFrom: new Date().toISOString().split('T')[0],
@@ -23,12 +23,34 @@ export const useSellingRateFormHandling = () => {
     setValue(name as keyof SellingRateFormValues, value);
   };
 
-  function generateTariffNumber() {
+  const generateTariffNumber = (country: string = "") => {
     const prefix = "TR";
     const timestamp = Date.now().toString().slice(-6);
     const random = Math.floor(Math.random() * 100).toString().padStart(2, '0');
-    return `${prefix}${timestamp}${random}`;
-  }
+    
+    // Add country code to the tariff number
+    const countryCode = getCountryCode(country);
+    return `${prefix}${countryCode}${timestamp}${random}`;
+  };
+  
+  // Helper function to get a 2-letter country code
+  const getCountryCode = (countryName: string): string => {
+    switch(countryName) {
+      case "Kenya": return "KE";
+      case "Sri Lanka": return "LK";
+      case "Eritrea": return "ER";
+      case "Sudan": return "SD";
+      case "Saudi Arabia": return "SA";
+      case "United Arab Emirates": return "AE";
+      case "Somalia": return "SO";
+      case "Tunisia": return "TN";
+      case "Philippines": return "PH";
+      case "Mozambique": return "MZ";
+      case "Uganda": return "UG";
+      case "Tanzania": return "TZ";
+      default: return "XX";
+    }
+  };
 
   return {
     methods,
@@ -37,6 +59,7 @@ export const useSellingRateFormHandling = () => {
     watch,
     setValue,
     errors,
-    handleInputChange
+    handleInputChange,
+    generateTariffNumber
   };
 };

@@ -22,7 +22,8 @@ export const useSellingRateForm = (id?: string) => {
     watch,
     setValue,
     errors,
-    handleInputChange
+    handleInputChange,
+    generateTariffNumber
   } = useSellingRateFormHandling();
 
   const {
@@ -43,6 +44,13 @@ export const useSellingRateForm = (id?: string) => {
   } = useDistrictRates();
 
   const watchedCountry = watch("country");
+
+  // Update tariff number when country changes
+  useEffect(() => {
+    if (watchedCountry && !isEditing) {
+      setValue("tariffNumber", generateTariffNumber(watchedCountry));
+    }
+  }, [watchedCountry, setValue, generateTariffNumber, isEditing]);
 
   useEffect(() => {
     updateDistrictsByCountry(watchedCountry);
