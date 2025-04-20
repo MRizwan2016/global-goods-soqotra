@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -57,10 +58,10 @@ const mockRateBoxes = {
 
 // Mock data for existing selling rates
 const mockSellingRates = [
-  { id: "1", freightType: "S", tariffNumber: "1", effectiveFrom: "01/01/2021", district: "POLONNARUWA", country: "Sri Lanka", sector: "COLOMBO : C" },
-  { id: "2", freightType: "S", tariffNumber: "1", effectiveFrom: "01/01/2021", district: "CHILAW", country: "Sri Lanka", sector: "COLOMBO : C" },
-  { id: "3", freightType: "S", tariffNumber: "1", effectiveFrom: "01/01/2021", district: "AMPARA", country: "Sri Lanka", sector: "COLOMBO : C" },
-  { id: "4", freightType: "S", tariffNumber: "2", effectiveFrom: "01/01/2022", district: "NAIROBI", country: "Kenya", sector: "DOHA : D" },
+  { id: "1", freightType: "S", tariffNumber: "1", effectiveFrom: "01/01/2021", effectiveUntil: "12/31/2022", district: "POLONNARUWA", country: "Sri Lanka", sector: "COLOMBO : C" },
+  { id: "2", freightType: "S", tariffNumber: "1", effectiveFrom: "01/01/2021", effectiveUntil: "12/31/2022", district: "CHILAW", country: "Sri Lanka", sector: "COLOMBO : C" },
+  { id: "3", freightType: "S", tariffNumber: "1", effectiveFrom: "01/01/2021", effectiveUntil: "12/31/2022", district: "AMPARA", country: "Sri Lanka", sector: "COLOMBO : C" },
+  { id: "4", freightType: "S", tariffNumber: "2", effectiveFrom: "01/01/2022", effectiveUntil: "12/31/2023", district: "NAIROBI", country: "Kenya", sector: "DOHA : D" },
 ];
 
 // Generate sequential tariff number
@@ -102,6 +103,9 @@ export const useSellingRateForm = (rateId?: string) => {
     reset
   } = methods;
 
+  // Add this line to watch the country value
+  const watchedCountry = watch("country");
+
   const [districts, setDistricts] = useState<string[]>([]);
   const [rateBoxes, setRateBoxes] = useState<BoxType[]>([]);
   const [districtRates, setDistrictRates] = useState<{[key: string]: {[key: string]: string}}>({});
@@ -132,7 +136,7 @@ export const useSellingRateForm = (rateId?: string) => {
       });
     });
     setDistrictRates(newDistrictRates);
-  }, [watchedCountry]);
+  }, [watchedCountry, districts.length, rateBoxes.length, setValue, watch]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;

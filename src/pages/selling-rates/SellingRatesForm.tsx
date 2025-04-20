@@ -26,7 +26,8 @@ const SellingRatesForm = () => {
     handleRateChange,
     onSubmit,
     watch,
-    methods // This should include the React Hook Form methods
+    methods,
+    sectors // Make sure to get sectors from the hook
   } = useSellingRateForm(id);
   
   // Watch the country value to pass to FormHeader
@@ -47,6 +48,7 @@ const SellingRatesForm = () => {
               register={register}
               errors={errors}
               handleInputChange={handleInputChange}
+              sectors={sectors} // Pass the sectors prop to TariffDetailsForm
             />
             
             <RatesTable 
