@@ -8,6 +8,7 @@ export const sellingRateSchema = z.object({
   }),
   sector: z.string().min(1, "Sector is required"),
   effectiveFrom: z.string().min(1, "Effective date is required"),
+  effectiveUntil: z.string().min(1, "End date is required"),
   country: z.string().min(1, "Country is required"),
 });
 

@@ -15,12 +15,14 @@ interface TariffDetailsFormProps {
   register: UseFormRegister<SellingRateFormValues>;
   errors: FieldErrors<SellingRateFormValues>;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  sectors: string[];
 }
 
 const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({ 
   register, 
   errors, 
-  handleInputChange
+  handleInputChange,
+  sectors
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
@@ -29,9 +31,9 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
         <FormControl>
           <Input 
             {...register("tariffNumber")}
+            readOnly
             name="tariffNumber"
-            onChange={handleInputChange}
-            className={`border ${errors.tariffNumber ? 'border-red-500' : 'border-gray-300'} focus:border-soqotra-blue focus:ring-1 focus:ring-soqotra-blue`}
+            className="bg-gray-100 border border-gray-300 focus:border-soqotra-blue focus:ring-1 focus:ring-soqotra-blue"
           />
         </FormControl>
         {errors.tariffNumber && (
@@ -48,7 +50,7 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
             {...register("freightType")}
             name="freightType"
             onChange={handleInputChange}
-            className={`bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors ${errors.freightType ? 'border-red-500' : ''}`}
+            className="bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors"
           >
             <option value="S">S</option>
             <option value="A">A</option>
@@ -69,11 +71,11 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
             {...register("sector")}
             name="sector"
             onChange={handleInputChange}
-            className={`bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors ${errors.sector ? 'border-red-500' : ''}`}
+            className="bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors"
           >
-            <option value="COLOMBO : C">COLOMBO : C</option>
-            <option value="DOHA : D">DOHA : D</option>
-            <option value="MANILA : M">MANILA : M</option>
+            {sectors.map(sector => (
+              <option key={sector} value={sector}>{sector}</option>
+            ))}
           </select>
         </FormControl>
         {errors.sector && (
@@ -91,12 +93,30 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
             type="date"
             name="effectiveFrom"
             onChange={handleInputChange}
-            className={`border ${errors.effectiveFrom ? 'border-red-500' : 'border-gray-300'} focus:border-soqotra-blue focus:ring-1 focus:ring-soqotra-blue`}
+            className="border border-gray-300 focus:border-soqotra-blue focus:ring-1 focus:ring-soqotra-blue"
           />
         </FormControl>
         {errors.effectiveFrom && (
           <FormMessage className="text-red-500 text-xs mt-1">
             {errors.effectiveFrom.message}
+          </FormMessage>
+        )}
+      </FormItem>
+
+      <FormItem className="flex flex-col">
+        <FormLabel className="text-sm font-medium mb-1 text-soqotra-slate">EFFECTIVE UNTIL:</FormLabel>
+        <FormControl>
+          <Input 
+            {...register("effectiveUntil")}
+            type="date"
+            name="effectiveUntil"
+            onChange={handleInputChange}
+            className="border border-gray-300 focus:border-soqotra-blue focus:ring-1 focus:ring-soqotra-blue"
+          />
+        </FormControl>
+        {errors.effectiveUntil && (
+          <FormMessage className="text-red-500 text-xs mt-1">
+            {errors.effectiveUntil.message}
           </FormMessage>
         )}
       </FormItem>
@@ -108,7 +128,7 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
             {...register("country")}
             name="country"
             onChange={handleInputChange}
-            className={`bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors ${errors.country ? 'border-red-500' : ''}`}
+            className="bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors"
           >
             <option value="Sri Lanka">SRI LANKA</option>
             <option value="Kenya">KENYA</option>
