@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { QatarJob } from "../../types/jobTypes";
 import JobStatusBadge from "../job-tracking/JobStatusBadge";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, Eye } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface JobStatusTableProps {
@@ -131,13 +131,14 @@ const JobStatusTable: React.FC<JobStatusTableProps> = ({
               <td className="p-2 border border-gray-200">{job.town}</td>
               <td className="p-2 border border-gray-200">{getVehicleNumber(job, index)}</td>
               <td className="p-2 border border-gray-200">{job.invoiceNumber || "-"}</td>
-              <td className="p-2 border border-gray-200 print:hidden">
+              <td className="p-2 border border-gray-200 print:hidden text-center">
                 <Button 
                   size="sm" 
                   variant="ghost" 
-                  className="text-blue-600 hover:text-blue-800"
+                  className="text-blue-600 hover:text-blue-800 hover:bg-blue-50 transition-colors"
                   onClick={() => handleViewJob(job.id)}
                 >
+                  <Eye className="h-4 w-4 mr-1" />
                   Display
                 </Button>
               </td>

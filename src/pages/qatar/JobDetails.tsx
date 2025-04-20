@@ -19,13 +19,20 @@ const JobDetails = () => {
       setLoading(true);
       
       if (id) {
+        console.log("Fetching job with ID:", id);
         const foundJob = JobStorageService.getJobById(id);
         if (foundJob) {
+          console.log("Found job:", foundJob);
           setJob(foundJob);
         } else {
+          console.error("Job not found for ID:", id);
           toast.error("Job not found!");
           navigate("/qatar");
         }
+      } else {
+        console.error("No job ID provided");
+        toast.error("No job ID provided!");
+        navigate("/qatar");
       }
       
       setLoading(false);

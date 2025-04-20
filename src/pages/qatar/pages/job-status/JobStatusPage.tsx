@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
@@ -22,13 +22,19 @@ const JobStatusPage = () => {
   });
 
   const sectors = ["ALL SECTORS", "MANILA", "COLOMBO", "DOHA", "DUBAI"];
-  const vehicles = ["ALL VEHICLES", "PICKUP", "SUZUKI", "HIACE VAN", "3 TON TRUCK", "7 TON TRUCK"];
+  const vehicles = ["41067", "41070", "41073", "514005", "119927", "74827"];
   const jobTypes = ["ALL JOBS", "COLLECTION", "DELIVERY", "PACKING", "UNPACKING"];
   const statuses = ["ALL STATUSES", "PENDING", "IN_PROGRESS", "SCHEDULED", "COMPLETED", "CANCELLED"];
   
   const [statusFilter, setStatusFilter] = useState("ALL STATUSES");
   const [vehicleFilter, setVehicleFilter] = useState("ALL VEHICLES");
   const [jobTypeFilter, setJobTypeFilter] = useState("ALL JOBS");
+  
+  // Define a function to refresh jobs if needed
+  const refreshJobs = useCallback(() => {
+    console.log("Refreshing jobs...");
+    // Re-fetch or update jobs if needed
+  }, []);
   
   const additionalFilters = (
     <>
@@ -43,6 +49,7 @@ const JobStatusPage = () => {
                 {vehicle}
               </SelectItem>
             ))}
+            <SelectItem value="ALL VEHICLES">ALL VEHICLES</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -79,11 +86,7 @@ const JobStatusPage = () => {
 
       <Button 
         onClick={() => {
-          if (Date() && Date()) {
-            console.log(`Filtering... applied status: ${statusFilter}`);
-          } else {
-            alert("Please select both start and end dates");
-          }
+          console.log(`Filtering... applied status: ${statusFilter}, vehicle: ${vehicleFilter}, jobType: ${jobTypeFilter}`);
         }}
         className="bg-amber-600 hover:bg-amber-700"
         size="sm"
@@ -127,6 +130,7 @@ const JobStatusPage = () => {
             />
           </>
         )}
+        refreshJobs={refreshJobs}
       />
     </>
   );
