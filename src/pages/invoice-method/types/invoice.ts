@@ -1,4 +1,3 @@
-
 export interface Invoice {
   id: string;
   invoiceNumber: string;
@@ -26,7 +25,7 @@ export interface Invoice {
   freightType?: string;
   amount?: number;
   currency?: string;
-  country?: string; // Added country property
+  country?: string;
   consignee?: string;
   packageDetails?: PackageDetail[];
   totalPaid?: number;
@@ -44,4 +43,12 @@ export interface PackageDetail {
   weight: string;
   boxNumber: string;
   volumeWeight: string;
+  containerNo?: string;
+  vesselName?: string;
+  voyage?: string;
+  eta?: string;
+  crno?: string;
+  loadedDate?: string;
+  vrno?: string;
+  cno?: string;
 }
