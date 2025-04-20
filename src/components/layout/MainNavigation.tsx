@@ -21,6 +21,18 @@ export const MainNavigation: React.FC = () => {
   };
 
   const isPathActive = (path: string): boolean => {
+    // Consider /selling-rates and /selling-rates/* as active for the selling rates menu item
+    if (path === "/selling-rates" && 
+        (location.pathname === "/selling-rates" || location.pathname.startsWith("/selling-rates/"))) {
+      return true;
+    }
+    
+    // Same for data-entry/selling-rates
+    if (path === "/data-entry/selling-rates" && 
+        (location.pathname === "/data-entry/selling-rates" || location.pathname.startsWith("/data-entry/selling-rates/"))) {
+      return true;
+    }
+    
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 

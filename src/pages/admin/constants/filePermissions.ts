@@ -1,4 +1,3 @@
-
 export const filePermissions = {
   masterData: {
     label: "Master Data",
@@ -8,7 +7,7 @@ export const filePermissions = {
       town: { label: "Town", path: "/master/town" },
       item: { label: "Item", path: "/master/item" },
       packageOptions: { label: "Package Options", path: "/master/package-options" },
-      sellingRates: { label: "Selling Rates", path: "/master/selling-rates" },
+      sellingRates: { label: "Selling Rates", path: "/selling-rates" },
       container: { label: "Container", path: "/qatar/containers" },
       vessel: { label: "Vessel", path: "/qatar/vessels" },
       invoiceBook: { label: "Invoice Book", path: "/master/invoice-book" },
@@ -25,6 +24,7 @@ export const filePermissions = {
       loadVessel: { label: "Load Vessel", path: "/qatar/vessels" },
       loadAirCargo: { label: "Load Air Cargo", path: "/data-entry/air-cargo" },
       packingList: { label: "Packing List", path: "/data-entry/packing-list" },
+      sellingRates: { label: "Selling Rates", path: "/data-entry/selling-rates" }
     }
   },
   reports: {
@@ -44,9 +44,9 @@ export const filePermissions = {
       reconciliation: { label: "Reconciliation", path: "/accounts/reconciliation" },
       profitLoss: { label: "Profit & Loss", path: "/accounts/profit-loss" },
       financialReports: { label: "Financial Reports", path: "/accounts/financial-reports" },
-      payments: { label: "Payments", path: "/accounts/payments" }, // Added payments
-      addPayment: { label: "Add Payment", path: "/accounts/payment/add" }, // Added add payment
-      paidInvoices: { label: "Paid Invoices", path: "/accounts/payments/paid" } // Added paid invoices
+      payments: { label: "Payments", path: "/accounts/payments" },
+      addPayment: { label: "Add Payment", path: "/accounts/payment/add" },
+      paidInvoices: { label: "Paid Invoices", path: "/accounts/payments/paid" }
     }
   }
 };

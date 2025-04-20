@@ -1,4 +1,3 @@
-
 import { Database, DollarSign, Settings, Truck } from "lucide-react";
 import { NavigationSections } from "./types";
 
@@ -15,7 +14,7 @@ export const navigationSections: NavigationSections = {
           { name: "INVOICING", path: "/data-entry/invoicing" },
           { name: "PAYMENT RECEIVABLE", path: "/data-entry/payment-receivable" },
           { name: "BOOKING FORM STOCK", path: "/data-entry/booking-form-stock" },
-          { name: "SELLING RATES", path: "/data-entry/selling-rates" },
+          { name: "SELLING RATES", path: "/selling-rates" },
           { name: "BILL OF LADING", path: "/data-entry/bill-of-lading" },
           { name: "PRINT DOCUMENTS", path: "/data-entry/print-documents" },
         ],

@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { 
@@ -94,7 +93,7 @@ const DataEntry = () => {
           </div>
         </div>
         
-        <Link to="/data-entry/selling-rates">
+        <Link to="/selling-rates">
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:border-orange-300 transition-all duration-300 hover:shadow-md hover:scale-105 transform">
             <div className="flex items-center gap-4">
               <div className="bg-orange-100 p-3 rounded-full">

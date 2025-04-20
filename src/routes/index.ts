@@ -9,6 +9,7 @@ import { printDocumentsRoutes } from "./printDocumentsRoutes";
 import { paymentReceivableRoutes } from "./paymentReceivableRoutes";
 import { authRoutes } from "./authRoutes";
 import { masterRoutes } from "./masterRoutes";
+import { sellingRatesRoutes } from "./sellingRatesRoutes";
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
@@ -55,5 +56,6 @@ export const routes: RouteConfig[] = [
   ...reportsRoutes,
   ...printDocumentsRoutes,
   ...paymentReceivableRoutes,
-  ...masterRoutes
+  ...masterRoutes,
+  ...sellingRatesRoutes
 ];
