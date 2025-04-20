@@ -8,3 +8,7 @@ export interface PackageInfo {
   documents_fee: string;
   total: string;
 }
+
+export interface PackageButtonProps {
+  onSelectPackage?: (pkg: PackageInfo) => void;
+}

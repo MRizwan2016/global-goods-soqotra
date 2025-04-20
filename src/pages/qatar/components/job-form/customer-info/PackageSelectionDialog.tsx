@@ -50,7 +50,7 @@ const PackageSelectionDialog: React.FC<PackageSelectionDialogProps> = ({
             />
           </div>
 
-          <PackageTable onSelectPackage={handleSelectPackage} />
+          <PackageTable onSelectPackage={handleSelectPackage} searchTerm={searchTerm} />
         </div>
 
         <DialogFooter>

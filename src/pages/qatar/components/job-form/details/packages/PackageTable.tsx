@@ -1,27 +1,46 @@
 
 import React from "react";
+import { Button } from "@/components/ui/button";
+import { packageOptions } from "./packageData";
 import PackageTableHeader from "./PackageTableHeader";
 import PackageTableRow from "./PackageTableRow";
-import { packageOptions } from "./packageData";
 import { PackageInfo } from "./types";
 
 interface PackageTableProps {
   onSelectPackage: (pkg: PackageInfo) => void;
+  searchTerm?: string;
 }
 
-const PackageTable = ({ onSelectPackage }: PackageTableProps) => {
+const PackageTable: React.FC<PackageTableProps> = ({ 
+  onSelectPackage,
+  searchTerm = ""
+}) => {
+  const filteredPackages = searchTerm 
+    ? packageOptions.filter(pkg => 
+        pkg.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        pkg.dimensions.includes(searchTerm)
+      )
+    : packageOptions;
+
   return (
-    <div className="overflow-auto max-h-[400px]">
+    <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <PackageTableHeader />
         <tbody>
-          {packageOptions.map((pkg) => (
-            <PackageTableRow 
+          {filteredPackages.map((pkg) => (
+            <PackageTableRow
               key={pkg.sr_no}
               pkg={pkg}
-              onSelect={onSelectPackage}
+              onSelectPackage={onSelectPackage}
             />
           ))}
+          {filteredPackages.length === 0 && (
+            <tr>
+              <td colSpan={7} className="text-center py-4 text-gray-500">
+                No packages found matching "{searchTerm}"
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>
