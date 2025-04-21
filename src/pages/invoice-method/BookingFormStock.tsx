@@ -26,6 +26,10 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import BookingFormActions from "./booking-form-stock/BookingFormActions";
+import BookingTabTable from "./booking-form-stock/BookingTabTable";
+import AssignUserDialog from "./booking-form-stock/AssignUserDialog";
+import ViewBookDialog from "./booking-form-stock/ViewBookDialog";
 
 interface Book {
   bookNumber: string;
@@ -131,19 +135,18 @@ const BookingFormStock = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-bold tracking-tight">BOOKING FORM STOCK MANAGEMENT</h1>
-          <div className="flex gap-2">
-            <Button variant="outline" className="gap-2" onClick={handleGenerateReport}>
-              <FileText className="h-4 w-4" />
-              Generate Report
-            </Button>
-            <Button className="gap-2" onClick={handleAddNewBook}>
-              <Plus className="h-4 w-4" />
-              Add New Book
-            </Button>
-          </div>
+          <BookingFormActions
+            onGenerateReport={handleGenerateReport}
+            onAddNewBook={handleAddNewBook}
+          />
         </div>
         
-        <Tabs defaultValue="active" className="w-full" value={selectedTab} onValueChange={setSelectedTab}>
+        <Tabs
+          defaultValue="active"
+          className="w-full"
+          value={selectedTab}
+          onValueChange={setSelectedTab}
+        >
           <TabsList className="grid w-full max-w-md grid-cols-3">
             <TabsTrigger value="active">Active Books</TabsTrigger>
             <TabsTrigger value="assigned">Assigned</TabsTrigger>
@@ -151,310 +154,50 @@ const BookingFormStock = () => {
           </TabsList>
           
           <TabsContent value="active" className="space-y-4 mt-4">
-            <Card className="p-6">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Book #
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Start Page
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        End Page
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Available Pages
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Assigned To
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {books.filter(book => book.status === "ACTIVE").map((book, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{book.bookNumber}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.startPage}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.endPage}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.available.length} pages</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {book.assignedTo ? book.assignedTo : (
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => handleAssignUser(book)}
-                              className="text-blue-600 hover:text-blue-800"
-                            >
-                              <User className="h-4 w-4 mr-1" />
-                              Assign User
-                            </Button>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            ACTIVE
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex gap-2">
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 px-2" 
-                              onClick={() => handleViewDetails(book)}
-                            >
-                              <FileText className="h-4 w-4" />
-                              <span className="sr-only">View</span>
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-8 px-2" 
-                              onClick={() => handleAssignUser(book)}
-                            >
-                              <User className="h-4 w-4" />
-                              <span className="sr-only">Assign</span>
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+            <BookingTabTable
+              books={books}
+              tab="active"
+              onAssignUser={handleAssignUser}
+              onViewDetails={handleViewDetails}
+            />
           </TabsContent>
           
           <TabsContent value="assigned" className="space-y-4 mt-4">
-            <Card className="p-6">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Book #
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Start Page
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        End Page
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Available Pages
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Assigned To
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {books.filter(book => book.assignedTo).map((book, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{book.bookNumber}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.startPage}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.endPage}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.available.length} pages</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.assignedTo}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                            ACTIVE
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="h-8 px-2"
-                            onClick={() => handleViewDetails(book)}
-                          >
-                            <FileText className="h-4 w-4" />
-                            <span className="sr-only">View</span>
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+            <BookingTabTable
+              books={books}
+              tab="assigned"
+              onAssignUser={handleAssignUser}
+              onViewDetails={handleViewDetails}
+            />
           </TabsContent>
           
           <TabsContent value="completed" className="space-y-4 mt-4">
-            <Card className="p-6">
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Book #
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Start Page
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        End Page
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Used By
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Completion Date
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white">
-                    <tr>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">721</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">13136001</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">13136050</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Multiple Staff</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-04-15</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 px-2"
-                        >
-                          <FileDown className="h-4 w-4" />
-                          <span className="sr-only">Export</span>
-                        </Button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </Card>
+            <BookingTabTable
+              books={books}
+              tab="completed"
+              onAssignUser={handleAssignUser}
+              onViewDetails={handleViewDetails}
+            />
           </TabsContent>
         </Tabs>
       </div>
 
-      <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Assign User to Book #{selectedBook?.bookNumber}</DialogTitle>
-          </DialogHeader>
-          
-          <div className="py-4">
-            <p className="text-sm text-gray-600 mb-4">
-              Select a user to assign to this booking form book
-            </p>
-            
-            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a user" />
-              </SelectTrigger>
-              <SelectContent>
-                {mockUsers.map(user => (
-                  <SelectItem key={user.id} value={user.id}>
-                    {user.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAssignDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={confirmAssignment}>
-              Assign User
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <AssignUserDialog
+        open={isAssignDialogOpen}
+        onOpenChange={setIsAssignDialogOpen}
+        selectedBook={selectedBook}
+        users={mockUsers}
+        selectedUserId={selectedUserId}
+        onUserChange={setSelectedUserId}
+        onConfirm={confirmAssignment}
+      />
 
-      <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader>
-            <DialogTitle>Book #{selectedBook?.bookNumber} Details</DialogTitle>
-          </DialogHeader>
-          
-          <div className="py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h3 className="font-medium text-gray-700 mb-2">Book Information</h3>
-                <dl className="divide-y divide-gray-100">
-                  <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
-                    <dt className="text-sm font-medium text-gray-500">Book Number</dt>
-                    <dd className="text-sm text-gray-900 sm:col-span-2">{selectedBook?.bookNumber}</dd>
-                  </div>
-                  <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
-                    <dt className="text-sm font-medium text-gray-500">Start Page</dt>
-                    <dd className="text-sm text-gray-900 sm:col-span-2">{selectedBook?.startPage}</dd>
-                  </div>
-                  <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
-                    <dt className="text-sm font-medium text-gray-500">End Page</dt>
-                    <dd className="text-sm text-gray-900 sm:col-span-2">{selectedBook?.endPage}</dd>
-                  </div>
-                  <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
-                    <dt className="text-sm font-medium text-gray-500">Available Pages</dt>
-                    <dd className="text-sm text-gray-900 sm:col-span-2">{selectedBook?.available.length}</dd>
-                  </div>
-                  <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
-                    <dt className="text-sm font-medium text-gray-500">Assigned To</dt>
-                    <dd className="text-sm text-gray-900 sm:col-span-2">
-                      {selectedBook?.assignedTo || "Not assigned"}
-                    </dd>
-                  </div>
-                </dl>
-              </div>
-              
-              <div>
-                <h3 className="font-medium text-gray-700 mb-2">Available Invoice Numbers</h3>
-                <div className="bg-gray-50 rounded-lg p-3 max-h-64 overflow-y-auto">
-                  <ul className="grid grid-cols-2 gap-2">
-                    {selectedBook?.available.slice(0, 10).map((pageNumber, index) => (
-                      <li key={index} className="text-sm text-gray-700 py-1 px-2 bg-white rounded border border-gray-200">
-                        {pageNumber}
-                      </li>
-                    ))}
-                    {selectedBook && selectedBook.available.length > 10 && (
-                      <li className="text-sm text-gray-500 py-1 px-2">
-                        ...and {selectedBook.available.length - 10} more
-                      </li>
-                    )}
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsViewDialogOpen(false)}>
-              Close
-            </Button>
-            {!selectedBook?.assignedTo && (
-              <Button onClick={() => {
-                setIsViewDialogOpen(false);
-                handleAssignUser(selectedBook!);
-              }}>
-                <User className="h-4 w-4 mr-1" />
-                Assign User
-              </Button>
-            )}
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <ViewBookDialog
+        open={isViewDialogOpen}
+        onOpenChange={setIsViewDialogOpen}
+        selectedBook={selectedBook}
+        onAssignUser={handleAssignUser}
+      />
     </Layout>
   );
 };
