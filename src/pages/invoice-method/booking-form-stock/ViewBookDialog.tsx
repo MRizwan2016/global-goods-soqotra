@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { User } from "lucide-react";
-import { Book } from "../BookingFormStock";
+import { Book } from "./types";
 
 interface ViewBookDialogProps {
   open: boolean;

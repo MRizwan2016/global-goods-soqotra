@@ -1,8 +1,9 @@
+
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { FileText, User, FileDown } from "lucide-react";
-import { Book } from "../BookingFormStock";
+import { Book } from "./types";
 
 interface BookingTabTableProps {
   books: Book[];

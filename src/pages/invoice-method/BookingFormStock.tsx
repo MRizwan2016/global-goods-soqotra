@@ -1,49 +1,14 @@
 import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  FileText, 
-  Plus, 
-  User,
-  FileDown
-} from "lucide-react";
-import { mockInvoiceBooks } from "@/pages/invoicing/constants/mockInvoiceBooks";
-import { 
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from "@/components/ui/select";
-import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { mockInvoiceBooks } from "@/pages/invoicing/constants/mockInvoiceBooks";
+import { toast } from "sonner";
 import BookingFormActions from "./booking-form-stock/BookingFormActions";
 import BookingTabTable from "./booking-form-stock/BookingTabTable";
 import AssignUserDialog from "./booking-form-stock/AssignUserDialog";
 import ViewBookDialog from "./booking-form-stock/ViewBookDialog";
-
-interface Book {
-  bookNumber: string;
-  startPage: string;
-  endPage: string;
-  available: string[];
-  assignedTo: string;
-  status?: string;
-}
-
-interface User {
-  id: string;
-  name: string;
-}
+import { Book, User } from "./booking-form-stock/types";
 
 const mockUsers: User[] = [
   { id: "1", name: "John Smith" },

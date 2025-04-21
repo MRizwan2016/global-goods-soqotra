@@ -15,7 +15,7 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { User } from "../BookingFormStock";
+import { User } from "./types";
 
 interface AssignUserDialogProps {
   open: boolean;
