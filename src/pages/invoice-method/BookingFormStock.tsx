@@ -25,7 +25,7 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface Book {
   bookNumber: string;
@@ -53,6 +53,7 @@ const mockUsers: User[] = [
 ];
 
 const BookingFormStock = () => {
+  const navigate = useNavigate();
   const [books, setBooks] = useState<Book[]>(mockInvoiceBooks.map(book => ({
     ...book,
     status: "ACTIVE"
