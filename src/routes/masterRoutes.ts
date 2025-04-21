@@ -21,11 +21,12 @@ export const masterRoutes: RouteConfig[] = [
     element: InvoiceBookForm,
     private: true
   },
-  {
-    path: "/master/invoice-book/add",
-    element: InvoiceBookForm,
-    private: true
-  },
+  // Remove the duplicate route that might be causing issues
+  // {
+  //   path: "/master/invoice-book/add",
+  //   element: InvoiceBookForm,
+  //   private: true
+  // },
   {
     path: "/master/book/stock",
     element: InvoiceBookStock,

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
@@ -26,8 +25,8 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { navigate } from "react-router-dom";
 
-// Define the Book type
 interface Book {
   bookNumber: string;
   startPage: string;
@@ -37,13 +36,11 @@ interface Book {
   status?: string;
 }
 
-// Define the User type
 interface User {
   id: string;
   name: string;
 }
 
-// Mock users for the dropdown
 const mockUsers: User[] = [
   { id: "1", name: "John Smith" },
   { id: "2", name: "Mary Johnson" },
@@ -67,20 +64,17 @@ const BookingFormStock = () => {
   const [selectedUserId, setSelectedUserId] = useState("");
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
-  // Handle assigning a user to a book
   const handleAssignUser = (book: Book) => {
     setSelectedBook(book);
     setSelectedUserId("");
     setIsAssignDialogOpen(true);
   };
 
-  // Handle viewing details
   const handleViewDetails = (book: Book) => {
     setSelectedBook(book);
     setIsViewDialogOpen(true);
   };
 
-  // Confirm user assignment
   const confirmAssignment = () => {
     if (!selectedBook || !selectedUserId) {
       toast.error("Please select a user to assign this book");
@@ -93,7 +87,6 @@ const BookingFormStock = () => {
       return;
     }
 
-    // Update the book with the assigned user
     setBooks(prev => 
       prev.map(book => 
         book.bookNumber === selectedBook.bookNumber 
@@ -102,7 +95,6 @@ const BookingFormStock = () => {
       )
     );
     
-    // Update localStorage
     try {
       localStorage.setItem('bookingFormBooks', JSON.stringify(
         books.map(book => 
@@ -119,35 +111,15 @@ const BookingFormStock = () => {
     toast.success(`Book #${selectedBook.bookNumber} has been assigned to ${selectedUser.name}`);
   };
 
-  // Handle adding a new book
   const handleAddNewBook = () => {
-    // This would typically open a form to add a new book
-    // For now, we'll just add a mock book
-    const lastBook = books[books.length - 1];
-    const newBookNumber = (parseInt(lastBook.bookNumber) + 1).toString();
-    const startPage = (parseInt(lastBook.endPage) + 1).toString();
-    const endPage = (parseInt(startPage) + 49).toString();
-    
-    const newBook: Book = {
-      bookNumber: newBookNumber,
-      startPage,
-      endPage,
-      available: Array.from({ length: 50 }, (_, i) => (parseInt(startPage) + i).toString()),
-      assignedTo: "",
-      status: "ACTIVE"
-    };
-    
-    setBooks([...books, newBook]);
-    toast.success(`New book #${newBookNumber} has been added`);
+    navigate("/master/book/new");
   };
 
-  // Handle generating report
   const handleGenerateReport = () => {
     toast.success("Generating report...", {
       description: "The report is being generated and will be downloaded shortly."
     });
     
-    // Mock download by showing success after a short delay
     setTimeout(() => {
       toast.success("Report generated successfully");
     }, 1500);
@@ -374,7 +346,6 @@ const BookingFormStock = () => {
         </Tabs>
       </div>
 
-      {/* User Assignment Dialog */}
       <Dialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
         <DialogContent>
           <DialogHeader>
@@ -411,7 +382,6 @@ const BookingFormStock = () => {
         </DialogContent>
       </Dialog>
 
-      {/* View Details Dialog */}
       <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>

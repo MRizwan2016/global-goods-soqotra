@@ -48,7 +48,8 @@ const InvoiceBookForm = () => {
     }
     
     toast.success("Invoice book added successfully");
-    navigate("/master/invoice-book");
+    // Fix the navigation route to match an existing route in routes/masterRoutes.ts
+    navigate("/master/book/stock");
   };
   
   return (
@@ -127,7 +128,7 @@ const InvoiceBookForm = () => {
               Save
             </Button>
             <Button 
-              onClick={() => navigate("/master/invoice-book")}
+              onClick={() => navigate("/master/book/stock")}
               variant="outline"
               className="border-gray-300 transition-colors hover:border-blue-400"
             >
