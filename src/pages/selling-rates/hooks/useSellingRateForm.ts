@@ -119,6 +119,31 @@ export const useSellingRateForm = (id?: string) => {
       case "Tanzania":
         setSectors(["Dar es Salaam", "Zanzibar", "Dodoma"]);
         break;
+      case "Qatar":
+        setSectors([
+          "Doha", "Al Rayyan", "Wakra", "Mansoora", "Al Khor", "Umm Salal", "West Bay", "Lusail"
+        ]);
+        break;
+      case "Oman":
+        setSectors([
+          "Muscat", "Salalah", "Sohar", "Nizwa"
+        ]);
+        break;
+      case "Kuwait":
+        setSectors([
+          "Kuwait City", "Hawalli", "Salmiya", "Farwaniya"
+        ]);
+        break;
+      case "Bahrain":
+        setSectors([
+          "Manama", "Muharraq", "Riffa", "Isa Town"
+        ]);
+        break;
+      case "Lebanon":
+        setSectors([
+          "Beirut", "Tripoli", "Sidon", "Zahle"
+        ]);
+        break;
       default:
         setSectors([]);
     }
