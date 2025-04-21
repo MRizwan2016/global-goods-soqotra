@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from "@/components/ui/input";
 import { 
@@ -166,6 +165,11 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
             <option value="Mozambique">MOZAMBIQUE</option>
             <option value="Uganda">UGANDA</option>
             <option value="Tanzania">TANZANIA</option>
+            <option value="Qatar">QATAR</option>
+            <option value="Oman">OMAN</option>
+            <option value="Kuwait">KUWAIT</option>
+            <option value="Bahrain">BAHRAIN</option>
+            <option value="Lebanon">LEBANON</option>
           </select>
         </FormControl>
         {errors.country && (
