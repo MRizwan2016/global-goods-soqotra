@@ -7,10 +7,10 @@ import { navigationSections } from './navigationConfig';
 export const MainNavigation: React.FC = () => {
   const location = useLocation();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    upb: true,
-    accounts: true,
-    admin: true,
-    cargo: true
+    upb: false,
+    accounts: false,
+    admin: false,
+    cargo: false
   });
 
   const toggleSection = (key: string) => {
@@ -96,3 +96,4 @@ export const MainNavigation: React.FC = () => {
 };
 
 export default MainNavigation;
+
