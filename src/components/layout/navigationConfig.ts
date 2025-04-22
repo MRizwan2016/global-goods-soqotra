@@ -1,3 +1,4 @@
+
 import { Database, DollarSign, Settings, Truck } from "lucide-react";
 import { NavigationSections } from "./types";
 
@@ -51,6 +52,39 @@ export const navigationSections: NavigationSections = {
           { name: "PAYMENTS", path: "/accounts/payments" },
           { name: "ADD PAYMENT", path: "/accounts/payment/add" }, 
           { name: "RECONCILIATION", path: "/accounts/reconciliation" },
+        ],
+      },
+      {
+        title: "REGISTRATIONS",
+        items: [
+          { name: "VENDORS", path: "/accounts/reconciliation/vendors" },
+          { name: "SHIPPING LINES", path: "/accounts/reconciliation/shipping-lines" },
+          { name: "FREIGHT FORWARDERS", path: "/accounts/reconciliation/freight-forwarders" },
+          { name: "EXPORT CUSTOMERS", path: "/accounts/reconciliation/customers/exports" },
+          { name: "IMPORT CUSTOMERS", path: "/accounts/reconciliation/customers/imports" },
+        ],
+      },
+      {
+        title: "FINANCIAL ENTITIES",
+        items: [
+          { name: "BANK DETAILS", path: "/accounts/reconciliation/bank-details" },
+          { name: "FINANCIAL INSTITUTIONS", path: "/accounts/reconciliation/financial-institutions" },
+          { name: "INSURANCE INSTITUTIONS", path: "/accounts/reconciliation/insurance-institutions" },
+        ],
+      },
+      {
+        title: "COUNTRY RECONCILIATIONS",
+        items: [
+          { name: "SRI LANKA", path: "/accounts/reconciliation/country/lk" },
+          { name: "KENYA", path: "/accounts/reconciliation/country/ke" },
+          { name: "ERITREA", path: "/accounts/reconciliation/country/er" },
+          { name: "SUDAN", path: "/accounts/reconciliation/country/sd" },
+          { name: "TUNISIA", path: "/accounts/reconciliation/country/tn" },
+          { name: "PHILIPPINES", path: "/accounts/reconciliation/country/ph" },
+          { name: "MOZAMBIQUE", path: "/accounts/reconciliation/country/mz" },
+          { name: "SAUDI ARABIA", path: "/accounts/reconciliation/country/sa" },
+          { name: "UAE", path: "/accounts/reconciliation/country/ae" },
+          { name: "OMAN", path: "/accounts/reconciliation/country/om" },
         ],
       },
     ],
