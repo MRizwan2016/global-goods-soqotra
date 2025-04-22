@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { globe } from "lucide-react";
+import { Globe } from "lucide-react";
 import RegistrationLayout from "./components/RegistrationLayout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,7 +29,7 @@ const CountryReconciliationPage: React.FC = () => {
       <RegistrationLayout
         title="Country Not Found"
         subtitle="The requested country page could not be found"
-        icon={<globe className="h-6 w-6 text-red-600" />}
+        icon={<Globe className="h-6 w-6 text-red-600" />}
         tabs={[]}
       >
         <Card>
@@ -49,7 +49,7 @@ const CountryReconciliationPage: React.FC = () => {
     <RegistrationLayout
       title={`${countryName} Reconciliation`}
       subtitle={`Manage reconciliation for ${countryName}`}
-      icon={<globe className="h-6 w-6 text-purple-600" />}
+      icon={<Globe className="h-6 w-6 text-purple-600" />}
       tabs={[]}
     >
       <Tabs value={activeTab} onValueChange={setActiveTab}>
