@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Package } from "lucide-react";
+import { ArrowRight, Package, CarFront, UserRoundCog } from "lucide-react";
 
 const DashboardHeader = () => {
   return (
@@ -11,13 +11,28 @@ const DashboardHeader = () => {
         <p className="text-gray-500">Cargo collection and delivery management</p>
       </div>
       
-      <div className="flex gap-2 mt-3 md:mt-0">
+      <div className="flex flex-wrap gap-2 mt-3 md:mt-0">
+        <Link to="/kenya/vehicles">
+          <Button variant="outline" className="flex items-center gap-1">
+            <CarFront size={16} />
+            Manage Vehicles
+          </Button>
+        </Link>
+        
+        <Link to="/kenya/drivers">
+          <Button variant="outline" className="flex items-center gap-1">
+            <UserRoundCog size={16} />
+            Manage Drivers
+          </Button>
+        </Link>
+        
         <Link to="/kenya/deliveries">
-          <Button variant="outline" className="gap-1">
+          <Button variant="outline" className="flex items-center gap-1">
             View All Deliveries
             <ArrowRight size={16} />
           </Button>
         </Link>
+        
         <Link to="/kenya/delivery/new">
           <Button className="gap-1 bg-green-600 hover:bg-green-700">
             New Delivery

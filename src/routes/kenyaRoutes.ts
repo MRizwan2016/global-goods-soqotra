@@ -3,8 +3,8 @@ import KenyaDashboard from "@/pages/kenya/KenyaDashboard";
 import KenyaDeliveryTracking from "@/pages/kenya/KenyaDeliveryTracking";
 import DeliveryDetails from "@/pages/kenya/DeliveryDetails";
 import NewDeliveryForm from "@/pages/kenya/NewDeliveryForm";
-import VehicleManagement from "@/pages/qatar/VehicleManagement";
-import DriverManagement from "@/pages/qatar/DriverManagement";
+import VehicleManagement from "@/pages/kenya/VehicleManagement";
+import DriverManagement from "@/pages/kenya/DriverManagement";
 import { RouteConfig } from "./types";
 
 export const kenyaRoutes: RouteConfig[] = [
