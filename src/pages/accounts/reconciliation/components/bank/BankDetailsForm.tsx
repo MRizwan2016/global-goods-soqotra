@@ -83,7 +83,7 @@ const BankDetailsForm = () => {
       setBankAccounts(prev =>
         prev.map(account =>
           account.id === currentEditId
-            ? { ...account, ...data, id: currentEditId }
+            ? { ...account, ...data }
             : account
         )
       );
@@ -95,8 +95,16 @@ const BankDetailsForm = () => {
       setCurrentEditId(null);
     } else {
       const newAccount: BankAccount = {
-        ...data,
         id: Date.now(),
+        bankName: data.bankName,
+        accountNumber: data.accountNumber,
+        accountName: data.accountName,
+        swiftCode: data.swiftCode,
+        branchName: data.branchName,
+        country: data.country,
+        currency: data.currency,
+        accountType: data.accountType,
+        notes: data.notes,
       };
       setBankAccounts(prev => [...prev, newAccount]);
       toast({
