@@ -46,6 +46,20 @@ const bankDetailsFormSchema = z.object({
 
 type BankDetailsFormValues = z.infer<typeof bankDetailsFormSchema>;
 
+// Define a more explicit interface for bank accounts
+interface BankAccount {
+  id: number;
+  bankName: string;
+  accountNumber: string;
+  accountName: string;
+  swiftCode: string;
+  branchName: string;
+  country: string;
+  currency: string;
+  accountType: string;
+  notes?: string;
+}
+
 const defaultValues: Partial<BankDetailsFormValues> = {
   country: "",
   currency: "",
@@ -54,7 +68,7 @@ const defaultValues: Partial<BankDetailsFormValues> = {
 };
 
 // Sample data for the table
-const mockBankAccounts = [
+const mockBankAccounts: BankAccount[] = [
   {
     id: 1,
     bankName: "HSBC Bank",
@@ -65,6 +79,7 @@ const mockBankAccounts = [
     country: "ae",
     currency: "AED",
     accountType: "checking",
+    notes: "",
   },
   {
     id: 2,
@@ -76,11 +91,12 @@ const mockBankAccounts = [
     country: "ke",
     currency: "KES",
     accountType: "current",
+    notes: "",
   },
 ];
 
 const BankDetailsForm = () => {
-  const [bankAccounts, setBankAccounts] = React.useState(mockBankAccounts);
+  const [bankAccounts, setBankAccounts] = React.useState<BankAccount[]>(mockBankAccounts);
   const [isEditing, setIsEditing] = React.useState(false);
   const [currentEditId, setCurrentEditId] = React.useState<number | null>(null);
 
@@ -91,10 +107,14 @@ const BankDetailsForm = () => {
 
   const onSubmit = (data: BankDetailsFormValues) => {
     if (isEditing && currentEditId) {
-      // Update existing bank account
+      // Update existing bank account with complete data
       setBankAccounts(prev => 
         prev.map(account => 
-          account.id === currentEditId ? { ...data, id: currentEditId } : account
+          account.id === currentEditId ? { 
+            ...account, 
+            ...data, 
+            id: currentEditId 
+          } : account
         )
       );
       toast({
@@ -104,8 +124,12 @@ const BankDetailsForm = () => {
       setIsEditing(false);
       setCurrentEditId(null);
     } else {
-      // Add new bank account
-      setBankAccounts(prev => [...prev, { ...data, id: Date.now() }]);
+      // Add new bank account with all required fields
+      const newAccount: BankAccount = {
+        ...data,
+        id: Date.now(),
+      };
+      setBankAccounts(prev => [...prev, newAccount]);
       toast({
         title: "Bank details added",
         description: `${data.bankName} account details have been added.`,
