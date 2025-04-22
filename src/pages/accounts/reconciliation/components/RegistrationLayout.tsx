@@ -32,12 +32,18 @@ const RegistrationLayout: React.FC<RegistrationLayoutProps> = ({
   const navigate = useNavigate();
   const location = useLocation();
   
-  const activeTab = tabs.find(tab => tab.path === location.pathname)?.id || defaultTab || tabs[0].id;
+  // Only try to find the active tab if tabs array has elements
+  const activeTab = tabs.length > 0 
+    ? (tabs.find(tab => tab.path === location.pathname)?.id || defaultTab || (tabs[0]?.id ?? ""))
+    : "";
   
   const handleTabChange = (tabId: string) => {
-    const tab = tabs.find(t => t.id === tabId);
-    if (tab) {
-      navigate(tab.path);
+    // Only attempt to navigate if tabs exist
+    if (tabs.length > 0) {
+      const tab = tabs.find(t => t.id === tabId);
+      if (tab) {
+        navigate(tab.path);
+      }
     }
   };
 
