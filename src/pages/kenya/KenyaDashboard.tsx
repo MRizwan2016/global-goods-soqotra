@@ -7,6 +7,7 @@ import DeliveryCharts from "./components/dashboard/DeliveryCharts";
 import RecentDeliveries from "./components/dashboard/RecentDeliveries";
 import { getDeliveryStats, cargoByCounty, monthlyShipments, CHART_COLORS } from "./utils/dashboardUtils";
 import { mockDeliveries } from "./data/mockDeliveryData";
+import DashboardHeader from "./components/dashboard/DashboardHeader";
 
 const KenyaDashboard = () => {
   // Get stats from the utility function
@@ -22,6 +23,9 @@ const KenyaDashboard = () => {
             <p className="text-gray-600">Overview of delivery operations in Kenya</p>
           </div>
         </div>
+        
+        {/* Dashboard header with action buttons */}
+        <DashboardHeader />
         
         {/* Stats summary cards */}
         <StatCards stats={stats} />
