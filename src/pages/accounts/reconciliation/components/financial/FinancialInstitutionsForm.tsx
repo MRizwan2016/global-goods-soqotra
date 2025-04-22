@@ -23,49 +23,50 @@ import {
 } from "@/components/ui/select";
 import { toast } from "@/components/ui/use-toast";
 
-const shippingLineFormSchema = z.object({
-  companyName: z.string().min(2, { message: "Company name is required" }),
+const financialInstitutionFormSchema = z.object({
+  institutionName: z.string().min(2, { message: "Institution name is required" }),
+  type: z.string().min(1, { message: "Institution type is required" }),
+  registrationNumber: z.string().min(2, { message: "Registration number is required" }),
   contactPerson: z.string().min(2, { message: "Contact person name is required" }),
   email: z.string().email({ message: "Invalid email address" }),
   phone: z.string().min(5, { message: "Phone number is required" }),
   address: z.string().min(5, { message: "Address is required" }),
   country: z.string().min(1, { message: "Country is required" }),
-  registrationNumber: z.string().min(1, { message: "Registration number is required" }),
-  fleetSize: z.string().optional(),
-  serviceRoutes: z.string().min(1, { message: "Service routes are required" }),
+  website: z.string().url({ message: "Please enter a valid URL" }).optional().or(z.literal("")),
   notes: z.string().optional(),
 });
 
-type ShippingLineFormValues = z.infer<typeof shippingLineFormSchema>;
+type FinancialInstitutionFormValues = z.infer<typeof financialInstitutionFormSchema>;
 
-const defaultValues: Partial<ShippingLineFormValues> = {
+const defaultValues: Partial<FinancialInstitutionFormValues> = {
   country: "",
-  fleetSize: "",
+  type: "",
+  website: "",
   notes: "",
 };
 
-const ShippingLineForm = () => {
-  const form = useForm<ShippingLineFormValues>({
-    resolver: zodResolver(shippingLineFormSchema),
+const FinancialInstitutionsForm = () => {
+  const form = useForm<FinancialInstitutionFormValues>({
+    resolver: zodResolver(financialInstitutionFormSchema),
     defaultValues,
   });
 
-  const onSubmit = (data: ShippingLineFormValues) => {
+  const onSubmit = (data: FinancialInstitutionFormValues) => {
     // In a real app, this would send the data to your backend
-    console.log("Shipping line form submitted:", data);
+    console.log("Financial institution form submitted:", data);
     toast({
-      title: "Shipping line registered successfully",
-      description: `${data.companyName} has been registered as a shipping line.`,
+      title: "Financial institution registered",
+      description: `${data.institutionName} has been registered successfully.`,
     });
     form.reset(defaultValues);
   };
 
   return (
     <div className="space-y-6">
-      <div className="p-4 bg-blue-50 border border-blue-100 rounded-md mb-6">
-        <h3 className="text-sm font-medium text-blue-800">Shipping Line Information</h3>
-        <p className="text-sm text-blue-600">
-          Register shipping lines for reconciliation purposes. All fields marked with * are required.
+      <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-md mb-6">
+        <h3 className="text-sm font-medium text-indigo-800">Financial Institution Details</h3>
+        <p className="text-sm text-indigo-600">
+          Register financial institutions for reconciliation purposes. All fields marked with * are required.
         </p>
       </div>
 
@@ -74,12 +75,53 @@ const ShippingLineForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
               control={form.control}
-              name="companyName"
+              name="institutionName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Company Name *</FormLabel>
+                  <FormLabel>Institution Name *</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter shipping line name" {...field} />
+                    <Input placeholder="Enter institution name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Institution Type *</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select institution type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="bank">Bank</SelectItem>
+                      <SelectItem value="credit_union">Credit Union</SelectItem>
+                      <SelectItem value="investment_firm">Investment Firm</SelectItem>
+                      <SelectItem value="insurance_company">Insurance Company</SelectItem>
+                      <SelectItem value="leasing_company">Leasing Company</SelectItem>
+                      <SelectItem value="microfinance">Microfinance Institution</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="registrationNumber"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Registration Number *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter registration/license number" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -135,7 +177,7 @@ const ShippingLineForm = () => {
                 <FormItem className="md:col-span-2">
                   <FormLabel>Address *</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Enter company address" {...field} />
+                    <Textarea placeholder="Enter institution address" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -147,7 +189,7 @@ const ShippingLineForm = () => {
               name="country"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Country of Registration *</FormLabel>
+                  <FormLabel>Country *</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
@@ -174,40 +216,12 @@ const ShippingLineForm = () => {
 
             <FormField
               control={form.control}
-              name="registrationNumber"
+              name="website"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Registration Number *</FormLabel>
+                  <FormLabel>Website</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter registration number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="fleetSize"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Fleet Size</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Number of vessels" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="serviceRoutes"
-              render={({ field }) => (
-                <FormItem className="md:col-span-2">
-                  <FormLabel>Service Routes *</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Enter the routes serviced by this shipping line" {...field} />
+                    <Input placeholder="https://www.example.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -233,7 +247,7 @@ const ShippingLineForm = () => {
             <Button variant="outline" type="button" onClick={() => form.reset(defaultValues)}>
               Reset
             </Button>
-            <Button type="submit">Register Shipping Line</Button>
+            <Button type="submit">Register Institution</Button>
           </div>
         </form>
       </Form>
@@ -241,4 +255,4 @@ const ShippingLineForm = () => {
   );
 };
 
-export default ShippingLineForm;
+export default FinancialInstitutionsForm;

@@ -2,6 +2,7 @@
 import React from "react";
 import { Building } from "lucide-react";
 import RegistrationLayout from "./components/RegistrationLayout";
+import FinancialInstitutionsForm from "./components/financial/FinancialInstitutionsForm";
 
 const FinancialInstitutionsPage: React.FC = () => {
   return (
@@ -11,11 +12,7 @@ const FinancialInstitutionsPage: React.FC = () => {
       icon={<Building className="h-6 w-6 text-purple-600" />}
       tabs={[]}
     >
-      <div className="space-y-4">
-        <p className="text-gray-500">
-          Financial institutions management interface will be implemented here.
-        </p>
-      </div>
+      <FinancialInstitutionsForm />
     </RegistrationLayout>
   );
 };

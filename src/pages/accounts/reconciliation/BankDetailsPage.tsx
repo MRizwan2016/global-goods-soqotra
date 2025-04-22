@@ -2,6 +2,7 @@
 import React from "react";
 import { Banknote } from "lucide-react";
 import RegistrationLayout from "./components/RegistrationLayout";
+import BankDetailsForm from "./components/bank/BankDetailsForm";
 
 const BankDetailsPage: React.FC = () => {
   return (
@@ -11,11 +12,7 @@ const BankDetailsPage: React.FC = () => {
       icon={<Banknote className="h-6 w-6 text-purple-600" />}
       tabs={[]}
     >
-      <div className="space-y-4">
-        <p className="text-gray-500">
-          Bank details management interface will be implemented here.
-        </p>
-      </div>
+      <BankDetailsForm />
     </RegistrationLayout>
   );
 };

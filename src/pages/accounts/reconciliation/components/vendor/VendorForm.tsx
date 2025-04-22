@@ -1,9 +1,11 @@
 
 import React from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -19,304 +21,219 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { toast } from "sonner";
-import { SUPPORTED_COUNTRIES } from "../../types";
+import { toast } from "@/components/ui/use-toast";
 
-const formSchema = z.object({
-  name: z.string().min(2).max(100),
-  email: z.string().email(),
-  phone: z.string().min(6).max(20),
-  address: z.string().min(5).max(200),
-  country: z.string().min(2),
-  vendorType: z.string().min(2),
-  contactPerson: z.string().min(2),
+const vendorFormSchema = z.object({
+  companyName: z.string().min(2, { message: "Company name is required" }),
+  contactPerson: z.string().min(2, { message: "Contact person name is required" }),
+  email: z.string().email({ message: "Invalid email address" }),
+  phone: z.string().min(5, { message: "Phone number is required" }),
+  address: z.string().min(5, { message: "Address is required" }),
+  country: z.string().min(1, { message: "Country is required" }),
+  vendorType: z.string().min(1, { message: "Vendor type is required" }),
   taxId: z.string().optional(),
-  serviceCategories: z.array(z.string()).nonempty("Select at least one service category"),
-  status: z.enum(["active", "inactive", "pending"])
+  notes: z.string().optional(),
 });
 
-const serviceCategories = [
-  { id: 'logistics', label: 'Logistics' },
-  { id: 'customs', label: 'Customs Clearance' },
-  { id: 'transport', label: 'Transportation' },
-  { id: 'warehousing', label: 'Warehousing' },
-  { id: 'packaging', label: 'Packaging' },
-  { id: 'consultation', label: 'Consultation' },
-  { id: 'insurance', label: 'Insurance' },
-  { id: 'maintenance', label: 'Maintenance' }
-];
+type VendorFormValues = z.infer<typeof vendorFormSchema>;
 
-const vendorTypes = [
-  { id: 'service', label: 'Service Provider' },
-  { id: 'material', label: 'Material Supplier' },
-  { id: 'equipment', label: 'Equipment Supplier' },
-  { id: 'contractor', label: 'Contractor' },
-  { id: 'consultant', label: 'Consultant' }
-];
+const defaultValues: Partial<VendorFormValues> = {
+  country: "",
+  vendorType: "",
+  notes: "",
+};
 
-const VendorForm: React.FC = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      phone: "",
-      address: "",
-      country: "",
-      vendorType: "",
-      contactPerson: "",
-      taxId: "",
-      serviceCategories: [],
-      status: "active"
-    },
+const VendorForm = () => {
+  const form = useForm<VendorFormValues>({
+    resolver: zodResolver(vendorFormSchema),
+    defaultValues,
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    toast.success("Vendor registered successfully", {
-      description: `${values.name} has been added to vendors.`
+  const onSubmit = (data: VendorFormValues) => {
+    // In a real app, this would send the data to your backend
+    console.log("Vendor form submitted:", data);
+    toast({
+      title: "Vendor registered successfully",
+      description: `${data.companyName} has been registered as a vendor.`,
     });
-    form.reset();
-  }
+    form.reset(defaultValues);
+  };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Basic Information */}
-          <Card>
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-4">Basic Information</h3>
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vendor Name*</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter vendor name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email*</FormLabel>
-                      <FormControl>
-                        <Input type="email" placeholder="vendor@example.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Phone Number*</FormLabel>
-                      <FormControl>
-                        <Input placeholder="+1 123 456 7890" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address*</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Enter full address" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="country"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Country*</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select country" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {SUPPORTED_COUNTRIES.map((country) => (
-                            <SelectItem key={country.code} value={country.code}>
-                              {country.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </CardContent>
-          </Card>
-          
-          {/* Vendor Details */}
-          <Card>
-            <CardContent className="pt-6">
-              <h3 className="text-lg font-medium mb-4">Vendor Details</h3>
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="vendorType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Vendor Type*</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select vendor type" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {vendorTypes.map((type) => (
-                            <SelectItem key={type.id} value={type.id}>
-                              {type.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="contactPerson"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Contact Person*</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter contact person name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="taxId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tax ID/VAT Number (Optional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter tax identification number" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="status"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Status*</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="active">Active</SelectItem>
-                          <SelectItem value="inactive">Inactive</SelectItem>
-                          <SelectItem value="pending">Pending</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="serviceCategories"
-                  render={() => (
-                    <FormItem>
-                      <div className="mb-4">
-                        <FormLabel className="text-base">Service Categories*</FormLabel>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        {serviceCategories.map((item) => (
-                          <FormField
-                            key={item.id}
-                            control={form.control}
-                            name="serviceCategories"
-                            render={({ field }) => {
-                              return (
-                                <FormItem
-                                  key={item.id}
-                                  className="flex flex-row items-start space-x-3 space-y-0"
-                                >
-                                  <FormControl>
-                                    <Checkbox
-                                      checked={field.value?.includes(item.id)}
-                                      onCheckedChange={(checked) => {
-                                        return checked
-                                          ? field.onChange([...field.value, item.id])
-                                          : field.onChange(
-                                              field.value?.filter(
-                                                (value) => value !== item.id
-                                              )
-                                            )
-                                      }}
-                                    />
-                                  </FormControl>
-                                  <FormLabel className="font-normal cursor-pointer">
-                                    {item.label}
-                                  </FormLabel>
-                                </FormItem>
-                              )
-                            }}
-                          />
-                        ))}
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="flex justify-end space-x-2">
-          <Button variant="outline" type="button" onClick={() => form.reset()}>
-            Cancel
-          </Button>
-          <Button type="submit">Register Vendor</Button>
-        </div>
-      </form>
-    </Form>
+    <div className="space-y-6">
+      <div className="p-4 bg-purple-50 border border-purple-100 rounded-md mb-6">
+        <h3 className="text-sm font-medium text-purple-800">Vendor Information</h3>
+        <p className="text-sm text-purple-600">
+          Register vendors for reconciliation purposes. All fields marked with * are required.
+        </p>
+      </div>
+
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              control={form.control}
+              name="companyName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Company Name *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter company name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="contactPerson"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Contact Person *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter contact person name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email *</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="Enter email address" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Phone Number *</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter phone number" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Address *</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Enter company address" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country *</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select country" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="ae">United Arab Emirates</SelectItem>
+                      <SelectItem value="er">Eritrea</SelectItem>
+                      <SelectItem value="ke">Kenya</SelectItem>
+                      <SelectItem value="lk">Sri Lanka</SelectItem>
+                      <SelectItem value="mz">Mozambique</SelectItem>
+                      <SelectItem value="om">Oman</SelectItem>
+                      <SelectItem value="ph">Philippines</SelectItem>
+                      <SelectItem value="sa">Saudi Arabia</SelectItem>
+                      <SelectItem value="sd">Sudan</SelectItem>
+                      <SelectItem value="tn">Tunisia</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="vendorType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Vendor Type *</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select vendor type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="supplier">Supplier</SelectItem>
+                      <SelectItem value="service-provider">Service Provider</SelectItem>
+                      <SelectItem value="contractor">Contractor</SelectItem>
+                      <SelectItem value="consultant">Consultant</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="taxId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tax ID / VAT Number</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter tax ID if applicable" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem className="md:col-span-2">
+                  <FormLabel>Additional Notes</FormLabel>
+                  <FormControl>
+                    <Textarea placeholder="Enter any additional information" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="flex justify-end space-x-2">
+            <Button variant="outline" type="button" onClick={() => form.reset(defaultValues)}>
+              Reset
+            </Button>
+            <Button type="submit">Register Vendor</Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 };
 
