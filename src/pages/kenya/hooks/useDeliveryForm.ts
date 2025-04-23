@@ -2,10 +2,12 @@
 import { useState, FormEvent, ChangeEvent } from "react";
 import { toast } from "sonner";
 import { NavigateFunction } from "react-router-dom";
+import { DeliveryFormState } from "../types/deliveryForm";
 
 export const useDeliveryForm = (navigate: NavigateFunction) => {
-  const [formState, setFormState] = useState({
+  const [formState, setFormState] = useState<DeliveryFormState>({
     invoiceNumber: "",
+    invoiceDate: "",
     senderName: "",
     senderContact: "",
     senderAddress: "",
@@ -25,6 +27,12 @@ export const useDeliveryForm = (navigate: NavigateFunction) => {
     estimatedDeliveryDate: "",
     driverId: "",
     vehicleId: "",
+    loadingDate: "", // New field for date of loading
+    receiveDate: "", // New field for date received
+    deliveryDate: "", // New field for loading for delivery date
+    paymentStatus: "pending",
+    paymentApproved: false,
+    receivedPackages: "",
   });
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -54,22 +62,27 @@ export const useDeliveryForm = (navigate: NavigateFunction) => {
     
     // Validate form
     if (!formState.invoiceNumber) {
-      toast.error("Please select an invoice number");
+      toast.error("Please enter GY invoice number");
       return;
     }
     
-    if (!formState.receiverName || !formState.receiverContact || !formState.receiverAddress) {
-      toast.error("Please enter receiver information");
+    if (!formState.senderName) {
+      toast.error("Please enter shipper name");
       return;
     }
     
-    if (!formState.county || !formState.district) {
-      toast.error("Please select a county and district");
+    if (!formState.receiverName) {
+      toast.error("Please enter consignee information");
+      return;
+    }
+
+    if (!formState.packages) {
+      toast.error("Please enter number of packages");
       return;
     }
     
-    if (!formState.collectionDate || !formState.estimatedDeliveryDate) {
-      toast.error("Please enter collection and estimated delivery dates");
+    if (!formState.loadingDate) {
+      toast.error("Please enter date of loading");
       return;
     }
     

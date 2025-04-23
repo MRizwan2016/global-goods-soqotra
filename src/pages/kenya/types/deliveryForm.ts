@@ -1,6 +1,7 @@
 
 export interface DeliveryFormState {
   invoiceNumber: string;
+  invoiceDate?: string; // Added for invoice date
   senderName: string;
   senderContact: string;
   senderAddress: string;
@@ -20,6 +21,12 @@ export interface DeliveryFormState {
   estimatedDeliveryDate: string;
   driverId: string;
   vehicleId: string;
+  loadingDate?: string; // New field for date of loading
+  receiveDate?: string; // New field for date received
+  deliveryDate?: string; // New field for date of loading for delivery
+  paymentStatus?: string; // Added for payment status
+  paymentApproved?: boolean; // Added for payment approval
+  receivedPackages?: string; // Added for packages received
 }
 
 export interface DeliveryFormHandlers {

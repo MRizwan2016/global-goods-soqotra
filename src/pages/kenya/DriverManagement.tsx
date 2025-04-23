@@ -18,23 +18,52 @@ import {
   Trash2,
   Phone,
   UserRoundCog,
-  BadgeCheck
+  BadgeCheck,
+  FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Driver } from "./types/deliveryTracking";
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+
+// Extended Driver type with assigned invoice
+interface ExtendedDriver extends Driver {
+  assignedInvoice?: string;
+}
 
 const DriverManagement = () => {
-  const [drivers, setDrivers] = useState<Driver[]>(mockDrivers);
+  // Add sample invoice numbers to some drivers
+  const extendedDrivers: ExtendedDriver[] = mockDrivers.map((driver, index) => ({
+    ...driver,
+    assignedInvoice: index < 3 ? `GY-KE-${23000 + index}` : undefined
+  }));
+
+  const [drivers, setDrivers] = useState<ExtendedDriver[]>(extendedDrivers);
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [isAddDriverOpen, setIsAddDriverOpen] = useState(false);
+  const [newDriver, setNewDriver] = useState({
+    name: "",
+    licenseNumber: "",
+    contactNumber: "",
+    status: "available"
+  });
 
   const filteredDrivers = drivers.filter((driver) => {
     const searchMatch = 
       driver.name.toLowerCase().includes(searchText.toLowerCase()) ||
       driver.licenseNumber.toLowerCase().includes(searchText.toLowerCase()) ||
-      driver.contactNumber.includes(searchText);
+      driver.contactNumber.includes(searchText) ||
+      (driver.assignedInvoice && driver.assignedInvoice.toLowerCase().includes(searchText.toLowerCase()));
 
     const statusMatch = statusFilter === "all" || driver.status === statusFilter;
 
@@ -54,6 +83,40 @@ const DriverManagement = () => {
     }
   };
 
+  const handleAddDriver = () => {
+    if (!newDriver.name || !newDriver.licenseNumber || !newDriver.contactNumber) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    const newDriverRecord: ExtendedDriver = {
+      id: `driver-${Date.now()}`,
+      name: newDriver.name,
+      licenseNumber: newDriver.licenseNumber,
+      contactNumber: newDriver.contactNumber,
+      status: newDriver.status as 'available' | 'on-delivery' | 'unavailable'
+    };
+
+    setDrivers([newDriverRecord, ...drivers]);
+    setIsAddDriverOpen(false);
+    setNewDriver({
+      name: "",
+      licenseNumber: "",
+      contactNumber: "",
+      status: "available"
+    });
+
+    toast.success("Driver added successfully");
+  };
+
+  const handleDriverInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewDriver(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   return (
     <Layout title="Driver Management">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -62,7 +125,10 @@ const DriverManagement = () => {
             <BackButton to="/kenya/deliveries" />
             <h3 className="text-lg font-medium text-green-800">Kenya Driver Management</h3>
           </div>
-          <Button className="bg-green-600 hover:bg-green-700 flex items-center gap-1">
+          <Button 
+            className="bg-green-600 hover:bg-green-700 flex items-center gap-1"
+            onClick={() => setIsAddDriverOpen(true)}
+          >
             <Plus size={16} />
             Add New Driver
           </Button>
@@ -114,7 +180,7 @@ const DriverManagement = () => {
               <div className="relative ml-auto">
                 <Input
                   type="text"
-                  placeholder="Search drivers..."
+                  placeholder="Search drivers or invoices..."
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
                   className="pl-9 pr-3 py-1 h-8 border border-gray-300 rounded text-sm w-60"
@@ -132,6 +198,7 @@ const DriverManagement = () => {
                   <TableHead>License Number</TableHead>
                   <TableHead>Contact</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead>Assigned Invoice</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -158,6 +225,16 @@ const DriverManagement = () => {
                         </div>
                       </TableCell>
                       <TableCell>{getStatusBadge(driver.status)}</TableCell>
+                      <TableCell>
+                        {driver.assignedInvoice ? (
+                          <div className="flex items-center">
+                            <FileText size={16} className="mr-2 text-gray-500" />
+                            <span className="text-blue-600 font-medium">{driver.assignedInvoice}</span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400 italic">No invoice assigned</span>
+                        )}
+                      </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
                           <Button 
@@ -180,7 +257,7 @@ const DriverManagement = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                    <TableCell colSpan={6} className="text-center py-6 text-gray-500">
                       No drivers found
                     </TableCell>
                   </TableRow>
@@ -194,6 +271,74 @@ const DriverManagement = () => {
           </div>
         </div>
       </div>
+
+      {/* Add Driver Dialog */}
+      <Dialog open={isAddDriverOpen} onOpenChange={setIsAddDriverOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Add New Driver</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="driverName">Driver Name</Label>
+              <Input
+                id="driverName"
+                name="name"
+                value={newDriver.name}
+                onChange={handleDriverInputChange}
+                placeholder="Enter driver's full name"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="licenseNumber">License Number</Label>
+              <Input
+                id="licenseNumber"
+                name="licenseNumber"
+                value={newDriver.licenseNumber}
+                onChange={handleDriverInputChange}
+                placeholder="Enter license number"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="contactNumber">Contact Number</Label>
+              <Input
+                id="contactNumber"
+                name="contactNumber"
+                value={newDriver.contactNumber}
+                onChange={handleDriverInputChange}
+                placeholder="Enter contact number"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="status">Status</Label>
+              <select
+                id="status"
+                name="status"
+                value={newDriver.status}
+                onChange={handleDriverInputChange}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="available">Available</option>
+                <option value="on-delivery">On Delivery</option>
+                <option value="unavailable">Unavailable</option>
+              </select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddDriverOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddDriver}>
+              Add Driver
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
