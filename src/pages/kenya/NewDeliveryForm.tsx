@@ -1,18 +1,12 @@
-
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import BackButton from "@/components/ui/back-button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router-dom";
 import { useDeliveryForm } from "./hooks/useDeliveryForm";
 import FormActions from "./components/FormActions";
-import FormHeader from "./components/FormHeader";
 import DeliveryFormContent from "./components/delivery-form/DeliveryFormContent";
-import { toast } from "sonner";
+import DeliveryInvoiceSelector from "./components/delivery-form/DeliveryInvoiceSelector";
 
 const NewDeliveryForm = () => {
   const navigate = useNavigate();
@@ -31,64 +25,11 @@ const NewDeliveryForm = () => {
             <CardHeader>
               <CardTitle>GY Invoice Information</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="invoiceNumber">GY Invoice Number</Label>
-                  <Input
-                    id="invoiceNumber"
-                    name="invoiceNumber"
-                    value={formState.invoiceNumber}
-                    onChange={handleInputChange}
-                    placeholder="Enter GY invoice number"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="invoiceDate">Invoice Date</Label>
-                  <Input
-                    id="invoiceDate"
-                    name="invoiceDate"
-                    type="date"
-                    value={formState.invoiceDate || ""}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="senderName">Shipper Name</Label>
-                  <Input
-                    id="senderName"
-                    name="senderName"
-                    value={formState.senderName}
-                    onChange={handleInputChange}
-                    placeholder="Enter shipper name"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="senderContact">Telephone Number</Label>
-                  <Input
-                    id="senderContact"
-                    name="senderContact"
-                    value={formState.senderContact}
-                    onChange={handleInputChange}
-                    placeholder="Enter telephone number"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="senderAddress">Address</Label>
-                <Textarea
-                  id="senderAddress"
-                  name="senderAddress"
-                  value={formState.senderAddress}
-                  onChange={handleInputChange}
-                  placeholder="Enter shipper address"
-                  rows={3}
-                />
-              </div>
+            <CardContent>
+              <DeliveryInvoiceSelector
+                invoiceNumber={formState.invoiceNumber}
+                onInvoiceSelect={(value) => handleSelectChange("invoiceNumber", value)}
+              />
             </CardContent>
           </Card>
           
