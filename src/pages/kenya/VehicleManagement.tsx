@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import BackButton from "@/components/ui/back-button";
@@ -23,11 +22,32 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Vehicle } from "./types/deliveryTracking";
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 const VehicleManagement = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [isAddVehicleDialogOpen, setIsAddVehicleDialogOpen] = useState(false);
+  const [newVehicle, setNewVehicle] = useState<{
+    registrationNumber: string;
+    type: 'truck' | 'van' | 'motorcycle';
+    capacity: string;
+    status: 'available' | 'on-delivery' | 'maintenance';
+  }>({
+    registrationNumber: "",
+    type: "truck",
+    capacity: "",
+    status: "available"
+  });
 
   const filteredVehicles = vehicles.filter((vehicle) => {
     const searchMatch = 
@@ -53,6 +73,36 @@ const VehicleManagement = () => {
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setNewVehicle(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleAddVehicle = () => {
+    if (!newVehicle.registrationNumber || !newVehicle.capacity) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    const vehicleToAdd: Vehicle = {
+      id: `v-${Date.now()}`,
+      ...newVehicle
+    };
+
+    setVehicles(prev => [vehicleToAdd, ...prev]);
+    setIsAddVehicleDialogOpen(false);
+    setNewVehicle({
+      registrationNumber: "",
+      type: "truck",
+      capacity: "",
+      status: "available"
+    });
+    toast.success("New vehicle added successfully");
+  };
+
   return (
     <Layout title="Vehicle Management">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -61,11 +111,94 @@ const VehicleManagement = () => {
             <BackButton to="/kenya/deliveries" />
             <h3 className="text-lg font-medium text-green-800">Kenya Fleet Management</h3>
           </div>
-          <Button className="bg-green-600 hover:bg-green-700 flex items-center gap-1">
+          <Button 
+            className="bg-green-600 hover:bg-green-700 flex items-center gap-1"
+            onClick={() => setIsAddVehicleDialogOpen(true)}
+          >
             <Plus size={16} />
             Add New Vehicle
           </Button>
         </div>
+
+        <Dialog open={isAddVehicleDialogOpen} onOpenChange={setIsAddVehicleDialogOpen}>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Add New Vehicle</DialogTitle>
+              <DialogDescription>
+                Enter the details for the new vehicle to add to your fleet
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="registrationNumber" className="text-right font-medium">
+                  Registration Number*
+                </label>
+                <Input
+                  id="registrationNumber"
+                  name="registrationNumber"
+                  value={newVehicle.registrationNumber}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                  placeholder="KBC 123A"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="type" className="text-right font-medium">
+                  Vehicle Type*
+                </label>
+                <select
+                  id="type"
+                  name="type"
+                  value={newVehicle.type}
+                  onChange={handleInputChange}
+                  className="col-span-3 border border-input h-10 rounded-md px-3 py-2 text-sm"
+                >
+                  <option value="truck">Truck</option>
+                  <option value="van">Van</option>
+                  <option value="motorcycle">Motorcycle</option>
+                </select>
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="capacity" className="text-right font-medium">
+                  Capacity*
+                </label>
+                <Input
+                  id="capacity"
+                  name="capacity"
+                  value={newVehicle.capacity}
+                  onChange={handleInputChange}
+                  className="col-span-3"
+                  placeholder="2 tons"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <label htmlFor="status" className="text-right font-medium">
+                  Status
+                </label>
+                <select
+                  id="status"
+                  name="status"
+                  value={newVehicle.status}
+                  onChange={handleInputChange}
+                  className="col-span-3 border border-input h-10 rounded-md px-3 py-2 text-sm"
+                >
+                  <option value="available">Available</option>
+                  <option value="maintenance">Maintenance</option>
+                  <option value="on-delivery">On Delivery</option>
+                </select>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsAddVehicleDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleAddVehicle}>Add Vehicle</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         <div className="p-4">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
