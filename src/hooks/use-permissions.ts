@@ -1,35 +1,20 @@
 
-import { useAuth } from "./use-auth";
+import { useContext } from "react";
+import { AuthContext } from "@/contexts/AuthContext";
 import { User } from "@/types/auth";
 
 export function usePermissions() {
-  const { currentUser } = useAuth();
+  const context = useContext(AuthContext);
   
-  const isAdmin = currentUser?.isAdmin || false;
+  if (!context) {
+    throw new Error("usePermissions must be used within an AuthProvider");
+  }
   
-  const hasPermission = (permission: keyof User['permissions']) => {
-    if (!currentUser) return false;
-    
-    if (currentUser.isAdmin) return true;
-    
-    return currentUser.permissions[permission] === true;
-  };
-  
-  const hasFilePermission = (filePermission: keyof User['permissions']['files']) => {
-    if (!currentUser) return false;
-    
-    if (currentUser.isAdmin) return true;
-    
-    // Don't default to true if permissions or files aren't set
-    if (!currentUser.permissions?.files) return false;
-    if (currentUser.permissions.files[filePermission] === undefined) return false;
-    
-    return !!currentUser.permissions.files[filePermission];
+  const hasFilePermission = (fileKey: keyof User['permissions']['files']) => {
+    return context.hasFilePermission(context.currentUser, fileKey);
   };
   
   return {
-    isAdmin,
-    hasPermission,
-    hasFilePermission
+    hasFilePermission,
   };
 }
