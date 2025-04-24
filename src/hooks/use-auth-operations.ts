@@ -104,7 +104,6 @@ export function useAuthOperations(
         accounting: false,
         controlPanel: false,
         files: {
-          masterData: false,
           salesRep: false,
           town: false,
           item: false,
