@@ -72,7 +72,7 @@ const PrivateRoute = ({
   // Check if specific file permission is required
   if (requiredFile && !isAdmin) {
     // Make sure requiredFile is a valid key before checking permissions
-    const fileKey = requiredFile as keyof typeof currentUser?.permissions.files;
+    const fileKey = requiredFile as string;
     const hasAccess = hasFilePermission(fileKey);
     console.log(`File permission ${requiredFile} required, user has access: ${hasAccess}`);
     
