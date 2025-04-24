@@ -48,6 +48,7 @@ const Login = () => {
     setError(null);
     setIsLoading(true);
     try {
+      console.log(`Login attempt: ${values.email}`);
       const success = await login(values.email, values.password);
       if (success) {
         // Navigate to the redirect path or default
@@ -56,8 +57,8 @@ const Login = () => {
         setError("Invalid email or password. Please try again.");
       }
     } catch (err) {
-      setError("An error occurred during login. Please try again.");
       console.error("Login error:", err);
+      setError("An error occurred during login. Please try again.");
     } finally {
       setIsLoading(false);
     }

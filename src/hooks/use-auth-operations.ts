@@ -14,10 +14,10 @@ export function useAuthOperations(
     console.log("Login attempt:", email);
     
     // Special case for admin
-    if (email === ADMIN_EMAIL) {
+    if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
       const adminPassword = localStorage.getItem("admin-password") || ADMIN_PASSWORD;
       if (password === adminPassword) {
-        const adminUser = users.find(user => user.email === ADMIN_EMAIL);
+        const adminUser = users.find(user => user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
         if (adminUser) {
           console.log("Admin login successful");
           setCurrentUser(adminUser);
@@ -31,14 +31,14 @@ export function useAuthOperations(
       }
     }
 
-    // Regular user login - first check for exact email match
+    // Regular user login - using case-insensitive email comparison
     const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.isActive);
     
-    console.log("Found user:", user);
+    console.log("Found user:", user?.email);
     
     if (user) {
-      console.log("Password check:", userPasswords[user.id] === password);
+      console.log("Password check for user:", user.id);
       
       if (userPasswords[user.id] === password) {
         // Ensure user has all required permissions properly set up
@@ -50,7 +50,11 @@ export function useAuthOperations(
           description: `Welcome back, ${user.fullName}!`,
         });
         return true;
+      } else {
+        console.log("Password mismatch");
       }
+    } else {
+      console.log("No active user found with that email");
     }
     
     toast({
