@@ -18,7 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { toggleUserStatus, toggleUserPermission, toggleFilePermission } = useUserOperations(users, setUsers);
   
   // Get auth operations
-  const { login, logout, register } = useAuthOperations(users, setUsers, setCurrentUser);
+  const { login, logout, register, requestPasswordReset, resetPassword } = useAuthOperations(users, setUsers, setCurrentUser);
 
   // Load data from localStorage on initial load
   useEffect(() => {
@@ -146,6 +146,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     login,
     logout,
     register,
+    requestPasswordReset,
+    resetPassword,
     users,
     toggleUserStatus,
     sendActivationEmail: async (user: User) => {

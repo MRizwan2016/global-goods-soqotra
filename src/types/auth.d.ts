@@ -1,0 +1,50 @@
+
+export interface User {
+  id: string;
+  fullName: string;
+  email: string;
+  mobileNumber: string;
+  country: string;
+  isActive: boolean;
+  isAdmin: boolean;
+  createdAt: string;
+  permissions: {
+    masterData: boolean;
+    dataEntry: boolean;
+    reports: boolean;
+    downloads: boolean;
+    accounting: boolean;
+    controlPanel: boolean;
+    files: {
+      [key: string]: boolean;
+      salesRep: boolean;
+      town: boolean;
+      item: boolean;
+      packageOptions: boolean;
+      sellingRates: boolean;
+      container: boolean;
+      vessel: boolean;
+      invoiceBook: boolean;
+      driverHelper: boolean;
+      invoicing: boolean;
+      paymentReceivable: boolean;
+    };
+  };
+}
+
+export interface AuthContextType {
+  currentUser: User | null;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  logout: () => void;
+  register: (userData: Omit<User, "id" | "isActive" | "isAdmin" | "createdAt" | "permissions"> & { password: string }) => Promise<boolean>;
+  requestPasswordReset: (email: string) => Promise<boolean>;
+  resetPassword: (userId: string, token: string, newPassword: string) => Promise<boolean>;
+  users: User[];
+  toggleUserStatus: (userId: string) => void;
+  sendActivationEmail: (user: User) => Promise<boolean>;
+  toggleUserPermission: (userId: string, permissionKey: keyof User['permissions']) => void;
+  toggleFilePermission: (userId: string, fileKey: keyof User['permissions']['files']) => void;
+  hasFilePermission: (user: User | null, fileKey: keyof User['permissions']['files']) => boolean;
+}
