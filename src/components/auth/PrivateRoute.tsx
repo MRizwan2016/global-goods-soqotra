@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { ReactNode, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/use-permissions";
+import { User } from "@/types/auth";
 
 interface PrivateRouteProps {
   children?: ReactNode;
@@ -71,8 +72,8 @@ const PrivateRoute = ({
 
   // Check if specific file permission is required
   if (requiredFile && !isAdmin) {
-    // Make sure requiredFile is a valid key before checking permissions
-    const fileKey = requiredFile as string;
+    // Convert the string to a valid key for file permissions
+    const fileKey = requiredFile as keyof User['permissions']['files'];
     const hasAccess = hasFilePermission(fileKey);
     console.log(`File permission ${requiredFile} required, user has access: ${hasAccess}`);
     
