@@ -55,7 +55,8 @@ const PrivateRoute = ({
 
   // Check if specific permission is required
   if (requiredPermission && !isAdmin && currentUser) {
-    const hasPermission = currentUser.permissions[requiredPermission as keyof typeof currentUser.permissions];
+    const permissionKey = requiredPermission as keyof typeof currentUser.permissions;
+    const hasPermission = currentUser.permissions[permissionKey];
     console.log(`Permission ${requiredPermission} required, user has access: ${hasPermission}`);
     
     if (!hasPermission) {
@@ -70,12 +71,12 @@ const PrivateRoute = ({
 
   // Check if specific file permission is required
   if (requiredFile && !isAdmin) {
-    // Make sure requiredFile is a string before checking permissions
-    const fileKey = requiredFile as keyof typeof currentUser.permissions.files;
-    const hasPermission = hasFilePermission(fileKey);
-    console.log(`File permission ${requiredFile} required, user has access: ${hasPermission}`);
+    // Make sure requiredFile is a valid key before checking permissions
+    const fileKey = requiredFile as keyof typeof currentUser?.permissions.files;
+    const hasAccess = hasFilePermission(fileKey);
+    console.log(`File permission ${requiredFile} required, user has access: ${hasAccess}`);
     
-    if (!hasPermission) {
+    if (!hasAccess) {
       toast({
         title: "Access Denied",
         description: `You do not have permission to access ${requiredFile}.`,
