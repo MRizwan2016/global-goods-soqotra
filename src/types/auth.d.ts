@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   fullName: string;
@@ -16,18 +15,27 @@ export interface User {
     accounting: boolean;
     controlPanel: boolean;
     files: {
-      [key: string]: boolean;
-      salesRep: boolean;
-      town: boolean;
-      item: boolean;
-      packageOptions: boolean;
-      sellingRates: boolean;
-      container: boolean;
-      vessel: boolean;
-      invoiceBook: boolean;
-      driverHelper: boolean;
-      invoicing: boolean;
-      paymentReceivable: boolean;
+      salesRep?: boolean;
+      town?: boolean;
+      item?: boolean;
+      packageOptions?: boolean;
+      sellingRates?: boolean;
+      container?: boolean;
+      vessel?: boolean;
+      invoiceBook?: boolean;
+      driverHelper?: boolean;
+      invoicing?: boolean;
+      paymentReceivable?: boolean;
+      loadContainer?: boolean;
+      loadVessel?: boolean;
+      loadAirCargo?: boolean;
+      packingList?: boolean;
+      cargoReports?: boolean;
+      financialReports?: boolean;
+      shippingReports?: boolean;
+      paymentMethods?: boolean;
+      reconciliation?: boolean;
+      profitLoss?: boolean;
     };
   };
 }
