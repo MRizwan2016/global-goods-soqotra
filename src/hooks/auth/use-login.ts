@@ -2,6 +2,7 @@
 import { User } from "@/types/auth";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "@/constants/auth";
 import { handleAdminLogin, handleUserLogin, handleLoginFailure } from "./utils/login-utils";
+import { toast } from "@/hooks/use-toast";
 
 export function useLogin(
   users: User[], 
@@ -41,4 +42,3 @@ export function useLogin(
 
   return { login, logout };
 }
-
