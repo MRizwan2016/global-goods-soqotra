@@ -1,18 +1,27 @@
-
 import React from "react";
 import Layout from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Plus, FileSearch, ArrowDownUp } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import BackButton from "@/components/ui/back-button";
 
 const PaymentsPage = () => {
+  const navigate = useNavigate();
+
+  const handleViewPayment = (invoiceId: string) => {
+    navigate(`/reports/cargo/invoice/${invoiceId}`);
+  };
+
   return (
     <Layout title="Payments">
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold tracking-tight">Payment Management</h1>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <BackButton />
+            <h1 className="text-2xl font-bold tracking-tight">Payment Management</h1>
+          </div>
           <Link to="/accounts/payment/add">
             <Button className="gap-2">
               <Plus className="h-4 w-4" />
@@ -65,7 +74,12 @@ const PaymentsPage = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={() => handleViewPayment('INV-1234')}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
                           <FileSearch className="h-4 w-4 mr-1" />
                           View
                         </Button>

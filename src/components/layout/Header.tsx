@@ -18,9 +18,22 @@ const Header = ({ title }: { title: string }) => {
     navigate("/admin/login");
   };
 
+  const handleLogoClick = () => {
+    window.location.href = '/'; // This will refresh and navigate to dashboard
+  };
+
   return (
     <header className="bg-white border-b border-b-[#e6e6e6] py-4 px-4 flex items-center justify-between">
-      <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
+      <div className="flex items-center gap-4">
+        <img 
+          src="/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png" 
+          alt="SOQOTRA LOGO" 
+          className="h-10 w-auto cursor-pointer"
+          onClick={handleLogoClick}
+        />
+        <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
+      </div>
+      
       <div className="flex items-center gap-2">
         {isAuthenticated ? (
           <Button 
