@@ -19,7 +19,7 @@ const Header = ({ title }: { title: string }) => {
   };
 
   const handleLogoClick = () => {
-    window.location.href = '/'; // This will refresh and navigate to dashboard
+    window.location.href = '/dashboard'; // This will refresh and navigate to dashboard
   };
 
   return (
