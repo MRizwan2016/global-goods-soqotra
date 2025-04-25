@@ -3,6 +3,7 @@
  * Service to handle job storage operations
  */
 import { JobNumberService } from '@/services/JobNumberService';
+import { format } from 'date-fns';
 
 export class JobStorageService {
   private static STORAGE_KEY = 'jobs';
@@ -180,6 +181,112 @@ export class JobStorageService {
     } catch (error) {
       console.error('Error completing job:', error);
       throw new Error('Failed to complete job');
+    }
+  }
+
+  /**
+   * Clear all jobs and initialize with today's jobs
+   */
+  static resetAndInitializeJobs() {
+    try {
+      // Format today's date
+      const today = format(new Date(), 'yyyy-MM-dd');
+      
+      // Create four jobs with the specified job numbers
+      const newJobs = [
+        {
+          id: 'job-1',
+          jobNumber: 'QJB-778321-6039',
+          customer: 'QATAR NATIONAL BANK',
+          date: today,
+          time: '10:00',
+          amPm: 'AM',
+          location: 'QNB TOWER',
+          city: 'DOHA',
+          town: 'WEST BAY',
+          sector: 'BANKING',
+          branch: 'DOHA MAIN BRANCH',
+          mobileNumber: '555-1234',
+          jobType: 'DELIVERY',
+          status: 'COMPLETED',
+          isAssigned: true,
+          vehicle: 'CAR',
+          completionDate: today,
+          completionNotes: 'Delivered all items successfully',
+          invoiceNumber: 'INV-2025-001'
+        },
+        {
+          id: 'job-2',
+          jobNumber: '933642-6093',
+          customer: 'DOHA MUNICIPALITY',
+          date: today,
+          time: '11:30',
+          amPm: 'AM',
+          location: 'MUNICIPALITY OFFICE',
+          city: 'DOHA',
+          town: 'CENTRAL DOHA',
+          sector: 'GOVERNMENT',
+          branch: 'MAIN BRANCH',
+          mobileNumber: '555-2345',
+          jobType: 'COLLECTION',
+          status: 'COMPLETED',
+          isAssigned: true,
+          vehicle: 'VAN',
+          completionDate: today,
+          completionNotes: 'Collected all items as scheduled',
+          invoiceNumber: 'INV-2025-002'
+        },
+        {
+          id: 'job-3',
+          jobNumber: '044344-5405',
+          customer: 'HAMAD INTERNATIONAL AIRPORT',
+          date: today,
+          time: '14:00',
+          amPm: 'PM',
+          location: 'HIA CARGO TERMINAL',
+          city: 'DOHA',
+          town: 'AIRPORT AREA',
+          sector: 'AVIATION',
+          branch: 'CARGO DIVISION',
+          mobileNumber: '555-3456',
+          jobType: 'DELIVERY',
+          status: 'COMPLETED',
+          isAssigned: true,
+          vehicle: 'TRUCK',
+          completionDate: today,
+          completionNotes: 'Delivery completed on time',
+          invoiceNumber: 'INV-2025-003'
+        },
+        {
+          id: 'job-4',
+          jobNumber: '192033-5923',
+          customer: 'SIDRA MEDICAL CENTER',
+          date: today,
+          time: '16:30',
+          amPm: 'PM',
+          location: 'SIDRA HOSPITAL',
+          city: 'DOHA',
+          town: 'EDUCATION CITY',
+          sector: 'HEALTHCARE',
+          branch: 'MAIN FACILITY',
+          mobileNumber: '555-4567',
+          jobType: 'COLLECTION',
+          status: 'COMPLETED',
+          isAssigned: true,
+          vehicle: 'CAR',
+          completionDate: today,
+          completionNotes: 'Items collected and properly documented',
+          invoiceNumber: 'INV-2025-004'
+        }
+      ];
+
+      // Save the new jobs to localStorage
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(newJobs));
+      
+      return newJobs;
+    } catch (error) {
+      console.error('Error resetting jobs:', error);
+      throw new Error('Failed to reset and initialize jobs');
     }
   }
 

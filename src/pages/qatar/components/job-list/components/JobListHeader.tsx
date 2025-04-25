@@ -14,7 +14,7 @@ const JobListHeader: React.FC<JobListHeaderProps> = ({ title }) => {
     <div className="flex justify-between items-center mb-4">
       <h1 className="text-2xl font-bold">{title}</h1>
       <Button 
-        onClick={() => navigate("/qatar/new")} 
+        onClick={() => navigate("/qatar/job/new")} 
         className="bg-blue-600 hover:bg-blue-700 text-white"
       >
         Create New Job

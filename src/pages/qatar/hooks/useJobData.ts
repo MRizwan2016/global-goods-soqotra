@@ -9,19 +9,21 @@ export const useJobData = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get jobs from storage service
-    const storedJobs = JobStorageService.getAllJobs();
-    
-    // If there are no stored jobs yet, initialize with mock data once
-    if (storedJobs.length === 0) {
-      // Initialize with mock data once
-      mockJobs.forEach(job => JobStorageService.saveJob(job));
-      setJobs(JobStorageService.getAllJobs());
-    } else {
-      setJobs(storedJobs);
-    }
-    
-    setIsLoading(false);
+    // Reset and initialize jobs with today's data
+    const initializeJobs = () => {
+      try {
+        // First clear all existing jobs and initialize with today's jobs
+        const initializedJobs = JobStorageService.resetAndInitializeJobs();
+        setJobs(initializedJobs);
+        console.log('Jobs initialized with today\'s data', initializedJobs.length);
+      } catch (error) {
+        console.error('Error initializing jobs:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeJobs();
   }, []);
 
   const refreshJobs = () => {
