@@ -200,7 +200,7 @@ export class JobStorageService {
           customer: 'QATAR NATIONAL BANK',
           date: today,
           time: '10:00',
-          amPm: 'AM',
+          amPm: 'AM' as 'AM', // TypeScript cast to ensure it's the correct type
           location: 'QNB TOWER',
           city: 'DOHA',
           town: 'WEST BAY',
@@ -221,7 +221,7 @@ export class JobStorageService {
           customer: 'DOHA MUNICIPALITY',
           date: today,
           time: '11:30',
-          amPm: 'AM',
+          amPm: 'AM' as 'AM', // TypeScript cast
           location: 'MUNICIPALITY OFFICE',
           city: 'DOHA',
           town: 'CENTRAL DOHA',
@@ -242,7 +242,7 @@ export class JobStorageService {
           customer: 'HAMAD INTERNATIONAL AIRPORT',
           date: today,
           time: '14:00',
-          amPm: 'PM',
+          amPm: 'PM' as 'PM', // TypeScript cast
           location: 'HIA CARGO TERMINAL',
           city: 'DOHA',
           town: 'AIRPORT AREA',
@@ -263,7 +263,7 @@ export class JobStorageService {
           customer: 'SIDRA MEDICAL CENTER',
           date: today,
           time: '16:30',
-          amPm: 'PM',
+          amPm: 'PM' as 'PM', // TypeScript cast
           location: 'SIDRA HOSPITAL',
           city: 'DOHA',
           town: 'EDUCATION CITY',

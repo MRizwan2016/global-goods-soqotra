@@ -6,12 +6,16 @@ import { toast } from "sonner";
 import { QatarJob } from "./types/jobTypes";
 import JobForm from "./components/JobForm";
 import { JobStorageService } from "./services/JobStorageService";
+import { Button } from "@/components/ui/button";
+import { CheckCircle, XCircle } from "lucide-react";
+import JobCloseDialog from "./components/job-tracking/JobCloseDialog";
 
 const JobDetails = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [job, setJob] = useState<QatarJob | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showCloseDialog, setShowCloseDialog] = useState(false);
   
   useEffect(() => {
     // Fetch the job data from JobStorageService
@@ -65,6 +69,35 @@ const JobDetails = () => {
       toast.error("An error occurred while updating the job");
     }
   };
+
+  const handleCompleteJob = () => {
+    if (job?.status === "COMPLETED" || job?.status === "CANCELLED") {
+      toast.error("This job has already been completed or cancelled");
+      return;
+    }
+    
+    setShowCloseDialog(true);
+  };
+
+  const handleCancelJob = () => {
+    if (job?.status === "COMPLETED" || job?.status === "CANCELLED") {
+      toast.error("This job has already been completed or cancelled");
+      return;
+    }
+    
+    setShowCloseDialog(true);
+  };
+
+  const handleJobClosed = () => {
+    // Refresh job data
+    if (id) {
+      const updatedJob = JobStorageService.getJobById(id);
+      if (updatedJob) {
+        setJob(updatedJob);
+        toast.success(`Job ${updatedJob.jobNumber} status updated`);
+      }
+    }
+  };
   
   if (loading) {
     return (
@@ -101,6 +134,27 @@ const JobDetails = () => {
               </p>
             )}
           </div>
+          
+          {!isJobReadOnly && (
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                className="border-red-500 text-red-500 hover:bg-red-50"
+                onClick={handleCancelJob}
+              >
+                <XCircle className="mr-1 h-4 w-4" />
+                Cancel Job
+              </Button>
+              
+              <Button
+                className="bg-green-600 hover:bg-green-700"
+                onClick={handleCompleteJob}
+              >
+                <CheckCircle className="mr-1 h-4 w-4" />
+                Complete Job
+              </Button>
+            </div>
+          )}
         </div>
         
         <JobForm 
@@ -108,6 +162,16 @@ const JobDetails = () => {
           onSubmit={handleUpdateJob}
           readOnly={isJobReadOnly}
         />
+
+        {job && (
+          <JobCloseDialog
+            isOpen={showCloseDialog}
+            onClose={() => setShowCloseDialog(false)}
+            jobId={job.id}
+            jobNumber={job.jobNumber}
+            onSuccess={handleJobClosed}
+          />
+        )}
       </div>
     </Layout>
   );

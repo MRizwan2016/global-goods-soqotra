@@ -14,7 +14,7 @@ export const useJobData = () => {
       try {
         // First clear all existing jobs and initialize with today's jobs
         const initializedJobs = JobStorageService.resetAndInitializeJobs();
-        setJobs(initializedJobs);
+        setJobs(initializedJobs as QatarJob[]); // Using type assertion to fix the type error
         console.log('Jobs initialized with today\'s data', initializedJobs.length);
       } catch (error) {
         console.error('Error initializing jobs:', error);
