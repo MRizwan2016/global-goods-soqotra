@@ -54,6 +54,33 @@ const InvoiceForm = () => {
       }
     }
   }, [formState.invoiceNumber, formState.jobNumber]);
+
+  // Update fields when package items change
+  useEffect(() => {
+    if (packageItems.length > 0) {
+      // Calculate total volume and weight
+      let totalVolume = 0;
+      let totalWeight = 0;
+      
+      packageItems.forEach(pkg => {
+        totalVolume += parseFloat(pkg.volume || '0');
+        totalWeight += parseFloat(pkg.weight || '0');
+      });
+      
+      // Update form state with calculated values
+      handleInputChange({
+        target: { name: 'volume', value: totalVolume.toFixed(6) }
+      } as React.ChangeEvent<HTMLInputElement>);
+      
+      handleInputChange({
+        target: { name: 'weight', value: totalWeight.toFixed(2) }
+      } as React.ChangeEvent<HTMLInputElement>);
+      
+      handleInputChange({
+        target: { name: 'packages', value: packageItems.length.toString() }
+      } as React.ChangeEvent<HTMLInputElement>);
+    }
+  }, [packageItems]);
   
   return (
     <Layout title={isEditing ? "Update Invoice" : "Add Invoice"}>
@@ -85,6 +112,7 @@ const InvoiceForm = () => {
             handleInputChange={handleInputChange}
             handleSelectChange={handleSelectChange}
             updatePackagePricing={updatePackagePricing}
+            packageItems={packageItems}
           />
           
           <PackageDetailsSection 

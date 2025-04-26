@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import {
@@ -12,6 +13,7 @@ import JobTypeSelector from "./details/JobTypeSelector";
 import VehicleSelector from "./details/VehicleSelector";
 import CitySelector from "./details/CitySelector";
 import { useJobForm } from "./context/JobFormContext";
+import { toast } from "sonner";
 
 // Replace BookItem with the proper interface
 interface InvoiceBook {
@@ -28,29 +30,58 @@ interface InvoiceBook {
 const JobDetailsSection = () => {
   const { jobData, handleSelectChange, isJobNumberGenerated } = useJobForm();
   const [availableInvoices, setAvailableInvoices] = useState<string[]>([]);
+  const [allInvoices, setAllInvoices] = useState<any[]>([]);
 
   useEffect(() => {
-    // Load available invoice numbers from active books
-    const loadAvailableInvoices = () => {
-      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
-      const usedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]')
-        .map((inv: any) => inv.invoiceNumber);
+    // Load all invoices for data reference
+    const loadAllInvoices = () => {
+      const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+      setAllInvoices(invoices);
       
-      const availableNumbers: string[] = [];
-      activeBooks.forEach((book: any) => {
-        if (book.availablePages) {
-          const filtered = book.availablePages.filter(
-            (num: string) => !usedInvoices.includes(num)
-          );
-          availableNumbers.push(...filtered);
-        }
-      });
+      // Extract invoice numbers that don't already have job numbers
+      const availableNumbers = invoices
+        .filter((inv: any) => !inv.jobNumber || inv.jobNumber === "")
+        .map((inv: any) => inv.invoiceNumber);
       
       setAvailableInvoices(availableNumbers);
     };
 
-    loadAvailableInvoices();
+    loadAllInvoices();
   }, []);
+
+  // Handle invoice selection to load associated data
+  const handleInvoiceChange = (value: string) => {
+    // Update the jobData with the selected invoice
+    handleSelectChange("invoiceNumber", value);
+    
+    // Find the selected invoice data to populate other fields
+    const selectedInvoice = allInvoices.find(inv => inv.invoiceNumber === value);
+    if (selectedInvoice) {
+      // Update other fields based on invoice data
+      if (selectedInvoice.consignee1) {
+        handleSelectChange("customer", selectedInvoice.consignee1);
+      }
+      
+      if (selectedInvoice.consigneeMobile) {
+        handleSelectChange("mobileNumber", selectedInvoice.consigneeMobile);
+      }
+      
+      if (selectedInvoice.country) {
+        handleSelectChange("country", selectedInvoice.country);
+      }
+      
+      if (selectedInvoice.sector) {
+        handleSelectChange("sector", selectedInvoice.sector);
+      }
+      
+      if (selectedInvoice.branch) {
+        handleSelectChange("branch", selectedInvoice.branch);
+      }
+      
+      // Show success message
+      toast.success("Invoice details loaded successfully");
+    }
+  };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 animate-fade-in">
@@ -63,7 +94,7 @@ const JobDetailsSection = () => {
           <Label htmlFor="invoiceNumber">INVOICE NUMBER</Label>
           <Select
             value={jobData.invoiceNumber || ""}
-            onValueChange={(value) => handleSelectChange("invoiceNumber", value)}
+            onValueChange={handleInvoiceChange}
             disabled={!isJobNumberGenerated}
           >
             <SelectTrigger className="w-full">

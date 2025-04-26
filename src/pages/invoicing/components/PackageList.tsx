@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import { 
   Table, 
   TableBody, 
@@ -19,6 +19,30 @@ const PackageList: React.FC<PackageListProps> = ({
   packageItems,
   handleRemovePackage,
 }) => {
+  const totals = useMemo(() => {
+    let totalVolume = 0;
+    let totalWeight = 0;
+    let totalPrice = 0;
+    let totalDocFee = 0;
+    let totalAmount = 0;
+    
+    packageItems.forEach(item => {
+      totalVolume += parseFloat(item.volume || "0");
+      totalWeight += parseFloat(item.weight || "0");
+      totalPrice += parseFloat(item.price || "0");
+      totalDocFee += parseFloat(item.documentsFee || "0");
+      totalAmount += parseFloat(item.total || "0");
+    });
+    
+    return {
+      volume: totalVolume.toFixed(6),
+      weight: totalWeight.toFixed(2),
+      price: totalPrice.toFixed(2),
+      docFee: totalDocFee.toFixed(2),
+      total: totalAmount.toFixed(2)
+    };
+  }, [packageItems]);
+
   if (packageItems.length === 0) {
     return null;
   }
@@ -59,6 +83,17 @@ const PackageList: React.FC<PackageListProps> = ({
               </TableCell>
             </TableRow>
           ))}
+          
+          {/* Totals row */}
+          <TableRow className="bg-gray-50 font-semibold">
+            <TableCell colSpan={2} className="text-right">TOTALS:</TableCell>
+            <TableCell>{totals.volume} CBM</TableCell>
+            <TableCell>{totals.weight} kg</TableCell>
+            <TableCell>{totals.price}</TableCell>
+            <TableCell>{totals.docFee}</TableCell>
+            <TableCell className="font-bold">{totals.total}</TableCell>
+            <TableCell></TableCell>
+          </TableRow>
         </TableBody>
       </Table>
     </div>

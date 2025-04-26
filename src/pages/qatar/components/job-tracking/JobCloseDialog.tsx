@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ import { Calendar as CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { JobStorageService } from "../../services/JobStorageService";
 import { toast } from "sonner";
+import { JobNumberService } from "@/services/JobNumberService";
 
 interface JobCloseDialogProps {
   isOpen: boolean;
@@ -29,14 +30,28 @@ interface JobCloseDialogProps {
 
 const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobCloseDialogProps) => {
   const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [availableInvoices, setAvailableInvoices] = useState<string[]>([]);
   const [invoiceAmount, setInvoiceAmount] = useState("");
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [reason, setReason] = useState("");
   const [action, setAction] = useState<"COMPLETE" | "CANCEL">("COMPLETE");
   const [loading, setLoading] = useState(false);
 
+  // Load available invoices from localStorage
+  useEffect(() => {
+    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const invoiceNumbers = invoices.map((inv: any) => inv.invoiceNumber);
+    setAvailableInvoices(invoiceNumbers);
+  }, [isOpen]);
+
   const handleComplete = () => {
     setLoading(true);
+    
+    if (!invoiceNumber) {
+      toast.error("Please select an invoice number");
+      setLoading(false);
+      return;
+    }
     
     try {
       const job = JobStorageService.getJobById(jobId);
@@ -50,12 +65,28 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
       const updatedJob = {
         ...job,
         status: "COMPLETED",
-        invoiceNumber: invoiceNumber || job.invoiceNumber,
+        invoiceNumber: invoiceNumber,
         invoiceAmount: invoiceAmount ? parseFloat(invoiceAmount) : job.advanceAmount,
         completionDate: date ? format(date, "yyyy-MM-dd") : format(new Date(), "yyyy-MM-dd"),
         completionNotes: "Job completed successfully",
         lastUpdated: new Date().toISOString()
       };
+      
+      // Link job number with invoice number
+      JobNumberService.linkJobToInvoice(job.jobNumber, invoiceNumber);
+
+      // Also update invoice with this job number
+      try {
+        const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+        const matchingInvoiceIndex = invoices.findIndex((inv: any) => inv.invoiceNumber === invoiceNumber);
+        
+        if (matchingInvoiceIndex >= 0) {
+          invoices[matchingInvoiceIndex].jobNumber = job.jobNumber;
+          localStorage.setItem('invoices', JSON.stringify(invoices));
+        }
+      } catch (error) {
+        console.error("Error updating invoice with job number:", error);
+      }
       
       JobStorageService.updateJob(jobId, updatedJob);
       toast.success(`Job ${jobNumber} marked as completed`);
@@ -145,12 +176,17 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="invoiceNumber">Invoice Number</Label>
-                  <Input
+                  <select
                     id="invoiceNumber"
                     value={invoiceNumber}
                     onChange={(e) => setInvoiceNumber(e.target.value)}
-                    placeholder="Enter invoice number"
-                  />
+                    className="w-full rounded-md border border-gray-300 p-2"
+                  >
+                    <option value="">Select Invoice Number</option>
+                    {availableInvoices.map((inv) => (
+                      <option key={inv} value={inv}>{inv}</option>
+                    ))}
+                  </select>
                 </div>
                 
                 <div className="space-y-2">
@@ -210,7 +246,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
           </Button>
           <Button 
             onClick={action === "COMPLETE" ? handleComplete : handleCancel}
-            disabled={loading}
+            disabled={loading || (action === "COMPLETE" && !invoiceNumber)}
             className={action === "COMPLETE" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"}
           >
             {loading && <span className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></span>}

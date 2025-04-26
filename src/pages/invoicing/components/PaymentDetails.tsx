@@ -14,13 +14,15 @@ interface PaymentDetailsProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   handleSelectChange?: (name: string, value: string) => void;
   updatePackagePricing?: () => void;
+  packageItems?: any[];
 }
 
 const PaymentDetails: React.FC<PaymentDetailsProps> = ({
   formState,
   handleInputChange,
   handleSelectChange,
-  updatePackagePricing
+  updatePackagePricing,
+  packageItems = []
 }) => {
   // Calculate net amount when gross or discount changes
   useEffect(() => {
@@ -75,6 +77,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
           <PaymentAmounts 
             formState={formState}
             handleInputChange={handleInputChange}
+            packageItems={packageItems}
           />
           
           <div className="mt-4">

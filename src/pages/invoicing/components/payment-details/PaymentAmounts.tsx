@@ -1,16 +1,68 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import InputField from "./InputField";
+import { calculateDocumentFee } from "../../utils/packageCalculations";
 
 interface PaymentAmountsProps {
   formState: any;
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+  packageItems?: any[];
 }
 
 const PaymentAmounts: React.FC<PaymentAmountsProps> = ({
   formState,
   handleInputChange,
+  packageItems = [],
 }) => {
+  // Calculate and update document fee based on package volume
+  useEffect(() => {
+    if (packageItems && packageItems.length) {
+      // Calculate total volume from all packages
+      let totalVolume = 0;
+      packageItems.forEach(pkg => {
+        if (pkg.volume) {
+          totalVolume += parseFloat(pkg.volume.toString() || "0");
+        }
+      });
+
+      // Add QAR 50 document fee only once if volume > 1 CBM
+      const documentFee = calculateDocumentFee(totalVolume);
+      
+      // Update document fee in form
+      const event = {
+        target: {
+          name: "document",
+          value: documentFee.toString()
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      
+      handleInputChange(event);
+    }
+  }, [packageItems, handleInputChange]);
+
+  // Calculate and update freight based on package totals
+  useEffect(() => {
+    if (packageItems && packageItems.length) {
+      // Calculate total amount from packages
+      let totalAmount = 0;
+      packageItems.forEach(pkg => {
+        totalAmount += parseFloat(pkg.total || "0");
+      });
+      
+      // Update freight in form if it's different
+      if (parseFloat(formState.freight || "0") !== totalAmount) {
+        const event = {
+          target: {
+            name: "freight",
+            value: totalAmount.toString()
+          }
+        } as React.ChangeEvent<HTMLInputElement>;
+        
+        handleInputChange(event);
+      }
+    }
+  }, [packageItems, formState.freight, handleInputChange]);
+
   return (
     <>
       <InputField 

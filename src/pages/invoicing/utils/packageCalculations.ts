@@ -13,17 +13,23 @@ export const calculateTotalsFromPackages = (packages: PackageItem[]): {
   totalWeight: number;
   totalAmount: number;
   packageCount: number;
+  hasVolumeOverOneUnit: boolean;
 } => {
   // Calculate totals from all packages
   let totalVolume = 0;
   let totalWeight = 0;
   let totalAmount = 0;
   let packageCount = packages.length;
+  let hasVolumeOverOneUnit = false;
   
   packages.forEach(pkg => {
     // Handle numeric conversion properly
     if (pkg.volume) {
-      totalVolume += parseFloat(pkg.volume.toString() || "0");
+      const volume = parseFloat(pkg.volume.toString() || "0");
+      totalVolume += volume;
+      if (volume > 1) {
+        hasVolumeOverOneUnit = true;
+      }
     }
     
     if (pkg.weight) {
@@ -37,7 +43,8 @@ export const calculateTotalsFromPackages = (packages: PackageItem[]): {
     totalVolume,
     totalWeight,
     totalAmount,
-    packageCount
+    packageCount,
+    hasVolumeOverOneUnit
   };
 };
 
@@ -74,4 +81,12 @@ export const createPackageItemFromForm = (
     quantity: 1, // Default quantity
     total: parseFloat(total || "0")  // Convert string to number
   };
+};
+
+/**
+ * Calculate document fee based on volume
+ * If volume is > 1 CBM, add QAR 50 once, otherwise add 0
+ */
+export const calculateDocumentFee = (totalVolume: number): number => {
+  return totalVolume > 1 ? 50 : 0;
 };
