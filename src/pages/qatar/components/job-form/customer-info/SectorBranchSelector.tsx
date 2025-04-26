@@ -15,6 +15,7 @@ import PackageSelectionDialog from "./PackageSelectionDialog";
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
 import { PackageInfo } from "../details/packages/types";
+import SelectedPackagesList from "./SelectedPackagesList";
 
 interface SectorBranchSelectorProps {
   onPackageSelect?: (pkg: PackageInfo) => void;
@@ -23,30 +24,43 @@ interface SectorBranchSelectorProps {
 const SectorBranchSelector: React.FC<SectorBranchSelectorProps> = ({ onPackageSelect }) => {
   const { jobData, handleInputChange, handleSelectChange } = useJobForm();
   const [isPackageDialogOpen, setIsPackageDialogOpen] = useState(false);
+  const [selectedPackages, setSelectedPackages] = useState<PackageInfo[]>([]);
+
+  const availableSectors = useMemo(() => {
+    return jobData.country ? sectorOptions[jobData.country as keyof typeof sectorOptions] || [] : [];
+  }, [jobData.country]);
 
   const availableBranches = useMemo(() => {
-    return jobData.sector ? branchOptions[jobData.sector] || [] : [];
-  }, [jobData.sector]);
+    if (!jobData.country || !jobData.sector) return [];
+    return branchOptions[jobData.country as keyof typeof branchOptions]?.[jobData.sector] || [];
+  }, [jobData.country, jobData.sector]);
 
   const handlePackageSelect = (pkg: PackageInfo) => {
-    if (onPackageSelect) {
-      onPackageSelect(pkg);
+    if (!selectedPackages.some(p => p.sr_no === pkg.sr_no)) {
+      setSelectedPackages(prev => [...prev, pkg]);
+      if (onPackageSelect) {
+        onPackageSelect(pkg);
+      }
     }
+  };
+
+  const handleRemovePackage = (pkg: PackageInfo) => {
+    setSelectedPackages(prev => prev.filter(p => p.sr_no !== pkg.sr_no));
   };
 
   return (
     <>
       <div>
-        <Label htmlFor="sector">SECTOR:</Label>
+        <Label>SECTOR:</Label>
         <Select
           value={jobData.sector || ""}
           onValueChange={(value) => handleSelectChange("sector", value)}
         >
-          <SelectTrigger id="sector" className="w-full">
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Select Sector" />
           </SelectTrigger>
           <SelectContent>
-            {sectorOptions.map((option) => (
+            {availableSectors.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
@@ -56,13 +70,13 @@ const SectorBranchSelector: React.FC<SectorBranchSelectorProps> = ({ onPackageSe
       </div>
 
       <div>
-        <Label htmlFor="branch">BRANCH:</Label>
+        <Label>BRANCH:</Label>
         <Select
           value={jobData.branch || ""}
           onValueChange={(value) => handleSelectChange("branch", value)}
           disabled={!jobData.sector}
         >
-          <SelectTrigger id="branch" className="w-full">
+          <SelectTrigger className="w-full">
             <SelectValue placeholder="Select Branch" />
           </SelectTrigger>
           <SelectContent>
@@ -85,6 +99,13 @@ const SectorBranchSelector: React.FC<SectorBranchSelectorProps> = ({ onPackageSe
           <Package size={16} />
           PACKAGES
         </Button>
+      </div>
+
+      <div className="md:col-span-2">
+        <SelectedPackagesList 
+          selectedPackages={selectedPackages}
+          onRemovePackage={handleRemovePackage}
+        />
       </div>
 
       <PackageSelectionDialog

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import {
@@ -30,47 +29,27 @@ const JobDetailsSection = () => {
   const { jobData, handleSelectChange, isJobNumberGenerated } = useJobForm();
   const [availableInvoices, setAvailableInvoices] = useState<string[]>([]);
 
-  // Load available invoice numbers from active books
   useEffect(() => {
-    const fetchAvailableInvoices = () => {
-      // Get active invoice books from localStorage
-      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]') as InvoiceBook[];
-      const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]') as InvoiceBook[];
+    // Load available invoice numbers from active books
+    const loadAvailableInvoices = () => {
+      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+      const usedInvoices = JSON.parse(localStorage.getItem('invoices') || '[]')
+        .map((inv: any) => inv.invoiceNumber);
       
-      // Get used invoice numbers to filter them out
-      const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-      const usedInvoiceNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
+      const availableNumbers: string[] = [];
+      activeBooks.forEach((book: any) => {
+        if (book.availablePages) {
+          const filtered = book.availablePages.filter(
+            (num: string) => !usedInvoices.includes(num)
+          );
+          availableNumbers.push(...filtered);
+        }
+      });
       
-      let allAvailableInvoices: string[] = [];
-      
-      // Get invoices from active books
-      if (activeBooks.length > 0) {
-        activeBooks.forEach((book: any) => {
-          if (book.availablePages) {
-            // Filter out already used invoice numbers
-            const availableFromBook = book.availablePages.filter(
-              (invoice: string) => !usedInvoiceNumbers.includes(invoice)
-            );
-            allAvailableInvoices = [...allAvailableInvoices, ...availableFromBook];
-          }
-        });
-      } else if (storedBooks.length > 0) {
-        // If no active books, try stored books
-        storedBooks.forEach((book: any) => {
-          if (book.isActivated && book.availablePages) {
-            // Filter out already used invoice numbers
-            const availableFromBook = book.availablePages.filter(
-              (invoice: string) => !usedInvoiceNumbers.includes(invoice)
-            );
-            allAvailableInvoices = [...allAvailableInvoices, ...availableFromBook];
-          }
-        });
-      }
-      
-      setAvailableInvoices(allAvailableInvoices);
+      setAvailableInvoices(availableNumbers);
     };
-    
-    fetchAvailableInvoices();
+
+    loadAvailableInvoices();
   }, []);
 
   return (
@@ -81,29 +60,25 @@ const JobDetailsSection = () => {
         <JobTypeSelector />
         
         <div>
-          <Label htmlFor="invoiceNumber" className="font-medium text-gray-700 mb-1 block">
-            INVOICE NUMBER
-          </Label>
+          <Label htmlFor="invoiceNumber">INVOICE NUMBER</Label>
           <Select
             value={jobData.invoiceNumber || ""}
             onValueChange={(value) => handleSelectChange("invoiceNumber", value)}
             disabled={!isJobNumberGenerated}
           >
-            <SelectTrigger id="invoiceNumber" className="border border-gray-300 bg-white hover:bg-gray-50 transition-colors">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="SELECT INVOICE NUMBER" />
             </SelectTrigger>
             <SelectContent>
-              {availableInvoices.length > 0 ? (
-                availableInvoices.map((invoice, index) => (
-                  <SelectItem key={index} value={invoice}>{invoice}</SelectItem>
-                ))
-              ) : (
-                <SelectItem value="no-invoices-available">No available invoice numbers</SelectItem>
-              )}
+              {availableInvoices.map((invoice) => (
+                <SelectItem key={invoice} value={invoice}>
+                  {invoice}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
-        
+
         <DateTimeSelector />
         
         <div className="grid grid-cols-2 gap-4">
