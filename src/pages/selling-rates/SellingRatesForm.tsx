@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { useSellingRateForm } from "./hooks/useSellingRateForm";
@@ -22,7 +23,6 @@ const SellingRatesForm = () => {
     rateBoxes,
     districtRates,
     isDistrictRatesValid,
-    handleInputChange,
     handleRateChange,
     onSubmit,
     watch,
@@ -61,7 +61,6 @@ const SellingRatesForm = () => {
             <TariffDetailsForm 
               register={register}
               errors={errors}
-              handleInputChange={handleInputChange}
               sectors={sectors}
               currencies={currencies}
               selectedCurrency={selectedCurrency}
