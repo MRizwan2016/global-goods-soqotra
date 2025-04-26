@@ -125,48 +125,48 @@ export const cityVehicleMapping: Record<string, string[]> = {
   'STREET NO. 18': ['514005'],
   'STREET NO. 19': ['514005'],
   'STREET NO. 20': ['514005'],
-  'STREET NO. 21': ['514005'],
-  'STREET NO. 22': ['514005'],
-  'STREET NO. 23': ['514005'],
-  'STREET NO. 24': ['514005'],
-  'STREET NO. 25': ['514005'],
-  'STREET NO. 26': ['514005'],
-  'STREET NO. 27': ['514005'],
-  'STREET NO. 28': ['514005'],
-  'STREET NO. 29': ['514005'],
-  'STREET NO. 30': ['514005'],
   
-  // Warehouse locations (using 119927)
-  'WSB': ['119927'],
+  // Warehouse areas (using 119927 vehicle)
+  'WAREHOUSE 1': ['119927'],
+  'WAREHOUSE 2': ['119927'],
+  'WAREHOUSE 3': ['119927'],
+  'WAREHOUSE 4': ['119927'],
+  'WAREHOUSE 5': ['119927'],
+  'WAREHOUSE 6': ['119927'],
+  'LOGISTICS VILLAGE': ['119927'],
   
-  // Special locations (using 74827)
-  'DOH': ['74827'],
-  'RAK': ['74827'],
-  'WAK': ['74827'],
-  'UMS': ['74827'],
-  'KHO': ['74827'],
-  'DAY': ['74827'],
-  'SHA': ['74827'],
-  
-  // International cargo collecting countries
-  'KENYA': ['41070'],
-  'PHILIPPINES': ['41070'],
-  'SOMALIA': ['41070'],
-  'ERITREA': ['41070'],
-  'SUDAN': ['41070'],
-  'UGANDA': ['41070'],
-  'MOZAMBIQUE': ['41070'],
-  'TUNISIA': ['41070']
+  // Special areas (using 74827 vehicle)
+  'DUKHAN': ['74827'],
+  'SEALINE BEACH': ['74827'],
+  'UMM BAB': ['74827'],
+  'ZEKREET': ['74827'],
+  'AL KHOR': ['74827'],
+  'RAS LAFFAN': ['74827']
 };
 
-// Get recommended vehicles for a city
-export const getRecommendedVehiclesForCity = (cityCode: string): string[] => {
-  return cityVehicleMapping[cityCode] || [];
-};
-
-// Get all cities that use a specific vehicle
+/**
+ * Get cities assigned to a specific vehicle
+ * @param vehicleNumber The vehicle number to search for
+ * @returns Array of city names assigned to the vehicle
+ */
 export const getCitiesForVehicle = (vehicleNumber: string): string[] => {
-  return Object.entries(cityVehicleMapping)
-    .filter(([_, vehicles]) => vehicles.includes(vehicleNumber))
-    .map(([city, _]) => city);
+  const assignedCities: string[] = [];
+  
+  // Loop through all city entries and check if the vehicle is listed
+  for (const [city, vehicles] of Object.entries(cityVehicleMapping)) {
+    if (vehicles.includes(vehicleNumber)) {
+      assignedCities.push(city);
+    }
+  }
+  
+  return assignedCities;
+};
+
+/**
+ * Get recommended vehicles for a specific city
+ * @param city The city to get vehicles for
+ * @returns Array of vehicle numbers recommended for the city
+ */
+export const getVehiclesForCity = (city: string): string[] => {
+  return cityVehicleMapping[city] || [];
 };
