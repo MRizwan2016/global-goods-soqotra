@@ -1,223 +1,136 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { mockVehicles } from "../../data/mockVehicles";
+import { Button } from "@/components/ui/button";
+import { Edit, Trash2, MapPin, CheckCircle, AlertCircle, WrenchIcon } from "lucide-react";
 import { 
   Table, 
-  TableHeader, 
-  TableRow, 
-  TableHead, 
   TableBody, 
-  TableCell 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Edit2, Trash2, AlertTriangle, Printer, FileText } from "lucide-react";
-import { toast } from "sonner";
-import { mockVehicles } from "../../data/mockVehicles";
-import { QatarVehicle } from "../../types/vehicleTypes";
-import VehicleForm from "./VehicleForm";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { getCitiesForVehicle } from "../../data/cityVehicleMapping";
 
-const VehicleList: React.FC = () => {
-  // Load vehicles from localStorage if available, otherwise use mockVehicles
-  const loadVehicles = () => {
-    try {
-      const storedVehicles = localStorage.getItem('qatarVehicles');
-      if (storedVehicles) {
-        return JSON.parse(storedVehicles);
-      }
-    } catch (error) {
-      console.error("Error loading vehicles from localStorage:", error);
-    }
-    // If localStorage fails or is empty, use mockVehicles
-    return mockVehicles;
+const VehicleList = () => {
+  const [viewCities, setViewCities] = useState<string[]>([]);
+  const [showCitiesModal, setShowCitiesModal] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<string>("");
+  
+  const handleViewCities = (vehicleNumber: string) => {
+    const cities = getCitiesForVehicle(vehicleNumber);
+    setViewCities(cities);
+    setSelectedVehicle(vehicleNumber);
+    setShowCitiesModal(true);
   };
-
-  const [vehicles, setVehicles] = useState<QatarVehicle[]>(loadVehicles());
-  const [searchTerm, setSearchTerm] = useState("");
-  const [editingVehicle, setEditingVehicle] = useState<QatarVehicle | null>(null);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [vehicleToDelete, setVehicleToDelete] = useState<QatarVehicle | null>(null);
-
-  useEffect(() => {
-    // Update localStorage when vehicles change
-    try {
-      localStorage.setItem('qatarVehicles', JSON.stringify(vehicles));
-    } catch (error) {
-      console.error("Error saving vehicles to localStorage:", error);
-    }
-  }, [vehicles]);
-
-  const handleDeleteClick = (vehicle: QatarVehicle) => {
-    setVehicleToDelete(vehicle);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const confirmDelete = () => {
-    if (vehicleToDelete) {
-      setVehicles(vehicles.filter(v => v.id !== vehicleToDelete.id));
-      toast.success("Vehicle deleted successfully");
-      setIsDeleteDialogOpen(false);
-      setVehicleToDelete(null);
+  
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "RUN":
+        return <Badge className="bg-green-500">Running</Badge>;
+      case "MAINTENANCE":
+        return <Badge className="bg-amber-500">Maintenance</Badge>;
+      case "GARAGE":
+        return <Badge className="bg-red-500">In Garage</Badge>;
+      default:
+        return <Badge className="bg-gray-500">{status}</Badge>;
     }
   };
-
-  const filteredVehicles = vehicles.filter(vehicle => 
-    vehicle.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    vehicle.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "RUN":
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case "MAINTENANCE":
+        return <WrenchIcon className="h-4 w-4 text-amber-500" />;
+      case "GARAGE":
+        return <AlertCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return null;
+    }
+  };
 
   return (
     <>
-      <div className="mb-4 flex flex-wrap gap-2 items-center justify-between">
-        <div className="w-full md:w-64">
-          <Input
-            placeholder="Search vehicles..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full"
-          />
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="text-blue-600">
-            <Printer size={16} className="mr-1" /> Print List
-          </Button>
-          <Button variant="outline" size="sm" className="text-green-600">
-            <FileText size={16} className="mr-1" /> Export to Excel
-          </Button>
-        </div>
-      </div>
-
-      <div className="border border-gray-200 rounded-md overflow-x-auto">
+      <div className="overflow-x-auto">
         <Table>
           <TableHeader>
-            <TableRow className="bg-blue-50">
-              <TableHead className="font-bold text-blue-800">NUMBER</TableHead>
-              <TableHead className="font-bold text-blue-800">TYPE</TableHead>
-              <TableHead className="font-bold text-blue-800">DESCRIPTION</TableHead>
-              <TableHead className="font-bold text-blue-800">STATUS</TableHead>
-              <TableHead className="font-bold text-blue-800">LICENSE EXPIRE</TableHead>
-              <TableHead className="font-bold text-blue-800">INSURANCE EXPIRE</TableHead>
-              <TableHead className="font-bold text-blue-800">MILEAGE</TableHead>
-              <TableHead className="font-bold text-blue-800">ASSIGNED AREAS</TableHead>
-              <TableHead className="font-bold text-blue-800 text-center">ACTIONS</TableHead>
+            <TableRow>
+              <TableHead className="w-[100px]">Vehicle No.</TableHead>
+              <TableHead>Type</TableHead>
+              <TableHead>Make</TableHead>
+              <TableHead>Model</TableHead>
+              <TableHead>Year</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-center">Locations</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredVehicles.length > 0 ? (
-              filteredVehicles.map((vehicle, index) => {
-                const assignedCities = getCitiesForVehicle(vehicle.number);
-                
-                return (
-                  <TableRow key={vehicle.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <TableCell className="font-medium">{vehicle.number}</TableCell>
-                    <TableCell>{vehicle.type}</TableCell>
-                    <TableCell>{vehicle.description}</TableCell>
-                    <TableCell>
-                      <Badge className={
-                        vehicle.status === "RUN" ? "bg-green-100 text-green-800 hover:bg-green-200" :
-                        vehicle.status === "MAINTENANCE" ? "bg-amber-100 text-amber-800 hover:bg-amber-200" :
-                        "bg-red-100 text-red-800 hover:bg-red-200"
-                      }>
-                        {vehicle.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{vehicle.licenseExpiry}</TableCell>
-                    <TableCell>{vehicle.insuranceExpiry}</TableCell>
-                    <TableCell>{vehicle.mileage}</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1 max-w-[200px]">
-                        {assignedCities.length > 0 ? (
-                          assignedCities.slice(0, 3).map((city, i) => (
-                            <Badge key={i} variant="outline" className="bg-blue-50 text-xs">
-                              {city}
-                            </Badge>
-                          ))
-                        ) : (
-                          <span className="text-gray-500 text-xs">No areas assigned</span>
-                        )}
-                        {assignedCities.length > 3 && (
-                          <Badge variant="outline" className="bg-gray-100 text-xs">
-                            +{assignedCities.length - 3} more
-                          </Badge>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-center">
-                      <div className="flex justify-center gap-2">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-blue-600 h-8 w-8 p-0"
-                          onClick={() => setEditingVehicle(vehicle)}
-                        >
-                          <Edit2 size={16} />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-red-600 h-8 w-8 p-0"
-                          onClick={() => handleDeleteClick(vehicle)}
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center py-4 text-gray-500">
-                  No vehicles found
+            {mockVehicles.map((vehicle) => (
+              <TableRow key={vehicle.vehicleNumber}>
+                <TableCell className="font-medium">{vehicle.vehicleNumber}</TableCell>
+                <TableCell>{vehicle.type}</TableCell>
+                <TableCell>{vehicle.make}</TableCell>
+                <TableCell>{vehicle.model}</TableCell>
+                <TableCell>{vehicle.year}</TableCell>
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {getStatusIcon(vehicle.status)}
+                    {getStatusBadge(vehicle.status)}
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    onClick={() => handleViewCities(vehicle.vehicleNumber)}
+                    className="px-2"
+                  >
+                    <MapPin size={16} className="text-blue-600" />
+                  </Button>
+                </TableCell>
+                <TableCell className="text-right">
+                  <div className="flex justify-end gap-1">
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600">
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
-            )}
+            ))}
           </TableBody>
         </Table>
-        
-        <div className="p-3 bg-white border-t border-gray-200 flex justify-between items-center">
-          <div>Showing {filteredVehicles.length} of {vehicles.length} vehicles</div>
-          <div className="flex gap-1">
-            <Button variant="outline" size="sm" disabled className="text-sm">Previous</Button>
-            <Button variant="default" size="sm" className="bg-blue-600 text-white text-sm">1</Button>
-            <Button variant="outline" size="sm" disabled className="text-sm">Next</Button>
-          </div>
-        </div>
       </div>
-
-      {/* Edit Vehicle Dialog */}
-      {editingVehicle && (
-        <Dialog open={!!editingVehicle} onOpenChange={(open) => !open && setEditingVehicle(null)}>
-          <DialogContent className="max-w-3xl">
-            <DialogTitle>Edit Vehicle</DialogTitle>
-            <VehicleForm 
-              vehicleToEdit={editingVehicle} 
-              onCancel={() => setEditingVehicle(null)} 
-            />
-          </DialogContent>
-        </Dialog>
-      )}
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent>
-          <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-500" />
-            Confirm Deletion
-          </DialogTitle>
-          <DialogDescription>
-            Are you sure you want to delete vehicle #{vehicleToDelete?.number}? This action cannot be undone.
-          </DialogDescription>
-          <div className="flex justify-end gap-3 mt-4">
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
-              Delete Vehicle
-            </Button>
+      
+      <Dialog open={showCitiesModal} onOpenChange={setShowCitiesModal}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Assigned Locations for Vehicle {selectedVehicle}</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[300px] overflow-y-auto">
+            {viewCities.length > 0 ? (
+              <div className="space-y-1 p-2">
+                {viewCities.map((city) => (
+                  <Badge key={city} className="bg-blue-100 text-blue-700 mr-2 mb-2">
+                    {city}
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No cities assigned to this vehicle.</p>
+            )}
           </div>
         </DialogContent>
       </Dialog>

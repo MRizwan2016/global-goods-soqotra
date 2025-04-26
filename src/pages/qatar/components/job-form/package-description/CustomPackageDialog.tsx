@@ -24,6 +24,7 @@ interface CustomPackageDialogProps {
 
 const CustomPackageDialog = ({ isJobNumberGenerated, onAddPackage }: CustomPackageDialogProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [packageName, setPackageName] = useState("");
   const [dimensions, setDimensions] = useState<PackageDimensionsState>({
     length: "",
     width: "",
@@ -53,8 +54,13 @@ const CustomPackageDialog = ({ isJobNumberGenerated, onAddPackage }: CustomPacka
       setQuantity(value);
     }
   };
+  
+  const handlePackageNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPackageName(e.target.value);
+  };
 
   const resetForm = () => {
+    setPackageName("");
     setDimensions({ length: "", width: "", height: "", weight: "" });
     setSellPrice("");
     setQuantity("1");
@@ -64,18 +70,23 @@ const CustomPackageDialog = ({ isJobNumberGenerated, onAddPackage }: CustomPacka
   const handleSubmit = () => {
     const { length, width, height, weight } = dimensions;
     
+    if (!packageName) {
+      toast.error("Please enter a package name");
+      return;
+    }
+    
     if (!length || !width || !height || !sellPrice) {
       toast.error("Please enter dimensions and price");
       return;
     }
 
     const dimensionsStr = `${length}cm x ${width}cm x ${height}cm ${weight ? `(${weight}kg)` : ''}`;
-    const packageName = `CUSTOM PACKAGE: ${dimensionsStr}`.toUpperCase();
+    const finalPackageName = packageName.toUpperCase();
     
     const newItem: JobItem = {
       id: uuidv4(),
-      name: packageName,
-      itemName: packageName,
+      name: finalPackageName,
+      itemName: finalPackageName,
       jobId: 'temp',
       sellPrice: parseFloat(sellPrice),
       quantity: parseInt(quantity || "1"),
@@ -83,6 +94,7 @@ const CustomPackageDialog = ({ isJobNumberGenerated, onAddPackage }: CustomPacka
       width: parseFloat(width),
       height: parseFloat(height),
       weight: weight ? parseFloat(weight) : undefined,
+      description: dimensionsStr
     };
     
     onAddPackage(newItem);
@@ -109,6 +121,16 @@ const CustomPackageDialog = ({ isJobNumberGenerated, onAddPackage }: CustomPacka
           <DialogTitle>Add New Package with Dimensions</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
+          <div>
+            <Label htmlFor="packageName" className="mb-1 block">Package Name</Label>
+            <input
+              id="packageName"
+              value={packageName}
+              onChange={handlePackageNameChange}
+              className="border border-gray-300 px-3 py-2 rounded w-full"
+              placeholder="Enter package name"
+            />
+          </div>
           <div className="grid grid-cols-3 gap-4">
             <div>
               <Label htmlFor="length" className="mb-1 block">Length (cm)</Label>

@@ -1,197 +1,188 @@
 
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { QatarVehicle } from "../../types/vehicleTypes";
-import { v4 as uuidv4 } from 'uuid';
 
 interface VehicleFormProps {
-  vehicleToEdit?: QatarVehicle;
   onCancel: () => void;
+  initialData?: any;
+  isEditing?: boolean;
 }
 
-const VehicleForm: React.FC<VehicleFormProps> = ({ vehicleToEdit, onCancel }) => {
-  const isEditMode = !!vehicleToEdit;
-  
-  const [formData, setFormData] = useState<Partial<QatarVehicle>>({
-    id: vehicleToEdit?.id || uuidv4(),
-    number: vehicleToEdit?.number || "",
-    type: vehicleToEdit?.type || "LORRY",
-    description: vehicleToEdit?.description || "",
-    status: vehicleToEdit?.status || "RUN",
-    licenseExpiry: vehicleToEdit?.licenseExpiry || "",
-    insuranceExpiry: vehicleToEdit?.insuranceExpiry || "",
-    mileage: vehicleToEdit?.mileage || "0"
+const VehicleForm: React.FC<VehicleFormProps> = ({ onCancel, initialData, isEditing = false }) => {
+  const [formData, setFormData] = useState({
+    vehicleNumber: initialData?.vehicleNumber || "",
+    type: initialData?.type || "LORRY",
+    make: initialData?.make || "",
+    model: initialData?.model || "",
+    year: initialData?.year || new Date().getFullYear(),
+    plateNumber: initialData?.plateNumber || "",
+    registrationDate: initialData?.registrationDate || new Date().toISOString().split('T')[0],
+    status: initialData?.status || "RUN",
+    driver: initialData?.driver || "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate form
-    if (!formData.number || !formData.type) {
-      toast.error("Please fill in all required fields");
+    // Validate required fields
+    if (!formData.vehicleNumber || !formData.make || !formData.model) {
+      toast.error("Please fill all required fields");
       return;
     }
     
-    // In a real application, this would save the vehicle data to a backend API
+    // Here we would normally save the vehicle
     console.log("Saving vehicle:", formData);
     
-    // For demonstration purposes, we'll update localStorage
-    try {
-      const existingVehicles = JSON.parse(localStorage.getItem('qatarVehicles') || JSON.stringify([]));
-      
-      if (isEditMode) {
-        // Update existing vehicle
-        const updatedVehicles = existingVehicles.map((vehicle: QatarVehicle) => 
-          vehicle.id === formData.id ? {...formData as QatarVehicle} : vehicle
-        );
-        localStorage.setItem('qatarVehicles', JSON.stringify(updatedVehicles));
-      } else {
-        // Add new vehicle
-        existingVehicles.push(formData);
-        localStorage.setItem('qatarVehicles', JSON.stringify(existingVehicles));
-      }
-      
-      toast.success(`Vehicle ${isEditMode ? "updated" : "added"} successfully`);
-      onCancel();
-    } catch (error) {
-      console.error("Error saving vehicle data:", error);
-      toast.error("Failed to save vehicle data");
-    }
+    toast.success(`Vehicle ${isEditing ? "updated" : "added"} successfully!`);
+    onCancel();
   };
 
   return (
-    <Card className="shadow-md">
-      <CardHeader className="bg-blue-50">
-        <CardTitle>{isEditMode ? "Edit Vehicle" : "Add New Vehicle"}</CardTitle>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="number">Vehicle Number *</Label>
-              <Input
-                id="number"
-                name="number"
-                value={formData.number}
-                onChange={handleInputChange}
-                placeholder="Enter vehicle number"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="type">Vehicle Type *</Label>
-              <Select 
-                value={formData.type} 
-                onValueChange={(value) => handleSelectChange("type", value)}
-              >
-                <SelectTrigger id="type">
-                  <SelectValue placeholder="Select vehicle type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="LORRY">Lorry</SelectItem>
-                  <SelectItem value="TRUCK">Truck</SelectItem>
-                  <SelectItem value="FORK LIFT">Fork Lift</SelectItem>
-                  <SelectItem value="PICKUP">Pickup</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Input
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Enter vehicle description"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select 
-                value={formData.status} 
-                onValueChange={(value) => handleSelectChange("status", value as "RUN" | "GARAGE" | "MAINTENANCE")}
-              >
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="RUN">RUN</SelectItem>
-                  <SelectItem value="GARAGE">GARAGE</SelectItem>
-                  <SelectItem value="MAINTENANCE">MAINTENANCE</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="licenseExpiry">License Expiry</Label>
-              <Input
-                id="licenseExpiry"
-                name="licenseExpiry"
-                type="text"
-                value={formData.licenseExpiry}
-                onChange={handleInputChange}
-                placeholder="DD/MM/YYYY"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="insuranceExpiry">Insurance Expiry</Label>
-              <Input
-                id="insuranceExpiry"
-                name="insuranceExpiry"
-                type="text"
-                value={formData.insuranceExpiry}
-                onChange={handleInputChange}
-                placeholder="DD/MM/YYYY"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="mileage">Mileage</Label>
-              <Input
-                id="mileage"
-                name="mileage"
-                value={formData.mileage}
-                onChange={handleInputChange}
-                placeholder="Enter current mileage"
-              />
-            </div>
-          </div>
-          
-          <div className="flex justify-end gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onCancel}>
-              Cancel
-            </Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-              {isEditMode ? "Update Vehicle" : "Add Vehicle"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-1">
+          <Label htmlFor="vehicleNumber">Vehicle Number *</Label>
+          <Input
+            id="vehicleNumber"
+            name="vehicleNumber"
+            value={formData.vehicleNumber}
+            onChange={handleInputChange}
+            placeholder="Enter Vehicle Number"
+            required
+          />
+        </div>
+        
+        <div className="space-y-1">
+          <Label htmlFor="type">Vehicle Type *</Label>
+          <Select
+            name="type"
+            value={formData.type}
+            onValueChange={(value) => handleSelectChange("type", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="LORRY">Lorry</SelectItem>
+              <SelectItem value="TRUCK">Truck</SelectItem>
+              <SelectItem value="VAN">Van</SelectItem>
+              <SelectItem value="PICKUP">Pickup</SelectItem>
+              <SelectItem value="FORK LIFT">Fork Lift</SelectItem>
+              <SelectItem value="CRANE TRUCK">Crane Truck</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-1">
+          <Label htmlFor="make">Make *</Label>
+          <Input
+            id="make"
+            name="make"
+            value={formData.make}
+            onChange={handleInputChange}
+            placeholder="Enter Make"
+            required
+          />
+        </div>
+        
+        <div className="space-y-1">
+          <Label htmlFor="model">Model *</Label>
+          <Input
+            id="model"
+            name="model"
+            value={formData.model}
+            onChange={handleInputChange}
+            placeholder="Enter Model"
+            required
+          />
+        </div>
+        
+        <div className="space-y-1">
+          <Label htmlFor="year">Year</Label>
+          <Input
+            id="year"
+            name="year"
+            type="number"
+            value={formData.year}
+            onChange={handleInputChange}
+            placeholder="Enter Year"
+          />
+        </div>
+        
+        <div className="space-y-1">
+          <Label htmlFor="plateNumber">Plate Number</Label>
+          <Input
+            id="plateNumber"
+            name="plateNumber"
+            value={formData.plateNumber}
+            onChange={handleInputChange}
+            placeholder="Enter Plate Number"
+          />
+        </div>
+        
+        <div className="space-y-1">
+          <Label htmlFor="registrationDate">Registration Date</Label>
+          <Input
+            id="registrationDate"
+            name="registrationDate"
+            type="date"
+            value={formData.registrationDate}
+            onChange={handleInputChange}
+          />
+        </div>
+        
+        <div className="space-y-1">
+          <Label htmlFor="status">Status</Label>
+          <Select
+            name="status"
+            value={formData.status}
+            onValueChange={(value) => handleSelectChange("status", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="RUN">Running</SelectItem>
+              <SelectItem value="MAINTENANCE">In Maintenance</SelectItem>
+              <SelectItem value="GARAGE">In Garage</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-1">
+          <Label htmlFor="driver">Assigned Driver</Label>
+          <Input
+            id="driver"
+            name="driver"
+            value={formData.driver}
+            onChange={handleInputChange}
+            placeholder="Enter Driver Name"
+          />
+        </div>
+      </div>
+      
+      <div className="flex justify-end gap-2 pt-4">
+        <Button type="button" variant="outline" onClick={onCancel}>
+          Cancel
+        </Button>
+        <Button type="submit">
+          {isEditing ? "Update" : "Save"} Vehicle
+        </Button>
+      </div>
+    </form>
   );
 };
 

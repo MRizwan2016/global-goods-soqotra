@@ -56,9 +56,9 @@ export const cityVehicleMapping: Record<string, string[]> = {
   'MOORA': ['41067'],
   'MUSHERIEB': ['41067'],
   'MESHAF': ['41067'],
-  'AL KHOR': ['41067'],
+  'AL KHOR': ['41067', '74827'], // Note: Al Khor is mapped to multiple vehicles
   'SALWA ROAD': ['41067'],
-  'RAS LAFFAN': ['41067'],
+  'RAS LAFFAN': ['41067', '74827'], // Note: Ras Laffan is mapped to multiple vehicles
   'RUMEILAH': ['41067'],
   'SAHANIYA': ['41067'],
   'SIMSIMA': ['41067'],
@@ -139,9 +139,9 @@ export const cityVehicleMapping: Record<string, string[]> = {
   'DUKHAN': ['74827'],
   'SEALINE BEACH': ['74827'],
   'UMM BAB': ['74827'],
-  'ZEKREET': ['74827'],
-  'AL KHOR': ['74827'],
-  'RAS LAFFAN': ['74827']
+  'ZEKREET': ['74827']
+  // Note: Removed duplicate entries for AL KHOR and RAS LAFFAN
+  // They are now handled above with multiple vehicle assignments
 };
 
 /**
