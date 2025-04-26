@@ -48,6 +48,8 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (userData: Omit<User, "id" | "isActive" | "isAdmin" | "createdAt" | "permissions"> & { password: string }) => Promise<boolean>;
+  requestPasswordReset: (email: string) => Promise<boolean>;
+  resetPassword: (userId: string, token: string, newPassword: string) => Promise<boolean>;
   users: User[];
   toggleUserStatus: (userId: string) => Promise<void>;
   sendActivationEmail: (user: User) => Promise<boolean>;
