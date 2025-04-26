@@ -14,7 +14,6 @@ import { CurrencyOption } from '../hooks/useSellingRateForm';
 interface TariffDetailsFormProps {
   register: UseFormRegister<SellingRateFormValues>;
   errors: FieldErrors<SellingRateFormValues>;
-  handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   sectors: string[];
   currencies: CurrencyOption[];
   selectedCurrency: CurrencyOption;
@@ -24,7 +23,6 @@ interface TariffDetailsFormProps {
 const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({ 
   register, 
   errors, 
-  handleInputChange,
   sectors,
   currencies,
   selectedCurrency,
@@ -55,7 +53,6 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
           <select
             {...register("freightType")}
             name="freightType"
-            onChange={handleInputChange}
             className="bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors"
           >
             <option value="S">S</option>
@@ -76,7 +73,6 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
           <select
             {...register("sector")}
             name="sector"
-            onChange={handleInputChange}
             className="bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors"
           >
             {sectors.map(sector => (
@@ -98,7 +94,6 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
             {...register("effectiveFrom")}
             type="date"
             name="effectiveFrom"
-            onChange={handleInputChange}
             className="border border-gray-300 focus:border-soqotra-blue focus:ring-1 focus:ring-soqotra-blue"
           />
         </FormControl>
@@ -133,7 +128,6 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
             {...register("effectiveUntil")}
             type="date"
             name="effectiveUntil"
-            onChange={handleInputChange}
             className="border border-gray-300 focus:border-soqotra-blue focus:ring-1 focus:ring-soqotra-blue"
           />
         </FormControl>
@@ -150,7 +144,6 @@ const TariffDetailsForm: React.FC<TariffDetailsFormProps> = ({
           <select
             {...register("country")}
             name="country"
-            onChange={handleInputChange}
             className="bg-soqotra-blue text-white py-2 px-3 rounded text-sm hover:bg-soqotra-navy transition-colors"
           >
             <option value="Sri Lanka">SRI LANKA</option>
