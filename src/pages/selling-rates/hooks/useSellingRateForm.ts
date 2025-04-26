@@ -1,30 +1,27 @@
 
-import { useState, useEffect } from "react";
-import { SellingRatesService } from "@/services/SellingRatesService";
-import { SellingRateFormValues } from "../schema/sellingRateSchema";
+import { useEffect } from "react";
+import { useSellingRateFormState } from "./useSellingRateFormState";
+import { useSectorUpdate } from "./useSectorUpdate";
+import { useFormSubmission } from "./useFormSubmission";
 import { useCurrencyHandling } from "./useCurrencyHandling";
 import { useDistrictRates } from "./useDistrictRates";
-import { useSellingRateFormHandling } from "./useSellingRateFormHandling";
-import { BoxType, CurrencyOption } from "../types/sellingRates";
-
-// Re-export types using 'export type' to fix the isolatedModules error
-export type { BoxType, CurrencyOption };
 
 export const useSellingRateForm = (id?: string) => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isEditing] = useState(!!id);
-  const [sectors, setSectors] = useState<string[]>([]);
-
   const {
+    isSubmitting,
+    setIsSubmitting,
+    isEditing,
+    sectors,
+    setSectors,
     methods,
     register,
     handleSubmit,
     watch,
     setValue,
-    errors,
-    handleInputChange,
-    generateTariffNumber
-  } = useSellingRateFormHandling();
+    errors
+  } = useSellingRateFormState(id);
+
+  const { updateSectorsByCountry } = useSectorUpdate(setSectors);
 
   const {
     currencies,
@@ -43,14 +40,15 @@ export const useSellingRateForm = (id?: string) => {
     addCustomPackage
   } = useDistrictRates();
 
+  const { onSubmit } = useFormSubmission(isDistrictRatesValid, setIsSubmitting, districtRates);
+
   const watchedCountry = watch("country");
 
-  // Update tariff number when country changes
   useEffect(() => {
     if (watchedCountry && !isEditing) {
       setValue("tariffNumber", generateTariffNumber(watchedCountry));
     }
-  }, [watchedCountry, setValue, generateTariffNumber, isEditing]);
+  }, [watchedCountry, setValue, isEditing]);
 
   useEffect(() => {
     updateDistrictsByCountry(watchedCountry);
@@ -81,95 +79,29 @@ export const useSellingRateForm = (id?: string) => {
     }
   }, [isEditing, id, setValue]);
 
-  const updateSectorsByCountry = (country: string) => {
-    switch(country) {
-      case "Kenya":
-        setSectors(["Nairobi", "Mombasa", "Kisumu", "Nakuru"]);
-        break;
-      case "Sri Lanka":
-        setSectors(["Colombo", "Kandy", "Galle", "Jaffna"]);
-        break;
-      case "Eritrea":
-        setSectors(["Asmara", "Keren", "Massawa"]);
-        break;
-      case "Sudan":
-        setSectors(["Khartoum", "Port Sudan", "Omdurman"]);
-        break;
-      case "Saudi Arabia":
-        setSectors(["Riyadh", "Jeddah", "Mecca", "Medina"]);
-        break;
-      case "United Arab Emirates":
-        setSectors(["Dubai", "Abu Dhabi", "Sharjah", "Ajman"]);
-        break;
-      case "Somalia":
-        setSectors(["Mogadishu", "Hargeisa", "Bosaso"]);
-        break;
-      case "Tunisia":
-        setSectors(["Tunis", "Sfax", "Sousse"]);
-        break;
-      case "Philippines":
-        setSectors(["Manila", "Cebu", "Davao", "Quezon City"]);
-        break;
-      case "Mozambique":
-        setSectors(["Maputo", "Beira", "Nampula"]);
-        break;
-      case "Uganda":
-        setSectors(["Kampala", "Entebbe", "Jinja"]);
-        break;
-      case "Tanzania":
-        setSectors(["Dar es Salaam", "Zanzibar", "Dodoma"]);
-        break;
-      case "Qatar":
-        setSectors([
-          "Doha", "Al Rayyan", "Wakra", "Mansoora", "Al Khor", "Umm Salal", "West Bay", "Lusail"
-        ]);
-        break;
-      case "Oman":
-        setSectors([
-          "Muscat", "Salalah", "Sohar", "Nizwa"
-        ]);
-        break;
-      case "Kuwait":
-        setSectors([
-          "Kuwait City", "Hawalli", "Salmiya", "Farwaniya"
-        ]);
-        break;
-      case "Bahrain":
-        setSectors([
-          "Manama", "Muharraq", "Riffa", "Isa Town"
-        ]);
-        break;
-      case "Lebanon":
-        setSectors([
-          "Beirut", "Tripoli", "Sidon", "Zahle"
-        ]);
-        break;
-      default:
-        setSectors([]);
-    }
+  const generateTariffNumber = (country: string = "") => {
+    const prefix = "TR";
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.floor(Math.random() * 100).toString().padStart(2, '0');
+    const countryCode = getCountryCode(country);
+    return `${prefix}${countryCode}${timestamp}${random}`;
   };
 
-  const onSubmit = async (data: SellingRateFormValues) => {
-    if (!isDistrictRatesValid) {
-      return false;
-    }
-    
-    setIsSubmitting(true);
-    
-    try {
-      const formattedData = {
-        ...data,
-        districtRates,
-      };
-      
-      const result = await SellingRatesService.saveSellingRates(formattedData);
-      
-      setIsSubmitting(false);
-      return result;
-    } catch (error) {
-      console.error("Error saving selling rates:", error);
-      setIsSubmitting(false);
-      return false;
+  const getCountryCode = (countryName: string): string => {
+    switch(countryName) {
+      case "Kenya": return "KE";
+      case "Sri Lanka": return "LK";
+      case "Eritrea": return "ER";
+      case "Sudan": return "SD";
+      case "Saudi Arabia": return "SA";
+      case "United Arab Emirates": return "AE";
+      case "Somalia": return "SO";
+      case "Tunisia": return "TN";
+      case "Philippines": return "PH";
+      case "Mozambique": return "MZ";
+      case "Uganda": return "UG";
+      case "Tanzania": return "TZ";
+      default: return "XX";
     }
   };
 
@@ -183,7 +115,6 @@ export const useSellingRateForm = (id?: string) => {
     rateBoxes,
     districtRates,
     isDistrictRatesValid,
-    handleInputChange,
     handleRateChange,
     onSubmit,
     watch,
@@ -197,4 +128,5 @@ export const useSellingRateForm = (id?: string) => {
   };
 };
 
+export type { BoxType, CurrencyOption } from '../types/sellingRates';
 export default useSellingRateForm;
