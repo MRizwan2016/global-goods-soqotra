@@ -10,6 +10,7 @@ interface ItemAction {
   name?: string;
   sellPrice?: number;
   quantity?: number;
+  boxNumber?: string;
 }
 
 export const useJobItems = () => {
@@ -28,7 +29,8 @@ export const useJobItems = () => {
                   name: action.name || action.itemName || item.name || item.itemName || '', 
                   itemName: action.itemName || action.name || item.itemName || item.name || '',
                   sellPrice: action.sellPrice || item.sellPrice || 0, 
-                  quantity: action.quantity || item.quantity 
+                  quantity: action.quantity || item.quantity,
+                  boxNumber: action.boxNumber || item.boxNumber || String(prevItems.length + 1)
                 }
               : item
           );
@@ -36,6 +38,7 @@ export const useJobItems = () => {
           // Ensure both name and itemName are set to the same value
           const itemName = action.itemName || action.name || '';
           const name = action.name || action.itemName || '';
+          const boxNumber = action.boxNumber || String(prevItems.length + 1);
           
           return [...prevItems, { 
             id: action.id,
@@ -43,7 +46,8 @@ export const useJobItems = () => {
             itemName,
             jobId: action.jobId || 'temp',
             sellPrice: action.sellPrice || 0,
-            quantity: action.quantity || 1
+            quantity: action.quantity || 1,
+            boxNumber
           }];
         }
         default:

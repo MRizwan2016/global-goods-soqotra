@@ -50,6 +50,7 @@ export interface JobItem {
   itemName?: string;
   sellPrice?: number;
   jobId?: string;
+  boxNumber?: string; // Added boxNumber property to fix the error
 }
 
 // Types used in dashboard components
