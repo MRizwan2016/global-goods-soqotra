@@ -38,6 +38,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   const handlePrintHBL = () => {
     if (invoiceId) {
       window.open(`/data-entry/print-documents/bl-print/${invoiceId}`, '_blank');
+      console.log("Print HBL triggered for invoice:", invoiceId);
     } else {
       toast.info("Invoice ID not available for printing");
     }
@@ -48,6 +49,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       <Button 
         className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300"
         onClick={handlePrintInvoice}
+        disabled={!invoiceId}
       >
         <Printer className="mr-2 h-4 w-4" />
         Print
@@ -56,6 +58,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       <Button 
         className="bg-gradient-to-r from-indigo-500 to-indigo-600 hover:from-indigo-600 hover:to-indigo-700 text-white shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300"
         onClick={handlePrintCertificate}
+        disabled={!invoiceId}
       >
         <FileText className="mr-2 h-4 w-4" />
         Print Certificate
@@ -64,6 +67,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
       <Button 
         className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300"
         onClick={handlePrintHBL}
+        disabled={!invoiceId}
       >
         <FileText className="mr-2 h-4 w-4" />
         Print HBL

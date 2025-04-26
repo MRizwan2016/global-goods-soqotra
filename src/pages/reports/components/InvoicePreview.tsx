@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer, Box, Ship, Calendar, Truck, Info, Receipt } from "lucide-react";
+import { ArrowLeft, Printer, Box, Ship, Calendar, Truck, Info, Receipt, FileText } from "lucide-react";
 import { mockInvoiceData } from "@/data/mockData";
 import { toast } from "sonner";
 import PrintStyles from "@/pages/invoicing/components/print/PrintStyles";
@@ -77,6 +77,18 @@ const InvoicePreview: React.FC = () => {
       navigate(`/data-entry/print-documents/invoice-print/${id}`);
     }
   };
+  
+  const handlePrintHBL = () => {
+    if (id) {
+      navigate(`/data-entry/print-documents/bl-print/${id}`);
+    }
+  };
+  
+  const handlePrintCertificate = () => {
+    if (id) {
+      navigate(`/data-entry/print-documents/invoice-print/${id}?mode=certificate`);
+    }
+  };
 
   if (loading) {
     return (
@@ -143,6 +155,22 @@ const InvoicePreview: React.FC = () => {
           >
             <Receipt className="h-4 w-4" />
             Print Invoice
+          </Button>
+          <Button 
+            onClick={handlePrintCertificate}
+            variant="outline"
+            className="flex items-center gap-1"
+          >
+            <FileText className="h-4 w-4" />
+            Print Certificate
+          </Button>
+          <Button 
+            onClick={handlePrintHBL}
+            variant="outline"
+            className="flex items-center gap-1"
+          >
+            <FileText className="h-4 w-4" />
+            Print HBL
           </Button>
           <Button 
             onClick={handlePrint}

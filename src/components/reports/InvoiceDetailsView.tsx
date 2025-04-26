@@ -158,7 +158,8 @@ export const InvoiceDetailsView: React.FC = () => {
 
       <ActionButtons 
         handleBack={handleBack} 
-        isFullScreen={isFullScreen} 
+        isFullScreen={isFullScreen}
+        invoiceId={id} 
       />
     </div>
   );
