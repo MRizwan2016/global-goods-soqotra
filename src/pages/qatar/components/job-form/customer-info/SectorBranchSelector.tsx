@@ -1,9 +1,15 @@
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useJobForm } from "../context/JobFormContext";
 import { sectorOptions } from "../../../data/sectorOptions";
 import { branchOptions } from "../../../data/branchOptions";
-import { Select } from "@/components/ui/select";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import PackageSelectionDialog from "./PackageSelectionDialog";
 import { Button } from "@/components/ui/button";
@@ -18,6 +24,10 @@ const SectorBranchSelector: React.FC<SectorBranchSelectorProps> = ({ onPackageSe
   const { jobData, handleInputChange, handleSelectChange } = useJobForm();
   const [isPackageDialogOpen, setIsPackageDialogOpen] = useState(false);
 
+  const availableBranches = useMemo(() => {
+    return jobData.sector ? branchOptions[jobData.sector] || [] : [];
+  }, [jobData.sector]);
+
   const handlePackageSelect = (pkg: PackageInfo) => {
     if (onPackageSelect) {
       onPackageSelect(pkg);
@@ -29,23 +39,40 @@ const SectorBranchSelector: React.FC<SectorBranchSelectorProps> = ({ onPackageSe
       <div>
         <Label htmlFor="sector">SECTOR:</Label>
         <Select
-          id="sector"
-          name="sector"
-          placeholder="Select Sector"
           value={jobData.sector || ""}
           onValueChange={(value) => handleSelectChange("sector", value)}
-        />
+        >
+          <SelectTrigger id="sector" className="w-full">
+            <SelectValue placeholder="Select Sector" />
+          </SelectTrigger>
+          <SelectContent>
+            {sectorOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div>
         <Label htmlFor="branch">BRANCH:</Label>
         <Select
-          id="branch"
-          name="branch"
-          placeholder="Select Branch"
           value={jobData.branch || ""}
           onValueChange={(value) => handleSelectChange("branch", value)}
-        />
+          disabled={!jobData.sector}
+        >
+          <SelectTrigger id="branch" className="w-full">
+            <SelectValue placeholder="Select Branch" />
+          </SelectTrigger>
+          <SelectContent>
+            {availableBranches.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       
       <div className="flex flex-col">

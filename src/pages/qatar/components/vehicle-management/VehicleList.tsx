@@ -66,9 +66,8 @@ const VehicleList = () => {
             <TableRow>
               <TableHead className="w-[100px]">Vehicle No.</TableHead>
               <TableHead>Type</TableHead>
-              <TableHead>Make</TableHead>
-              <TableHead>Model</TableHead>
-              <TableHead>Year</TableHead>
+              <TableHead>Make/Model</TableHead>
+              <TableHead>Description</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-center">Locations</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -76,12 +75,11 @@ const VehicleList = () => {
           </TableHeader>
           <TableBody>
             {mockVehicles.map((vehicle) => (
-              <TableRow key={vehicle.vehicleNumber}>
-                <TableCell className="font-medium">{vehicle.vehicleNumber}</TableCell>
+              <TableRow key={vehicle.id}>
+                <TableCell className="font-medium">{vehicle.number}</TableCell>
                 <TableCell>{vehicle.type}</TableCell>
-                <TableCell>{vehicle.make}</TableCell>
-                <TableCell>{vehicle.model}</TableCell>
-                <TableCell>{vehicle.year}</TableCell>
+                <TableCell>{vehicle.description.split(' ')[0] || 'N/A'}</TableCell>
+                <TableCell>{vehicle.description}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {getStatusIcon(vehicle.status)}
@@ -92,7 +90,7 @@ const VehicleList = () => {
                   <Button 
                     variant="ghost" 
                     size="sm"
-                    onClick={() => handleViewCities(vehicle.vehicleNumber)}
+                    onClick={() => handleViewCities(vehicle.number)}
                     className="px-2"
                   >
                     <MapPin size={16} className="text-blue-600" />
