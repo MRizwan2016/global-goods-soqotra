@@ -52,7 +52,7 @@ const PackageList: React.FC<PackageListProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableCell className="font-medium">Package</TableCell>
+            <TableCell className="font-medium">Box/Package</TableCell>
             <TableCell className="font-medium">Dimensions (L×W×H)</TableCell>
             <TableCell className="font-medium">Volume</TableCell>
             <TableCell className="font-medium">Weight</TableCell>
@@ -65,7 +65,7 @@ const PackageList: React.FC<PackageListProps> = ({
         <TableBody>
           {packageItems.map((item) => (
             <TableRow key={item.id}>
-              <TableCell>{item.name}</TableCell>
+              <TableCell>Box {item.boxNumber || "N/A"}: {item.name}</TableCell>
               <TableCell>{`${item.length}×${item.width}×${item.height}`}</TableCell>
               <TableCell>{item.volume}</TableCell>
               <TableCell>{item.weight}</TableCell>

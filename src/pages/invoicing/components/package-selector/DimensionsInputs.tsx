@@ -52,6 +52,16 @@ const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
   return (
     <>
       <div className="flex flex-col">
+        <label className="text-sm font-medium mb-1">BOX NUMBER:</label>
+        <Input 
+          name="boxNumber"
+          value={formState.boxNumber}
+          onChange={handleInputChange}
+          className="border border-gray-300"
+        />
+      </div>
+      
+      <div className="flex flex-col">
         <label className="text-sm font-medium mb-1">LENGTH (in):</label>
         <Input 
           name="length"
@@ -103,16 +113,6 @@ const DimensionsInputs: React.FC<DimensionsInputsProps> = ({
           onChange={handleInputChange}
           className="border border-gray-300"
           type="number"
-        />
-      </div>
-      
-      <div className="flex flex-col">
-        <label className="text-sm font-medium mb-1">BOX NUMBER:</label>
-        <Input 
-          name="boxNumber"
-          value={formState.boxNumber}
-          onChange={handleInputChange}
-          className="border border-gray-300"
         />
       </div>
     </>

@@ -25,7 +25,7 @@ const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
           {validItems.map((item, index) => (
             <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
               <td className="px-4 py-3 whitespace-nowrap uppercase">
-                {item.itemName || item.name}
+                Box {item.boxNumber || index + 1}: {item.itemName || item.name}
               </td>
               <td className="px-4 py-3 whitespace-nowrap">
                 {(item.sellPrice || 0).toFixed(2)}
