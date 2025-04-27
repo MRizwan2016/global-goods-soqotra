@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Button } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ArrowLeft, Printer, FileText } from "lucide-react";
 
 interface HeaderActionsProps {
