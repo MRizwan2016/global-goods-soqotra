@@ -20,6 +20,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({
   
   const handlePrintInvoice = () => {
     if (invoiceId) {
+      // Use navigate instead of window.open to handle routing within the application
       // Open in a new tab with the correct path
       window.open(`/data-entry/print-documents/invoice-print/${invoiceId}`, '_blank');
     } else {

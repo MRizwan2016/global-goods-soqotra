@@ -78,11 +78,16 @@ export const useInvoicePrintData = () => {
   const totalWeight = invoice ? (parseFloat(invoice.weight) || 0).toFixed(2) : "0.00";
   
   useEffect(() => {
+    // Don't redirect for print views as they need to be publicly accessible
+    if (location.pathname.includes('/print-documents/')) {
+      return;
+    }
+    
     // If not authenticated, redirect to login
     if (!isAuthenticated) {
       navigate("/admin/login", { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, location]);
   
   const handlePrint = () => {
     window.print();
