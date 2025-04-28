@@ -13,6 +13,20 @@ const AppRoutes = () => {
       {routes.map((route, index) => {
         const RouteElement = route.element;
         
+        // Determine if this route should require a specific section permission
+        let requiredPermission: string | undefined;
+        if (route.path.startsWith('/master')) {
+          requiredPermission = 'masterData';
+        } else if (route.path.startsWith('/data-entry')) {
+          requiredPermission = 'dataEntry';
+        } else if (route.path.startsWith('/reports')) {
+          requiredPermission = 'reports';
+        } else if (route.path.startsWith('/accounts')) {
+          requiredPermission = 'accounting';
+        } else if (route.path.includes('/admin/control-panel')) {
+          requiredPermission = 'controlPanel';
+        }
+        
         if (route.private) {
           return (
             <Route
@@ -22,7 +36,7 @@ const AppRoutes = () => {
                 <PrivateRouteWrapper
                   requireAdmin={route.path.includes('/admin') && !route.path.includes('/admin/login')} 
                   requiredFile={route.requiredFile}
-                  requiredPermission={route.requiredPermission}
+                  requiredPermission={route.requiredPermission || requiredPermission}
                 >
                   <RouteElement />
                 </PrivateRouteWrapper>

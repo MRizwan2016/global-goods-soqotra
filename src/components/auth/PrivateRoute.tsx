@@ -1,5 +1,5 @@
 
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import { ReactNode, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
@@ -21,6 +21,7 @@ const PrivateRoute = ({
 }: PrivateRouteProps) => {
   const { isAuthenticated, isAdmin, currentUser } = useAuth();
   const { hasFilePermission } = usePermissions();
+  const location = useLocation();
 
   useEffect(() => {
     console.log("PrivateRoute: Authentication status", { 
@@ -28,9 +29,10 @@ const PrivateRoute = ({
       isAdmin, 
       currentUser: currentUser ? `${currentUser.fullName} (${currentUser.email})` : 'none',
       requiredFile,
-      requiredPermission
+      requiredPermission,
+      path: location.pathname
     });
-  }, [isAuthenticated, isAdmin, currentUser, requiredFile, requiredPermission]);
+  }, [isAuthenticated, isAdmin, currentUser, requiredFile, requiredPermission, location.pathname]);
 
   // Check if user is authenticated
   if (!isAuthenticated) {
@@ -40,7 +42,7 @@ const PrivateRoute = ({
       description: "Please log in to access this page.",
       variant: "destructive",
     });
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/admin/login" replace state={{ from: location }} />;
   }
 
   // Check if admin is required for the route
@@ -81,6 +83,36 @@ const PrivateRoute = ({
       toast({
         title: "Access Denied",
         description: `You do not have permission to access ${requiredFile}.`,
+        variant: "destructive",
+      });
+      return <Navigate to="/" replace />;
+    }
+  }
+
+  // Create a mapping of route paths to required permissions
+  const routePermissionMap: Record<string, keyof User['permissions']> = {
+    "/master": "masterData",
+    "/data-entry": "dataEntry",
+    "/reports": "reports",
+    "/accounts": "accounting",
+    "/admin/control-panel": "controlPanel"
+  };
+
+  // Check if the current path requires a specific permission
+  const pathRequiresPermission = Object.keys(routePermissionMap).find(path => 
+    location.pathname.startsWith(path)
+  );
+
+  if (pathRequiresPermission && !isAdmin && currentUser) {
+    const requiredPermission = routePermissionMap[pathRequiresPermission];
+    const hasAccess = currentUser.permissions?.[requiredPermission] || false;
+    
+    console.log(`Path ${location.pathname} requires permission ${requiredPermission}, user has access: ${hasAccess}`);
+    
+    if (!hasAccess) {
+      toast({
+        title: "Access Denied",
+        description: "You do not have permission to access this section.",
         variant: "destructive",
       });
       return <Navigate to="/" replace />;

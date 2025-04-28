@@ -25,7 +25,7 @@ export function ensureUserPermissions(user: User): User {
           salesRep: user.isAdmin ? true : false,
           town: user.isAdmin ? true : false,
           packageOptions: user.isAdmin ? true : false,
-          sellingRates: true, // Always enable selling rates for all users
+          sellingRates: user.isAdmin ? true : false,
           container: user.isAdmin ? true : false,
           vessel: user.isAdmin ? true : false,
           invoiceBook: user.isAdmin ? true : false,
@@ -49,7 +49,7 @@ export function ensureUserPermissions(user: User): User {
           salesRep: user.isAdmin ? true : false,
           town: user.isAdmin ? true : false,
           packageOptions: user.isAdmin ? true : false,
-          sellingRates: true, // Always enable selling rates for all users
+          sellingRates: user.isAdmin ? true : false,
           container: user.isAdmin ? true : false,
           vessel: user.isAdmin ? true : false,
           invoiceBook: user.isAdmin ? true : false,
@@ -77,7 +77,7 @@ export function ensureUserPermissions(user: User): User {
           salesRep: currentFiles.salesRep ?? (user.isAdmin ? true : false),
           town: currentFiles.town ?? (user.isAdmin ? true : false),
           packageOptions: currentFiles.packageOptions ?? (user.isAdmin ? true : false),
-          sellingRates: true, // Always enable selling rates for all users
+          sellingRates: currentFiles.sellingRates ?? (user.isAdmin ? true : false),
           container: currentFiles.container ?? (user.isAdmin ? true : false),
           vessel: currentFiles.vessel ?? (user.isAdmin ? true : false),
           invoiceBook: currentFiles.invoiceBook ?? (user.isAdmin ? true : false),
@@ -131,7 +131,46 @@ export function hasFilePermission(user: User | null, fileKey: keyof User['permis
   if (!user) return false;
   if (user.isAdmin) return true; // Admins have access to everything
   
-  // Don't default to true if file permissions aren't set
+  // First check if the user has the category permission related to this file
+  const categoryPermissionMap: Record<string, keyof User['permissions']> = {
+    // Master Data files
+    salesRep: 'masterData',
+    town: 'masterData',
+    item: 'masterData',
+    packageOptions: 'masterData',
+    sellingRates: 'masterData',
+    container: 'masterData',
+    vessel: 'masterData',
+    invoiceBook: 'masterData',
+    driverHelper: 'masterData',
+    
+    // Data Entry files
+    invoicing: 'dataEntry',
+    paymentReceivable: 'dataEntry',
+    loadContainer: 'dataEntry',
+    loadVessel: 'dataEntry',
+    loadAirCargo: 'dataEntry',
+    packingList: 'dataEntry',
+    
+    // Reports files
+    cargoReports: 'reports',
+    financialReports: 'reports',
+    shippingReports: 'reports',
+    
+    // Accounting files
+    paymentMethods: 'accounting',
+    reconciliation: 'accounting',
+    profitLoss: 'accounting'
+  };
+  
+  // Check if the user has the category permission for this file
+  const requiredCategoryPermission = categoryPermissionMap[fileKey as string];
+  if (requiredCategoryPermission && !user.permissions?.[requiredCategoryPermission]) {
+    console.log(`User lacks category permission ${requiredCategoryPermission} for ${fileKey}`);
+    return false;
+  }
+  
+  // Then check if they have the specific file permission
   if (!user.permissions?.files) return false;
   if (user.permissions.files[fileKey] === undefined) return false;
   
