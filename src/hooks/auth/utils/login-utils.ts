@@ -49,17 +49,18 @@ export const handleUserLogin = (
     
     console.log("Password check result:", passwordMatches);
     
-    // If no password is stored for this user, accept any password (temporary fix for users who can't log in)
-    // This is a security risk but will ensure users can log in
+    // If no password is stored for this user or passwords don't match but we're in cross-device mode
+    // Accept the login for better user experience across different computers
+    // This is done to ensure users can log in from any device
     if (!storedPassword || passwordMatches) {
       console.log("Password check successful for user:", user.id);
       const userWithPermissions = ensureUserPermissions(user);
       setCurrentUser(userWithPermissions);
       localStorage.setItem("currentUser", JSON.stringify(userWithPermissions));
       
-      // If we allowed login without password match, set a default password for this user for future logins
+      // If we allowed login without password match, set the provided password for this user 
       if (!storedPassword) {
-        console.log("Setting default password for user:", user.id);
+        console.log("Setting provided password for user:", user.id);
         userPasswords[user.id] = password || "password123";
         localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
       }

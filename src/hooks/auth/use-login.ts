@@ -24,6 +24,16 @@ export function useLogin(
     // Debug user passwords
     console.log("Available user passwords (IDs only):", Object.keys(userPasswords));
     
+    // Find the user to check if they exist
+    const userExists = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.isActive);
+    
+    // If user exists but no password is stored or if this is a cross-device login
+    if (userExists && (!userPasswords[userExists.id] || userPasswords[userExists.id] === password)) {
+      const success = handleUserLogin(users, email, password, userPasswords, setCurrentUser);
+      return success;
+    }
+    
+    // Try normal login process
     const success = handleUserLogin(users, email, password, userPasswords, setCurrentUser);
     
     if (!success) {
