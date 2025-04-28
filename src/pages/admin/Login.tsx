@@ -25,9 +25,17 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [browserInfo, setBrowserInfo] = useState<string>("");
 
   // Get the redirect path from the location state, or default to admin panel
   const from = location.state?.from?.pathname || "/dashboard";
+
+  // Gather browser information for debugging
+  useEffect(() => {
+    const info = `Browser: ${navigator.userAgent}, Platform: ${navigator.platform}, Date: ${new Date().toISOString()}`;
+    setBrowserInfo(info);
+    console.log("Login page loaded with browser info:", info);
+  }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -61,19 +69,23 @@ const Login = () => {
     setError(null);
     setIsLoading(true);
     try {
-      console.log(`Login attempt: ${values.email}`);
+      console.log(`Login attempt: ${values.email} with browser info: ${browserInfo}`);
       
-      // Check if user exists but has no password
+      // Check if user exists
       const user = users.find(u => u.email.toLowerCase() === values.email.toLowerCase() && u.isActive);
       if (user) {
         console.log(`Found user: ${user.fullName} (${user.id})`);
+      } else {
+        console.log(`No user found with email: ${values.email}`);
       }
       
       const success = await login(values.email, values.password);
       if (success) {
+        console.log("Login successful, navigating to:", from);
         // Navigate to the redirect path or default
         navigate(from, { replace: true });
       } else {
+        console.log("Login failed");
         setError("Invalid email or password. Please try again.");
       }
     } catch (err) {
@@ -129,6 +141,7 @@ const Login = () => {
                             placeholder="Enter your email" 
                             className="pl-10 py-6" 
                             {...field} 
+                            autoComplete="username"
                           />
                         </FormControl>
                       </FormItem>
@@ -156,6 +169,7 @@ const Login = () => {
                               placeholder="Enter your password"
                               className="pl-10 py-6"
                               {...field}
+                              autoComplete="current-password"
                             />
                             <button
                               type="button"

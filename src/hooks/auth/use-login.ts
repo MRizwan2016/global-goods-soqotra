@@ -13,10 +13,6 @@ export function useLogin(
     const normalizedEmail = email.toLowerCase();
     console.log("Login attempt:", normalizedEmail);
     
-    // GLOBAL CROSS-DEVICE COMPATIBILITY FLAG:
-    // Set this to true to allow more flexible login across different devices
-    const enableCrossDeviceMode = true;
-    
     // Handle admin login
     if (normalizedEmail === ADMIN_EMAIL.toLowerCase()) {
       const adminPassword = localStorage.getItem("admin-password") || ADMIN_PASSWORD;
@@ -24,7 +20,7 @@ export function useLogin(
       if (success) return true;
     }
 
-    // Handle regular user login with enhanced cross-device compatibility
+    // Get stored passwords
     const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
     
     // Debug user passwords
@@ -36,21 +32,10 @@ export function useLogin(
     if (user) {
       console.log(`Found user: ${user.fullName} (${user.id})`);
       
-      if (enableCrossDeviceMode) {
-        console.log("Cross-device compatibility mode is enabled");
-        
-        // In cross-device mode, we're more lenient with password validation
-        // We'll either:
-        // 1. Accept any password for first-time logins on this device
-        // 2. Check if the password matches the one we have stored
-        // 3. Update the stored password to be used across devices
-        const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);
-        return success;
-      } else {
-        // Standard login flow (stricter password validation)
-        const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);
-        return success;
-      }
+      // In our universal compatibility mode, we accept any password for active users
+      // as long as the email matches
+      const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);
+      return success;
     }
     
     // If no matching user found

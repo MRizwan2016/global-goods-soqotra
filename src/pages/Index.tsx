@@ -8,11 +8,14 @@ const Index = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("Index page: checking authentication status:", isAuthenticated);
     // If authenticated, redirect to dashboard, otherwise to login
     if (isAuthenticated) {
+      console.log("User is authenticated, redirecting to dashboard");
       navigate("/dashboard");
     } else {
-      navigate("/login");
+      console.log("User is not authenticated, redirecting to login");
+      navigate("/admin/login");
     }
   }, [isAuthenticated, navigate]);
 
