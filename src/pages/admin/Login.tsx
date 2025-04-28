@@ -32,14 +32,24 @@ const Login = () => {
 
   // Gather browser information for debugging
   useEffect(() => {
-    const info = `Browser: ${navigator.userAgent}, Platform: ${navigator.platform}, Date: ${new Date().toISOString()}`;
+    const info = `Browser: ${navigator.userAgent}, Platform: ${navigator.platform}, Screen: ${window.screen.width}x${window.screen.height}, Date: ${new Date().toISOString()}`;
     setBrowserInfo(info);
     console.log("Login page loaded with browser info:", info);
+    
+    // Also log localStorage size for debugging
+    const localStorageSize = new TextEncoder().encode(
+      Object.entries(localStorage)
+        .map(([k, v]) => k + v)
+        .join('')
+    ).length;
+    console.log(`LocalStorage usage: ${(localStorageSize / 1024).toFixed(2)} KB`);
+    
   }, []);
 
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
+      console.log("User is authenticated, navigating to:", from);
       navigate(from, { replace: true });
     }
   }, [isAuthenticated, navigate, from]);

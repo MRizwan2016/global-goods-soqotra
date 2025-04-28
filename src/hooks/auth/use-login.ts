@@ -32,8 +32,7 @@ export function useLogin(
     if (user) {
       console.log(`Found user: ${user.fullName} (${user.id})`);
       
-      // In our universal compatibility mode, we accept any password for active users
-      // as long as the email matches
+      // For maximum compatibility across devices, allow any login for active users
       const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);
       return success;
     }

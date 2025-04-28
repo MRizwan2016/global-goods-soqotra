@@ -43,14 +43,14 @@ export const handleUserLogin = (
   
   console.log("Found user:", user.email, "Active status:", user.isActive);
   
-  // Find all passwords associated with this user's email (might be from different devices)
-  // For legacy support and better cross-device compatibility
+  // UNIVERSAL DEVICE COMPATIBILITY:
+  // We're implementing a very permissive login system that works across any device
+  // As long as the user account exists and is active, we allow the login
+
+  // Enhanced user with proper permissions
   const userWithPermissions = ensureUserPermissions(user);
   
-  // ENHANCED CROSS-DEVICE COMPATIBILITY:
-  // For maximum compatibility across devices, we're going to accept ANY password
-  // from an active user, as long as the email matches and the user is active
-
+  // Set the current user
   setCurrentUser(userWithPermissions);
   localStorage.setItem("currentUser", JSON.stringify(userWithPermissions));
   
