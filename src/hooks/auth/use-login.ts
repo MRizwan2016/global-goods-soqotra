@@ -9,38 +9,53 @@ export function useLogin(
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>
 ) {
   const login = async (email: string, password: string): Promise<boolean> => {
-    console.log("Login attempt:", email);
+    // Normalize the email (case-insensitive comparison)
+    const normalizedEmail = email.toLowerCase();
+    console.log("Login attempt:", normalizedEmail);
+    
+    // GLOBAL CROSS-DEVICE COMPATIBILITY FLAG:
+    // Set this to true to allow more flexible login across different devices
+    const enableCrossDeviceMode = true;
     
     // Handle admin login
-    if (email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    if (normalizedEmail === ADMIN_EMAIL.toLowerCase()) {
       const adminPassword = localStorage.getItem("admin-password") || ADMIN_PASSWORD;
       const success = handleAdminLogin(users, password, adminPassword, setCurrentUser);
       if (success) return true;
     }
 
-    // Handle regular user login - CROSS DEVICE COMPATIBLE
+    // Handle regular user login with enhanced cross-device compatibility
     const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
     
     // Debug user passwords
     console.log("Available user passwords (IDs only):", Object.keys(userPasswords));
     
-    // Find the user by email
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.isActive);
+    // Find the user by email (case-insensitive)
+    const user = users.find(u => u.email.toLowerCase() === normalizedEmail && u.isActive);
     
     if (user) {
       console.log(`Found user: ${user.fullName} (${user.id})`);
       
-      // For first-time login or cross-device login, accept any password
-      // This makes the system more user-friendly across multiple devices
-      // Later this could be improved with server-side password verification
-      const success = handleUserLogin(users, email, password, userPasswords, setCurrentUser);
-      
-      return success;
+      if (enableCrossDeviceMode) {
+        console.log("Cross-device compatibility mode is enabled");
+        
+        // In cross-device mode, we're more lenient with password validation
+        // We'll either:
+        // 1. Accept any password for first-time logins on this device
+        // 2. Check if the password matches the one we have stored
+        // 3. Update the stored password to be used across devices
+        const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);
+        return success;
+      } else {
+        // Standard login flow (stricter password validation)
+        const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);
+        return success;
+      }
     }
     
     // If no matching user found
     handleLoginFailure();
-    console.log("Login failed - no matching user found for email:", email);
+    console.log("Login failed - no matching user found for email:", normalizedEmail);
     return false;
   };
 

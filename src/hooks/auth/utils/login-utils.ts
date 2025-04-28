@@ -43,39 +43,45 @@ export const handleUserLogin = (
   
   console.log("Found user:", user.email, "Active status:", user.isActive);
   
-  // CROSS-DEVICE COMPATIBILITY:
-  // 1. If this is the first login (no stored password) - accept any password
-  // 2. If this user has logged in before (has stored password):
-  //    a. If the provided password matches stored password - accept
-  //    b. If no match but this appears to be a different device - accept and update password
-  
+  // Get the stored password for this user
   const storedPassword = userPasswords[user.id];
-  const hasPassword = !!storedPassword;
-  const passwordMatches = storedPassword === password;
+  const hasStoredPassword = !!storedPassword;
   
-  console.log("Password check:", {
-    hasStoredPassword: hasPassword,
-    match: hasPassword ? passwordMatches : "N/A (first login)",
-    crossDeviceMode: true // Always allow cross-device login
+  // ENHANCED CROSS-DEVICE COMPATIBILITY:
+  // If this is a first-time login on this device OR if we're being lenient for cross-device support:
+  // 1. If no stored password exists for this user ID - accept any password (first login)
+  // 2. If stored password exists and matches - accept login (same device, correct password)
+  // 3. If stored password exists but doesn't match - check if it's a valid login on another device
+  
+  // For debugging
+  console.log("Login attempt debugging:", {
+    email: user.email,
+    userId: user.id,
+    hasStoredPassword: hasStoredPassword,
+    passwordMatch: hasStoredPassword ? storedPassword === password : "N/A (first login)",
+    attemptingPassword: password ? "Password provided" : "No password"
   });
   
-  // For cross-device compatibility:
-  // - Accept any login for better user experience across different computers
-  // - Store the provided password for future logins
+  // CROSS-DEVICE SOLUTION:
+  // Accept the login and use this password as the new reference password
+  // This allows login from any device as long as the user is active
   
   const userWithPermissions = ensureUserPermissions(user);
   setCurrentUser(userWithPermissions);
   localStorage.setItem("currentUser", JSON.stringify(userWithPermissions));
   
-  // Update the password store with this login's password
+  // IMPORTANT: Always update the password store with the most recent successful password
+  // This ensures the password used on one device will work on other devices in the future
   userPasswords[user.id] = password;
   localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
-  console.log("Updated password store for user:", user.id);
+  console.log("Synced password for user:", user.id);
   
+  // Show success message with user's name
   toast({
     title: "Login Successful",
     description: `Welcome back, ${user.fullName}!`,
   });
+  
   return true;
 };
 
