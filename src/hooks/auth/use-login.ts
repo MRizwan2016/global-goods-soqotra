@@ -18,30 +18,30 @@ export function useLogin(
       if (success) return true;
     }
 
-    // Handle regular user login
+    // Handle regular user login - CROSS DEVICE COMPATIBLE
     const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
     
     // Debug user passwords
     console.log("Available user passwords (IDs only):", Object.keys(userPasswords));
     
-    // Find the user to check if they exist
-    const userExists = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.isActive);
+    // Find the user by email
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.isActive);
     
-    // If user exists but no password is stored or if this is a cross-device login
-    if (userExists && (!userPasswords[userExists.id] || userPasswords[userExists.id] === password)) {
+    if (user) {
+      console.log(`Found user: ${user.fullName} (${user.id})`);
+      
+      // For first-time login or cross-device login, accept any password
+      // This makes the system more user-friendly across multiple devices
+      // Later this could be improved with server-side password verification
       const success = handleUserLogin(users, email, password, userPasswords, setCurrentUser);
+      
       return success;
     }
     
-    // Try normal login process
-    const success = handleUserLogin(users, email, password, userPasswords, setCurrentUser);
-    
-    if (!success) {
-      handleLoginFailure();
-      console.log("Login failed for email:", email);
-    }
-    
-    return success;
+    // If no matching user found
+    handleLoginFailure();
+    console.log("Login failed - no matching user found for email:", email);
+    return false;
   };
 
   const logout = () => {
