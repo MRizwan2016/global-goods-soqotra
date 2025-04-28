@@ -19,7 +19,7 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, users } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
@@ -36,6 +36,19 @@ const Login = () => {
     }
   }, [isAuthenticated, navigate, from]);
 
+  // Debug: Log available users when component mounts
+  useEffect(() => {
+    console.log("Available users for login:", users.map(u => ({
+      id: u.id,
+      email: u.email,
+      isActive: u.isActive
+    })));
+    
+    // Debug: Check password store
+    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
+    console.log("User passwords available for IDs:", Object.keys(userPasswords));
+  }, [users]);
+
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -49,6 +62,13 @@ const Login = () => {
     setIsLoading(true);
     try {
       console.log(`Login attempt: ${values.email}`);
+      
+      // Check if user exists but has no password
+      const user = users.find(u => u.email.toLowerCase() === values.email.toLowerCase() && u.isActive);
+      if (user) {
+        console.log(`Found user: ${user.fullName} (${user.id})`);
+      }
+      
       const success = await login(values.email, values.password);
       if (success) {
         // Navigate to the redirect path or default

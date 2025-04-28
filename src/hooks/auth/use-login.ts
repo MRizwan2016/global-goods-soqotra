@@ -20,6 +20,10 @@ export function useLogin(
 
     // Handle regular user login
     const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
+    
+    // Debug user passwords
+    console.log("Available user passwords (IDs only):", Object.keys(userPasswords));
+    
     const success = handleUserLogin(users, email, password, userPasswords, setCurrentUser);
     
     if (!success) {
