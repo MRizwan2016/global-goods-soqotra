@@ -1,51 +1,64 @@
 
-import { RouteConfig } from "./types";
-import PaymentsPage from "@/pages/accounts/PaymentsPage";
 import AddInvoicePayment from "@/pages/accounts/AddInvoicePayment";
 import PaymentMethodsPage from "@/pages/accounts/PaymentMethodsPage";
+import PaymentsPage from "@/pages/accounts/PaymentsPage";
 import ReconciliationPage from "@/pages/accounts/ReconciliationPage";
 import AddPaymentPage from "@/pages/accounts/payment/AddPaymentPage";
 import PaidInvoicesPage from "@/pages/accounts/payments/PaidInvoicesPage";
+import ReconciliationPage as PaymentReconciliation from "@/pages/accounts/payments/ReconciliationPage";
+import ProfitLossPage from "@/pages/accounts/ProfitLossPage";
+
+import { RouteConfig } from "./types";
 
 const accountsRoutes: RouteConfig[] = [
   {
-    path: "accounts/payments",
+    path: "/accounts/payments",
     element: PaymentsPage,
-    private: true
+    private: true,
+    requiredPermission: "accounting"
   },
   {
-    path: "accounts/payments/add",
+    path: "/accounts/paid-invoices",
+    element: PaidInvoicesPage,
+    private: true,
+    requiredPermission: "accounting"
+  },
+  {
+    path: "/accounts/add-invoice-payment",
     element: AddInvoicePayment,
-    private: true
+    private: true,
+    requiredPermission: "accounting"
   },
   {
-    path: "accounts/payment/add",
-    element: AddPaymentPage,
-    private: true
-  },
-  {
-    path: "accounts/payment-methods",
+    path: "/accounts/payment-methods",
     element: PaymentMethodsPage,
     private: true,
-    requiredFile: "paymentMethods"
+    requiredPermission: "accounting"
   },
   {
-    path: "accounts/reconciliation",
+    path: "/accounts/reconciliation",
     element: ReconciliationPage,
     private: true,
-    requiredFile: "reconciliation"
+    requiredPermission: "accounting"
   },
   {
-    path: "accounts/payments/reconciliation",
-    element: ReconciliationPage,
+    path: "/accounts/payments/reconciliation",
+    element: PaymentReconciliation,
     private: true,
-    requiredFile: "reconciliation"
+    requiredPermission: "accounting"
   },
   {
-    path: "accounts/payments/paid",
-    element: PaidInvoicesPage,
-    private: true
+    path: "/accounts/payment/add",
+    element: AddPaymentPage,
+    private: true,
+    requiredPermission: "accounting"
   },
+  {
+    path: "/accounts/profit-loss",
+    element: ProfitLossPage,
+    private: true,
+    requiredPermission: "accounting"
+  }
 ];
 
 export default accountsRoutes;

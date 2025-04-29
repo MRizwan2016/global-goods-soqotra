@@ -52,6 +52,7 @@ export const navigationSections: NavigationSections = {
           { name: "PAYMENTS", path: "/accounts/payments" },
           { name: "ADD PAYMENT", path: "/accounts/payment/add" }, 
           { name: "RECONCILIATION", path: "/accounts/reconciliation" },
+          { name: "PROFIT & LOSS", path: "/accounts/profit-loss" },
         ],
       },
       {
