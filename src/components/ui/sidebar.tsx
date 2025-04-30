@@ -14,6 +14,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
+  TooltipRoot,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
 
@@ -569,11 +570,10 @@ const SidebarMenuButton = React.forwardRef<
       return button
     }
 
-    // Fix: The main issue is here. We need to ensure we're properly handling the tooltip prop
-    // whether it's a string or a more complex object
+    // Fix: We need to properly handle the tooltip by using the Tooltip component correctly
     return (
       <TooltipProvider>
-        <Tooltip>
+        <TooltipRoot>
           <TooltipTrigger asChild>{button}</TooltipTrigger>
           <TooltipContent
             side="right"
@@ -581,7 +581,7 @@ const SidebarMenuButton = React.forwardRef<
             hidden={state !== "collapsed" || isMobile}
             {...(typeof tooltip === 'string' ? { children: tooltip } : tooltip)}
           />
-        </Tooltip>
+        </TooltipRoot>
       </TooltipProvider>
     )
   }
