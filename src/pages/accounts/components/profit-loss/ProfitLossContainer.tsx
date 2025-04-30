@@ -49,6 +49,8 @@ const ProfitLossContainer: React.FC<ProfitLossContainerProps> = ({
           view={view}
           setView={setView}
           handleRefresh={handleRefresh}
+          profitLossData={profitLossData}
+          profitLossByCountry={profitLossByCountry}
         />
         
         <ProfitLossTabs

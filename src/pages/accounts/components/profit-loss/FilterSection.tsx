@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { RefreshCw, Download } from "lucide-react";
 import { CountrySelector } from "./CountrySelector";
+import { ProfitLossData, CountryProfitData } from "../../types/profitLossTypes";
+import { 
+  exportTransactionsToCSV, 
+  exportMonthlyDataToCSV,
+  exportSummaryToCSV
+} from "../../hooks/profit-loss/exportUtils";
+import { useToast } from "@/hooks/use-toast";
 
 interface FilterSectionProps {
   selectedCountry: string;
@@ -13,6 +20,8 @@ interface FilterSectionProps {
   handleRefresh: () => void;
   view: "summary" | "detailed";
   setView: (view: "summary" | "detailed") => void;
+  profitLossData: ProfitLossData | null;
+  profitLossByCountry: Record<string, CountryProfitData>;
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({
@@ -23,7 +32,53 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   handleRefresh,
   view,
   setView,
+  profitLossData,
+  profitLossByCountry
 }) => {
+  const { toast } = useToast();
+  
+  const handleExport = () => {
+    if (!profitLossData) {
+      toast({
+        title: "No data to export",
+        description: "There is no data available to export.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      // Export all data formats
+      exportTransactionsToCSV(
+        profitLossData.transactions, 
+        `profit_loss_transactions_${selectedCountry !== 'all' ? selectedCountry : 'all'}.csv`
+      );
+      
+      exportMonthlyDataToCSV(
+        profitLossData.monthlyData,
+        `profit_loss_monthly_${selectedCountry !== 'all' ? selectedCountry : 'all'}.csv`
+      );
+      
+      exportSummaryToCSV(
+        profitLossData,
+        profitLossByCountry,
+        `profit_loss_summary_${selectedCountry !== 'all' ? selectedCountry : 'all'}.csv`
+      );
+      
+      toast({
+        title: "Export successful",
+        description: "Financial data has been exported to CSV successfully.",
+      });
+    } catch (error) {
+      console.error("Export error:", error);
+      toast({
+        title: "Export failed",
+        description: "There was an error exporting the data.",
+        variant: "destructive"
+      });
+    }
+  };
+  
   return (
     <>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -44,7 +99,12 @@ const FilterSection: React.FC<FilterSectionProps> = ({
             <RefreshCw size={16} />
             Refresh
           </Button>
-          <Button variant="outline" size="sm" className="flex items-center gap-1">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center gap-1"
+            onClick={handleExport}
+          >
             <Download size={16} />
             Export
           </Button>
