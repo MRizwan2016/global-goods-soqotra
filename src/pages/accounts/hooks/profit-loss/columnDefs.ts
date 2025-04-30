@@ -9,7 +9,7 @@ export const getProfitLossColumnDefs = (): Column[] => {
       id: "date",
       header: "Date",
       accessorKey: "date",
-      cell: ({ row }) => <span>{row.date}</span>,
+      cell: ({ row }) => <span>{row.original.date}</span>,
     },
     {
       id: "description",
@@ -26,8 +26,8 @@ export const getProfitLossColumnDefs = (): Column[] => {
       header: "Type",
       accessorKey: "type",
       cell: ({ row }) => (
-        <Badge className={row.type === "revenue" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-          {row.type === "revenue" ? "Revenue" : "Expense"}
+        <Badge className={row.original.type === "revenue" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
+          {row.original.type === "revenue" ? "Revenue" : "Expense"}
         </Badge>
       ),
     },
@@ -35,15 +35,15 @@ export const getProfitLossColumnDefs = (): Column[] => {
       id: "expenseType",
       header: "Category",
       accessorKey: "expenseType",
-      cell: ({ row }) => row.expenseType || "-",
+      cell: ({ row }) => row.original.expenseType || "-",
     },
     {
       id: "amount",
       header: "Amount",
       accessorKey: "amount",
       cell: ({ row }) => (
-        <span className={row.type === "revenue" ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
-          ${parseFloat(row.amount).toFixed(2)}
+        <span className={row.original.type === "revenue" ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+          ${parseFloat(row.original.amount).toFixed(2)}
         </span>
       ),
     },
@@ -52,9 +52,9 @@ export const getProfitLossColumnDefs = (): Column[] => {
       header: "Status",
       accessorKey: "status",
       cell: ({ row }) => {
-        if (row.type === "expense") return "-";
+        if (row.original.type === "expense") return "-";
         
-        return row.status === "paid" ? (
+        return row.original.status === "paid" ? (
           <Badge className="bg-green-100 text-green-800">Paid</Badge>
         ) : (
           <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>

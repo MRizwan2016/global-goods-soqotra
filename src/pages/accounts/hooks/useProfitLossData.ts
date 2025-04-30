@@ -1,125 +1,159 @@
 
 import { useState, useEffect } from "react";
-import { 
-  ProfitLossData, 
-  CountryProfitData, 
-  Transaction 
-} from "../types/profitLossTypes";
+import { ProfitLossData, CountryProfitData, Transaction } from "../types/profitLossTypes";
+import { filterData, generateSampleExpenses } from "./profit-loss/filterUtils";
+import { calculateMonthlyData, calculateCountryProfit } from "./profit-loss/calculationUtils";
 import { getProfitLossColumnDefs } from "./profit-loss/columnDefs";
-import { 
-  filterData, 
-  getCountryFromLocation,
-  getCountryNameFromCode,
-  generateSampleExpenses
-} from "./profit-loss/filterUtils";
-import { 
-  calculateMonthlyData,
-  calculateCountryProfit
-} from "./profit-loss/calculationUtils";
 
 export const useProfitLossData = (
-  country: string = "all", 
-  dateRange: { from?: Date; to?: Date } = {},
+  country: string,
+  dateRange: { from?: Date; to?: Date },
   refreshKey: number = 0
 ) => {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [profitLossData, setProfitLossData] = useState<ProfitLossData | null>(null);
   const [profitLossByCountry, setProfitLossByCountry] = useState<Record<string, CountryProfitData>>({});
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-
-  // Get column definitions for the data table
-  const columnDefs = getProfitLossColumnDefs();
-
+  
+  // Load and process the profit/loss data
   useEffect(() => {
-    const fetchProfitLossData = async () => {
+    const loadData = async () => {
       setIsLoading(true);
       
       try {
-        // Load invoices from localStorage
-        const invoices = JSON.parse(localStorage.getItem("invoices") || "[]");
+        // In a real app, fetch data from an API
+        // For this demo, generate sample data
+        await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
         
-        // Load expenses from localStorage (create if doesn't exist)
-        const expenses = JSON.parse(localStorage.getItem("expenses") || "[]");
+        // Generate fake data
+        const expenses = generateSampleExpenses();
         
-        // If expenses storage doesn't exist, create it with some sample data
-        if (!localStorage.getItem("expenses")) {
-          const sampleExpenses = generateSampleExpenses();
-          localStorage.setItem("expenses", JSON.stringify(sampleExpenses));
-        }
+        // Simulate invoice data
+        const invoices = [
+          {
+            id: 'inv-1',
+            date: '2025-03-15',
+            description: 'Shipping Services - March',
+            country: 'Qatar',
+            type: 'revenue' as const,
+            amount: 5250.50,
+            status: 'paid' as const
+          },
+          {
+            id: 'inv-2',
+            date: '2025-03-22',
+            description: 'Container Transport',
+            country: 'UAE',
+            type: 'revenue' as const,
+            amount: 3125.75,
+            status: 'paid' as const
+          },
+          {
+            id: 'inv-3',
+            date: '2025-04-05',
+            description: 'Logistics Services - April',
+            country: 'Kenya',
+            type: 'revenue' as const,
+            amount: 4750.00,
+            status: 'pending' as const
+          },
+          {
+            id: 'inv-4',
+            date: '2025-04-15',
+            description: 'Export Documentation',
+            country: 'Qatar',
+            type: 'revenue' as const,
+            amount: 875.25,
+            status: 'pending' as const
+          },
+          {
+            id: 'inv-5',
+            date: '2025-03-30',
+            description: 'International Freight',
+            country: 'Saudi Arabia',
+            type: 'revenue' as const,
+            amount: 7325.00,
+            status: 'paid' as const
+          },
+        ];
         
-        // Process and filter data by country and date range if provided
-        const filteredInvoices = filterData(invoices, country, dateRange);
-        const filteredExpenses = filterData(expenses, country, dateRange);
-        
-        // Calculate total revenue from invoices
-        const totalRevenue = filteredInvoices.reduce((sum, inv) => sum + parseFloat(inv.totalAmount || "0"), 0);
-        const paidRevenue = filteredInvoices
-          .filter(inv => inv.paymentStatus === "paid")
-          .reduce((sum, inv) => sum + parseFloat(inv.totalAmount || "0"), 0);
-        const pendingRevenue = filteredInvoices
-          .filter(inv => inv.paymentStatus !== "paid")
-          .reduce((sum, inv) => sum + parseFloat(inv.totalAmount || "0"), 0);
-        
-        // Calculate total expenses
-        const totalExpenses = filteredExpenses.reduce((sum, exp) => sum + parseFloat(exp.amount || "0"), 0);
-        
-        // Create transaction list for detailed view
-        const transactions: Transaction[] = [
-          ...filteredInvoices.map(inv => ({
+        // Combine transactions
+        const allTransactions: Transaction[] = [
+          ...invoices.map(inv => ({
             id: inv.id,
-            date: inv.date || inv.createdAt,
-            description: `Invoice ${inv.invoiceNumber} - ${inv.consigneeName || inv.shipperName || "Customer"}`,
-            country: getCountryFromLocation(inv.locationTo || ""),
-            type: "revenue",
-            amount: parseFloat(inv.totalAmount || "0"),
-            status: inv.paymentStatus || "pending"
+            date: inv.date,
+            description: inv.description,
+            country: inv.country,
+            type: inv.type,
+            amount: inv.amount,
+            status: inv.status
           })),
-          ...filteredExpenses.map(exp => ({
+          ...expenses.map((exp: any) => ({
             id: exp.id,
             date: exp.date,
             description: exp.description,
             country: exp.country,
-            type: "expense",
-            expenseType: exp.category,
-            amount: parseFloat(exp.amount || "0"),
-            status: "paid" // Expenses are considered paid by default
+            type: 'expense' as const,
+            amount: parseFloat(exp.amount),
+            expenseType: exp.category
           }))
-        ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        ];
         
-        // Calculate monthly data for charts
-        const monthlyData = calculateMonthlyData(transactions);
+        // Apply filters
+        const filteredTransactions = filterData(allTransactions, country, dateRange);
         
-        // Calculate profit by country
-        const countryProfitData = calculateCountryProfit(transactions);
-        
-        // Build the final data object
-        const data: ProfitLossData = {
-          revenue: {
-            total: totalRevenue,
-            paid: paidRevenue,
-            pending: pendingRevenue,
-            invoiceCount: filteredInvoices.length,
-            paidCount: filteredInvoices.filter(inv => inv.paymentStatus === "paid").length,
-            pendingCount: filteredInvoices.filter(inv => inv.paymentStatus !== "paid").length,
-          },
-          expenses: {
-            total: totalExpenses,
-            count: filteredExpenses.length,
-          },
-          transactions,
-          monthlyData,
+        // Calculate revenue and expense totals
+        const revenue = {
+          total: filteredTransactions
+            .filter(t => t.type === 'revenue')
+            .reduce((sum, t) => sum + t.amount, 0),
+          paid: filteredTransactions
+            .filter(t => t.type === 'revenue' && t.status === 'paid')
+            .reduce((sum, t) => sum + t.amount, 0),
+          pending: filteredTransactions
+            .filter(t => t.type === 'revenue' && t.status === 'pending')
+            .reduce((sum, t) => sum + t.amount, 0),
+          invoiceCount: filteredTransactions.filter(t => t.type === 'revenue').length,
+          paidCount: filteredTransactions.filter(t => t.type === 'revenue' && t.status === 'paid').length,
+          pendingCount: filteredTransactions.filter(t => t.type === 'revenue' && t.status === 'pending').length,
         };
         
-        setProfitLossData(data);
+        const expenses = {
+          total: filteredTransactions
+            .filter(t => t.type === 'expense')
+            .reduce((sum, t) => sum + t.amount, 0),
+          count: filteredTransactions.filter(t => t.type === 'expense').length
+        };
+        
+        // Calculate monthly data
+        const monthlyData = calculateMonthlyData(filteredTransactions);
+        
+        // Calculate country profit data
+        const countryProfitData = calculateCountryProfit(filteredTransactions);
+        
+        setProfitLossData({
+          revenue,
+          expenses,
+          transactions: filteredTransactions,
+          monthlyData
+        });
+        
         setProfitLossByCountry(countryProfitData);
       } catch (error) {
-        console.error("Error loading profit and loss data:", error);
+        console.error("Error loading profit/loss data:", error);
       } finally {
         setIsLoading(false);
       }
     };
     
-    fetchProfitLossData();
+    loadData();
   }, [country, dateRange, refreshKey]);
   
-  return { profitLossData, profitLossByCountry, isLoading, columnDefs };
+  const columnDefs = getProfitLossColumnDefs();
+  
+  return {
+    profitLossData,
+    profitLossByCountry,
+    isLoading,
+    columnDefs
+  };
 };
