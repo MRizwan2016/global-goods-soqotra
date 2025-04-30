@@ -1,13 +1,37 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { navigationSections } from "./navigationConfig";
 
 export const useMainNavigation = (sectionKeys: string[]) => {
-  // Keep all collapsed by default (matching the screenshot request)
+  // Initialize with empty object (all collapsed)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
     Object.fromEntries(sectionKeys.map((k) => [k, false]))
   );
 
   const location = useLocation();
+
+  useEffect(() => {
+    // Auto-expand sections based on the current URL path
+    const newExpandedSections = { ...expandedSections };
+    
+    // Find which section contains the current path
+    sectionKeys.forEach(key => {
+      const section = navigationSections[key];
+      
+      // Check if any item in this section matches the current path
+      const hasActivePath = section.submenu.some(submenu => 
+        submenu.items.some(item => isPathActive(item.path))
+      );
+      
+      // If this section contains the current path, expand it
+      if (hasActivePath) {
+        newExpandedSections[key] = true;
+      }
+    });
+    
+    setExpandedSections(newExpandedSections);
+  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleSection = (key: string) => {
     setExpandedSections((prev) => ({
@@ -31,3 +55,5 @@ export const useMainNavigation = (sectionKeys: string[]) => {
 
   return { expandedSections, toggleSection, isPathActive, location };
 };
+
+export default useMainNavigation;

@@ -66,6 +66,8 @@ const MenuItemList: React.FC<Props> = ({
     return hasFilePermission(fileKey as any);
   };
 
+  console.log('Rendering submenu for section:', sectionKey, submenu);
+
   return (
     <div className="space-y-1 pl-10 mt-2 animate-slide-in">
       {submenu.map((submenu, idx) => {
@@ -73,6 +75,8 @@ const MenuItemList: React.FC<Props> = ({
         const filteredItems = submenu.items.filter(item => 
           hasPermissionForPath(item.path)
         );
+        
+        console.log('Filtered items for', submenu.title, ':', filteredItems);
         
         // If no items in this submenu have permission, skip rendering it
         if (filteredItems.length === 0) return null;

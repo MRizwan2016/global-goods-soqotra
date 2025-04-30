@@ -1,17 +1,39 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { navigationSections } from './navigationConfig';
 import { useMainNavigation } from './useMainNavigation';
 import MenuSection from './MenuSection';
 import { useAuth } from '@/hooks/use-auth';
+import { useLocation } from 'react-router-dom';
 
 export const MainNavigation: React.FC = () => {
   const { currentUser, isAdmin } = useAuth();
   const sectionKeys = Object.keys(navigationSections);
-  const { expandedSections, toggleSection, isPathActive } = useMainNavigation(sectionKeys);
+  const { expandedSections, toggleSection, isPathActive, location } = useMainNavigation(sectionKeys);
+  
+  // Auto-expand the section that contains the current path
+  useEffect(() => {
+    if (location.pathname) {
+      // Find which section contains the current path
+      sectionKeys.forEach(key => {
+        const section = navigationSections[key];
+        
+        // Check if any item in this section matches the current path
+        const hasActivePath = section.submenu.some(submenu => 
+          submenu.items.some(item => isPathActive(item.path))
+        );
+        
+        // If this section contains the current path, expand it
+        if (hasActivePath) {
+          toggleSection(key);
+        }
+      });
+    }
+  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onNavigate = (path: string) => {
     // No special logic presently; placeholder for mobile sidebar close etc
+    console.log(`Navigating to ${path}`);
   };
 
   // Filter navigation sections based on user permissions
@@ -31,6 +53,9 @@ export const MainNavigation: React.FC = () => {
     
     return currentUser.permissions[requiredPermission] || false;
   });
+
+  console.log('Expanded sections:', expandedSections);
+  console.log('Current path:', location.pathname);
 
   return (
     <nav className="w-full space-y-1">
