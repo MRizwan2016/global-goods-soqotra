@@ -1,10 +1,12 @@
 
+import { DateRange } from "react-day-picker";
+
 /**
  * Utility functions for filtering and processing profit/loss data
  */
 
 // Filter data based on country and date range
-export function filterData(data: any[], country: string, dateRange: { from?: Date; to?: Date }) {
+export function filterData(data: any[], country: string, dateRange: DateRange) {
   return data.filter(item => {
     // Filter by country if specified
     if (country && country !== "all") {

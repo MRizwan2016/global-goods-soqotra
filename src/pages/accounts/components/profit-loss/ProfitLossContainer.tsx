@@ -5,12 +5,13 @@ import FilterSection from "./FilterSection";
 import ProfitLossTabs from "./ProfitLossTabs";
 import { ProfitLossData, CountryProfitData } from "../../types/profitLossTypes";
 import { Column } from "@/components/ui/data-table";
+import { DateRange } from "react-day-picker";
 
 interface ProfitLossContainerProps {
   selectedCountry: string;
   setSelectedCountry: (value: string) => void;
-  dateRange: { from?: Date; to?: Date };
-  setDateRange: (value: { from?: Date; to?: Date }) => void;
+  dateRange: DateRange;
+  setDateRange: (value: DateRange) => void;
   view: "summary" | "detailed";
   setView: (view: "summary" | "detailed") => void;
   handleRefresh: () => void;

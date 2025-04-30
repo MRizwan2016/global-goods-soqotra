@@ -2,12 +2,13 @@
 import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { useProfitLossData } from "./hooks/useProfitLossData";
-import { getProfitLossColumnDefs } from "./hooks/profit-loss/columnDefs";
+import { getProfitLossColumnDefs } from "./hooks/profit-loss/columnDefs.tsx";
 import ProfitLossContainer from "./components/profit-loss/ProfitLossContainer";
+import { DateRange } from "react-day-picker";
 
 const ProfitLossPage = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
-  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date }>({});
+  const [dateRange, setDateRange] = useState<DateRange>({} as DateRange); // Initialize with empty object cast as DateRange
   const [view, setView] = useState<"summary" | "detailed">("summary");
   const [refreshKey, setRefreshKey] = useState<number>(0);
   

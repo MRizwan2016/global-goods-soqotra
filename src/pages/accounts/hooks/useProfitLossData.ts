@@ -3,10 +3,11 @@ import { ProfitLossData, CountryProfitData, Transaction } from "../types/profitL
 import { filterData, generateSampleExpenses } from "./profit-loss/filterUtils";
 import { calculateMonthlyData, calculateCountryProfit } from "./profit-loss/calculationUtils";
 import { getProfitLossColumnDefs } from "./profit-loss/columnDefs.tsx";
+import { DateRange } from "react-day-picker";
 
 export const useProfitLossData = (
   country: string,
-  dateRange: { from?: Date; to?: Date },
+  dateRange: DateRange,
   refreshKey: number = 0
 ) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);

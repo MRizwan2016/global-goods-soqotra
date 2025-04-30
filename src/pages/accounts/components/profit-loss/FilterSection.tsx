@@ -11,12 +11,13 @@ import {
   exportSummaryToCSV
 } from "../../hooks/profit-loss/exportUtils";
 import { useToast } from "@/hooks/use-toast";
+import { DateRange } from "react-day-picker";
 
 interface FilterSectionProps {
   selectedCountry: string;
   setSelectedCountry: (value: string) => void;
-  dateRange: { from?: Date; to?: Date };
-  setDateRange: (value: { from?: Date; to?: Date }) => void;
+  dateRange: DateRange | undefined; // Update this to match the DatePickerWithRange component's expected type
+  setDateRange: (value: DateRange | undefined) => void; // Update this to match the DatePickerWithRange component's expected type
   handleRefresh: () => void;
   view: "summary" | "detailed";
   setView: (view: "summary" | "detailed") => void;
