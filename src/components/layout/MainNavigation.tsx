@@ -27,6 +27,11 @@ export const MainNavigation: React.FC = () => {
         if (hasActivePath) {
           toggleSection(key);
         }
+        
+        // Special case: Always expand accounts section when viewing profit-loss
+        if (location.pathname === '/accounts/profit-loss' && key === 'accounts') {
+          toggleSection(key);
+        }
       });
     }
   }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -56,6 +61,14 @@ export const MainNavigation: React.FC = () => {
 
   console.log('Expanded sections:', expandedSections);
   console.log('Current path:', location.pathname);
+  
+  // Debug: Print all accounts navigation items
+  if (navigationSections.accounts) {
+    console.log('ACCOUNTS navigation config:');
+    navigationSections.accounts.submenu.forEach(submenu => {
+      console.log(`- ${submenu.title}:`, submenu.items.map(item => `${item.name} (${item.path})`));
+    });
+  }
 
   return (
     <nav className="w-full space-y-1">

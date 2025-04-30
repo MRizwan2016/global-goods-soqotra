@@ -35,6 +35,11 @@ const MenuItemList: React.FC<Props> = ({
   const hasPermissionForPath = (path: string): boolean => {
     if (isAdmin || !currentUser) return true; // Admin sees everything
     
+    // Special case for Profit & Loss - explicitly allow
+    if (path === '/accounts/profit-loss') {
+      return currentUser.permissions.accounting || false;
+    }
+    
     // Get file key from path
     let fileKey: string | undefined;
     
@@ -66,7 +71,10 @@ const MenuItemList: React.FC<Props> = ({
     return hasFilePermission(fileKey as any);
   };
 
-  console.log('Rendering submenu for section:', sectionKey, submenu);
+  console.log(`Rendering submenu for section "${sectionKey}":`);
+  submenu.forEach(menu => {
+    console.log(`- ${menu.title} items:`, menu.items.map(item => item.name));
+  });
 
   return (
     <div className="space-y-1 pl-10 mt-2 animate-slide-in">
@@ -76,7 +84,8 @@ const MenuItemList: React.FC<Props> = ({
           hasPermissionForPath(item.path)
         );
         
-        console.log('Filtered items for', submenu.title, ':', filteredItems);
+        console.log(`Filtered items for "${submenu.title}" in "${sectionKey}":`, 
+          filteredItems.map(item => `${item.name} (${item.path})`));
         
         // If no items in this submenu have permission, skip rendering it
         if (filteredItems.length === 0) return null;

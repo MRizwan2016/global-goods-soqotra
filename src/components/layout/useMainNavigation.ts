@@ -28,6 +28,11 @@ export const useMainNavigation = (sectionKeys: string[]) => {
       if (hasActivePath) {
         newExpandedSections[key] = true;
       }
+
+      // Special case: If we're on profit-loss page, ensure accounts section is expanded
+      if (location.pathname === '/accounts/profit-loss' && key === 'accounts') {
+        newExpandedSections[key] = true;
+      }
     });
     
     setExpandedSections(newExpandedSections);
@@ -50,6 +55,12 @@ export const useMainNavigation = (sectionKeys: string[]) => {
         (location.pathname === "/data-entry/selling-rates" || location.pathname.startsWith("/data-entry/selling-rates/"))) {
       return true;
     }
+    
+    // Special case for profit-loss to ensure it's recognized
+    if (path === "/accounts/profit-loss" && location.pathname === "/accounts/profit-loss") {
+      return true;
+    }
+    
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
 
