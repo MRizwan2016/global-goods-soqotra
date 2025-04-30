@@ -5,7 +5,8 @@ import PaymentsPage from "@/pages/accounts/PaymentsPage";
 import ReconciliationPage from "@/pages/accounts/ReconciliationPage";
 import AddPaymentPage from "@/pages/accounts/payment/AddPaymentPage";
 import PaidInvoicesPage from "@/pages/accounts/payments/PaidInvoicesPage";
-import ReconciliationPage as PaymentReconciliation from "@/pages/accounts/payments/ReconciliationPage";
+// Import ReconciliationPage component with a different name to avoid naming conflict
+import { default as PaymentReconciliation } from "@/pages/accounts/payments/ReconciliationPage";
 import ProfitLossPage from "@/pages/accounts/ProfitLossPage";
 
 import { RouteConfig } from "./types";
