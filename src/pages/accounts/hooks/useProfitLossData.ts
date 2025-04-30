@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from "react";
 import { ProfitLossData, CountryProfitData, Transaction } from "../types/profitLossTypes";
 import { filterData, generateSampleExpenses } from "./profit-loss/filterUtils";
 import { calculateMonthlyData, calculateCountryProfit } from "./profit-loss/calculationUtils";
-import { getProfitLossColumnDefs } from "./profit-loss/columnDefs";
+import { getProfitLossColumnDefs } from "./profit-loss/columnDefs.tsx";
 
 export const useProfitLossData = (
   country: string,
@@ -25,7 +24,7 @@ export const useProfitLossData = (
         await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
         
         // Generate fake data
-        const expenses = generateSampleExpenses();
+        const expenseItems = generateSampleExpenses();
         
         // Simulate invoice data
         const invoices = [
@@ -87,7 +86,7 @@ export const useProfitLossData = (
             amount: inv.amount,
             status: inv.status
           })),
-          ...expenses.map((exp: any) => ({
+          ...expenseItems.map((exp: any) => ({
             id: exp.id,
             date: exp.date,
             description: exp.description,
@@ -117,7 +116,7 @@ export const useProfitLossData = (
           pendingCount: filteredTransactions.filter(t => t.type === 'revenue' && t.status === 'pending').length,
         };
         
-        const expenses = {
+        const expenseData = {
           total: filteredTransactions
             .filter(t => t.type === 'expense')
             .reduce((sum, t) => sum + t.amount, 0),
@@ -132,7 +131,7 @@ export const useProfitLossData = (
         
         setProfitLossData({
           revenue,
-          expenses,
+          expenses: expenseData,
           transactions: filteredTransactions,
           monthlyData
         });

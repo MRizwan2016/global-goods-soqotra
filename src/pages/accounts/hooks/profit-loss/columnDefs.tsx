@@ -2,6 +2,7 @@
 import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Column } from "@/components/ui/data-table";
+import { Tooltip } from "@/components/ui/tooltip";
 
 export const getProfitLossColumnDefs = (): Column[] => {
   return [
@@ -15,6 +16,13 @@ export const getProfitLossColumnDefs = (): Column[] => {
       id: "description",
       header: "Description",
       accessorKey: "description",
+      cell: ({ row }) => (
+        <Tooltip content={row.original.description}>
+          <span className="block max-w-[200px] truncate">
+            {row.original.description}
+          </span>
+        </Tooltip>
+      ),
     },
     {
       id: "country",
