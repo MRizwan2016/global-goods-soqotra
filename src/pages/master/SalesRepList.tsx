@@ -17,6 +17,7 @@ import { toast } from "sonner";
 
 interface SalesRep {
   id: string;
+  title?: string; // Make optional for backward compatibility
   name: string;
   employeeNumber: string;
   operation: string;
@@ -31,7 +32,14 @@ const SalesRepList = () => {
   useEffect(() => {
     try {
       const loadedSalesReps = JSON.parse(localStorage.getItem('salesReps') || '[]');
-      setSalesReps(loadedSalesReps);
+      // Ensure backward compatibility by adding title if it doesn't exist
+      const updatedReps = loadedSalesReps.map((rep: SalesRep) => {
+        if (!rep.title) {
+          return { ...rep, title: "Mr." };
+        }
+        return rep;
+      });
+      setSalesReps(updatedReps);
     } catch (error) {
       console.error("Failed to load sales reps:", error);
       toast.error("Failed to load sales representatives data");
@@ -105,7 +113,7 @@ const SalesRepList = () => {
                   filteredData.map((rep, index) => (
                     <TableRow key={rep.id} className="hover:bg-green-50/50 transition-colors">
                       <BookingTableCell className="text-center">{index + 1}</BookingTableCell>
-                      <BookingTableCell>{rep.name}</BookingTableCell>
+                      <BookingTableCell>{rep.title || "Mr."} {rep.name}</BookingTableCell>
                       <BookingTableCell>{rep.employeeNumber}</BookingTableCell>
                       <BookingTableCell className="text-center">{rep.available}</BookingTableCell>
                       <BookingTableCell>{rep.operation}</BookingTableCell>

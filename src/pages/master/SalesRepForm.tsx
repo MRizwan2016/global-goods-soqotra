@@ -14,19 +14,53 @@ const SalesRepForm = () => {
   const { id } = useParams();
   const [formData, setFormData] = useState({
     id: id || uuidv4(),
+    title: "Mr.",
     name: "",
     employeeNumber: "",
     operation: "UPB - SYSTEM",
     available: "Y"
   });
   
+  // Auto-generate employee number on component mount for new entries
+  useEffect(() => {
+    if (!id && !formData.employeeNumber) {
+      // Generate sequential employee number based on existing reps
+      try {
+        const salesReps = JSON.parse(localStorage.getItem('salesReps') || '[]');
+        // Extract numeric part of employee numbers
+        const existingNumbers = salesReps.map((rep) => {
+          const match = rep.employeeNumber.match(/\d+$/);
+          return match ? parseInt(match[0], 10) : 0;
+        });
+        
+        // Find the highest number and increment
+        const highestNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) : 0;
+        const newNumber = highestNumber + 1;
+        
+        // Format with leading zeros (e.g., EMP-001)
+        const formattedNumber = `EMP-${String(newNumber).padStart(3, '0')}`;
+        
+        setFormData(prev => ({
+          ...prev,
+          employeeNumber: formattedNumber
+        }));
+      } catch (error) {
+        console.error("Failed to generate employee number:", error);
+      }
+    }
+  }, [id]);
+  
   // Load existing sales rep data if editing
   useEffect(() => {
     if (id) {
       try {
         const salesReps = JSON.parse(localStorage.getItem('salesReps') || '[]');
-        const salesRep = salesReps.find((rep: any) => rep.id === id);
+        const salesRep = salesReps.find((rep) => rep.id === id);
         if (salesRep) {
+          // Ensure backward compatibility by adding title if it doesn't exist
+          if (!salesRep.title) {
+            salesRep.title = "Mr.";
+          }
           setFormData(salesRep);
         }
       } catch (error) {
@@ -35,7 +69,7 @@ const SalesRepForm = () => {
     }
   }, [id]);
   
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -60,7 +94,7 @@ const SalesRepForm = () => {
       
       if (id) {
         // Update existing
-        const index = existingSalesReps.findIndex((rep: any) => rep.id === id);
+        const index = existingSalesReps.findIndex((rep) => rep.id === id);
         if (index !== -1) {
           existingSalesReps[index] = formData;
         } else {
@@ -98,19 +132,35 @@ const SalesRepForm = () => {
         <div className="p-6">
           <div className="grid grid-cols-1 gap-6 max-w-3xl">
             <motion.div
-              className="flex flex-col"
+              className="grid grid-cols-4 gap-3 items-end"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
             >
-              <label className="text-sm font-medium mb-1">NAME:</label>
-              <Input 
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="border border-gray-300 transition-colors focus:border-green-400"
-                placeholder="Enter name"
-              />
+              <div className="col-span-1">
+                <label className="text-sm font-medium mb-1 block">TITLE:</label>
+                <select
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  <option value="Mr.">Mr.</option>
+                  <option value="Mrs.">Mrs.</option>
+                  <option value="Ms.">Ms.</option>
+                  <option value="Dr.">Dr.</option>
+                </select>
+              </div>
+              <div className="col-span-3">
+                <label className="text-sm font-medium mb-1 block">NAME:</label>
+                <Input 
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="border border-gray-300 transition-colors focus:border-green-400"
+                  placeholder="Enter name"
+                />
+              </div>
             </motion.div>
             
             <motion.div
@@ -124,9 +174,15 @@ const SalesRepForm = () => {
                 name="employeeNumber"
                 value={formData.employeeNumber}
                 onChange={handleInputChange}
-                className="border border-gray-300 transition-colors focus:border-green-400"
-                placeholder="Enter employee number"
+                className="border border-gray-300 transition-colors focus:border-green-400 bg-blue-50"
+                placeholder="Auto-generated"
+                readOnly={!id} // Only allow editing for existing entries
               />
+              {!id && (
+                <p className="text-xs text-blue-600 mt-1">
+                  Employee number is auto-generated
+                </p>
+              )}
             </motion.div>
             
             <motion.div
