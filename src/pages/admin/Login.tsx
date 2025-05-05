@@ -107,112 +107,112 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Header with logo and company name */}
-      <div className="bg-[#1976d2] text-white py-8 text-center">
-        <div className="container mx-auto px-4">
-          <img 
-            src="/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png"
-            alt="Soqotra Logo" 
-            className="h-20 mx-auto mb-4 bg-white p-2 rounded"
-          />
-          <h1 className="text-3xl font-bold mb-1">SOQOTRA LOGISTICS SERVICES</h1>
-          <p className="text-xl">TRANSPORTATION & TRADING WLL.</p>
-        </div>
-      </div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 p-4">
+      <div className="absolute inset-0 z-0 bg-[url('/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png')] bg-no-repeat bg-center bg-contain opacity-10 blur-sm"></div>
       
-      {/* Login form */}
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">LOGIN TO YOUR ACCOUNT</h2>
-          
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-              <div className="space-y-2">
-                <label htmlFor="email" className="text-gray-700 block mb-1">Username</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-500">
-                    <User size={20} />
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input 
-                            id="email"
-                            placeholder="Enter your email" 
-                            className="pl-10 py-6" 
-                            {...field} 
-                            autoComplete="username"
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <label htmlFor="password" className="text-gray-700 block mb-1">Password</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-blue-500">
-                    <Lock size={20} />
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <div className="relative">
-                            <Input
-                              id="password"
-                              type={showPassword ? "text" : "password"}
-                              placeholder="Enter your password"
-                              className="pl-10 py-6"
-                              {...field}
-                              autoComplete="current-password"
-                            />
-                            <button
-                              type="button"
-                              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500"
-                              onClick={() => setShowPassword(!showPassword)}
-                              tabIndex={-1}
-                            >
-                              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                            </button>
-                          </div>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-              
-              <Button 
-                type="submit" 
-                className="w-full py-6 bg-[#1976d2] hover:bg-blue-600 text-white text-lg font-medium"
-                disabled={isLoading}
-              >
-                {isLoading ? "LOGGING IN..." : "LOGIN"}
-              </Button>
-              
-              <div className="text-center pt-2">
-                <Link to="/admin/forgot-password" className="text-blue-500 hover:underline font-medium">
-                  Forgot Password?
-                </Link>
-              </div>
-            </form>
-          </Form>
+      {/* Glass container */}
+      <div className="w-full max-w-md relative z-10 backdrop-blur-lg bg-white/10 rounded-2xl shadow-xl border border-white/20 p-8 overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute -top-24 -right-24 w-64 h-64 bg-blue-500/30 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-32 -left-20 w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl"></div>
+        
+        {/* Logo and header */}
+        <div className="text-center mb-8">
+          <img 
+            src="/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png" 
+            alt="Soqotra Logo" 
+            className="h-24 mx-auto mb-6 drop-shadow-lg"
+          />
+          <h1 className="text-2xl font-bold text-white mb-1">SOQOTRA LOGISTICS SERVICES</h1>
+          <p className="text-white/80 text-sm">TRANSPORTATION & TRADING WLL.</p>
         </div>
+        
+        {error && (
+          <Alert variant="destructive" className="mb-6 bg-red-500/20 border-red-500/50 text-white">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-4">
+              <label htmlFor="email" className="text-white/90 text-sm font-medium ml-1">Username</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-white/80">
+                  <User size={18} />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input 
+                          id="email"
+                          placeholder="Enter your email" 
+                          className="pl-10 py-6 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus-visible:ring-blue-500 focus-visible:border-blue-500" 
+                          {...field} 
+                          autoComplete="username"
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-4">
+              <label htmlFor="password" className="text-white/90 text-sm font-medium ml-1">Password</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-white/80">
+                  <Lock size={18} />
+                </div>
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            id="password"
+                            type={showPassword ? "text" : "password"}
+                            placeholder="Enter your password"
+                            className="pl-10 py-6 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus-visible:ring-blue-500 focus-visible:border-blue-500"
+                            {...field}
+                            autoComplete="current-password"
+                          />
+                          <button
+                            type="button"
+                            className="absolute inset-y-0 right-0 flex items-center pr-3 text-white/70 hover:text-white"
+                            onClick={() => setShowPassword(!showPassword)}
+                            tabIndex={-1}
+                          >
+                            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                          </button>
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
+            
+            <Button 
+              type="submit" 
+              className="w-full py-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-lg font-medium rounded-md shadow-lg transition-all duration-300 hover:shadow-blue-500/20 hover:shadow-xl"
+              disabled={isLoading}
+            >
+              {isLoading ? "LOGGING IN..." : "LOGIN"}
+            </Button>
+            
+            <div className="text-center pt-4">
+              <Link to="/admin/forgot-password" className="text-blue-300 hover:text-blue-200 hover:underline font-medium text-sm transition-colors">
+                Forgot Password?
+              </Link>
+            </div>
+          </form>
+        </Form>
       </div>
     </div>
   );
