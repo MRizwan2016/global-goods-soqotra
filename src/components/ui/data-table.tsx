@@ -36,7 +36,10 @@ export const DataTable: React.FC<DataTableProps> = ({
     );
   }
   
-  if (data.length === 0) {
+  // Make sure data is an array and not null/undefined
+  const safeData = Array.isArray(data) ? data : [];
+  
+  if (safeData.length === 0) {
     return (
       <div className="w-full h-48 flex items-center justify-center border rounded-md">
         <p className="text-muted-foreground">No data available</p>
@@ -55,19 +58,28 @@ export const DataTable: React.FC<DataTableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((row, rowIndex) => (
-            <TableRow key={rowIndex}>
-              {columns.map((column) => (
-                <TableCell key={`${rowIndex}-${column.id}`}>
-                  {column.cell 
-                    ? column.cell({ row }) 
-                    : column.accessorKey 
-                      ? row[column.accessorKey] 
-                      : null}
-                </TableCell>
-              ))}
-            </TableRow>
-          ))}
+          {safeData.map((row, rowIndex) => {
+            if (!row) {
+              console.warn("Found null or undefined row at index", rowIndex);
+              return null; // Skip rendering this row
+            }
+            
+            return (
+              <TableRow key={rowIndex}>
+                {columns.map((column) => (
+                  <TableCell key={`${rowIndex}-${column.id}`}>
+                    {column.cell 
+                      ? column.cell({ row: { original: row } }) 
+                      : column.accessorKey
+                        ? row[column.accessorKey] !== undefined && row[column.accessorKey] !== null 
+                            ? row[column.accessorKey] 
+                            : "-"
+                        : null}
+                  </TableCell>
+                ))}
+              </TableRow>
+            );
+          }).filter(Boolean)}
         </TableBody>
       </Table>
     </div>

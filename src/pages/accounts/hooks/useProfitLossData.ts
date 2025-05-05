@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { ProfitLossData, CountryProfitData, Transaction } from "../types/profitLossTypes";
 import { filterData, generateSampleExpenses } from "./profit-loss/filterUtils";
@@ -13,11 +14,13 @@ export const useProfitLossData = (
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [profitLossData, setProfitLossData] = useState<ProfitLossData | null>(null);
   const [profitLossByCountry, setProfitLossByCountry] = useState<Record<string, CountryProfitData>>({});
+  const [error, setError] = useState<string | null>(null);
   
   // Load and process the profit/loss data
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
+      setError(null);
       
       try {
         // In a real app, fetch data from an API
@@ -76,6 +79,11 @@ export const useProfitLossData = (
           },
         ];
         
+        // Ensure valid expense items
+        const validExpenses = expenseItems.filter(exp => 
+          exp && typeof exp === 'object' && exp.id && exp.date && exp.description
+        );
+        
         // Combine transactions
         const allTransactions: Transaction[] = [
           ...invoices.map(inv => ({
@@ -87,14 +95,14 @@ export const useProfitLossData = (
             amount: inv.amount,
             status: inv.status
           })),
-          ...expenseItems.map((exp: any) => ({
+          ...validExpenses.map((exp: any) => ({
             id: exp.id,
             date: exp.date,
             description: exp.description,
-            country: exp.country,
+            country: exp.country || 'Unknown',
             type: 'expense' as const,
-            amount: parseFloat(exp.amount),
-            expenseType: exp.category
+            amount: parseFloat(exp.amount) || 0,
+            expenseType: exp.category || 'Miscellaneous'
           }))
         ];
         
@@ -105,13 +113,13 @@ export const useProfitLossData = (
         const revenue = {
           total: filteredTransactions
             .filter(t => t.type === 'revenue')
-            .reduce((sum, t) => sum + t.amount, 0),
+            .reduce((sum, t) => sum + (t.amount || 0), 0),
           paid: filteredTransactions
             .filter(t => t.type === 'revenue' && t.status === 'paid')
-            .reduce((sum, t) => sum + t.amount, 0),
+            .reduce((sum, t) => sum + (t.amount || 0), 0),
           pending: filteredTransactions
             .filter(t => t.type === 'revenue' && t.status === 'pending')
-            .reduce((sum, t) => sum + t.amount, 0),
+            .reduce((sum, t) => sum + (t.amount || 0), 0),
           invoiceCount: filteredTransactions.filter(t => t.type === 'revenue').length,
           paidCount: filteredTransactions.filter(t => t.type === 'revenue' && t.status === 'paid').length,
           pendingCount: filteredTransactions.filter(t => t.type === 'revenue' && t.status === 'pending').length,
@@ -120,7 +128,7 @@ export const useProfitLossData = (
         const expenseData = {
           total: filteredTransactions
             .filter(t => t.type === 'expense')
-            .reduce((sum, t) => sum + t.amount, 0),
+            .reduce((sum, t) => sum + (t.amount || 0), 0),
           count: filteredTransactions.filter(t => t.type === 'expense').length
         };
         
@@ -129,6 +137,10 @@ export const useProfitLossData = (
         
         // Calculate country profit data
         const countryProfitData = calculateCountryProfit(filteredTransactions);
+        
+        // Log for debugging
+        console.log("Filtered transactions:", filteredTransactions);
+        console.log("Monthly data:", monthlyData);
         
         setProfitLossData({
           revenue,
@@ -140,6 +152,7 @@ export const useProfitLossData = (
         setProfitLossByCountry(countryProfitData);
       } catch (error) {
         console.error("Error loading profit/loss data:", error);
+        setError("Failed to load profit and loss data");
       } finally {
         setIsLoading(false);
       }
@@ -154,6 +167,7 @@ export const useProfitLossData = (
     profitLossData,
     profitLossByCountry,
     isLoading,
+    error,
     columnDefs
   };
 };
