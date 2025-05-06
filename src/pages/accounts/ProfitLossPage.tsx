@@ -8,7 +8,7 @@ import { DateRange } from "react-day-picker";
 
 const ProfitLossPage = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
-  const [dateRange, setDateRange] = useState<DateRange>({} as DateRange); // Initialize with empty object cast as DateRange
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [view, setView] = useState<"summary" | "detailed">("summary");
   const [refreshKey, setRefreshKey] = useState<number>(0);
   

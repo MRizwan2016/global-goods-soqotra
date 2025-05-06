@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RefreshCcw, FileText, Download } from "lucide-react";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import { ProfitLossData, CountryProfitData } from "../../types/profitLossTypes";
 
 export interface FilterSectionProps {
@@ -38,10 +38,10 @@ const FilterSection: React.FC<FilterSectionProps> = ({
           <div className="flex justify-between items-center">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
-              <DateRangePicker
-                value={dateRange}
-                onChange={setDateRange}
-                placeholder="Select date range"
+              <DatePickerWithRange
+                date={dateRange}
+                setDate={setDateRange}
+                className="w-[300px]"
               />
             </div>
 
