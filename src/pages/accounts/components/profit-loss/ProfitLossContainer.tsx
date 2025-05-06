@@ -2,7 +2,7 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import CountrySelector from "./CountrySelector";
+import { CountrySelector } from "./CountrySelector";
 import FilterSection from "./FilterSection";
 import ProfitLossTabs from "./ProfitLossTabs";
 import { ProfitLossData, CountryProfitData } from "../../types/profitLossTypes";
@@ -49,6 +49,10 @@ const ProfitLossContainer: React.FC<ProfitLossContainerProps> = ({
             view={view}
             setView={setView}
             handleRefresh={handleRefresh}
+            selectedCountry={selectedCountry}
+            setSelectedCountry={setSelectedCountry}
+            profitLossData={profitLossData}
+            profitLossByCountry={profitLossByCountry}
           />
         </div>
         

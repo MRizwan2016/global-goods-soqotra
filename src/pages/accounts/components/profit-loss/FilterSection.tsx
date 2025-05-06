@@ -1,150 +1,94 @@
 
 import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DatePickerWithRange } from "@/components/ui/date-range-picker";
-import { RefreshCw, Download } from "lucide-react";
-import { CountrySelector } from "./CountrySelector";
+import { RefreshCcw, FileText, Download } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { ProfitLossData, CountryProfitData } from "../../types/profitLossTypes";
-import { 
-  exportTransactionsToCSV, 
-  exportMonthlyDataToCSV,
-  exportSummaryToCSV
-} from "../../hooks/profit-loss/exportUtils";
-import { useToast } from "@/hooks/use-toast";
-import { DateRange } from "react-day-picker";
 
-interface FilterSectionProps {
-  selectedCountry: string;
-  setSelectedCountry: (value: string) => void;
-  dateRange: DateRange | undefined; // Update this to match the DatePickerWithRange component's expected type
-  setDateRange: (value: DateRange | undefined) => void; // Update this to match the DatePickerWithRange component's expected type
-  handleRefresh: () => void;
+export interface FilterSectionProps {
+  dateRange: any;
+  setDateRange: (range: any) => void;
   view: "summary" | "detailed";
   setView: (view: "summary" | "detailed") => void;
+  handleRefresh: () => void;
+  selectedCountry: string;
+  setSelectedCountry: (country: string) => void;
   profitLossData: ProfitLossData | null;
   profitLossByCountry: Record<string, CountryProfitData>;
 }
 
 const FilterSection: React.FC<FilterSectionProps> = ({
-  selectedCountry,
-  setSelectedCountry,
   dateRange,
   setDateRange,
-  handleRefresh,
   view,
   setView,
+  handleRefresh,
+  // We won't use these props in this component, but they're required by the interface
+  selectedCountry,
+  setSelectedCountry,
   profitLossData,
   profitLossByCountry
 }) => {
-  const { toast } = useToast();
-  
-  const handleExport = () => {
-    if (!profitLossData) {
-      toast({
-        title: "No data to export",
-        description: "There is no data available to export.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      // Export all data formats
-      exportTransactionsToCSV(
-        profitLossData.transactions, 
-        `profit_loss_transactions_${selectedCountry !== 'all' ? selectedCountry : 'all'}.csv`
-      );
-      
-      exportMonthlyDataToCSV(
-        profitLossData.monthlyData,
-        `profit_loss_monthly_${selectedCountry !== 'all' ? selectedCountry : 'all'}.csv`
-      );
-      
-      exportSummaryToCSV(
-        profitLossData,
-        profitLossByCountry,
-        `profit_loss_summary_${selectedCountry !== 'all' ? selectedCountry : 'all'}.csv`
-      );
-      
-      toast({
-        title: "Export successful",
-        description: "Financial data has been exported to CSV successfully.",
-      });
-    } catch (error) {
-      console.error("Export error:", error);
-      toast({
-        title: "Export failed",
-        description: "There was an error exporting the data.",
-        variant: "destructive"
-      });
-    }
-  };
-  
   return (
-    <>
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">Profit & Loss Analysis</h1>
-          <p className="text-muted-foreground">
-            Track revenue, expenses, and profitability across all countries
-          </p>
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex flex-col space-y-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+              <DateRangePicker
+                value={dateRange}
+                onChange={setDateRange}
+                placeholder="Select date range"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">View</label>
+              <ToggleGroup 
+                type="single" 
+                value={view} 
+                onValueChange={(value) => value && setView(value as "summary" | "detailed")}
+                className="border rounded-md"
+              >
+                <ToggleGroupItem value="summary" className="text-xs px-2">Summary</ToggleGroupItem>
+                <ToggleGroupItem value="detailed" className="text-xs px-2">Detailed</ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex items-center gap-1"
+              onClick={handleRefresh}
+            >
+              <RefreshCcw className="h-4 w-4" />
+              Refresh
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex items-center gap-1"
+            >
+              <FileText className="h-4 w-4" />
+              Export PDF
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="flex items-center gap-1"
+            >
+              <Download className="h-4 w-4" />
+              Export Excel
+            </Button>
+          </div>
         </div>
-        
-        <div className="flex flex-wrap gap-2">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={handleRefresh}
-            className="flex items-center gap-1"
-          >
-            <RefreshCw size={16} />
-            Refresh
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex items-center gap-1"
-            onClick={handleExport}
-          >
-            <Download size={16} />
-            Export
-          </Button>
-        </div>
-      </div>
-      
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
-        <div className="w-full md:w-1/3">
-          <CountrySelector
-            selectedCountry={selectedCountry}
-            onChange={setSelectedCountry}
-          />
-        </div>
-        
-        <div className="w-full md:w-2/3">
-          <DatePickerWithRange 
-            date={dateRange} 
-            setDate={setDateRange} 
-          />
-        </div>
-      </div>
-      
-      <div className="flex flex-wrap justify-end gap-2 mb-4">
-        <Button 
-          variant={view === "summary" ? "default" : "outline"} 
-          size="sm"
-          onClick={() => setView("summary")}
-        >
-          Summary View
-        </Button>
-        <Button 
-          variant={view === "detailed" ? "default" : "outline"} 
-          size="sm"
-          onClick={() => setView("detailed")}
-        >
-          Detailed View
-        </Button>
-      </div>
-    </>
+      </CardContent>
+    </Card>
   );
 };
 
