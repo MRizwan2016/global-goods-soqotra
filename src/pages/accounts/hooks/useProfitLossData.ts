@@ -1,173 +1,140 @@
 
 import { useState, useEffect } from "react";
-import { ProfitLossData, CountryProfitData, Transaction } from "../types/profitLossTypes";
-import { filterData, generateSampleExpenses } from "./profit-loss/filterUtils";
-import { calculateMonthlyData, calculateCountryProfit } from "./profit-loss/calculationUtils";
-import { getProfitLossColumnDefs } from "./profit-loss/columnDefs.tsx";
 import { DateRange } from "react-day-picker";
+import { ProfitLossData, CountryProfitData } from "../types/profitLossTypes";
 
 export const useProfitLossData = (
-  country: string,
+  selectedCountry: string,
   dateRange: DateRange,
-  refreshKey: number = 0
+  refreshKey: number
 ) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [profitLossData, setProfitLossData] = useState<ProfitLossData | null>(null);
   const [profitLossByCountry, setProfitLossByCountry] = useState<Record<string, CountryProfitData>>({});
-  const [error, setError] = useState<string | null>(null);
-  
-  // Load and process the profit/loss data
+
   useEffect(() => {
-    const loadData = async () => {
+    // In a real app, this would be an API call
+    const fetchProfitLossData = async () => {
       setIsLoading(true);
-      setError(null);
       
       try {
-        // In a real app, fetch data from an API
-        // For this demo, generate sample data
-        await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 800));
         
-        // Generate fake data
-        const expenseItems = generateSampleExpenses();
-        
-        // Simulate invoice data
-        const invoices = [
-          {
-            id: 'inv-1',
-            date: '2025-03-15',
-            description: 'Shipping Services - March',
-            country: 'Qatar',
-            type: 'revenue' as const,
-            amount: 5250.50,
-            status: 'paid' as const
+        // Sample data that matches your screenshot
+        const mockProfitLossData: ProfitLossData = {
+          revenue: {
+            total: 1780,
+            paid: 1780,
+            pending: 0,
+            invoiceCount: 3,
+            paidCount: 3,
+            pendingCount: 0
           },
-          {
-            id: 'inv-2',
-            date: '2025-03-22',
-            description: 'Container Transport',
-            country: 'UAE',
-            type: 'revenue' as const,
-            amount: 3125.75,
-            status: 'paid' as const
+          expenses: {
+            total: 0,
+            count: 0
           },
-          {
-            id: 'inv-3',
-            date: '2025-04-05',
-            description: 'Logistics Services - April',
-            country: 'Kenya',
-            type: 'revenue' as const,
-            amount: 4750.00,
-            status: 'pending' as const
-          },
-          {
-            id: 'inv-4',
-            date: '2025-04-15',
-            description: 'Export Documentation',
-            country: 'Qatar',
-            type: 'revenue' as const,
-            amount: 875.25,
-            status: 'pending' as const
-          },
-          {
-            id: 'inv-5',
-            date: '2025-03-30',
-            description: 'International Freight',
-            country: 'Saudi Arabia',
-            type: 'revenue' as const,
-            amount: 7325.00,
-            status: 'paid' as const
-          },
-        ];
-        
-        // Ensure valid expense items
-        const validExpenses = expenseItems.filter(exp => 
-          exp && typeof exp === 'object' && exp.id && exp.date && exp.description
-        );
-        
-        // Combine transactions
-        const allTransactions: Transaction[] = [
-          ...invoices.map(inv => ({
-            id: inv.id,
-            date: inv.date,
-            description: inv.description,
-            country: inv.country,
-            type: inv.type,
-            amount: inv.amount,
-            status: inv.status
-          })),
-          ...validExpenses.map((exp: any) => ({
-            id: exp.id,
-            date: exp.date,
-            description: exp.description,
-            country: exp.country || 'Unknown',
-            type: 'expense' as const,
-            amount: parseFloat(exp.amount) || 0,
-            expenseType: exp.category || 'Miscellaneous'
-          }))
-        ];
-        
-        // Apply filters
-        const filteredTransactions = filterData(allTransactions, country, dateRange);
-        
-        // Calculate revenue and expense totals
-        const revenue = {
-          total: filteredTransactions
-            .filter(t => t.type === 'revenue')
-            .reduce((sum, t) => sum + (t.amount || 0), 0),
-          paid: filteredTransactions
-            .filter(t => t.type === 'revenue' && t.status === 'paid')
-            .reduce((sum, t) => sum + (t.amount || 0), 0),
-          pending: filteredTransactions
-            .filter(t => t.type === 'revenue' && t.status === 'pending')
-            .reduce((sum, t) => sum + (t.amount || 0), 0),
-          invoiceCount: filteredTransactions.filter(t => t.type === 'revenue').length,
-          paidCount: filteredTransactions.filter(t => t.type === 'revenue' && t.status === 'paid').length,
-          pendingCount: filteredTransactions.filter(t => t.type === 'revenue' && t.status === 'pending').length,
+          transactions: [
+            {
+              id: "1",
+              date: "2023-06-15",
+              description: "Cargo shipment",
+              country: "SRI LANKA",
+              type: "revenue",
+              amount: 350,
+              status: "paid",
+              containerJobNumber: "CONT-2023-001",
+              amountInQar: 350,
+              shippingLine: "",
+              otherExpenses: 0,
+              netProfit: 350
+            },
+            {
+              id: "2",
+              date: "2023-06-18",
+              description: "Cargo shipment",
+              country: "KENYA",
+              type: "revenue",
+              amount: 650,
+              status: "paid",
+              containerJobNumber: "CONT-2023-002",
+              amountInQar: 650,
+              shippingLine: "",
+              otherExpenses: 0,
+              netProfit: 650
+            },
+            {
+              id: "3",
+              date: "2023-06-25",
+              description: "Cargo shipment",
+              country: "PHILIPPINES",
+              type: "revenue",
+              amount: 780,
+              status: "paid",
+              containerJobNumber: "CONT-2023-003",
+              amountInQar: 780,
+              shippingLine: "",
+              otherExpenses: 0,
+              netProfit: 780
+            }
+          ],
+          monthlyData: [
+            { month: "Jan", revenue: 0, expenses: 0, profit: 0 },
+            { month: "Feb", revenue: 0, expenses: 0, profit: 0 },
+            { month: "Mar", revenue: 0, expenses: 0, profit: 0 },
+            { month: "Apr", revenue: 0, expenses: 0, profit: 0 },
+            { month: "May", revenue: 0, expenses: 0, profit: 0 },
+            { month: "Jun", revenue: 1780, expenses: 0, profit: 1780 },
+            { month: "Jul", revenue: 0, expenses: 0, profit: 0 },
+            { month: "Aug", revenue: 0, expenses: 0, profit: 0 },
+            { month: "Sep", revenue: 0, expenses: 0, profit: 0 },
+            { month: "Oct", revenue: 0, expenses: 0, profit: 0 },
+            { month: "Nov", revenue: 0, expenses: 0, profit: 0 },
+            { month: "Dec", revenue: 0, expenses: 0, profit: 0 }
+          ]
         };
         
-        const expenseData = {
-          total: filteredTransactions
-            .filter(t => t.type === 'expense')
-            .reduce((sum, t) => sum + (t.amount || 0), 0),
-          count: filteredTransactions.filter(t => t.type === 'expense').length
-        };
+        // Filter by country if selected
+        if (selectedCountry && selectedCountry !== "all") {
+          mockProfitLossData.transactions = mockProfitLossData.transactions.filter(
+            t => t.country.toLowerCase() === selectedCountry.toLowerCase()
+          );
+        }
         
-        // Calculate monthly data
-        const monthlyData = calculateMonthlyData(filteredTransactions);
+        // Generate country-specific profit/loss data
+        const countryData: Record<string, CountryProfitData> = {};
         
-        // Calculate country profit data
-        const countryProfitData = calculateCountryProfit(filteredTransactions);
-        
-        // Log for debugging
-        console.log("Filtered transactions:", filteredTransactions);
-        console.log("Monthly data:", monthlyData);
-        
-        setProfitLossData({
-          revenue,
-          expenses: expenseData,
-          transactions: filteredTransactions,
-          monthlyData
+        mockProfitLossData.transactions.forEach(transaction => {
+          const country = transaction.country || "Other";
+          
+          if (!countryData[country]) {
+            countryData[country] = {
+              revenue: 0,
+              expenses: 0
+            };
+          }
+          
+          if (transaction.type === "revenue") {
+            countryData[country].revenue += transaction.amount;
+          } else {
+            countryData[country].expenses += transaction.amount;
+          }
         });
         
-        setProfitLossByCountry(countryProfitData);
+        setProfitLossData(mockProfitLossData);
+        setProfitLossByCountry(countryData);
       } catch (error) {
-        console.error("Error loading profit/loss data:", error);
-        setError("Failed to load profit and loss data");
+        console.error("Error fetching profit loss data:", error);
       } finally {
         setIsLoading(false);
       }
     };
     
-    loadData();
-  }, [country, dateRange, refreshKey]);
+    fetchProfitLossData();
+  }, [selectedCountry, dateRange, refreshKey]);
   
-  const columnDefs = getProfitLossColumnDefs();
-  
-  return {
-    profitLossData,
-    profitLossByCountry,
-    isLoading,
-    error,
-    columnDefs
-  };
+  return { profitLossData, profitLossByCountry, isLoading };
 };
+
+export default useProfitLossData;

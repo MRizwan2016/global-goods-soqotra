@@ -1,17 +1,18 @@
 
 import React from "react";
-import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import CountrySelector from "./CountrySelector";
 import FilterSection from "./FilterSection";
 import ProfitLossTabs from "./ProfitLossTabs";
 import { ProfitLossData, CountryProfitData } from "../../types/profitLossTypes";
 import { Column } from "@/components/ui/data-table";
-import { DateRange } from "react-day-picker";
 
 interface ProfitLossContainerProps {
   selectedCountry: string;
-  setSelectedCountry: (value: string) => void;
-  dateRange: DateRange;
-  setDateRange: (value: DateRange) => void;
+  setSelectedCountry: (country: string) => void;
+  dateRange: any;
+  setDateRange: (range: any) => void;
   view: "summary" | "detailed";
   setView: (view: "summary" | "detailed") => void;
   handleRefresh: () => void;
@@ -35,33 +36,32 @@ const ProfitLossContainer: React.FC<ProfitLossContainerProps> = ({
   columnDefs,
 }) => {
   return (
-    <Card className="bg-white">
-      <CardHeader className="bg-gray-50 border-b pb-3">
-        <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
-          <CardTitle className="text-lg">Filters & Controls</CardTitle>
+    <Card className="bg-white p-4">
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CountrySelector
+            selectedCountry={selectedCountry}
+            setSelectedCountry={setSelectedCountry}
+          />
+          <FilterSection
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            view={view}
+            setView={setView}
+            handleRefresh={handleRefresh}
+          />
         </div>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <FilterSection
-          selectedCountry={selectedCountry}
-          setSelectedCountry={setSelectedCountry}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          view={view}
-          setView={setView}
-          handleRefresh={handleRefresh}
-          profitLossData={profitLossData}
-          profitLossByCountry={profitLossByCountry}
-        />
         
-        <ProfitLossTabs
-          profitLossData={profitLossData}
-          profitLossByCountry={profitLossByCountry}
-          isLoading={isLoading}
-          view={view}
-          columnDefs={columnDefs}
-        />
-      </CardContent>
+        <Tabs defaultValue="overview" className="w-full">
+          <ProfitLossTabs
+            profitLossData={profitLossData}
+            profitLossByCountry={profitLossByCountry}
+            isLoading={isLoading}
+            view={view}
+            columnDefs={columnDefs}
+          />
+        </Tabs>
+      </div>
     </Card>
   );
 };

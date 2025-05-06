@@ -3,103 +3,145 @@ import React from "react";
 import { Badge } from "@/components/ui/badge";
 import { Column } from "@/components/ui/data-table";
 import { Tooltip } from "@/components/ui/tooltip";
+import { ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const getProfitLossColumnDefs = (): Column[] => {
   return [
     {
-      id: "date",
-      header: "Date",
-      accessorKey: "date",
-      cell: ({ row }) => {
-        // Add null check for row.original
-        if (!row?.original) return null;
-        return <span>{row.original.date}</span>;
-      },
-    },
-    {
-      id: "description",
-      header: "Description",
-      accessorKey: "description",
-      cell: ({ row }) => {
-        // Add null check for row.original
-        if (!row?.original) return null;
+      id: "country",
+      header: ({ column }) => {
         return (
-          <Tooltip content={row.original.description || ""}>
-            <span className="block max-w-[200px] truncate">
-              {row.original.description || ""}
-            </span>
-          </Tooltip>
+          <Button
+            variant="ghost"
+            className="flex items-center gap-1 p-0 font-bold"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            COUNTRY
+            <ChevronDown className="ml-1 h-4 w-4" />
+          </Button>
         );
       },
-    },
-    {
-      id: "country",
-      header: "Country",
       accessorKey: "country",
       cell: ({ row }) => {
-        // Add null check for row.original
         if (!row?.original) return null;
-        return row.original.country || "-";
-      },
-    },
-    {
-      id: "type",
-      header: "Type",
-      accessorKey: "type",
-      cell: ({ row }) => {
-        // Add null check for row.original
-        if (!row?.original) return null;
-        const type = row.original.type || "expense";
         return (
-          <Badge className={type === "revenue" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-            {type === "revenue" ? "Revenue" : "Expense"}
-          </Badge>
+          <span className="font-medium">{row.original.country || "-"}</span>
         );
       },
     },
     {
-      id: "expenseType",
-      header: "Category",
-      accessorKey: "expenseType",
+      id: "containerJobNumber",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className="flex items-center gap-1 p-0 font-bold"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            CONTAINER JOB NUMBER
+            <ChevronDown className="ml-1 h-4 w-4" />
+          </Button>
+        );
+      },
+      accessorKey: "containerJobNumber",
       cell: ({ row }) => {
-        // Add null check for row.original
         if (!row?.original) return null;
-        return row.original.expenseType || "-";
+        return row.original.containerJobNumber || "-";
       },
     },
     {
-      id: "amount",
-      header: "Amount",
-      accessorKey: "amount",
-      cell: ({ row }) => {
-        // Add null check for row.original
-        if (!row?.original) return null;
-        const type = row.original.type || "expense";
-        const amount = row.original.amount || 0;
+      id: "amountInQar",
+      header: ({ column }) => {
         return (
-          <span className={type === "revenue" ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
-            ${parseFloat(amount).toFixed(2)}
+          <Button
+            variant="ghost"
+            className="flex items-center gap-1 p-0 font-bold"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            AMOUNT IN QAR
+            <ChevronDown className="ml-1 h-4 w-4" />
+          </Button>
+        );
+      },
+      accessorKey: "amountInQar",
+      cell: ({ row }) => {
+        if (!row?.original) return null;
+        const amount = row.original.amountInQar || 0;
+        return (
+          <span className="font-medium text-right block">
+            {parseFloat(amount).toFixed(0)}
           </span>
         );
       },
     },
     {
-      id: "status",
-      header: "Status",
-      accessorKey: "status",
+      id: "shippingLine",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className="flex items-center gap-1 p-0 font-bold"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            SHIPPING LINE
+            <ChevronDown className="ml-1 h-4 w-4" />
+          </Button>
+        );
+      },
+      accessorKey: "shippingLine",
       cell: ({ row }) => {
-        // Add null check for row.original
         if (!row?.original) return null;
-        
-        // If expense type, return dash
-        if (row.original.type === "expense") return "-";
-        
-        // Add null check for status
-        const status = row.original.status || "pending";
-        return status === "paid" ? (
-          <Badge className="bg-green-100 text-green-800">Paid</Badge>
-        ) : (
-          <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
+        return row.original.shippingLine || "-";
+      },
+    },
+    {
+      id: "otherExpenses",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className="flex items-center gap-1 p-0 font-bold"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            OTHER EXPENSES
+            <ChevronDown className="ml-1 h-4 w-4" />
+          </Button>
+        );
+      },
+      accessorKey: "otherExpenses",
+      cell: ({ row }) => {
+        if (!row?.original) return null;
+        const expenses = row.original.otherExpenses || 0;
+        return (
+          <span className="text-right block">
+            {parseFloat(expenses).toFixed(0)}
+          </span>
+        );
+      },
+    },
+    {
+      id: "netProfit",
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            className="flex items-center gap-1 p-0 font-bold"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            NET PROFIT
+            <ChevronDown className="ml-1 h-4 w-4" />
+          </Button>
+        );
+      },
+      accessorKey: "netProfit",
+      cell: ({ row }) => {
+        if (!row?.original) return null;
+        const profit = row.original.netProfit || 0;
+        return (
+          <span className="font-medium text-right block text-green-600">
+            {parseFloat(profit).toFixed(0)}
+          </span>
         );
       },
     },

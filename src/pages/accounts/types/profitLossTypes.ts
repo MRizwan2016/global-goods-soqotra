@@ -22,6 +22,11 @@ export interface Transaction {
   amount: number;
   status?: 'paid' | 'pending';
   expenseType?: string;
+  containerJobNumber?: string;
+  amountInQar?: number;
+  shippingLine?: string;
+  otherExpenses?: number;
+  netProfit?: number;
 }
 
 export interface MonthlyData {

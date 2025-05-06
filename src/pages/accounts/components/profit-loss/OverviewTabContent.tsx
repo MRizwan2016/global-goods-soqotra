@@ -22,6 +22,39 @@ const OverviewTabContent: React.FC<OverviewTabContentProps> = ({
   view,
   columnDefs,
 }) => {
+  // Sample data matching your screenshot for demonstration
+  const sampleProfitLossData = [
+    {
+      id: "1",
+      country: "SRI LANKA",
+      containerJobNumber: "CONT-2023-001",
+      amountInQar: 350,
+      shippingLine: "",
+      otherExpenses: 0,
+      netProfit: 350
+    },
+    {
+      id: "2",
+      country: "KENYA",
+      containerJobNumber: "CONT-2023-002",
+      amountInQar: 650,
+      shippingLine: "",
+      otherExpenses: 0,
+      netProfit: 650
+    },
+    {
+      id: "3",
+      country: "PHILIPPINES",
+      containerJobNumber: "CONT-2023-003",
+      amountInQar: 780,
+      shippingLine: "",
+      otherExpenses: 0,
+      netProfit: 780
+    }
+  ];
+  
+  const tableData = profitLossData?.transactions || sampleProfitLossData;
+  
   return (
     <div className="space-y-4">
       <ProfitLossSummary 
@@ -29,6 +62,21 @@ const OverviewTabContent: React.FC<OverviewTabContentProps> = ({
         byCountry={profitLossByCountry} 
         isLoading={isLoading} 
       />
+      
+      <Card className="bg-white">
+        <CardHeader className="pb-2">
+          <CardTitle className="text-lg">Profit and Loss Statement</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <DataTable 
+            columns={columnDefs}
+            data={tableData}
+            isLoading={isLoading}
+            defaultSortField="country"
+            defaultSortDirection="asc"
+          />
+        </CardContent>
+      </Card>
       
       <Card className="bg-white">
         <CardHeader className="pb-2">
@@ -40,21 +88,6 @@ const OverviewTabContent: React.FC<OverviewTabContentProps> = ({
           </div>
         </CardContent>
       </Card>
-      
-      {view === "detailed" && (
-        <Card className="bg-white">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">Transaction Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DataTable 
-              columns={columnDefs}
-              data={profitLossData?.transactions || []}
-              isLoading={isLoading}
-            />
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
