@@ -47,21 +47,27 @@ export class JobStorageService {
         throw new Error('No job data provided');
       }
 
+      console.log("Starting to save job with data:", jobData);
+      
       const jobs = this.getAllJobs();
       
       // Generate job number if not provided
       if (!jobData.jobNumber) {
         const nextJobNumber = JobNumberService.generateJobNumber(jobData.country);
         jobData.jobNumber = nextJobNumber;
+        console.log("Generated job number:", nextJobNumber);
       }
       
       // Add an ID if it doesn't exist
       if (!jobData.id) {
         jobData.id = uuidv4();
+        console.log("Generated new job ID:", jobData.id);
       }
       
-      // Add timestamp
-      jobData.timestamp = new Date().toISOString();
+      // Add timestamp if missing
+      if (!jobData.timestamp) {
+        jobData.timestamp = new Date().toISOString();
+      }
       
       // Make a copy of the job data before modifying
       const jobToSave = { ...jobData };
@@ -70,14 +76,19 @@ export class JobStorageService {
       if (Array.isArray(jobToSave.items)) {
         jobToSave.items = jobToSave.items.map((item: any) => ({
           ...item,
+          id: item.id || uuidv4(),
           jobId: jobToSave.id
         }));
+      } else {
+        jobToSave.items = [];
       }
 
+      console.log("Checking if job exists with ID:", jobToSave.id);
       // Check if a job with this ID already exists
       const existingJobIndex = jobs.findIndex((job: any) => job.id === jobToSave.id);
       
       if (existingJobIndex >= 0) {
+        console.log("Updating existing job at index:", existingJobIndex);
         // Update existing job
         jobs[existingJobIndex] = {
           ...jobs[existingJobIndex],
@@ -85,10 +96,12 @@ export class JobStorageService {
           lastUpdated: new Date().toISOString()
         };
       } else {
+        console.log("Adding new job to jobs array");
         // Add new job
         jobs.push(jobToSave);
       }
       
+      console.log("Saving jobs to localStorage, count:", jobs.length);
       // Save to localStorage
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(jobs));
       

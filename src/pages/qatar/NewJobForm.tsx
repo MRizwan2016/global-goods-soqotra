@@ -31,6 +31,13 @@ const NewJobForm = () => {
         return;
       }
       
+      // Ensure we have an ID
+      if (!jobData.id) {
+        toast.error("Job ID is missing");
+        setIsSaving(false);
+        return;
+      }
+      
       // Add location-based vehicle assignment
       if (jobData.city && !jobData.vehicle) {
         try {
@@ -43,6 +50,7 @@ const NewJobForm = () => {
       
       // Save the job using our storage service
       try {
+        console.log("About to save job with data:", jobData);
         const savedJob = JobStorageService.saveJob(jobData);
         console.log("Job saved successfully:", savedJob);
 

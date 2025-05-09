@@ -5,6 +5,7 @@ import { Save, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useJobForm } from "./context/JobFormContext";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from 'uuid';
 
 interface JobFormActionsProps {
   isNewJob: boolean;
@@ -47,20 +48,22 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
       return;
     }
     
-    // Prepare the job data with all items included
-    const completeJobData = {
+    // Ensure job has an ID
+    const jobDataWithId = {
       ...jobData,
+      id: jobData.id || uuidv4(),  // Use existing ID or generate a new one
       items: jobItems,
       // Convert advance amount to number for storage
       advanceAmount: parseFloat(String(jobData.advanceAmount)) || 0,
       // Set default status if not already set
-      status: jobData.status || 'PENDING'
+      status: jobData.status || 'PENDING',
+      timestamp: new Date().toISOString()
     };
     
     // Submit the form with complete data
-    console.log("Submitting job form data:", completeJobData);
+    console.log("Submitting job form data:", jobDataWithId);
     try {
-      onSubmit(completeJobData);
+      onSubmit(jobDataWithId);
     } catch (error) {
       console.error("Error submitting job:", error);
       toast.error(`Error submitting job: ${error instanceof Error ? error.message : "Unknown error"}`);
