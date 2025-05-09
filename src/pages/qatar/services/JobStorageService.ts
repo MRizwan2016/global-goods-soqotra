@@ -1,9 +1,9 @@
-
 /**
  * Service to handle job storage operations
  */
 import { JobNumberService } from '@/services/JobNumberService';
 import { format } from 'date-fns';
+import { v4 as uuidv4 } from 'uuid';
 
 export class JobStorageService {
   private static STORAGE_KEY = 'jobs';
@@ -43,6 +43,10 @@ export class JobStorageService {
    */
   static saveJob(jobData: any) {
     try {
+      if (!jobData) {
+        throw new Error('No job data provided');
+      }
+
       const jobs = this.getAllJobs();
       
       // Generate job number if not provided
@@ -53,24 +57,50 @@ export class JobStorageService {
       
       // Add an ID if it doesn't exist
       if (!jobData.id) {
-        jobData.id = `job-${Date.now()}`;
+        jobData.id = uuidv4();
       }
       
       // Add timestamp
       jobData.timestamp = new Date().toISOString();
       
-      jobs.push(jobData);
+      // Make a copy of the job data before modifying
+      const jobToSave = { ...jobData };
+      
+      // Ensure items are properly structured
+      if (Array.isArray(jobToSave.items)) {
+        jobToSave.items = jobToSave.items.map((item: any) => ({
+          ...item,
+          jobId: jobToSave.id
+        }));
+      }
+
+      // Check if a job with this ID already exists
+      const existingJobIndex = jobs.findIndex((job: any) => job.id === jobToSave.id);
+      
+      if (existingJobIndex >= 0) {
+        // Update existing job
+        jobs[existingJobIndex] = {
+          ...jobs[existingJobIndex],
+          ...jobToSave,
+          lastUpdated: new Date().toISOString()
+        };
+      } else {
+        // Add new job
+        jobs.push(jobToSave);
+      }
+      
+      // Save to localStorage
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(jobs));
       
       // Update invoices with the job number if there's an invoice number
-      if (jobData.invoiceNumber) {
-        this.updateInvoiceWithJobNumber(jobData.invoiceNumber, jobData.jobNumber);
+      if (jobToSave.invoiceNumber) {
+        this.updateInvoiceWithJobNumber(jobToSave.invoiceNumber, jobToSave.jobNumber);
       }
       
-      return jobData;
+      return jobToSave;
     } catch (error) {
       console.error('Error saving job:', error);
-      throw new Error('Failed to save job');
+      throw new Error(`Failed to save job: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
   }
 

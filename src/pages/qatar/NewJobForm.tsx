@@ -13,7 +13,7 @@ const NewJobForm = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   
-  const handleCreateJob = (jobData: any) => {
+  const handleCreateJob = async (jobData: any) => {
     try {
       setIsSaving(true);
       console.log("Creating new job:", jobData);
@@ -33,38 +33,48 @@ const NewJobForm = () => {
       
       // Add location-based vehicle assignment
       if (jobData.city && !jobData.vehicle) {
-        const cityMapping = require('./data/cityVehicleMapping').cityVehicleMapping;
-        jobData.vehicle = cityMapping[jobData.city]?.[0] || "";
-      }
-      
-      // Save the job using our storage service
-      const savedJob = JobStorageService.saveJob(jobData);
-      console.log("Job saved successfully:", savedJob);
-
-      // If there's an invoice number, update the invoice to include the job number
-      if (savedJob.invoiceNumber) {
         try {
-          const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-          const matchingInvoice = invoices.find((inv: any) => inv.invoiceNumber === savedJob.invoiceNumber);
-          if (matchingInvoice) {
-            matchingInvoice.jobNumber = savedJob.jobNumber;
-            localStorage.setItem('invoices', JSON.stringify(invoices));
-          }
-          
-          // Also link via the JobNumberService
-          JobNumberService.linkJobToInvoice(savedJob.jobNumber, savedJob.invoiceNumber);
+          const cityMapping = require('./data/cityVehicleMapping').cityVehicleMapping;
+          jobData.vehicle = cityMapping[jobData.city]?.[0] || "";
         } catch (error) {
-          console.error('Error linking job number with invoice:', error);
+          console.error("Error loading city vehicle mapping:", error);
         }
       }
       
-      setTimeout(() => {
-        toast.success("Job created successfully!");
+      // Save the job using our storage service
+      try {
+        const savedJob = JobStorageService.saveJob(jobData);
+        console.log("Job saved successfully:", savedJob);
+
+        // If there's an invoice number, update the invoice to include the job number
+        if (savedJob.invoiceNumber) {
+          try {
+            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+            const matchingInvoice = invoices.find((inv: any) => inv.invoiceNumber === savedJob.invoiceNumber);
+            if (matchingInvoice) {
+              matchingInvoice.jobNumber = savedJob.jobNumber;
+              localStorage.setItem('invoices', JSON.stringify(invoices));
+            }
+            
+            // Also link via the JobNumberService
+            JobNumberService.linkJobToInvoice(savedJob.jobNumber, savedJob.invoiceNumber);
+          } catch (error) {
+            console.error('Error linking job number with invoice:', error);
+          }
+        }
+        
+        setTimeout(() => {
+          toast.success("Job created successfully!");
+          setIsSaving(false);
+          navigate("/qatar");
+        }, 800);
+      } catch (error) {
+        console.error("Error in JobStorageService.saveJob:", error);
+        toast.error(`Failed to save job: ${error instanceof Error ? error.message : "Unknown error"}`);
         setIsSaving(false);
-        navigate("/qatar");
-      }, 800);
+      }
     } catch (error) {
-      console.error("Error saving job:", error);
+      console.error("Error in overall job creation process:", error);
       toast.error(`Failed to save job: ${error instanceof Error ? error.message : "Unknown error"}`);
       setIsSaving(false);
     }

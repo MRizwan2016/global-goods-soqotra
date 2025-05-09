@@ -47,16 +47,24 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
       return;
     }
     
-    // Proceed with submission
-    console.log("Submitting job form data:", jobData);
-    onSubmit({
+    // Prepare the job data with all items included
+    const completeJobData = {
       ...jobData,
       items: jobItems,
       // Convert advance amount to number for storage
       advanceAmount: parseFloat(String(jobData.advanceAmount)) || 0,
       // Set default status if not already set
       status: jobData.status || 'PENDING'
-    });
+    };
+    
+    // Submit the form with complete data
+    console.log("Submitting job form data:", completeJobData);
+    try {
+      onSubmit(completeJobData);
+    } catch (error) {
+      console.error("Error submitting job:", error);
+      toast.error(`Error submitting job: ${error instanceof Error ? error.message : "Unknown error"}`);
+    }
   };
 
   const handleCancel = () => {
