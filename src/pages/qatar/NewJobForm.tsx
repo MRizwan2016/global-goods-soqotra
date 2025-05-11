@@ -33,9 +33,8 @@ const NewJobForm = () => {
       
       // Ensure we have an ID
       if (!jobData.id) {
-        toast.error("Job ID is missing");
-        setIsSaving(false);
-        return;
+        jobData.id = crypto.randomUUID();
+        console.log("Generated new job ID:", jobData.id);
       }
       
       // Add location-based vehicle assignment
@@ -74,7 +73,7 @@ const NewJobForm = () => {
         setTimeout(() => {
           toast.success("Job created successfully!");
           setIsSaving(false);
-          navigate("/qatar");
+          navigate("/qatar/jobs");  // Navigate to jobs page after successful creation
         }, 800);
       } catch (error) {
         console.error("Error in JobStorageService.saveJob:", error);

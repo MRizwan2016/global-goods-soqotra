@@ -1,3 +1,4 @@
+
 /**
  * Service to handle job storage operations
  */
@@ -81,6 +82,15 @@ export class JobStorageService {
         }));
       } else {
         jobToSave.items = [];
+      }
+
+      // Ensure required fields are set
+      if (!jobToSave.status) {
+        jobToSave.status = 'PENDING';
+      }
+      
+      if (!jobToSave.jobType) {
+        jobToSave.jobType = jobToSave.jobType || 'COLLECTION';
       }
 
       console.log("Checking if job exists with ID:", jobToSave.id);

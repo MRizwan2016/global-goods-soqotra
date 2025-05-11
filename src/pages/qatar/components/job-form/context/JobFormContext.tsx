@@ -84,7 +84,10 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
     remarks: ''
   };
 
-  const [jobData, setJobData] = useState<JobData>(initialJobData);
+  const [jobData, setJobData] = useState<JobData>({
+    ...initialJobData,
+    id: isNewJob ? uuidv4() : undefined  // Assign ID immediately for new jobs
+  });
   const [jobItems, setJobItems] = useState<any[]>([]);
   const [isJobNumberGenerated, setIsJobNumberGenerated] = useState(false);
 
@@ -99,8 +102,11 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
         toast.error("Job not found!");
       }
     } else {
-      // Reset form for new job
-      setJobData(initialJobData);
+      // Reset form for new job but ensure we have an ID
+      setJobData({
+        ...initialJobData,
+        id: uuidv4()  // Always ensure a new job has an ID
+      });
       setJobItems([]);
       setIsJobNumberGenerated(false);
     }
@@ -114,7 +120,6 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
     }));
   }, []);
 
-  // Add the missing handleSelectChange function
   const handleSelectChange = useCallback((field: string, value: string) => {
     setJobData(prevData => ({
       ...prevData,
@@ -122,7 +127,6 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
     }));
   }, []);
 
-  // Add the missing handleGenerateJobNumber function
   const handleGenerateJobNumber = useCallback(() => {
     // Generate a new job number
     const prefix = "QJB";
@@ -133,14 +137,13 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
     setJobData(prevData => ({
       ...prevData,
       jobNumber: newJobNumber,
-      id: uuidv4()
+      id: prevData.id || uuidv4()  // Ensure we have an ID
     }));
     
     setIsJobNumberGenerated(true);
     toast.success("Job Number Generated: " + newJobNumber);
   }, []);
 
-  // Add the missing handleAddItem function
   const handleAddItem = useCallback((action: any) => {
     setJobItems(prevItems => {
       switch (action.type) {
@@ -166,7 +169,7 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
           const boxNumber = action.boxNumber || String(prevItems.length + 1);
           
           return [...prevItems, { 
-            id: action.id,
+            id: action.id || uuidv4(),
             name,
             itemName,
             jobId: action.jobId || jobData.id || 'temp',
