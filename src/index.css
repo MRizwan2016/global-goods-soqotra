@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -281,3 +282,4 @@
 .card-hover:hover {
   transform: translateY(-2px);
 }
+
