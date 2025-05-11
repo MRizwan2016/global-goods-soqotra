@@ -7,7 +7,7 @@ interface DashboardCardProps {
 
 const DashboardCard = ({ children }: DashboardCardProps) => {
   return (
-    <div className="glass p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <div className="glass bg-white/60 backdrop-blur-sm border border-white/20 rounded-xl shadow-md p-6 mb-6 transition-all hover:shadow-lg animate-fade-in">
       {children}
     </div>
   );
