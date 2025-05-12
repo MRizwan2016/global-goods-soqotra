@@ -11,13 +11,15 @@ interface InvoiceTableRowProps {
   index: number;
   indexOffset: number;
   onPrint: (id: string) => void;
+  onView: (id: string) => void; // Added this prop
 }
 
 const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
   item,
   index,
   indexOffset,
-  onPrint
+  onPrint,
+  onView // Added this prop in the destructuring
 }) => {
   const navigate = useNavigate();
   
@@ -55,11 +57,10 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
   // Ensure NIC number is displayed
   const nicNumber = item.nic || (item.id === "inv-13136051" ? "QAT987654" : "");
   
-  // Handle view invoice - navigate to invoice details view
+  // Handle view invoice - now uses the onView prop
   const handleViewInvoice = () => {
     console.log("View invoice clicked:", item.id);
-    navigate(`/reports/cargo/invoice/${item.id}`);
-    toast.success("Opening invoice details");
+    onView(item.id);
   };
   
   // Handle delete - placeholder for delete functionality

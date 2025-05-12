@@ -14,12 +14,14 @@ interface InvoiceTableProps {
   currentEntries: any[];
   indexOfFirstEntry: number;
   handlePrintInvoice: (id: string) => void;
+  handleViewInvoice: (id: string) => void; // Added the handleViewInvoice prop
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({
   currentEntries,
   indexOfFirstEntry,
-  handlePrintInvoice
+  handlePrintInvoice,
+  handleViewInvoice // Added this prop in the destructuring
 }) => {
   return (
     <div className="overflow-x-auto border border-gray-200">
@@ -49,6 +51,7 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
             <InvoiceTableHead className="w-16">Delete</InvoiceTableHead>
             <InvoiceTableHead className="w-16">View</InvoiceTableHead>
             <InvoiceTableHead className="w-16">Print</InvoiceTableHead>
+            <InvoiceTableHead className="w-16">BL</InvoiceTableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -60,11 +63,12 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
                 index={index} 
                 indexOffset={indexOfFirstEntry}
                 onPrint={handlePrintInvoice}
+                onView={handleViewInvoice} // Pass the handleViewInvoice to the row component
               />
             ))
           ) : (
             <TableRow>
-              <InvoiceTableCell colSpan={23} className="text-center py-4">
+              <InvoiceTableCell colSpan={24} className="text-center py-4">
                 No data available in table
               </InvoiceTableCell>
             </TableRow>
