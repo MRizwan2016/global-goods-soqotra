@@ -47,30 +47,51 @@ const InvoiceBookForm = () => {
       return;
     }
     
-    // Create the new book object
-    const newBook = {
-      id: Date.now().toString(),
-      bookNumber: formData.bookNumber,
-      startPage: formData.startPage,
-      endPage: formData.endPage,
-      isIssued: false,
-      isActivated: false,
-      pagesUsed: 0,
-      availablePages: Array.from(
-        { length: 50 }, 
-        (_, i) => (parseInt(formData.startPage) + i).toString()
-      )
-    };
-    
-    // Get existing books from localStorage
-    const existingBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
-    
-    // Add the new book and save back to localStorage
-    const updatedBooks = [...existingBooks, newBook];
-    localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
-    
-    toast.success("Invoice book added successfully");
-    navigate("/master/book/stock");
+    try {
+      // Create the new book object
+      const newBook = {
+        id: Date.now().toString(),
+        bookNumber: formData.bookNumber,
+        startPage: formData.startPage,
+        endPage: formData.endPage,
+        isIssued: false,
+        isActivated: false,
+        bookType: formData.bookType,
+        pagesUsed: 0,
+        availablePages: Array.from(
+          { length: 50 }, 
+          (_, i) => (parseInt(formData.startPage) + i).toString()
+        )
+      };
+      
+      console.log("Creating new book:", newBook);
+      
+      // Get existing books from localStorage
+      const existingBooksJson = localStorage.getItem('invoiceBooks');
+      const existingBooks = existingBooksJson ? JSON.parse(existingBooksJson) : [];
+      
+      // Check if a book with the same number already exists
+      const bookExists = existingBooks.some((book: any) => book.bookNumber === formData.bookNumber);
+      if (bookExists) {
+        toast.error(`Book #${formData.bookNumber} already exists`);
+        return;
+      }
+      
+      // Add the new book and save back to localStorage
+      const updatedBooks = [...existingBooks, newBook];
+      localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+      
+      toast.success("Invoice book added successfully");
+      console.log("Updated books in localStorage:", updatedBooks);
+      
+      // Trigger storage event so other components know to refresh
+      window.dispatchEvent(new Event('storage'));
+      
+      navigate("/master/book/stock");
+    } catch (error) {
+      console.error("Error saving book:", error);
+      toast.error("Failed to save book. Please try again.");
+    }
   };
   
   return (

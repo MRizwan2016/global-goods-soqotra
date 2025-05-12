@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -24,8 +24,20 @@ const BookingFormStock = () => {
     handleAssignUser,
     handleViewDetails,
     confirmAssignment,
-    mockUsers
+    mockUsers,
+    loadBooks
   } = useBookStock();
+
+  // Listen for storage events to reload books when changes happen
+  useEffect(() => {
+    const handleStorageChange = () => {
+      console.log("Storage change detected, refreshing books...");
+      loadBooks();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [loadBooks]);
 
   const handleAddNewBook = () => {
     navigate("/master/book/new");

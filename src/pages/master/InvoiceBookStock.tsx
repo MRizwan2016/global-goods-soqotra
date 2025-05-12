@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -61,20 +60,39 @@ const InvoiceBookStock = () => {
   const [selectedBook, setSelectedBook] = useState<InvoiceBook | null>(null);
   const [selectedUserId, setSelectedUserId] = useState("");
   
-  // Load book data on component mount
-  useEffect(() => {
+  // Function to load book data
+  const loadBookData = () => {
+    console.log("Loading book data from localStorage");
     const savedBooks = localStorage.getItem('invoiceBooks');
     if (savedBooks) {
       try {
         const parsedBooks = JSON.parse(savedBooks);
         setBookData(parsedBooks);
+        console.log("Loaded books:", parsedBooks);
       } catch (error) {
         console.error("Error parsing stored books:", error);
         setBookData([]);
       }
     } else {
+      console.log("No books found in localStorage");
       setBookData([]);
     }
+  };
+  
+  // Load book data on component mount and focus
+  useEffect(() => {
+    loadBookData();
+    
+    // Also reload when component gets focus (user navigates back)
+    window.addEventListener('focus', loadBookData);
+    
+    // Listen for storage events to reload when changes happen elsewhere
+    window.addEventListener('storage', loadBookData);
+    
+    return () => {
+      window.removeEventListener('focus', loadBookData);
+      window.removeEventListener('storage', loadBookData);
+    };
   }, []);
 
   // Save book data to localStorage when it changes
@@ -149,6 +167,9 @@ const InvoiceBookStock = () => {
     
     setIsActivateDialogOpen(false);
     toast.success(`Book #${selectedBook.bookNumber} has been successfully activated for ${selectedUser.name}`);
+    
+    // Dispatch storage event to notify other components
+    window.dispatchEvent(new Event('storage'));
   };
   
   return (

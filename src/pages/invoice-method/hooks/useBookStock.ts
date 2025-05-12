@@ -29,6 +29,10 @@ export function useBookStock() {
 
   // Load books from localStorage on component mount
   useEffect(() => {
+    loadBooks();
+  }, []);
+  
+  const loadBooks = () => {
     const savedBooks = localStorage.getItem('invoiceBooks');
     if (savedBooks) {
       try {
@@ -47,7 +51,7 @@ export function useBookStock() {
     } else {
       setBooks([]);
     }
-  }, []);
+  };
 
   const handleAssignUser = (book: Book) => {
     setSelectedBook(book);
@@ -72,22 +76,54 @@ export function useBookStock() {
       return;
     }
 
-    const updatedBooks = books.map(book => 
-      book.bookNumber === selectedBook.bookNumber 
-        ? { ...book, assignedTo: selectedUser.name }
-        : book
-    );
-    
-    setBooks(updatedBooks);
-    
-    try {
-      localStorage.setItem('bookingFormBooks', JSON.stringify(updatedBooks));
-    } catch (error) {
-      console.error("Error saving books to localStorage:", error);
+    // Get the original books from localStorage to update
+    const storedBooks = localStorage.getItem('invoiceBooks');
+    if (!storedBooks) {
+      toast.error("Could not find book data");
+      return;
     }
 
-    setIsAssignDialogOpen(false);
-    toast.success(`Book #${selectedBook.bookNumber} has been assigned to ${selectedUser.name}`);
+    try {
+      const originalBooks = JSON.parse(storedBooks);
+      
+      // Update the specific book with the assigned user
+      const updatedOriginalBooks = originalBooks.map((book: any) => 
+        book.bookNumber === selectedBook.bookNumber 
+          ? { ...book, assignedTo: selectedUser.name }
+          : book
+      );
+      
+      // Save back to localStorage
+      localStorage.setItem('invoiceBooks', JSON.stringify(updatedOriginalBooks));
+
+      // Also update active invoice books if needed
+      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+      const updatedActiveBooks = activeBooks.map((book: any) => 
+        book.bookNumber === selectedBook.bookNumber 
+          ? { ...book, assignedTo: selectedUser.name }
+          : book
+      );
+      localStorage.setItem('activeInvoiceBooks', JSON.stringify(updatedActiveBooks));
+
+      // Update the state
+      const updatedBooks = books.map(book => 
+        book.bookNumber === selectedBook.bookNumber 
+          ? { ...book, assignedTo: selectedUser.name }
+          : book
+      );
+      
+      setBooks(updatedBooks);
+      
+      setIsAssignDialogOpen(false);
+      toast.success(`Book #${selectedBook.bookNumber} has been assigned to ${selectedUser.name}`);
+      
+      // Reload books to ensure we have the latest data
+      loadBooks();
+      
+    } catch (error) {
+      console.error("Error saving book assignment:", error);
+      toast.error("Failed to assign user to book");
+    }
   };
 
   return {
@@ -104,6 +140,7 @@ export function useBookStock() {
     handleAssignUser,
     handleViewDetails,
     confirmAssignment,
-    mockUsers
+    mockUsers,
+    loadBooks
   };
 }
