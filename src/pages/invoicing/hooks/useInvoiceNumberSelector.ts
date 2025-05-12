@@ -46,18 +46,20 @@ export const useInvoiceNumberSelector = ({
     
     let invoiceList: any[] = [];
     
-    // Get invoices from active books
+    // Get invoices from active books that are NOT assigned to anyone
     if (activeBooks.length > 0) {
       activeBooks.forEach((book: any) => {
         if (book.availablePages) {
-          // Filter out already used invoice numbers
+          // Filter out already used invoice numbers AND assigned numbers
           const availableFromBook = book.availablePages
             .filter((invoiceNo: string) => !allUsedNumbers.includes(invoiceNo))
             .map((invoiceNo: string) => ({
               invoiceNumber: invoiceNo,
               bookNumber: book.bookNumber,
-              assignedTo: book.assignedTo || 'Unassigned'
-            }));
+              assignedTo: book.assignedTo || undefined
+            }))
+            // Filter out already assigned invoices (only show unassigned)
+            .filter((item: any) => !item.assignedTo);
             
           invoiceList = [...invoiceList, ...availableFromBook];
         }
@@ -66,14 +68,16 @@ export const useInvoiceNumberSelector = ({
       // If no active books, try stored books
       storedBooks.forEach((book: any) => {
         if (book.isActivated && book.availablePages) {
-          // Filter out already used invoice numbers
+          // Filter out already used invoice numbers AND assigned numbers
           const availableFromBook = book.availablePages
             .filter((invoiceNo: string) => !allUsedNumbers.includes(invoiceNo))
             .map((invoiceNo: string) => ({
               invoiceNumber: invoiceNo,
               bookNumber: book.bookNumber,
-              assignedTo: book.assignedTo || 'System User'
-            }));
+              assignedTo: book.assignedTo || undefined
+            }))
+            // Filter out already assigned invoices (only show unassigned)
+            .filter((item: any) => !item.assignedTo);
             
           invoiceList = [...invoiceList, ...availableFromBook];
         }

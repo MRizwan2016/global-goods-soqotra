@@ -25,6 +25,7 @@ interface InvoiceBook {
   isActivated: boolean;
   country: string;
   branch?: string;
+  assignedTo?: string;
 }
 
 const JobDetailsSection = () => {
@@ -38,16 +39,47 @@ const JobDetailsSection = () => {
       const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
       setAllInvoices(invoices);
       
-      // Extract invoice numbers that don't already have job numbers
-      const availableNumbers = invoices
-        .filter((inv: any) => !inv.jobNumber || inv.jobNumber === "")
-        .map((inv: any) => inv.invoiceNumber);
-      
-      setAvailableInvoices(availableNumbers);
+      // Load available invoices that don't have job numbers and aren't assigned
+      loadAvailableInvoices();
     };
 
     loadAllInvoices();
   }, []);
+  
+  const loadAvailableInvoices = () => {
+    // Get existing invoices that don't have job numbers
+    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const invoicesWithoutJobNumbers = existingInvoices
+      .filter((inv: any) => !inv.jobNumber || inv.jobNumber === "");
+    
+    // Get unassigned invoice numbers from books
+    const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+    const unassignedBooks = activeBooks.filter((book: any) => !book.assignedTo);
+    
+    let availableNumbers: string[] = [];
+    
+    // Add invoice numbers from existing invoices without job numbers
+    invoicesWithoutJobNumbers.forEach((inv: any) => {
+      availableNumbers.push(inv.invoiceNumber);
+    });
+    
+    // Add invoice numbers from unassigned books that aren't used yet
+    const usedNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
+    
+    unassignedBooks.forEach((book: any) => {
+      if (book.availablePages) {
+        const unusedPages = book.availablePages.filter(
+          (page: string) => !usedNumbers.includes(page)
+        );
+        availableNumbers = [...availableNumbers, ...unusedPages];
+      }
+    });
+    
+    // Filter out duplicates
+    availableNumbers = [...new Set(availableNumbers)];
+    
+    setAvailableInvoices(availableNumbers);
+  };
 
   // Handle invoice selection to load associated data
   const handleInvoiceChange = (value: string) => {

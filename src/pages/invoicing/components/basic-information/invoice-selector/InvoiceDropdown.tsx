@@ -28,6 +28,9 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
   isDuplicate = false,
   availableInvoices
 }) => {
+  // Filter out any invoices that have an assignedTo value
+  const unassignedInvoices = availableInvoices.filter(invoice => !invoice.assignedTo);
+  
   return (
     <div className="w-full relative">
       <Select
@@ -39,7 +42,7 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
           <SelectValue placeholder="Select invoice number" />
         </SelectTrigger>
         <SelectContent className="max-h-60">
-          {availableInvoices.map((invoice) => (
+          {unassignedInvoices.map((invoice) => (
             <SelectItem 
               key={invoice.invoiceNumber} 
               value={invoice.invoiceNumber}
@@ -49,11 +52,6 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
                 <span>{invoice.invoiceNumber}</span>
                 <span className="text-xs text-gray-500">Book {invoice.bookNumber}</span>
               </div>
-              {invoice.assignedTo && (
-                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
-                  {invoice.assignedTo}
-                </span>
-              )}
             </SelectItem>
           ))}
         </SelectContent>

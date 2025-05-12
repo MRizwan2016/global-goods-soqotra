@@ -45,14 +45,17 @@ export const useInvoiceSelection = (
             (page: string) => !allUsedNumbers.includes(page)
           );
           
-          invoiceList = [
-            ...invoiceList,
-            ...availablePages.map((pageNumber: string) => ({
-              bookNumber: book.bookNumber,
-              invoiceNumber: pageNumber,
-              assignedTo: book.assignedTo || 'Unassigned'
-            }))
-          ];
+          // Only include unassigned invoices
+          if (!book.assignedTo) {
+            invoiceList = [
+              ...invoiceList,
+              ...availablePages.map((pageNumber: string) => ({
+                bookNumber: book.bookNumber,
+                invoiceNumber: pageNumber,
+                assignedTo: undefined
+              }))
+            ];
+          }
         }
       });
     } 
@@ -60,7 +63,7 @@ export const useInvoiceSelection = (
     if (invoiceList.length === 0 && allStoredBooks.length > 0) {
       // If no active books but we have stored books
       allStoredBooks
-        .filter((book: any) => book.isActivated)
+        .filter((book: any) => book.isActivated && !book.assignedTo)
         .forEach((book: any) => {
           if (book.availablePages) {
             // Filter out already used invoice numbers
@@ -73,7 +76,7 @@ export const useInvoiceSelection = (
               ...availablePages.map((pageNumber: string) => ({
                 bookNumber: book.bookNumber,
                 invoiceNumber: pageNumber,
-                assignedTo: book.assignedTo || 'System User'
+                assignedTo: undefined
               }))
             ];
           }
@@ -83,29 +86,31 @@ export const useInvoiceSelection = (
     // We no longer add mock invoices - let's create real GY invoices if needed
     if (invoiceList.length === 0) {
       // We'll use the utility function to ensure invoice availability
-      const { ensureInvoiceAvailability } = require("../../utils/invoiceNumberGenerator");
+      const { ensureInvoiceAvailability } = require("../utils/invoiceNumberGenerator");
       ensureInvoiceAvailability();
       
       // After ensuring availability, try loading again
       const refreshedActiveBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
       
-      refreshedActiveBooks.forEach((book: any) => {
-        if (book.availablePages) {
-          // Filter out already used invoice numbers
-          const availablePages = book.availablePages.filter(
-            (page: string) => !allUsedNumbers.includes(page)
-          );
-          
-          invoiceList = [
-            ...invoiceList,
-            ...availablePages.map((pageNumber: string) => ({
-              invoiceNumber: pageNumber,
-              bookNumber: book.bookNumber,
-              assignedTo: book.assignedTo || 'System User'
-            }))
-          ];
-        }
-      });
+      refreshedActiveBooks
+        .filter((book: any) => !book.assignedTo)
+        .forEach((book: any) => {
+          if (book.availablePages) {
+            // Filter out already used invoice numbers
+            const availablePages = book.availablePages.filter(
+              (page: string) => !allUsedNumbers.includes(page)
+            );
+            
+            invoiceList = [
+              ...invoiceList,
+              ...availablePages.map((pageNumber: string) => ({
+                invoiceNumber: pageNumber,
+                bookNumber: book.bookNumber,
+                assignedTo: undefined
+              }))
+            ];
+          }
+        });
     }
     
     console.log("Available invoices:", invoiceList);
@@ -114,11 +119,6 @@ export const useInvoiceSelection = (
   
   const handleSelectInvoice = (invoiceNumber: string) => {
     console.log(`Selecting invoice number: ${invoiceNumber}`);
-    
-    // Find the selected invoice in our available invoices
-    const selectedInvoice = availableInvoices.find(
-      invoice => invoice.invoiceNumber === invoiceNumber
-    );
     
     // Get any linked job number
     const jobNumber = JobStorageService.getJobNumberByInvoiceNumber(invoiceNumber) || "";
@@ -130,11 +130,8 @@ export const useInvoiceSelection = (
       jobNumber
     }));
     
-    // Show toast with user assignment and job number if available
+    // Show toast with job number if available
     let toastMessage = `Invoice number ${invoiceNumber} selected`;
-    if (selectedInvoice && selectedInvoice.assignedTo) {
-      toastMessage += ` (assigned to ${selectedInvoice.assignedTo})`;
-    }
     if (jobNumber) {
       toastMessage += ` - Job #${jobNumber}`;
     }

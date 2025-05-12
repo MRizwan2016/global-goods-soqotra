@@ -41,23 +41,27 @@ const DeliveryInvoiceSelector: React.FC<DeliveryInvoiceSelectorProps> = ({
     let invoiceList: string[] = [];
     
     if (activeBooks.length > 0) {
-      activeBooks.forEach((book: any) => {
-        if (book.availablePages) {
-          const availableFromBook = book.availablePages.filter(
-            (invoiceNo: string) => !usedInvoiceNumbers.includes(invoiceNo)
-          );
-          invoiceList = [...invoiceList, ...availableFromBook];
-        }
-      });
+      activeBooks
+        .filter((book: any) => !book.assignedTo) // Only include unassigned books
+        .forEach((book: any) => {
+          if (book.availablePages) {
+            const availableFromBook = book.availablePages.filter(
+              (invoiceNo: string) => !usedInvoiceNumbers.includes(invoiceNo)
+            );
+            invoiceList = [...invoiceList, ...availableFromBook];
+          }
+        });
     } else if (storedBooks.length > 0) {
-      storedBooks.forEach((book: any) => {
-        if (book.isActivated && book.availablePages) {
-          const availableFromBook = book.availablePages.filter(
-            (invoiceNo: string) => !usedInvoiceNumbers.includes(invoiceNo)
-          );
-          invoiceList = [...invoiceList, ...availableFromBook];
-        }
-      });
+      storedBooks
+        .filter((book: any) => book.isActivated && !book.assignedTo) // Only include unassigned books
+        .forEach((book: any) => {
+          if (book.availablePages) {
+            const availableFromBook = book.availablePages.filter(
+              (invoiceNo: string) => !usedInvoiceNumbers.includes(invoiceNo)
+            );
+            invoiceList = [...invoiceList, ...availableFromBook];
+          }
+        });
     }
 
     setAvailableInvoices(invoiceList);
