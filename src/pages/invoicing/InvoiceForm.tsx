@@ -38,6 +38,13 @@ const InvoiceForm = () => {
     updatePackagePricing,
   } = useInvoiceForm(id);
 
+  // Ensure invoice numbers are available when page loads
+  useEffect(() => {
+    if (!isEditing) {
+      ensureInvoiceAvailability();
+    }
+  }, [isEditing]);
+
   // Check if the invoice has a job number but it's not in formState
   useEffect(() => {
     if (formState.invoiceNumber && !formState.jobNumber) {

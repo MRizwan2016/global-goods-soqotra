@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { ensureInvoiceAvailability } from "../utils/invoiceNumberGenerator";
 
 interface UseInvoiceNumberSelectorProps {
   formState: any;
@@ -25,6 +26,9 @@ export const useInvoiceNumberSelector = ({
   }, []);
   
   const loadAvailableInvoices = () => {
+    // First, make sure we have invoice numbers available
+    ensureInvoiceAvailability();
+    
     // Get active invoice books from localStorage
     const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
     const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
@@ -45,14 +49,14 @@ export const useInvoiceNumberSelector = ({
     // Get invoices from active books
     if (activeBooks.length > 0) {
       activeBooks.forEach((book: any) => {
-        if (book.availablePages && book.assignedTo) {
+        if (book.availablePages) {
           // Filter out already used invoice numbers
           const availableFromBook = book.availablePages
             .filter((invoiceNo: string) => !allUsedNumbers.includes(invoiceNo))
             .map((invoiceNo: string) => ({
               invoiceNumber: invoiceNo,
               bookNumber: book.bookNumber,
-              assignedTo: book.assignedTo
+              assignedTo: book.assignedTo || 'Unassigned'
             }));
             
           invoiceList = [...invoiceList, ...availableFromBook];
@@ -74,27 +78,6 @@ export const useInvoiceNumberSelector = ({
           invoiceList = [...invoiceList, ...availableFromBook];
         }
       });
-    } 
-    
-    // If no active books or stored books, use mock data as fallback
-    if (invoiceList.length === 0) {
-      // Create mock data with GY prefix
-      const mockInvoices = [];
-      for (let i = 1; i <= 100; i++) {
-        const num = i.toString().padStart(6, '0');
-        mockInvoices.push(`GY${num}`);
-      }
-      
-      // Filter out used invoice numbers
-      const availableMockInvoices = mockInvoices
-        .filter(invoiceNo => !allUsedNumbers.includes(invoiceNo))
-        .map(invoiceNo => ({
-          invoiceNumber: invoiceNo,
-          bookNumber: "Default",
-          assignedTo: 'System User'
-        }));
-      
-      invoiceList = [...invoiceList, ...availableMockInvoices];
     }
     
     console.log("Available invoice list:", invoiceList);

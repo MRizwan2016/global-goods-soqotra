@@ -1,13 +1,11 @@
 
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { mockInvoiceBooks } from "../constants/mockInvoiceBooks";
-import { FormState } from "../types/invoiceForm";
 import { JobStorageService } from "@/pages/qatar/services/JobStorageService";
 
 export const useInvoiceSelection = (
   isEditing: boolean,
-  setFormState: React.Dispatch<React.SetStateAction<FormState>>
+  setFormState: React.Dispatch<React.SetStateAction<any>>
 ) => {
   const [showInvoiceSelector, setShowInvoiceSelector] = useState(false);
   const [availableInvoices, setAvailableInvoices] = useState<any[]>([]);
@@ -82,25 +80,32 @@ export const useInvoiceSelection = (
         });
     }
     
+    // We no longer add mock invoices - let's create real GY invoices if needed
     if (invoiceList.length === 0) {
-      // Create mock invoice books if none found
-      // Generate GY-prefixed invoice numbers
-      const mockInvoices = [];
-      for (let i = 1; i <= 100; i++) {
-        const num = i.toString().padStart(6, '0');
-        mockInvoices.push(`GY${num}`);
-      }
+      // We'll use the utility function to ensure invoice availability
+      const { ensureInvoiceAvailability } = require("../../utils/invoiceNumberGenerator");
+      ensureInvoiceAvailability();
       
-      // Filter out used invoice numbers
-      const availableMockInvoices = mockInvoices
-        .filter(invoiceNo => !allUsedNumbers.includes(invoiceNo))
-        .map(invoiceNo => ({
-          invoiceNumber: invoiceNo,
-          bookNumber: "Default",
-          assignedTo: 'System User'
-        }));
+      // After ensuring availability, try loading again
+      const refreshedActiveBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
       
-      invoiceList = availableMockInvoices;
+      refreshedActiveBooks.forEach((book: any) => {
+        if (book.availablePages) {
+          // Filter out already used invoice numbers
+          const availablePages = book.availablePages.filter(
+            (page: string) => !allUsedNumbers.includes(page)
+          );
+          
+          invoiceList = [
+            ...invoiceList,
+            ...availablePages.map((pageNumber: string) => ({
+              invoiceNumber: pageNumber,
+              bookNumber: book.bookNumber,
+              assignedTo: book.assignedTo || 'System User'
+            }))
+          ];
+        }
+      });
     }
     
     console.log("Available invoices:", invoiceList);
