@@ -44,6 +44,9 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
     handleSelectInvoice
   });
 
+  // Log available invoices for debugging
+  console.log("InvoiceNumberSelector availableInvoiceList:", availableInvoiceList);
+
   return (
     <div className="space-y-2">
       <Label>Invoice Number</Label>

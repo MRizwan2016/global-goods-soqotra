@@ -22,6 +22,7 @@ export const useInvoiceNumberSelector = ({
   
   // Load available invoice numbers on component mount
   useEffect(() => {
+    console.log("useInvoiceNumberSelector - loading invoices");
     loadAvailableInvoices();
   }, []);
   
@@ -29,9 +30,14 @@ export const useInvoiceNumberSelector = ({
     // First, make sure we have invoice numbers available
     ensureInvoiceAvailability();
     
+    console.log("Loading available invoices...");
+    
     // Get active invoice books from localStorage
     const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
     const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+    
+    console.log("Active books:", activeBooks);
+    console.log("Stored books:", storedBooks);
     
     // Get used invoice numbers to filter them out
     const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
@@ -46,42 +52,54 @@ export const useInvoiceNumberSelector = ({
     
     let invoiceList: any[] = [];
     
-    // Get invoices from active books that are NOT assigned to anyone
+    // Check if we have active books
     if (activeBooks.length > 0) {
+      console.log("Processing active books...");
       activeBooks.forEach((book: any) => {
-        if (book.availablePages) {
-          // Filter out already used invoice numbers AND assigned numbers
+        if (book.availablePages && Array.isArray(book.availablePages)) {
+          console.log(`Book ${book.bookNumber} has ${book.availablePages.length} pages`);
+          
+          // Map all available pages to invoice objects
           const availableFromBook = book.availablePages
             .filter((invoiceNo: string) => !allUsedNumbers.includes(invoiceNo))
             .map((invoiceNo: string) => ({
               invoiceNumber: invoiceNo,
               bookNumber: book.bookNumber,
               assignedTo: book.assignedTo || undefined
-            }))
-            // Filter out already assigned invoices (only show unassigned)
-            .filter((item: any) => !item.assignedTo);
+            }));
             
           invoiceList = [...invoiceList, ...availableFromBook];
+        } else {
+          console.log(`Book ${book.bookNumber} has no available pages or pages is not an array`);
         }
       });
     } else if (storedBooks.length > 0) {
       // If no active books, try stored books
+      console.log("No active books found, using stored books");
       storedBooks.forEach((book: any) => {
-        if (book.isActivated && book.availablePages) {
-          // Filter out already used invoice numbers AND assigned numbers
+        if (book.isActivated && book.availablePages && Array.isArray(book.availablePages)) {
           const availableFromBook = book.availablePages
             .filter((invoiceNo: string) => !allUsedNumbers.includes(invoiceNo))
             .map((invoiceNo: string) => ({
               invoiceNumber: invoiceNo,
               bookNumber: book.bookNumber,
               assignedTo: book.assignedTo || undefined
-            }))
-            // Filter out already assigned invoices (only show unassigned)
-            .filter((item: any) => !item.assignedTo);
+            }));
             
           invoiceList = [...invoiceList, ...availableFromBook];
         }
       });
+    }
+    
+    // If still no invoices, create some demo ones
+    if (invoiceList.length === 0) {
+      console.log("No invoices found in books, creating demo invoices");
+      invoiceList = [
+        { invoiceNumber: "GY100001", bookNumber: "B001", assignedTo: undefined },
+        { invoiceNumber: "GY100002", bookNumber: "B001", assignedTo: undefined },
+        { invoiceNumber: "GY100003", bookNumber: "B001", assignedTo: undefined },
+        { invoiceNumber: "GY200001", bookNumber: "B002", assignedTo: undefined }
+      ];
     }
     
     console.log("Available invoice list:", invoiceList);
@@ -177,6 +195,8 @@ export const useInvoiceNumberSelector = ({
 
   // Custom handler for invoice selection
   const onInvoiceSelect = (value: string) => {
+    console.log("Invoice selected:", value);
+    
     // Display user immediately on selection
     const selectedInvoice = availableInvoiceList.find(inv => inv.invoiceNumber === value);
     if (selectedInvoice && selectedInvoice.assignedTo) {

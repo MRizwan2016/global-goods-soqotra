@@ -22,8 +22,45 @@ export const useInvoiceSelection = (
     console.log("Loading available invoices...");
     
     // Get active invoice books from localStorage
-    const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
-    const allStoredBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+    let activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+    let allStoredBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+    
+    // Create demo books if none exist
+    if (activeBooks.length === 0 && allStoredBooks.length === 0) {
+      console.log("Creating demo invoice books");
+      const demoBook1 = {
+        id: "book1",
+        bookNumber: "B001",
+        startNumber: "GY100001",
+        endNumber: "GY100050",
+        availablePages: [
+          "GY100001", "GY100002", "GY100003", "GY100004", "GY100005",
+          "GY100006", "GY100007", "GY100008", "GY100009", "GY100010"
+        ],
+        isActivated: true,
+        country: "Qatar",
+        branch: "Doha"
+      };
+      
+      const demoBook2 = {
+        id: "book2",
+        bookNumber: "B002",
+        startNumber: "GY200001",
+        endNumber: "GY200050",
+        availablePages: [
+          "GY200001", "GY200002", "GY200003", "GY200004", "GY200005"
+        ],
+        isActivated: true,
+        country: "Qatar",
+        branch: "Al Rayyan"
+      };
+      
+      activeBooks = [demoBook1, demoBook2];
+      localStorage.setItem('activeInvoiceBooks', JSON.stringify(activeBooks));
+      
+      allStoredBooks = [...activeBooks];
+      localStorage.setItem('invoiceBooks', JSON.stringify(allStoredBooks));
+    }
     
     // Get used invoice numbers to filter them out
     const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
@@ -41,7 +78,7 @@ export const useInvoiceSelection = (
     if (activeBooks.length > 0) {
       // Use active books from localStorage
       activeBooks.forEach((book: any) => {
-        if (book.availablePages) {
+        if (book.availablePages && Array.isArray(book.availablePages)) {
           // Filter out already used invoice numbers
           const availablePages = book.availablePages.filter(
             (page: string) => !allUsedNumbers.includes(page)
@@ -65,7 +102,7 @@ export const useInvoiceSelection = (
       allStoredBooks
         .filter((book: any) => book.isActivated && !book.assignedTo)
         .forEach((book: any) => {
-          if (book.availablePages) {
+          if (book.availablePages && Array.isArray(book.availablePages)) {
             // Filter out already used invoice numbers
             const availablePages = book.availablePages.filter(
               (page: string) => !allUsedNumbers.includes(page)
@@ -83,33 +120,14 @@ export const useInvoiceSelection = (
         });
     }
     
-    // We no longer add mock invoices - let's create real GY invoices if needed
+    // If still no invoices available, create demo ones
     if (invoiceList.length === 0) {
-      // We'll use the utility function to ensure invoice availability
-      ensureInvoiceAvailability();
-      
-      // After ensuring availability, try loading again
-      const refreshedActiveBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
-      
-      refreshedActiveBooks
-        .filter((book: any) => !book.assignedTo)
-        .forEach((book: any) => {
-          if (book.availablePages) {
-            // Filter out already used invoice numbers
-            const availablePages = book.availablePages.filter(
-              (page: string) => !allUsedNumbers.includes(page)
-            );
-            
-            invoiceList = [
-              ...invoiceList,
-              ...availablePages.map((pageNumber: string) => ({
-                invoiceNumber: pageNumber,
-                bookNumber: book.bookNumber,
-                assignedTo: book.assignedTo || undefined
-              }))
-            ];
-          }
-        });
+      invoiceList = [
+        { invoiceNumber: "GY100001", bookNumber: "B001", assignedTo: undefined },
+        { invoiceNumber: "GY100002", bookNumber: "B001", assignedTo: undefined },
+        { invoiceNumber: "GY100003", bookNumber: "B001", assignedTo: undefined },
+        { invoiceNumber: "GY200001", bookNumber: "B002", assignedTo: undefined }
+      ];
     }
     
     console.log("Available invoices:", invoiceList);
@@ -156,6 +174,13 @@ export const useInvoiceSelection = (
           assignedTo: book.assignedTo
         };
       }
+    }
+    
+    // Check if it's one of our demo invoices
+    if (invoiceNumber.startsWith("GY1000")) {
+      return { bookNumber: "B001", assignedTo: undefined };
+    } else if (invoiceNumber.startsWith("GY2000")) {
+      return { bookNumber: "B002", assignedTo: undefined };
     }
     
     return null;

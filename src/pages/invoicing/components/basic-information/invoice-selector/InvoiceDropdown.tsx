@@ -35,6 +35,14 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
   const selectedInvoice = availableInvoices.find(invoice => invoice.invoiceNumber === value);
   const selectedBookInfo = selectedInvoice ? `Book: ${selectedInvoice.bookNumber}` : "";
   
+  console.log("InvoiceDropdown values:", {
+    value,
+    availableInvoices,
+    unassignedInvoices,
+    selectedInvoice,
+    selectedBookInfo
+  });
+
   return (
     <div className="w-full relative">
       <Select
