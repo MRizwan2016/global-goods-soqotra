@@ -1,11 +1,12 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { useInvoiceList } from "./hooks/useInvoiceList";
 import InvoiceFilters from "./components/InvoiceFilters";
 import InvoiceListControls from "./components/InvoiceListControls";
 import InvoiceTable from "./components/InvoiceTable";
 import InvoicePagination from "./components/InvoicePagination";
+import { toast } from "sonner";
 
 const InvoiceList = () => {
   const {
@@ -31,6 +32,17 @@ const InvoiceList = () => {
     indexOfFirstEntry,
     currentEntries,
   } = useInvoiceList();
+
+  useEffect(() => {
+    console.log("Invoice list component mounted");
+    // Check if there are any invoices in localStorage
+    const storedInvoices = localStorage.getItem('invoices');
+    if (!storedInvoices || JSON.parse(storedInvoices).length === 0) {
+      console.log("No invoices found in localStorage");
+    } else {
+      console.log(`Found ${JSON.parse(storedInvoices).length} invoices in localStorage`);
+    }
+  }, []);
 
   return (
     <Layout title="Invoice Management">
@@ -62,6 +74,7 @@ const InvoiceList = () => {
             currentEntries={currentEntries}
             indexOfFirstEntry={indexOfFirstEntry}
             handlePrintInvoice={handlePrintInvoice}
+            handleViewInvoice={handleViewInvoice}
           />
           
           <InvoicePagination 

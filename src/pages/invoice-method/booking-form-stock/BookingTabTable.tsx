@@ -22,7 +22,7 @@ const BookingTabTable: React.FC<BookingTabTableProps> = ({ books, tab, onAssignU
   // Filter books based on tab type
   const filteredBooks = tab === "active"
     ? books.filter(book => book.status === "ACTIVE" && !book.assignedTo)
-    : books.filter(book => book.assignedTo);
+    : books.filter(book => book.status === "ACTIVE" && !!book.assignedTo);
   
   console.log(`BookingTabTable - ${tab} tab:`, { 
     allBooks: books,

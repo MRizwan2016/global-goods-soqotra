@@ -11,6 +11,7 @@ import { paymentReceivableRoutes } from "./paymentReceivableRoutes";
 import { authRoutes } from "./authRoutes";
 import { masterRoutes } from "./masterRoutes";
 import { sellingRatesRoutes } from "./sellingRatesRoutes";
+import { invoiceRoutes } from "./invoiceRoutes";
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
@@ -59,5 +60,6 @@ export const routes: RouteConfig[] = [
   ...printDocumentsRoutes,
   ...paymentReceivableRoutes,
   ...masterRoutes,
-  ...sellingRatesRoutes
+  ...sellingRatesRoutes,
+  ...invoiceRoutes // Ensure invoiceRoutes is included here
 ];
