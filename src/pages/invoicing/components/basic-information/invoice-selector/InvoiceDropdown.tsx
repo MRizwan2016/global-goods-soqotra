@@ -1,6 +1,6 @@
 
 import React from "react";
-import { AlertCircle, FileText } from "lucide-react";
+import { AlertCircle, FileText, BookOpen } from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -31,6 +31,10 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
   // Filter out any invoices that have an assignedTo value
   const unassignedInvoices = availableInvoices.filter(invoice => !invoice.assignedTo);
   
+  // Get book info for selected invoice
+  const selectedInvoice = availableInvoices.find(invoice => invoice.invoiceNumber === value);
+  const selectedBookInfo = selectedInvoice ? `Book: ${selectedInvoice.bookNumber}` : "";
+  
   return (
     <div className="w-full relative">
       <Select
@@ -39,26 +43,36 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
         disabled={disabled}
       >
         <SelectTrigger className={`w-full ${isDuplicate ? 'border-red-500 bg-red-50' : ''}`}>
-          <SelectValue placeholder="Select invoice number" />
+          <div className="flex flex-col items-start text-left">
+            <SelectValue placeholder="Select invoice number" />
+            {value && selectedBookInfo && (
+              <span className="text-xs text-gray-500 mt-1">{selectedBookInfo}</span>
+            )}
+          </div>
         </SelectTrigger>
         <SelectContent className="max-h-60 overflow-y-auto bg-white">
-          {unassignedInvoices.map((invoice) => (
-            <SelectItem 
-              key={invoice.invoiceNumber} 
-              value={invoice.invoiceNumber}
-              className="py-2 px-2 hover:bg-gray-100"
-            >
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <FileText className="h-4 w-4 text-blue-500" />
-                  <span className="font-medium">{invoice.invoiceNumber}</span>
+          {unassignedInvoices.length > 0 ? (
+            unassignedInvoices.map((invoice) => (
+              <SelectItem 
+                key={invoice.invoiceNumber} 
+                value={invoice.invoiceNumber}
+                className="py-2 px-2 hover:bg-gray-100"
+              >
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4 text-blue-500" />
+                    <span className="font-medium">{invoice.invoiceNumber}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-gray-500 mt-1 pl-6">
+                    <BookOpen className="h-3 w-3" />
+                    <span>Book: <span className="font-medium">{invoice.bookNumber}</span></span>
+                  </div>
                 </div>
-                <div className="text-xs text-gray-500 mt-1 pl-6">
-                  Book: <span className="font-medium">{invoice.bookNumber}</span>
-                </div>
-              </div>
-            </SelectItem>
-          ))}
+              </SelectItem>
+            ))
+          ) : (
+            <div className="p-2 text-center text-gray-500">No invoices available</div>
+          )}
         </SelectContent>
       </Select>
       
