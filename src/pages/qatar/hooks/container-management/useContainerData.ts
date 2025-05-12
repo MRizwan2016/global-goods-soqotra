@@ -47,6 +47,18 @@ export const useContainerData = () => {
     }
   };
 
+  // Generate a running number based on container details
+  const generateRunningNumber = (container: QatarContainer) => {
+    const date = new Date();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear().toString().slice(-2);
+    const random = Math.floor(1000 + Math.random() * 9000);
+    const prefix = (container.shippingLine?.substring(0, 2) || "XX") + 
+                  (container.containerType?.substring(0, 2) || "XX");
+    
+    return `${prefix}-${year}${month}-${random}`;
+  };
+
   const handleAddContainer = (newContainer: QatarContainer) => {
     console.log("Adding container:", newContainer);
     
@@ -58,6 +70,11 @@ export const useContainerData = () => {
     // Set status to "Available" if not specified
     if (!newContainer.status) {
       newContainer.status = "Available";
+    }
+    
+    // Generate a running number if not provided
+    if (!newContainer.runningNumber) {
+      newContainer.runningNumber = generateRunningNumber(newContainer);
     }
     
     // Ensure container has appropriate defaults
@@ -86,6 +103,11 @@ export const useContainerData = () => {
 
   const handleUpdateContainer = (updatedContainer: QatarContainer) => {
     console.log("Updating container:", updatedContainer);
+    
+    // Ensure running number exists
+    if (!updatedContainer.runningNumber) {
+      updatedContainer.runningNumber = generateRunningNumber(updatedContainer);
+    }
     
     const updatedContainers = containers.map(container => 
       container.id === updatedContainer.id ? updatedContainer : container
@@ -118,6 +140,7 @@ export const useContainerData = () => {
     handleEditContainer,
     handleUpdateContainer,
     getCurrentContainer,
-    saveContainersToLocalStorage
+    saveContainersToLocalStorage,
+    generateRunningNumber
   };
 };

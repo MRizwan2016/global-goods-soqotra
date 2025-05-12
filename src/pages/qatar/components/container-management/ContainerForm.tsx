@@ -28,6 +28,28 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
   const [shippingLine, setShippingLine] = useState("MAERSK");
   const [direction, setDirection] = useState("EXPORT");
   const [sector, setSector] = useState("QAT-SL");
+  const [generatedRunningNumbers, setGeneratedRunningNumbers] = useState<string[]>([]);
+  
+  // Generate running numbers
+  useEffect(() => {
+    // Generate 5 running numbers based on container type and shipping line
+    const numbers = Array(5).fill(0).map((_, i) => {
+      const date = new Date();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear().toString().slice(-2);
+      const random = Math.floor(1000 + Math.random() * 9000);
+      const prefix = shippingLine.substring(0, 2) + containerType.substring(0, 2);
+      
+      return `${prefix}-${year}${month}-${random + i}`;
+    });
+    
+    setGeneratedRunningNumbers(numbers);
+    
+    // Set the first generated number as default if no running number is selected yet
+    if (!runningNumber && !existingContainer?.runningNumber) {
+      setRunningNumber(numbers[0]);
+    }
+  }, [containerType, shippingLine]);
   
   // Load existing container data if provided
   useEffect(() => {
@@ -145,12 +167,28 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
 
               <div>
                 <Label htmlFor="runningNumber">RUNNING NUMBER</Label>
-                <Input
-                  id="runningNumber"
-                  placeholder="ENTER RUNNING NUMBER"
-                  value={runningNumber}
-                  onChange={(e) => setRunningNumber(e.target.value)}
-                />
+                <Select 
+                  value={runningNumber} 
+                  onValueChange={setRunningNumber}
+                >
+                  <SelectTrigger id="runningNumber" className="bg-blue-50 border-blue-200">
+                    <SelectValue placeholder="Auto-generated if left empty" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {generatedRunningNumbers.map((num, index) => (
+                      <SelectItem key={index} value={num}>{num}</SelectItem>
+                    ))}
+                    {existingContainer?.runningNumber && 
+                      !generatedRunningNumbers.includes(existingContainer.runningNumber) && (
+                      <SelectItem value={existingContainer.runningNumber}>
+                        {existingContainer.runningNumber} (Current)
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Auto-generated based on shipping line and container type
+                </p>
               </div>
               
               <div>

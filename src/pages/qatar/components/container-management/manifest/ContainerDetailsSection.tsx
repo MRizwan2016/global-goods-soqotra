@@ -44,8 +44,8 @@ const ContainerDetailsSection: React.FC<ContainerDetailsSectionProps> = ({
             
             <div>
               <Label className="font-bold text-gray-700 mb-1 block">RUNNING NUMBER:</Label>
-              <div className="bg-gray-100 border border-gray-300 p-2 rounded">
-                {container.runningNumber}
+              <div className="bg-blue-50 border border-blue-200 p-2 rounded text-blue-800 font-medium">
+                {container.runningNumber || "Not assigned"}
               </div>
             </div>
           </div>
