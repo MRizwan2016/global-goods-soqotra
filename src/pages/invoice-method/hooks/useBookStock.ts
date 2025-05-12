@@ -30,9 +30,28 @@ export function useBookStock() {
   // Load books from localStorage on component mount
   useEffect(() => {
     loadBooks();
+    
+    // Add event listener for storage changes
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Reload when window gets focus
+    window.addEventListener('focus', loadBooks);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('focus', loadBooks);
+    };
   }, []);
   
+  const handleStorageChange = (event: StorageEvent) => {
+    if (event.key === 'invoiceBooks' || event.key === null) {
+      console.log("Storage change detected for invoiceBooks, reloading books...");
+      loadBooks();
+    }
+  };
+  
   const loadBooks = () => {
+    console.log("Loading books from localStorage...");
     const savedBooks = localStorage.getItem('invoiceBooks');
     if (savedBooks) {
       try {
@@ -40,15 +59,21 @@ export function useBookStock() {
         // Transform the format if needed
         const transformedBooks = parsedBooks.map((book: any) => ({
           ...book,
+          id: book.id || String(Date.now() + Math.floor(Math.random() * 1000)),
+          bookNumber: book.bookNumber,
+          startPage: book.startPage || book.startNumber,
+          endPage: book.endPage || book.endNumber,
           status: book.isActivated ? "ACTIVE" : "INACTIVE",
           available: book.availablePages || []
         }));
+        console.log("Loaded books:", transformedBooks);
         setBooks(transformedBooks);
       } catch (error) {
         console.error("Error loading books from localStorage:", error);
         setBooks([]);
       }
     } else {
+      console.log("No books found in localStorage");
       setBooks([]);
     }
   };
@@ -119,6 +144,9 @@ export function useBookStock() {
       
       // Reload books to ensure we have the latest data
       loadBooks();
+      
+      // Notify other components about the change
+      window.dispatchEvent(new Event('storage'));
       
     } catch (error) {
       console.error("Error saving book assignment:", error);

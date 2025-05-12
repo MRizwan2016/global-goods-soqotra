@@ -13,6 +13,9 @@ interface ActiveBooksTableProps {
 }
 
 const ActiveBooksTable: React.FC<ActiveBooksTableProps> = ({ books, onAssignUser, onViewDetails }) => {
+  // Debug logging
+  console.log("ActiveBooksTable rendered with books:", books);
+  
   return (
     <Card className="p-6">
       <div className="overflow-x-auto">
@@ -29,23 +32,31 @@ const ActiveBooksTable: React.FC<ActiveBooksTableProps> = ({ books, onAssignUser
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {books.map((book, index) => (
-              <tr key={index}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{book.bookNumber}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.startPage}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.endPage}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.available.length} pages</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <AssignUserButton book={book} onAssignUser={onAssignUser} />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <StatusBadge />
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <ActionButtons book={book} onViewDetails={onViewDetails} onAssignUser={onAssignUser} />
+            {books.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
+                  No active books found. Please add a new book or activate existing ones.
                 </td>
               </tr>
-            ))}
+            ) : (
+              books.map((book, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{book.bookNumber}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.startPage}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.endPage}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{book.available.length} pages</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <AssignUserButton book={book} onAssignUser={onAssignUser} />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <StatusBadge />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <ActionButtons book={book} onViewDetails={onViewDetails} onAssignUser={onAssignUser} />
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

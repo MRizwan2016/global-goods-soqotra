@@ -28,15 +28,33 @@ const BookingFormStock = () => {
     loadBooks
   } = useBookStock();
 
-  // Listen for storage events to reload books when changes happen
+  // Force refresh books when component mounts
   useEffect(() => {
-    const handleStorageChange = () => {
-      console.log("Storage change detected, refreshing books...");
+    console.log("BookingFormStock component mounted, loading books...");
+    loadBooks();
+    
+    // Manually trigger a refresh when this component is focused
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log("Page visibility changed to visible, refreshing books...");
+        loadBooks();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    // Create a custom internal event listener for book updates
+    const handleBookUpdate = () => {
+      console.log("Book update event detected, refreshing books...");
       loadBooks();
     };
     
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('book-update', handleBookUpdate);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('book-update', handleBookUpdate);
+    };
   }, [loadBooks]);
 
   const handleAddNewBook = () => {

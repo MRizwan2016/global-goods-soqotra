@@ -55,7 +55,7 @@ const InvoiceBookForm = () => {
         startPage: formData.startPage,
         endPage: formData.endPage,
         isIssued: false,
-        isActivated: false,
+        isActivated: true, // Set to active by default so it shows in the active tab
         bookType: formData.bookType,
         pagesUsed: 0,
         availablePages: Array.from(
@@ -81,11 +81,28 @@ const InvoiceBookForm = () => {
       const updatedBooks = [...existingBooks, newBook];
       localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
       
+      // Also update activeInvoiceBooks
+      const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+      const updatedActiveBooks = [
+        ...activeBooks, 
+        {
+          bookNumber: newBook.bookNumber,
+          availablePages: newBook.availablePages,
+          pagesUsed: 0,
+          isActivated: true
+        }
+      ];
+      localStorage.setItem('activeInvoiceBooks', JSON.stringify(updatedActiveBooks));
+      
       toast.success("Invoice book added successfully");
       console.log("Updated books in localStorage:", updatedBooks);
       
       // Trigger storage event so other components know to refresh
       window.dispatchEvent(new Event('storage'));
+      
+      // Also dispatch a custom event specific for book updates
+      const bookUpdateEvent = new Event('book-update');
+      window.dispatchEvent(bookUpdateEvent);
       
       navigate("/master/book/stock");
     } catch (error) {
