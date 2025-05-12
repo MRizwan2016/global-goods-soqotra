@@ -47,8 +47,29 @@ const InvoiceBookForm = () => {
       return;
     }
     
+    // Create the new book object
+    const newBook = {
+      id: Date.now().toString(),
+      bookNumber: formData.bookNumber,
+      startPage: formData.startPage,
+      endPage: formData.endPage,
+      isIssued: false,
+      isActivated: false,
+      pagesUsed: 0,
+      availablePages: Array.from(
+        { length: 50 }, 
+        (_, i) => (parseInt(formData.startPage) + i).toString()
+      )
+    };
+    
+    // Get existing books from localStorage
+    const existingBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+    
+    // Add the new book and save back to localStorage
+    const updatedBooks = [...existingBooks, newBook];
+    localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+    
     toast.success("Invoice book added successfully");
-    // Fix the navigation route to match an existing route in routes/masterRoutes.ts
     navigate("/master/book/stock");
   };
   

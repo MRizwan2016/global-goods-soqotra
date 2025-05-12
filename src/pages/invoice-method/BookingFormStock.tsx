@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -29,16 +29,35 @@ const mockUsers: User[] = [
 
 const BookingFormStock = () => {
   const navigate = useNavigate();
-  const [books, setBooks] = useState<Book[]>(mockInvoiceBooks.map(book => ({
-    ...book,
-    status: "ACTIVE"
-  })));
+  const [books, setBooks] = useState<Book[]>([]);
   
   const [selectedTab, setSelectedTab] = useState("active");
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+
+  // Load books from localStorage on component mount
+  useEffect(() => {
+    const savedBooks = localStorage.getItem('invoiceBooks');
+    if (savedBooks) {
+      try {
+        const parsedBooks = JSON.parse(savedBooks);
+        // Transform the format if needed
+        const transformedBooks = parsedBooks.map((book: any) => ({
+          ...book,
+          status: book.isActivated ? "ACTIVE" : "INACTIVE",
+          available: book.availablePages || []
+        }));
+        setBooks(transformedBooks);
+      } catch (error) {
+        console.error("Error loading books from localStorage:", error);
+        setBooks([]);
+      }
+    } else {
+      setBooks([]);
+    }
+  }, []);
 
   const handleAssignUser = (book: Book) => {
     setSelectedBook(book);
@@ -125,21 +144,39 @@ const BookingFormStock = () => {
           </TabsList>
           
           <TabsContent value="active" className="space-y-4 mt-4">
-            <BookingTabTable
-              books={books}
-              tab="active"
-              onAssignUser={handleAssignUser}
-              onViewDetails={handleViewDetails}
-            />
+            {books.length > 0 ? (
+              <BookingTabTable
+                books={books}
+                tab="active"
+                onAssignUser={handleAssignUser}
+                onViewDetails={handleViewDetails}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 bg-gray-50 border border-gray-200 rounded-lg">
+                <p className="text-gray-500 mb-4">No active books found.</p>
+                <Button 
+                  onClick={handleAddNewBook}
+                  className="bg-blue-500 hover:bg-blue-600"
+                >
+                  Add New Book
+                </Button>
+              </div>
+            )}
           </TabsContent>
           
           <TabsContent value="assigned" className="space-y-4 mt-4">
-            <BookingTabTable
-              books={books}
-              tab="assigned"
-              onAssignUser={handleAssignUser}
-              onViewDetails={handleViewDetails}
-            />
+            {books.filter(book => book.assignedTo).length > 0 ? (
+              <BookingTabTable
+                books={books}
+                tab="assigned"
+                onAssignUser={handleAssignUser}
+                onViewDetails={handleViewDetails}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 bg-gray-50 border border-gray-200 rounded-lg">
+                <p className="text-gray-500">No assigned books found.</p>
+              </div>
+            )}
           </TabsContent>
           
           <TabsContent value="completed" className="space-y-4 mt-4">

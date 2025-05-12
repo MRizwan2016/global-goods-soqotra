@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -52,28 +53,6 @@ const mockUsers: User[] = [
   { id: "13", name: "Mr. Edwin Mbuguo" },
 ];
 
-// Initialize mock data with available pages
-const initialBookData: InvoiceBook[] = Array.from({ length: 8 }, (_, i) => {
-  const bookNumber = 744 + i;
-  const startPage = 13137151 + (i * 50);
-  const availablePages = Array.from({ length: 50 }, (_, j) => (startPage + j).toString());
-  
-  return {
-    id: (i + 1).toString(),
-    bookNumber: bookNumber.toString(),
-    startPage: startPage.toString(),
-    endPage: (startPage + 49).toString(),
-    isIssued: false,
-    isActivated: i < 2, // First two books are activated
-    pagesUsed: 0,
-    availablePages
-  };
-});
-
-// Preassign users to match the mockInvoiceBooks data
-initialBookData[0].assignedTo = "Mr. Lahiru Chathuranga";
-initialBookData[1].assignedTo = "Mr. M.P.A. Ranatunghe";
-
 const InvoiceBookStock = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [bookData, setBookData] = useState<InvoiceBook[]>([]);
@@ -91,10 +70,10 @@ const InvoiceBookStock = () => {
         setBookData(parsedBooks);
       } catch (error) {
         console.error("Error parsing stored books:", error);
-        setBookData(initialBookData);
+        setBookData([]);
       }
     } else {
-      setBookData(initialBookData);
+      setBookData([]);
     }
   }, []);
 
@@ -113,6 +92,10 @@ const InvoiceBookStock = () => {
           pagesUsed: book.pagesUsed
         }));
       localStorage.setItem('activeInvoiceBooks', JSON.stringify(activeBooks));
+    } else {
+      // Clear storage if no books exist
+      localStorage.setItem('invoiceBooks', JSON.stringify([]));
+      localStorage.setItem('activeInvoiceBooks', JSON.stringify([]));
     }
   }, [bookData]);
   
@@ -223,67 +206,75 @@ const InvoiceBookStock = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredData.map((item) => (
-                  <TableRow key={item.id} className="hover:bg-blue-50/50 transition-colors">
-                    <BookingTableCell className="text-center">{item.id}</BookingTableCell>
-                    <BookingTableCell>{item.bookNumber}</BookingTableCell>
-                    <BookingTableCell>{item.startPage}</BookingTableCell>
-                    <BookingTableCell>{item.endPage}</BookingTableCell>
-                    <BookingTableCell className="text-center">
-                      {item.isActivated ? 
-                        <span className="text-green-600 font-medium">Activated</span> : 
-                        <span className="text-gray-600">Inactive</span>
-                      }
-                    </BookingTableCell>
-                    <BookingTableCell>
-                      {item.assignedTo || (
-                        <span className="text-gray-400">Not assigned</span>
-                      )}
-                    </BookingTableCell>
-                    <BookingTableCell className="text-center">
-                      {item.pagesUsed} / 50
-                    </BookingTableCell>
-                    <BookingTableCell className="text-center">
-                      {!item.isActivated ? (
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="hover:bg-green-100 transition-colors"
-                          onClick={() => handleActivateBook(item)}
-                        >
-                          <UserCheck size={16} className="inline text-green-500 mr-1" />
-                          Activate
-                        </Button>
-                      ) : (
-                        <div className="flex justify-center space-x-2">
+                {filteredData.length > 0 ? (
+                  filteredData.map((item) => (
+                    <TableRow key={item.id} className="hover:bg-blue-50/50 transition-colors">
+                      <BookingTableCell className="text-center">{item.id}</BookingTableCell>
+                      <BookingTableCell>{item.bookNumber}</BookingTableCell>
+                      <BookingTableCell>{item.startPage}</BookingTableCell>
+                      <BookingTableCell>{item.endPage}</BookingTableCell>
+                      <BookingTableCell className="text-center">
+                        {item.isActivated ? 
+                          <span className="text-green-600 font-medium">Activated</span> : 
+                          <span className="text-gray-600">Inactive</span>
+                        }
+                      </BookingTableCell>
+                      <BookingTableCell>
+                        {item.assignedTo || (
+                          <span className="text-gray-400">Not assigned</span>
+                        )}
+                      </BookingTableCell>
+                      <BookingTableCell className="text-center">
+                        {item.pagesUsed} / 50
+                      </BookingTableCell>
+                      <BookingTableCell className="text-center">
+                        {!item.isActivated ? (
                           <Button 
                             variant="ghost" 
                             size="sm" 
-                            className="hover:bg-blue-100 transition-colors"
-                            onClick={() => handleViewBook(item)}
-                          >
-                            <FileText size={16} className="inline text-blue-500" />
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            className="hover:bg-blue-100 transition-colors"
+                            className="hover:bg-green-100 transition-colors"
                             onClick={() => handleActivateBook(item)}
                           >
-                            <UserCheck size={16} className="inline text-green-500" />
+                            <UserCheck size={16} className="inline text-green-500 mr-1" />
+                            Activate
                           </Button>
-                        </div>
-                      )}
+                        ) : (
+                          <div className="flex justify-center space-x-2">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="hover:bg-blue-100 transition-colors"
+                              onClick={() => handleViewBook(item)}
+                            >
+                              <FileText size={16} className="inline text-blue-500" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="hover:bg-blue-100 transition-colors"
+                              onClick={() => handleActivateBook(item)}
+                            >
+                              <UserCheck size={16} className="inline text-green-500" />
+                            </Button>
+                          </div>
+                        )}
+                      </BookingTableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <BookingTableCell colSpan={8} className="text-center py-8 text-gray-500">
+                      No invoice books found. Please add a new book.
                     </BookingTableCell>
                   </TableRow>
-                ))}
+                )}
               </TableBody>
             </Table>
           </div>
           
           <div className="flex justify-between items-center mt-4">
             <div className="text-sm">
-              Showing 1 to {filteredData.length} of {filteredData.length} entries
+              Showing {filteredData.length > 0 ? '1' : '0'} to {filteredData.length} of {filteredData.length} entries
             </div>
             <div className="flex gap-1">
               <Button variant="outline" size="sm" disabled>Previous</Button>
