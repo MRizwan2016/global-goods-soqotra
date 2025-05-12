@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { useNavigate } from "react-router-dom";
@@ -11,14 +12,19 @@ import ViewBookDialog from "./booking-form-stock/ViewBookDialog";
 import { Book, User } from "./booking-form-stock/types";
 
 const mockUsers: User[] = [
-  { id: "1", name: "John Smith" },
-  { id: "2", name: "Mary Johnson" },
-  { id: "3", name: "Mr. Lahiru" },
-  { id: "4", name: "Mr. Evans" },
-  { id: "5", name: "Mr. Paul Onchana" },
-  { id: "6", name: "Mr. Paulo Fernando" },
-  { id: "7", name: "Mr. Edwin Mbuguo" },
-  { id: "8", name: "Mr. Ali Hussain" },
+  { id: "1", name: "Mr. Lahiru Chathuranga" },
+  { id: "2", name: "Mr. M.P.A. Ranatunghe" },
+  { id: "3", name: "Mr. Gamage Kashmika Gayashan" },
+  { id: "4", name: "Mr. Daminda" },
+  { id: "5", name: "Mr. Ali Hussain Mufees" },
+  { id: "6", name: "Mr. Paolo Fernando" },
+  { id: "7", name: "Mr. Jun Jun Santos Manuel" },
+  { id: "8", name: "Mr. Raymond" },
+  { id: "9", name: "John Smith" },
+  { id: "10", name: "Mary Johnson" },
+  { id: "11", name: "Mr. Evans" },
+  { id: "12", name: "Mr. Paul Onchana" },
+  { id: "13", name: "Mr. Edwin Mbuguo" },
 ];
 
 const BookingFormStock = () => {

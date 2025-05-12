@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
@@ -38,38 +37,42 @@ interface InvoiceBook {
 
 // Mock users for the system
 const mockUsers: User[] = [
-  { id: "1", name: "Mr. Lahiru" },
-  { id: "2", name: "Mr. Evans" },
-  { id: "3", name: "Mr. Paul Onchana" },
-  { id: "4", name: "Mr. Paulo Fernando" },
-  { id: "5", name: "Mr. Edwin Mbuguo" },
-  { id: "6", name: "Mr. Ali Hussain" },
-  { id: "7", name: "John Smith" },
-  { id: "8", name: "Mary Johnson" },
+  { id: "1", name: "Mr. Lahiru Chathuranga" },
+  { id: "2", name: "Mr. M.P.A. Ranatunghe" },
+  { id: "3", name: "Mr. Gamage Kashmika Gayashan" },
+  { id: "4", name: "Mr. Daminda" },
+  { id: "5", name: "Mr. Ali Hussain Mufees" },
+  { id: "6", name: "Mr. Paolo Fernando" },
+  { id: "7", name: "Mr. Jun Jun Santos Manuel" },
+  { id: "8", name: "Mr. Raymond" },
+  { id: "9", name: "John Smith" },
+  { id: "10", name: "Mary Johnson" },
+  { id: "11", name: "Mr. Evans" },
+  { id: "12", name: "Mr. Paul Onchana" },
+  { id: "13", name: "Mr. Edwin Mbuguo" },
 ];
 
 // Initialize mock data with available pages
-const initialBookData: InvoiceBook[] = Array.from({ length: 10 }, (_, i) => {
-  const startPage = i === 0 ? 10000 : (10000 + (i * 50));
-  const availablePages = Array.from({ length: 50 }, (_, j) => (startPage + j).toString().padStart(6, '0'));
+const initialBookData: InvoiceBook[] = Array.from({ length: 8 }, (_, i) => {
+  const bookNumber = 744 + i;
+  const startPage = 13137151 + (i * 50);
+  const availablePages = Array.from({ length: 50 }, (_, j) => (startPage + j).toString());
   
   return {
     id: (i + 1).toString(),
-    bookNumber: (722 + i).toString(),
-    startPage: startPage.toString().padStart(6, '0'),
-    endPage: (startPage + 49).toString().padStart(6, '0'),
+    bookNumber: bookNumber.toString(),
+    startPage: startPage.toString(),
+    endPage: (startPage + 49).toString(),
     isIssued: false,
-    isActivated: false,
+    isActivated: i < 2, // First two books are activated
     pagesUsed: 0,
     availablePages
   };
 });
 
-// Preassign users to match the sample in the screenshot
-initialBookData[0].assignedTo = "John Smith";
-initialBookData[0].isActivated = true;
-initialBookData[1].assignedTo = "Mary Johnson";
-initialBookData[1].isActivated = true;
+// Preassign users to match the mockInvoiceBooks data
+initialBookData[0].assignedTo = "Mr. Lahiru Chathuranga";
+initialBookData[1].assignedTo = "Mr. M.P.A. Ranatunghe";
 
 const InvoiceBookStock = () => {
   const [searchTerm, setSearchTerm] = useState("");
