@@ -14,6 +14,7 @@ import VehicleSelector from "./details/VehicleSelector";
 import CitySelector from "./details/CitySelector";
 import { useJobForm } from "./context/JobFormContext";
 import { toast } from "sonner";
+import { FileText } from "lucide-react";
 
 // Replace BookItem with the proper interface
 interface InvoiceBook {
@@ -30,7 +31,11 @@ interface InvoiceBook {
 
 const JobDetailsSection = () => {
   const { jobData, handleSelectChange, isJobNumberGenerated } = useJobForm();
-  const [availableInvoices, setAvailableInvoices] = useState<string[]>([]);
+  const [availableInvoices, setAvailableInvoices] = useState<{
+    invoiceNumber: string;
+    bookNumber: string;
+    assignedTo?: string;
+  }[]>([]);
   const [allInvoices, setAllInvoices] = useState<any[]>([]);
 
   useEffect(() => {
@@ -54,31 +59,70 @@ const JobDetailsSection = () => {
     
     // Get unassigned invoice numbers from books
     const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
-    const unassignedBooks = activeBooks.filter((book: any) => !book.assignedTo);
     
-    let availableNumbers: string[] = [];
+    let availableNumbersList: {
+      invoiceNumber: string;
+      bookNumber: string;
+      assignedTo?: string;
+    }[] = [];
     
     // Add invoice numbers from existing invoices without job numbers
     invoicesWithoutJobNumbers.forEach((inv: any) => {
-      availableNumbers.push(inv.invoiceNumber);
+      // Find the book this invoice belongs to
+      const bookInfo = getBookInfoByInvoiceNumber(inv.invoiceNumber);
+      availableNumbersList.push({
+        invoiceNumber: inv.invoiceNumber,
+        bookNumber: bookInfo?.bookNumber || "Unknown",
+        assignedTo: bookInfo?.assignedTo
+      });
     });
     
-    // Add invoice numbers from unassigned books that aren't used yet
+    // Add invoice numbers from books that aren't used yet
     const usedNumbers = existingInvoices.map((inv: any) => inv.invoiceNumber);
     
-    unassignedBooks.forEach((book: any) => {
+    activeBooks.forEach((book: any) => {
       if (book.availablePages) {
         const unusedPages = book.availablePages.filter(
           (page: string) => !usedNumbers.includes(page)
         );
-        availableNumbers = [...availableNumbers, ...unusedPages];
+        
+        const pagesWithBookInfo = unusedPages.map((pageNumber: string) => ({
+          invoiceNumber: pageNumber,
+          bookNumber: book.bookNumber,
+          assignedTo: book.assignedTo
+        }));
+        
+        availableNumbersList = [...availableNumbersList, ...pagesWithBookInfo];
       }
     });
     
     // Filter out duplicates
-    availableNumbers = [...new Set(availableNumbers)];
+    const uniqueInvoices: {[key: string]: any} = {};
+    availableNumbersList.forEach(item => {
+      if (!uniqueInvoices[item.invoiceNumber]) {
+        uniqueInvoices[item.invoiceNumber] = item;
+      }
+    });
     
-    setAvailableInvoices(availableNumbers);
+    setAvailableInvoices(Object.values(uniqueInvoices));
+  };
+  
+  // Helper function to get book information for an invoice number
+  const getBookInfoByInvoiceNumber = (invoiceNumber: string) => {
+    const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+    const allStoredBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+    const allBooks = [...activeBooks, ...allStoredBooks];
+    
+    for (const book of allBooks) {
+      if (book.availablePages && book.availablePages.includes(invoiceNumber)) {
+        return {
+          bookNumber: book.bookNumber,
+          assignedTo: book.assignedTo
+        };
+      }
+    }
+    
+    return null;
   };
 
   // Handle invoice selection to load associated data
@@ -110,8 +154,12 @@ const JobDetailsSection = () => {
         handleSelectChange("branch", selectedInvoice.branch);
       }
       
+      // Get book info
+      const bookInfo = getBookInfoByInvoiceNumber(value);
+      const bookMessage = bookInfo ? ` from Book #${bookInfo.bookNumber}` : '';
+      
       // Show success message
-      toast.success("Invoice details loaded successfully");
+      toast.success(`Invoice ${value}${bookMessage} details loaded successfully`);
     }
   };
 
@@ -132,10 +180,25 @@ const JobDetailsSection = () => {
             <SelectTrigger className="w-full">
               <SelectValue placeholder="SELECT INVOICE NUMBER" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-60 overflow-y-auto bg-white">
               {availableInvoices.map((invoice) => (
-                <SelectItem key={invoice} value={invoice}>
-                  {invoice}
+                <SelectItem 
+                  key={invoice.invoiceNumber} 
+                  value={invoice.invoiceNumber}
+                  className="py-2 px-2 hover:bg-gray-100"
+                >
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-2">
+                      <FileText className="h-4 w-4 text-blue-500" />
+                      <span className="font-medium">{invoice.invoiceNumber}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1 pl-6">
+                      Book: <span className="font-medium">{invoice.bookNumber}</span>
+                      {invoice.assignedTo && (
+                        <span className="ml-2 text-gray-500">({invoice.assignedTo})</span>
+                      )}
+                    </div>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>

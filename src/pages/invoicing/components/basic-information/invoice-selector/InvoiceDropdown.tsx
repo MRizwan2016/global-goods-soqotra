@@ -1,6 +1,6 @@
 
 import React from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, FileText } from "lucide-react";
 import { 
   Select, 
   SelectContent, 
@@ -41,16 +41,21 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
         <SelectTrigger className={`w-full ${isDuplicate ? 'border-red-500 bg-red-50' : ''}`}>
           <SelectValue placeholder="Select invoice number" />
         </SelectTrigger>
-        <SelectContent className="max-h-60">
+        <SelectContent className="max-h-60 overflow-y-auto bg-white">
           {unassignedInvoices.map((invoice) => (
             <SelectItem 
               key={invoice.invoiceNumber} 
               value={invoice.invoiceNumber}
-              className="flex justify-between items-center"
+              className="py-2 px-2 hover:bg-gray-100"
             >
               <div className="flex flex-col">
-                <span>{invoice.invoiceNumber}</span>
-                <span className="text-xs text-gray-500">Book {invoice.bookNumber}</span>
+                <div className="flex items-center gap-2">
+                  <FileText className="h-4 w-4 text-blue-500" />
+                  <span className="font-medium">{invoice.invoiceNumber}</span>
+                </div>
+                <div className="text-xs text-gray-500 mt-1 pl-6">
+                  Book: <span className="font-medium">{invoice.bookNumber}</span>
+                </div>
               </div>
             </SelectItem>
           ))}

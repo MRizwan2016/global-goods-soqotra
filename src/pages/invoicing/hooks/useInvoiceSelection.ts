@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { JobStorageService } from "@/pages/qatar/services/JobStorageService";
-// Import the utility directly instead of using require
+// Import the utility directly using ES modules
 import { ensureInvoiceAvailability } from "../utils/invoiceNumberGenerator";
 
 export const useInvoiceSelection = (
@@ -47,17 +47,15 @@ export const useInvoiceSelection = (
             (page: string) => !allUsedNumbers.includes(page)
           );
           
-          // Only include unassigned invoices
-          if (!book.assignedTo) {
-            invoiceList = [
-              ...invoiceList,
-              ...availablePages.map((pageNumber: string) => ({
-                bookNumber: book.bookNumber,
-                invoiceNumber: pageNumber,
-                assignedTo: undefined
-              }))
-            ];
-          }
+          // Add detailed information for each invoice
+          invoiceList = [
+            ...invoiceList,
+            ...availablePages.map((pageNumber: string) => ({
+              bookNumber: book.bookNumber,
+              invoiceNumber: pageNumber,
+              assignedTo: book.assignedTo || undefined
+            }))
+          ];
         }
       });
     } 
@@ -78,7 +76,7 @@ export const useInvoiceSelection = (
               ...availablePages.map((pageNumber: string) => ({
                 bookNumber: book.bookNumber,
                 invoiceNumber: pageNumber,
-                assignedTo: undefined
+                assignedTo: book.assignedTo || undefined
               }))
             ];
           }
@@ -107,7 +105,7 @@ export const useInvoiceSelection = (
               ...availablePages.map((pageNumber: string) => ({
                 invoiceNumber: pageNumber,
                 bookNumber: book.bookNumber,
-                assignedTo: undefined
+                assignedTo: book.assignedTo || undefined
               }))
             ];
           }
@@ -124,6 +122,10 @@ export const useInvoiceSelection = (
     // Get any linked job number
     const jobNumber = JobStorageService.getJobNumberByInvoiceNumber(invoiceNumber) || "";
     
+    // Get the book info for this invoice for display purposes
+    const bookInfo = getBookInfoByInvoiceNumber(invoiceNumber);
+    const assignedInfo = bookInfo?.assignedTo ? ` (assigned to ${bookInfo.assignedTo})` : "";
+    
     // Update form state with the selected invoice number and job number if available
     setFormState(prev => ({
       ...prev,
@@ -131,14 +133,32 @@ export const useInvoiceSelection = (
       jobNumber
     }));
     
-    // Show toast with job number if available
-    let toastMessage = `Invoice number ${invoiceNumber} selected`;
+    // Show toast with book and job number info
+    let toastMessage = `Invoice ${invoiceNumber} selected from Book #${bookInfo?.bookNumber || "Unknown"}${assignedInfo}`;
     if (jobNumber) {
       toastMessage += ` - Job #${jobNumber}`;
     }
     toast.success(toastMessage);
     
     setShowInvoiceSelector(false);
+  };
+  
+  // Helper function to get book information for an invoice number
+  const getBookInfoByInvoiceNumber = (invoiceNumber: string) => {
+    const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
+    const allStoredBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+    const allBooks = [...activeBooks, ...allStoredBooks];
+    
+    for (const book of allBooks) {
+      if (book.availablePages && book.availablePages.includes(invoiceNumber)) {
+        return {
+          bookNumber: book.bookNumber,
+          assignedTo: book.assignedTo
+        };
+      }
+    }
+    
+    return null;
   };
   
   return {
