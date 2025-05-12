@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { JobStorageService } from "@/pages/qatar/services/JobStorageService";
+// Import the utility directly instead of using require
+import { ensureInvoiceAvailability } from "../utils/invoiceNumberGenerator";
 
 export const useInvoiceSelection = (
   isEditing: boolean,
@@ -86,7 +88,6 @@ export const useInvoiceSelection = (
     // We no longer add mock invoices - let's create real GY invoices if needed
     if (invoiceList.length === 0) {
       // We'll use the utility function to ensure invoice availability
-      const { ensureInvoiceAvailability } = require("../utils/invoiceNumberGenerator");
       ensureInvoiceAvailability();
       
       // After ensuring availability, try loading again

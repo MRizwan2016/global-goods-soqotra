@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { toast } from "sonner";
@@ -8,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Save, ArrowLeft, Truck } from "lucide-react";
 import { JobStorageService } from "./services/JobStorageService";
 import { JobNumberService } from "@/services/JobNumberService";
+import { cityVehicleMapping } from "./data/cityVehicleMapping";
 
 const NewJobForm = () => {
   const navigate = useNavigate();
@@ -40,8 +40,7 @@ const NewJobForm = () => {
       // Add location-based vehicle assignment
       if (jobData.city && !jobData.vehicle) {
         try {
-          const cityMapping = require('./data/cityVehicleMapping').cityVehicleMapping;
-          jobData.vehicle = cityMapping[jobData.city]?.[0] || "";
+          jobData.vehicle = cityVehicleMapping[jobData.city]?.[0] || "";
         } catch (error) {
           console.error("Error loading city vehicle mapping:", error);
         }
