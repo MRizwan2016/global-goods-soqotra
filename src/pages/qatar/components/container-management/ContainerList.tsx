@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { QatarContainer, ContainerListProps } from "../../types/containerTypes";
 import { Button } from "@/components/ui/button";
@@ -139,7 +138,7 @@ const ContainerList: React.FC<ContainerListProps> = ({
                   />
                 ))
               ) : (
-                <NoContainersFound />
+                <NoContainersFound onAddClick={onAddClick} />
               )}
             </tbody>
           </table>

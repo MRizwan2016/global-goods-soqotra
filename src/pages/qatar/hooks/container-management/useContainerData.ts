@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import mockContainers from "../../data/mockContainers";
 
 export const useContainerData = () => {
-  const [containers, setContainers] = useState<QatarContainer[]>(mockContainers);
+  const [containers, setContainers] = useState<QatarContainer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [editContainerId, setEditContainerId] = useState<string | null>(null);
 
@@ -23,10 +23,15 @@ export const useContainerData = () => {
           setContainers(parsedContainers);
           console.log("Loaded containers from local storage:", parsedContainers.length);
         }
-      } else {
-        // If no saved containers, save the mock data
+      } else if (mockContainers.length > 0) {
+        // If no saved containers but we have mock data, use it
+        setContainers(mockContainers);
         saveContainersToLocalStorage(mockContainers);
         console.log("No saved containers found, using mock data");
+      } else {
+        // No data at all, just use empty array
+        setContainers([]);
+        console.log("No container data available");
       }
     } catch (error) {
       console.error("Error loading containers:", error);
