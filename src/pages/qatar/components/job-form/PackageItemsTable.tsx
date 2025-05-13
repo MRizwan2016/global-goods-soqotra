@@ -1,52 +1,45 @@
 
 import React from "react";
-import { PackageItemsTableProps } from "./package-items/types";
-import EmptyState from "./package-items/EmptyState";
-import TableHeader from "./package-items/TableHeader";
-import ActionButtons from "./package-items/ActionButtons";
+import { useJobForm } from "./context/JobFormContext";
 
-const PackageItemsTable: React.FC<PackageItemsTableProps> = ({
-  items = [],
-  onEdit,
-  onDelete
-}) => {
-  // Filter out items with negative quantity (marked for deletion)
-  const validItems = items.filter(item => item.quantity > 0);
-
-  if (validItems.length === 0) {
-    return <EmptyState />;
+const PackageItemsTable: React.FC = () => {
+  const { jobItems } = useJobForm();
+  
+  if (jobItems.length === 0) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h3 className="font-bold text-lg text-gray-800 mb-5 border-b pb-2">PACKAGE ITEMS</h3>
+        <p className="text-gray-500 text-center py-8">No package items added yet.</p>
+      </div>
+    );
   }
-
+  
   return (
-    <div className="overflow-x-auto animate-fade-in">
-      <table className="min-w-full divide-y divide-gray-200">
-        <TableHeader />
-        <tbody className="bg-white divide-y divide-gray-200">
-          {validItems.map((item, index) => (
-            <tr key={item.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-              <td className="px-4 py-3 whitespace-nowrap uppercase">
-                Box {item.boxNumber || index + 1}: {item.itemName || item.name}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap">
-                {(item.sellPrice || 0).toFixed(2)}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap">
-                {item.quantity}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap">
-                {((item.sellPrice || 0) * item.quantity).toFixed(2)}
-              </td>
-              <td className="px-4 py-3 whitespace-nowrap text-right">
-                <ActionButtons 
-                  item={item}
-                  onEdit={onEdit}
-                  onDelete={onDelete}
-                />
-              </td>
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <h3 className="font-bold text-lg text-gray-800 mb-5 border-b pb-2">PACKAGE ITEMS</h3>
+      
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Box</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {jobItems.map((item) => (
+              <tr key={item.id}>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.boxNumber}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.name || item.itemName}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.quantity}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.sellPrice}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
