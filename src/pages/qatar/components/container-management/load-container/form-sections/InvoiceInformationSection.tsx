@@ -84,7 +84,9 @@ const InvoiceInformationSection: React.FC<InvoiceInformationSectionProps> = ({
     if (allInvoices.length === 0) {
       // Fallback to mock data if no invoices found in storage
       mockInvoiceBooks.forEach(book => {
-        const bookInvoices = book.available.map((invoiceNo) => ({
+        // Use either available property (for backward compatibility) or invoiceNumbers
+        const invoiceNumbersList = book.available || book.invoiceNumbers;
+        const bookInvoices = invoiceNumbersList.map((invoiceNo) => ({
           invoiceNumber: invoiceNo,
           bookNumber: book.bookNumber,
           assignedTo: book.assignedTo || 'Default User'
@@ -144,7 +146,9 @@ const InvoiceInformationSection: React.FC<InvoiceInformationSectionProps> = ({
       // If still not found, check mock data as fallback
       if (!foundUser) {
         for (const book of mockInvoiceBooks) {
-          if (book.available.includes(invoiceNumber)) {
+          // Use either available property or invoiceNumbers
+          const invoiceNumbersList = book.available || book.invoiceNumbers;
+          if (invoiceNumbersList.includes(invoiceNumber)) {
             foundUser = book.assignedTo || '';
             break;
           }

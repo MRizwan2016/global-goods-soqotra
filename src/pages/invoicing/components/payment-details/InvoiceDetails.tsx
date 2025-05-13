@@ -51,7 +51,7 @@ const InvoiceDetails: React.FC<InvoiceDetailsProps> = ({
     // If still not found, check mock data as fallback
     if (!foundUser) {
       for (const book of mockInvoiceBooks) {
-        if (book.available.includes(invoiceNumber)) {
+        if (book.available && book.available.includes(invoiceNumber)) {
           foundUser = book.assignedTo || '';
           break;
         }
