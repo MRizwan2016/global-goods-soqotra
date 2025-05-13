@@ -9,7 +9,7 @@ import VehicleSelector from "./details/VehicleSelector";
 import AdvanceAmount from "./details/AdvanceAmount";
 
 const JobDetailsSection: React.FC = () => {
-  const { readOnly } = useJobForm();
+  const { jobData, handleInputChange, handleSelectChange, readOnly } = useJobForm();
   
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -18,10 +18,18 @@ const JobDetailsSection: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <JobTypeSelector />
         <DateTimeSelector />
-        <LocationSelector />
+        <LocationSelector 
+          town={jobData.town || ""}
+          location={jobData.location}
+          handleInputChange={handleInputChange}
+          handleSelectChange={handleSelectChange}
+        />
         <CitySelector />
         <VehicleSelector />
-        <AdvanceAmount />
+        <AdvanceAmount 
+          advanceAmount={jobData.advanceAmount}
+          handleInputChange={handleInputChange}
+        />
       </div>
     </div>
   );

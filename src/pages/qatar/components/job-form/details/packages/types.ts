@@ -7,4 +7,9 @@ export interface PackageInfo {
   price: string;
   documents_fee: string;
   total: string;
+  boxNumber?: string; // Added boxNumber as an optional property
+}
+
+export interface PackageButtonProps {
+  onSelectPackage?: (pkg: PackageInfo) => void;
 }
