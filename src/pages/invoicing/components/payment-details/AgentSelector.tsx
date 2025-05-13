@@ -12,13 +12,10 @@ interface AgentSelectorProps {
   onAgentSelect: (name: string, code: string) => void;
 }
 
-// Mock list of agents - in a real app this would come from API or database
+// List of agents as requested
 const AGENT_LIST = [
-  { name: "Ahmed Al-Mansouri", code: "1234" },
-  { name: "Mohammed Khan", code: "5678" },
-  { name: "Sara Al-Jaber", code: "9012" },
-  { name: "Ali Hassan", code: "3456" },
-  { name: "Maria Torres", code: "7890" }
+  { name: "TRICO MARITIME (PVT) LTD", code: "TRC01" },
+  { name: "IPSEN LOGISTICS", code: "IPL01" }
 ];
 
 const AgentSelector: React.FC<AgentSelectorProps> = ({

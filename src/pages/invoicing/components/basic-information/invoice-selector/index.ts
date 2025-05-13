@@ -1,14 +1,7 @@
 
-import InvoiceDropdown from './InvoiceDropdown';
-import ManualEntryForm from './ManualEntryForm';
-import ManualEntryLink from './ManualEntryLink';
-import NoInvoicesAvailable from './NoInvoicesAvailable';
-import StatusIndicators from './StatusIndicators';
-
-export {
-  InvoiceDropdown,
-  ManualEntryForm,
-  ManualEntryLink,
-  NoInvoicesAvailable,
-  StatusIndicators
-};
+export { default as InvoiceDropdown } from "./InvoiceDropdown";
+export { default as ManualEntryForm } from "./ManualEntryForm";
+export { default as ManualEntryLink } from "./ManualEntryLink";
+export { default as NoInvoicesAvailable } from "./NoInvoicesAvailable";
+export { default as StatusIndicators } from "./StatusIndicators";
+export { default as BookSelector } from "./BookSelector";

@@ -1,3 +1,4 @@
+
 import React from "react";
 import { QRCodeSVG } from "qrcode.react";
 
@@ -159,21 +160,21 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
               packageDetails.map((pkg, index) => (
                 <tr key={index} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                   <td className="border border-gray-300 p-2">{index + 1}</td>
-                  <td className="border border-gray-300 p-2">{pkg.packageName || "Carton Box"}</td>
+                  <td className="border border-gray-300 p-2">{pkg.name || "1 METER WOODEN BOX"}</td>
                   <td className="border border-gray-300 p-2">{pkg.quantity || 1}</td>
                   <td className="border border-gray-300 p-2">{parseFloat(pkg.weight || 0).toFixed(2)}</td>
                   <td className="border border-gray-300 p-2">{parseFloat(pkg.volume || 0).toFixed(3)}</td>
-                  <td className="border border-gray-300 p-2">{pkg.description || "General Cargo"}</td>
+                  <td className="border border-gray-300 p-2">PERSONAL EFFECTS AND HOUSEHOLD GOODS</td>
                 </tr>
               ))
             ) : (
               <tr>
                 <td className="border border-gray-300 p-2">1</td>
-                <td className="border border-gray-300 p-2">Carton Box</td>
+                <td className="border border-gray-300 p-2">1 METER WOODEN BOX</td>
                 <td className="border border-gray-300 p-2">1</td>
                 <td className="border border-gray-300 p-2">{parseFloat(totalWeight).toFixed(2)}</td>
                 <td className="border border-gray-300 p-2">{totalVolume}</td>
-                <td className="border border-gray-300 p-2">General Cargo</td>
+                <td className="border border-gray-300 p-2">PERSONAL EFFECTS AND HOUSEHOLD GOODS</td>
               </tr>
             )}
             <tr className="bg-gray-100 font-semibold">

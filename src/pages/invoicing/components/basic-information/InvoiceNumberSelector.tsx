@@ -8,7 +8,8 @@ import {
   ManualEntryForm,
   ManualEntryLink,
   NoInvoicesAvailable,
-  StatusIndicators
+  StatusIndicators,
+  BookSelector
 } from "./invoice-selector";
 
 interface InvoiceNumberSelectorProps {
@@ -31,21 +32,26 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
     activeInvoiceUser,
     isDuplicate,
     availableInvoiceList,
+    filteredInvoiceList,
     showManualEntry,
     manualInvoiceNumber,
+    selectedBookNumber,
     setManualInvoiceNumber,
     setShowManualEntry,
+    setSelectedBookNumber,
     onInvoiceSelect,
     handleManualSubmit,
-    loadAvailableInvoices
+    loadAvailableInvoices,
+    handleBookSelect
   } = useInvoiceNumberSelector({
     formState,
     isEditing,
     handleSelectInvoice
   });
 
-  // Log available invoices for debugging
   console.log("InvoiceNumberSelector availableInvoiceList:", availableInvoiceList);
+  console.log("InvoiceNumberSelector filteredInvoiceList:", filteredInvoiceList);
+  console.log("InvoiceNumberSelector selectedBookNumber:", selectedBookNumber);
 
   return (
     <div className="space-y-2">
@@ -62,13 +68,15 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
         <>
           {!showManualEntry ? (
             <>
-              {availableInvoiceList.length > 0 ? (
+              <BookSelector onBookSelect={handleBookSelect} />
+              
+              {filteredInvoiceList.length > 0 ? (
                 <InvoiceDropdown
                   value={formState.invoiceNumber || ""}
                   onValueChange={onInvoiceSelect}
                   disabled={isEditing}
                   isDuplicate={isDuplicate}
-                  availableInvoices={availableInvoiceList}
+                  availableInvoices={filteredInvoiceList}
                 />
               ) : (
                 <NoInvoicesAvailable
@@ -76,11 +84,9 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
                 />
               )}
               
-              {availableInvoiceList.length > 0 && (
-                <ManualEntryLink
-                  onClick={() => setShowManualEntry(true)}
-                />
-              )}
+              <ManualEntryLink
+                onClick={() => setShowManualEntry(true)}
+              />
             </>
           ) : (
             <ManualEntryForm

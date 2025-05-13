@@ -3,12 +3,12 @@
  * Generates package description from invoice data
  */
 export const getPackageDescription = (invoice: any) => {
-  let description = "SAID TO CONTAIN PERSONAL EFFECTS";
+  let description = "PERSONAL EFFECTS AND HOUSEHOLD GOODS";
   
   const packageDetails = invoice.packageDetails || invoice.packageItems || [];
   if (packageDetails && packageDetails.length > 0) {
-    const packageNames = packageDetails.map((p: any) => p.name || "PACKAGE").join(", ");
-    description = `${packageNames}\nSAID TO CONTAIN PERSONAL EFFECTS`;
+    const packageNames = packageDetails.map((p: any) => p.name || "1 METER WOODEN BOX").join(", ");
+    description = `${packageNames}\nPERSONAL EFFECTS AND HOUSEHOLD GOODS`;
     
     const carPackage = packageDetails.find((p: any) => 
       p.name && (p.name.toLowerCase().includes("car") || p.name.toLowerCase().includes("vehicle")));

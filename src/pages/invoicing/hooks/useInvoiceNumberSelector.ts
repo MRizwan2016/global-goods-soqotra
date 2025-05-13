@@ -17,6 +17,8 @@ export const useInvoiceNumberSelector = ({
   const [activeInvoiceUser, setActiveInvoiceUser] = useState<string>("");
   const [isDuplicate, setIsDuplicate] = useState<boolean>(false);
   const [availableInvoiceList, setAvailableInvoiceList] = useState<any[]>([]);
+  const [filteredInvoiceList, setFilteredInvoiceList] = useState<any[]>([]);
+  const [selectedBookNumber, setSelectedBookNumber] = useState<string>("");
   const [showManualEntry, setShowManualEntry] = useState<boolean>(false);
   const [manualInvoiceNumber, setManualInvoiceNumber] = useState<string>("");
   
@@ -25,6 +27,19 @@ export const useInvoiceNumberSelector = ({
     console.log("useInvoiceNumberSelector - loading invoices");
     loadAvailableInvoices();
   }, []);
+  
+  // Filter invoices when book number changes
+  useEffect(() => {
+    if (selectedBookNumber) {
+      const filtered = availableInvoiceList.filter(invoice => 
+        invoice.bookNumber === selectedBookNumber
+      );
+      console.log("Filtered invoices by book:", filtered);
+      setFilteredInvoiceList(filtered);
+    } else {
+      setFilteredInvoiceList(availableInvoiceList);
+    }
+  }, [selectedBookNumber, availableInvoiceList]);
   
   const loadAvailableInvoices = () => {
     // First, make sure we have invoice numbers available
@@ -94,7 +109,18 @@ export const useInvoiceNumberSelector = ({
     // If still no invoices, create some demo ones
     if (invoiceList.length === 0) {
       console.log("No invoices found in books, creating demo invoices");
+      // Add book 734 with pages 1001-1010
+      for (let i = 1001; i <= 1010; i++) {
+        invoiceList.push({ 
+          invoiceNumber: `734-${i}`, 
+          bookNumber: "734", 
+          assignedTo: undefined
+        });
+      }
+      
+      // Add other demo invoice numbers
       invoiceList = [
+        ...invoiceList,
         { invoiceNumber: "GY100001", bookNumber: "B001", assignedTo: undefined },
         { invoiceNumber: "GY100002", bookNumber: "B001", assignedTo: undefined },
         { invoiceNumber: "GY100003", bookNumber: "B001", assignedTo: undefined },
@@ -104,6 +130,7 @@ export const useInvoiceNumberSelector = ({
     
     console.log("Available invoice list:", invoiceList);
     setAvailableInvoiceList(invoiceList);
+    setFilteredInvoiceList(invoiceList);
   };
   
   // Check for duplicate invoice numbers when form state changes
@@ -193,6 +220,24 @@ export const useInvoiceNumberSelector = ({
     }
   };
 
+  // Custom handler for book selection
+  const handleBookSelect = (bookNumber: string) => {
+    console.log("Book selected:", bookNumber);
+    setSelectedBookNumber(bookNumber);
+    
+    // Filter available invoices by the selected book
+    const filtered = availableInvoiceList.filter(invoice => 
+      invoice.bookNumber === bookNumber
+    );
+    
+    setFilteredInvoiceList(filtered);
+    
+    // Show toast about the book selection
+    toast.success(`Book #${bookNumber} selected`, {
+      description: `${filtered.length} invoice pages available in this book`,
+    });
+  };
+
   // Custom handler for invoice selection
   const onInvoiceSelect = (value: string) => {
     console.log("Invoice selected:", value);
@@ -235,12 +280,16 @@ export const useInvoiceNumberSelector = ({
     activeInvoiceUser,
     isDuplicate,
     availableInvoiceList,
+    filteredInvoiceList,
     showManualEntry,
     manualInvoiceNumber,
+    selectedBookNumber,
     setManualInvoiceNumber,
     setShowManualEntry,
+    setSelectedBookNumber,
     onInvoiceSelect,
     handleManualSubmit,
-    loadAvailableInvoices
+    loadAvailableInvoices,
+    handleBookSelect
   };
 };
