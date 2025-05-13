@@ -8,12 +8,14 @@ import {
   SelectTrigger, 
   SelectValue 
 } from "@/components/ui/select";
+import { mockInvoiceBooks } from "../../../constants/mockInvoiceBooks";
 
 interface InvoiceDropdownProps {
   value: string;
   onValueChange: (value: string) => void;
   disabled?: boolean;
   isDuplicate?: boolean;
+  selectedBookNumber?: string;
   availableInvoices: Array<{
     invoiceNumber: string;
     bookNumber: string;
@@ -26,18 +28,45 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
   onValueChange,
   disabled = false,
   isDuplicate = false,
+  selectedBookNumber,
   availableInvoices
 }) => {
+  // Filter invoices based on selected book number if provided
+  let filteredInvoices = availableInvoices;
+  
+  if (selectedBookNumber) {
+    // First check mock books for invoice numbers
+    const mockBook = mockInvoiceBooks.find(book => book.bookNumber === selectedBookNumber);
+    
+    if (mockBook) {
+      // Create invoice objects from the mock book
+      const mockInvoices = mockBook.invoiceNumbers.map(invNum => ({
+        invoiceNumber: invNum,
+        bookNumber: selectedBookNumber,
+        assignedTo: undefined
+      }));
+      
+      // Combine with any matching invoices from availableInvoices
+      const existingInvoices = availableInvoices.filter(inv => inv.bookNumber === selectedBookNumber);
+      filteredInvoices = [...mockInvoices, ...existingInvoices];
+    } else {
+      // Just filter by book number if not in mock data
+      filteredInvoices = availableInvoices.filter(invoice => invoice.bookNumber === selectedBookNumber);
+    }
+  }
+  
   // Filter out any invoices that have an assignedTo value
-  const unassignedInvoices = availableInvoices.filter(invoice => !invoice.assignedTo);
+  const unassignedInvoices = filteredInvoices.filter(invoice => !invoice.assignedTo);
   
   // Get book info for selected invoice
-  const selectedInvoice = availableInvoices.find(invoice => invoice.invoiceNumber === value);
+  const selectedInvoice = filteredInvoices.find(invoice => invoice.invoiceNumber === value);
   const selectedBookInfo = selectedInvoice ? `Book: ${selectedInvoice.bookNumber}` : "";
   
   console.log("InvoiceDropdown values:", {
     value,
     availableInvoices,
+    filteredInvoices,
+    selectedBookNumber,
     unassignedInvoices,
     selectedInvoice,
     selectedBookInfo

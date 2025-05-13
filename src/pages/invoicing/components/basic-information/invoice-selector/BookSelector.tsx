@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { mockInvoiceBooks } from "../../../constants/mockInvoiceBooks";
 
 interface BookSelectorProps {
   onBookSelect: (bookNumber: string) => void;
@@ -22,12 +22,20 @@ const BookSelector: React.FC<BookSelectorProps> = ({ onBookSelect }) => {
   useEffect(() => {
     // Load available books
     const loadAvailableBooks = () => {
+      // Get books from mockInvoiceBooks first
+      const mockBooks = mockInvoiceBooks.map(book => book.bookNumber);
+      
+      // Try to get books from localStorage
       const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
       const storedBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
       
-      // Get unique book numbers
+      // Get unique book numbers from all sources
       const books = new Set<string>();
       
+      // Add mock books first
+      mockBooks.forEach(book => books.add(book));
+      
+      // Add books from localStorage
       activeBooks.forEach((book: any) => {
         if (book.bookNumber) books.add(book.bookNumber);
       });
@@ -35,11 +43,6 @@ const BookSelector: React.FC<BookSelectorProps> = ({ onBookSelect }) => {
       storedBooks.forEach((book: any) => {
         if (book.bookNumber) books.add(book.bookNumber);
       });
-      
-      // If no books found, create some demo ones
-      if (books.size === 0) {
-        ["734", "B001", "B002", "B003"].forEach((bookNum) => books.add(bookNum));
-      }
       
       setAvailableBooks(Array.from(books));
     };

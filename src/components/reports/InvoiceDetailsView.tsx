@@ -17,6 +17,7 @@ export const InvoiceDetailsView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [invoice, setInvoice] = useState<any>(null);
+  const [paymentInfo, setPaymentInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const { isFullScreen, toggleFullScreen, exitFullScreen } = useFullScreen();
 
@@ -40,6 +41,9 @@ export const InvoiceDetailsView: React.FC = () => {
         if (foundInvoice) {
           console.log("Found invoice:", foundInvoice);
           setInvoice(foundInvoice);
+          
+          // Look for payment information for this invoice
+          fetchPaymentInfo(foundInvoice.invoiceNumber);
         } else {
           toast.error("Invoice not found");
           setTimeout(() => navigate("/reports/cargo"), 1000);
@@ -56,6 +60,25 @@ export const InvoiceDetailsView: React.FC = () => {
       fetchInvoiceData();
     }
   }, [id, navigate]);
+  
+  // Function to fetch payment information
+  const fetchPaymentInfo = (invoiceNumber: string) => {
+    try {
+      const payments = localStorage.getItem('payments');
+      if (payments) {
+        const parsedPayments = JSON.parse(payments);
+        // Find payment for this specific invoice
+        const payment = parsedPayments.find((p: any) => p.invoiceNumber === invoiceNumber);
+        
+        if (payment) {
+          console.log("Found payment for invoice:", payment);
+          setPaymentInfo(payment);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching payment info:", error);
+    }
+  };
 
   const handleBack = () => {
     if (isFullScreen) {
@@ -143,18 +166,27 @@ export const InvoiceDetailsView: React.FC = () => {
       />
 
       <PaymentDetailsTable 
-        isFullScreen={isFullScreen} 
+        isFullScreen={isFullScreen}
+        paymentInfo={paymentInfo}
+        invoice={invoice}
+        currency={invoice.currency || "QAR"}
       />
 
-      <CargoDetailsTable 
-        type="hold" 
-        isFullScreen={isFullScreen} 
-      />
+      {/* Only show cargo details tables if no payment info exists */}
+      {!paymentInfo && (
+        <>
+          <CargoDetailsTable 
+            type="hold" 
+            isFullScreen={isFullScreen} 
+            invoice={invoice}
+          />
 
-      <CargoDetailsTable 
-        type="clear" 
-        isFullScreen={isFullScreen} 
-      />
+          <CargoDetailsTable 
+            type="clear" 
+            isFullScreen={isFullScreen} 
+          />
+        </>
+      )}
 
       <ActionButtons 
         handleBack={handleBack} 
