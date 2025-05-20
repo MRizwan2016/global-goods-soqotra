@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
@@ -16,7 +17,7 @@ const AdditionalDestinations = () => {
             PHILIPPINES
           </h2>
           <Link 
-            to="/destinations/philippines" 
+            to="/philippines" 
             className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
           >
             VIEW DETAILS 
@@ -64,7 +65,7 @@ const AdditionalDestinations = () => {
             <span className="text-red-700">TUNISIA</span>
           </h2>
           <Link 
-            to="/destinations/tunisia" 
+            to="/tunisia" 
             className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
           >
             VIEW DETAILS 
@@ -84,7 +85,7 @@ const AdditionalDestinations = () => {
             <span className="text-blue-700">SOMALIA</span>
           </h2>
           <Link 
-            to="/destinations/somalia" 
+            to="/somalia" 
             className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
           >
             VIEW DETAILS 
