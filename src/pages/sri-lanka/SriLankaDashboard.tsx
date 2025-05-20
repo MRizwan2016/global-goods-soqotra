@@ -4,7 +4,7 @@ import Layout from "@/components/layout/Layout";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip } from "@/components/ui/tooltip";
-import { ArrowRight, Phone, MapPin, Ship, Truck, FileText } from "lucide-react";
+import { ArrowRight, Phone, MapPin, Ship, Truck, FileText, Clock, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { sriLankaShipmentData } from "@/data/mockData";
 
@@ -68,7 +68,7 @@ const SriLankaDashboard: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2 text-gray-700">
                     <Truck className="text-green-600" size={18} />
-                    <span className="font-medium">Major Logistics Hubs:</span> Colombo, Kandy, Galle
+                    <span className="font-medium">Major Logistics Hubs:</span> Colombo, Kurunegala, Galle
                   </div>
                   <div className="flex items-center gap-2 text-gray-700">
                     <FileText className="text-amber-600" size={18} />
@@ -206,44 +206,84 @@ const SriLankaDashboard: React.FC = () => {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="border rounded-md p-4">
-                  <h4 className="font-medium text-lg mb-1">Colombo Central</h4>
+                  <h4 className="font-medium text-lg mb-1">Colombo UPB Distribution Warehouse</h4>
                   <p className="text-gray-500 text-sm mb-2">Main Warehouse</p>
                   <div className="text-gray-600 text-sm space-y-1">
                     <div className="flex items-start gap-2">
                       <MapPin size={16} className="text-gray-400 mt-0.5" />
-                      <span>123 Port Access Road, Colombo</span>
+                      <span>50K Cyril C Perera Mawatha, Colombo - 13, Sri Lanka</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <Phone size={16} className="text-gray-400 mt-0.5" />
-                      <span>+94 11 2456789</span>
+                      <span>+94 11 244 4400</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Phone size={16} className="text-gray-400 mt-0.5" />
+                      <span>WhatsApp: +94 76 600 2222</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Calendar size={16} className="text-gray-400 mt-0.5" />
+                      <span>Open: Monday to Friday</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Clock size={16} className="text-gray-400 mt-0.5" />
+                      <span>Timing: 8:00 am to 3:00 PM</span>
                     </div>
                   </div>
                 </div>
                 <div className="border rounded-md p-4">
-                  <h4 className="font-medium text-lg mb-1">Kandy Distribution</h4>
+                  <h4 className="font-medium text-lg mb-1">Kurunegala Distribution Center</h4>
                   <p className="text-gray-500 text-sm mb-2">Regional Hub</p>
                   <div className="text-gray-600 text-sm space-y-1">
                     <div className="flex items-start gap-2">
                       <MapPin size={16} className="text-gray-400 mt-0.5" />
-                      <span>45 Industrial Zone, Kandy</span>
+                      <span>Hambara Road, Sandagala, Kurunegala, Sri Lanka</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <Phone size={16} className="text-gray-400 mt-0.5" />
-                      <span>+94 81 2345678</span>
+                      <span>+94 37 223 8924-5</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Phone size={16} className="text-gray-400 mt-0.5" />
+                      <span>Mobile: +94 773028348</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Phone size={16} className="text-gray-400 mt-0.5" />
+                      <span>WhatsApp: +94 76 600 2222</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Calendar size={16} className="text-gray-400 mt-0.5" />
+                      <span>Open: Monday to Friday</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Clock size={16} className="text-gray-400 mt-0.5" />
+                      <span>Timing: 8:00 am to 5:00 PM</span>
                     </div>
                   </div>
                 </div>
                 <div className="border rounded-md p-4">
-                  <h4 className="font-medium text-lg mb-1">Galle Port Facility</h4>
+                  <h4 className="font-medium text-lg mb-1">Galle UPB Distribution Warehouse</h4>
                   <p className="text-gray-500 text-sm mb-2">Port Operations</p>
                   <div className="text-gray-600 text-sm space-y-1">
                     <div className="flex items-start gap-2">
                       <MapPin size={16} className="text-gray-400 mt-0.5" />
-                      <span>78 Harbor Road, Galle</span>
+                      <span>331, Matara Road, Katugoda, Galle, Sri Lanka</span>
                     </div>
                     <div className="flex items-start gap-2">
                       <Phone size={16} className="text-gray-400 mt-0.5" />
-                      <span>+94 91 2345678</span>
+                      <span>+94 91 223 4842-4</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Phone size={16} className="text-gray-400 mt-0.5" />
+                      <span>Mobile: +94 77 7776214</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Phone size={16} className="text-gray-400 mt-0.5" />
+                      <span>Mobile: +94 77 7699817</span>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Clock size={16} className="text-gray-400 mt-0.5" />
+                      <span>Timing: 8:00 am to 3:00 PM</span>
                     </div>
                   </div>
                 </div>
@@ -359,3 +399,4 @@ const SriLankaDashboard: React.FC = () => {
 };
 
 export default SriLankaDashboard;
+
