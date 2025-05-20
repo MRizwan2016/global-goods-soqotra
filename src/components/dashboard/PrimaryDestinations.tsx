@@ -36,7 +36,7 @@ const PrimaryDestinations = () => {
             <span className="text-amber-700">SRI LANKA</span>
           </h2>
           <Link 
-            to="/destinations/sri-lanka" 
+            to="/sri-lanka" 
             className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
           >
             VIEW DETAILS 
@@ -44,7 +44,7 @@ const PrimaryDestinations = () => {
           </Link>
         </div>
         
-        {/* Uganda Card (updating link to our new dedicated page) */}
+        {/* Uganda Card */}
         <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-red-600 transition-all duration-300 hover:shadow-lg">
           <h2 className="flex items-center gap-2 font-semibold text-lg mb-3 uppercase">
             <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm" style={{ 

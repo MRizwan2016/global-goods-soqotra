@@ -6,6 +6,7 @@ import reconciliationRoutes from "./reconciliationRoutes";
 import { kenyaRoutes } from "./kenyaRoutes";
 import { qatarRoutes } from "./qatarRoutes";
 import { ugandaRoutes } from "./ugandaRoutes";
+import { sriLankaRoutes } from "./sriLankaRoutes";
 import { reportsRoutes } from "./reportsRoutes";
 import { printDocumentsRoutes } from "./printDocumentsRoutes";
 import { paymentReceivableRoutes } from "./paymentReceivableRoutes";
@@ -58,6 +59,7 @@ export const routes: RouteConfig[] = [
   ...kenyaRoutes,
   ...qatarRoutes,
   ...ugandaRoutes,
+  ...sriLankaRoutes,
   ...reportsRoutes,
   ...printDocumentsRoutes,
   ...paymentReceivableRoutes,
