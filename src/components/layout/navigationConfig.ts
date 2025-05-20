@@ -134,6 +134,24 @@ export const navigationSections: NavigationSections = {
         ],
       },
       {
+        title: "PHILIPPINES",
+        items: [
+          { name: "DASHBOARD", path: "/philippines" },
+        ],
+      },
+      {
+        title: "SOMALIA",
+        items: [
+          { name: "DASHBOARD", path: "/somalia" },
+        ],
+      },
+      {
+        title: "TUNISIA",
+        items: [
+          { name: "DASHBOARD", path: "/tunisia" },
+        ],
+      },
+      {
         title: "REPORTS",
         items: [
           { name: "01 PRINT JOB SCHEDULE", path: "/qatar/jobs/print" },
