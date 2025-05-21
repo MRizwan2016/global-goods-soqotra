@@ -14,7 +14,9 @@
 
 /* Country-specific flag colors */
 .flag-kenya {
-  background: linear-gradient(to bottom, #000000 33%, #FFFFFF 33%, #FFFFFF 66%, #009A49 66%);
+  background-image: url('/lovable-uploads/369cd06a-781a-4245-b14f-be0f89da811c.png');
+  background-size: cover;
+  background-position: center;
 }
 
 .flag-tunisia {
@@ -66,31 +68,9 @@
 
 /* Updated Sri Lanka flag */
 .flag-sri-lanka {
-  background: #8D1B3D; /* Maroon background */
-  position: relative;
-  border: 1px solid rgba(255, 215, 0, 0.5); /* Gold border */
-}
-
-.flag-sri-lanka::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 30%;
-  background: #009E60; /* Green portion */
-}
-
-.flag-sri-lanka::after {
-  content: '';
-  position: absolute;
-  right: 20%;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 8px;
-  height: 8px;
-  background: #FFD700; /* Gold lion symbol simplified */
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Simple shape to represent lion */
+  background-image: url('/lovable-uploads/cf6ea931-595f-4abe-9309-082e42ecc739.png');
+  background-size: cover;
+  background-position: center;
 }
 
 .flag-somalia {
@@ -126,7 +106,9 @@
 
 /* Flag styles from App.css */
 .flag-kenya {
-  background: linear-gradient(135deg, #000000, #006600, #FF0000);
+  background-image: url('/lovable-uploads/369cd06a-781a-4245-b14f-be0f89da811c.png');
+  background-size: cover;
+  background-position: center;
   border: 1px solid rgba(255,255,255,0.3);
 }
 
@@ -146,19 +128,10 @@
 }
 
 .flag-srilanka {
-  background-color: #8D153A;
-  border: 2px solid #FFC100;
-  position: relative;
-}
-
-.flag-srilanka::before {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background-color: #FF9B00;
-  right: 5px;
-  border-radius: 50%;
+  background-image: url('/lovable-uploads/cf6ea931-595f-4abe-9309-082e42ecc739.png');
+  background-size: cover;
+  background-position: center;
+  border: 1px solid rgba(255,255,255,0.3);
 }
 
 .flag-somalia {
