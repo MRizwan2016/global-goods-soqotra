@@ -261,19 +261,31 @@
   z-index: 1;
 }
 
+/* Fix for Sri Lanka flag */
 .flag-sri-lanka {
-  background: #FFBE29;
+  background: #8D1B3D;
   position: relative;
 }
 
 .flag-sri-lanka::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 66%;
+  right: 2px;
+  width: 10px;
   height: 100%;
-  background: #FF4E12;
+  background: #F8982D;
+}
+
+.flag-sri-lanka::after {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 3px;
+  width: 12px;
+  height: 12px;
+  background: transparent;
+  border-radius: 1px;
+  box-shadow: 0 0 0 2px #4C973E;
 }
 
 .flag-somalia {

@@ -12,7 +12,8 @@ const DestinationCard = ({ country, bgColor, to }: DestinationCardProps) => {
   // Function to determine the appropriate flag class based on country
   const getFlagClass = (country: string) => {
     const countryLower = country.toLowerCase();
-    return `flag-${countryLower}`;
+    // Convert "Sri Lanka" to "sri-lanka" for the CSS class
+    return `flag-${countryLower.replace(/\s+/g, "-")}`;
   };
 
   return (
