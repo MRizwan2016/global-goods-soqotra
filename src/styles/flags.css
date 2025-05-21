@@ -1,0 +1,223 @@
+
+/* Flag styles */
+.flag-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 18px;
+  border-radius: 2px;
+  overflow: hidden;
+  margin-right: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Country-specific flag colors */
+.flag-kenya {
+  background: linear-gradient(to bottom, #000000 33%, #FFFFFF 33%, #FFFFFF 66%, #009A49 66%);
+}
+
+.flag-tunisia {
+  background: #E70013;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flag-tunisia::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #E70013;
+}
+
+.flag-uganda {
+  background: linear-gradient(to bottom, #000000 33%, #FCDC04 33%, #FCDC04 66%, #D90000 66%);
+}
+
+.flag-philippines {
+  background: linear-gradient(to bottom, #0038A8 50%, #CE1126 50%);
+  position: relative;
+}
+
+.flag-philippines::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 8px;
+  height: 100%;
+  background: #FFFFFF;
+}
+
+.flag-philippines::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: #FCD116;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+/* Updated Sri Lanka flag */
+.flag-sri-lanka {
+  background: #8D1B3D; /* Maroon background */
+  position: relative;
+  border: 1px solid rgba(255, 215, 0, 0.5); /* Gold border */
+}
+
+.flag-sri-lanka::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 30%;
+  background: #009E60; /* Green portion */
+}
+
+.flag-sri-lanka::after {
+  content: '';
+  position: absolute;
+  right: 20%;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 8px;
+  height: 8px;
+  background: #FFD700; /* Gold lion symbol simplified */
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* Simple shape to represent lion */
+}
+
+.flag-somalia {
+  background: #75AADB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flag-somalia::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: white;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.flag-qatar {
+  background: #8D1B3D;
+  position: relative;
+}
+
+.flag-qatar::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 33%;
+  height: 100%;
+  background: white;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%, 33% 90%, 33% 10%);
+}
+
+/* Flag styles from App.css */
+.flag-kenya {
+  background: linear-gradient(135deg, #000000, #006600, #FF0000);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.flag-tunisia {
+  background-color: #E70013;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.flag-uganda {
+  background: linear-gradient(180deg, #000000 33%, #FFFF00 33%, #FFFF00 66%, #FF0000 66%);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.flag-philippines {
+  background: linear-gradient(135deg, #0038A8 50%, #CE1126 50%);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.flag-srilanka {
+  background-color: #8D153A;
+  border: 2px solid #FFC100;
+  position: relative;
+}
+
+.flag-srilanka::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background-color: #FF9B00;
+  right: 5px;
+  border-radius: 50%;
+}
+
+.flag-somalia {
+  background-color: #4189DD;
+  border: 1px solid rgba(255,255,255,0.3);
+  position: relative;
+}
+
+.flag-somalia::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background-color: white;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+/* Syria flag */
+.flag-syria {
+  background: linear-gradient(to bottom, #CE1126 33%, #FFFFFF 33%, #FFFFFF 66%, #000000 66%);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* Saudi Arabia flag */
+.flag-saudi-arabia {
+  background: #006C35;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.flag-saudi-arabia::before {
+  content: '';
+  position: absolute;
+  width: 12px;
+  height: 4px;
+  background-color: white;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Ethiopia flag */
+.flag-ethiopia {
+  background: linear-gradient(to bottom, #078930 33%, #FCDD09 33%, #FCDD09 66%, #DA121A 66%);
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.flag-ethiopia::before {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0F47AF;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
