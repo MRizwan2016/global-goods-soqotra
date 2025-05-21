@@ -1,4 +1,3 @@
-
 /* Flag styles */
 .flag-icon {
   display: inline-flex;
@@ -160,8 +159,9 @@
 
 /* Saudi Arabia flag */
 .flag-saudi-arabia {
-  background: #006C35;
-  position: relative;
+  background-image: url('/lovable-uploads/4ae13822-259b-4267-bc9f-c39bdd23960d.png');
+  background-size: cover;
+  background-position: center;
   border: 1px solid rgba(255,255,255,0.3);
 }
 
