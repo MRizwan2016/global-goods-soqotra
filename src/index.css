@@ -235,15 +235,38 @@
 }
 
 .flag-philippines {
-  background: linear-gradient(to right, #0038A8 33%, #FFFFFF 33%, #FFFFFF 66%, #CE1126 66%);
+  background: linear-gradient(to bottom, #0038A8 50%, #CE1126 50%);
+  position: relative;
 }
 
-.flag-srilanka {
+.flag-philippines::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 8px;
+  height: 100%;
+  background: #FFFFFF;
+}
+
+.flag-philippines::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: #FCD116;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.flag-sri-lanka {
   background: #FFBE29;
   position: relative;
 }
 
-.flag-srilanka::before {
+.flag-sri-lanka::before {
   content: '';
   position: absolute;
   left: 0;
@@ -255,6 +278,33 @@
 
 .flag-somalia {
   background: #75AADB;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flag-somalia::after {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: white;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.flag-qatar {
+  background: #8D1B3D;
+  position: relative;
+}
+
+.flag-qatar::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 33%;
+  height: 100%;
+  background: white;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%, 33% 90%, 33% 10%);
 }
 
 /* Glass effect for dashboard cards */

@@ -9,9 +9,18 @@ interface DestinationCardProps {
 }
 
 const DestinationCard = ({ country, bgColor, to }: DestinationCardProps) => {
+  // Function to determine the appropriate flag class based on country
+  const getFlagClass = (country: string) => {
+    const countryLower = country.toLowerCase();
+    return `flag-${countryLower}`;
+  };
+
   return (
     <div className={`glass rounded-lg p-5 ${bgColor} flex justify-between items-center card-hover`}>
-      <h3 className="text-xl font-semibold text-gray-800">{country}</h3>
+      <h3 className="text-xl font-semibold text-gray-800 flex items-center gap-2">
+        <span className={`flag-icon ${getFlagClass(country)}`}></span>
+        {country}
+      </h3>
       <Link 
         to={to} 
         className="flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors duration-300"
