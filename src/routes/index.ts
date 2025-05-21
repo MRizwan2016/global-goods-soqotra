@@ -17,6 +17,9 @@ import { authRoutes } from "./authRoutes";
 import { masterRoutes } from "./masterRoutes";
 import { sellingRatesRoutes } from "./sellingRatesRoutes";
 import { invoiceRoutes } from "./invoiceRoutes";
+import { syriaRoutes } from "./syriaRoutes";
+import { saudiArabiaRoutes } from "./saudiArabiaRoutes";
+import { ethiopiaRoutes } from "./ethiopiaRoutes";
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
@@ -66,6 +69,9 @@ export const routes: RouteConfig[] = [
   ...philippinesRoutes,
   ...somaliaRoutes,
   ...tunisiaRoutes,
+  ...syriaRoutes,
+  ...saudiArabiaRoutes,
+  ...ethiopiaRoutes,
   ...reportsRoutes,
   ...printDocumentsRoutes,
   ...paymentReceivableRoutes,

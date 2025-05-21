@@ -1,4 +1,3 @@
-
 import React from "react";
 import Layout from "@/components/layout/Layout";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -7,6 +6,9 @@ import { Tooltip } from "@/components/ui/tooltip";
 import { ArrowRight, Phone, MapPin, Ship, Truck, FileText, Clock, Calendar } from "lucide-react";
 import { Link } from "react-router-dom";
 import { sriLankaShipmentData } from "@/data/mockData";
+import CountryBackButton from "@/components/ui/country-back-button";
+import LanguageSwitcher from "@/components/ui/language-switcher";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 import StatCards from "./components/dashboard/StatCards";
 import DeliveryCharts from "./components/dashboard/DeliveryCharts";
@@ -14,6 +16,7 @@ import ImageGallery from "./components/dashboard/ImageGallery";
 
 const SriLankaDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = React.useState("overview");
+  const { language } = useLanguage();
   
   return (
     <Layout title="Sri Lanka Operations">
@@ -21,12 +24,14 @@ const SriLankaDashboard: React.FC = () => {
       <div className="border-b pb-4 mb-6">
         <div className="flex justify-between items-center">
           <div>
+            <CountryBackButton className="mb-2" />
             <h1 className="text-3xl font-bold text-gray-800 mb-1">Sri Lanka Operations</h1>
             <p className="text-gray-600">
               Central hub for all Sri Lanka-related logistics operations
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <LanguageSwitcher />
             <Tooltip content="Contact Sri Lanka Office">
               <Link 
                 to="#" 
@@ -399,4 +404,3 @@ const SriLankaDashboard: React.FC = () => {
 };
 
 export default SriLankaDashboard;
-
