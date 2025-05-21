@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
 
 type Language = "en" | "ar";
 
@@ -90,6 +90,18 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
+  
+  useEffect(() => {
+    // Add Arabic font class to body when language is Arabic
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+    document.documentElement.lang = language;
+    
+    if (language === 'ar') {
+      document.body.classList.add('font-arabic');
+    } else {
+      document.body.classList.remove('font-arabic');
+    }
+  }, [language]);
 
   const t = (key: string): string => {
     return translations[language][key] || key;
