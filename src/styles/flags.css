@@ -1,3 +1,4 @@
+
 /* Flag styles */
 .flag-icon {
   display: inline-flex;
@@ -194,3 +195,40 @@
   top: 50%;
   transform: translate(-50%, -50%);
 }
+
+/* Sudan flag - new addition */
+.flag-sudan {
+  background: linear-gradient(to bottom, #D21034 33%, #FFFFFF 33%, #FFFFFF 66%, #000000 66%);
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.flag-sudan::before {
+  content: '';
+  position: absolute;
+  width: 33%;
+  height: 100%;
+  background: #007229;
+  left: 0;
+  top: 0;
+}
+
+/* Eritrea flag - new addition */
+.flag-eritrea {
+  background: linear-gradient(to bottom, #43B02A 50%, #4189DD 50%);
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.flag-eritrea::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border-left: 10px solid #DA121A;
+  clip-path: polygon(0 0, 50% 50%, 0 100%);
+}
+

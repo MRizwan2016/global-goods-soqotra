@@ -20,6 +20,8 @@ import { invoiceRoutes } from "./invoiceRoutes";
 import { syriaRoutes } from "./syriaRoutes";
 import { saudiArabiaRoutes } from "./saudiArabiaRoutes";
 import { ethiopiaRoutes } from "./ethiopiaRoutes";
+import { sudanRoutes } from "./sudanRoutes";
+import { eritreaRoutes } from "./eritreaRoutes";
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
@@ -72,6 +74,8 @@ export const routes: RouteConfig[] = [
   ...syriaRoutes,
   ...saudiArabiaRoutes,
   ...ethiopiaRoutes,
+  ...sudanRoutes,
+  ...eritreaRoutes,
   ...reportsRoutes,
   ...printDocumentsRoutes,
   ...paymentReceivableRoutes,
