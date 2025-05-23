@@ -27,6 +27,8 @@ const translations: Record<Language, Record<string, string>> = {
     "country.syria": "Syria",
     "country.saudiArabia": "Saudi Arabia",
     "country.ethiopia": "Ethiopia",
+    "country.sudan": "Sudan",
+    "country.eritrea": "Eritrea",
     
     // Back button
     "navigation.back": "Back",
@@ -64,6 +66,8 @@ const translations: Record<Language, Record<string, string>> = {
     "country.syria": "سوريا",
     "country.saudiArabia": "المملكة العربية السعودية",
     "country.ethiopia": "إثيوبيا",
+    "country.sudan": "السودان",
+    "country.eritrea": "إريتريا",
     
     // Back button
     "navigation.back": "رجوع",

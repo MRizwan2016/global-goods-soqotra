@@ -60,11 +60,11 @@ const AdditionalDestinations = () => {
           </Link>
         </div>
         
-        {/* Sudan - New Addition */}
+        {/* Sudan - Updated */}
         <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-blue-600 transition-all duration-300 hover:shadow-lg">
           <h2 className={`flex items-center gap-2 font-semibold text-lg mb-3 uppercase ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
             <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm flag-icon flag-sudan"></div>
-            <span className={`text-blue-700 ${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.sudan") || "SUDAN"}</span>
+            <span className={`text-blue-700 ${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.sudan")}</span>
           </h2>
           <Link 
             to="/sudan" 
@@ -76,11 +76,11 @@ const AdditionalDestinations = () => {
           </Link>
         </div>
         
-        {/* Eritrea - New Addition */}
+        {/* Eritrea - Updated */}
         <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-purple-600 transition-all duration-300 hover:shadow-lg">
           <h2 className={`flex items-center gap-2 font-semibold text-lg mb-3 uppercase ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
             <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm flag-icon flag-eritrea"></div>
-            <span className={`text-purple-700 ${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.eritrea") || "ERITREA"}</span>
+            <span className={`text-purple-700 ${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.eritrea")}</span>
           </h2>
           <Link 
             to="/eritrea" 

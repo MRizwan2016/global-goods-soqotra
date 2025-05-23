@@ -196,39 +196,19 @@
   transform: translate(-50%, -50%);
 }
 
-/* Sudan flag - new addition */
+/* Sudan flag - Updated with new image */
 .flag-sudan {
-  background: linear-gradient(to bottom, #D21034 33%, #FFFFFF 33%, #FFFFFF 66%, #000000 66%);
-  position: relative;
+  background-image: url('/lovable-uploads/9706daa3-2a76-4ae1-a665-99c70f32e1b2.png');
+  background-size: cover;
+  background-position: center;
   border: 1px solid rgba(255,255,255,0.3);
 }
 
-.flag-sudan::before {
-  content: '';
-  position: absolute;
-  width: 33%;
-  height: 100%;
-  background: #007229;
-  left: 0;
-  top: 0;
-}
-
-/* Eritrea flag - new addition */
+/* Eritrea flag - Updated with new image */
 .flag-eritrea {
-  background: linear-gradient(to bottom, #43B02A 50%, #4189DD 50%);
-  position: relative;
+  background-image: url('/lovable-uploads/e28310f0-a553-47bc-a76d-5ff53230e687.png');
+  background-size: cover;
+  background-position: center;
   border: 1px solid rgba(255,255,255,0.3);
-}
-
-.flag-eritrea::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  border-left: 10px solid #DA121A;
-  clip-path: polygon(0 0, 50% 50%, 0 100%);
 }
 
