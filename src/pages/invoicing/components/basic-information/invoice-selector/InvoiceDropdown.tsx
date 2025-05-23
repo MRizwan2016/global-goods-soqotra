@@ -9,6 +9,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface InvoiceDropdownProps {
   value: string;
@@ -25,14 +26,23 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
   isDuplicate = false,
   availableInvoices
 }) => {
+  const { language } = useLanguage();
+  
   // Show toast if no invoices available
   React.useEffect(() => {
     if (availableInvoices.length === 0) {
-      toast.warning("No invoice numbers available for this book", {
-        description: "Please select another book or enter a manual invoice number"
-      });
+      toast.warning(
+        language === 'ar' 
+          ? "لا توجد أرقام فواتير متاحة لهذا الكتاب" 
+          : "No invoice numbers available for this book", 
+        {
+          description: language === 'ar'
+            ? "الرجاء اختيار كتاب آخر أو إدخال رقم فاتورة يدوي"
+            : "Please select another book or enter a manual invoice number"
+        }
+      );
     }
-  }, [availableInvoices]);
+  }, [availableInvoices, language]);
 
   return (
     <div className="relative">
@@ -44,9 +54,11 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
         <SelectTrigger 
           className={`w-full ${isDuplicate ? 'border-red-500 text-red-500' : ''}`}
         >
-          <SelectValue placeholder="Select invoice number" />
+          <SelectValue 
+            placeholder={language === 'ar' ? "اختر رقم فاتورة" : "Select invoice number"}
+          />
         </SelectTrigger>
-        <SelectContent className="bg-white max-h-60 overflow-y-auto z-50">
+        <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]">
           {availableInvoices.length > 0 ? (
             availableInvoices.map((invoice) => (
               <SelectItem 
@@ -67,7 +79,7 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
             ))
           ) : (
             <div className="p-2 text-gray-500 text-center">
-              No invoices available
+              {language === 'ar' ? "لا توجد فواتير متاحة" : "No invoices available"}
             </div>
           )}
         </SelectContent>
