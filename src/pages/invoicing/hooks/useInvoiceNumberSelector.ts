@@ -34,12 +34,19 @@ export const useInvoiceNumberSelector = ({
       const filtered = availableInvoiceList.filter(invoice => 
         invoice.bookNumber === selectedBookNumber
       );
-      console.log("Filtered invoices by book:", filtered);
+      console.log(`Filtered invoices by book ${selectedBookNumber}:`, filtered);
       setFilteredInvoiceList(filtered);
+      
+      // If we have filtered invoices available, select the first one automatically
+      if (filtered.length > 0 && !formState.invoiceNumber) {
+        const firstInvoice = filtered[0].invoiceNumber;
+        handleSelectInvoice(firstInvoice);
+        toast.success(`Book #${selectedBookNumber} selected with invoice ${firstInvoice}`);
+      }
     } else {
       setFilteredInvoiceList(availableInvoiceList);
     }
-  }, [selectedBookNumber, availableInvoiceList]);
+  }, [selectedBookNumber, availableInvoiceList, formState.invoiceNumber, handleSelectInvoice]);
   
   const loadAvailableInvoices = () => {
     // First, make sure we have invoice numbers available

@@ -10,6 +10,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { BookOpen } from "lucide-react";
 import { mockInvoiceBooks } from "../../../constants/mockInvoiceBooks";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BookSelectorProps {
   onBookSelect: (bookNumber: string) => void;
@@ -18,6 +19,7 @@ interface BookSelectorProps {
 const BookSelector: React.FC<BookSelectorProps> = ({ onBookSelect }) => {
   const [availableBooks, setAvailableBooks] = useState<string[]>([]);
   const [selectedBook, setSelectedBook] = useState<string>("");
+  const { language } = useLanguage();
   
   useEffect(() => {
     // Load available books
@@ -57,17 +59,17 @@ const BookSelector: React.FC<BookSelectorProps> = ({ onBookSelect }) => {
   
   return (
     <div className="mb-4">
-      <Label className="mb-1 block">Select Book Number</Label>
-      <div className="flex gap-2 items-center">
+      <Label className="mb-1 block">{language === 'ar' ? 'اختر رقم الكتاب' : 'Select Book Number'}</Label>
+      <div className={`flex gap-2 items-center ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
         <BookOpen className="h-4 w-4 text-blue-500" />
         <Select value={selectedBook} onValueChange={handleSelectBook}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Choose Book Number" />
+          <SelectTrigger className={`w-full ${language === 'ar' ? 'text-right' : ''}`}>
+            <SelectValue placeholder={language === 'ar' ? 'اختر رقم الكتاب' : 'Choose Book Number'} />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white z-50">
             {availableBooks.map((bookNumber) => (
               <SelectItem key={bookNumber} value={bookNumber}>
-                Book #{bookNumber}
+                {language === 'ar' ? `كتاب #${bookNumber}` : `Book #${bookNumber}`}
               </SelectItem>
             ))}
           </SelectContent>
