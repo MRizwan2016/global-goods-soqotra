@@ -43,13 +43,13 @@
 }
 
 .flag-eritrea {
-  background-image: url('/lovable-uploads/e28310f0-a553-47bc-a76d-5ff53230e687.png');
+  background-image: url('/lovable-uploads/627ba0e4-2f84-4abc-ba70-4f329def3062.png');
   background-size: cover;
   background-position: center;
   border: 1px solid rgba(255,255,255,0.3);
 }
 
-/* Solid color flags with decorative elements */
+/* Decorative flags with CSS elements */
 .flag-tunisia {
   background-color: #E70013;
   border: 1px solid rgba(255,255,255,0.3);
