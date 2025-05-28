@@ -82,6 +82,20 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
     }
   }, [formState.destination]);
 
+  // Clear consignee name when gift cargo is set to "yes"
+  useEffect(() => {
+    if (formState.giftCargo === "yes" && formState.consignee1) {
+      const clearEvent = {
+        target: {
+          name: "consignee1",
+          value: ""
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      
+      handleInputChange(clearEvent);
+    }
+  }, [formState.giftCargo]);
+
   return (
     <div>
       <h4 className="font-medium text-sm mb-3 text-gray-600">Consignee Information</h4>
