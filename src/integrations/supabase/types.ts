@@ -9,7 +9,83 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      schedule_jobs: {
+        Row: {
+          created_at: string
+          id: string
+          job_data: Json
+          schedule_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_data: Json
+          schedule_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_data?: Json
+          schedule_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "schedule_jobs_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "schedules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schedules: {
+        Row: {
+          country: string
+          created_at: string
+          created_by: string | null
+          driver: string | null
+          helper: string | null
+          id: string
+          sales_rep: string | null
+          schedule_date: string
+          schedule_number: string
+          status: string | null
+          total_jobs: number | null
+          updated_at: string
+          vehicle: string
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          created_by?: string | null
+          driver?: string | null
+          helper?: string | null
+          id?: string
+          sales_rep?: string | null
+          schedule_date: string
+          schedule_number: string
+          status?: string | null
+          total_jobs?: number | null
+          updated_at?: string
+          vehicle: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          driver?: string | null
+          helper?: string | null
+          id?: string
+          sales_rep?: string | null
+          schedule_date?: string
+          schedule_number?: string
+          status?: string | null
+          total_jobs?: number | null
+          updated_at?: string
+          vehicle?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
