@@ -117,6 +117,7 @@ export const navigationSections: NavigationSections = {
           { name: "DASHBOARD", path: "/kenya" },
           { name: "NEW DELIVERY", path: "/kenya/delivery/new" },
           { name: "DELIVERY TRACKING", path: "/kenya/deliveries" },
+          { name: "VIEW SCHEDULES", path: "/kenya/schedules" },
         ],
       },
       {
@@ -137,6 +138,14 @@ export const navigationSections: NavigationSections = {
         title: "PHILIPPINES",
         items: [
           { name: "DASHBOARD", path: "/philippines" },
+          { name: "VIEW SCHEDULES", path: "/philippines/schedules" },
+        ],
+      },
+      {
+        title: "SRI LANKA",
+        items: [
+          { name: "DASHBOARD", path: "/sri-lanka" },
+          { name: "VIEW SCHEDULES", path: "/sri-lanka/schedules" },
         ],
       },
       {
