@@ -1,5 +1,6 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Search, Edit, Eye, Trash2, Ship, Package, FileText } from "lucide-react";
 
 const EritreaDashboard = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSector, setSelectedSector] = useState("all");
   const [selectedBranch, setSelectedBranch] = useState("all");
@@ -106,7 +108,10 @@ const EritreaDashboard = () => {
             <div className="w-12 h-8 bg-gradient-to-r from-green-500 to-red-500 rounded"></div>
             <h1 className="text-3xl font-bold text-gray-900">Dashboard - Eritrea</h1>
           </div>
-          <Button className="gap-2">
+          <Button 
+            className="gap-2"
+            onClick={() => navigate("/eritrea/invoice/add")}
+          >
             <Plus className="h-4 w-4" />
             Add New
           </Button>
