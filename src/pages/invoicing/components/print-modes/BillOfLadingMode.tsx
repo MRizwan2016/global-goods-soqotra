@@ -103,6 +103,11 @@ const BillOfLadingMode: React.FC<BillOfLadingModeProps> = ({
         </div>
       </div>
       
+      <div className="border p-2 mb-3 bg-white">
+        <h3 className="font-bold mb-1 text-sm">AGENT</h3>
+        <p className="text-sm">{invoice.agentName || "N/A"}</p>
+      </div>
+      
       <div className="mt-6 grid grid-cols-2 gap-3 bg-white">
         <div>
           <p className="font-bold text-sm">FOR THE CARRIER</p>
