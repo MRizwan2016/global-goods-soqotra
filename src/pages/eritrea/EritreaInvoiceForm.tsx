@@ -7,11 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Plus, Save } from "lucide-react";
+import { ArrowLeft, Plus, Save, Eye, Printer } from "lucide-react";
+import EritreaInvoicePreview from "./components/EritreaInvoicePreview";
 
 const EritreaInvoiceForm = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
+  const [showPreview, setShowPreview] = useState(false);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -93,6 +95,28 @@ const EritreaInvoiceForm = () => {
     // Here you would typically save the data
     console.log("Saving invoice data:", { formData, packageDetails, shippingDetails, costDetails });
     navigate("/eritrea");
+  };
+
+  const handlePreview = () => {
+    setShowPreview(true);
+  };
+
+  const handlePrint = () => {
+    const invoiceData = {
+      formData,
+      packageDetails,
+      shippingDetails,
+      costDetails
+    };
+    
+    navigate(`/eritrea/invoice/print/${formData.invoiceNumber || 'ER' + Date.now()}`, {
+      state: { invoiceData }
+    });
+  };
+
+  const handlePrintFromPreview = () => {
+    setShowPreview(false);
+    handlePrint();
   };
 
   const renderPage1 = () => (
@@ -937,6 +961,14 @@ const EritreaInvoiceForm = () => {
           </div>
           
           <div className="flex gap-2">
+            <Button onClick={handlePreview} variant="outline" className="gap-2">
+              <Eye className="h-4 w-4" />
+              Preview
+            </Button>
+            <Button onClick={handlePrint} variant="outline" className="gap-2">
+              <Printer className="h-4 w-4" />
+              Print
+            </Button>
             <Button onClick={handleSave} className="gap-2">
               <Save className="h-4 w-4" />
               Save
@@ -949,6 +981,16 @@ const EritreaInvoiceForm = () => {
           </div>
         </div>
       </div>
+
+      <EritreaInvoicePreview
+        formData={formData}
+        packageDetails={packageDetails}
+        shippingDetails={shippingDetails}
+        costDetails={costDetails}
+        isOpen={showPreview}
+        onClose={() => setShowPreview(false)}
+        onPrint={handlePrintFromPreview}
+      />
     </Layout>
   );
 };
