@@ -22,6 +22,11 @@ export const useInvoiceNumberSelector = ({
   const [showManualEntry, setShowManualEntry] = useState<boolean>(false);
   const [manualInvoiceNumber, setManualInvoiceNumber] = useState<string>("");
   
+  // Enhanced state for UPB integration and book status
+  const [bookActivationStatus, setBookActivationStatus] = useState<string>("");
+  const [driverName, setDriverName] = useState<string>("");
+  const [bookAssignedUser, setBookAssignedUser] = useState<string>("");
+  
   // Load available invoice numbers on component mount
   useEffect(() => {
     console.log("useInvoiceNumberSelector - loading invoices");
@@ -148,16 +153,20 @@ export const useInvoiceNumberSelector = ({
     }
   }, [formState.invoiceNumber]);
   
-  // Function to update the assigned user when an invoice is selected
+  // Enhanced function to update book information and UPB integration
   const updateAssignedUser = (invoiceNumber: string) => {
     // First check in active books from localStorage
     const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
     let foundUser = "";
+    let foundDriver = "";
+    let activationStatus = "";
     
     // Find the book that contains this invoice
     for (const book of activeBooks) {
       if (book.availablePages && book.availablePages.includes(invoiceNumber)) {
         foundUser = book.assignedTo || "";
+        foundDriver = book.driverName || book.driver || ""; // Support both field names
+        activationStatus = "ACTIVATED";
         break;
       }
     }
@@ -168,12 +177,14 @@ export const useInvoiceNumberSelector = ({
       for (const book of storedBooks) {
         if (book.availablePages && book.availablePages.includes(invoiceNumber)) {
           foundUser = book.assignedTo || "";
+          foundDriver = book.driverName || book.driver || "";
+          activationStatus = book.isActivated ? "ACTIVATED" : "INACTIVE";
           break;
         }
       }
     }
     
-    // If not found in active books, check available invoices
+    // If not found in books, check available invoices
     if (!foundUser) {
       const selectedInvoice = availableInvoiceList.find(
         invoice => invoice.invoiceNumber === invoiceNumber
@@ -181,15 +192,30 @@ export const useInvoiceNumberSelector = ({
       
       if (selectedInvoice && selectedInvoice.assignedTo) {
         foundUser = selectedInvoice.assignedTo;
+        activationStatus = "ACTIVATED";
       }
     }
     
-    // If still not found, default to System User
+    // Set defaults if still not found
     if (!foundUser) {
       foundUser = "System User";
+      activationStatus = "PENDING ACTIVATION";
     }
     
+    // Update all state variables
     setActiveInvoiceUser(foundUser);
+    setBookAssignedUser(foundUser);
+    setDriverName(foundDriver || "Not Assigned");
+    setBookActivationStatus(activationStatus);
+    
+    // Log UPB integration info
+    console.log("UPB Integration - Book Status:", {
+      invoiceNumber,
+      user: foundUser,
+      driver: foundDriver || "Not Assigned",
+      status: activationStatus,
+      upbConnected: true
+    });
   };
 
   // Function to check if the invoice number is already in use
@@ -297,6 +323,10 @@ export const useInvoiceNumberSelector = ({
     onInvoiceSelect,
     handleManualSubmit,
     loadAvailableInvoices,
-    handleBookSelect
+    handleBookSelect,
+    // Enhanced UPB integration properties
+    bookActivationStatus,
+    driverName,
+    bookAssignedUser
   };
 };

@@ -9,13 +9,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Plus, Save, Eye, Printer } from "lucide-react";
 import EritreaInvoicePreview from "./components/EritreaInvoicePreview";
+import { useInvoiceNumberSelector } from "../invoicing/hooks/useInvoiceNumberSelector";
+import InvoiceNumberSelector from "../invoicing/components/basic-information/InvoiceNumberSelector";
+import UPBIntegrationCard from "@/components/invoice/UPBIntegrationCard";
 
 const EritreaInvoiceForm = () => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [showPreview, setShowPreview] = useState(false);
 
-  // Form state
+  // Form state - defined first
   const [formData, setFormData] = useState({
     sector: "",
     branch: "",
@@ -79,6 +82,35 @@ const EritreaInvoiceForm = () => {
     gross: "",
     discount: "",
     net: ""
+  });
+
+  // Invoice number selector hook for UPB integration
+  const handleSelectInvoice = (invoiceNumber: string) => {
+    setFormData(prev => ({ ...prev, invoiceNumber }));
+  };
+  
+  const {
+    activeInvoiceUser,
+    isDuplicate,
+    availableInvoiceList,
+    filteredInvoiceList,
+    showManualEntry,
+    manualInvoiceNumber,
+    selectedBookNumber,
+    setManualInvoiceNumber,
+    setShowManualEntry,
+    setSelectedBookNumber,
+    onInvoiceSelect,
+    handleManualSubmit,
+    loadAvailableInvoices,
+    handleBookSelect,
+    bookActivationStatus,
+    driverName,
+    bookAssignedUser
+  } = useInvoiceNumberSelector({
+    formState: formData,
+    isEditing: false,
+    handleSelectInvoice
   });
 
   const addPackageRow = () => {
@@ -277,12 +309,16 @@ const EritreaInvoiceForm = () => {
               />
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">INVOICE NUMBER:</label>
-              <Input
-                value={formData.invoiceNumber}
-                onChange={(e) => setFormData({...formData, invoiceNumber: e.target.value})}
-                placeholder="Invoice Number"
+            <div className="space-y-2 col-span-2">
+              <label className="text-sm font-medium">INVOICE NUMBER (UPB INTEGRATED):</label>
+              <InvoiceNumberSelector
+                formState={formData}
+                handleInputChange={(e) => setFormData({...formData, invoiceNumber: e.target.value})}
+                showInvoiceSelector={true}
+                setShowInvoiceSelector={() => {}}
+                availableInvoices={availableInvoiceList}
+                handleSelectInvoice={handleSelectInvoice}
+                isEditing={false}
               />
             </div>
 
@@ -294,6 +330,31 @@ const EritreaInvoiceForm = () => {
                 onChange={(e) => setFormData({...formData, invoiceDate: e.target.value})}
               />
             </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* UPB Integration Status Card */}
+      {formData.invoiceNumber && (
+        <Card>
+          <CardContent className="pt-6">
+            <UPBIntegrationCard
+              activationStatus={bookActivationStatus}
+              userName={bookAssignedUser}
+              driverName={driverName}
+              invoiceNumber={formData.invoiceNumber}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Package Details */}
+      <Card>
+        <CardHeader className="bg-blue-500 text-white">
+          <CardTitle>PACKAGES DETAILS</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-6">
 
             <div className="space-y-2">
               <label className="text-sm font-medium">GIFT CARGO:</label>
