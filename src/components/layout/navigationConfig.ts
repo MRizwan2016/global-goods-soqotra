@@ -86,6 +86,9 @@ export const navigationSections: NavigationSections = {
           { name: "SAUDI ARABIA", path: "/accounts/reconciliation/country/sa" },
           { name: "UAE", path: "/accounts/reconciliation/country/ae" },
           { name: "OMAN", path: "/accounts/reconciliation/country/om" },
+          { name: "BURUNDI", path: "/accounts/reconciliation/country/bi" },
+          { name: "ALGERIA", path: "/accounts/reconciliation/country/dz" },
+          { name: "GHANA", path: "/accounts/reconciliation/country/gh" },
         ],
       },
     ],
@@ -158,6 +161,24 @@ export const navigationSections: NavigationSections = {
         title: "TUNISIA",
         items: [
           { name: "DASHBOARD", path: "/tunisia" },
+        ],
+      },
+      {
+        title: "BURUNDI",
+        items: [
+          { name: "DASHBOARD", path: "/burundi" },
+        ],
+      },
+      {
+        title: "ALGERIA",
+        items: [
+          { name: "DASHBOARD", path: "/algeria" },
+        ],
+      },
+      {
+        title: "GHANA",
+        items: [
+          { name: "DASHBOARD", path: "/ghana" },
         ],
       },
       {

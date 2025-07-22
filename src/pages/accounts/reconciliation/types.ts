@@ -153,6 +153,27 @@ export const SUPPORTED_COUNTRIES: Country[] = [
     currency: 'OMR',
     currencySymbol: 'ر.ع.',
     timezone: 'Asia/Muscat'
+  },
+  { 
+    code: 'bi', 
+    name: 'Burundi', 
+    currency: 'BIF',
+    currencySymbol: 'FBu',
+    timezone: 'Africa/Bujumbura'
+  },
+  { 
+    code: 'dz', 
+    name: 'Algeria', 
+    currency: 'DZD',
+    currencySymbol: 'د.ج',
+    timezone: 'Africa/Algiers'
+  },
+  { 
+    code: 'gh', 
+    name: 'Ghana', 
+    currency: 'GHS',
+    currencySymbol: '₵',
+    timezone: 'Africa/Accra'
   }
 ];
 

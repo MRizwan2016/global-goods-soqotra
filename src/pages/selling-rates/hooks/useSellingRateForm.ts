@@ -101,6 +101,9 @@ export const useSellingRateForm = (id?: string) => {
       case "Mozambique": return "MZ";
       case "Uganda": return "UG";
       case "Tanzania": return "TZ";
+      case "Burundi": return "BI";
+      case "Algeria": return "DZ";
+      case "Ghana": return "GH";
       default: return "XX";
     }
   };

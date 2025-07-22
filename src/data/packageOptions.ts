@@ -52,6 +52,27 @@ export interface PackageOption {
         isVolumeBasedPricing: false;
       };
     };
+    burundi: {
+      bujumbura: {
+        price: number;
+        documentsFee: number;
+        isVolumeBasedPricing: false;
+      };
+    };
+    algeria: {
+      algiers: {
+        price: number;
+        documentsFee: number;
+        isVolumeBasedPricing: false;
+      };
+    };
+    ghana: {
+      accra: {
+        price: number;
+        documentsFee: number;
+        isVolumeBasedPricing: false;
+      };
+    };
   };
   // Legacy fields for backward compatibility
   price: number;
@@ -100,6 +121,27 @@ const calculateDefaultPricing = (basePrice: number, weightKg: number) => {
       portSudan: {
         price: weightKg * 10.2,
         documentsFee: 45,
+        isVolumeBasedPricing: false as const
+      }
+    },
+    burundi: {
+      bujumbura: {
+        price: weightKg * 11.5,
+        documentsFee: 50,
+        isVolumeBasedPricing: false as const
+      }
+    },
+    algeria: {
+      algiers: {
+        price: weightKg * 10.8,
+        documentsFee: 45,
+        isVolumeBasedPricing: false as const
+      }
+    },
+    ghana: {
+      accra: {
+        price: weightKg * 9.2,
+        documentsFee: 40,
         isVolumeBasedPricing: false as const
       }
     }
