@@ -137,6 +137,9 @@ export function useBookStock() {
           : book
       );
       
+      console.log("=== USER ASSIGNMENT SUCCESS ===");
+      console.log("Updated books with user assignment:", updatedBooks);
+      
       setBooks(updatedBooks);
       
       setIsAssignDialogOpen(false);

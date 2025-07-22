@@ -42,7 +42,11 @@ const InvoiceBookForm = () => {
   };
   
   const handleSave = () => {
+    console.log("=== SAVE BUTTON CLICKED ===");
+    console.log("Form data:", formData);
+    
     if (!formData.bookNumber) {
+      console.log("ERROR: No book number provided");
       toast.error("Please enter a book number");
       return;
     }
@@ -72,13 +76,17 @@ const InvoiceBookForm = () => {
       
       // Check if a book with the same number already exists
       const bookExists = existingBooks.some((book: any) => book.bookNumber === formData.bookNumber);
+      console.log("Checking for existing book:", formData.bookNumber, "Found:", bookExists);
+      
       if (bookExists) {
+        console.log("ERROR: Book already exists");
         toast.error(`Book #${formData.bookNumber} already exists`);
         return;
       }
       
       // Add the new book and save back to localStorage
       const updatedBooks = [...existingBooks, newBook];
+      console.log("Saving to localStorage - invoiceBooks:", updatedBooks.length, "books");
       localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
       
       // Also update activeInvoiceBooks
@@ -92,21 +100,26 @@ const InvoiceBookForm = () => {
           isActivated: true
         }
       ];
+      console.log("Saving to localStorage - activeInvoiceBooks:", updatedActiveBooks.length, "books");
       localStorage.setItem('activeInvoiceBooks', JSON.stringify(updatedActiveBooks));
       
+      console.log("=== SAVE SUCCESS ===");
       toast.success("Invoice book added successfully");
       console.log("Updated books in localStorage:", updatedBooks);
       
       // Trigger storage event so other components know to refresh
+      console.log("Dispatching storage event...");
       window.dispatchEvent(new Event('storage'));
       
       // Also dispatch a custom event specific for book updates
+      console.log("Dispatching book-update event...");
       const bookUpdateEvent = new Event('book-update');
       window.dispatchEvent(bookUpdateEvent);
       
+      console.log("Navigating back to stock list...");
       navigate("/master/book/stock");
     } catch (error) {
-      console.error("Error saving book:", error);
+      console.error("=== SAVE ERROR ===", error);
       toast.error("Failed to save book. Please try again.");
     }
   };
