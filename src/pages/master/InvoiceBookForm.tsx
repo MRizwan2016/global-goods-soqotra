@@ -10,29 +10,71 @@ const InvoiceBookForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     pagesInBook: "50",
+    country: "",
     bookNumber: "",
     startPage: "",
     endPage: "",
-    bookType: "NORMAL"
+    bookType: "NORMAL",
+    salesRepresentative: "",
+    driverName: ""
   });
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    if (name === "bookNumber" && value) {
-      const bookNum = parseInt(value);
-      if (!isNaN(bookNum)) {
-        const firstPage = 13136000 + ((bookNum - 722) * 50) + 1;
-        const lastPage = firstPage + 49;
+    // Handle country-specific page number calculation
+    if (name === "country" || (name === "bookNumber" && value && formData.country)) {
+      let updatedFormData = { ...formData, [name]: value };
+      
+      const country = name === "country" ? value : formData.country;
+      const bookNumber = name === "bookNumber" ? parseInt(value) : parseInt(formData.bookNumber);
+      
+      if (country && !isNaN(bookNumber) && bookNumber > 0) {
+        let firstPage: number;
+        let lastPage: number;
         
-        setFormData({
-          ...formData,
-          bookNumber: value,
-          startPage: firstPage.toString(),
-          endPage: lastPage.toString()
-        });
-        return;
+        switch (country) {
+          case "SRI_LANKA":
+            // Sri Lanka: book 1 = 13131000-13131051, book 2 = 13131051-13131101, etc.
+            firstPage = 13131000 + ((bookNumber - 1) * 50);
+            lastPage = firstPage + 49;
+            break;
+          case "ERITREA":
+            // Eritrea: book 1 = 01000-01051, book 2 = 01051-01101, etc.
+            firstPage = 1000 + ((bookNumber - 1) * 50);
+            lastPage = firstPage + 49;
+            break;
+          case "KENYA":
+            // Kenya: book 1 = 02000-02051, book 2 = 02051-02101, etc.
+            firstPage = 2000 + ((bookNumber - 1) * 50);
+            lastPage = firstPage + 49;
+            break;
+          case "SUDAN":
+            // Sudan: book 1 = 03000-03051, book 2 = 03051-03101, etc.
+            firstPage = 3000 + ((bookNumber - 1) * 50);
+            lastPage = firstPage + 49;
+            break;
+          case "UAE":
+            // UAE: book 1 = 04000-04051, book 2 = 04051-04101, etc.
+            firstPage = 4000 + ((bookNumber - 1) * 50);
+            lastPage = firstPage + 49;
+            break;
+          default:
+            // Default fallback (keeping existing logic for other countries)
+            firstPage = 13136000 + ((bookNumber - 722) * 50) + 1;
+            lastPage = firstPage + 49;
+            break;
+        }
+        
+        updatedFormData = {
+          ...updatedFormData,
+          startPage: firstPage.toString().padStart(8, '0'),
+          endPage: lastPage.toString().padStart(8, '0')
+        };
       }
+      
+      setFormData(updatedFormData);
+      return;
     }
     
     setFormData({
@@ -45,9 +87,27 @@ const InvoiceBookForm = () => {
     console.log("=== SAVE BUTTON CLICKED ===");
     console.log("Form data:", formData);
     
+    if (!formData.country) {
+      console.log("ERROR: No country selected");
+      toast.error("Please select a country");
+      return;
+    }
+    
     if (!formData.bookNumber) {
       console.log("ERROR: No book number provided");
       toast.error("Please enter a book number");
+      return;
+    }
+    
+    if (!formData.salesRepresentative) {
+      console.log("ERROR: No sales representative provided");
+      toast.error("Please enter a sales representative name");
+      return;
+    }
+    
+    if (!formData.driverName) {
+      console.log("ERROR: No driver name provided");
+      toast.error("Please enter a driver name");
       return;
     }
     
@@ -55,6 +115,7 @@ const InvoiceBookForm = () => {
       // Create the new book object
       const newBook = {
         id: Date.now().toString(),
+        country: formData.country,
         bookNumber: formData.bookNumber,
         startPage: formData.startPage,
         endPage: formData.endPage,
@@ -62,9 +123,11 @@ const InvoiceBookForm = () => {
         isActivated: true, // Set to active by default so it shows in the active tab
         bookType: formData.bookType,
         pagesUsed: 0,
+        salesRepresentative: formData.salesRepresentative,
+        driverName: formData.driverName,
         availablePages: Array.from(
           { length: 50 }, 
-          (_, i) => (parseInt(formData.startPage) + i).toString()
+          (_, i) => (parseInt(formData.startPage) + i).toString().padStart(8, '0')
         )
       };
       
@@ -134,7 +197,39 @@ const InvoiceBookForm = () => {
         </div>
         
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">COUNTRY:</label>
+              <select
+                name="country"
+                value={formData.country}
+                onChange={handleInputChange}
+                className="bg-blue-500 text-white py-2 px-3 rounded text-sm h-10 transition-all hover:bg-blue-600"
+              >
+                <option value="">Select Country</option>
+                <option value="SRI_LANKA">Sri Lanka</option>
+                <option value="ERITREA">Eritrea</option>
+                <option value="KENYA">Kenya</option>
+                <option value="SUDAN">Sudan</option>
+                <option value="UAE">UAE</option>
+                <option value="SAUDI_ARABIA">Saudi Arabia</option>
+                <option value="OMAN">Oman</option>
+                <option value="QATAR">Qatar</option>
+              </select>
+            </div>
+            
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">BOOK NUMBER:</label>
+              <Input 
+                name="bookNumber"
+                value={formData.bookNumber}
+                onChange={handleInputChange}
+                className="border border-gray-300 transition-colors focus:border-blue-400"
+                placeholder="Enter book number"
+                disabled={!formData.country}
+              />
+            </div>
+            
             <div className="flex flex-col">
               <label className="text-sm font-medium mb-1">PAGES IN BOOK:</label>
               <Input 
@@ -147,14 +242,17 @@ const InvoiceBookForm = () => {
             </div>
             
             <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">BOOK NUMBER:</label>
-              <Input 
-                name="bookNumber"
-                value={formData.bookNumber}
+              <label className="text-sm font-medium mb-1">BOOK TYPE:</label>
+              <select
+                name="bookType"
+                value={formData.bookType}
                 onChange={handleInputChange}
-                className="border border-gray-300 transition-colors focus:border-blue-400"
-                placeholder="Enter book number"
-              />
+                className="bg-blue-500 text-white py-2 px-3 rounded text-sm h-10 transition-all hover:bg-blue-600"
+              >
+                <option value="NORMAL">NORMAL</option>
+                <option value="SPECIAL">SPECIAL</option>
+                <option value="EXPRESS">EXPRESS</option>
+              </select>
             </div>
             
             <div className="flex flex-col">
@@ -178,17 +276,25 @@ const InvoiceBookForm = () => {
             </div>
             
             <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">BOOK TYPE:</label>
-              <select
-                name="bookType"
-                value={formData.bookType}
+              <label className="text-sm font-medium mb-1">SALES REPRESENTATIVE:</label>
+              <Input 
+                name="salesRepresentative"
+                value={formData.salesRepresentative}
                 onChange={handleInputChange}
-                className="bg-blue-500 text-white py-2 px-3 rounded text-sm h-10 transition-all hover:bg-blue-600"
-              >
-                <option value="NORMAL">NORMAL</option>
-                <option value="SPECIAL">SPECIAL</option>
-                <option value="EXPRESS">EXPRESS</option>
-              </select>
+                className="border border-gray-300 transition-colors focus:border-blue-400"
+                placeholder="Enter sales representative name"
+              />
+            </div>
+            
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">DRIVER NAME:</label>
+              <Input 
+                name="driverName"
+                value={formData.driverName}
+                onChange={handleInputChange}
+                className="border border-gray-300 transition-colors focus:border-blue-400"
+                placeholder="Enter driver name"
+              />
             </div>
           </div>
           

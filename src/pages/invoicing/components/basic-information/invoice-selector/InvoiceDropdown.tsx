@@ -70,11 +70,14 @@ const InvoiceDropdown: React.FC<InvoiceDropdownProps> = ({
                   <FileText className="h-4 w-4 text-blue-500" />
                   <span>{invoice.invoiceNumber}</span>
                 </div>
-                {invoice.assignedTo && (
-                  <span className="text-xs text-gray-500 ml-2">
-                    {invoice.assignedTo}
-                  </span>
-                )}
+                <div className="flex flex-col text-xs text-gray-500 ml-2">
+                  {invoice.assignedTo && (
+                    <span>Rep: {invoice.assignedTo}</span>
+                  )}
+                  {invoice.driverName && (
+                    <span>Driver: {invoice.driverName}</span>
+                  )}
+                </div>
               </SelectItem>
             ))
           ) : (

@@ -271,48 +271,82 @@ export const useEritreaInvoice = (invoiceId?: string) => {
   };
 
   const saveInvoice = async () => {
+    console.log("💾 ERITREA INVOICE SAVE - Starting save process");
+    console.log("📊 Form data:", formData);
+    console.log("📦 Package items:", packageItems);
+    
     try {
       // Validate required fields
       if (!formData.invoiceNumber) {
+        console.log("❌ VALIDATION FAILED: No invoice number");
         toast.error("Invoice number is required");
         return false;
       }
       
       if (!formData.shipperName || !formData.consigneeName) {
+        console.log("❌ VALIDATION FAILED: Missing shipper or consignee name");
+        console.log("Shipper:", formData.shipperName, "Consignee:", formData.consigneeName);
         toast.error("Shipper and Consignee names are required");
         return false;
       }
 
       if (packageItems.length === 0) {
+        console.log("❌ VALIDATION FAILED: No package items");
         toast.error("At least one package item is required");
         return false;
       }
+
+      console.log("✅ VALIDATION PASSED - Proceeding with save");
 
       // Save to localStorage for now (can be replaced with API call)
       const invoiceData = {
         ...formData,
         packageItems,
         id: invoiceId || formData.invoiceNumber,
+        country: 'eritrea',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
 
-      const existingInvoices = JSON.parse(localStorage.getItem("eritrea-invoices") || "[]");
+      console.log("📝 Prepared invoice data:", invoiceData);
+
+      // Use consistent localStorage key
+      const storageKey = "eritreaInvoices";
+      const existingInvoices = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      console.log("📚 Current invoices count:", existingInvoices.length);
+      
       const invoiceIndex = existingInvoices.findIndex((inv: any) => inv.id === invoiceData.id);
+      console.log("🔍 Invoice index check:", invoiceIndex);
       
       if (invoiceIndex >= 0) {
+        console.log("📝 Updating existing invoice");
         existingInvoices[invoiceIndex] = invoiceData;
       } else {
+        console.log("➕ Adding new invoice");
         existingInvoices.push(invoiceData);
       }
       
-      localStorage.setItem("eritrea-invoices", JSON.stringify(existingInvoices));
+      console.log("💾 Saving to localStorage - total invoices:", existingInvoices.length);
+      localStorage.setItem(storageKey, JSON.stringify(existingInvoices));
       
-      toast.success("Invoice saved successfully");
-      return true;
+      // Verify the save was successful
+      const verifyInvoices = JSON.parse(localStorage.getItem(storageKey) || "[]");
+      const savedInvoice = verifyInvoices.find((inv: any) => inv.id === invoiceData.id);
+      
+      if (savedInvoice) {
+        console.log("✅ ERITREA INVOICE - Save verified successfully!");
+        console.log("Saved invoice:", savedInvoice);
+        toast.success("Eritrea invoice saved successfully!");
+        return true;
+      } else {
+        console.log("❌ ERITREA INVOICE - Save verification failed");
+        toast.error("Failed to verify invoice save");
+        return false;
+      }
+      
     } catch (error) {
-      console.error("Error saving invoice:", error);
-      toast.error("Failed to save invoice");
+      console.error("❌ ERITREA INVOICE SAVE ERROR:", error);
+      toast.error("Failed to save Eritrea invoice");
       return false;
     }
   };
