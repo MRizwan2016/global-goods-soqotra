@@ -25,6 +25,10 @@ export interface EritreaFormData {
   driver: string;
   district: string;
   
+  // Invoice Book Details
+  bookNumber: string;
+  isInvoiceActivated: boolean;
+  
   // Door to Door
   doorToDoor: "YES" | "NO";
   doorToDoorPrice: number;
@@ -78,6 +82,8 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     salesRep: "",
     driver: "",
     district: "",
+    bookNumber: "",
+    isInvoiceActivated: false,
     doorToDoor: "NO",
     doorToDoorPrice: 0,
     shipperName: "",
@@ -122,15 +128,17 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     quantity: "1"
   });
 
-  // Auto-calculate door-to-door pricing when sector changes
+  // Auto-calculate door-to-door pricing based on Gross Weight × Door-to-Door
   useEffect(() => {
-    if (formData.doorToDoor === "YES" && formData.sector) {
+    if (formData.doorToDoor === "YES" && formData.sector && formData.totalWeight > 0) {
       const pricing = doorToDoorPricing[formData.sector as keyof typeof doorToDoorPricing];
       if (pricing) {
+        // Calculate: Gross Weight × Door-to-Door rate
+        const doorToDoorAmount = formData.totalWeight * pricing.price;
         setFormData(prev => ({
           ...prev,
-          doorToDoorPrice: pricing.price,
-          destinationDoorDelivery: pricing.price
+          doorToDoorPrice: doorToDoorAmount,
+          destinationDoorDelivery: doorToDoorAmount
         }));
       }
     } else {
@@ -140,7 +148,7 @@ export const useEritreaInvoice = (invoiceId?: string) => {
         destinationDoorDelivery: 0
       }));
     }
-  }, [formData.doorToDoor, formData.sector]);
+  }, [formData.doorToDoor, formData.sector, formData.totalWeight]);
 
   // Auto-calculate totals when costs change
   useEffect(() => {
@@ -329,6 +337,61 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     }
   };
 
+  const activateInvoice = (invoiceNumber: string, bookNumber: string) => {
+    try {
+      // Update form data with activation
+      setFormData(prev => ({
+        ...prev,
+        invoiceNumber,
+        bookNumber,
+        isInvoiceActivated: true
+      }));
+
+      // Store activated invoice in localStorage
+      const activatedInvoices = JSON.parse(localStorage.getItem("activated-eritrea-invoices") || "[]");
+      const activatedInvoice = {
+        invoiceNumber,
+        bookNumber,
+        activatedAt: new Date().toISOString(),
+        status: "ACTIVE"
+      };
+
+      const existingIndex = activatedInvoices.findIndex((inv: any) => inv.invoiceNumber === invoiceNumber);
+      if (existingIndex >= 0) {
+        activatedInvoices[existingIndex] = activatedInvoice;
+      } else {
+        activatedInvoices.push(activatedInvoice);
+      }
+
+      localStorage.setItem("activated-eritrea-invoices", JSON.stringify(activatedInvoices));
+      
+      toast.success(`Invoice ${invoiceNumber} activated with Book #${bookNumber}`);
+      return true;
+    } catch (error) {
+      console.error("Error activating invoice:", error);
+      toast.error("Failed to activate invoice");
+      return false;
+    }
+  };
+
+  const assignBookNumber = (bookNumber: string) => {
+    if (!formData.invoiceNumber) {
+      toast.error("Please select an invoice first");
+      return false;
+    }
+
+    return activateInvoice(formData.invoiceNumber, bookNumber);
+  };
+
+  const getActivatedInvoices = () => {
+    try {
+      return JSON.parse(localStorage.getItem("activated-eritrea-invoices") || "[]");
+    } catch (error) {
+      console.error("Error loading activated invoices:", error);
+      return [];
+    }
+  };
+
   return {
     formData,
     packageItems,
@@ -341,6 +404,9 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     removePackageItem,
     updatePackageItem,
     saveInvoice,
-    loadInvoice
+    loadInvoice,
+    activateInvoice,
+    assignBookNumber,
+    getActivatedInvoices
   };
 };
