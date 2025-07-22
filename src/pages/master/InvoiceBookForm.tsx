@@ -18,6 +18,39 @@ const InvoiceBookForm = () => {
     salesRepresentative: "",
     driverName: ""
   });
+
+  // Country-specific data
+  const getSalesRepresentatives = (country: string) => {
+    switch (country) {
+      case "ERITREA":
+        return [
+          { value: "MR_YOUSUF", label: "Mr. Yousuf" },
+          { value: "MR_SALEH", label: "Mr. Saleh" },
+          { value: "MR_ABDUL_QADER", label: "Mr. Abdul Qader" },
+          { value: "MR_YASIR", label: "Mr. Yasir" }
+        ];
+      default:
+        return [
+          { value: "DEFAULT_REP", label: "Default Representative" }
+        ];
+    }
+  };
+
+  const getDrivers = (country: string) => {
+    switch (country) {
+      case "ERITREA":
+        return [
+          { value: "MR_JOHNY_VENAKADY", label: "Mr. Johny Venakady" },
+          { value: "MR_SALIH", label: "Mr. Salih" },
+          { value: "MR_BAKHEETH", label: "Mr. Bakheeth" },
+          { value: "MR_IDRIS_KARAR", label: "Mr. Idris Karar" }
+        ];
+      default:
+        return [
+          { value: "DEFAULT_DRIVER", label: "Default Driver" }
+        ];
+    }
+  };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -40,8 +73,8 @@ const InvoiceBookForm = () => {
             lastPage = firstPage + 49;
             break;
           case "ERITREA":
-            // Eritrea: book 1 = 01000-01051, book 2 = 01051-01101, etc.
-            firstPage = 1000 + ((bookNumber - 1) * 50);
+            // Eritrea: book 1 = 010000-010051, book 2 = 010051-010101, etc.
+            firstPage = 10000 + ((bookNumber - 1) * 50);
             lastPage = firstPage + 49;
             break;
           case "KENYA":
@@ -68,9 +101,15 @@ const InvoiceBookForm = () => {
         
         updatedFormData = {
           ...updatedFormData,
-          startPage: firstPage.toString().padStart(8, '0'),
-          endPage: lastPage.toString().padStart(8, '0')
+          startPage: firstPage.toString().padStart(6, '0'),
+          endPage: lastPage.toString().padStart(6, '0')
         };
+      }
+      
+      // Reset sales rep and driver when country changes
+      if (name === "country") {
+        updatedFormData.salesRepresentative = "";
+        updatedFormData.driverName = "";
       }
       
       setFormData(updatedFormData);
@@ -277,24 +316,38 @@ const InvoiceBookForm = () => {
             
             <div className="flex flex-col">
               <label className="text-sm font-medium mb-1">SALES REPRESENTATIVE:</label>
-              <Input 
+              <select
                 name="salesRepresentative"
                 value={formData.salesRepresentative}
                 onChange={handleInputChange}
-                className="border border-gray-300 transition-colors focus:border-blue-400"
-                placeholder="Enter sales representative name"
-              />
+                className="bg-blue-500 text-white py-2 px-3 rounded text-sm h-10 transition-all hover:bg-blue-600"
+                disabled={!formData.country}
+              >
+                <option value="">Select Sales Representative</option>
+                {getSalesRepresentatives(formData.country).map(rep => (
+                  <option key={rep.value} value={rep.label}>
+                    {rep.label}
+                  </option>
+                ))}
+              </select>
             </div>
             
             <div className="flex flex-col">
               <label className="text-sm font-medium mb-1">DRIVER NAME:</label>
-              <Input 
+              <select
                 name="driverName"
                 value={formData.driverName}
                 onChange={handleInputChange}
-                className="border border-gray-300 transition-colors focus:border-blue-400"
-                placeholder="Enter driver name"
-              />
+                className="bg-blue-500 text-white py-2 px-3 rounded text-sm h-10 transition-all hover:bg-blue-600"
+                disabled={!formData.country}
+              >
+                <option value="">Select Driver</option>
+                {getDrivers(formData.country).map(driver => (
+                  <option key={driver.value} value={driver.label}>
+                    {driver.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           
