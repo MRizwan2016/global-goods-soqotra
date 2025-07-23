@@ -50,7 +50,9 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-blue-900">
-                    SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL
+                    {formData.shipperCountry === "SAUDI ARABIA" 
+                      ? "SOQOTRA SOLUTIONS WLL" 
+                      : "SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL"}
                   </h1>
                   <div className="text-sm text-gray-600 mt-2">
                     <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
@@ -105,7 +107,9 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
               </div>
               <div>
                 <p><span className="font-medium">PAYMENT STATUS:</span></p>
-                <p className="text-green-600 font-bold">{costDetails.net > 0 ? "PAID" : "PENDING"}</p>
+                <p className={`font-bold ${formData.paymentStatus === 'PAID' ? 'text-green-600' : 'text-red-600'}`}>
+                  {formData.paymentStatus || "UNPAID"}
+                </p>
               </div>
               <div>
                 <p><span className="font-medium">PAYMENT METHOD:</span></p>

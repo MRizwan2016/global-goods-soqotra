@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { User, MapPin, Phone, Globe } from "lucide-react";
-import { namePrefixes, qatarCities, destinationCountries, eritreaCities } from "../../data/eritreaData";
+import { namePrefixes, qatarCities, destinationCountries, eritreaCities, saudiCities } from "../../data/eritreaData";
 import { EritreaFormData } from "../../hooks/useEritreaInvoice";
 
 interface ShipperDetailsProps {
@@ -115,6 +115,25 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
                   {eritreaCities.map(city => (
+                    <SelectItem key={city} value={city}>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-3 w-3" />
+                        {city}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : formData.shipperCountry === "SAUDI ARABIA" ? (
+              <Select 
+                value={formData.shipperCity} 
+                onValueChange={(value) => handleFormChange('shipperCity', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Saudi city" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {saudiCities.map(city => (
                     <SelectItem key={city} value={city}>
                       <div className="flex items-center gap-2">
                         <MapPin className="h-3 w-3" />

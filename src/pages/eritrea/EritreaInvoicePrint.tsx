@@ -44,10 +44,11 @@ const EritreaInvoicePrint = () => {
 
   // Get company name based on shipper country
   const getCompanyName = () => {
-    if (invoice?.shipperCountry === "SAUDI ARABIA") {
-      return "SOQOTRA SOLUTION WLL";
+    const country = invoice?.shipperCountry || displayData?.shipperCountry || "QATAR";
+    if (country === "SAUDI ARABIA") {
+      return "SOQOTRA SOLUTIONS WLL";
     }
-    return "SOQOTRA EXPRESS CARGO";
+    return "SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL";
   };
 
   // Fallback invoice data for when loading from location state
@@ -207,22 +208,30 @@ const EritreaInvoicePrint = () => {
           style={{ minHeight: '297mm' }}
         >
           <div className="invoice-container p-8">
-            {/* Header */}
-            <div className="header">
-              <div className="company-info flex items-start">
-                <div className="logo-placeholder">LOGO</div>
+            {/* Header - Using preview layout */}
+            <div className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', flex: 1 }}>
+                <div style={{ width: '64px', height: '64px', background: 'linear-gradient(45deg, #22c55e, #ef4444)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
+                  LOGO
+                </div>
                 <div>
-                  <h1>{getCompanyName()}</h1>
-                  <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
-                  <p>AZIZIA COMMERCIAL STREET, P.O.BOX: 55861, AZIZIA - ERITREA</p>
-                  <p>TEL: +291 - 44832508 | EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
+                  <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e3a8a', margin: '0' }}>
+                    {getCompanyName()}
+                  </h1>
+                  <div style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+                    <p style={{ margin: '0' }}>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
+                    <p style={{ margin: '0' }}>AZIZIA COMMERCIAL STREET, P.O.BOX: 55861, AZIZIA - ERITREA</p>
+                    <p style={{ margin: '0' }}>TEL: +291 - 44832508 | EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
+                  </div>
                 </div>
               </div>
-              <div className="invoice-badge">
-                <h2>INVOICE</h2>
-                <p style={{ fontSize: '16px', fontWeight: 'bold' }}>#{displayData.invoiceNumber || displayData.formData?.invoiceNumber}</p>
-                <p>DATE: {displayData.invoiceDate || displayData.formData?.invoiceDate}</p>
-                <p>PRINT DATE: {new Date().toLocaleDateString()}</p>
+              <div style={{ textAlign: 'right' }}>
+                <div style={{ border: '2px solid #ccc', padding: '16px', borderRadius: '8px' }}>
+                  <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0' }}>INVOICE</h2>
+                  <p style={{ fontSize: '18px', fontWeight: 'bold', margin: '4px 0' }}>#{displayData.invoiceNumber || displayData.formData?.invoiceNumber}</p>
+                  <p style={{ fontSize: '14px', margin: '4px 0' }}>DATE: {displayData.invoiceDate || displayData.formData?.invoiceDate}</p>
+                  <p style={{ fontSize: '14px', margin: '4px 0' }}>PRINT DATE: {new Date().toLocaleDateString()}</p>
+                </div>
               </div>
             </div>
 
@@ -280,8 +289,8 @@ const EritreaInvoicePrint = () => {
                   </div>
                   <div>
                     <strong>PAYMENT STATUS:</strong><br />
-                    <span style={{ color: '#16a34a', fontWeight: 'bold' }}>
-                      {parseFloat(invoiceData.costDetails.net) > 0 ? "PAID" : "PENDING"}
+                    <span style={{ color: displayData.paymentStatus === 'PAID' ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>
+                      {displayData.paymentStatus || "UNPAID"}
                     </span>
                   </div>
                   <div>

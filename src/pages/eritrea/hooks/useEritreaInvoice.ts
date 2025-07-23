@@ -77,6 +77,9 @@ export interface EritreaFormData {
   giftCargo: "YES" | "NO";
   prePaid: "YES" | "NO";
   freightBy: "SEA" | "AIR" | "LAND";
+  
+  // Payment Status
+  paymentStatus: "PAID" | "UNPAID";
 }
 
 export const useEritreaInvoice = (invoiceId?: string) => {
@@ -126,7 +129,8 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     remarks: "",
     giftCargo: "NO",
     prePaid: "NO",
-    freightBy: "SEA"
+    freightBy: "SEA",
+    paymentStatus: "UNPAID"
   });
 
   const [packageItems, setPackageItems] = useState<EritreaPackageItem[]>([]);

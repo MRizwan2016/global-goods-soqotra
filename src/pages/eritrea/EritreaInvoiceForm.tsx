@@ -626,6 +626,18 @@ const EritreaInvoiceForm = () => {
                     </Select>
                   </div>
                   <div className="space-y-2">
+                    <label className="text-sm font-medium">PAYMENT STATUS:</label>
+                    <Select value={formData.paymentStatus} onValueChange={(value) => handleFormChange('paymentStatus', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="UNPAID">UNPAID</SelectItem>
+                        <SelectItem value="PAID">PAID</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
                     <label className="text-sm font-medium">REMARKS:</label>
                     <Textarea
                       value={formData.remarks}
