@@ -225,7 +225,7 @@ const EritreaInvoicePrint = () => {
             <div className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', flex: 1 }}>
                 <img 
-                  src="/lovable-uploads/20ff731f-6c24-4e68-beae-c5b2c55e7837.png" 
+                  src="/lovable-uploads/5d6de24f-5662-4b63-ad5a-e94dfa2aada7.png" 
                   alt="Soqotra Logo" 
                   style={{ width: '180px', height: 'auto', objectFit: 'contain' }}
                 />
