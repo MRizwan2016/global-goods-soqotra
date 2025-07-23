@@ -17,6 +17,9 @@ export const mockUsers: User[] = [
   { id: "11", name: "Mr. Evans" },
   { id: "12", name: "Mr. Paul Onchana" },
   { id: "13", name: "Mr. Edwin Mbuguo" },
+  { id: "14", name: "Mr. Yousuf" },
+  { id: "15", name: "Mr. Saleh" },
+  { id: "16", name: "Mr. Abdul Qader" },
 ];
 
 export function useBookStock() {
