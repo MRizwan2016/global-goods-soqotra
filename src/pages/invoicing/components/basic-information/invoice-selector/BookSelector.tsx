@@ -43,13 +43,28 @@ const BookSelector: React.FC<BookSelectorProps> = ({ onBookSelect }) => {
       });
       
       storedBooks.forEach((book: any) => {
-        if (book.bookNumber) books.add(book.bookNumber);
+        if (book.bookNumber && book.isActivated) books.add(book.bookNumber);
       });
+      
+      console.log("BookSelector - Available books loaded:", Array.from(books));
       
       setAvailableBooks(Array.from(books));
     };
     
     loadAvailableBooks();
+    
+    // Listen for storage changes to reload books
+    const handleStorageChange = () => {
+      loadAvailableBooks();
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('book-update', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('book-update', handleStorageChange);
+    };
   }, []);
   
   const handleSelectBook = (value: string) => {

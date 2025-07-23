@@ -73,9 +73,9 @@ const InvoiceBookForm = () => {
             lastPage = firstPage + 49;
             break;
           case "ERITREA":
-            // Eritrea: book 1 = 010002-010051, book 2 = 010052-010101, etc.
-            firstPage = 10002 + ((bookNumber - 1) * 50);
-            lastPage = firstPage + 49;
+            // Eritrea: book 1 = 010000-010051, book 2 = 010052-010101, etc.
+            firstPage = 10000 + ((bookNumber - 1) * 50);
+            lastPage = firstPage + 51;
             break;
           case "KENYA":
             // Kenya: book 1 = 02000-02051, book 2 = 02051-02101, etc.
@@ -165,8 +165,8 @@ const InvoiceBookForm = () => {
         salesRepresentative: formData.salesRepresentative,
         driverName: formData.driverName,
         availablePages: Array.from(
-          { length: 50 }, 
-          (_, i) => (parseInt(formData.startPage) + i).toString().padStart(8, '0')
+          { length: parseInt(formData.endPage) - parseInt(formData.startPage) + 1 }, 
+          (_, i) => (parseInt(formData.startPage) + i).toString().padStart(6, '0')
         )
       };
       
