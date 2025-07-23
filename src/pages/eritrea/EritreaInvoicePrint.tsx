@@ -46,7 +46,7 @@ const EritreaInvoicePrint = () => {
   const getCompanyName = () => {
     const country = invoice?.shipperCountry || displayData?.shipperCountry || "QATAR";
     if (country === "SAUDI ARABIA") {
-      return "SOQOTRA SOLUTIONS WLL";
+      return "SOQOTRA SOLUTION WLL";
     }
     return "SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL";
   };
@@ -224,9 +224,11 @@ const EritreaInvoicePrint = () => {
             {/* Header - Using preview layout */}
             <div className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', flex: 1 }}>
-                <div style={{ width: '64px', height: '64px', background: 'linear-gradient(45deg, #22c55e, #ef4444)', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
-                  LOGO
-                </div>
+                <img 
+                  src="/lovable-uploads/20ff731f-6c24-4e68-beae-c5b2c55e7837.png" 
+                  alt="Soqotra Logo" 
+                  style={{ width: '180px', height: 'auto', objectFit: 'contain' }}
+                />
                 <div>
                   <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e3a8a', margin: '0' }}>
                     {getCompanyName()}
