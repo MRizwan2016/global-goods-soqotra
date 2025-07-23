@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { UserCheck, MapPin, Phone, Globe } from "lucide-react";
-import { namePrefixes, qatarCities, destinationCountries } from "../../data/eritreaData";
+import { namePrefixes, qatarCities, destinationCountries, eritreaCities } from "../../data/eritreaData";
 import { EritreaFormData } from "../../hooks/useEritreaInvoice";
 
 interface ConsigneeDetailsProps {
@@ -96,6 +96,25 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
                 </SelectTrigger>
                 <SelectContent className="max-h-[300px]">
                   {qatarCities.map(city => (
+                    <SelectItem key={city} value={city}>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-3 w-3" />
+                        {city}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : formData.consigneeCountry === "ERITREA" ? (
+              <Select 
+                value={formData.consigneeCity} 
+                onValueChange={(value) => handleFormChange('consigneeCity', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Eritrea city" />
+                </SelectTrigger>
+                <SelectContent className="max-h-[300px]">
+                  {eritreaCities.map(city => (
                     <SelectItem key={city} value={city}>
                       <div className="flex items-center gap-2">
                         <MapPin className="h-3 w-3" />

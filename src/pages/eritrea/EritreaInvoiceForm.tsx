@@ -98,14 +98,11 @@ const EritreaInvoiceForm = () => {
   };
 
   const handlePrint = () => {
-    const invoiceData = {
-      formData,
-      packageItems
-    };
-    
-    navigate(`/eritrea/invoice/print/${formData.invoiceNumber || 'ER' + Date.now()}`, {
-      state: { invoiceData }
-    });
+    if (id) {
+      navigate(`/eritrea/invoice/print/${id}`);
+    } else {
+      toast.error("Please save the invoice first to print");
+    }
   };
 
   const handlePrintFromPreview = () => {

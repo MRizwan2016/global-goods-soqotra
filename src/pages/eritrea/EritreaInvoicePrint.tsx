@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Printer } from "lucide-react";
@@ -9,8 +9,48 @@ const EritreaInvoicePrint = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const printRef = useRef<HTMLDivElement>(null);
-  
-  // Get invoice data from location state or mock data
+  const [invoice, setInvoice] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Load invoice from localStorage
+  useEffect(() => {
+    const loadInvoice = () => {
+      try {
+        const storedInvoices = JSON.parse(localStorage.getItem('eritreaInvoices') || '[]');
+        const foundInvoice = storedInvoices.find((inv: any) => inv.id === id);
+        
+        if (foundInvoice) {
+          setInvoice(foundInvoice);
+          console.log("📄 PRINT - Invoice loaded:", foundInvoice);
+        } else {
+          toast.error("Invoice not found");
+          navigate("/eritrea");
+        }
+      } catch (error) {
+        console.error("Error loading invoice:", error);
+        toast.error("Failed to load invoice");
+        navigate("/eritrea");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      loadInvoice();
+    } else {
+      setLoading(false);
+    }
+  }, [id, navigate]);
+
+  // Get company name based on shipper country
+  const getCompanyName = () => {
+    if (invoice?.shipperCountry === "SAUDI ARABIA") {
+      return "SOQOTRA SOLUTION WLL";
+    }
+    return "SOQOTRA EXPRESS CARGO";
+  };
+
+  // Fallback invoice data for when loading from location state
   const invoiceData = location.state?.invoiceData || {
     formData: {
       invoiceNumber: "ER13135619",
@@ -119,8 +159,26 @@ const EritreaInvoicePrint = () => {
   };
 
   const handleBack = () => {
-    navigate("/eritrea");
+    if (id) {
+      navigate(`/eritrea/invoice/edit/${id}`);
+    } else {
+      navigate("/eritrea");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p>Loading invoice...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Use loaded invoice data or fallback to location state
+  const displayData = invoice || invoiceData;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -154,7 +212,7 @@ const EritreaInvoicePrint = () => {
               <div className="company-info flex items-start">
                 <div className="logo-placeholder">LOGO</div>
                 <div>
-                  <h1>SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</h1>
+                  <h1>{getCompanyName()}</h1>
                   <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
                   <p>AZIZIA COMMERCIAL STREET, P.O.BOX: 55861, AZIZIA - ERITREA</p>
                   <p>TEL: +291 - 44832508 | EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
@@ -162,8 +220,8 @@ const EritreaInvoicePrint = () => {
               </div>
               <div className="invoice-badge">
                 <h2>INVOICE</h2>
-                <p style={{ fontSize: '16px', fontWeight: 'bold' }}>#{invoiceData.formData.invoiceNumber}</p>
-                <p>DATE: {invoiceData.formData.invoiceDate}</p>
+                <p style={{ fontSize: '16px', fontWeight: 'bold' }}>#{displayData.invoiceNumber || displayData.formData?.invoiceNumber}</p>
+                <p>DATE: {displayData.invoiceDate || displayData.formData?.invoiceDate}</p>
                 <p>PRINT DATE: {new Date().toLocaleDateString()}</p>
               </div>
             </div>
@@ -173,28 +231,36 @@ const EritreaInvoicePrint = () => {
               <div className="section">
                 <div className="section-header">SHIPPER</div>
                 <div className="section-content">
-                  <p style={{ fontWeight: 'bold' }}>{invoiceData.shippingDetails.shipper1}</p>
-                  <p>{invoiceData.shippingDetails.shipper2}</p>
+                  <p style={{ fontWeight: 'bold' }}>
+                    {displayData.shipperPrefix} {displayData.shipperName || displayData.shippingDetails?.shipper1}
+                  </p>
+                  <p>{displayData.shipperAddress || displayData.shippingDetails?.shipper2}</p>
                   <p style={{ color: '#dc2626', fontWeight: '500', marginTop: '10px' }}>
-                    {invoiceData.shippingDetails.town}
+                    {displayData.shipperCity}, {displayData.shipperCountry || displayData.shippingDetails?.town}
                   </p>
                   <p style={{ marginTop: '10px' }}>
-                    <strong>MOBILE:</strong> {invoiceData.shippingDetails.mobile}
+                    <strong>MOBILE:</strong> {displayData.shipperMobile || displayData.shippingDetails?.mobile}
                   </p>
+                  <p><strong>EMAIL:</strong> {displayData.shipperEmail}</p>
+                  <p><strong>ID:</strong> {displayData.shipperIdNumber}</p>
                 </div>
               </div>
               
               <div className="section">
                 <div className="section-header">CONSIGNEE</div>
                 <div className="section-content">
-                  <p style={{ fontWeight: 'bold' }}>{invoiceData.shippingDetails.consignee1}</p>
-                  <p>{invoiceData.shippingDetails.consignee2}</p>
-                  <p style={{ marginTop: '10px' }}>{invoiceData.shippingDetails.consigneeAddress}</p>
-                  <p>{invoiceData.shippingDetails.consigneeTown}</p>
-                  <p style={{ marginTop: '10px' }}>
-                    <strong>MOBILE:</strong> {invoiceData.shippingDetails.consigneeMobile}
+                  <p style={{ fontWeight: 'bold' }}>
+                    {displayData.consigneePrefix} {displayData.consigneeName || displayData.shippingDetails?.consignee1}
                   </p>
-                  <p><strong>ID/PASSPORT:</strong> {invoiceData.shippingDetails.consigneePassportNic}</p>
+                  <p>{displayData.consigneeAddress || displayData.shippingDetails?.consignee2}</p>
+                  <p style={{ marginTop: '10px' }}>
+                    {displayData.consigneeCity}, {displayData.consigneeCountry || displayData.shippingDetails?.consigneeTown}
+                  </p>
+                  <p style={{ marginTop: '10px' }}>
+                    <strong>MOBILE:</strong> {displayData.consigneeMobile || displayData.shippingDetails?.consigneeMobile}
+                  </p>
+                  <p><strong>EMAIL:</strong> {displayData.consigneeEmail}</p>
+                  <p><strong>ID/PASSPORT:</strong> {displayData.consigneeIdNumber || displayData.shippingDetails?.consigneePassportNic}</p>
                 </div>
               </div>
             </div>

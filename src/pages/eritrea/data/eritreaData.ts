@@ -78,6 +78,12 @@ export const destinationCountries = [
   "MOZAMBIQUE", "TUNISIA", "ALGERIA", "LIBYA", "MOROCCO", "JORDAN"
 ];
 
+// Eritrea cities for consignee/shipper destination
+export const eritreaCities = [
+  "ASMARA", "MENDEFERA", "MASSAWA", "DEKEMHARE", "BARENTU", 
+  "ADI KEYH", "IDI", "ASSAB", "AKORDAT", "KEREN"
+];
+
 // Country codes for mobile numbers
 export const countryCodes = {
   "QATAR": "+974",

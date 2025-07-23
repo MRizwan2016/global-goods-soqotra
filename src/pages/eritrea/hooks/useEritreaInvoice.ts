@@ -394,7 +394,7 @@ export const useEritreaInvoice = (invoiceId?: string) => {
 
   const loadInvoice = async (id: string) => {
     try {
-      const existingInvoices = JSON.parse(localStorage.getItem("eritrea-invoices") || "[]");
+      const existingInvoices = JSON.parse(localStorage.getItem("eritreaInvoices") || "[]");
       const invoice = existingInvoices.find((inv: any) => inv.id === id);
       
       if (invoice) {

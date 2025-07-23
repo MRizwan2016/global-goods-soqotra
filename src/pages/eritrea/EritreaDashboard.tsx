@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -17,8 +17,25 @@ const EritreaDashboard = () => {
   const [selectedBranch, setSelectedBranch] = useState("all");
   const [selectedWarehouse, setSelectedWarehouse] = useState("all");
 
-  // Mock data for Eritrea operations
-  const shipmentData = [
+  // Load saved invoices from localStorage
+  const [invoices, setInvoices] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadInvoices = () => {
+      try {
+        const storedInvoices = JSON.parse(localStorage.getItem('eritreaInvoices') || '[]');
+        setInvoices(storedInvoices);
+        console.log("📊 DASHBOARD - Loaded invoices:", storedInvoices);
+      } catch (error) {
+        console.error("Error loading invoices:", error);
+      }
+    };
+
+    loadInvoices();
+  }, []);
+
+  // Mock data for Eritrea operations - will be replaced by loaded invoices
+  const mockShipmentData = [
     {
       id: "ER001001",
       invoiceDate: "20/01/2025",
@@ -71,6 +88,25 @@ const EritreaDashboard = () => {
       status: "processing"
     }
   ];
+
+  // Transform loaded invoices to display format
+  const shipmentData = invoices.length > 0 ? invoices.map((invoice, index) => ({
+    id: invoice.id || invoice.invoiceNumber,
+    invoiceDate: new Date(invoice.invoiceDate || invoice.createdAt).toLocaleDateString('en-GB'),
+    customer: `${invoice.consigneePrefix || ''} ${invoice.consigneeName || 'N/A'}`.trim(),
+    sector: invoice.sector?.charAt(0) || "M",
+    warehouse: invoice.port || "Massawa",
+    d2d: invoice.doorToDoor || "No",
+    nic: invoice.consigneeIdNumber || `ER${Date.now().toString().slice(-7)}`,
+    volume: invoice.totalVolume?.toFixed(2) || "0.00",
+    weight: invoice.totalWeight?.toFixed(2) || "0.00",
+    packages: invoice.totalPackages?.toString() || "0",
+    gross: invoice.gross?.toFixed(2) || "0.00",
+    discount: invoice.discount?.toFixed(2) || "0.00",
+    net: invoice.net?.toFixed(2) || "0.00",
+    paid: "0.00", // TODO: Add payment tracking
+    status: "pending" // TODO: Add status tracking
+  })) : mockShipmentData;
 
   const statsData = [
     { title: "Total Shipments", value: "156", icon: Ship, color: "bg-blue-500" },
@@ -242,10 +278,20 @@ const EritreaDashboard = () => {
                       <TableCell>{getStatusBadge(item.status)}</TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          <Button variant="ghost" size="sm" className="text-blue-600 p-1">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-blue-600 p-1"
+                            onClick={() => navigate(`/eritrea/invoice/edit/${item.id}`)}
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm" className="text-green-600 p-1">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-green-600 p-1"
+                            onClick={() => navigate(`/eritrea/invoice/print/${item.id}`)}
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button variant="ghost" size="sm" className="text-red-600 p-1">

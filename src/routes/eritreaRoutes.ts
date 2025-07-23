@@ -16,6 +16,11 @@ export const eritreaRoutes: RouteConfig[] = [
     private: true
   },
   {
+    path: "/eritrea/invoice/edit/:id",
+    element: EritreaInvoiceForm,
+    private: true
+  },
+  {
     path: "/eritrea/invoice/print/:id",
     element: EritreaInvoicePrint,
     private: true
