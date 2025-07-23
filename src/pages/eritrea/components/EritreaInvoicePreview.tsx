@@ -40,7 +40,7 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
           </DialogTitle>
         </DialogHeader>
         
-        <div id="eritrea-invoice-print" className="bg-white p-8 text-black text-sm">
+        <div id="eritrea-invoice-print" className="bg-white p-6 text-black" style={{ fontSize: '11pt', fontFamily: 'Arial, sans-serif' }}>
           {/* Header */}
           <div className="flex justify-between items-start mb-8">
             <div className="flex-1">
@@ -99,7 +99,7 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
             <div className="grid grid-cols-4 gap-4 p-4">
               <div>
                 <p><span className="font-medium">WAREHOUSE:</span></p>
-                <p>{formData.warehouse || "KURUNEGALA"}</p>
+                <p>ERITREA</p>
               </div>
               <div>
                 <p><span className="font-medium">SECTOR:</span></p>
@@ -179,9 +179,12 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
             <div>
               <h3 className="font-bold text-lg mb-3 text-blue-900">TERMS & CONDITIONS:</h3>
               <div className="text-xs space-y-1">
-                <p>IN CASE OF DISPUTE OVER ANY CHARGES ON THIS INVOICE, PLEASE EMAIL:</p>
-                <p>ACCOUNTS@SOQOTRALOGISTICS.COM TO US WITHIN SEVEN DAYS FROM THE DATE OF INVOICE.</p>
-                <p>OTHERWISE CHARGES WOULD BE DEEMED AS CORRECT AND NO FURTHER DISPUTE WILL BE ENTERTAINED.</p>
+                <p>(1) I/We hereby declare that the contents of this consignment are fully accurately described, and the parcel or package doesn't contain any illegal items, cash, jewelry, or dangerous goods.</p>
+                <p>(2) Perishable & breakable items are shipped at my own risk; SOQOTRA is not liable for any loss from breakable or undeclared items.</p>
+                <p>(3) Shipper/Consignee responsible for destination charges.</p>
+                <p>(4) I understand that delivery time is just an indicator; it may change.</p>
+                <p>(5) Storage charges are applicable after 30 days.</p>
+                <p>(6) I undertake to comply with the above-mentioned terms and conditions.</p>
               </div>
             </div>
             
@@ -208,8 +211,22 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
             </div>
           </div>
 
+          {/* Signature Section */}
+          <div className="mt-8 flex justify-between items-end">
+            <div className="text-left">
+              <div className="border-t border-gray-400 pt-2 w-48">
+                <p className="text-xs font-medium">PAYMENT/CUSTOMER/SHIPPER SIGNATURE</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="border-t border-gray-400 pt-2 w-48">
+                <p className="text-xs font-medium">SHIPPER'S SIGNATURE</p>
+              </div>
+            </div>
+          </div>
+
           {/* Footer */}
-          <div className="mt-8 text-center text-xs text-gray-500">
+          <div className="mt-4 text-center text-xs text-gray-500">
             <p>This is a computer generated invoice and does not require signature.</p>
           </div>
         </div>
