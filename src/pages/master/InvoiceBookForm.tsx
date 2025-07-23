@@ -73,8 +73,8 @@ const InvoiceBookForm = () => {
             lastPage = firstPage + 49;
             break;
           case "ERITREA":
-            // Eritrea: book 1 = 010000-010051, book 2 = 010051-010101, etc.
-            firstPage = 10000 + ((bookNumber - 1) * 50);
+            // Eritrea: book 1 = 010002-010051, book 2 = 010052-010101, etc.
+            firstPage = 10002 + ((bookNumber - 1) * 50);
             lastPage = firstPage + 49;
             break;
           case "KENYA":
