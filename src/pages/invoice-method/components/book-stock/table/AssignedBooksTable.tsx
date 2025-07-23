@@ -44,7 +44,7 @@ const AssignedBooksTable: React.FC<AssignedBooksTableProps> = ({ books, onAssign
                     <span className="text-blue-600 font-mono">GY {book.startPage} - GY {book.endPage}</span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {parseInt(book.endPage) - parseInt(book.startPage) + 1} pages
+                    {parseInt(book.endPage) - parseInt(book.startPage) - 1} pages
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <span className="text-green-600 font-semibold">{book.available.length} available</span>
