@@ -98,29 +98,30 @@ const EritreaInvoicePrint = () => {
           }
           @page { 
             size: A4; 
-            margin: 0.5in; 
+            margin: 0.4in; 
           }
           body { 
             margin: 0; 
             padding: 0; 
-            font-size: 10px !important;
-            line-height: 1.2;
+            font-size: 12px !important;
+            line-height: 1.3;
           }
           .print-content {
             width: 100% !important;
             max-width: none !important;
             margin: 0 !important;
-            padding: 10px !important;
-            font-size: 10px !important;
-            transform: scale(0.9);
-            transform-origin: top left;
+            padding: 0 !important;
+          }
+          .invoice-container {
+            padding: 15px !important;
           }
           .no-print { display: none !important; }
-          table { page-break-inside: avoid; font-size: 9px; }
+          table { page-break-inside: avoid; font-size: 10px; }
           .grid { display: block !important; }
           .grid > div { margin-bottom: 8px !important; }
           h1, h2, h3 { margin: 5px 0 !important; }
           .section { margin-bottom: 15px !important; }
+          img { max-width: 120px !important; height: auto !important; }
         }
       </style>
     `;
@@ -221,26 +222,26 @@ const EritreaInvoicePrint = () => {
           style={{ minHeight: '297mm' }}
         >
           <div className="invoice-container p-8">
-            {/* Header - Using preview layout */}
-            <div className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px', flex: 1 }}>
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
                 <img 
                   src="/lovable-uploads/5d6de24f-5662-4b63-ad5a-e94dfa2aada7.png" 
                   alt="Soqotra Logo" 
-                  style={{ width: '180px', height: 'auto', objectFit: 'contain' }}
+                  style={{ width: '120px', height: 'auto', objectFit: 'contain', display: 'block' }}
                 />
-                <div>
-                  <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1e3a8a', margin: '0' }}>
+                <div style={{ flex: 1 }}>
+                  <h1 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e3a8a', margin: '0 0 8px 0', lineHeight: '1.2' }}>
                     {getCompanyName()}
                   </h1>
-                  <div style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+                  <div style={{ fontSize: '11px', color: '#666', lineHeight: '1.3' }}>
                     <p style={{ margin: '0' }}>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
                     <p style={{ margin: '0' }}>AZIZIA COMMERCIAL STREET, P.O.BOX: 55861, AZIZIA - ERITREA</p>
                     <p style={{ margin: '0' }}>TEL: +291 - 44832508 | EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
                   </div>
                 </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
+              <div style={{ textAlign: 'right', minWidth: '200px' }}>
                 <div style={{ border: '2px solid #ccc', padding: '16px', borderRadius: '8px' }}>
                   <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0' }}>INVOICE</h2>
                   <p style={{ fontSize: '18px', fontWeight: 'bold', margin: '4px 0' }}>#{displayData.invoiceNumber || displayData.formData?.invoiceNumber}</p>
@@ -381,9 +382,12 @@ const EritreaInvoicePrint = () => {
                   TERMS & CONDITIONS:
                 </h3>
                 <div style={{ fontSize: '9px', lineHeight: '1.4' }}>
-                  <p>IN CASE OF DISPUTE OVER ANY CHARGES ON THIS INVOICE, PLEASE EMAIL:</p>
-                  <p>ACCOUNTS@SOQOTRALOGISTICS.COM TO US WITHIN SEVEN DAYS FROM THE DATE OF INVOICE.</p>
-                  <p>OTHERWISE CHARGES WOULD BE DEEMED AS CORRECT AND NO FURTHER DISPUTE WILL BE ENTERTAINED.</p>
+                  <p style={{ margin: '2px 0' }}>(1) WE HEREBY DECLARE THAT THE CONTENTS OF THIS CONSIGNMENT ARE FULLY AND ACCURATELY DESCRIBED, AND THE PARCEL OR PACKAGE DOESN'T CONTAIN ANY ILLEGAL ITEMS, CASH, JEWELRY, OR DANGEROUS GOODS.</p>
+                  <p style={{ margin: '2px 0' }}>(2) PERISHABLE & BREAKABLE ITEMS ARE SHIPPED AT MY OWN RISK. SOQOTRA IS NOT LIABLE FOR ANY LOSS FROM BREAKABLE OR UNDECLARED ITEMS.</p>
+                  <p style={{ margin: '2px 0' }}>(3) SHIPPER/CONSIGNEE RESPONSIBLE FOR DESTINATION CHARGES.</p>
+                  <p style={{ margin: '2px 0' }}>(4) I UNDERSTAND THE PRESENT TIME IS JUST AN INDICATOR, IT MAY CHANGE.</p>
+                  <p style={{ margin: '2px 0' }}>(5) STORAGE CHARGES ARE APPLICABLE AFTER 30 DAYS.</p>
+                  <p style={{ margin: '2px 0' }}>(6) I UNDERTAKE TO COMPLY WITH THE ABOVE-MENTIONED TERMS AND CONDITIONS.</p>
                 </div>
               </div>
               

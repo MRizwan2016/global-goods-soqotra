@@ -45,9 +45,11 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
           <div className="flex justify-between items-start mb-8">
             <div className="flex-1">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-red-500 rounded flex items-center justify-center text-white font-bold">
-                  LOGO
-                </div>
+                <img 
+                  src="/lovable-uploads/5d6de24f-5662-4b63-ad5a-e94dfa2aada7.png" 
+                  alt="Soqotra Logo" 
+                  className="w-[120px] h-auto object-contain"
+                />
                 <div>
                   <h1 className="text-xl font-bold text-blue-900">
                     {formData.shipperCountry === "SAUDI ARABIA" 
@@ -178,13 +180,13 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
           <div className="grid grid-cols-2 gap-8">
             <div>
               <h3 className="font-bold text-lg mb-3 text-blue-900">TERMS & CONDITIONS:</h3>
-              <div className="space-y-1" style={{ fontSize: '9px' }}>
-                <p>(1) I/We hereby declare that the contents of this consignment are fully accurately described, and the parcel or package doesn't contain any illegal items, cash, jewelry, or dangerous goods.</p>
-                <p>(2) Perishable & breakable items are shipped at my own risk; SOQOTRA is not liable for any loss from breakable or undeclared items.</p>
-                <p>(3) Shipper/Consignee responsible for destination charges.</p>
-                <p>(4) I understand that delivery time is just an indicator; it may change.</p>
-                <p>(5) Storage charges are applicable after 30 days.</p>
-                <p>(6) I undertake to comply with the above-mentioned terms and conditions.</p>
+              <div className="space-y-1" style={{ fontSize: '9px', lineHeight: '1.4' }}>
+                <p>(1) WE HEREBY DECLARE THAT THE CONTENTS OF THIS CONSIGNMENT ARE FULLY AND ACCURATELY DESCRIBED, AND THE PARCEL OR PACKAGE DOESN'T CONTAIN ANY ILLEGAL ITEMS, CASH, JEWELRY, OR DANGEROUS GOODS.</p>
+                <p>(2) PERISHABLE & BREAKABLE ITEMS ARE SHIPPED AT MY OWN RISK. SOQOTRA IS NOT LIABLE FOR ANY LOSS FROM BREAKABLE OR UNDECLARED ITEMS.</p>
+                <p>(3) SHIPPER/CONSIGNEE RESPONSIBLE FOR DESTINATION CHARGES.</p>
+                <p>(4) I UNDERSTAND THE PRESENT TIME IS JUST AN INDICATOR, IT MAY CHANGE.</p>
+                <p>(5) STORAGE CHARGES ARE APPLICABLE AFTER 30 DAYS.</p>
+                <p>(6) I UNDERTAKE TO COMPLY WITH THE ABOVE-MENTIONED TERMS AND CONDITIONS.</p>
               </div>
             </div>
             
