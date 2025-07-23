@@ -96,18 +96,31 @@ const EritreaInvoicePrint = () => {
             -webkit-print-color-adjust: exact !important;
             color-adjust: exact !important;
           }
-          body { margin: 0; padding: 0; }
+          @page { 
+            size: A4; 
+            margin: 0.5in; 
+          }
+          body { 
+            margin: 0; 
+            padding: 0; 
+            font-size: 10px !important;
+            line-height: 1.2;
+          }
           .print-content {
             width: 100% !important;
             max-width: none !important;
             margin: 0 !important;
-            padding: 20px !important;
-            font-size: 12px !important;
+            padding: 10px !important;
+            font-size: 10px !important;
+            transform: scale(0.9);
+            transform-origin: top left;
           }
           .no-print { display: none !important; }
-          table { page-break-inside: avoid; }
+          table { page-break-inside: avoid; font-size: 9px; }
           .grid { display: block !important; }
-          .grid > div { margin-bottom: 10px !important; }
+          .grid > div { margin-bottom: 8px !important; }
+          h1, h2, h3 { margin: 5px 0 !important; }
+          .section { margin-bottom: 15px !important; }
         }
       </style>
     `;
@@ -285,7 +298,7 @@ const EritreaInvoicePrint = () => {
                   </div>
                   <div>
                     <strong>SECTOR:</strong><br />
-                    {invoiceData.formData.sector}
+                    KASSALA
                   </div>
                   <div>
                     <strong>PAYMENT STATUS:</strong><br />

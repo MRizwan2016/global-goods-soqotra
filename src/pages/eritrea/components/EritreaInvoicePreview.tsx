@@ -103,7 +103,7 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
               </div>
               <div>
                 <p><span className="font-medium">SECTOR:</span></p>
-                <p>{formData.sector || "COLOMBO"}</p>
+                <p>KASSALA</p>
               </div>
               <div>
                 <p><span className="font-medium">PAYMENT STATUS:</span></p>
