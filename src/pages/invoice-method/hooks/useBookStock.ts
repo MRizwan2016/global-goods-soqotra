@@ -34,11 +34,15 @@ export function useBookStock() {
     // Add event listener for storage changes
     window.addEventListener('storage', handleStorageChange);
     
+    // Add event listener for book updates
+    window.addEventListener('book-update', loadBooks);
+    
     // Reload when window gets focus
     window.addEventListener('focus', loadBooks);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('book-update', loadBooks);
       window.removeEventListener('focus', loadBooks);
     };
   }, []);
@@ -53,9 +57,13 @@ export function useBookStock() {
   const loadBooks = () => {
     console.log("Loading books from localStorage...");
     const savedBooks = localStorage.getItem('invoiceBooks');
+    console.log("Raw localStorage data:", savedBooks);
+    
     if (savedBooks) {
       try {
         const parsedBooks = JSON.parse(savedBooks);
+        console.log("Parsed books from localStorage:", parsedBooks);
+        
         // Transform the format if needed
         const transformedBooks = parsedBooks.map((book: any) => ({
           ...book,
@@ -64,9 +72,10 @@ export function useBookStock() {
           startPage: book.startPage || book.startNumber,
           endPage: book.endPage || book.endNumber,
           status: book.isActivated ? "ACTIVE" : "INACTIVE",
-          available: book.availablePages || []
+          available: book.availablePages || [],
+          assignedTo: book.assignedTo || book.salesRepresentative || undefined
         }));
-        console.log("Loaded books:", transformedBooks);
+        console.log("Transformed books:", transformedBooks);
         setBooks(transformedBooks);
       } catch (error) {
         console.error("Error loading books from localStorage:", error);
