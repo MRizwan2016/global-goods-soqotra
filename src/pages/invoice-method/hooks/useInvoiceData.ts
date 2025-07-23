@@ -29,6 +29,30 @@ export const useInvoiceData = () => {
         console.log("Loaded invoices from localStorage:", parsedInvoices);
       }
       
+      // Also load Eritrea invoices
+      const eritreaInvoices = localStorage.getItem('eritreaInvoices');
+      if (eritreaInvoices) {
+        const parsedEritreaInvoices = JSON.parse(eritreaInvoices);
+        console.log("Loaded Eritrea invoices:", parsedEritreaInvoices);
+        
+        // Convert Eritrea invoice format to standard format
+        const convertedEritreaInvoices = parsedEritreaInvoices.map((invoice: any) => ({
+          id: invoice.id || invoice.invoiceNumber,
+          invoiceNumber: invoice.invoiceNumber || invoice.formData?.invoiceNumber,
+          date: invoice.formData?.date || invoice.date || new Date().toISOString().split('T')[0],
+          shipper1: invoice.formData?.shipper1 || invoice.shipper1,
+          consignee1: invoice.formData?.consignee1 || invoice.consignee1,
+          net: invoice.formData?.netAmount || invoice.net || invoice.formData?.totalCharges || 1500,
+          paid: invoice.paid || false,
+          balanceToPay: invoice.formData?.netAmount || invoice.net || invoice.formData?.totalCharges || 1500,
+          currency: invoice.formData?.currency || 'QR',
+          bookingForm: invoice.formData?.bookNumber || invoice.bookingForm,
+          country: "ERITREA"
+        }));
+        
+        parsedInvoices = [...parsedInvoices, ...convertedEritreaInvoices];
+      }
+      
       // Check if there are payments for any invoices
       const payments = localStorage.getItem('payments');
       if (payments) {

@@ -52,6 +52,34 @@ const InvoiceSearchPanel: React.FC = () => {
       }
     }
     
+    // Also load Eritrea invoices
+    const eritreaInvoices = localStorage.getItem('eritreaInvoices');
+    if (eritreaInvoices) {
+      try {
+        const parsedEritreaInvoices = JSON.parse(eritreaInvoices);
+        console.log("Loading Eritrea invoices for search:", parsedEritreaInvoices);
+        
+        // Convert Eritrea invoice format to standard format and avoid duplicates
+        const existingIds = new Set(allInvoices.map(inv => inv.id));
+        const convertedEritreaInvoices = parsedEritreaInvoices
+          .filter((invoice: any) => !existingIds.has(invoice.id || invoice.invoiceNumber))
+          .map((invoice: any) => ({
+            id: invoice.id || invoice.invoiceNumber,
+            invoiceNumber: invoice.invoiceNumber || invoice.formData?.invoiceNumber,
+            date: invoice.formData?.date || invoice.date || new Date().toISOString().split('T')[0],
+            shipper1: invoice.formData?.shipper1 || invoice.shipper1 || '',
+            consignee1: invoice.formData?.consignee1 || invoice.consignee1 || '',
+            net: invoice.formData?.netAmount || invoice.net || invoice.formData?.totalCharges || 1500,
+            paid: invoice.paid || false,
+            country: "ERITREA"
+          }));
+        
+        allInvoices = [...allInvoices, ...convertedEritreaInvoices];
+      } catch (error) {
+        console.error("Error parsing Eritrea invoices:", error);
+      }
+    }
+    
     const results = allInvoices.filter(invoice => 
       invoice.invoiceNumber.toLowerCase().includes(query) ||
       invoice.consignee1?.toLowerCase().includes(query) ||

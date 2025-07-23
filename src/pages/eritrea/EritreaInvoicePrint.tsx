@@ -20,8 +20,30 @@ const EritreaInvoicePrint = () => {
         const foundInvoice = storedInvoices.find((inv: any) => inv.id === id);
         
         if (foundInvoice) {
+          // Check payment status from payments localStorage
+          const payments = localStorage.getItem('payments');
+          let paymentStatus = foundInvoice.paymentStatus || "UNPAID";
+          
+          if (payments) {
+            try {
+              const parsedPayments = JSON.parse(payments);
+              const invoicePayments = parsedPayments.filter((p: any) => 
+                p.invoiceNumber === foundInvoice.invoiceNumber || 
+                p.invoiceNumber === foundInvoice.formData?.invoiceNumber
+              );
+              
+              if (invoicePayments.length > 0) {
+                paymentStatus = "PAID";
+                foundInvoice.paymentStatus = "PAID";
+                foundInvoice.formData = { ...foundInvoice.formData, paymentStatus: "PAID" };
+              }
+            } catch (e) {
+              console.error("Error parsing payments:", e);
+            }
+          }
+          
           setInvoice(foundInvoice);
-          console.log("📄 PRINT - Invoice loaded:", foundInvoice);
+          console.log("📄 PRINT - Invoice loaded with payment status:", foundInvoice, "Payment Status:", paymentStatus);
         } else {
           toast.error("Invoice not found");
           navigate("/eritrea");
