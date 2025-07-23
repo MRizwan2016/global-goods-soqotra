@@ -178,7 +178,7 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
           <div className="grid grid-cols-2 gap-8">
             <div>
               <h3 className="font-bold text-lg mb-3 text-blue-900">TERMS & CONDITIONS:</h3>
-              <div className="text-xs space-y-1">
+              <div className="space-y-1" style={{ fontSize: '9px' }}>
                 <p>(1) I/We hereby declare that the contents of this consignment are fully accurately described, and the parcel or package doesn't contain any illegal items, cash, jewelry, or dangerous goods.</p>
                 <p>(2) Perishable & breakable items are shipped at my own risk; SOQOTRA is not liable for any loss from breakable or undeclared items.</p>
                 <p>(3) Shipper/Consignee responsible for destination charges.</p>

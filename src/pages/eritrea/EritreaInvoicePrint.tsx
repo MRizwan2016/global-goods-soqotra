@@ -365,7 +365,7 @@ const EritreaInvoicePrint = () => {
                 <h3 style={{ color: '#1e3a8a', fontWeight: 'bold', fontSize: '16px', marginBottom: '15px' }}>
                   TERMS & CONDITIONS:
                 </h3>
-                <div style={{ fontSize: '11px', lineHeight: '1.4' }}>
+                <div style={{ fontSize: '9px', lineHeight: '1.4' }}>
                   <p>IN CASE OF DISPUTE OVER ANY CHARGES ON THIS INVOICE, PLEASE EMAIL:</p>
                   <p>ACCOUNTS@SOQOTRALOGISTICS.COM TO US WITHIN SEVEN DAYS FROM THE DATE OF INVOICE.</p>
                   <p>OTHERWISE CHARGES WOULD BE DEEMED AS CORRECT AND NO FURTHER DISPUTE WILL BE ENTERTAINED.</p>
