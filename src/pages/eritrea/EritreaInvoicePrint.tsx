@@ -46,7 +46,7 @@ const EritreaInvoicePrint = () => {
   const getCompanyName = () => {
     const country = invoice?.shipperCountry || displayData?.shipperCountry || "QATAR";
     if (country === "SAUDI ARABIA") {
-      return "SOQOTRA SOLUTION WLL";
+      return "SOQOTRA SOLUTIONS WLL";
     }
     return "SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL";
   };
