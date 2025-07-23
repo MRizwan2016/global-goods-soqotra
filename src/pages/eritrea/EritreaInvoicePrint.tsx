@@ -333,10 +333,10 @@ const EritreaInvoicePrint = () => {
                   <thead>
                     <tr>
                       <th>NO.</th>
-                      <th>PACKAGE TYPE</th>
+                      <th>DIMENSION (LxWxH)</th>
                       <th>QTY</th>
                       <th>WEIGHT (KG)</th>
-                      <th>VOLUME (M³)</th>
+                      <th>INVOICE PACKAGE DETAILS</th>
                       <th>DESCRIPTION</th>
                     </tr>
                   </thead>
@@ -345,20 +345,20 @@ const EritreaInvoicePrint = () => {
                       invoiceData.packageDetails.map((pkg: any, index: number) => (
                         <tr key={index}>
                           <td>{index + 1}</td>
-                          <td>{pkg.name || "HOUSEHOLD ITEMS"}</td>
+                          <td>{pkg.length && pkg.width && pkg.height ? `${pkg.length}x${pkg.width}x${pkg.height}` : "N/A"}</td>
                           <td>1</td>
                           <td>{pkg.weight || "29.34"}</td>
-                          <td>{pkg.cubicMetre || "0.672"}</td>
-                          <td>PERSONAL EFFECTS AND HOUSEHOLD GOODS</td>
+                          <td>{pkg.name || "HOUSEHOLD ITEMS"}</td>
+                          <td>{pkg.description || displayData.packageDescription || "PERSONAL EFFECTS AND HOUSEHOLD GOODS"}</td>
                         </tr>
                       ))
                     ) : (
                       <tr>
                         <td>1</td>
-                        <td>HOUSEHOLD ITEMS</td>
+                        <td>N/A</td>
                         <td>1</td>
                         <td>29.34</td>
-                        <td>0.672</td>
+                        <td>HOUSEHOLD ITEMS</td>
                         <td>PERSONAL EFFECTS AND HOUSEHOLD GOODS</td>
                       </tr>
                     )}
