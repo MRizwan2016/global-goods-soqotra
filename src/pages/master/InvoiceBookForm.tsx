@@ -173,8 +173,13 @@ const InvoiceBookForm = () => {
       console.log("Creating new book:", newBook);
       
       // Get existing books from localStorage
+      console.log("=== BEFORE SAVE ===");
+      console.log("All localStorage keys BEFORE save:", Object.keys(localStorage));
+      console.log("localStorage 'invoiceBooks' BEFORE save:", localStorage.getItem('invoiceBooks'));
+      
       const existingBooksJson = localStorage.getItem('invoiceBooks');
       const existingBooks = existingBooksJson ? JSON.parse(existingBooksJson) : [];
+      console.log("Existing books from localStorage:", existingBooks);
       
       // Check if a book with the same number already exists
       const bookExists = existingBooks.some((book: any) => book.bookNumber === formData.bookNumber);
@@ -189,7 +194,14 @@ const InvoiceBookForm = () => {
       // Add the new book and save back to localStorage
       const updatedBooks = [...existingBooks, newBook];
       console.log("Saving to localStorage - invoiceBooks:", updatedBooks.length, "books");
+      console.log("About to save this data:", JSON.stringify(updatedBooks));
       localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+      
+      // Verify the save worked
+      console.log("=== AFTER SAVE VERIFICATION ===");
+      const verifyBooks = localStorage.getItem('invoiceBooks');
+      console.log("localStorage 'invoiceBooks' AFTER save:", verifyBooks);
+      console.log("All localStorage keys AFTER save:", Object.keys(localStorage));
       
       // Also update activeInvoiceBooks
       const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');

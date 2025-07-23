@@ -56,6 +56,9 @@ export function useBookStock() {
   
   const loadBooks = () => {
     console.log("Loading books from localStorage...");
+    console.log("All localStorage keys:", Object.keys(localStorage));
+    console.log("localStorage 'invoiceBooks':", localStorage.getItem('invoiceBooks'));
+    console.log("localStorage 'activeInvoiceBooks':", localStorage.getItem('activeInvoiceBooks'));
     const savedBooks = localStorage.getItem('invoiceBooks');
     console.log("Raw localStorage data:", savedBooks);
     
