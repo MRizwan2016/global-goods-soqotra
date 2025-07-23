@@ -199,12 +199,30 @@ const InvoiceBookForm = () => {
       console.log("About to save this data:", JSON.stringify(updatedBooks));
       
       // Force a localStorage clear and re-save to ensure it works
-      console.log("Attempting localStorage save...");
+      console.log("=== ATTEMPTING LOCALSTORAGE SAVE ===");
+      console.log("Data being saved:", JSON.stringify(updatedBooks, null, 2));
+      console.log("Number of books to save:", updatedBooks.length);
+      console.log("Current localStorage size:", JSON.stringify(localStorage).length);
+      
       try {
-        localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+        // Check localStorage quota before saving
+        const testData = JSON.stringify(updatedBooks);
+        console.log("Size of data to save:", testData.length, "characters");
+        
+        localStorage.setItem('invoiceBooks', testData);
         console.log("localStorage save successful");
+        
+        // Immediately verify the save
+        const immediateVerify = localStorage.getItem('invoiceBooks');
+        console.log("Immediate verification - Data exists:", !!immediateVerify);
+        console.log("Immediate verification - Length:", immediateVerify?.length);
+        
       } catch (storageError) {
         console.error("localStorage save failed:", storageError);
+        if (storageError.name === 'QuotaExceededError') {
+          console.error("localStorage quota exceeded");
+          toast.error("Storage quota exceeded. Please clear some data.");
+        }
         throw storageError;
       }
       

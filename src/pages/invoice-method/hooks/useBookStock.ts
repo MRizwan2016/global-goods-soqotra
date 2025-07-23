@@ -30,6 +30,33 @@ export function useBookStock() {
   const [selectedUserId, setSelectedUserId] = useState("");
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
+  // Add localStorage monitoring to detect changes
+  const originalSetItem = localStorage.setItem.bind(localStorage);
+  const originalRemoveItem = localStorage.removeItem.bind(localStorage);
+  const originalClear = localStorage.clear.bind(localStorage);
+
+  // Override localStorage methods to log changes
+  localStorage.setItem = function(key, value) {
+    console.log("=== localStorage.setItem called ===");
+    console.log("Key:", key);
+    console.log("Value length:", value?.length);
+    console.log("Stack trace:", new Error().stack);
+    return originalSetItem(key, value);
+  };
+
+  localStorage.removeItem = function(key) {
+    console.log("=== localStorage.removeItem called ===");
+    console.log("Key:", key);
+    console.log("Stack trace:", new Error().stack);
+    return originalRemoveItem(key);
+  };
+
+  localStorage.clear = function() {
+    console.log("=== localStorage.clear called ===");
+    console.log("Stack trace:", new Error().stack);
+    return originalClear();
+  };
+
   // Load books from localStorage on component mount
   useEffect(() => {
     loadBooks();
@@ -58,10 +85,22 @@ export function useBookStock() {
   };
   
   const loadBooks = () => {
-    console.log("Loading books from localStorage...");
+    console.log("=== LOADING BOOKS FROM LOCALSTORAGE ===");
+    console.log("Timestamp:", new Date().toISOString());
     console.log("All localStorage keys:", Object.keys(localStorage));
     console.log("localStorage 'invoiceBooks':", localStorage.getItem('invoiceBooks'));
     console.log("localStorage 'activeInvoiceBooks':", localStorage.getItem('activeInvoiceBooks'));
+    
+    // Check if localStorage is working at all
+    try {
+      localStorage.setItem('test-key', 'test-value');
+      const testValue = localStorage.getItem('test-key');
+      console.log("localStorage test - set 'test-value', got:", testValue);
+      localStorage.removeItem('test-key');
+    } catch (error) {
+      console.error("localStorage not working:", error);
+    }
+    
     const savedBooks = localStorage.getItem('invoiceBooks');
     console.log("Raw localStorage data:", savedBooks);
     
