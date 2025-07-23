@@ -345,7 +345,7 @@ const EritreaInvoicePrint = () => {
                       invoiceData.packageDetails.map((pkg: any, index: number) => (
                         <tr key={index}>
                           <td>{index + 1}</td>
-                          <td>{pkg.length && pkg.width && pkg.height ? `${pkg.length}x${pkg.width}x${pkg.height}` : "N/A"}</td>
+                          <td>{pkg.length && pkg.width && pkg.height ? `${pkg.length}x${pkg.width}x${pkg.height} inches` : "N/A"}</td>
                           <td>1</td>
                           <td>{pkg.weight || "29.34"}</td>
                           <td>{pkg.name || "HOUSEHOLD ITEMS"}</td>
