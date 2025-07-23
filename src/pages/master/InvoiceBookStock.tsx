@@ -110,11 +110,8 @@ const InvoiceBookStock = () => {
           pagesUsed: book.pagesUsed
         }));
       localStorage.setItem('activeInvoiceBooks', JSON.stringify(activeBooks));
-    } else {
-      // Clear storage if no books exist
-      localStorage.setItem('invoiceBooks', JSON.stringify([]));
-      localStorage.setItem('activeInvoiceBooks', JSON.stringify([]));
     }
+    // Don't clear localStorage when bookData is empty - it might contain data from other sources
   }, [bookData]);
   
   // Filter booking data based on search term
