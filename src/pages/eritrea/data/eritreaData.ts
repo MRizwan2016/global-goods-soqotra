@@ -46,6 +46,61 @@ export const eritreaDistricts = [
   { value: "DEBUBAWI_N_REDSEA", label: "DEBUBAWI (N. REDSEA)" }
 ];
 
+// Name prefixes for shipper/consignee
+export const namePrefixes = [
+  { value: "MR", label: "MR." },
+  { value: "MRS", label: "MRS." },
+  { value: "MS", label: "MS." },
+  { value: "REV", label: "REV." },
+  { value: "SHEIKH", label: "SHEIKH" },
+  { value: "DR", label: "DR." },
+  { value: "PROFESSOR", label: "PROFESSOR" }
+];
+
+// Qatar cities as requested
+export const qatarCities = [
+  "AL HILAL", "NAJMA", "WUKAIR", "ABU NAKLA", "MANSOORA", "AZIZIA", "AL WAAB", 
+  "BAAYA", "MUAITHAR", "WAKRA", "DAFFNA", "WEST BAY", "MADEENA KHALEEFA", 
+  "AIN KHALITH", "NASARIYA", "SHAHANIYA", "SALWA ROAD", "BANI HAJAR", 
+  "NEW SALATHA", "AL SAAD", "MUSHERIEB", "INDUSTRIAL AREA", "RAS LAFFAN", 
+  "AL KEESHA", "MATHAR AL QADEEM", "MUNTAZA", "AL KHOR", "KARATHIYATH", 
+  "GARAFA", "EDUCATIONAL CITY", "ABU SAMRA", "AL ASIRI", "AL HITMI", 
+  "AL JABAR", "UMM SALAAL ALI", "UMM SALAAL MOHAMED", "AL DHAKIRA", 
+  "AL JUMAILIYAH", "AL KARRARA", "AL MESSILA", "AL MIRQAB", "AL REYYAN", 
+  "AL RUWAIS", "ABU SIDRA", "AL WAJBA", "BARWA CITY", "BIN OMRAN", 
+  "BARWA VILLAGE", "ASIAN CITY", "BU SIDRA", "AL NASAR STREET"
+];
+
+// Destination countries
+export const destinationCountries = [
+  "ERITREA", "SUDAN", "KENYA", "SRI LANKA", "PHILIPPINES", "SAUDI ARABIA", 
+  "QATAR", "UAE", "OMAN", "KUWAIT", "UGANDA", "BURUNDI", "TANZANIA", 
+  "MOZAMBIQUE", "TUNISIA", "ALGERIA", "LIBYA", "MOROCCO", "JORDAN"
+];
+
+// Country codes for mobile numbers
+export const countryCodes = {
+  "QATAR": "+974",
+  "ERITREA": "+291",
+  "SUDAN": "+249",
+  "KENYA": "+254",
+  "SRI LANKA": "+94",
+  "PHILIPPINES": "+63",
+  "SAUDI ARABIA": "+966",
+  "UAE": "+971",
+  "OMAN": "+968",
+  "KUWAIT": "+965",
+  "UGANDA": "+256",
+  "BURUNDI": "+257",
+  "TANZANIA": "+255",
+  "MOZAMBIQUE": "+258",
+  "TUNISIA": "+216",
+  "ALGERIA": "+213",
+  "LIBYA": "+218",
+  "MOROCCO": "+212",
+  "JORDAN": "+962"
+};
+
 // Door-to-door pricing based on sectors (from screenshot)
 export const doorToDoorPricing = {
   // QAR 10.00 sectors

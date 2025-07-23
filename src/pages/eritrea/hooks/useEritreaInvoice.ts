@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { doorToDoorPricing, eritreaPackageTypes, calculateVolumeWeight, calculateCubicFeet } from "../data/eritreaData";
+import { doorToDoorPricing, eritreaPackageTypes, calculateVolumeWeight, calculateCubicFeet, countryCodes } from "../data/eritreaData";
 import { toast } from "sonner";
 
 export interface EritreaPackageItem {
@@ -34,18 +34,24 @@ export interface EritreaFormData {
   doorToDoorPrice: number;
   
   // Shipper Details
+  shipperPrefix: string;
   shipperName: string;
+  shipperCity: string;
   shipperAddress: string;
   shipperMobile: string;
   shipperEmail: string;
   shipperIdNumber: string;
+  shipperCountry: string;
   
   // Consignee Details
+  consigneePrefix: string;
   consigneeName: string;
+  consigneeCity: string;
   consigneeAddress: string;
   consigneeMobile: string;
   consigneeEmail: string;
   consigneeIdNumber: string;
+  consigneeCountry: string;
   
   // Package Summary
   totalPackages: number;
@@ -86,16 +92,22 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     isInvoiceActivated: false,
     doorToDoor: "NO",
     doorToDoorPrice: 0,
+    shipperPrefix: "",
     shipperName: "",
+    shipperCity: "",
     shipperAddress: "",
     shipperMobile: "",
     shipperEmail: "",
     shipperIdNumber: "",
+    shipperCountry: "QATAR",
+    consigneePrefix: "",
     consigneeName: "",
+    consigneeCity: "",
     consigneeAddress: "",
     consigneeMobile: "",
     consigneeEmail: "",
     consigneeIdNumber: "",
+    consigneeCountry: "",
     totalPackages: 0,
     totalWeight: 0,
     totalVolume: 0,
@@ -183,6 +195,35 @@ export const useEritreaInvoice = (invoiceId?: string) => {
       totalVolume
     }));
   }, [packageItems]);
+
+  // Auto-update mobile number country code when country changes
+  useEffect(() => {
+    if (formData.shipperCountry && countryCodes[formData.shipperCountry as keyof typeof countryCodes]) {
+      const countryCode = countryCodes[formData.shipperCountry as keyof typeof countryCodes];
+      if (formData.shipperMobile && !formData.shipperMobile.startsWith(countryCode)) {
+        // Remove any existing country code and add the new one
+        const cleanNumber = formData.shipperMobile.replace(/^\+\d{1,4}\s?/, '');
+        setFormData(prev => ({
+          ...prev,
+          shipperMobile: `${countryCode} ${cleanNumber}`
+        }));
+      }
+    }
+  }, [formData.shipperCountry]);
+
+  useEffect(() => {
+    if (formData.consigneeCountry && countryCodes[formData.consigneeCountry as keyof typeof countryCodes]) {
+      const countryCode = countryCodes[formData.consigneeCountry as keyof typeof countryCodes];
+      if (formData.consigneeMobile && !formData.consigneeMobile.startsWith(countryCode)) {
+        // Remove any existing country code and add the new one
+        const cleanNumber = formData.consigneeMobile.replace(/^\+\d{1,4}\s?/, '');
+        setFormData(prev => ({
+          ...prev,
+          consigneeMobile: `${countryCode} ${cleanNumber}`
+        }));
+      }
+    }
+  }, [formData.consigneeCountry]);
 
   const handleFormChange = (field: keyof EritreaFormData, value: any) => {
     setFormData(prev => ({

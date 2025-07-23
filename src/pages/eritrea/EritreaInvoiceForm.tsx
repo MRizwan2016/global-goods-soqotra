@@ -13,6 +13,8 @@ import { useInvoiceNumberSelector } from "../invoicing/hooks/useInvoiceNumberSel
 import InvoiceNumberSelector from "../invoicing/components/basic-information/InvoiceNumberSelector";
 import UPBIntegrationCard from "@/components/invoice/UPBIntegrationCard";
 import { useEritreaInvoice } from "./hooks/useEritreaInvoice";
+import ShipperDetails from "./components/shipping/ShipperDetails";
+import ConsigneeDetails from "./components/shipping/ConsigneeDetails";
 import { 
   eritreaPorts, 
   eritreaSectors, 
@@ -453,113 +455,17 @@ const EritreaInvoiceForm = () => {
           </CardContent>
         </Card>
 
-        {/* Shipper & Consignee Details */}
-        <Card>
-          <CardHeader className="bg-blue-500 text-white">
-            <CardTitle>SHIPPING DETAILS</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-6">
-              {/* Shipper Details */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg border-b pb-2">Shipper Information</h3>
-                <div className="space-y-3">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">SHIPPER NAME:</label>
-                    <Input
-                      value={formData.shipperName}
-                      onChange={(e) => handleFormChange('shipperName', e.target.value)}
-                      placeholder="Enter shipper name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">ADDRESS:</label>
-                    <Textarea
-                      value={formData.shipperAddress}
-                      onChange={(e) => handleFormChange('shipperAddress', e.target.value)}
-                      placeholder="Enter shipper address"
-                      rows={3}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">MOBILE:</label>
-                    <Input
-                      value={formData.shipperMobile}
-                      onChange={(e) => handleFormChange('shipperMobile', e.target.value)}
-                      placeholder="Enter mobile number"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">EMAIL:</label>
-                    <Input
-                      type="email"
-                      value={formData.shipperEmail}
-                      onChange={(e) => handleFormChange('shipperEmail', e.target.value)}
-                      placeholder="Enter email address"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">ID NUMBER:</label>
-                    <Input
-                      value={formData.shipperIdNumber}
-                      onChange={(e) => handleFormChange('shipperIdNumber', e.target.value)}
-                      placeholder="Enter ID number"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Consignee Details */}
-              <div className="space-y-4">
-                <h3 className="font-semibold text-lg border-b pb-2">Consignee Information</h3>
-                <div className="space-y-3">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">CONSIGNEE NAME:</label>
-                    <Input
-                      value={formData.consigneeName}
-                      onChange={(e) => handleFormChange('consigneeName', e.target.value)}
-                      placeholder="Enter consignee name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">ADDRESS:</label>
-                    <Textarea
-                      value={formData.consigneeAddress}
-                      onChange={(e) => handleFormChange('consigneeAddress', e.target.value)}
-                      placeholder="Enter consignee address"
-                      rows={3}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">MOBILE:</label>
-                    <Input
-                      value={formData.consigneeMobile}
-                      onChange={(e) => handleFormChange('consigneeMobile', e.target.value)}
-                      placeholder="Enter mobile number"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">EMAIL:</label>
-                    <Input
-                      type="email"
-                      value={formData.consigneeEmail}
-                      onChange={(e) => handleFormChange('consigneeEmail', e.target.value)}
-                      placeholder="Enter email address"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">ID NUMBER:</label>
-                    <Input
-                      value={formData.consigneeIdNumber}
-                      onChange={(e) => handleFormChange('consigneeIdNumber', e.target.value)}
-                      placeholder="Enter ID number"
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Enhanced Shipper & Consignee Details */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ShipperDetails 
+            formData={formData} 
+            handleFormChange={handleFormChange} 
+          />
+          <ConsigneeDetails 
+            formData={formData} 
+            handleFormChange={handleFormChange} 
+          />
+        </div>
 
         {/* Cost Details */}
         <Card>
