@@ -281,7 +281,7 @@ const EritreaInvoicePrint = () => {
                 <div className="grid-4">
                   <div>
                     <strong>WAREHOUSE:</strong><br />
-                    {invoiceData.formData.warehouse}
+                    ERITREA
                   </div>
                   <div>
                     <strong>SECTOR:</strong><br />
