@@ -20,7 +20,8 @@ export const eritreaSectors = [
   { value: "SHANDEE", label: "SHANDEE", port: "MUSSAMWA" },
   { value: "DUNGULAR", label: "DUNGULAR", port: "MUSSAMWA" },
   { value: "AL_DAMAL", label: "AL DAMAL", port: "MUSSAMWA" },
-  { value: "MARWI", label: "MARWI", port: "MUSSAMWA" }
+  { value: "MARWI", label: "MARWI", port: "MUSSAMWA" },
+  { value: "ASMARA", label: "ASMARA", port: "MUSSAMWA" }
 ];
 
 export const eritreaSalesReps = [
@@ -141,6 +142,7 @@ export const doorToDoorPricing = {
   ALZEER: { price: 10.00, currency: "QAR" },
   UM_SHAJARA: { price: 10.00, currency: "QAR" },
   AL_GADHAREEF: { price: 10.00, currency: "QAR" },
+  ASMARA: { price: 10.00, currency: "QAR" },
   
   // QAR 26.00 sectors
   ALFA_JADEEDHA: { price: 26.00, currency: "QAR" },
