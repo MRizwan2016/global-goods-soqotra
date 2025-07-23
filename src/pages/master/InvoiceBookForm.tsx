@@ -74,7 +74,7 @@ const InvoiceBookForm = () => {
             break;
           case "ERITREA":
             // Eritrea: book 1 = 010000-010051, book 2 = 010052-010101, etc.
-            firstPage = 10000 + ((bookNumber - 1) * 50);
+            firstPage = 10000 + ((bookNumber - 1) * 52);
             lastPage = firstPage + 51;
             break;
           case "KENYA":
@@ -125,6 +125,8 @@ const InvoiceBookForm = () => {
   const handleSave = () => {
     console.log("=== SAVE BUTTON CLICKED ===");
     console.log("Form data:", formData);
+    console.log("Browser localStorage support:", typeof(Storage) !== "undefined");
+    console.log("Current localStorage state:", localStorage);
     
     if (!formData.country) {
       console.log("ERROR: No country selected");
@@ -195,7 +197,16 @@ const InvoiceBookForm = () => {
       const updatedBooks = [...existingBooks, newBook];
       console.log("Saving to localStorage - invoiceBooks:", updatedBooks.length, "books");
       console.log("About to save this data:", JSON.stringify(updatedBooks));
-      localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+      
+      // Force a localStorage clear and re-save to ensure it works
+      console.log("Attempting localStorage save...");
+      try {
+        localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+        console.log("localStorage save successful");
+      } catch (storageError) {
+        console.error("localStorage save failed:", storageError);
+        throw storageError;
+      }
       
       // Verify the save worked
       console.log("=== AFTER SAVE VERIFICATION ===");

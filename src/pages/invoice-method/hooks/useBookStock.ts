@@ -123,10 +123,15 @@ export function useBookStock() {
     try {
       const originalBooks = JSON.parse(storedBooks);
       
-      // Update the specific book with the assigned user
+      // Update the specific book with the assigned user and mark it as assigned
       const updatedOriginalBooks = originalBooks.map((book: any) => 
         book.bookNumber === selectedBook.bookNumber 
-          ? { ...book, assignedTo: selectedUser.name }
+          ? { 
+              ...book, 
+              assignedTo: selectedUser.name,
+              isAssigned: true, // Mark as assigned to prevent reuse
+              assignedDate: new Date().toISOString()
+            }
           : book
       );
       
@@ -137,7 +142,12 @@ export function useBookStock() {
       const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
       const updatedActiveBooks = activeBooks.map((book: any) => 
         book.bookNumber === selectedBook.bookNumber 
-          ? { ...book, assignedTo: selectedUser.name }
+          ? { 
+              ...book, 
+              assignedTo: selectedUser.name,
+              isAssigned: true,
+              assignedDate: new Date().toISOString()
+            }
           : book
       );
       localStorage.setItem('activeInvoiceBooks', JSON.stringify(updatedActiveBooks));
@@ -145,7 +155,12 @@ export function useBookStock() {
       // Update the state
       const updatedBooks = books.map(book => 
         book.bookNumber === selectedBook.bookNumber 
-          ? { ...book, assignedTo: selectedUser.name }
+          ? { 
+              ...book, 
+              assignedTo: selectedUser.name,
+              isAssigned: true,
+              assignedDate: new Date().toISOString()
+            }
           : book
       );
       
