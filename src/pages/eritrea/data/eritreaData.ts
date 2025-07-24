@@ -142,7 +142,7 @@ export const doorToDoorPricing = {
   ALZEER: { price: 10.00, currency: "QAR" },
   UM_SHAJARA: { price: 10.00, currency: "QAR" },
   AL_GADHAREEF: { price: 10.00, currency: "QAR" },
-  ASMARA: { price: 10.00, currency: "QAR" },
+  ASMARA: { price: 11.00, currency: "QAR" },
   
   // QAR 26.00 sectors
   ALFA_JADEEDHA: { price: 26.00, currency: "QAR" },
