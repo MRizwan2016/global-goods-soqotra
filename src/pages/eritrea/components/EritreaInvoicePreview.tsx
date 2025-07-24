@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Printer, Eye, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import QrCodeSection from "@/components/payment/receipt-sections/QrCodeSection";
+import { QRCodeSVG } from "qrcode.react";
 
 interface EritreaInvoicePreviewProps {
   formData: any;
@@ -63,33 +63,33 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
         <div id="eritrea-invoice-print" className="bg-white p-6 text-black" style={{ fontSize: '11pt', fontFamily: 'Arial, sans-serif' }}>
           {/* Header */}
           <div className="flex justify-between items-start mb-8">
-            <div className="flex-1">
-              <div className="flex items-start gap-6 mb-4">
-                {/* Enhanced Logo - larger and more prominent */}
-                <div className="flex-shrink-0">
-                  <img 
-                    src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
-                    alt="Soqotra Logo" 
-                    className="w-[200px] h-auto object-contain"
-                    style={{ 
-                      imageRendering: 'crisp-edges'
-                    }}
-                  />
-                </div>
-                <div className="flex-1">
-                  <h1 className="text-lg font-bold text-blue-900 leading-tight">
-                    {formData.shipperCountry === "SAUDI ARABIA" 
-                      ? "SOQOTRA SOLUTIONS WLL" 
-                      : "SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL"}
-                  </h1>
-                  <div className="text-sm text-gray-600 mt-3 leading-relaxed">
-                    <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
-                    <p>AZIZIA COMMERCIAL STREET, P.O.BOX: 55861, AZIZIA - ERITREA</p>
-                    <p>TEL: +291 - 44832508 | EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
-                  </div>
-                </div>
+            {/* Logo - Left side, large and prominent */}
+            <div className="flex-shrink-0">
+              <img 
+                src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
+                alt="Soqotra Logo" 
+                className="w-[280px] h-auto object-contain"
+                style={{ 
+                  imageRendering: 'crisp-edges'
+                }}
+              />
+            </div>
+            
+            {/* Company Info - Center */}
+            <div className="flex-1 px-6">
+              <h1 className="text-lg font-bold text-blue-900 leading-tight text-center">
+                {formData.shipperCountry === "SAUDI ARABIA" 
+                  ? "SOQOTRA SOLUTIONS WLL" 
+                  : "SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL"}
+              </h1>
+              <div className="text-sm text-gray-600 mt-3 leading-relaxed text-center">
+                <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
+                <p>AZIZIA COMMERCIAL STREET, P.O.BOX: 55861, AZIZIA - DOHA - QATAR</p>
+                <p>TEL: +974 - 44832508 | EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
               </div>
             </div>
+            
+            {/* Invoice Info - Right side */}
             <div className="text-right">
               <div className="border-2 border-gray-300 p-4 rounded">
                 <h2 className="text-2xl font-bold">INVOICE</h2>
@@ -255,7 +255,17 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
 
           {/* QR Code Section */}
           <div className="mt-6 flex justify-end">
-            <QrCodeSection qrData={generateQRData()} />
+            <div className="text-center">
+              <QRCodeSVG 
+                value={generateQRData()} 
+                size={120} 
+                bgColor="#ffffff"
+                fgColor="#000000"
+                level="M"
+                includeMargin={true}
+              />
+              <p className="text-xs text-gray-500 mt-2">Scan to verify invoice</p>
+            </div>
           </div>
 
           {/* Footer */}
