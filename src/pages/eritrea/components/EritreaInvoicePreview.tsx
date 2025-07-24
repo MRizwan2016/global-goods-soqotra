@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Printer, Eye, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import QrCodeSection from "@/components/payment/receipt-sections/QrCodeSection";
 
 interface EritreaInvoicePreviewProps {
   formData: any;
@@ -22,6 +23,18 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
   onClose,
   onPrint
 }) => {
+  // Generate QR code data for the invoice
+  const generateQRData = () => {
+    const invoiceData = {
+      invoiceNumber: formData.invoiceNumber || "010000",
+      date: formData.invoiceDate || new Date().toISOString().split('T')[0],
+      total: parseFloat(costDetails.net || costDetails.freight || "59.00").toFixed(2),
+      shipper: shippingDetails.shipper1 || "INSAF M M M",
+      consignee: shippingDetails.consignee1 || "INSAF M M M",
+      paymentStatus: formData.paymentStatus || "UNPAID"
+    };
+    return JSON.stringify(invoiceData);
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -44,19 +57,25 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
           {/* Header */}
           <div className="flex justify-between items-start mb-8">
             <div className="flex-1">
-              <div className="flex items-center gap-4 mb-4">
-                <img 
-                  src="/lovable-uploads/5d6de24f-5662-4b63-ad5a-e94dfa2aada7.png" 
-                  alt="Soqotra Logo" 
-                  className="w-[120px] h-auto object-contain"
-                />
-                <div>
-                  <h1 className="text-xl font-bold text-blue-900">
+              <div className="flex items-start gap-6 mb-4">
+                {/* Enhanced Logo - larger and more prominent */}
+                <div className="flex-shrink-0">
+                  <img 
+                    src="/lovable-uploads/5d6de24f-5662-4b63-ad5a-e94dfa2aada7.png" 
+                    alt="Soqotra Logo" 
+                    className="w-[180px] h-auto object-contain"
+                    style={{ 
+                      imageRendering: 'crisp-edges'
+                    }}
+                  />
+                </div>
+                <div className="flex-1">
+                  <h1 className="text-lg font-bold text-blue-900 leading-tight">
                     {formData.shipperCountry === "SAUDI ARABIA" 
                       ? "SOQOTRA SOLUTIONS WLL" 
                       : "SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL"}
                   </h1>
-                  <div className="text-sm text-gray-600 mt-2">
+                  <div className="text-sm text-gray-600 mt-3 leading-relaxed">
                     <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
                     <p>AZIZIA COMMERCIAL STREET, P.O.BOX: 55861, AZIZIA - ERITREA</p>
                     <p>TEL: +291 - 44832508 | EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
@@ -67,7 +86,7 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
             <div className="text-right">
               <div className="border-2 border-gray-300 p-4 rounded">
                 <h2 className="text-2xl font-bold">INVOICE</h2>
-                <p className="text-lg font-semibold">#{formData.invoiceNumber || "13135619"}</p>
+                <p className="text-lg font-semibold">#{formData.invoiceNumber || "010000"}</p>
                 <p className="text-sm">DATE: {formData.invoiceDate || new Date().toISOString().split('T')[0]}</p>
                 <p className="text-sm">PRINT DATE: {new Date().toLocaleDateString()}</p>
               </div>
@@ -109,8 +128,8 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
               </div>
               <div>
                 <p><span className="font-medium">PAYMENT STATUS:</span></p>
-                <p className={`font-bold ${formData.paymentStatus === 'PAID' ? 'text-green-600' : 'text-red-600'}`}>
-                  {formData.paymentStatus || "UNPAID"}
+                <p className={`font-bold text-lg ${formData.paymentStatus === 'PAID' ? 'text-green-600' : 'text-red-600'}`}>
+                  {formData.paymentStatus === 'PAID' ? 'PAID' : 'UNPAID'}
                 </p>
               </div>
               <div>
@@ -225,6 +244,11 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
                 <p className="text-xs font-medium">SHIPPER'S SIGNATURE</p>
               </div>
             </div>
+          </div>
+
+          {/* QR Code Section */}
+          <div className="mt-6 flex justify-end">
+            <QrCodeSection qrData={generateQRData()} />
           </div>
 
           {/* Footer */}
