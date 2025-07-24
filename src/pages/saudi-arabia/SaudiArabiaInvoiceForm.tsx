@@ -1,7 +1,30 @@
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, Save, Eye } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Layout from "@/components/layout/Layout";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Plus, Save, Eye, Printer, Trash2 } from "lucide-react";
+import SaudiArabiaInvoicePreview from "./components/SaudiArabiaInvoicePreview";
+import { useInvoiceNumberSelector } from "../invoicing/hooks/useInvoiceNumberSelector";
+import InvoiceNumberSelector from "../invoicing/components/basic-information/InvoiceNumberSelector";
+import UPBIntegrationCard from "@/components/invoice/UPBIntegrationCard";
+import { useSaudiArabiaInvoice } from "./hooks/useSaudiArabiaInvoice";
+import ShipperDetails from "./components/shipping/ShipperDetails";
+import ConsigneeDetails from "./components/shipping/ConsigneeDetails";
+import { 
+  saudiArabiaPorts, 
+  saudiArabiaSectors, 
+  saudiArabiaSalesReps, 
+  saudiArabiaDrivers, 
+  saudiArabiaDistricts,
+  saudiArabiaPackageTypes,
+  doorToDoorPricing 
+} from "./data/saudiArabiaData";
+import { toast } from "sonner";
 
 const SaudiArabiaInvoiceForm = () => {
   const navigate = useNavigate();
