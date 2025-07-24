@@ -8,7 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Search, Edit, Eye, Trash2, Ship, Package, FileText } from "lucide-react";
+import { Plus, Search, Edit, Eye, Trash2, Ship, Package, FileText, RefreshCw } from "lucide-react";
+import { updateInvoice010009 } from "@/scripts/updateInvoice010009";
+import { toast } from "sonner";
 
 const EritreaDashboard = () => {
   const navigate = useNavigate();
@@ -144,13 +146,42 @@ const EritreaDashboard = () => {
             <div className="w-12 h-8 bg-gradient-to-r from-green-500 to-red-500 rounded"></div>
             <h1 className="text-3xl font-bold text-gray-900">Dashboard - Eritrea</h1>
           </div>
-          <Button 
-            className="gap-2"
-            onClick={() => navigate("/eritrea/invoice/add")}
-          >
-            <Plus className="h-4 w-4" />
-            Add New
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              className="gap-2"
+              onClick={() => navigate("/eritrea/invoice/add")}
+            >
+              <Plus className="h-4 w-4" />
+              Add New
+            </Button>
+            <Button 
+              variant="outline"
+              className="gap-2"
+              onClick={() => {
+                try {
+                  const success = updateInvoice010009();
+                  if (success) {
+                    // Refresh the invoices after update
+                    const loadInvoices = () => {
+                      try {
+                        const storedInvoices = JSON.parse(localStorage.getItem('eritreaInvoices') || '[]');
+                        setInvoices(storedInvoices);
+                      } catch (error) {
+                        console.error("Error loading invoices:", error);
+                      }
+                    };
+                    loadInvoices();
+                  }
+                } catch (error) {
+                  console.error("Update failed:", error);
+                  toast.error("Failed to update invoice 010009");
+                }
+              }}
+            >
+              <RefreshCw className="h-4 w-4" />
+              Fix Invoice 010009
+            </Button>
+          </div>
         </div>
 
         {/* Success Message */}

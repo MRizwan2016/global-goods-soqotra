@@ -414,30 +414,53 @@ const EritreaInvoicePrint = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>CARTON BOX</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>25</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>20X20X20</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>0.134</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>PERSONAL EFFECTS</td>
-                  </tr>
-                  <tr>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>2</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>TRAVELLING BAG</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>30</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>22X14X12</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>0.062</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>PERSONAL EFFECTS</td>
-                  </tr>
+                  {displayData.packageItems?.length > 0 ? (
+                    displayData.packageItems.map((item: any, index: number) => (
+                      <tr key={index}>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>{index + 1}</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>{item.name}</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>{item.quantity}</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>{item.weight}</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>{item.length}X{item.width}X{item.height}</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>{item.cubicMetre}</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>{item.description || 'PERSONAL EFFECTS'}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    // Fallback data if no packageItems found
+                    <>
+                      <tr>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>CARTON BOX</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>25</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>20X20X20</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>0.134</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>PERSONAL EFFECTS</td>
+                      </tr>
+                      <tr>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>2</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>TRAVELLING BAG</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>30</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>22X14X12</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>0.062</td>
+                        <td style={{ border: '1px solid #000', padding: '5px' }}>PERSONAL EFFECTS</td>
+                      </tr>
+                    </>
+                  )}
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }} colSpan={2}>TOTAL</td>
-                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>2</td>
-                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>55</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>
+                      {displayData.totalPackages || displayData.packageItems?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 2}
+                    </td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>
+                      {displayData.totalWeight || displayData.packageItems?.reduce((sum: number, item: any) => sum + (item.weight * item.quantity), 0) || 55}
+                    </td>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}></td>
-                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>0.196</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>
+                      {displayData.totalVolume || displayData.packageItems?.reduce((sum: number, item: any) => sum + (item.cubicMetre * item.quantity), 0) || 0.196}
+                    </td>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}></td>
                   </tr>
                 </tbody>
