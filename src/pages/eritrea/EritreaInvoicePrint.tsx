@@ -293,7 +293,7 @@ const EritreaInvoicePrint = () => {
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>SALES REP</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>MR. GAYASHAN</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>Mr. Yousuf</td>
                   </tr>
                 </table>
               </div>
