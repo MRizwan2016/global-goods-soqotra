@@ -239,6 +239,12 @@ export const eritreaPackageTypes = [
     name: "WASHING MACHINE",
     dimensions: { length: 41, width: 36, height: 22 },
     volume: 0.545
+  },
+  {
+    name: "BED (MEDICAL BED)",
+    dimensions: { length: 198, width: 28, height: 104 }, // 78x11x41 inches converted to cm
+    volume: 0.576, // 198 x 28 x 104 cm = 0.576 m³
+    weight: 54.90 // Weight in kg
   }
 ];
 
