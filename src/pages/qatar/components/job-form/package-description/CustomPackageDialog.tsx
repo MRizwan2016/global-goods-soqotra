@@ -81,7 +81,7 @@ const CustomPackageDialog = ({ isJobNumberGenerated, onAddPackage }: CustomPacka
     }
 
     const dimensionsStr = `${length}cm x ${width}cm x ${height}cm ${weight ? `(${weight}kg)` : ''}`;
-    const finalPackageName = packageName.toUpperCase();
+    const finalPackageName = (packageName || "").toUpperCase();
     
     const newItem: JobItem = {
       id: uuidv4(),

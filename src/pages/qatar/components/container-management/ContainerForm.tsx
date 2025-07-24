@@ -70,10 +70,10 @@ const ContainerForm: React.FC<ContainerFormProps> = ({
     // Prepare the container data
     const containerData: QatarContainer = {
       id: existingContainer?.id || uuidv4(),
-      containerNumber: containerNumber.toUpperCase(),
+      containerNumber: (containerNumber || "").toUpperCase(),
       containerType: containerType,
       runningNumber: runningNumber,
-      sealNumber: sealNumber.toUpperCase(),
+      sealNumber: (sealNumber || "").toUpperCase(),
       shippingLine: shippingLine,
       direction: direction,
       sector: sector,

@@ -36,7 +36,7 @@ const CitySelector = () => {
 
   const handleAddCity = () => {
     if (newCity.trim()) {
-      setCustomCities([...customCities, newCity.toUpperCase().trim()]);
+      setCustomCities([...customCities, (newCity || "").toUpperCase().trim()]);
       setNewCity("");
       setShowAddCityDialog(false);
     }
