@@ -237,13 +237,30 @@ const EritreaDashboard = () => {
                     <TableRow key={item.id} className="hover:bg-gray-50">
                       <TableCell className="font-medium">{index + 1}</TableCell>
                       <TableCell>
-                        <Button variant="outline" size="sm" className="text-blue-600">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                          onClick={() => navigate(`/eritrea/invoice/edit/${item.id}`)}
+                        >
                           {item.id}
                         </Button>
                       </TableCell>
                       <TableCell>{item.invoiceDate}</TableCell>
                       <TableCell className="font-medium">{item.customer}</TableCell>
-                      <TableCell>{item.sector}</TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="text-gray-700 hover:text-blue-600 font-medium"
+                          onClick={() => {
+                            setSelectedSector(item.sector);
+                            toast.success(`Filtered by sector: ${item.sector}`);
+                          }}
+                        >
+                          {item.sector}
+                        </Button>
+                      </TableCell>
                       <TableCell>{item.warehouse}</TableCell>
                       <TableCell>{item.d2d}</TableCell>
                       <TableCell>{item.nic}</TableCell>
@@ -253,8 +270,40 @@ const EritreaDashboard = () => {
                       <TableCell>{item.gross}</TableCell>
                       <TableCell>{item.discount}</TableCell>
                       <TableCell className="font-medium">{item.net}</TableCell>
-                      <TableCell>{item.paid}</TableCell>
-                      <TableCell>{getStatusBadge(item.status)}</TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className={`${parseFloat(item.paid) > 0 ? 'text-green-600' : 'text-red-600 hover:text-red-700'} font-medium`}
+                          onClick={() => {
+                            // Store invoice for payment
+                            sessionStorage.setItem('selectedInvoice', JSON.stringify({
+                              id: item.id,
+                              invoiceNumber: item.id,
+                              customerName: item.customer,
+                              net: parseFloat(item.net),
+                              totalPaid: parseFloat(item.paid)
+                            }));
+                            navigate('/accounts/payment/add');
+                          }}
+                        >
+                          {item.paid}
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            // Toggle status or navigate to status management
+                            toast.info(`Status: ${item.status}`, {
+                              description: "Click actions to modify status"
+                            });
+                          }}
+                        >
+                          {getStatusBadge(item.status)}
+                        </Button>
+                      </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
                           <Button 
