@@ -31,9 +31,16 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
       total: parseFloat(costDetails.net || costDetails.freight || "59.00").toFixed(2),
       shipper: shippingDetails.shipper1 || "INSAF M M M",
       consignee: shippingDetails.consignee1 || "INSAF M M M",
-      paymentStatus: formData.paymentStatus || "UNPAID"
+      paymentStatus: formData.paymentStatus || "UNPAID",
+      company: "SOQOTRA LOGISTICS",
+      verified: true
     };
-    return JSON.stringify(invoiceData);
+    
+    // Create a shorter, more reliable QR data format
+    const qrString = `INVOICE:${invoiceData.invoiceNumber}|DATE:${invoiceData.date}|TOTAL:${invoiceData.total} QAR|STATUS:${invoiceData.paymentStatus}|VERIFIED:TRUE`;
+    
+    console.log("Generated QR data:", qrString);
+    return qrString;
   };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
