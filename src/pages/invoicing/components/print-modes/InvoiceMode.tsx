@@ -44,7 +44,7 @@ const InvoiceMode: React.FC<InvoiceModeProps> = ({
       <div className="p-6 bg-white border-b border-gray-300">
         <div className="flex justify-between items-center">
           <div className="flex items-center">
-            <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-16 w-16 mr-4" />
+            <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Soqotra Logo" className="h-20 w-24 object-contain mr-4" />
             <div>
               <h1 className="text-xl font-bold">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</h1>
               <p className="text-sm">Office No. 3, 1st Floor, Zone 55, Building No.53, Street No.76,</p>

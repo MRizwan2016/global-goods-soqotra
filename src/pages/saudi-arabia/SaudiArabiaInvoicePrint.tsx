@@ -182,7 +182,7 @@ const SaudiArabiaInvoicePrint = () => {
             {/* Header */}
             <div className="flex p-2 border-b border-gray-300">
               <div className="w-1/4 flex items-center justify-center">
-                <img src="/soqotra-logo.png" alt="Soqotra Logo" className="h-20 w-20" />
+                <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Soqotra Logo" className="h-24 w-32 object-contain" />
               </div>
               
               <div className="w-1/4 flex items-center justify-center">

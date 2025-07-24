@@ -61,9 +61,9 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
                 {/* Enhanced Logo - larger and more prominent */}
                 <div className="flex-shrink-0">
                   <img 
-                    src="/lovable-uploads/5d6de24f-5662-4b63-ad5a-e94dfa2aada7.png" 
+                    src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
                     alt="Soqotra Logo" 
-                    className="w-[180px] h-auto object-contain"
+                    className="w-[200px] h-auto object-contain"
                     style={{ 
                       imageRendering: 'crisp-edges'
                     }}

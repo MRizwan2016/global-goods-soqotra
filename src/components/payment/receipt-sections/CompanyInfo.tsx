@@ -16,7 +16,7 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({ logo }) => {
           onError={(e) => {
             const target = e.target as HTMLImageElement;
             target.onerror = null;
-            target.src = "/soqotra-logo.png";
+            target.src = "/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png";
             console.log("Using fallback logo path");
           }}
         />
