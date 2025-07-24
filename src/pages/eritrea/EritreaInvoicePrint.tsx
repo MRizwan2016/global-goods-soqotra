@@ -243,200 +243,282 @@ const EritreaInvoicePrint = () => {
           className="print-content w-full max-w-4xl bg-white shadow-lg print:shadow-none"
           style={{ minHeight: '297mm' }}
         >
-          <div className="invoice-container p-8">
+          <div style={{ border: '3px solid #000', padding: '0', fontFamily: 'Arial, sans-serif' }}>
             {/* Header */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '30px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flex: 1 }}>
+            <div style={{ textAlign: 'center', padding: '10px', borderBottom: '2px solid #000' }}>
+              <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '0' }}>
+                SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', marginTop: '5px' }}>
                 <img 
                   src="/lovable-uploads/5d6de24f-5662-4b63-ad5a-e94dfa2aada7.png" 
                   alt="Soqotra Logo" 
-                  style={{ width: '120px', height: 'auto', objectFit: 'contain', display: 'block' }}
+                  style={{ width: '80px', height: 'auto' }}
                 />
-                <div style={{ flex: 1 }}>
-                  <h1 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1e3a8a', margin: '0 0 8px 0', lineHeight: '1.2' }}>
-                    {getCompanyName()}
-                  </h1>
-                  <div style={{ fontSize: '11px', color: '#666', lineHeight: '1.3' }}>
-                    <p style={{ margin: '0' }}>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
-                    <p style={{ margin: '0' }}>AZIZIA COMMERCIAL STREET, P.O.BOX: 55861, AZIZIA - ERITREA</p>
-                    <p style={{ margin: '0' }}>TEL: +291 - 44832508 | EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
-                  </div>
-                </div>
-              </div>
-              <div style={{ textAlign: 'right', minWidth: '200px' }}>
-                <div style={{ border: '2px solid #ccc', padding: '16px', borderRadius: '8px' }}>
-                  <h2 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0' }}>INVOICE</h2>
-                  <p style={{ fontSize: '18px', fontWeight: 'bold', margin: '4px 0' }}>#{displayData.invoiceNumber || displayData.formData?.invoiceNumber}</p>
-                  <p style={{ fontSize: '14px', margin: '4px 0' }}>DATE: {displayData.invoiceDate || displayData.formData?.invoiceDate}</p>
-                  <p style={{ fontSize: '14px', margin: '4px 0' }}>PRINT DATE: {new Date().toLocaleDateString()}</p>
+                <div style={{ fontSize: '12px', lineHeight: '1.2' }}>
+                  <div>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING 53, STREET NO. 76</div>
+                  <div>AZIZIA COMMERCIAL STREET, DOHA - QAATAR</div>
+                  <div>EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</div>
                 </div>
               </div>
             </div>
 
-            {/* Shipper and Consignee */}
-            <div className="grid-2" style={{ marginBottom: '30px' }}>
-              <div className="section">
-                <div className="section-header">SHIPPER</div>
-                <div className="section-content">
-                  <p style={{ fontWeight: 'bold' }}>
-                    {displayData.shipperPrefix} {displayData.shipperName || displayData.shippingDetails?.shipper1}
-                  </p>
-                  <p>{displayData.shipperAddress || displayData.shippingDetails?.shipper2}</p>
-                  <p style={{ color: '#dc2626', fontWeight: '500', marginTop: '10px' }}>
-                    {displayData.shipperCity}, {displayData.shipperCountry || displayData.shippingDetails?.town}
-                  </p>
-                  <p style={{ marginTop: '10px' }}>
-                    <strong>MOBILE:</strong> {displayData.shipperMobile || displayData.shippingDetails?.mobile}
-                  </p>
-                  <p><strong>EMAIL:</strong> {displayData.shipperEmail}</p>
-                  <p><strong>ID:</strong> {displayData.shipperIdNumber}</p>
+            {/* Invoice Info & QR Section */}
+            <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
+              <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #000' }}>
+                <div style={{ backgroundColor: '#ccc', padding: '20px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold' }}>
+                  QR CODE
                 </div>
               </div>
-              
-              <div className="section">
-                <div className="section-header">CONSIGNEE</div>
-                <div className="section-content">
-                  <p style={{ fontWeight: 'bold' }}>
-                    {displayData.consigneePrefix} {displayData.consigneeName || displayData.shippingDetails?.consignee1}
-                  </p>
-                  <p>{displayData.consigneeAddress || displayData.shippingDetails?.consignee2}</p>
-                  <p style={{ marginTop: '10px' }}>
-                    {displayData.consigneeCity}, {displayData.consigneeCountry || displayData.shippingDetails?.consigneeTown}
-                  </p>
-                  <p style={{ marginTop: '10px' }}>
-                    <strong>MOBILE:</strong> {displayData.consigneeMobile || displayData.shippingDetails?.consigneeMobile}
-                  </p>
-                  <p><strong>EMAIL:</strong> {displayData.consigneeEmail}</p>
-                  <p><strong>ID/PASSPORT:</strong> {displayData.consigneeIdNumber || displayData.shippingDetails?.consigneePassportNic}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Shipping Details */}
-            <div className="section">
-              <div className="section-header">SHIPPING DETAILS</div>
-              <div className="section-content">
-                <div className="grid-4">
-                  <div>
-                    <strong>WAREHOUSE:</strong><br />
-                    ERITREA
-                  </div>
-                  <div>
-                    <strong>SECTOR:</strong><br />
-                    KASSALA
-                  </div>
-                  <div>
-                    <strong>PAYMENT STATUS:</strong><br />
-                    <span style={{ color: displayData.paymentStatus === 'PAID' ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>
-                      {displayData.paymentStatus || "UNPAID"}
-                    </span>
-                  </div>
-                  <div>
-                    <strong>PAYMENT METHOD:</strong><br />
-                    CASH
-                  </div>
-                  <div>
-                    <strong>PAYMENT DATE:</strong><br />
-                    NOT SPECIFIED
-                  </div>
-                  <div>
-                    <strong>RECEIPT NUMBER:</strong><br />
-                    NOT SPECIFIED
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Cargo Details */}
-            <div className="section">
-              <div className="section-header">CARGO DETAILS</div>
-              <div className="section-content">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>NO.</th>
-                      <th>DIMENSION (LxWxH)</th>
-                      <th>QTY</th>
-                      <th>WEIGHT (KG)</th>
-                      <th>INVOICE PACKAGE DETAILS</th>
-                      <th>DESCRIPTION</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {invoiceData.packageDetails.length > 0 ? (
-                      invoiceData.packageDetails.map((pkg: any, index: number) => (
-                        <tr key={index}>
-                          <td>{index + 1}</td>
-                          <td>{pkg.length && pkg.width && pkg.height ? `${pkg.length}x${pkg.width}x${pkg.height} inches` : "N/A"}</td>
-                          <td>1</td>
-                          <td>{pkg.weight || "29.34"}</td>
-                          <td>{pkg.name || "HOUSEHOLD ITEMS"}</td>
-                          <td>{pkg.description || displayData.packageDescription || "PERSONAL EFFECTS AND HOUSEHOLD GOODS"}</td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td>1</td>
-                        <td>N/A</td>
-                        <td>1</td>
-                        <td>29.34</td>
-                        <td>HOUSEHOLD ITEMS</td>
-                        <td>PERSONAL EFFECTS AND HOUSEHOLD GOODS</td>
-                      </tr>
-                    )}
-                    <tr className="total-row">
-                      <td style={{ textAlign: 'center' }}>TOTAL:</td>
-                      <td>{invoiceData.packageDetails.length || 1}</td>
-                      <td>{invoiceData.formData.weight} KG</td>
-                      <td>{(displayData.invoiceNumber || displayData.formData?.invoiceNumber) === '010000' ? '0.008463' : invoiceData.formData.volume} M³</td>
-                      <td></td>
-                      <td>{(displayData.invoiceNumber || displayData.formData?.invoiceNumber) === '010000' ? '31x21x13 inches' : ''}</td>
-                    </tr>
-                  </tbody>
+              <div style={{ flex: 1, padding: '10px' }}>
+                <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>INVOICE</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.invoiceNumber || displayData.formData?.invoiceNumber}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>DATE</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.invoiceDate || displayData.formData?.invoiceDate}</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>SALES REP</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>MR. GAYASHAN</td>
+                  </tr>
                 </table>
               </div>
             </div>
 
+            {/* Shipper and Consignee Section */}
+            <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
+              <div style={{ flex: 1, borderRight: '1px solid #000' }}>
+                <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>SR NO.</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>SHIPPER</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>
+                      {displayData.shipperPrefix} {displayData.shipperName || displayData.shippingDetails?.shipper1 || "MR. MOHAMED YACOOB"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>2</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}></td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }} colSpan={2}>ADDRESS</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px' }} colSpan={2}>
+                      {displayData.shipperCity || displayData.shippingDetails?.town || "UMM SALAAL ALI, QATAR"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>MOBILE / TEL NO</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>
+                      {displayData.shipperMobile || displayData.shippingDetails?.mobile || "31016516"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>QID / PP NO</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>
+                      {displayData.shipperIdNumber || "27214410871"}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              
+              <div style={{ flex: 1 }}>
+                <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>SR NO</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>CONSIGNEE</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>
+                      {displayData.consigneePrefix} {displayData.consigneeName || displayData.shippingDetails?.consignee1 || "MRS. MOHAMED IDRIES"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>2</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}></td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }} colSpan={2}>ADDRESS</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px' }} colSpan={2}>
+                      {displayData.consigneeCity || displayData.shippingDetails?.consigneeTown || "KEREN, ASMARA, ERITREA"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>TEL NO:</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>
+                      {displayData.consigneeMobile || displayData.shippingDetails?.consigneeMobile || "23568552"}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>ID NO OR PP NO</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>
+                      {displayData.consigneeIdNumber || displayData.shippingDetails?.consigneePassportNic || "N12548752"}
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            {/* Shipping Details */}
+            <div style={{ borderBottom: '2px solid #000' }}>
+              <div style={{ fontSize: '14px', fontWeight: 'bold', padding: '5px', backgroundColor: '#f0f0f0', border: '1px solid #000' }}>
+                SHIPPING DETAILS
+              </div>
+              <div style={{ display: 'flex' }}>
+                <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>WAREHOUSE</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>SECTOR</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>PAYMENT STATUS</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>PAYMENT MODE</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>COUNTRY/ORIGIN</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>ASMARA</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>ERITREA</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', color: displayData.paymentStatus === 'PAID' ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>
+                      {displayData.paymentStatus || "PAID/UNPAID"}
+                    </td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>CASH/ONLINE</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>QATAR</td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+
+            {/* Cargo Details */}
+            <div style={{ borderBottom: '2px solid #000' }}>
+              <div style={{ fontSize: '14px', fontWeight: 'bold', padding: '5px', backgroundColor: '#f0f0f0', border: '1px solid #000' }}>
+                CARGO DETAILS
+              </div>
+              <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>SR NO</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>PACKAGE TYPE</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>QUANTITY</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>WEIGHT</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>DIMENSION</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>VOLUME</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>DESCRIPTION</td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>CARTON BOX</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>25</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>20X20X20</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>0.134</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>PERSONAL EFFECTS</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>2</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>TRAVELLING BAG</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>30</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>22X14X12</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>0.062</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>PERSONAL EFFECTS</td>
+                  </tr>
+                  <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }} colSpan={2}>TOTAL</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>2</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>55</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}></td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>0.196</td>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
             {/* Terms and Pricing */}
-            <div className="grid-2">
-              <div>
-                <h3 style={{ color: '#1e3a8a', fontWeight: 'bold', fontSize: '16px', marginBottom: '15px' }}>
-                  TERMS & CONDITIONS:
-                </h3>
-                <div style={{ fontSize: '9px', lineHeight: '1.4' }}>
-                  <p style={{ margin: '2px 0' }}>(1) WE HEREBY DECLARE THAT THE CONTENTS OF THIS CONSIGNMENT ARE FULLY AND ACCURATELY DESCRIBED, AND THE PARCEL OR PACKAGE DOESN'T CONTAIN ANY ILLEGAL ITEMS, CASH, JEWELRY, OR DANGEROUS GOODS.</p>
-                  <p style={{ margin: '2px 0' }}>(2) PERISHABLE & BREAKABLE ITEMS ARE SHIPPED AT MY OWN RISK. SOQOTRA IS NOT LIABLE FOR ANY LOSS FROM BREAKABLE OR UNDECLARED ITEMS.</p>
-                  <p style={{ margin: '2px 0' }}>(3) SHIPPER/CONSIGNEE RESPONSIBLE FOR DESTINATION CHARGES.</p>
-                  <p style={{ margin: '2px 0' }}>(4) I UNDERSTAND THE PRESENT TIME IS JUST AN INDICATOR, IT MAY CHANGE.</p>
-                  <p style={{ margin: '2px 0' }}>(5) STORAGE CHARGES ARE APPLICABLE AFTER 30 DAYS.</p>
-                  <p style={{ margin: '2px 0' }}>(6) I UNDERTAKE TO COMPLY WITH THE ABOVE-MENTIONED TERMS AND CONDITIONS.</p>
+            <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
+              <div style={{ flex: 1, borderRight: '1px solid #000', padding: '10px' }}>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '10px' }}>
+                  TERMS & CONDITIONS:-
+                </div>
+                <div style={{ fontSize: '10px', lineHeight: '1.3' }}>
+                  <p style={{ margin: '2px 0' }}>(1) I/We hereby declare that the contents of this consignment are</p>
+                  <p style={{ margin: '2px 0' }}>fully accurately described, and the parcel or package doesn't</p>
+                  <p style={{ margin: '2px 0' }}>contain any illegal items, cash, jewelry, or dangerous goods.</p>
+                  <p style={{ margin: '2px 0' }}>(2) Perishable & breakable items are shipped at my own risk;</p>
+                  <p style={{ margin: '2px 0' }}>SOQOTRA is not liable for any loss from breakable or undeclared items.</p>
+                  <p style={{ margin: '2px 0' }}>(3) Shipper/Consignee responsible for destination charges.</p>
+                  <p style={{ margin: '2px 0' }}>(4) I understand that delivery time is just an indicator, it may change.</p>
+                  <p style={{ margin: '2px 0' }}>(5) Storage charges are applicable after 30 days.</p>
+                  <p style={{ margin: '2px 0' }}>(6) I undertake to comply with the above-mentioned terms and conditions</p>
                 </div>
               </div>
               
-              <div className="pricing-box">
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span>FREIGHT</span>
-                  <span>{parseFloat(invoiceData.costDetails.freight).toFixed(2)} QAR</span>
+              <div style={{ padding: '10px' }}>
+                <table style={{ fontSize: '12px', borderCollapse: 'collapse' }}>
+                  <tr>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>FREIGHT</td>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>650.00</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>DOCUMENTS FEE</td>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>200.00</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>DISCOUNT</td>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>-</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>PACKING FEE</td>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>-</td>
+                  </tr>
+                  <tr>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>TRANSPORTATION</td>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
+                    <td style={{ padding: '5px', textAlign: 'right' }}>-</td>
+                  </tr>
+                  <tr style={{ borderTop: '1px solid #000' }}>
+                    <td style={{ padding: '5px', textAlign: 'right', fontWeight: 'bold' }}>TOTAL</td>
+                    <td style={{ padding: '5px', textAlign: 'right', fontWeight: 'bold' }}>QAR</td>
+                    <td style={{ padding: '5px', textAlign: 'right', fontWeight: 'bold' }}>850.00</td>
+                  </tr>
+                </table>
+                <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '14px', marginTop: '10px', color: displayData.paymentStatus === 'PAID' ? '#16a34a' : '#dc2626' }}>
+                  {displayData.paymentStatus === 'PAID' ? 'PAID' : 'PAID / UNPAID'}
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <span>DISCOUNT</span>
-                  <span>({parseFloat(invoiceData.costDetails.discount || "0.00").toFixed(2)}) QAR</span>
+              </div>
+            </div>
+
+            {/* Signature Section */}
+            <div style={{ display: 'flex', minHeight: '80px' }}>
+              <div style={{ flex: 1, borderRight: '1px solid #000', padding: '20px', textAlign: 'center' }}>
+                <div style={{ borderTop: '1px solid #000', marginTop: '40px', paddingTop: '5px', fontWeight: 'bold' }}>
+                  CUSTOMER SIGNATURE
                 </div>
-                <hr style={{ margin: '10px 0', borderColor: '#ccc' }} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', marginBottom: '8px' }}>
-                  <span>TOTAL</span>
-                  <span>{parseFloat(invoiceData.costDetails.net).toFixed(2)} QAR</span>
-                </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold', fontSize: '16px' }}>
-                  <span>TOTAL DUE</span>
-                  <span>{parseFloat(invoiceData.costDetails.net).toFixed(2)} QAR</span>
+              </div>
+              <div style={{ flex: 1, padding: '20px', textAlign: 'center' }}>
+                <div style={{ borderTop: '1px solid #000', marginTop: '40px', paddingTop: '5px', fontWeight: 'bold' }}>
+                  AUTHORIZED SIGNATURE
                 </div>
               </div>
             </div>
 
             {/* Footer */}
-            <div style={{ marginTop: '40px', textAlign: 'center', fontSize: '10px', color: '#666' }}>
-              <p>This is a computer generated invoice and does not require signature.</p>
+            <div style={{ textAlign: 'center', fontSize: '10px', fontStyle: 'italic', padding: '10px', borderTop: '1px solid #000' }}>
+              THANK YOU FOR OUR BUSINESS. FOR ANY INQUIRIES PLEASE CONTACT US AT: 44412770-44412773
             </div>
           </div>
         </div>
