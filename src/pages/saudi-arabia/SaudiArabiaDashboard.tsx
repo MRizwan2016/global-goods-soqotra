@@ -1,202 +1,295 @@
-
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Phone, Flag, Globe, Briefcase, FileText, Ship, Truck } from "lucide-react";
-import CountryBackButton from "@/components/ui/country-back-button";
-import LanguageSwitcher from "@/components/ui/language-switcher";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { Plus, Search, Edit, Eye, Trash2, Ship, Package, FileText } from "lucide-react";
+import { toast } from "sonner";
 
-const SaudiArabiaDashboard: React.FC = () => {
-  const { t, language } = useLanguage();
-  
+const SaudiArabiaDashboard = () => {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedSector, setSelectedSector] = useState("all");
+  const [selectedBranch, setSelectedBranch] = useState("all");
+  const [selectedWarehouse, setSelectedWarehouse] = useState("all");
+
+  // Load saved invoices from localStorage
+  const [invoices, setInvoices] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadInvoices = () => {
+      try {
+        const storedInvoices = JSON.parse(localStorage.getItem('saudiArabiaInvoices') || '[]');
+        setInvoices(storedInvoices);
+        console.log("📊 SAUDI ARABIA DASHBOARD - Loaded invoices:", storedInvoices);
+      } catch (error) {
+        console.error("Error loading invoices:", error);
+      }
+    };
+
+    loadInvoices();
+  }, []);
+
+  // Mock data for Saudi Arabia operations
+  const mockShipmentData = [
+    {
+      id: "SA001001",
+      invoiceDate: "20/01/2025",
+      customer: "ABDULLAH HASSAN M",
+      sector: "R",
+      warehouse: "Riyadh",
+      d2d: "No",
+      nic: "SA8840923",
+      volume: "2.85",
+      weight: "420.50",
+      packages: "2",
+      gross: "850.00",
+      discount: "0.00",
+      net: "850.00",
+      paid: "0.00",
+      status: "pending"
+    },
+    {
+      id: "SA001002", 
+      invoiceDate: "20/01/2025",
+      customer: "MOHAMMED OMAR K",
+      sector: "D",
+      warehouse: "Dammam",
+      d2d: "Yes",
+      nic: "SA7730154",
+      volume: "1.20",
+      weight: "180.75",
+      packages: "1",
+      gross: "425.00",
+      discount: "0.00", 
+      net: "425.00",
+      paid: "425.00",
+      status: "completed"
+    }
+  ];
+
+  // Transform loaded invoices to display format
+  const shipmentData = invoices.length > 0 ? invoices.map((invoice, index) => ({
+    id: invoice.id || invoice.invoiceNumber,
+    invoiceDate: new Date(invoice.invoiceDate || invoice.createdAt).toLocaleDateString('en-GB'),
+    customer: `${invoice.consigneePrefix || ''} ${invoice.consigneeName || 'N/A'}`.trim(),
+    sector: invoice.sector?.charAt(0) || "R",
+    warehouse: invoice.port || "Riyadh",
+    d2d: invoice.doorToDoor || "No",
+    nic: invoice.consigneeIdNumber || `SA${Date.now().toString().slice(-7)}`,
+    volume: invoice.totalVolume?.toFixed(2) || "0.00",
+    weight: invoice.totalWeight?.toFixed(2) || "0.00",
+    packages: invoice.totalPackages?.toString() || "0",
+    gross: invoice.gross?.toFixed(2) || "0.00",
+    discount: invoice.discount?.toFixed(2) || "0.00",
+    net: invoice.net?.toFixed(2) || "0.00",
+    paid: "0.00",
+    status: "pending"
+  })) : mockShipmentData;
+
+  const statsData = [
+    { title: "Total Shipments", value: "89", icon: Ship, color: "bg-blue-500" },
+    { title: "Active Packages", value: "56", icon: Package, color: "bg-green-500" },
+    { title: "Pending Invoices", value: "12", icon: FileText, color: "bg-yellow-500" },
+    { title: "Completed Today", value: "7", icon: Eye, color: "bg-purple-500" }
+  ];
+
+  const filteredData = shipmentData.filter(item => {
+    const matchesSearch = item.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         item.id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSector = selectedSector === "all" || item.sector === selectedSector;
+    const matchesBranch = selectedBranch === "all" || item.warehouse === selectedBranch;
+    
+    return matchesSearch && matchesSector && matchesBranch;
+  });
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      pending: { variant: "destructive" as const, label: "Pending" },
+      processing: { variant: "default" as const, label: "Processing" },
+      completed: { variant: "secondary" as const, label: "Completed" }
+    };
+    
+    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
+
   return (
-    <Layout title="Saudi Arabia Operations">
-      <div className="mb-8">
-        <div className="flex justify-between mb-4">
-          <CountryBackButton />
-          <LanguageSwitcher />
+    <Layout title="Dashboard - Saudi Arabia">
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-8 bg-gradient-to-r from-green-600 to-black rounded"></div>
+            <h1 className="text-3xl font-bold text-gray-900">Dashboard - Saudi Arabia</h1>
+          </div>
+          <div className="flex gap-2">
+            <Button 
+              className="gap-2"
+              onClick={() => navigate("/saudi-arabia/invoice/add")}
+            >
+              <Plus className="h-4 w-4" />
+              Add New
+            </Button>
+          </div>
         </div>
-        <div className="flex items-center gap-3 mb-2">
-          <span className="flag-icon flag-saudi-arabia w-10 h-6"></span>
-          <h1 className={`text-3xl font-bold text-gray-800 ${language === 'ar' ? 'font-arabic' : ''}`}>
-            {t("country.saudiArabia")}
-          </h1>
+
+        {/* Success Message */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <p className="text-green-800 font-medium">✓ View Invoice Record Listed.</p>
         </div>
-        <p className={`text-gray-600 ${language === 'ar' ? 'font-arabic' : ''}`}>
-          {language === 'ar' ? 'خدمات لوجستية شاملة في جميع أنحاء المملكة العربية السعودية' : 'Comprehensive logistics services across Saudi Arabia'}
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle className={`${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.details.overview")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p className={`${language === 'ar' ? 'font-arabic' : ''}`}>
-                {language === 'ar' 
-                  ? 'المملكة العربية السعودية هي دولة في غرب آسيا. وهي أكبر دولة في الشرق الأوسط، وثاني أكبر دولة في العالم العربي. تشمل عملياتنا في المملكة العربية السعودية حلولاً لوجستية شاملة لاقتصاد المملكة المزدهر.'
-                  : 'Saudi Arabia, officially the Kingdom of Saudi Arabia, is a country in Western Asia. It is the largest country in the Middle East, and the second-largest country in the Arab world. Our operations in Saudi Arabia encompass comprehensive logistics solutions for the Kingdom\'s thriving economy.'}
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div className="flex items-start gap-2">
-                  <MapPin className="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className={`font-medium ${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.details.capital")}</p>
-                    <p className={`${language === 'ar' ? 'font-arabic' : ''}`}>{language === 'ar' ? 'الرياض' : 'Riyadh'}</p>
-                  </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {statsData.map((stat, index) => (
+            <Card key={index} className="hover:shadow-md transition-shadow">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-600">
+                  {stat.title}
+                </CardTitle>
+                <div className={`p-2 rounded-lg ${stat.color}`}>
+                  <stat.icon className="h-4 w-4 text-white" />
                 </div>
-                
-                <div className="flex items-start gap-2">
-                  <Globe className="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className={`font-medium ${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.details.population")}</p>
-                    <p className={`${language === 'ar' ? 'font-arabic' : ''}`}>{language === 'ar' ? '٣٥.٥ مليون' : '35.5 million'}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-2">
-                  <Flag className="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className={`font-medium ${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.details.language")}</p>
-                    <p className={`${language === 'ar' ? 'font-arabic' : ''}`}>{language === 'ar' ? 'العربية' : 'Arabic'}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start gap-2">
-                  <Briefcase className="h-5 w-5 text-gray-500 mt-0.5" />
-                  <div>
-                    <p className={`font-medium ${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.details.currency")}</p>
-                    <p className={`${language === 'ar' ? 'font-arabic' : ''}`}>{language === 'ar' ? 'الريال السعودي (SAR)' : 'Saudi Riyal (SAR)'}</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
-        
-        <div>
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle className={`${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.details.logistics")}</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-start gap-2">
-                <Ship className="h-5 w-5 text-blue-500 mt-0.5" />
-                <div>
-                  <p className={`font-medium ${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.details.ports")}</p>
-                  <p className={`${language === 'ar' ? 'font-arabic' : ''}`}>
-                    {language === 'ar' 
-                      ? 'ميناء جدة الإسلامي، ميناء الملك عبد العزيز (الدمام)، ميناء الملك فهد الصناعي (ينبع)، ميناء الجبيل التجاري'
-                      : 'Jeddah Islamic Port, King Abdulaziz Port (Dammam), King Fahd Industrial Port (Yanbu), Jubail Commercial Port'}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-2">
-                <FileText className="h-5 w-5 text-orange-500 mt-0.5" />
-                <div>
-                  <p className={`font-medium ${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.details.customs")}</p>
-                  <p className={`${language === 'ar' ? 'font-arabic' : ''}`}>
-                    {language === 'ar'
-                      ? 'نظام التخليص الجمركي الإلكتروني (فسح)، تراخيص الاستيراد مطلوبة لبعض السلع'
-                      : 'Electronic customs clearance system (FASAH), import licenses required for certain goods'}
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-start gap-2">
-                <Truck className="h-5 w-5 text-green-500 mt-0.5" />
-                <div>
-                  <p className={`font-medium ${language === 'ar' ? 'font-arabic' : ''}`}>
-                    {language === 'ar' ? 'ممرات النقل الرئيسية' : 'Major Transport Corridors'}
-                  </p>
-                  <p className={`${language === 'ar' ? 'font-arabic' : ''}`}>
-                    {language === 'ar'
-                      ? 'طريق الشرق-الغرب السريع، طريق الشمال-الجنوب السريع، طريق الرياض-الدمام السريع'
-                      : 'East-West Expressway, North-South Highway, Riyadh-Dammam Highway'}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+
+        {/* Filters */}
         <Card>
           <CardHeader>
-            <CardTitle className={`${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.details.operations")}</CardTitle>
+            <CardTitle>Shipment Management</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className={`${language === 'ar' ? 'font-arabic' : ''}`}>
-              {language === 'ar'
-                ? 'عملياتنا في المملكة العربية السعودية واسعة النطاق، وتغطي كامل سلسلة الخدمات اللوجستية من عمليات الموانئ إلى خدمات التوصيل للميل الأخير. نحن متخصصون في:'
-                : 'Our operations in Saudi Arabia are extensive, covering the entire logistics spectrum from port operations to last-mile delivery. We specialize in:'}
-            </p>
-            <ul className={`list-disc list-inside mt-2 space-y-1 ${language === 'ar' ? 'font-arabic' : ''}`}>
-              <li>{language === 'ar' ? 'الخدمات اللوجستية للنفط والغاز' : 'Oil and gas logistics'}</li>
-              <li>{language === 'ar' ? 'نقل مواد البناء' : 'Construction material transportation'}</li>
-              <li>{language === 'ar' ? 'توزيع السلع الاستهلاكية' : 'Consumer goods distribution'}</li>
-              <li>{language === 'ar' ? 'خدمات الشحن عبر الحدود' : 'Cross-border freight services'}</li>
-              <li>{language === 'ar' ? 'التخزين والتوزيع' : 'Warehousing and distribution'}</li>
-              <li>{language === 'ar' ? 'الخدمات اللوجستية للمشاريع العملاقة' : 'Project logistics for mega-projects'}</li>
-              <li>{language === 'ar' ? 'الخدمات اللوجستية للسلسلة الباردة للأغذية والأدوية' : 'Cold chain logistics for food and pharmaceuticals'}</li>
-            </ul>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle className={`${language === 'ar' ? 'font-arabic' : ''}`}>{t("country.details.contacts")}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex items-start gap-2">
-              <MapPin className="h-5 w-5 text-blue-500 mt-0.5" />
-              <div>
-                <p className={`font-medium ${language === 'ar' ? 'font-arabic' : ''}`}>
-                  {language === 'ar' ? 'المكتب الرئيسي في الرياض' : 'Riyadh Head Office'}
-                </p>
-                <p className={`text-sm ${language === 'ar' ? 'font-arabic' : ''}`}>
-                  {language === 'ar' ? 'طريق الملك فهد، حي العليا، الرياض 12213' : 'King Fahd Road, Al Olaya District, Riyadh 12213'}
-                </p>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <Select value={selectedSector} onValueChange={setSelectedSector}>
+                <SelectTrigger>
+                  <SelectValue placeholder="RIYADH · R" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">ALL SECTORS</SelectItem>
+                  <SelectItem value="R">RIYADH · R</SelectItem>
+                  <SelectItem value="D">DAMMAM · D</SelectItem>
+                  <SelectItem value="J">JEDDAH · J</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+                <SelectTrigger>
+                  <SelectValue placeholder="ALL BRANCHES" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">ALL BRANCHES</SelectItem>
+                  <SelectItem value="Riyadh">Riyadh</SelectItem>
+                  <SelectItem value="Dammam">Dammam</SelectItem>
+                  <SelectItem value="Jeddah">Jeddah</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select value={selectedWarehouse} onValueChange={setSelectedWarehouse}>
+                <SelectTrigger>
+                  <SelectValue placeholder="ALL WAREHOUSES" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">ALL WAREHOUSES</SelectItem>
+                  <SelectItem value="Riyadh">Riyadh</SelectItem>
+                  <SelectItem value="Dammam">Dammam</SelectItem>
+                  <SelectItem value="Jeddah">Jeddah</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  placeholder="Search..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
               </div>
             </div>
-            
-            <div className="flex items-start gap-2">
-              <MapPin className="h-5 w-5 text-blue-500 mt-0.5" />
-              <div>
-                <p className={`font-medium ${language === 'ar' ? 'font-arabic' : ''}`}>
-                  {language === 'ar' ? 'فرع جدة' : 'Jeddah Branch'}
-                </p>
-                <p className={`text-sm ${language === 'ar' ? 'font-arabic' : ''}`}>
-                  {language === 'ar' ? 'حي الأندلس، شارع الأمير سلطان، جدة 23218' : 'Al Andalus District, Prince Sultan Street, Jeddah 23218'}
-                </p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-2">
-              <Phone className="h-5 w-5 text-green-500 mt-0.5" />
-              <div>
-                <p className={`font-medium ${language === 'ar' ? 'font-arabic' : ''}`}>
-                  {language === 'ar' ? 'أرقام الاتصال' : 'Contact Number'}
-                </p>
-                <p className={`text-sm ${language === 'ar' ? 'font-arabic text-right' : ''}`}>+966 11 4567890 (Riyadh)</p>
-                <p className={`text-sm ${language === 'ar' ? 'font-arabic text-right' : ''}`}>+966 12 6543210 (Jeddah)</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start gap-2">
-              <Globe className="h-5 w-5 text-purple-500 mt-0.5" />
-              <div>
-                <p className={`font-medium ${language === 'ar' ? 'font-arabic' : ''}`}>
-                  {language === 'ar' ? 'البريد الإلكتروني' : 'Email'}
-                </p>
-                <p className={`text-sm ${language === 'ar' ? 'font-arabic text-right' : ''}`}>ksa.operations@soqotra-logistics.com</p>
-              </div>
+
+            {/* Data Table */}
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-blue-500 hover:bg-blue-500">
+                    <TableHead className="text-white font-medium">Num</TableHead>
+                    <TableHead className="text-white font-medium">MODIFY</TableHead>
+                    <TableHead className="text-white font-medium">INV. DATE</TableHead>
+                    <TableHead className="text-white font-medium">CUSTOMER</TableHead>
+                    <TableHead className="text-white font-medium">S/A</TableHead>
+                    <TableHead className="text-white font-medium">W/H</TableHead>
+                    <TableHead className="text-white font-medium">D2D</TableHead>
+                    <TableHead className="text-white font-medium">NIC</TableHead>
+                    <TableHead className="text-white font-medium">VOL</TableHead>
+                    <TableHead className="text-white font-medium">WGHT</TableHead>
+                    <TableHead className="text-white font-medium">PKGS</TableHead>
+                    <TableHead className="text-white font-medium">GROSS</TableHead>
+                    <TableHead className="text-white font-medium">DISC</TableHead>
+                    <TableHead className="text-white font-medium">NET</TableHead>
+                    <TableHead className="text-white font-medium">PAID</TableHead>
+                    <TableHead className="text-white font-medium">STATUS</TableHead>
+                    <TableHead className="text-white font-medium">ACTIONS</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredData.map((item, index) => (
+                    <TableRow key={item.id} className="hover:bg-gray-50">
+                      <TableCell className="font-medium">{index + 1}</TableCell>
+                      <TableCell>
+                        <Button variant="outline" size="sm" className="text-blue-600">
+                          {item.id}
+                        </Button>
+                      </TableCell>
+                      <TableCell>{item.invoiceDate}</TableCell>
+                      <TableCell className="font-medium">{item.customer}</TableCell>
+                      <TableCell>{item.sector}</TableCell>
+                      <TableCell>{item.warehouse}</TableCell>
+                      <TableCell>{item.d2d}</TableCell>
+                      <TableCell>{item.nic}</TableCell>
+                      <TableCell>{item.volume}</TableCell>
+                      <TableCell>{item.weight}</TableCell>
+                      <TableCell>{item.packages}</TableCell>
+                      <TableCell>{item.gross}</TableCell>
+                      <TableCell>{item.discount}</TableCell>
+                      <TableCell className="font-medium">{item.net}</TableCell>
+                      <TableCell>{item.paid}</TableCell>
+                      <TableCell>{getStatusBadge(item.status)}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-1">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-blue-600 p-1"
+                            onClick={() => navigate(`/saudi-arabia/invoice/edit/${item.id}`)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-green-600 p-1"
+                            onClick={() => navigate(`/saudi-arabia/invoice/print/${item.id}`)}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="sm" className="text-red-600 p-1">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </div>
           </CardContent>
         </Card>
