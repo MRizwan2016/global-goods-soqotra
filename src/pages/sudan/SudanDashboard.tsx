@@ -45,6 +45,25 @@ const SudanDashboard = () => {
             ))}
           </div>
         </div>
+
+        {/* Invoice Management Section */}
+        <div className="bg-white border border-gray-200 rounded-lg p-4">
+          <h2 className="text-lg font-semibold mb-4">Invoice Management</h2>
+          <div className="flex gap-4">
+            <button 
+              onClick={() => window.location.href = '/sudan/invoice/add'}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+            >
+              Create New Invoice
+            </button>
+            <button 
+              onClick={() => window.location.href = '/reports/cargo'}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md"
+            >
+              Search Invoices
+            </button>
+          </div>
+        </div>
       </div>
     </Layout>
   );
