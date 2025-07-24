@@ -61,41 +61,44 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
         </DialogHeader>
         
         <div id="eritrea-invoice-print" className="bg-white p-6 text-black" style={{ fontSize: '11pt', fontFamily: 'Arial, sans-serif' }}>
-          {/* Header */}
-          <div className="flex justify-between items-start mb-8">
-            {/* Logo - Left side, large and prominent */}
-            <div className="flex-shrink-0">
+          {/* Header with Logo in Top-Left Corner */}
+          <div className="mb-8">
+            {/* Logo - Top left corner, very large */}
+            <div className="flex justify-start mb-6">
               <img 
                 src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
                 alt="Soqotra Logo" 
-                className="w-[280px] h-auto object-contain"
+                className="w-[350px] h-auto object-contain"
                 style={{ 
                   imageRendering: 'crisp-edges'
                 }}
               />
             </div>
             
-            {/* Company Info - Center */}
-            <div className="flex-1 px-6">
-              <h1 className="text-lg font-bold text-blue-900 leading-tight text-center">
-                {formData.shipperCountry === "SAUDI ARABIA" 
-                  ? "SOQOTRA SOLUTIONS WLL" 
-                  : "SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL"}
-              </h1>
-              <div className="text-sm text-gray-600 mt-3 leading-relaxed text-center">
-                <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
-                <p>AZIZIA COMMERCIAL STREET, P.O.BOX: 55861, AZIZIA - DOHA - QATAR</p>
-                <p>TEL: +974 - 44832508 | EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
+            {/* Company Info and Invoice Details */}
+            <div className="flex justify-between items-start">
+              {/* Company Info - Left side */}
+              <div className="flex-1">
+                <h1 className="text-lg font-bold text-blue-900 leading-tight">
+                  {formData.shipperCountry === "SAUDI ARABIA" 
+                    ? "SOQOTRA SOLUTIONS WLL" 
+                    : "SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL"}
+                </h1>
+                <div className="text-sm text-gray-600 mt-3 leading-relaxed">
+                  <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
+                  <p>AZIZIA COMMERCIAL STREET, P.O.BOX: 55861, AZIZIA - DOHA - QATAR</p>
+                  <p>TEL: +974 - 44832508 | EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
+                </div>
               </div>
-            </div>
-            
-            {/* Invoice Info - Right side */}
-            <div className="text-right">
-              <div className="border-2 border-gray-300 p-4 rounded">
-                <h2 className="text-2xl font-bold">INVOICE</h2>
-                <p className="text-lg font-semibold">#{formData.invoiceNumber || "010000"}</p>
-                <p className="text-sm">DATE: {formData.invoiceDate || new Date().toISOString().split('T')[0]}</p>
-                <p className="text-sm">PRINT DATE: {new Date().toLocaleDateString()}</p>
+              
+              {/* Invoice Info - Right side */}
+              <div className="text-right">
+                <div className="border-2 border-gray-300 p-4 rounded">
+                  <h2 className="text-2xl font-bold">INVOICE</h2>
+                  <p className="text-lg font-semibold">#{formData.invoiceNumber || "010000"}</p>
+                  <p className="text-sm">DATE: {formData.invoiceDate || new Date().toISOString().split('T')[0]}</p>
+                  <p className="text-sm">PRINT DATE: {new Date().toLocaleDateString()}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -191,11 +194,10 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
                   </tr>
                 )}
                 <tr className="bg-gray-50 font-bold">
-                  <td className="border border-gray-300 p-2 text-center">TOTAL:</td>
+                  <td className="border border-gray-300 p-2 text-center" colSpan={2}>TOTAL:</td>
                   <td className="border border-gray-300 p-2">{packageDetails.length || 1}</td>
                   <td className="border border-gray-300 p-2">{formData.weight || "29.34"} KG</td>
                   <td className="border border-gray-300 p-2">{formData.volume || "0.672"} M³</td>
-                  <td className="border border-gray-300 p-2"></td>
                   <td className="border border-gray-300 p-2"></td>
                 </tr>
               </tbody>
