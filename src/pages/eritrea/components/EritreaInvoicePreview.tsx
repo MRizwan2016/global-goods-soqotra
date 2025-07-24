@@ -60,21 +60,21 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
           </DialogTitle>
         </DialogHeader>
         
-        <div id="eritrea-invoice-print" className="bg-white p-6 text-black" style={{ fontSize: '11pt', fontFamily: 'Arial, sans-serif' }}>
-          {/* Header with Logo in Top-Left Corner */}
-          <div className="mb-8">
-            {/* Logo - Top left corner, very large */}
-            <div className="flex justify-start mb-6">
-              <img 
-                src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
-                alt="Soqotra Logo" 
-                className="w-[550px] h-auto object-contain"
-                style={{ 
-                  imageRendering: 'crisp-edges'
-                }}
-              />
-            </div>
-            
+        <div id="eritrea-invoice-print" className="bg-white p-6 text-black relative" style={{ fontSize: '11pt', fontFamily: 'Arial, sans-serif' }}>
+          {/* Logo - Absolute positioned in top-left corner */}
+          <div className="absolute top-2 left-2 z-10">
+            <img 
+              src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
+              alt="Soqotra Logo" 
+              className="w-48 h-auto object-contain"
+              style={{ 
+                imageRendering: 'crisp-edges'
+              }}
+            />
+          </div>
+
+          {/* Header with Company Info */}
+          <div className="mb-8 pt-16">
             {/* Company Info and Invoice Details */}
             <div className="flex justify-between items-start">
               {/* Company Info - Left side */}

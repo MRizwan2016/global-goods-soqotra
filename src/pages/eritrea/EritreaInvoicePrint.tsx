@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Printer } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 
 const EritreaInvoicePrint = () => {
@@ -245,17 +246,22 @@ const EritreaInvoicePrint = () => {
         >
           <div style={{ border: '3px solid #000', padding: '0', fontFamily: 'Arial, sans-serif' }}>
             {/* Header */}
-            <div style={{ textAlign: 'center', padding: '10px', borderBottom: '2px solid #000' }}>
-              <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '0' }}>
-                SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', marginTop: '5px' }}>
+            <div style={{ position: 'relative', padding: '10px', borderBottom: '2px solid #000' }}>
+              {/* Logo - Top left corner */}
+              <div style={{ position: 'absolute', top: '5px', left: '5px' }}>
                 <img 
                   src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
                   alt="Soqotra Logo" 
-                  style={{ width: '120px', height: 'auto' }}
+                  style={{ width: '160px', height: 'auto' }}
                 />
-                <div style={{ fontSize: '12px', lineHeight: '1.2' }}>
+              </div>
+              
+              {/* Company name centered */}
+              <div style={{ textAlign: 'center', paddingTop: '20px' }}>
+                <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '0' }}>
+                  SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL
+                </div>
+                <div style={{ fontSize: '12px', lineHeight: '1.2', marginTop: '5px' }}>
                   <div>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING 53, STREET NO. 76</div>
                   <div>AZIZIA COMMERCIAL STREET, DOHA - QAATAR</div>
                   <div>EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</div>
@@ -265,10 +271,15 @@ const EritreaInvoicePrint = () => {
 
             {/* Invoice Info & QR Section */}
             <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
-              <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #000' }}>
-                <div style={{ backgroundColor: '#ccc', padding: '20px', textAlign: 'center', fontSize: '14px', fontWeight: 'bold' }}>
-                  QR CODE
-                </div>
+              <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <QRCodeSVG 
+                  value={`INVOICE:${displayData.invoiceNumber || displayData.formData?.invoiceNumber || "010009"}|DATE:${displayData.invoiceDate || displayData.formData?.invoiceDate}|TOTAL:850.00 QAR|STATUS:${displayData.paymentStatus || "UNPAID"}|VERIFIED:TRUE`}
+                  size={100}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  level="M"
+                  includeMargin={true}
+                />
               </div>
               <div style={{ flex: 1, padding: '10px' }}>
                 <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
