@@ -16,7 +16,13 @@ export const COUNTRY_CURRENCY_MAP: Record<string, string[]> = {
   "European Union": ["EUR"],
   "Burundi": ["BIF"],
   "Algeria": ["DZD"],
-  "Ghana": ["GHS"]
+  "Ghana": ["GHS"],
+  "Saudi Arabia": ["SAR"],
+  "Egypt": ["EGP"],
+  "Oman": ["OMR"],
+  "Kuwait": ["KWD"],
+  "Bahrain": ["BHD"],
+  "Lebanon": ["LBP"]
 };
 
 /**
@@ -32,7 +38,13 @@ export const CURRENCY_SYMBOLS: Record<string, string> = {
   "LKR": "Rs",
   "BIF": "FBu",
   "DZD": "د.ج",
-  "GHS": "₵"
+  "GHS": "₵",
+  "SAR": "SR",
+  "EGP": "E£",
+  "OMR": "ر.ع.",
+  "KWD": "د.ك",
+  "BHD": "ب.د",
+  "LBP": "ل.ل"
 };
 
 /**
