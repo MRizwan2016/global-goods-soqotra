@@ -36,63 +36,10 @@ const EritreaDashboard = () => {
     loadInvoices();
   }, []);
 
-  // Mock data for Eritrea operations - will be replaced by loaded invoices
-  const mockShipmentData = [
-    {
-      id: "ER001001",
-      invoiceDate: "20/01/2025",
-      customer: "AHMED HASSAN M",
-      sector: "M",
-      warehouse: "Massawa",
-      d2d: "No",
-      nic: "ER8840923",
-      volume: "2.85",
-      weight: "420.50",
-      packages: "2",
-      gross: "850.00",
-      discount: "0.00",
-      net: "850.00",
-      paid: "0.00",
-      status: "pending"
-    },
-    {
-      id: "ER001002", 
-      invoiceDate: "20/01/2025",
-      customer: "SARA MOHAMED K",
-      sector: "M",
-      warehouse: "Assab",
-      d2d: "Yes",
-      nic: "ER7730154",
-      volume: "1.20",
-      weight: "180.75",
-      packages: "1",
-      gross: "425.00",
-      discount: "0.00", 
-      net: "425.00",
-      paid: "425.00",
-      status: "completed"
-    },
-    {
-      id: "ER001003",
-      invoiceDate: "21/01/2025", 
-      customer: "IBRAHIM ALI S",
-      sector: "M",
-      warehouse: "Massawa",
-      d2d: "No",
-      nic: "ER9205123",
-      volume: "3.50",
-      weight: "525.20",
-      packages: "3",
-      gross: "1,200.00",
-      discount: "50.00",
-      net: "1,150.00", 
-      paid: "0.00",
-      status: "processing"
-    }
-  ];
+  // Real data will come from localStorage invoices only
 
-  // Transform loaded invoices to display format
-  const shipmentData = invoices.length > 0 ? invoices.map((invoice, index) => ({
+  // Transform loaded invoices to display format - only show real data
+  const shipmentData = invoices.map((invoice, index) => ({
     id: invoice.id || invoice.invoiceNumber,
     invoiceDate: new Date(invoice.invoiceDate || invoice.createdAt).toLocaleDateString('en-GB'),
     customer: `${invoice.consigneePrefix || ''} ${invoice.consigneeName || 'N/A'}`.trim(),
@@ -108,13 +55,14 @@ const EritreaDashboard = () => {
     net: invoice.net?.toFixed(2) || "0.00",
     paid: "0.00", // TODO: Add payment tracking
     status: "pending" // TODO: Add status tracking
-  })) : mockShipmentData;
+  }));
 
+  // Calculate real stats from actual invoice data
   const statsData = [
-    { title: "Total Shipments", value: "156", icon: Ship, color: "bg-blue-500" },
-    { title: "Active Packages", value: "89", icon: Package, color: "bg-green-500" },
-    { title: "Pending Invoices", value: "23", icon: FileText, color: "bg-yellow-500" },
-    { title: "Completed Today", value: "12", icon: Eye, color: "bg-purple-500" }
+    { title: "Total Shipments", value: shipmentData.length.toString(), icon: Ship, color: "bg-blue-500" },
+    { title: "Active Packages", value: shipmentData.reduce((total, item) => total + parseInt(item.packages || "0"), 0).toString(), icon: Package, color: "bg-green-500" },
+    { title: "Pending Invoices", value: shipmentData.filter(item => item.status === "pending").length.toString(), icon: FileText, color: "bg-yellow-500" },
+    { title: "Completed Today", value: shipmentData.filter(item => item.status === "completed" && item.invoiceDate === new Date().toLocaleDateString('en-GB')).length.toString(), icon: Eye, color: "bg-purple-500" }
   ];
 
   const filteredData = shipmentData.filter(item => {
