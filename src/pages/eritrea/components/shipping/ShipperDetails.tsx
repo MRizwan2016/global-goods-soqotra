@@ -49,7 +49,7 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
           <div className="space-y-2 md:col-span-2">
             <label className="text-sm font-medium text-gray-700">SHIPPER NAME:</label>
             <Input
-              value={formData.shipperName.toUpperCase()}
+              value={(formData.shipperName || "").toUpperCase()}
               onChange={(e) => handleFormChange('shipperName', e.target.value.toUpperCase())}
               placeholder="ENTER SHIPPER NAME"
               className="uppercase"
@@ -145,7 +145,7 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
               </Select>
             ) : (
               <Input
-                value={formData.shipperCity.toUpperCase()}
+                value={(formData.shipperCity || "").toUpperCase()}
                 onChange={(e) => handleFormChange('shipperCity', e.target.value.toUpperCase())}
                 placeholder="ENTER CITY NAME"
                 className="uppercase"
@@ -158,7 +158,7 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">ADDRESS:</label>
           <Textarea
-            value={formData.shipperAddress.toUpperCase()}
+            value={(formData.shipperAddress || "").toUpperCase()}
             onChange={(e) => handleFormChange('shipperAddress', e.target.value.toUpperCase())}
             placeholder="ENTER COMPLETE ADDRESS"
             rows={3}
@@ -184,7 +184,7 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
             <label className="text-sm font-medium text-gray-700">EMAIL:</label>
             <Input
               type="email"
-              value={formData.shipperEmail.toLowerCase()}
+              value={(formData.shipperEmail || "").toLowerCase()}
               onChange={(e) => handleFormChange('shipperEmail', e.target.value.toLowerCase())}
               placeholder="enter email address"
             />
@@ -195,7 +195,7 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">ID NUMBER (PASSPORT/QID):</label>
           <Input
-            value={formData.shipperIdNumber.toUpperCase()}
+            value={(formData.shipperIdNumber || "").toUpperCase()}
             onChange={(e) => handleFormChange('shipperIdNumber', e.target.value.toUpperCase())}
             placeholder="ENTER ID NUMBER"
             className="uppercase"

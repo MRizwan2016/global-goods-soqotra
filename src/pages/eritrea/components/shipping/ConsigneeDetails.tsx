@@ -49,7 +49,7 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
           <div className="space-y-2 md:col-span-2">
             <label className="text-sm font-medium text-gray-700">CONSIGNEE NAME:</label>
             <Input
-              value={formData.consigneeName.toUpperCase()}
+              value={(formData.consigneeName || "").toUpperCase()}
               onChange={(e) => handleFormChange('consigneeName', e.target.value.toUpperCase())}
               placeholder="ENTER CONSIGNEE NAME"
               className="uppercase"
@@ -145,7 +145,7 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
               </Select>
             ) : (
               <Input
-                value={formData.consigneeCity.toUpperCase()}
+                value={(formData.consigneeCity || "").toUpperCase()}
                 onChange={(e) => handleFormChange('consigneeCity', e.target.value.toUpperCase())}
                 placeholder="ENTER CITY NAME"
                 className="uppercase"
@@ -158,7 +158,7 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">DESTINATION ADDRESS:</label>
           <Textarea
-            value={formData.consigneeAddress.toUpperCase()}
+            value={(formData.consigneeAddress || "").toUpperCase()}
             onChange={(e) => handleFormChange('consigneeAddress', e.target.value.toUpperCase())}
             placeholder="ENTER COMPLETE DESTINATION ADDRESS"
             rows={3}
@@ -184,7 +184,7 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
             <label className="text-sm font-medium text-gray-700">EMAIL:</label>
             <Input
               type="email"
-              value={formData.consigneeEmail.toLowerCase()}
+              value={(formData.consigneeEmail || "").toLowerCase()}
               onChange={(e) => handleFormChange('consigneeEmail', e.target.value.toLowerCase())}
               placeholder="enter email address"
             />
@@ -195,7 +195,7 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">ID NUMBER (PASSPORT/NATIONAL ID):</label>
           <Input
-            value={formData.consigneeIdNumber.toUpperCase()}
+            value={(formData.consigneeIdNumber || "").toUpperCase()}
             onChange={(e) => handleFormChange('consigneeIdNumber', e.target.value.toUpperCase())}
             placeholder="ENTER ID NUMBER"
             className="uppercase"
