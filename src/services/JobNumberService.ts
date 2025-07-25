@@ -11,6 +11,7 @@ export class JobNumberService {
     'Bahrain': 'BHR',
     'Saudi Arabia': 'KSA',
     'Sri Lanka': 'LKA',
+    'Eritrea': 'ERT',
     // Add more country prefixes as needed
   };
 
@@ -139,6 +140,73 @@ export class JobNumberService {
     }
   }
   
+  /**
+   * Gets a job number by mobile number
+   * @param mobileNumber The mobile number to look up
+   * @returns Associated job number or empty string if not found
+   */
+  static getJobNumberByMobile(mobileNumber: string): string {
+    if (!mobileNumber) return '';
+    
+    // Search in jobs
+    const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+    const matchingJob = jobs.find((job: any) => job.mobileNumber === mobileNumber || job.mobile === mobileNumber);
+    if (matchingJob?.jobNumber) {
+      return matchingJob.jobNumber;
+    }
+    
+    // Search in invoices
+    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const matchingInvoice = invoices.find((inv: any) => inv.mobileNumber === mobileNumber || inv.mobile === mobileNumber);
+    return matchingInvoice ? matchingInvoice.jobNumber : '';
+  }
+  
+  /**
+   * Gets a mobile number by job number
+   * @param jobNumber The job number to look up
+   * @returns Associated mobile number or empty string if not found
+   */
+  static getMobileNumberByJob(jobNumber: string): string {
+    if (!jobNumber) return '';
+    
+    // Search in jobs first
+    const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+    const matchingJob = jobs.find((job: any) => job.jobNumber === jobNumber);
+    if (matchingJob?.mobileNumber || matchingJob?.mobile) {
+      return matchingJob.mobileNumber || matchingJob.mobile;
+    }
+    
+    // Search in invoices
+    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const matchingInvoice = invoices.find((inv: any) => inv.jobNumber === jobNumber);
+    return matchingInvoice ? (matchingInvoice.mobileNumber || matchingInvoice.mobile) : '';
+  }
+  
+  /**
+   * Associate a job number with a mobile number
+   * @param jobNumber The job number to link
+   * @param mobileNumber The mobile number to link
+   */
+  static linkJobToMobile(jobNumber: string, mobileNumber: string): void {
+    if (!jobNumber || !mobileNumber) return;
+    
+    // Update in jobs
+    const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+    const jobIndex = jobs.findIndex((j: any) => j.jobNumber === jobNumber);
+    if (jobIndex >= 0) {
+      jobs[jobIndex].mobileNumber = mobileNumber;
+      localStorage.setItem('jobs', JSON.stringify(jobs));
+    }
+    
+    // Update in invoices
+    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const invoiceIndex = invoices.findIndex((inv: any) => inv.jobNumber === jobNumber);
+    if (invoiceIndex >= 0) {
+      invoices[invoiceIndex].mobileNumber = mobileNumber;
+      localStorage.setItem('invoices', JSON.stringify(invoices));
+    }
+  }
+
   /**
    * Helper to save the job number counters to localStorage
    */
