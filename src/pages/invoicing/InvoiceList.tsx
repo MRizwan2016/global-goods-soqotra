@@ -26,6 +26,7 @@ const InvoiceList = () => {
     setInvoiceNumber,
     handlePrintInvoice,
     handleViewInvoice,
+    handleInactivateInvoice,
     filteredData,
     totalPages,
     indexOfLastEntry,
@@ -75,6 +76,7 @@ const InvoiceList = () => {
             indexOfFirstEntry={indexOfFirstEntry}
             handlePrintInvoice={handlePrintInvoice}
             handleViewInvoice={handleViewInvoice}
+            handleInactivateInvoice={handleInactivateInvoice}
           />
           
           <InvoicePagination 

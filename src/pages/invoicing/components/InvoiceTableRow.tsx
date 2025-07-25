@@ -13,6 +13,7 @@ interface InvoiceTableRowProps {
   indexOffset: number;
   onPrint: (id: string) => void;
   onView: (id: string) => void;
+  onInactivate?: (id: string, invoiceNumber: string) => void;
 }
 
 const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
@@ -20,7 +21,8 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
   index,
   indexOffset,
   onPrint,
-  onView
+  onView,
+  onInactivate
 }) => {
   const navigate = useNavigate();
   
@@ -108,9 +110,13 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
     onView(item.id);
   };
   
-  // Handle delete - placeholder for delete functionality
-  const handleDeleteInvoice = () => {
-    toast.error("Delete functionality is not implemented");
+  // Handle inactivate invoice
+  const handleInactivateInvoice = () => {
+    if (onInactivate) {
+      onInactivate(item.id, item.invoiceNumber);
+    } else {
+      toast.error("Inactivate functionality is not available");
+    }
   };
 
   // Handle House Bill of Lading
@@ -152,7 +158,8 @@ const InvoiceTableRow: React.FC<InvoiceTableRowProps> = ({
           variant="ghost" 
           size="icon" 
           className="h-8 w-8 text-red-600"
-          onClick={handleDeleteInvoice}
+          onClick={handleInactivateInvoice}
+          title="Inactivate Invoice"
         >
           <Trash className="h-4 w-4" />
         </Button>

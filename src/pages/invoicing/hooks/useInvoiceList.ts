@@ -19,16 +19,48 @@ export const useInvoiceList = () => {
   const [invoices, setInvoices] = useState<any[]>([]);
   
   useEffect(() => {
-    // Load invoices from localStorage if available
+    // Load invoices from all sources: localStorage, eritreaInvoices, generatedInvoices
     try {
+      let allInvoices = [];
+      
+      // Load main invoices
       const storedInvoices = localStorage.getItem('invoices');
       if (storedInvoices) {
         const parsedInvoices = JSON.parse(storedInvoices);
-        setInvoices(parsedInvoices);
-      } else {
-        // Use mock data if no local storage data
-        setInvoices(mockInvoiceData);
+        allInvoices = [...allInvoices, ...parsedInvoices];
       }
+      
+      // Load Eritrea invoices
+      const eritreaInvoices = localStorage.getItem('eritreaInvoices');
+      if (eritreaInvoices) {
+        const parsedEritreaInvoices = JSON.parse(eritreaInvoices);
+        allInvoices = [...allInvoices, ...parsedEritreaInvoices];
+      }
+      
+      // Load generated invoices
+      const generatedInvoices = localStorage.getItem('generatedInvoices');
+      if (generatedInvoices) {
+        const parsedGeneratedInvoices = JSON.parse(generatedInvoices);
+        allInvoices = [...allInvoices, ...parsedGeneratedInvoices];
+      }
+      
+      // Load Philippines invoices
+      const philippinesInvoices = localStorage.getItem('philippinesInvoices');
+      if (philippinesInvoices) {
+        const parsedPhilippinesInvoices = JSON.parse(philippinesInvoices);
+        allInvoices = [...allInvoices, ...parsedPhilippinesInvoices];
+      }
+      
+      // Include mock data for demonstration
+      allInvoices = [...allInvoices, ...mockInvoiceData];
+      
+      // Remove duplicates based on invoice number
+      const uniqueInvoices = allInvoices.filter((invoice, index, self) => 
+        index === self.findIndex(i => i.invoiceNumber === invoice.invoiceNumber)
+      );
+      
+      setInvoices(uniqueInvoices);
+      console.log("Loaded invoices from all sources:", uniqueInvoices.length, "total invoices");
     } catch (error) {
       console.error("Error loading invoices:", error);
       // Fallback to mock data
@@ -84,6 +116,53 @@ export const useInvoiceList = () => {
     navigate(`/reports/cargo/invoice/${id}`);
     toast.success("Opening invoice details");
   };
+
+  const handleInactivateInvoice = (id: string, invoiceNumber: string) => {
+    try {
+      // Find the invoice in the current list
+      const invoiceToInactivate = invoices.find(inv => inv.id === id || inv.invoiceNumber === invoiceNumber);
+      
+      if (!invoiceToInactivate) {
+        toast.error("Invoice not found");
+        return;
+      }
+
+      // Mark as inactive
+      const updatedInvoice = { ...invoiceToInactivate, status: 'inactive', isActive: false };
+      
+      // Update all possible storage locations
+      const storageKeys = ['invoices', 'eritreaInvoices', 'generatedInvoices', 'philippinesInvoices'];
+      
+      storageKeys.forEach(key => {
+        const storedData = localStorage.getItem(key);
+        if (storedData) {
+          try {
+            const parsedData = JSON.parse(storedData);
+            const updatedData = parsedData.map((inv: any) => 
+              (inv.id === id || inv.invoiceNumber === invoiceNumber) 
+                ? updatedInvoice 
+                : inv
+            );
+            localStorage.setItem(key, JSON.stringify(updatedData));
+          } catch (err) {
+            console.error(`Error updating ${key}:`, err);
+          }
+        }
+      });
+
+      // Update local state
+      setInvoices(prev => prev.map(inv => 
+        (inv.id === id || inv.invoiceNumber === invoiceNumber) 
+          ? updatedInvoice 
+          : inv
+      ));
+
+      toast.success(`Invoice ${invoiceNumber} has been inactivated`);
+    } catch (error) {
+      console.error("Error inactivating invoice:", error);
+      toast.error("Failed to inactivate invoice");
+    }
+  };
   
   return {
     searchText,
@@ -102,6 +181,7 @@ export const useInvoiceList = () => {
     setInvoiceNumber,
     handlePrintInvoice,
     handleViewInvoice,
+    handleInactivateInvoice,
     filteredData,
     totalPages,
     indexOfLastEntry,
