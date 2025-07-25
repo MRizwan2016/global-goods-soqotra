@@ -22,13 +22,13 @@ const CustomerInfoSection = () => {
     
     setSelectedPackages(prev => [...prev, pkg]);
     
+    // Update the packageDetails string with detailed package information
+    const updatedPackages = [...selectedPackages, pkg];
+    const packageInfo = updatedPackages
+      .map(p => `${p.description} | Dimensions: ${p.dimensions} | Volume: ${p.volume_in_meters} CBM | Price: ${p.price} | Total: ${p.total}`)
+      .join(" || ");
+    
     if (handleInputChange) {
-      // Update the packageDetails string with all packages
-      const updatedPackages = [...selectedPackages, pkg];
-      const packageInfo = updatedPackages
-        .map(p => `${p.description} (${p.dimensions}) - ${p.total}`)
-        .join(" | ");
-      
       const syntheticEvent = {
         target: {
           name: 'packageDetails',
@@ -45,15 +45,15 @@ const CustomerInfoSection = () => {
   const handleRemovePackage = (pkg: PackageInfo) => {
     setSelectedPackages(prev => prev.filter(p => p.sr_no !== pkg.sr_no));
     
+    // Update packageDetails without the removed package
+    const updatedPackages = selectedPackages.filter(p => p.sr_no !== pkg.sr_no);
+    const packageInfo = updatedPackages.length > 0
+      ? updatedPackages
+          .map(p => `${p.description} | Dimensions: ${p.dimensions} | Volume: ${p.volume_in_meters} CBM | Price: ${p.price} | Total: ${p.total}`)
+          .join(" || ")
+      : "";
+    
     if (handleInputChange) {
-      // Update packageDetails without the removed package
-      const updatedPackages = selectedPackages.filter(p => p.sr_no !== pkg.sr_no);
-      const packageInfo = updatedPackages.length > 0
-        ? updatedPackages
-            .map(p => `${p.description} (${p.dimensions}) - ${p.total}`)
-            .join(" | ")
-        : "";
-      
       const syntheticEvent = {
         target: {
           name: 'packageDetails',

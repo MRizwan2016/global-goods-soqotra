@@ -53,12 +53,16 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
   
   const handleAddItem = () => {
     if (selectedItem) {
+      // Create a more detailed description with package information
+      const packageDescription = `${selectedItem} - Qty: ${quantity}, Price: QAR ${sellPrice}`;
+      
       const newItem: JobItem = {
         id: uuidv4(),
         name: selectedItem,
         itemName: selectedItem,
         sellPrice,
-        quantity
+        quantity,
+        description: packageDescription // Add detailed description
       };
       
       onAddItem(newItem);

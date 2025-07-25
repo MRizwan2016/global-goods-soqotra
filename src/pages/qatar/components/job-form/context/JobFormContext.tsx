@@ -158,14 +158,29 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
                   itemName: action.itemName || action.name || item.itemName || item.name || '',
                   sellPrice: action.sellPrice || item.sellPrice || 0,
                   quantity: action.quantity || item.quantity,
-                  boxNumber: action.boxNumber || item.boxNumber || String(prevItems.length + 1)
+                  boxNumber: action.boxNumber || item.boxNumber || String(prevItems.length + 1),
+                  description: action.description || item.description
                 }
               : item
           );
         case 'add': {
-          // Ensure both name and itemName are set to the same value
+          // Check if item already exists to prevent duplication
           const itemName = action.itemName || action.name || '';
           const name = action.name || action.itemName || '';
+          const existingItem = prevItems.find(item => 
+            (item.name === name || item.itemName === itemName) && 
+            item.sellPrice === action.sellPrice
+          );
+          
+          if (existingItem) {
+            // Update quantity instead of adding duplicate
+            return prevItems.map(item => 
+              item.id === existingItem.id 
+                ? { ...item, quantity: item.quantity + (action.quantity || 1) }
+                : item
+            );
+          }
+          
           const boxNumber = action.boxNumber || String(prevItems.length + 1);
           
           return [...prevItems, { 
@@ -175,7 +190,8 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
             jobId: action.jobId || jobData.id || 'temp',
             sellPrice: action.sellPrice || 0,
             quantity: action.quantity || 1,
-            boxNumber
+            boxNumber,
+            description: action.description || `${name} - Qty: ${action.quantity || 1}, Price: QAR ${action.sellPrice || 0}`
           }];
         }
         default:

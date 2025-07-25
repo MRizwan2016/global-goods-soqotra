@@ -18,6 +18,13 @@ const NewJobForm = () => {
       setIsSaving(true);
       console.log("Creating new job:", jobData);
       
+      // Clear sample data on first run (only once)
+      const existingJobs = JobStorageService.getAllJobs();
+      if (existingJobs.length > 0 && existingJobs.some((job: any) => job.customer === "QATAR NATIONAL BANK")) {
+        console.log("Clearing sample data...");
+        JobStorageService.clearAllJobs();
+      }
+      
       // Validate essential fields
       if (!jobData.jobNumber) {
         toast.error("Job number is required");
