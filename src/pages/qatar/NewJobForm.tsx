@@ -1,29 +1,30 @@
+
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { toast } from "sonner";
 import JobForm from "./components/JobForm";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Save, ArrowLeft, Truck } from "lucide-react";
 import { JobStorageService } from "./services/JobStorageService";
 import { JobNumberService } from "@/services/JobNumberService";
 import { cityVehicleMapping } from "./data/cityVehicleMapping";
+import { fixInvoiceLinkage, cleanupDummyData } from "./utils/fixInvoiceLinkage";
 
 const NewJobForm = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   
+  // Fix invoice linkage issues on component mount
+  useEffect(() => {
+    fixInvoiceLinkage();
+    cleanupDummyData();
+  }, []);
+  
   const handleCreateJob = async (jobData: any) => {
     try {
       setIsSaving(true);
       console.log("Creating new job:", jobData);
-      
-      // Clear sample data on first run (only once)
-      const existingJobs = JobStorageService.getAllJobs();
-      if (existingJobs.length > 0 && existingJobs.some((job: any) => job.customer === "QATAR NATIONAL BANK")) {
-        console.log("Clearing sample data...");
-        JobStorageService.clearAllJobs();
-      }
       
       // Validate essential fields
       if (!jobData.jobNumber) {
@@ -71,6 +72,11 @@ const NewJobForm = () => {
             
             // Also link via the JobNumberService
             JobNumberService.linkJobToInvoice(savedJob.jobNumber, savedJob.invoiceNumber);
+            
+            // Link mobile number if available
+            if (savedJob.mobileNumber) {
+              JobNumberService.linkJobToMobile(savedJob.jobNumber, savedJob.mobileNumber);
+            }
           } catch (error) {
             console.error('Error linking job number with invoice:', error);
           }

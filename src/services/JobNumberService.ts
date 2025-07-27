@@ -42,24 +42,33 @@ export class JobNumberService {
   }
   
   /**
-   * Gets a job number by invoice number
+   * Gets a job number by invoice number with better error handling
    * @param invoiceNumber The invoice number to look up
    * @returns Associated job number or empty string if not found
    */
   static getJobNumberByInvoice(invoiceNumber: string): string {
     if (!invoiceNumber) return '';
     
+    console.log(`Looking up job number for invoice: ${invoiceNumber}`);
+    
+    // Search in jobs first
+    const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+    const matchingJob = jobs.find((job: any) => job.invoiceNumber === invoiceNumber);
+    if (matchingJob?.jobNumber) {
+      console.log(`Found job number in jobs: ${matchingJob.jobNumber}`);
+      return matchingJob.jobNumber;
+    }
+    
     // Search in invoices
     const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
     const matchingInvoice = invoices.find((inv: any) => inv.invoiceNumber === invoiceNumber);
     if (matchingInvoice?.jobNumber) {
+      console.log(`Found job number in invoices: ${matchingInvoice.jobNumber}`);
       return matchingInvoice.jobNumber;
     }
     
-    // If not found in invoices, try jobs
-    const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
-    const matchingJob = jobs.find((job: any) => job.invoiceNumber === invoiceNumber);
-    return matchingJob ? matchingJob.jobNumber : '';
+    console.log(`No job number found for invoice: ${invoiceNumber}`);
+    return '';
   }
   
   /**
@@ -90,6 +99,8 @@ export class JobNumberService {
    */
   static linkJobToInvoice(jobNumber: string, invoiceNumber: string): void {
     if (!jobNumber || !invoiceNumber) return;
+    
+    console.log(`Linking job ${jobNumber} to invoice ${invoiceNumber}`);
     
     // Update in jobs
     const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
@@ -126,39 +137,43 @@ export class JobNumberService {
   }
   
   /**
-   * Helper to get the job number counters from localStorage
-   */
-  private static getCounters(): Record<string, number> {
-    const stored = localStorage.getItem(this.JOB_NUMBER_KEY);
-    if (!stored) return {};
-    
-    try {
-      return JSON.parse(stored);
-    } catch (e) {
-      console.error('Error parsing job number counters:', e);
-      return {};
-    }
-  }
-  
-  /**
-   * Gets a job number by mobile number
+   * Gets a job number by mobile number with enhanced search
    * @param mobileNumber The mobile number to look up
    * @returns Associated job number or empty string if not found
    */
   static getJobNumberByMobile(mobileNumber: string): string {
     if (!mobileNumber) return '';
     
-    // Search in jobs
+    console.log(`Looking up job number for mobile: ${mobileNumber}`);
+    
+    // Search in jobs first
     const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
-    const matchingJob = jobs.find((job: any) => job.mobileNumber === mobileNumber || job.mobile === mobileNumber);
+    const matchingJob = jobs.find((job: any) => 
+      job.mobileNumber === mobileNumber || 
+      job.mobile === mobileNumber ||
+      job.mobileNumber === `+974${mobileNumber}` ||
+      job.mobile === `+974${mobileNumber}`
+    );
     if (matchingJob?.jobNumber) {
+      console.log(`Found job number in jobs: ${matchingJob.jobNumber}`);
       return matchingJob.jobNumber;
     }
     
     // Search in invoices
     const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    const matchingInvoice = invoices.find((inv: any) => inv.mobileNumber === mobileNumber || inv.mobile === mobileNumber);
-    return matchingInvoice ? matchingInvoice.jobNumber : '';
+    const matchingInvoice = invoices.find((inv: any) => 
+      inv.mobileNumber === mobileNumber || 
+      inv.mobile === mobileNumber ||
+      inv.mobileNumber === `+974${mobileNumber}` ||
+      inv.mobile === `+974${mobileNumber}`
+    );
+    if (matchingInvoice?.jobNumber) {
+      console.log(`Found job number in invoices: ${matchingInvoice.jobNumber}`);
+      return matchingInvoice.jobNumber;
+    }
+    
+    console.log(`No job number found for mobile: ${mobileNumber}`);
+    return '';
   }
   
   /**
@@ -190,6 +205,8 @@ export class JobNumberService {
   static linkJobToMobile(jobNumber: string, mobileNumber: string): void {
     if (!jobNumber || !mobileNumber) return;
     
+    console.log(`Linking job ${jobNumber} to mobile ${mobileNumber}`);
+    
     // Update in jobs
     const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
     const jobIndex = jobs.findIndex((j: any) => j.jobNumber === jobNumber);
@@ -204,6 +221,49 @@ export class JobNumberService {
     if (invoiceIndex >= 0) {
       invoices[invoiceIndex].mobileNumber = mobileNumber;
       localStorage.setItem('invoices', JSON.stringify(invoices));
+    }
+  }
+
+  /**
+   * Fix specific invoice linkage issues
+   * @param invoiceNumber The invoice number to fix
+   * @param expectedJobNumber The expected job number
+   * @param mobileNumber The mobile number to link
+   */
+  static fixInvoiceLinkage(invoiceNumber: string, expectedJobNumber: string, mobileNumber: string): void {
+    console.log(`Fixing linkage for invoice ${invoiceNumber}, job ${expectedJobNumber}, mobile ${mobileNumber}`);
+    
+    // Update invoice with job number
+    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const invoiceIndex = invoices.findIndex((inv: any) => inv.invoiceNumber === invoiceNumber);
+    if (invoiceIndex >= 0) {
+      invoices[invoiceIndex].jobNumber = expectedJobNumber;
+      invoices[invoiceIndex].mobileNumber = mobileNumber;
+      localStorage.setItem('invoices', JSON.stringify(invoices));
+    }
+    
+    // Update job with invoice number
+    const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+    const jobIndex = jobs.findIndex((job: any) => job.jobNumber === expectedJobNumber);
+    if (jobIndex >= 0) {
+      jobs[jobIndex].invoiceNumber = invoiceNumber;
+      jobs[jobIndex].mobileNumber = mobileNumber;
+      localStorage.setItem('jobs', JSON.stringify(jobs));
+    }
+  }
+
+  /**
+   * Helper to get the job number counters from localStorage
+   */
+  private static getCounters(): Record<string, number> {
+    const stored = localStorage.getItem(this.JOB_NUMBER_KEY);
+    if (!stored) return {};
+    
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      console.error('Error parsing job number counters:', e);
+      return {};
     }
   }
 
