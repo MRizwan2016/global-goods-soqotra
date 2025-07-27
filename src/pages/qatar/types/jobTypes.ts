@@ -34,6 +34,7 @@ export interface QatarJob {
   items?: JobItem[];
   collectDate?: string; // Added this as it's used in mockJobs.ts
   entryDate?: string; // Added this as it's used in mockJobs.ts
+  packageDetails?: string; // Added to store package details for printing
 }
 
 export interface JobItem {
