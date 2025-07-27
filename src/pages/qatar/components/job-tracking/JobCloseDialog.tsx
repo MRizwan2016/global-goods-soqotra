@@ -13,8 +13,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { JobStorageService } from "../../services/JobStorageService";
 import { toast } from "sonner";
@@ -28,20 +35,111 @@ interface JobCloseDialogProps {
   onSuccess: () => void;
 }
 
+interface InvoiceDetails {
+  invoiceNumber: string;
+  bookNumber: string;
+  assignedTo?: string;
+  driverName?: string;
+  amount?: number;
+  date?: string;
+}
+
 const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobCloseDialogProps) => {
   const [invoiceNumber, setInvoiceNumber] = useState("");
-  const [availableInvoices, setAvailableInvoices] = useState<string[]>([]);
+  const [availableInvoices, setAvailableInvoices] = useState<InvoiceDetails[]>([]);
   const [invoiceAmount, setInvoiceAmount] = useState("");
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [reason, setReason] = useState("");
   const [action, setAction] = useState<"COMPLETE" | "CANCEL">("COMPLETE");
   const [loading, setLoading] = useState(false);
 
-  // Load available invoices from localStorage
+  // Load available invoices from localStorage with detailed information
   useEffect(() => {
-    const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-    const invoiceNumbers = invoices.map((inv: any) => inv.invoiceNumber);
-    setAvailableInvoices(invoiceNumbers);
+    const loadInvoices = () => {
+      try {
+        // Load available invoices from books
+        const activeBooks = JSON.parse(localStorage.getItem('active-books') || '[]');
+        const storedBooks = JSON.parse(localStorage.getItem('books') || '[]');
+        const usedInvoices = JSON.parse(localStorage.getItem('used-invoices') || '[]');
+        
+        let invoiceList: InvoiceDetails[] = [];
+        
+        // Process active books first
+        if (activeBooks.length > 0) {
+          activeBooks.forEach((book: any) => {
+            if (book.isActivated && book.availablePages && Array.isArray(book.availablePages)) {
+              const availableFromBook = book.availablePages
+                .filter((invoiceNo: string) => !usedInvoices.includes(invoiceNo))
+                .map((invoiceNo: string) => ({
+                  invoiceNumber: invoiceNo,
+                  bookNumber: book.bookNumber,
+                  assignedTo: book.assignedTo,
+                  driverName: book.driverName,
+                  amount: book.defaultAmount || 0,
+                  date: book.activationDate || new Date().toISOString().split('T')[0]
+                }));
+              
+              invoiceList = [...invoiceList, ...availableFromBook];
+            }
+          });
+        }
+        
+        // If no active books, try stored books
+        if (invoiceList.length === 0 && storedBooks.length > 0) {
+          storedBooks.forEach((book: any) => {
+            if (book.isActivated && book.availablePages && Array.isArray(book.availablePages)) {
+              const availableFromBook = book.availablePages
+                .filter((invoiceNo: string) => !usedInvoices.includes(invoiceNo))
+                .map((invoiceNo: string) => ({
+                  invoiceNumber: invoiceNo,
+                  bookNumber: book.bookNumber,
+                  assignedTo: book.assignedTo,
+                  driverName: book.driverName,
+                  amount: book.defaultAmount || 0,
+                  date: book.activationDate || new Date().toISOString().split('T')[0]
+                }));
+              
+              invoiceList = [...invoiceList, ...availableFromBook];
+            }
+          });
+        }
+        
+        // If still no invoices, create demo invoices for Qatar
+        if (invoiceList.length === 0) {
+          for (let i = 10001; i <= 10010; i++) {
+            invoiceList.push({
+              invoiceNumber: `QAT-${i}`,
+              bookNumber: "QAT-001",
+              assignedTo: "Qatar Sales Rep",
+              driverName: "Qatar Driver",
+              amount: 500,
+              date: new Date().toISOString().split('T')[0]
+            });
+          }
+          
+          // Add some more demo invoices
+          invoiceList = [
+            ...invoiceList,
+            { invoiceNumber: "010001", bookNumber: "B001", assignedTo: "Sales Rep 1", driverName: "Driver 1", amount: 750, date: new Date().toISOString().split('T')[0] },
+            { invoiceNumber: "010002", bookNumber: "B001", assignedTo: "Sales Rep 1", driverName: "Driver 1", amount: 600, date: new Date().toISOString().split('T')[0] },
+            { invoiceNumber: "010003", bookNumber: "B001", assignedTo: "Sales Rep 2", driverName: "Driver 2", amount: 800, date: new Date().toISOString().split('T')[0] }
+          ];
+        }
+        
+        console.log("Available invoices for job completion:", invoiceList);
+        setAvailableInvoices(invoiceList);
+      } catch (error) {
+        console.error("Error loading available invoices:", error);
+        // Fallback to basic demo invoices
+        setAvailableInvoices([
+          { invoiceNumber: "010001", bookNumber: "B001", assignedTo: "Sales Rep", driverName: "Driver", amount: 500, date: new Date().toISOString().split('T')[0] }
+        ]);
+      }
+    };
+
+    if (isOpen) {
+      loadInvoices();
+    }
   }, [isOpen]);
 
   const handleComplete = () => {
@@ -176,17 +274,57 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="invoiceNumber">Invoice Number</Label>
-                  <select
-                    id="invoiceNumber"
-                    value={invoiceNumber}
-                    onChange={(e) => setInvoiceNumber(e.target.value)}
-                    className="w-full rounded-md border border-gray-300 p-2"
-                  >
-                    <option value="">Select Invoice Number</option>
-                    {availableInvoices.map((inv) => (
-                      <option key={inv} value={inv}>{inv}</option>
-                    ))}
-                  </select>
+                  <Select value={invoiceNumber} onValueChange={(value) => {
+                    setInvoiceNumber(value);
+                    // Auto-fill amount when invoice is selected
+                    const selectedInvoice = availableInvoices.find(inv => inv.invoiceNumber === value);
+                    if (selectedInvoice && selectedInvoice.amount) {
+                      setInvoiceAmount(selectedInvoice.amount.toString());
+                    }
+                  }}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select Invoice Number" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]">
+                      {availableInvoices.length > 0 ? (
+                        availableInvoices.map((invoice) => (
+                          <SelectItem 
+                            key={invoice.invoiceNumber} 
+                            value={invoice.invoiceNumber}
+                            className="flex flex-col items-start space-y-1 p-3"
+                          >
+                            <div className="flex items-center gap-2 w-full">
+                              <FileText className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                              <div className="flex flex-col flex-1 min-w-0">
+                                <div className="font-medium text-sm">
+                                  {invoice.invoiceNumber}
+                                </div>
+                                <div className="text-xs text-gray-500 space-y-0.5">
+                                  <div>Book: {invoice.bookNumber}</div>
+                                  {invoice.assignedTo && (
+                                    <div>Rep: {invoice.assignedTo}</div>
+                                  )}
+                                  {invoice.driverName && (
+                                    <div>Driver: {invoice.driverName}</div>
+                                  )}
+                                  {invoice.amount && (
+                                    <div>Amount: QAR {invoice.amount}</div>
+                                  )}
+                                  {invoice.date && (
+                                    <div>Date: {invoice.date}</div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-3 text-gray-500 text-center text-sm">
+                          No invoices available
+                        </div>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div className="space-y-2">
