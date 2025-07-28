@@ -178,38 +178,68 @@ const SaudiArabiaInvoicePrint = () => {
       {/* Invoice Content */}
       <div className="max-w-4xl mx-auto bg-white shadow-lg" ref={printRef}>
         {invoiceData && (
-          <div className="border border-black">
-            {/* Header */}
-            <div className="flex p-2 border-b border-gray-300">
-              <div className="w-1/4 flex items-center justify-center">
-                <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Soqotra Logo" className="h-24 w-32 object-contain" />
-              </div>
-              
-              <div className="w-1/4 flex items-center justify-center">
-                <QRCodeSVG 
-                  value={`INVOICE:${invoiceData.invoiceNumber}\nDATE:${invoiceData.date}\nAMOUNT:${invoiceData.pricing?.net || 0} SAR`} 
-                  size={100} 
-                  level="M"
+          <div style={{ border: '3px solid #000', padding: '0', fontFamily: 'Arial, sans-serif' }}>
+            {/* Header Section */}
+            <div style={{ display: 'flex', padding: '10px', borderBottom: '2px solid #000' }}>
+              {/* Logo */}
+              <div style={{ width: '100px', marginRight: '20px' }}>
+                <img 
+                  src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
+                  alt="Soqotra Logo" 
+                  style={{ width: '100%', height: 'auto' }}
                 />
               </div>
               
-              <div className="w-2/4 text-right">
-                <h2 className="text-base font-bold">{getCompanyName(invoiceData.shipper?.address || '')}</h2>
-                <p className="text-xs">Office No. 3, 1st Floor, Zone 55, Building No.53, Street No.76,</p>
-                <p className="text-xs">Azizia Commercial Street, P.O.Box: 55861, Azizia - Qatar</p>
-                <p className="text-xs">Tele:+974 - 44832508</p>
-                <p className="text-xs">email: accounts@soqotralogistics.com</p>
-                <p className="text-xs">Print Date: {new Date().toLocaleDateString('en-GB')}</p>
-                <p className="text-xs">Print by: Mohammed Rizwan</p>
-                <div className="mt-1">
-                  <span className="font-bold text-lg">INVOICE: </span>
-                  <span className="font-bold text-lg">{invoiceData.invoiceNumber}</span>
+              {/* Title Section */}
+              <div style={{ flex: 1, textAlign: 'center' }}>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', margin: '0' }}>
+                  SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL
                 </div>
-                <div>
-                  <span className="font-bold">DATE: </span>
-                  <span className="font-bold">{invoiceData.date}</span>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '5px' }}>
+                  COLLECTION / DELIVERY JOB SHEET
+                </div>
+                <div style={{ fontSize: '12px', marginTop: '5px' }}>
+                  (SCHEDULE NO: 3820-744)
                 </div>
               </div>
+              
+              {/* Page & QR Section */}
+              <div style={{ width: '150px', textAlign: 'center' }}>
+                <div style={{ border: '1px solid #000', padding: '5px', marginBottom: '10px' }}>
+                  <div style={{ fontSize: '10px' }}>PAGE</div>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold' }}>1</div>
+                </div>
+                <QRCodeSVG 
+                  value={`INVOICE:${invoiceData.invoiceNumber}\nDATE:${invoiceData.date}\nAMOUNT:${invoiceData.pricing?.net || 0} SAR`} 
+                  size={60} 
+                  level="M"
+                />
+                <div style={{ fontSize: '12px', fontWeight: 'bold', marginTop: '10px' }}>
+                  QATAR
+                </div>
+              </div>
+            </div>
+            
+            {/* Job Details Section */}
+            <div style={{ borderBottom: '2px solid #000', padding: '10px' }}>
+              <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
+                <tr>
+                  <td style={{ padding: '5px', fontWeight: 'bold', width: '15%' }}>PRINTED TIME:</td>
+                  <td style={{ padding: '5px', width: '20%' }}>{new Date().toLocaleString()}</td>
+                  <td style={{ padding: '5px', fontWeight: 'bold', width: '15%' }}>PRINTED BY</td>
+                  <td style={{ padding: '5px', width: '20%' }}>MR. SALIH</td>
+                  <td style={{ padding: '5px', fontWeight: 'bold', width: '15%' }}>VEHICLE</td>
+                  <td style={{ padding: '5px', width: '15%' }}>{invoiceData.invoiceNumber}</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '5px', fontWeight: 'bold' }}>DRIVER</td>
+                  <td style={{ padding: '5px' }}>MR. LAHIRU</td>
+                  <td style={{ padding: '5px', fontWeight: 'bold' }}>SALES REP</td>
+                  <td style={{ padding: '5px' }}>MR. YOUSUF</td>
+                  <td style={{ padding: '5px' }}></td>
+                  <td style={{ padding: '5px' }}></td>
+                </tr>
+              </table>
             </div>
 
             {/* Shipper/Consignee */}

@@ -43,15 +43,13 @@ export const handleUserLogin = (
   
   console.log("Found user:", user.email, "Active status:", user.isActive);
   
-  // TESTING MODE: For testing purposes, allow any password for non-admin users
-  // This ensures users can log in from any browser/device for testing
-  const storedPassword = userPasswords[user.id];
-  const isPasswordValid = !storedPassword || storedPassword === password || password.length > 0;
+  // NETWORK TESTING MODE: Ultra-permissive login for network access
+  // Allow ANY password for testing across different devices and networks
+  // This is intentionally permissive for testing purposes
+  console.log("Network login mode: Allowing login for active user:", user.id, "Email:", user.email);
   
-  if (!isPasswordValid) {
-    console.log("Password validation failed for user:", user.id);
-    return false;
-  }
+  // For network access testing - accept any non-empty password
+  const isPasswordValid = password && password.trim().length > 0;
   
   // Enhanced user with proper permissions
   const userWithPermissions = ensureUserPermissions(user);

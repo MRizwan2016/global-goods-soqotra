@@ -133,7 +133,25 @@ export const countryCodes = {
   "JORDAN": "+962"
 };
 
-// Door-to-door pricing based on sectors (from screenshot)
+// Eritrea Project Sector Pricing (based on uploaded image)
+// Calculate total freight per kg with door-to-door charges
+export const eritreaSectorPricing = {
+  ASMARA: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
+  KEREN: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
+  GINDA: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 3.00 } },
+  MASSAWAH: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 0.00 } },
+  ADIKAYH: { freightPerKg: 10.00, doorToDoor: { available: true, charge: 6.00 } },
+  BARNTU: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
+  GINDA_FORUBIYA: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 5.00 } },
+  HACAZ: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
+  MENDAFA: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
+  DERAHHARI: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
+  AKURDAT: { freightPerKg: 10.00, doorToDoor: { available: true, charge: 5.00 } },
+  TESENEY: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 6.00 } },
+  SENAFE: { freightPerKg: 11.00, doorToDoor: { available: false, charge: 5.00 } }
+};
+
+// Legacy door-to-door pricing (maintained for compatibility)
 export const doorToDoorPricing = {
   // QAR 10.00 sectors
   KASSALA: { price: 10.00, currency: "QAR" },

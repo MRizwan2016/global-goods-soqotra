@@ -245,26 +245,41 @@ const EritreaInvoicePrint = () => {
           style={{ minHeight: '297mm' }}
         >
           <div style={{ border: '3px solid #000', padding: '0', fontFamily: 'Arial, sans-serif' }}>
-            {/* Header */}
-            <div style={{ position: 'relative', padding: '10px', borderBottom: '2px solid #000' }}>
-              {/* Logo - Top left corner */}
-              <div style={{ position: 'absolute', top: '5px', left: '5px' }}>
+            {/* Header Section */}
+            <div style={{ display: 'flex', padding: '10px', borderBottom: '2px solid #000' }}>
+              {/* Logo */}
+              <div style={{ width: '100px', marginRight: '20px' }}>
                 <img 
                   src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
                   alt="Soqotra Logo" 
-                  style={{ width: '160px', height: 'auto' }}
+                  style={{ width: '100%', height: 'auto' }}
                 />
               </div>
               
-              {/* Company name centered */}
-              <div style={{ textAlign: 'center', paddingTop: '20px' }}>
-                <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '0' }}>
-                  SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL
+              {/* Title Section */}
+              <div style={{ flex: 1, textAlign: 'center' }}>
+                <div style={{ fontSize: '18px', fontWeight: 'bold', margin: '0' }}>
+                  SOQOTRA SOLUTION WLL
                 </div>
-                <div style={{ fontSize: '12px', lineHeight: '1.2', marginTop: '5px' }}>
-                  <div>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING 53, STREET NO. 76</div>
-                  <div>AZIZIA COMMERCIAL STREET, DOHA - QAATAR</div>
-                  <div>EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</div>
+                <div style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '5px' }}>
+                  COLLECTION / DELIVERY JOB SHEET
+                </div>
+                <div style={{ fontSize: '12px', marginTop: '5px' }}>
+                  (SCHEDULE NO: 3820-744)
+                </div>
+              </div>
+              
+              {/* Page & QR Section */}
+              <div style={{ width: '150px', textAlign: 'center' }}>
+                <div style={{ border: '1px solid #000', padding: '5px', marginBottom: '10px' }}>
+                  <div style={{ fontSize: '10px' }}>PAGE</div>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold' }}>1</div>
+                </div>
+                <div style={{ border: '1px solid #ccc', padding: '5px', backgroundColor: '#f0f0f0' }}>
+                  <div style={{ fontSize: '10px' }}>QR CODE</div>
+                </div>
+                <div style={{ fontSize: '12px', fontWeight: 'bold', marginTop: '10px' }}>
+                  ERITREA
                 </div>
               </div>
             </div>

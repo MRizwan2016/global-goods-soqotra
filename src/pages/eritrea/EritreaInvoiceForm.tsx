@@ -22,7 +22,8 @@ import {
   eritreaDrivers, 
   eritreaDistricts,
   eritreaPackageTypes,
-  doorToDoorPricing 
+  doorToDoorPricing,
+  eritreaSectorPricing 
 } from "./data/eritreaData";
 import { toast } from "sonner";
 
@@ -110,13 +111,40 @@ const EritreaInvoiceForm = () => {
     handlePrint();
   };
 
-  // Calculate door-to-door pricing display
-  const getDoorToDoorPricing = () => {
-    if (formData.doorToDoor === "YES" && formData.sector) {
-      const pricing = doorToDoorPricing[formData.sector as keyof typeof doorToDoorPricing];
-      return pricing ? `${pricing.price} ${pricing.currency}` : "Not Available";
+  // Calculate pricing using new Eritrea sector pricing system
+  const getSectorPricing = () => {
+    if (formData.sector) {
+      const sectorPricing = eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing];
+      if (sectorPricing) {
+        const freightPerKg = sectorPricing.freightPerKg;
+        const doorCharge = formData.doorToDoor === "YES" && sectorPricing.doorToDoor.available 
+          ? sectorPricing.doorToDoor.charge 
+          : 0;
+        const totalFreight = freightPerKg + doorCharge;
+        
+        return {
+          freightPerKg,
+          doorCharge,
+          totalFreight,
+          doorAvailable: sectorPricing.doorToDoor.available
+        };
+      }
     }
-    return "N/A";
+    return {
+      freightPerKg: 11.00,
+      doorCharge: 0,
+      totalFreight: 11.00,
+      doorAvailable: false
+    };
+  };
+
+  // Legacy door-to-door pricing display for compatibility
+  const getDoorToDoorPricing = () => {
+    const pricing = getSectorPricing();
+    if (formData.doorToDoor === "YES" && pricing.doorAvailable) {
+      return `${pricing.doorCharge.toFixed(2)} QAR`;
+    }
+    return pricing.doorAvailable ? "Available" : "Not Available";
   };
 
   return (
@@ -463,6 +491,44 @@ const EritreaInvoiceForm = () => {
             handleFormChange={handleFormChange} 
           />
         </div>
+
+        {/* Eritrea Sector Pricing Calculator */}
+        {formData.sector && (
+          <Card>
+            <CardHeader className="bg-green-600 text-white">
+              <CardTitle>ERITREA PROJECT PRICING</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg">
+                <div className="text-center">
+                  <div className="text-sm text-gray-600">FREIGHT PER KG</div>
+                  <div className="text-xl font-bold text-blue-600">QAR {getSectorPricing().freightPerKg.toFixed(2)}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm text-gray-600">DOOR TO DOOR</div>
+                  <div className="text-xl font-bold text-orange-600">
+                    {getSectorPricing().doorAvailable ? 'YES' : 'NO'}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm text-gray-600">DOOR CHARGE</div>
+                  <div className="text-xl font-bold text-purple-600">QAR {getSectorPricing().doorCharge.toFixed(2)}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm text-gray-600">TOTAL FREIGHT</div>
+                  <div className="text-xl font-bold text-green-600">QAR {getSectorPricing().totalFreight.toFixed(2)}</div>
+                </div>
+              </div>
+              {!getSectorPricing().doorAvailable && formData.doorToDoor === "YES" && (
+                <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-700 font-medium">
+                    ⚠️ Door to Door service is not available for {formData.sector} sector
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Cost Details */}
         <Card>
