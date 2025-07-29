@@ -6,22 +6,19 @@ export const eritreaPorts = [
 ];
 
 export const eritreaSectors = [
-  { value: "KASSALA", label: "KASSALA", port: "MUSSAMWA" },
-  { value: "GIRBA", label: "GIRBA", port: "MUSSAMWA" },
-  { value: "SHUWAIKH", label: "SHUWAIKH", port: "MUSSAMWA" },
-  { value: "ALZEER", label: "ALZEER", port: "MUSSAMWA" },
-  { value: "UM_SHAJARA", label: "UM SHAJARA", port: "MUSSAMWA" },
-  { value: "AL_GADHAREEF", label: "AL GADHAREEF", port: "MUSSAMWA" },
-  { value: "ALFA_JADEEDHA", label: "ALFA JADEEDHA", port: "MUSSAMWA" },
-  { value: "AL_MADEENAH", label: "AL MADEENAH", port: "MUSSAMWA" },
-  { value: "GARGOOR", label: "GARGOOR", port: "MUSSAMWA" },
-  { value: "KARKOORA", label: "KARKOORA", port: "MUSSAMWA" },
-  { value: "ATHBARA", label: "ATHBARA", port: "MUSSAMWA" },
-  { value: "SHANDEE", label: "SHANDEE", port: "MUSSAMWA" },
-  { value: "DUNGULAR", label: "DUNGULAR", port: "MUSSAMWA" },
-  { value: "AL_DAMAL", label: "AL DAMAL", port: "MUSSAMWA" },
-  { value: "MARWI", label: "MARWI", port: "MUSSAMWA" },
-  { value: "ASMARA", label: "ASMARA", port: "MUSSAMWA" }
+  { value: "ASMARA", label: "ASMARA", port: "MASSAWA" },
+  { value: "KEREN", label: "KEREN", port: "MASSAWA" },
+  { value: "GINDA", label: "GINDA", port: "MASSAWA" },
+  { value: "MASSAWA", label: "MASSAWA", port: "MASSAWA" },
+  { value: "ADIKAYH", label: "ADI KAYH", port: "MASSAWA" },
+  { value: "BARENTU", label: "BARENTU", port: "MASSAWA" },
+  { value: "GINDA_FORUBIYA", label: "GINDA FORUBIYA", port: "MASSAWA" },
+  { value: "HACAZ", label: "HACAZ", port: "MASSAWA" },
+  { value: "MENDEFERA", label: "MENDEFERA", port: "MASSAWA" },
+  { value: "DEKEMHARE", label: "DEKEMHARE", port: "MASSAWA" },
+  { value: "AGORDAT", label: "AGORDAT", port: "MASSAWA" },
+  { value: "TESENEY", label: "TESENEY", port: "MASSAWA" },
+  { value: "SENAFE", label: "SENAFE", port: "MASSAWA" }
 ];
 
 export const eritreaSalesReps = [
@@ -133,22 +130,39 @@ export const countryCodes = {
   "JORDAN": "+962"
 };
 
-// Eritrea Project Sector Pricing (based on uploaded image)
+// Eritrea Project Sector Pricing (based on uploaded pricing table)
 // Calculate total freight per kg with door-to-door charges
 export const eritreaSectorPricing = {
   ASMARA: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
   KEREN: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
   GINDA: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 3.00 } },
-  MASSAWAH: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 0.00 } },
+  MASSAWA: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 0.00 } },
   ADIKAYH: { freightPerKg: 10.00, doorToDoor: { available: true, charge: 6.00 } },
-  BARNTU: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
+  BARENTU: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
   GINDA_FORUBIYA: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 5.00 } },
   HACAZ: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
-  MENDAFA: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
-  DERAHHARI: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
-  AKURDAT: { freightPerKg: 10.00, doorToDoor: { available: true, charge: 5.00 } },
+  MENDEFERA: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
+  DEKEMHARE: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
+  AGORDAT: { freightPerKg: 10.00, doorToDoor: { available: true, charge: 5.00 } },
   TESENEY: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 6.00 } },
   SENAFE: { freightPerKg: 11.00, doorToDoor: { available: false, charge: 5.00 } }
+};
+
+// Dynamic sector management
+export const createNewSector = (name: string, freightPerKg: number, doorToDoorAvailable: boolean, doorToDoorCharge: number) => {
+  const sectorKey = name.toUpperCase().replace(/\s+/g, '_');
+  return {
+    value: sectorKey,
+    label: name.toUpperCase(),
+    port: "MASSAWA",
+    pricing: {
+      freightPerKg,
+      doorToDoor: {
+        available: doorToDoorAvailable,
+        charge: doorToDoorCharge
+      }
+    }
+  };
 };
 
 // Legacy door-to-door pricing (maintained for compatibility)

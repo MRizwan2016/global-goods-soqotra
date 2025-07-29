@@ -25,12 +25,15 @@ import {
   doorToDoorPricing,
   eritreaSectorPricing 
 } from "./data/eritreaData";
+import SectorManagement from "./components/SectorManagement";
 import { toast } from "sonner";
 
 const EritreaInvoiceForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [showPreview, setShowPreview] = useState(false);
+  const [availableSectors, setAvailableSectors] = useState(eritreaSectors);
+  const [showSectorManagement, setShowSectorManagement] = useState(false);
 
   // Use the enhanced Eritrea invoice hook
   const {
@@ -111,10 +114,27 @@ const EritreaInvoiceForm = () => {
     handlePrint();
   };
 
+  // Load custom sectors from localStorage
+  React.useEffect(() => {
+    const savedSectors = localStorage.getItem('eritreaCustomSectors');
+    if (savedSectors) {
+      const customSectors = JSON.parse(savedSectors);
+      setAvailableSectors([...eritreaSectors, ...customSectors]);
+    }
+  }, []);
+
+  // Handle new sector addition
+  const handleSectorAdded = (newSector: any) => {
+    setAvailableSectors(prev => [...prev, newSector]);
+  };
+
   // Calculate pricing using new Eritrea sector pricing system
   const getSectorPricing = () => {
     if (formData.sector) {
-      const sectorPricing = eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing];
+      // Check custom pricing first
+      const customPricing = JSON.parse(localStorage.getItem('eritreaSectorPricing') || '{}');
+      const sectorPricing = customPricing[formData.sector] || eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing];
+      
       if (sectorPricing) {
         const freightPerKg = sectorPricing.freightPerKg;
         const doorCharge = formData.doorToDoor === "YES" && sectorPricing.doorToDoor.available 
@@ -192,13 +212,23 @@ const EritreaInvoiceForm = () => {
 
               {/* Sector Selection */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">SECTOR:</label>
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium">SECTOR:</label>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setShowSectorManagement(!showSectorManagement)}
+                  >
+                    {showSectorManagement ? 'Hide' : 'Manage'} Sectors
+                  </Button>
+                </div>
                 <Select value={formData.sector} onValueChange={(value) => handleFormChange('sector', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select Sector" />
                   </SelectTrigger>
                   <SelectContent>
-                    {eritreaSectors.map(sector => (
+                    {availableSectors.map(sector => (
                       <SelectItem key={sector.value} value={sector.value}>
                         {sector.label}
                       </SelectItem>
@@ -717,6 +747,18 @@ const EritreaInvoiceForm = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Sector Management */}
+        {showSectorManagement && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Sector Management</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SectorManagement onSectorAdded={handleSectorAdded} />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Action Buttons */}
         <div className="flex justify-between items-center pt-6 border-t">

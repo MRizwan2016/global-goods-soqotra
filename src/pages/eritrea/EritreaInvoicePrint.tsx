@@ -65,12 +65,8 @@ const EritreaInvoicePrint = () => {
     }
   }, [id, navigate]);
 
-  // Get company name based on shipper country
+  // Get company name - Always use Qatar company name for Eritrea project
   const getCompanyName = () => {
-    const country = invoice?.shipperCountry || displayData?.shipperCountry || "QATAR";
-    if (country === "SAUDI ARABIA") {
-      return "SOQOTRA SOLUTIONS WLL";
-    }
     return "SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL";
   };
 

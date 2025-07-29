@@ -80,14 +80,12 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
               {/* Company Info - Left side */}
               <div className="flex-1">
                 <h1 className="text-lg font-bold text-blue-900 leading-tight">
-                  {formData.shipperCountry === "SAUDI ARABIA" 
-                    ? "SOQOTRA SOLUTIONS WLL" 
-                    : "SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL"}
+                  SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL
                 </h1>
                 <div className="text-sm text-gray-600 mt-3 leading-relaxed">
-                  <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING NO.53, STREET NO.76,</p>
-                  <p>AZIZIA COMMERCIAL STREET, P.O.BOX: 55861, AZIZIA - DOHA - QATAR</p>
-                  <p>TEL: +974 - 44832508 | EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
+                  <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING 53, STREET NO. 76</p>
+                  <p>AZIZIA COMMERCIAL STREET, DOHA - QATAR</p>
+                  <p>EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
                 </div>
               </div>
               
