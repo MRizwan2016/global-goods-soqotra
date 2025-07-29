@@ -4,7 +4,7 @@ import { PackageOption } from "@/data/packageOptions";
 import DimensionsInputs from "./package-selector/DimensionsInputs";
 import PriceFields from "./package-selector/PriceFields";
 import PackageNameSelector from "./package-selector/PackageNameSelector";
-import ManualPackageDialog from "./package-selector/ManualPackageDialog";
+import EnhancedManualPackageDialog from "./package-selector/EnhancedManualPackageDialog";
 import AddPackageButton from "./package-selector/AddPackageButton";
 import { PackageItem } from "../types/invoiceForm";
 
@@ -57,10 +57,14 @@ const PackageSelector: React.FC<PackageSelectorProps> = ({
       
       <AddPackageButton handleAddPackage={handleAddPackage} />
 
-      <ManualPackageDialog 
+      <EnhancedManualPackageDialog 
         open={showManualDialog} 
         onOpenChange={setShowManualDialog}
-        onSubmit={submitManualPackage}
+        onSubmit={(name, price, dimensions, volume, pricingType, docsFee) => {
+          if (handleManualPackage) {
+            handleManualPackage(name, price);
+          }
+        }}
       />
     </div>
   );
