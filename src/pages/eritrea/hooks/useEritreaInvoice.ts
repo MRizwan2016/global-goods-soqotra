@@ -144,20 +144,32 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     quantity: "1"
   });
 
-  // Auto-calculate door-to-door pricing based on Gross Weight × Door-to-Door
+  // Auto-calculate freight based on sector pricing and total weight
   useEffect(() => {
-    if (formData.doorToDoor === "YES" && formData.sector && formData.totalWeight > 0) {
-      const pricing = doorToDoorPricing[formData.sector as keyof typeof doorToDoorPricing];
-      if (pricing) {
-        // Calculate: Gross Weight × Door-to-Door rate
-        const doorToDoorAmount = formData.totalWeight * pricing.price;
+    if (formData.sector && formData.totalWeight > 0) {
+      // Get sector pricing from localStorage or default
+      const customPricing = JSON.parse(localStorage.getItem('eritreaSectorPricing') || '{}');
+      const sectorPricing = customPricing[formData.sector] || doorToDoorPricing[formData.sector as keyof typeof doorToDoorPricing];
+      
+      if (sectorPricing) {
+        // Base price calculation: Total Weight × Freight per KG
+        const baseFreight = formData.totalWeight * (sectorPricing.freightPerKg || sectorPricing.price || 11);
+        
+        // Door-to-door calculation: if enabled, add door charge × total weight
+        let doorToDoorAmount = 0;
+        if (formData.doorToDoor === "YES") {
+          const doorCharge = sectorPricing.doorToDoor?.charge || sectorPricing.price || 0;
+          doorToDoorAmount = formData.totalWeight * doorCharge;
+        }
+        
         setFormData(prev => ({
           ...prev,
+          freight: baseFreight,
           doorToDoorPrice: doorToDoorAmount,
           destinationDoorDelivery: doorToDoorAmount
         }));
       }
-    } else {
+    } else if (formData.doorToDoor === "NO") {
       setFormData(prev => ({
         ...prev,
         doorToDoorPrice: 0,
@@ -302,6 +314,26 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     setSelectedPackageType("");
     
     toast.success("Package added successfully");
+  };
+
+  const addManualPackageItem = (packageData: {
+    name: string;
+    length: number;
+    width: number;
+    height: number;
+    weight: number;
+    quantity: number;
+    cubicMetre: number;
+    cubicFeet: number;
+    volumeWeight: number;
+  }) => {
+    const newPackageItem: EritreaPackageItem = {
+      id: Date.now().toString(),
+      ...packageData
+    };
+
+    setPackageItems(prev => [...prev, newPackageItem]);
+    toast.success("Manual package added successfully");
   };
 
   const removePackageItem = (id: string) => {
@@ -480,6 +512,7 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     handlePackageTypeSelect,
     handlePackageInputChange,
     addPackageItem,
+    addManualPackageItem,
     removePackageItem,
     updatePackageItem,
     saveInvoice,

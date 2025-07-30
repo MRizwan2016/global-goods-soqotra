@@ -176,7 +176,8 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
             <Input
               value={formData.shipperMobile}
               onChange={(e) => handleFormChange('shipperMobile', e.target.value)}
-              placeholder="+974 XXXX XXXX"
+              placeholder="+974 XXXX XXXX (auto-fills customer data)"
+              className="border-blue-200 focus:border-blue-400"
             />
           </div>
           

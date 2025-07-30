@@ -26,6 +26,7 @@ import {
   eritreaSectorPricing 
 } from "./data/eritreaData";
 import SectorManagement from "./components/SectorManagement";
+import ManualPackageDialog from "./components/package-details/ManualPackageDialog";
 import { toast } from "sonner";
 import { CustomerDetailsService } from "@/services/CustomerDetailsService";
 import { JobNumberService } from "@/services/JobNumberService";
@@ -36,6 +37,7 @@ const EritreaInvoiceForm = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [availableSectors, setAvailableSectors] = useState(eritreaSectors);
   const [showSectorManagement, setShowSectorManagement] = useState(false);
+  const [showManualPackageDialog, setShowManualPackageDialog] = useState(false);
   const [associatedJobNumber, setAssociatedJobNumber] = useState("");
 
   // Use the enhanced Eritrea invoice hook
@@ -48,6 +50,7 @@ const EritreaInvoiceForm = () => {
     handlePackageTypeSelect,
     handlePackageInputChange,
     addPackageItem,
+    addManualPackageItem,
     removePackageItem,
     saveInvoice,
     loadInvoice
@@ -438,7 +441,19 @@ const EritreaInvoiceForm = () => {
             {/* Package Type Selection */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2 col-span-2">
-                <label className="text-sm font-medium">PACKAGE TYPE:</label>
+                <div className="flex justify-between items-center">
+                  <label className="text-sm font-medium">PACKAGE TYPE:</label>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setShowManualPackageDialog(true)}
+                    className="gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
+                    Add Manual Package
+                  </Button>
+                </div>
                 <Select value={selectedPackageType} onValueChange={handlePackageTypeSelect}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select Package Type" />
@@ -895,6 +910,12 @@ const EritreaInvoiceForm = () => {
         isOpen={showPreview}
         onClose={() => setShowPreview(false)}
         onPrint={handlePrintFromPreview}
+      />
+
+      <ManualPackageDialog
+        open={showManualPackageDialog}
+        onOpenChange={setShowManualPackageDialog}
+        onSubmit={addManualPackageItem}
       />
     </Layout>
   );
