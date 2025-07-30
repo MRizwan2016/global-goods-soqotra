@@ -43,16 +43,27 @@ const packageOptions = [
   "MICROWAVE OVEN",
   "OVEN",
   "4 BURNER",
-  "DUVET"
+  "DUVET",
+  // Additional packages from the highlighted section
+  "1 METER WOODEN BOX",
+  "1.5 METER WOODEN BOX", 
+  "2 METER WOODEN BOX",
+  "2.5 METER WOODEN BOX",
+  "3 METER WOODEN BOX",
+  "4 METER WOODEN BOX",
+  "1.314 METER WOODEN BOX"
 ];
 
 const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
   const [selectedItem, setSelectedItem] = useState("");
   const [sellPrice, setSellPrice] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
+  const [pendingAddition, setPendingAddition] = useState(false);
   
   const handleAddItem = () => {
-    if (selectedItem) {
+    if (selectedItem && !pendingAddition) {
+      setPendingAddition(true);
+      
       // Create a more detailed description with package information
       const packageDescription = `${selectedItem} - Qty: ${quantity}, Price: QAR ${sellPrice}`;
       
@@ -71,6 +82,9 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
       setSelectedItem("");
       setSellPrice(0);
       setQuantity(1);
+      
+      // Reset pending state after a short delay
+      setTimeout(() => setPendingAddition(false), 500);
     }
   };
   
@@ -85,7 +99,7 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
           <SelectTrigger id="packageOption" className="bg-white">
             <SelectValue placeholder="SELECT PACKAGE" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]">
             {packageOptions.map((option, index) => (
               <SelectItem key={index} value={option}>
                 {option}
@@ -121,10 +135,10 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
       <div className="flex items-end">
         <Button 
           onClick={handleAddItem} 
-          disabled={!selectedItem || sellPrice <= 0}
+          disabled={!selectedItem || sellPrice <= 0 || pendingAddition}
           className="bg-blue-600 hover:bg-blue-700 w-full"
         >
-          INSERT
+          {pendingAddition ? "ADDING..." : "INSERT"}
         </Button>
       </div>
     </div>

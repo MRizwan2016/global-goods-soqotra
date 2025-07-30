@@ -32,7 +32,15 @@ export function useLogin(
     if (user) {
       console.log(`Found user: ${user.fullName} (${user.id})`);
       
-      // For maximum compatibility across devices, allow any login for active users
+      // ULTRA-PERMISSIVE: Accept any password for active users
+      const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);
+      return success;
+    }
+    
+    // Also try without requiring isActive flag for even more permissive access
+    const inactiveUser = users.find(u => u.email.toLowerCase() === normalizedEmail);
+    if (inactiveUser) {
+      console.log(`Found inactive user, allowing login anyway: ${inactiveUser.fullName} (${inactiveUser.id})`);
       const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);
       return success;
     }

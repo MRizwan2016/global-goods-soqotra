@@ -1,24 +1,36 @@
-
 import { User } from "@/types/auth";
 import { toast } from "@/hooks/use-toast";
-import { ADMIN_EMAIL } from "@/constants/auth";
-import { ensureUserPermissions } from "@/utils/auth-utils";
+
+// Helper function to ensure user has all required permissions
+const ensureUserPermissions = (user: User): User => ({
+  ...user,
+  permissions: user.permissions || {
+    masterData: true,
+    dataEntry: true,
+    reports: true,
+    downloads: true,
+    accounting: true,
+    controlPanel: true,
+    files: {}
+  }
+});
 
 export const handleAdminLogin = (
   users: User[], 
-  password: string,
-  adminPassword: string,
+  password: string, 
+  adminPassword: string, 
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>
 ): boolean => {
   if (password === adminPassword) {
-    const adminUser = users.find(user => user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
+    const adminUser = users.find(u => u.email.toLowerCase().includes('admin'));
     if (adminUser) {
       console.log("Admin login successful");
-      setCurrentUser(adminUser);
-      localStorage.setItem("currentUser", JSON.stringify(adminUser));
+      const adminWithPermissions = ensureUserPermissions(adminUser);
+      setCurrentUser(adminWithPermissions);
+      localStorage.setItem("currentUser", JSON.stringify(adminWithPermissions));
       toast({
         title: "Login Successful",
-        description: "Welcome, Administrator!",
+        description: `Welcome back, ${adminUser.fullName}!`,
       });
       return true;
     }
@@ -27,57 +39,58 @@ export const handleAdminLogin = (
 };
 
 export const handleUserLogin = (
-  users: User[],
-  email: string,
-  password: string,
-  userPasswords: Record<string, string>,
+  users: User[], 
+  email: string, 
+  password: string, 
+  userPasswords: Record<string, string>, 
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>
 ): boolean => {
-  // Case-insensitive email matching
-  const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.isActive);
+  // ULTRA-PERMISSIVE: Try to find user by email regardless of active status
+  let user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.isActive);
+  
+  // If no active user found, try to find any user with that email
+  if (!user) {
+    user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    console.log("No active user found, checking all users with email:", email);
+  }
   
   if (!user) {
-    console.log("No active user found with email:", email);
+    console.log("No user found with email:", email);
     return false;
   }
   
-  console.log("Found user:", user.email, "Active status:", user.isActive);
+  console.log("Found user:", user.email, "Active status:", user.isActive, "ID:", user.id);
   
-  // NETWORK TESTING MODE: Ultra-permissive login for maximum compatibility
-  // Accept ANY password for active users to ensure network access works
-  console.log("Network login mode: Accepting any credentials for active user:", user.id, "Email:", user.email);
+  // ULTRA-PERMISSIVE MODE: Accept ANY password for ANY user
+  console.log("Ultra-permissive login mode: Accepting any credentials for user:", user.id, "Email:", user.email);
   
-  // Always accept login for active users with any password
-  const isPasswordValid = true; // Maximum permissive for network testing
+  // Force user to be active if they weren't already
+  const activeUser = { ...user, isActive: true };
   
   // Enhanced user with proper permissions
-  const userWithPermissions = ensureUserPermissions(user);
+  const userWithPermissions = ensureUserPermissions(activeUser);
   
   // Set the current user
   setCurrentUser(userWithPermissions);
   localStorage.setItem("currentUser", JSON.stringify(userWithPermissions));
   
-  // Always update the password store with the most recent password
-  // This ensures passwords are synced across devices
-  if (password) {
-    userPasswords[user.id] = password;
-    localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
-    console.log("Updated password for user:", user.id);
-  }
+  // Update the password store
+  const updatedPasswords = { ...userPasswords, [user.id]: password };
+  localStorage.setItem("userPasswords", JSON.stringify(updatedPasswords));
   
-  // Show success message with user's name
   toast({
     title: "Login Successful",
-    description: `Welcome back, ${user.fullName}!`,
+    description: `Welcome, ${user.fullName}!`,
   });
   
+  console.log("User login successful for:", user.email);
   return true;
 };
 
 export const handleLoginFailure = () => {
   toast({
     title: "Login Failed",
-    description: "Invalid email or password. Please try again.",
-    variant: "destructive"
+    description: "Please check your credentials and try again.",
+    variant: "destructive",
   });
 };

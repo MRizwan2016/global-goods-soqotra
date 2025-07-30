@@ -7,12 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Plus, Save, Eye, Printer, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Save, Eye, Printer, Trash2, FileText } from "lucide-react";
 import EritreaInvoicePreview from "./components/EritreaInvoicePreview";
 import { useInvoiceNumberSelector } from "../invoicing/hooks/useInvoiceNumberSelector";
 import InvoiceNumberSelector from "../invoicing/components/basic-information/InvoiceNumberSelector";
 import UPBIntegrationCard from "@/components/invoice/UPBIntegrationCard";
-import { useEritreaInvoice } from "./hooks/useEritreaInvoice";
+import { useEritreaInvoice, EritreaFormData } from "./hooks/useEritreaInvoice";
 import ShipperDetails from "./components/shipping/ShipperDetails";
 import ConsigneeDetails from "./components/shipping/ConsigneeDetails";
 import { 
@@ -27,6 +27,8 @@ import {
 } from "./data/eritreaData";
 import SectorManagement from "./components/SectorManagement";
 import { toast } from "sonner";
+import { CustomerDetailsService } from "@/services/CustomerDetailsService";
+import { JobNumberService } from "@/services/JobNumberService";
 
 const EritreaInvoiceForm = () => {
   const navigate = useNavigate();
@@ -34,6 +36,7 @@ const EritreaInvoiceForm = () => {
   const [showPreview, setShowPreview] = useState(false);
   const [availableSectors, setAvailableSectors] = useState(eritreaSectors);
   const [showSectorManagement, setShowSectorManagement] = useState(false);
+  const [associatedJobNumber, setAssociatedJobNumber] = useState("");
 
   // Use the enhanced Eritrea invoice hook
   const {
@@ -91,6 +94,31 @@ const EritreaInvoiceForm = () => {
   };
 
   const handleSave = async () => {
+    // Store customer details before saving
+    if (formData.shipperMobile && formData.shipperName) {
+      const customerDetails = {
+        mobileNumber: formData.shipperMobile,
+        shipperPrefix: formData.shipperPrefix,
+        shipperName: formData.shipperName,
+        shipperCity: formData.shipperCity,
+        shipperAddress: formData.shipperAddress,
+        shipperEmail: formData.shipperEmail,
+        shipperIdNumber: formData.shipperIdNumber,
+        shipperCountry: formData.shipperCountry,
+        consigneePrefix: formData.consigneePrefix,
+        consigneeName: formData.consigneeName,
+        consigneeCity: formData.consigneeCity,
+        consigneeAddress: formData.consigneeAddress,
+        consigneeMobile: formData.consigneeMobile,
+        consigneeEmail: formData.consigneeEmail,
+        consigneeIdNumber: formData.consigneeIdNumber,
+        consigneeCountry: formData.consigneeCountry,
+        jobNumber: associatedJobNumber,
+        lastUsed: new Date().toISOString()
+      };
+      CustomerDetailsService.storeCustomerDetails(customerDetails);
+    }
+
     const success = await saveInvoice();
     if (success) {
       navigate("/eritrea");
@@ -126,6 +154,52 @@ const EritreaInvoiceForm = () => {
   // Handle new sector addition
   const handleSectorAdded = (newSector: any) => {
     setAvailableSectors(prev => [...prev, newSector]);
+  };
+
+  // Handle mobile number change with auto-fill
+  const handleMobileNumberChange = (field: keyof EritreaFormData, value: string) => {
+    handleFormChange(field, value);
+    
+    if (field === 'shipperMobile' && value.length >= 8) {
+      // Try to find existing customer details
+      const customerDetails = CustomerDetailsService.getCustomerDetailsByMobile(value);
+      if (customerDetails) {
+        // Auto-fill shipper details
+        handleFormChange('shipperName', customerDetails.shipperName);
+        handleFormChange('shipperAddress', customerDetails.shipperAddress);
+        handleFormChange('shipperCity', customerDetails.shipperCity);
+        handleFormChange('shipperEmail', customerDetails.shipperEmail);
+        handleFormChange('shipperIdNumber', customerDetails.shipperIdNumber);
+        handleFormChange('shipperCountry', customerDetails.shipperCountry);
+        
+        // Auto-fill consignee details
+        handleFormChange('consigneeName', customerDetails.consigneeName);
+        handleFormChange('consigneeAddress', customerDetails.consigneeAddress);
+        handleFormChange('consigneeCity', customerDetails.consigneeCity);
+        handleFormChange('consigneeMobile', customerDetails.consigneeMobile);
+        handleFormChange('consigneeEmail', customerDetails.consigneeEmail);
+        handleFormChange('consigneeIdNumber', customerDetails.consigneeIdNumber);
+        handleFormChange('consigneeCountry', customerDetails.consigneeCountry);
+        
+        // Try to get associated job number
+        const jobNumber = JobNumberService.getJobNumberByMobile(value);
+        if (jobNumber) {
+          setAssociatedJobNumber(jobNumber);
+          toast.success(`Auto-filled details for mobile ${value}. Job Number: ${jobNumber}`);
+        } else {
+          toast.success(`Auto-filled details for mobile ${value}`);
+        }
+      } else {
+        // Look for job number even if no customer details found
+        const jobNumber = JobNumberService.getJobNumberByMobile(value);
+        if (jobNumber) {
+          setAssociatedJobNumber(jobNumber);
+          toast.info(`Found Job Number: ${jobNumber} for mobile ${value}`);
+        } else {
+          setAssociatedJobNumber("");
+        }
+      }
+    }
   };
 
   // Calculate pricing using new Eritrea sector pricing system
@@ -510,11 +584,26 @@ const EritreaInvoiceForm = () => {
           </CardContent>
         </Card>
 
+        {/* Associated Job Number Display */}
+        {associatedJobNumber && (
+          <Card className="border-green-500 bg-green-50">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">Associated Job Number:</span>
+                </div>
+                <div className="text-lg font-bold text-green-600">{associatedJobNumber}</div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Enhanced Shipper & Consignee Details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ShipperDetails 
             formData={formData} 
-            handleFormChange={handleFormChange} 
+            handleFormChange={handleMobileNumberChange} 
           />
           <ConsigneeDetails 
             formData={formData} 

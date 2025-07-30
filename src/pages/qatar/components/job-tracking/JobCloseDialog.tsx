@@ -104,26 +104,27 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
           });
         }
         
-        // If still no invoices, create demo invoices for Qatar
+        // If still no invoices, create demo invoices for Qatar (100000-100050 range)
         if (invoiceList.length === 0) {
-          for (let i = 10001; i <= 10010; i++) {
-            invoiceList.push({
-              invoiceNumber: `QAT-${i}`,
-              bookNumber: "QAT-001",
-              assignedTo: "Qatar Sales Rep",
-              driverName: "Qatar Driver",
-              amount: 500,
-              date: new Date().toISOString().split('T')[0]
-            });
-          }
+          // Get used invoice numbers to avoid duplicates
+          const usedInvoices = JSON.parse(localStorage.getItem('used-invoices') || '[]');
           
-          // Add some more demo invoices
-          invoiceList = [
-            ...invoiceList,
-            { invoiceNumber: "010001", bookNumber: "B001", assignedTo: "Sales Rep 1", driverName: "Driver 1", amount: 750, date: new Date().toISOString().split('T')[0] },
-            { invoiceNumber: "010002", bookNumber: "B001", assignedTo: "Sales Rep 1", driverName: "Driver 1", amount: 600, date: new Date().toISOString().split('T')[0] },
-            { invoiceNumber: "010003", bookNumber: "B001", assignedTo: "Sales Rep 2", driverName: "Driver 2", amount: 800, date: new Date().toISOString().split('T')[0] }
-          ];
+          for (let i = 100000; i <= 100050; i++) {
+            const invoiceNumber = i.toString();
+            const bookNumber = `BOOK-${Math.floor((i - 100000) / 10) + 1}`.padStart(8, '0');
+            
+            // Only add if not already used
+            if (!usedInvoices.includes(invoiceNumber)) {
+              invoiceList.push({
+                invoiceNumber: invoiceNumber,
+                bookNumber: bookNumber,
+                assignedTo: "Qatar Sales Rep",
+                driverName: "Qatar Driver",
+                amount: 500,
+                date: new Date().toISOString().split('T')[0]
+              });
+            }
+          }
         }
         
         console.log("Available invoices for job completion:", invoiceList);
@@ -187,6 +188,14 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
       }
       
       JobStorageService.updateJob(jobId, updatedJob);
+      
+      // Mark invoice as used to prevent reuse
+      const usedInvoices = JSON.parse(localStorage.getItem('used-invoices') || '[]');
+      if (!usedInvoices.includes(invoiceNumber)) {
+        usedInvoices.push(invoiceNumber);
+        localStorage.setItem('used-invoices', JSON.stringify(usedInvoices));
+      }
+      
       toast.success(`Job ${jobNumber} marked as completed`);
       onSuccess();
       onClose();
