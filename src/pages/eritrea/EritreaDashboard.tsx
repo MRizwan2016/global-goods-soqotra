@@ -53,8 +53,8 @@ const EritreaDashboard = () => {
     gross: invoice.gross?.toFixed(2) || "0.00",
     discount: invoice.discount?.toFixed(2) || "0.00",
     net: invoice.net?.toFixed(2) || "0.00",
-    paid: "0.00", // TODO: Add payment tracking
-    status: "pending" // TODO: Add status tracking
+    paid: invoice.paidAmount?.toFixed(2) || "0.00",
+    status: invoice.cargoStatus || "pending"
   }));
 
   // Calculate real stats from actual invoice data
@@ -76,13 +76,14 @@ const EritreaDashboard = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      pending: { variant: "destructive" as const, label: "Pending" },
-      processing: { variant: "default" as const, label: "Processing" },
-      completed: { variant: "secondary" as const, label: "Completed" }
+      pending: { variant: "destructive" as const, label: "PENDING", className: "text-red-600 bg-red-50" },
+      loaded: { variant: "default" as const, label: "LOADED", className: "text-green-600 bg-green-50" },
+      processing: { variant: "default" as const, label: "Processing", className: "text-blue-600 bg-blue-50" },
+      completed: { variant: "secondary" as const, label: "Completed", className: "text-gray-600 bg-gray-50" }
     };
     
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
   };
 
   return (
@@ -270,40 +271,51 @@ const EritreaDashboard = () => {
                       <TableCell>{item.gross}</TableCell>
                       <TableCell>{item.discount}</TableCell>
                       <TableCell className="font-medium">{item.net}</TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className={`${parseFloat(item.paid) > 0 ? 'text-green-600' : 'text-red-600 hover:text-red-700'} font-medium`}
-                          onClick={() => {
-                            // Store invoice for payment
-                            sessionStorage.setItem('selectedInvoice', JSON.stringify({
-                              id: item.id,
-                              invoiceNumber: item.id,
-                              customerName: item.customer,
-                              net: parseFloat(item.net),
-                              totalPaid: parseFloat(item.paid)
-                            }));
-                            navigate('/accounts/payment/add');
-                          }}
-                        >
-                          {item.paid}
-                        </Button>
-                      </TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={() => {
-                            // Toggle status or navigate to status management
-                            toast.info(`Status: ${item.status}`, {
-                              description: "Click actions to modify status"
-                            });
-                          }}
-                        >
-                          {getStatusBadge(item.status)}
-                        </Button>
-                      </TableCell>
+                       <TableCell>
+                         <Button 
+                           variant="ghost" 
+                           size="sm" 
+                           className={`${parseFloat(item.paid) > 0 ? 'text-green-600 font-bold' : 'text-red-600 hover:text-red-700'} font-medium`}
+                           onClick={() => {
+                             // Store invoice for payment
+                             sessionStorage.setItem('selectedInvoice', JSON.stringify({
+                               id: item.id,
+                               invoiceNumber: item.id,
+                               customerName: item.customer,
+                               net: parseFloat(item.net),
+                               totalPaid: parseFloat(item.paid)
+                             }));
+                             navigate('/accounts/payment/add');
+                           }}
+                         >
+                           {parseFloat(item.paid) > 0 ? `PAID ${item.paid}` : item.paid}
+                         </Button>
+                       </TableCell>
+                       <TableCell>
+                         <Button 
+                           variant="ghost" 
+                           size="sm"
+                           onClick={() => {
+                             // Toggle status between pending and loaded
+                             const newStatus = item.status === "pending" ? "loaded" : "pending";
+                             
+                             // Update the invoice status in localStorage
+                             const storedInvoices = JSON.parse(localStorage.getItem('eritreaInvoices') || '[]');
+                             const updatedInvoices = storedInvoices.map((inv: any) => 
+                               inv.id === item.id || inv.invoiceNumber === item.id 
+                                 ? { ...inv, cargoStatus: newStatus }
+                                 : inv
+                             );
+                             
+                             localStorage.setItem('eritreaInvoices', JSON.stringify(updatedInvoices));
+                             setInvoices(updatedInvoices);
+                             
+                             toast.success(`Status updated to: ${newStatus.toUpperCase()}`);
+                           }}
+                         >
+                           {getStatusBadge(item.status)}
+                         </Button>
+                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
                           <Button 
