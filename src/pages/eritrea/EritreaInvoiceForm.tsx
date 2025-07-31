@@ -27,6 +27,7 @@ import {
 } from "./data/eritreaData";
 import SectorManagement from "./components/SectorManagement";
 import ManualPackageDialog from "./components/package-details/ManualPackageDialog";
+import SpecialProductPackageDialog from "./components/package-details/SpecialProductPackageDialog";
 import { toast } from "sonner";
 import { CustomerDetailsService } from "@/services/CustomerDetailsService";
 import { JobNumberService } from "@/services/JobNumberService";
@@ -38,6 +39,7 @@ const EritreaInvoiceForm = () => {
   const [availableSectors, setAvailableSectors] = useState(eritreaSectors);
   const [showSectorManagement, setShowSectorManagement] = useState(false);
   const [showManualPackageDialog, setShowManualPackageDialog] = useState(false);
+  const [showSpecialProductDialog, setShowSpecialProductDialog] = useState(false);
   const [associatedJobNumber, setAssociatedJobNumber] = useState("");
 
   // Use the enhanced Eritrea invoice hook
@@ -443,16 +445,28 @@ const EritreaInvoiceForm = () => {
               <div className="space-y-2 col-span-2">
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-medium">PACKAGE TYPE:</label>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => setShowManualPackageDialog(true)}
-                    className="gap-2"
-                  >
-                    <Plus className="h-4 w-4" />
-                    Add Manual Package
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setShowManualPackageDialog(true)}
+                      className="gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Manual Package
+                    </Button>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => setShowSpecialProductDialog(true)}
+                      className="gap-2 bg-orange-50 text-orange-700 border-orange-300"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Special Products
+                    </Button>
+                  </div>
                 </div>
                 <Select value={selectedPackageType} onValueChange={handlePackageTypeSelect}>
                   <SelectTrigger>
@@ -916,6 +930,15 @@ const EritreaInvoiceForm = () => {
         open={showManualPackageDialog}
         onOpenChange={setShowManualPackageDialog}
         onSubmit={addManualPackageItem}
+      />
+
+      <SpecialProductPackageDialog
+        open={showSpecialProductDialog}
+        onOpenChange={setShowSpecialProductDialog}
+        onSubmit={(packageData) => {
+          // Add special product package with selling amount pricing
+          addManualPackageItem(packageData);
+        }}
       />
     </Layout>
   );

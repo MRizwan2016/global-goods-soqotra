@@ -135,58 +135,68 @@ export const calculatePriceByDestination = (
   const volume = parseFloat(cubicMeter);
   const weight = parseFloat(weightInKg);
   
-  // Volume-based pricing destinations
-  if (destination === "Sri Lanka" || destination.includes("COLOMBO") || 
-      destination.includes("KURUNEGALA") || destination.includes("KANDY") || 
-      destination.includes("GALLE")) {
-    // QAR 365/meter for Sri Lanka
-    const basePrice = (volume * 365).toFixed(2);
-    // Add QAR 50 documentation fee if volume > 1 cubic meter
-    const docFee = volume > 1 ? "50.00" : "0.00";
-    return { price: basePrice, documentsFee: docFee };
+  // FIXED: Use gross weight x QAR 11 for auto-calculation instead of volume weight
+  // Default calculation for most destinations (gross weight x QAR 11)
+  if (weight > 0) {
+    const defaultPrice = (weight * 11).toFixed(2);
+    const defaultDocFee = "25.00"; // Standard documentation fee
+    
+    // Volume-based pricing destinations (Sri Lanka and Philippines only)
+    if (destination === "Sri Lanka" || destination.includes("COLOMBO") || 
+        destination.includes("KURUNEGALA") || destination.includes("KANDY") || 
+        destination.includes("GALLE")) {
+      // QAR 365/meter for Sri Lanka
+      const basePrice = (volume * 365).toFixed(2);
+      // Add QAR 50 documentation fee if volume > 1 cubic meter
+      const docFee = volume > 1 ? "50.00" : "0.00";
+      return { price: basePrice, documentsFee: docFee };
+    }
+    
+    if (destination === "Philippines" || destination.includes("MANILA") || 
+        destination.includes("CEBU")) {
+      // QAR 328.5/meter for Philippines (10% less than Sri Lanka)
+      const basePrice = (volume * 328.5).toFixed(2);
+      // Add QAR 45 documentation fee if volume > 1 cubic meter
+      const docFee = volume > 1 ? "45.00" : "0.00";
+      return { price: basePrice, documentsFee: docFee };
+    }
+    
+    // Weight-based pricing destinations with specific rates
+    if (destination === "Kenya - Mombasa" || destination.includes("MOMBASA")) {
+      // QAR 7.5 per kg for Mombasa
+      const basePrice = (weight * 7.5).toFixed(2);
+      return { price: basePrice, documentsFee: "35.00" };
+    }
+    
+    if (destination === "Kenya - Nairobi" || destination.includes("NAIROBI")) {
+      // QAR 8.2 per kg for Nairobi
+      const basePrice = (weight * 8.2).toFixed(2);
+      return { price: basePrice, documentsFee: "35.00" };
+    }
+    
+    if (destination === "Eritrea - Asmara" || destination.includes("ASMARA")) {
+      // QAR 9.5 per kg for Asmara
+      const basePrice = (weight * 9.5).toFixed(2);
+      return { price: basePrice, documentsFee: "40.00" };
+    }
+    
+    if (destination === "Eritrea - Hargeisa" || destination.includes("HARGEISA")) {
+      // QAR 8.7 per kg for Hargeisa
+      const basePrice = (weight * 8.7).toFixed(2);
+      return { price: basePrice, documentsFee: "40.00" };
+    }
+    
+    if (destination === "Sudan - Port Sudan" || destination.includes("PORT SUDAN")) {
+      // QAR 10.2 per kg for Port Sudan
+      const basePrice = (weight * 10.2).toFixed(2);
+      return { price: basePrice, documentsFee: "45.00" };
+    }
+    
+    // Default weight-based calculation (gross weight x QAR 11)
+    return { price: defaultPrice, documentsFee: defaultDocFee };
   }
   
-  if (destination === "Philippines" || destination.includes("MANILA") || 
-      destination.includes("CEBU")) {
-    // QAR 328.5/meter for Philippines (10% less than Sri Lanka)
-    const basePrice = (volume * 328.5).toFixed(2);
-    // Add QAR 45 documentation fee if volume > 1 cubic meter
-    const docFee = volume > 1 ? "45.00" : "0.00";
-    return { price: basePrice, documentsFee: docFee };
-  }
-  
-  // Weight-based pricing destinations
-  if (destination === "Kenya - Mombasa" || destination.includes("MOMBASA")) {
-    // QAR 7.5 per kg for Mombasa
-    const basePrice = (weight * 7.5).toFixed(2);
-    return { price: basePrice, documentsFee: "35.00" };
-  }
-  
-  if (destination === "Kenya - Nairobi" || destination.includes("NAIROBI")) {
-    // QAR 8.2 per kg for Nairobi
-    const basePrice = (weight * 8.2).toFixed(2);
-    return { price: basePrice, documentsFee: "35.00" };
-  }
-  
-  if (destination === "Eritrea - Asmara" || destination.includes("ASMARA")) {
-    // QAR 9.5 per kg for Asmara
-    const basePrice = (weight * 9.5).toFixed(2);
-    return { price: basePrice, documentsFee: "40.00" };
-  }
-  
-  if (destination === "Eritrea - Hargeisa" || destination.includes("HARGEISA")) {
-    // QAR 8.7 per kg for Hargeisa
-    const basePrice = (weight * 8.7).toFixed(2);
-    return { price: basePrice, documentsFee: "40.00" };
-  }
-  
-  if (destination === "Sudan - Port Sudan" || destination.includes("PORT SUDAN")) {
-    // QAR 10.2 per kg for Port Sudan
-    const basePrice = (weight * 10.2).toFixed(2);
-    return { price: basePrice, documentsFee: "45.00" };
-  }
-  
-  // Default - return empty values to use existing prices
+  // Default - return empty values if no weight provided
   return { price: "", documentsFee: "" };
 };
 

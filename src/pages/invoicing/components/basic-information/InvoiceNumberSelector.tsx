@@ -1,7 +1,8 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import { useInvoiceNumberSelector } from "../../hooks/useInvoiceNumberSelector";
 import { 
   InvoiceDropdown,
@@ -24,10 +25,14 @@ interface InvoiceNumberSelectorProps {
 
 const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
   formState,
+  handleInputChange,
   handleSelectInvoice,
   availableInvoices,
   isEditing
 }) => {
+  const { isAdmin } = useAuth();
+  const [isModifying, setIsModifying] = React.useState(false);
+  
   const {
     activeInvoiceUser,
     isDuplicate,
@@ -58,12 +63,26 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
       <Label>Invoice Number</Label>
       
       {isEditing ? (
-        <Input
-          name="invoiceNumber"
-          value={formState.invoiceNumber || ""}
-          readOnly={true}
-          className="w-full"
-        />
+        <div className="flex gap-2">
+          <Input
+            name="invoiceNumber"
+            value={formState.invoiceNumber || ""}
+            readOnly={!isModifying}
+            onChange={handleInputChange}
+            className="w-full"
+            placeholder="Invoice number"
+          />
+          {isAdmin && (
+            <Button
+              type="button"
+              variant={isModifying ? "destructive" : "outline"}
+              size="sm"
+              onClick={() => setIsModifying(!isModifying)}
+            >
+              {isModifying ? "Lock" : "Modify"}
+            </Button>
+          )}
+        </div>
       ) : (
         <>
           {!showManualEntry ? (
