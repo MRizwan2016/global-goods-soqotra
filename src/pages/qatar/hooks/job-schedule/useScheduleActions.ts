@@ -1,4 +1,3 @@
-
 import { JobScheduleFormData } from "../../components/job-generate/job-schedule-form/types";
 import { QatarJob } from "../../types/jobTypes";
 import { JobStorageService } from "../../services/JobStorageService";
@@ -125,12 +124,18 @@ export const useScheduleActions = (
       if (result.success) {
         // Also update local storage for immediate UI updates
         updatedJobs.forEach(job => {
-          JobStorageService.updateJob(job.id, job);
+          JobStorageService.updateJob(job.id, {
+            ...job,
+            status: 'SCHEDULED',
+            isAssigned: true
+          });
         });
         
-        console.log("Schedule saved to database:", result.schedule);
-        toast.success(`Schedule ${formDataWithUniqueSchedule.scheduleNumber} saved to database successfully!`);
+        toast.success(`Schedule ${formDataWithUniqueSchedule.scheduleNumber} saved successfully! Jobs moved to scheduled status.`);
         setIsPrintMode(true);
+        
+        // Clear selected jobs from job generation page after successful schedule creation
+        window.dispatchEvent(new CustomEvent('jobsScheduled', { detail: { jobIds: updatedJobs.map(j => j.id) } }));
       } else {
         throw new Error(result.error || 'Failed to save to database');
       }

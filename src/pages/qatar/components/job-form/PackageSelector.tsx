@@ -59,7 +59,16 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
   const [sellPrice, setSellPrice] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [pendingAddition, setPendingAddition] = useState(false);
+  const [selectedPackages, setSelectedPackages] = useState<string[]>([]);
   
+  const handlePackageSelection = (packageName: string) => {
+    if (selectedPackages.includes(packageName)) {
+      setSelectedPackages(prev => prev.filter(p => p !== packageName));
+    } else {
+      setSelectedPackages(prev => [...prev, packageName]);
+    }
+  };
+
   const handleAddItem = () => {
     if (selectedItem && !pendingAddition) {
       setPendingAddition(true);
@@ -73,12 +82,41 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
         itemName: selectedItem,
         sellPrice,
         quantity,
-        description: packageDescription // Add detailed description
+        description: packageDescription
       };
       
       onAddItem(newItem);
       
-      // Reset fields after adding
+      // Reset fields after adding but keep selected packages
+      setSelectedItem("");
+      setSellPrice(0);
+      setQuantity(1);
+      
+      // Reset pending state after a short delay
+      setTimeout(() => setPendingAddition(false), 500);
+    }
+  };
+
+  const handleAddSelectedPackages = () => {
+    if (selectedPackages.length > 0 && !pendingAddition) {
+      setPendingAddition(true);
+      
+      // Add each selected package as a separate item
+      selectedPackages.forEach(packageName => {
+        const newItem: JobItem = {
+          id: uuidv4(),
+          name: packageName,
+          itemName: packageName,
+          sellPrice: sellPrice || 0,
+          quantity: 1,
+          description: `${packageName} - Qty: 1, Price: QAR ${sellPrice || 0}`
+        };
+        
+        onAddItem(newItem);
+      });
+      
+      // Reset all fields after adding multiple packages
+      setSelectedPackages([]);
       setSelectedItem("");
       setSellPrice(0);
       setQuantity(1);

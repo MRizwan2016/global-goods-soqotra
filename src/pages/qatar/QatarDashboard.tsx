@@ -8,41 +8,58 @@ import JobListing from "./components/dashboard/JobListing";
 import VehicleStatistics from "./components/dashboard/VehicleStatistics";
 import { DailyJobForecast, VehicleStats } from "./types/jobTypes";
 import { useJobData } from "./hooks/useJobData";
+import { useJobManagement } from "./hooks/useJobManagement";
 
 const QatarDashboard = () => {
   const { 
     isLoading, 
     getRecentJobs, 
-    getJobStatistics, 
     getPendingJobs 
   } = useJobData();
+
+  const {
+    realJobs,
+    jobStats,
+    vehicleStats
+  } = useJobManagement();
   
-  // Get recent jobs for the listing
-  const recentJobs = getRecentJobs();
+  // Get recent jobs for the listing (use real jobs only)
+  const recentJobs = getRecentJobs().filter(job => 
+    !job.jobNumber.includes('TEST') && 
+    !job.jobNumber.includes('DUMMY') && 
+    !job.customer.includes('TEST') &&
+    !job.customer.includes('DUMMY')
+  );
   
-  // Get job statistics for the StatCards
-  const jobStats = getJobStatistics();
+  // Real job forecasts from actual pending jobs (last 7 days)
+  const jobForecasts: DailyJobForecast[] = Array.from({ length: 7 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() + i);
+    const dateStr = date.toISOString().split('T')[0];
+    const dayStr = date.toLocaleDateString('en-US', { weekday: 'long' });
+    
+    const dayJobs = realJobs.filter(job => job.date === dateStr);
+    return {
+      date: dateStr,
+      day: dayStr,
+      totalJobs: dayJobs.length,
+      deliveries: dayJobs.filter(job => job.jobType === 'DELIVERY').length,
+      collections: dayJobs.filter(job => job.jobType === 'COLLECTION').length
+    };
+  });
   
-  // Generate mock data for the job forecasts (pending jobs component)
-  const jobForecasts: DailyJobForecast[] = [
-    { date: "2023-06-01", day: "Monday", totalJobs: 12, deliveries: 8, collections: 4 },
-    { date: "2023-06-02", day: "Tuesday", totalJobs: 15, deliveries: 10, collections: 5 },
-    { date: "2023-06-03", day: "Wednesday", totalJobs: 8, deliveries: 5, collections: 3 },
-    { date: "2023-06-04", day: "Thursday", totalJobs: 10, deliveries: 7, collections: 3 },
-    { date: "2023-06-05", day: "Friday", totalJobs: 6, deliveries: 4, collections: 2 },
-  ];
-  
-  // Generate mock data for vehicle statistics
-  const vehicleStats: VehicleStats[] = [
-    { vehicle: "QTR-1234", totalJobs: 18, deliveries: 12, collections: 6 },
-    { vehicle: "QTR-5678", totalJobs: 15, deliveries: 9, collections: 6 },
-    { vehicle: "QTR-9012", totalJobs: 12, deliveries: 7, collections: 5 },
-  ];
+  // Real vehicle statistics from actual jobs
+  const vehicleStatsArray: VehicleStats[] = Object.entries(vehicleStats).map(([vehicle, stats]) => ({
+    vehicle,
+    totalJobs: stats.total,
+    deliveries: realJobs.filter(job => job.vehicle === vehicle && job.jobType === 'DELIVERY').length,
+    collections: realJobs.filter(job => job.vehicle === vehicle && job.jobType === 'COLLECTION').length
+  }));
   
   const vehicleTotals = {
-    totalJobs: vehicleStats.reduce((sum, stat) => sum + stat.totalJobs, 0),
-    totalDeliveries: vehicleStats.reduce((sum, stat) => sum + stat.deliveries, 0),
-    totalCollections: vehicleStats.reduce((sum, stat) => sum + stat.collections, 0),
+    totalJobs: vehicleStatsArray.reduce((sum, stat) => sum + stat.totalJobs, 0),
+    totalDeliveries: vehicleStatsArray.reduce((sum, stat) => sum + stat.deliveries, 0),
+    totalCollections: vehicleStatsArray.reduce((sum, stat) => sum + stat.collections, 0),
   };
   
   if (isLoading) {
@@ -56,14 +73,7 @@ const QatarDashboard = () => {
   return (
     <Layout title="Qatar Dashboard">
       <DashboardHeader />
-      <StatCards 
-        stats={{
-          total: jobStats.total,
-          completed: jobStats.completed,
-          inProgress: jobStats.inProgress,
-          pending: jobStats.pending
-        }}
-      />
+      <StatCards stats={jobStats} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
           <JobListing jobs={recentJobs} />
@@ -73,7 +83,7 @@ const QatarDashboard = () => {
         </div>
       </div>
       <VehicleStatistics 
-        vehicleStats={vehicleStats} 
+        vehicleStats={vehicleStatsArray} 
         totals={vehicleTotals} 
       />
     </Layout>
