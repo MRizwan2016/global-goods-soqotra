@@ -115,11 +115,52 @@ export class CustomerDetailsService {
       const customer = this.getCustomerDetailsByMobile(mobileNumber);
       if (customer) {
         customer.jobNumber = jobNumber;
+        customer.lastUsed = new Date().toISOString();
         this.storeCustomerDetails(customer);
         console.log(`Linked job ${jobNumber} to customer with mobile ${mobileNumber}`);
+      } else {
+        console.log(`No customer found to link job ${jobNumber} to mobile ${mobileNumber}`);
       }
     } catch (error) {
       console.error('Error linking job to customer:', error);
+    }
+  }
+
+  /**
+   * Create or update customer details from invoice data
+   */
+  static createFromInvoiceData(
+    mobileNumber: string,
+    shipperName: string,
+    shipperCity: string,
+    jobNumber?: string
+  ): void {
+    try {
+      const customerDetails: CustomerDetails = {
+        mobileNumber,
+        shipperPrefix: '',
+        shipperName,
+        shipperCity,
+        shipperAddress: '',
+        shipperEmail: '',
+        shipperIdNumber: '',
+        shipperCountry: 'Qatar',
+        consigneePrefix: '',
+        consigneeName: shipperName, // Default to same as shipper
+        consigneeCity: shipperCity,
+        consigneeAddress: '',
+        consigneeMobile: '',
+        consigneeEmail: '',
+        consigneeIdNumber: '',
+        consigneeCountry: 'Qatar',
+        jobNumber,
+        lastUsed: new Date().toISOString()
+      };
+      
+      this.storeCustomerDetails(customerDetails);
+      console.log(`Created customer details from invoice data for mobile: ${mobileNumber}`);
+    } catch (error) {
+      console.error('Error creating customer from invoice data:', error);
     }
   }
 

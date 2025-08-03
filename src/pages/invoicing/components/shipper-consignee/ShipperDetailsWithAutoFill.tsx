@@ -58,12 +58,13 @@ const ShipperDetailsWithAutoFill: React.FC<ShipperDetailsProps> = ({
       // Try to find existing customer details
       const customerDetails = CustomerDetailsService.getCustomerDetailsByMobile(value);
       if (customerDetails) {
-        // Auto-fill shipper details
+        // Auto-fill shipper details including job number
         const fieldsToFill = [
           { field: 'shipper1', value: customerDetails.shipperName },
           { field: 'collectionAddress', value: customerDetails.shipperAddress },
           { field: 'shipperCity', value: customerDetails.shipperCity },
-          { field: 'shipperIdNumber', value: customerDetails.shipperIdNumber }
+          { field: 'shipperIdNumber', value: customerDetails.shipperIdNumber },
+          { field: 'jobNumber', value: customerDetails.jobNumber || '' }
         ];
         
         fieldsToFill.forEach(({ field, value: fieldValue }) => {
@@ -103,7 +104,9 @@ const ShipperDetailsWithAutoFill: React.FC<ShipperDetailsProps> = ({
           });
         }
         
-        toast.success(`Auto-filled details for mobile ${value}`);
+        toast.success(`Auto-filled details including Job Number for mobile ${value}`);
+      } else {
+        console.log(`No customer details found for mobile: ${value}`);
       }
     }
   };
