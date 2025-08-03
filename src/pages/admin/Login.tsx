@@ -19,8 +19,7 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const auth = useAuth();
-  const { login, isAuthenticated, users } = auth || {};
+  const { login, isAuthenticated, users } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);

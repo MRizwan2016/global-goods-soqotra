@@ -1,19 +1,10 @@
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useParams } from "react-router-dom";
+import { InvoiceDetailsView } from "@/components/reports/InvoiceDetailsView";
 
 const UPBInvoicePrint = () => {
-  return (
-    <div className="container mx-auto p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl text-soqotra-blue">UPB Invoice Print</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>UPB Invoice print functionality will be implemented here.</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  // Use the existing InvoiceDetailsView component for proper invoice display
+  return <InvoiceDetailsView />;
 };
 
 export default UPBInvoicePrint;

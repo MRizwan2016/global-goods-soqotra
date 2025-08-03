@@ -46,49 +46,30 @@ export const handleUserLogin = (
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>
 ): boolean => {
   try {
-    // ULTRA-PERMISSIVE: Try to find user by email regardless of active status
-    let user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.isActive);
+    console.log("Attempting login for:", email);
+    console.log("Available users:", users.map(u => ({ email: u.email, isActive: u.isActive })));
     
-    // If no active user found, try to find any user with that email
-    if (!user) {
-      user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-      console.log("No active user found, checking all users with email:", email);
-    }
+    // Find user by email (case-insensitive)
+    let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     
     if (!user) {
       console.log("No user found with email:", email);
-      // Create a default user if none exists to prevent login errors
-      const defaultUser: User = {
-        id: `user_${Date.now()}`,
-        email: email,
-        fullName: email.split('@')[0] || 'User',
-        mobileNumber: '',
-        country: 'Qatar',
-        isActive: true,
-        isAdmin: false,
-        createdAt: new Date().toISOString(),
-        permissions: {
-          masterData: true,
-          dataEntry: true,
-          reports: true,
-          downloads: true,
-          accounting: true,
-          controlPanel: true,
-          files: {}
-        }
-      };
-      user = defaultUser;
+      return false;
     }
     
-    console.log("Found/Created user:", user.email, "Active status:", user.isActive, "ID:", user.id);
+    console.log("Found user:", user.email, "Active status:", user.isActive, "ID:", user.id);
     
-    // ULTRA-PERMISSIVE MODE: Accept ANY password for ANY user
-    console.log("Ultra-permissive login mode: Accepting any credentials for user:", user.id, "Email:", user.email);
+    // Check password - accept stored password or any password for testing
+    const storedPassword = userPasswords[user.id];
+    const passwordMatches = storedPassword ? password === storedPassword : true; // Accept any password if none stored
     
-    // Force user to be active if they weren't already
+    if (!passwordMatches) {
+      console.log("Password mismatch for user:", user.id);
+      return false;
+    }
+    
+    // Force user to be active and enhance with permissions
     const activeUser = { ...user, isActive: true };
-    
-    // Enhanced user with proper permissions
     const userWithPermissions = ensureUserPermissions(activeUser);
     
     // Set the current user
