@@ -24,6 +24,7 @@ export interface EritreaFormData {
   salesRep: string;
   driver: string;
   district: string;
+  jobNumber: string;
   
   // Invoice Book Details
   bookNumber: string;
@@ -91,6 +92,7 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     salesRep: "",
     driver: "",
     district: "",
+    jobNumber: "",
     bookNumber: "",
     isInvoiceActivated: false,
     doorToDoor: "NO",
@@ -272,20 +274,30 @@ export const useEritreaInvoice = (invoiceId?: string) => {
 
   const addPackageItem = () => {
     if (!packageInput.name || !packageInput.length || !packageInput.width || 
-        !packageInput.height || !packageInput.weight || !packageInput.quantity) {
-      toast.error("Please fill all package details");
+        !packageInput.height || !packageInput.quantity) {
+      toast.error("Please fill package name, dimensions, and quantity");
       return;
     }
 
     const length = parseFloat(packageInput.length);
     const width = parseFloat(packageInput.width);
     const height = parseFloat(packageInput.height);
-    const weight = parseFloat(packageInput.weight);
+    let weight = parseFloat(packageInput.weight) || 0;
     const quantity = parseInt(packageInput.quantity);
 
     const cubicMetre = (length * width * height) / 1000000; // Convert cm³ to m³
     const cubicFeet = calculateCubicFeet(cubicMetre);
     const volumeWeight = calculateVolumeWeight(length, width, height);
+
+    // Auto-calculate weight if not provided - use volume weight if greater than actual weight
+    if (!packageInput.weight || weight === 0) {
+      weight = volumeWeight;
+      toast.info(`Auto-calculated weight: ${weight.toFixed(2)} kg based on volume`);
+    } else if (volumeWeight > weight) {
+      // Use the greater of actual weight and volume weight (chargeable weight)
+      weight = volumeWeight;
+      toast.info(`Using volume weight: ${weight.toFixed(2)} kg (greater than actual weight)`);
+    }
 
     const newPackageItem: EritreaPackageItem = {
       id: Date.now().toString(),

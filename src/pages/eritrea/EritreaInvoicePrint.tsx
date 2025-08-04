@@ -255,13 +255,13 @@ const EritreaInvoicePrint = () => {
               {/* Title Section */}
               <div style={{ flex: 1, textAlign: 'center' }}>
                 <div style={{ fontSize: '18px', fontWeight: 'bold', margin: '0' }}>
-                  SOQOTRA SOLUTION WLL
+                  DHL EXPRESS
                 </div>
                 <div style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '5px' }}>
-                  COLLECTION / DELIVERY JOB SHEET
+                  Mussawa branch
                 </div>
                 <div style={{ fontSize: '12px', marginTop: '5px' }}>
-                  (SCHEDULE NO: 3820-744)
+                  Mr. Idries Omar Idries, Mobile No. +291 7159848
                 </div>
               </div>
               
@@ -303,8 +303,12 @@ const EritreaInvoicePrint = () => {
                     <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.invoiceDate || displayData.formData?.invoiceDate}</td>
                   </tr>
                   <tr>
+                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>JOB NO.</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.jobNumber || displayData.formData?.jobNumber || displayData.associatedJobNumber || ""}</td>
+                  </tr>
+                  <tr>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>SALES REP</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>Mr. Yousuf</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>Mr. Idries Omar Idries</td>
                   </tr>
                 </table>
               </div>

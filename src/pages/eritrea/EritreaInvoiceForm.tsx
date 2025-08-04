@@ -118,7 +118,7 @@ const EritreaInvoiceForm = () => {
         consigneeEmail: formData.consigneeEmail,
         consigneeIdNumber: formData.consigneeIdNumber,
         consigneeCountry: formData.consigneeCountry,
-        jobNumber: associatedJobNumber,
+        jobNumber: formData.jobNumber || associatedJobNumber,
         lastUsed: new Date().toISOString()
       };
       CustomerDetailsService.storeCustomerDetails(customerDetails);
@@ -190,6 +190,7 @@ const EritreaInvoiceForm = () => {
         const jobNumber = JobNumberService.getJobNumberByMobile(value);
         if (jobNumber) {
           setAssociatedJobNumber(jobNumber);
+          handleFormChange('jobNumber', jobNumber);
           toast.success(`Auto-filled details for mobile ${value}. Job Number: ${jobNumber}`);
         } else {
           toast.success(`Auto-filled details for mobile ${value}`);
@@ -199,9 +200,11 @@ const EritreaInvoiceForm = () => {
         const jobNumber = JobNumberService.getJobNumberByMobile(value);
         if (jobNumber) {
           setAssociatedJobNumber(jobNumber);
+          handleFormChange('jobNumber', jobNumber);
           toast.info(`Found Job Number: ${jobNumber} for mobile ${value}`);
         } else {
           setAssociatedJobNumber("");
+          handleFormChange('jobNumber', "");
         }
       }
     }
@@ -407,6 +410,21 @@ const EritreaInvoiceForm = () => {
                 />
               </div>
 
+              {/* Job Number */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">JOB NUMBER:</label>
+                <Input
+                  type="text"
+                  value={formData.jobNumber || associatedJobNumber}
+                  onChange={(e) => {
+                    handleFormChange('jobNumber', e.target.value);
+                    setAssociatedJobNumber(e.target.value);
+                  }}
+                  placeholder="Job Number"
+                  className={associatedJobNumber ? "bg-green-50 border-green-300" : ""}
+                />
+              </div>
+
               {/* Invoice Date */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">INVOICE DATE:</label>
@@ -545,52 +563,54 @@ const EritreaInvoiceForm = () => {
               Insert Package
             </Button>
             
-            {/* Package Items Table */}
+            {/* Package Items Table with Scroll */}
             <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-blue-500 hover:bg-blue-500">
-                    <TableHead className="text-white">No.</TableHead>
-                    <TableHead className="text-white">PACKAGE</TableHead>
-                    <TableHead className="text-white">DIMENSIONS</TableHead>
-                    <TableHead className="text-white">VOLUME (m³)</TableHead>
-                    <TableHead className="text-white">WEIGHT (kg)</TableHead>
-                    <TableHead className="text-white">QTY</TableHead>
-                    <TableHead className="text-white">VOL. WEIGHT</TableHead>
-                    <TableHead className="text-white">ACTIONS</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {packageItems.map((item, index) => (
-                    <TableRow key={item.id}>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell>{item.length}×{item.width}×{item.height} cm</TableCell>
-                      <TableCell>{item.cubicMetre.toFixed(3)}</TableCell>
-                      <TableCell>{item.weight}</TableCell>
-                      <TableCell>{item.quantity}</TableCell>
-                      <TableCell>{item.volumeWeight.toFixed(2)} kg</TableCell>
-                      <TableCell>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-red-600"
-                          onClick={() => removePackageItem(item.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
+              <div className="max-h-96 overflow-y-auto">
+                <Table>
+                  <TableHeader className="sticky top-0 z-10 bg-blue-500">
+                    <TableRow className="bg-blue-500 hover:bg-blue-500">
+                      <TableHead className="text-white">No.</TableHead>
+                      <TableHead className="text-white">PACKAGE</TableHead>
+                      <TableHead className="text-white">DIMENSIONS</TableHead>
+                      <TableHead className="text-white">VOLUME (m³)</TableHead>
+                      <TableHead className="text-white">WEIGHT (kg)</TableHead>
+                      <TableHead className="text-white">QTY</TableHead>
+                      <TableHead className="text-white">VOL. WEIGHT</TableHead>
+                      <TableHead className="text-white">ACTIONS</TableHead>
                     </TableRow>
-                  ))}
-                  {packageItems.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={8} className="text-center text-gray-500 py-8">
-                        No packages added yet. Use the form above to add packages.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {packageItems.map((item, index) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell className="font-medium">{item.name}</TableCell>
+                        <TableCell>{item.length}×{item.width}×{item.height} cm</TableCell>
+                        <TableCell>{item.cubicMetre.toFixed(3)}</TableCell>
+                        <TableCell>{item.weight}</TableCell>
+                        <TableCell>{item.quantity}</TableCell>
+                        <TableCell>{item.volumeWeight.toFixed(2)} kg</TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-600"
+                            onClick={() => removePackageItem(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {packageItems.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={8} className="text-center text-gray-500 py-8">
+                          No packages added yet. Use the form above to add packages.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
             </div>
 
             {/* Package Summary */}
