@@ -296,15 +296,15 @@ const EritreaInvoicePrint = () => {
                 <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>INVOICE</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.invoiceNumber || displayData.formData?.invoiceNumber}</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.formData?.invoiceNumber || displayData.invoiceNumber || "010000"}</td>
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>DATE</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.invoiceDate || displayData.formData?.invoiceDate}</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.formData?.invoiceDate || displayData.invoiceDate || new Date().toISOString().split('T')[0]}</td>
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>JOB NO.</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.jobNumber || displayData.formData?.jobNumber || displayData.associatedJobNumber || ""}</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.formData?.jobNumber || displayData.jobNumber || displayData.associatedJobNumber || displayData.formData?.invoiceNumber || "010000"}</td>
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>SALES REP</td>
@@ -325,7 +325,7 @@ const EritreaInvoicePrint = () => {
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>
-                      {displayData.shipperPrefix} {displayData.shipperName || displayData.shippingDetails?.shipper1 || "MR. MOHAMED YACOOB"}
+                      {displayData.formData?.shipperPrefix || displayData.shipperPrefix || "MR."} {displayData.formData?.shipperName || displayData.shipperName || displayData.shippingDetails?.shipper1 || "MOHAMED YACOOB"}
                     </td>
                   </tr>
                   <tr>
@@ -337,7 +337,7 @@ const EritreaInvoicePrint = () => {
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px' }} colSpan={2}>
-                      {displayData.shipperCity || displayData.shippingDetails?.town || "UMM SALAAL ALI, QATAR"}
+                      {displayData.formData?.shipperCity || displayData.shipperCity || displayData.shippingDetails?.town || "UMM SALAAL ALI, QATAR"}
                     </td>
                   </tr>
                   <tr>
@@ -364,7 +364,7 @@ const EritreaInvoicePrint = () => {
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>
-                      {displayData.consigneePrefix} {displayData.consigneeName || displayData.shippingDetails?.consignee1 || "MRS. MOHAMED IDRIES"}
+                      {displayData.formData?.consigneePrefix || displayData.consigneePrefix || "MRS."} {displayData.formData?.consigneeName || displayData.consigneeName || displayData.shippingDetails?.consignee1 || "MOHAMED IDRIES"}
                     </td>
                   </tr>
                   <tr>
@@ -376,7 +376,7 @@ const EritreaInvoicePrint = () => {
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px' }} colSpan={2}>
-                      {displayData.consigneeCity || displayData.shippingDetails?.consigneeTown || "KEREN, ASMARA, ERITREA"}
+                      {displayData.formData?.consigneeCity || displayData.consigneeCity || displayData.shippingDetails?.consigneeTown || "KEREN, ASMARA, ERITREA"}
                     </td>
                   </tr>
                   <tr>
@@ -410,12 +410,12 @@ const EritreaInvoicePrint = () => {
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold', backgroundColor: '#f0f0f0' }}>COUNTRY/ORIGIN</td>
                   </tr>
                   <tr>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>ASMARA</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>ERITREA</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.formData?.warehouse || displayData.warehouse || "ASMARA"}</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.formData?.sector || displayData.sector || "ERITREA"}</td>
                     <td style={{ border: '1px solid #000', padding: '5px', color: displayData.paymentStatus === 'PAID' ? '#16a34a' : '#dc2626', fontWeight: 'bold' }}>
-                      {displayData.paymentStatus || "PAID/UNPAID"}
+                      {displayData.paymentStatus || displayData.formData?.paymentStatus || "UNPAID"}
                     </td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>CASH/ONLINE</td>
+                    <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.formData?.paymentMode || displayData.paymentMode || "CASH"}</td>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>QATAR</td>
                   </tr>
                 </table>
