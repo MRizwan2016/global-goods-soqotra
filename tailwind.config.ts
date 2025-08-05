@@ -124,6 +124,8 @@ export default {
 			},
 			fontFamily: {
 				sans: ['Segoe UI', 'Tahoma', 'Geneva', 'Verdana', 'sans-serif'],
+				'arabic': ['Cairo', 'sans-serif'],
+				'nuska': ['NUSKA', 'Cairo', 'sans-serif'],
 			}
 		}
 	},

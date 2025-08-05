@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=NUSKA:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -86,6 +87,10 @@
   
   .font-arabic {
     font-family: 'Cairo', sans-serif;
+  }
+  
+  .font-nuska {
+    font-family: 'NUSKA', 'Cairo', sans-serif;
   }
   
   [dir="rtl"] {

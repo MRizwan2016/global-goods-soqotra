@@ -80,7 +80,7 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
               {/* Company Info - Left side */}
               <div className="flex-1">
                 <h1 className="text-lg font-bold text-blue-900 leading-tight">
-                  SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL
+                  SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL.
                 </h1>
                 <div className="text-sm text-gray-600 mt-3 leading-relaxed">
                   <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING 53, STREET NO. 76</p>
@@ -253,9 +253,21 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
             </div>
           </div>
 
-          {/* QR Code Section */}
-          <div className="mt-6 flex justify-end">
-            <div className="text-center">
+          {/* QR Code and Delivery Agent Section */}
+          <div className="mt-6 flex justify-between items-start">
+            {/* Destination Delivery Agent - Left side */}
+            <div className="flex-1">
+              <div className="border border-gray-300 p-3 bg-blue-50 rounded">
+                <h4 className="font-bold text-sm text-blue-900 mb-2">DESTINATION DELIVERY AGENT</h4>
+                <p className="font-bold text-lg">DHL EXPRESS</p>
+                <p className="text-sm">Massawa Branch, Eritrea</p>
+                <p className="text-xs text-gray-600">Contact: Mr. Idries Omar Idries</p>
+                <p className="text-xs text-gray-600">Mobile: +291 7159848</p>
+              </div>
+            </div>
+            
+            {/* QR Code - Right side */}
+            <div className="text-center ml-4">
               <QRCodeSVG 
                 value={generateQRData()} 
                 size={120} 

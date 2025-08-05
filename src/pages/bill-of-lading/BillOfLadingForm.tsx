@@ -1,226 +1,210 @@
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { mockBLData } from "./components/mockData";
-import BLHeader from "./components/BLHeader";
-import PartyInformation from "./components/PartyInformation";
-import ShippingDetails from "./components/ShippingDetails";
-import CargoDetails from "./components/CargoDetails";
-import FormActions from "./components/FormActions";
-import { getBillOfLadingById, saveBillOfLading } from "./services/BillOfLadingService";
 
 const BillOfLadingForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const isEditing = Boolean(id);
-  
-  // Get the existing record from our service
-  const existingBL = isEditing ? getBillOfLadingById(id!) : null;
-    
-  const [formState, setFormState] = useState({
-    blNumber: existingBL?.blNumber || "",
-    date: existingBL?.date || "",
-    shipper: existingBL?.shipper || "",
-    shipperAddress: existingBL?.shipperAddress || "",
-    consignee: existingBL?.consignee || "",
-    consigneeAddress: existingBL?.consigneeAddress || "",
-    notifyParty: existingBL?.notifyParty || "",
-    notifyPartyAddress: existingBL?.notifyPartyAddress || "",
-    deliveryAgent: existingBL?.deliveryAgent || "",
-    origin: existingBL?.origin || "",
-    destination: existingBL?.destination || "",
-    cargoType: existingBL?.cargoType || "Personal Effects",
-    vessel: existingBL?.vessel || "",
-    voyageNo: existingBL?.voyageNo || "",
-    loadingPort: existingBL?.loadingPort || "",
-    dischargePort: existingBL?.dischargePort || "",
-    grossWeight: existingBL?.grossWeight || "",
-    netWeight: existingBL?.netWeight || "",
-    measurement: existingBL?.measurement || "",
-    packages: existingBL?.packages || "",
-    marksAndNumbers: existingBL?.marksAndNumbers || "",
-    goodsDescription: existingBL?.goodsDescription || "",
-    containerNo: existingBL?.containerNo || "",
-    sealNo: existingBL?.sealNo || "",
-    status: existingBL?.status || "Shipped",
-    shippingMarks: existingBL?.shippingMarks || "",
-    freightCharges: existingBL?.freightCharges || "Prepaid",
-    placeOfIssue: existingBL?.placeOfIssue || "",
-    dateOfIssue: existingBL?.dateOfIssue || "",
-    vehicleMake: existingBL?.vehicleMake || "",
-    vehicleModel: existingBL?.vehicleModel || "",
-    vehicleYear: existingBL?.vehicleYear || "",
-    vehicleColor: existingBL?.vehicleColor || "",
-    chassisNumber: existingBL?.chassisNumber || "",
-    specialInstructions: existingBL?.specialInstructions || "",
+  const [isEditing] = useState(!!id);
+
+  const [blData, setBLData] = useState({
+    blNumber: "",
+    jobNumber: "",
+    shipperName: "",
+    shipperMobile: "",
+    consigneeName: "",
+    consigneeMobile: "",
+    deliveryAgentName: "",
+    cargoDescription: "",
+    grossWeight: "",
+    packagesNumber: ""
   });
 
-  // Use useEffect to update form state if existingBL changes (for example, if data is loaded asynchronously)
   useEffect(() => {
-    if (isEditing && existingBL) {
-      setFormState({
-        blNumber: existingBL.blNumber || "",
-        date: existingBL.date || "",
-        shipper: existingBL.shipper || "",
-        shipperAddress: existingBL.shipperAddress || "",
-        consignee: existingBL.consignee || "",
-        consigneeAddress: existingBL.consigneeAddress || "",
-        notifyParty: existingBL.notifyParty || "",
-        notifyPartyAddress: existingBL.notifyPartyAddress || "",
-        deliveryAgent: existingBL.deliveryAgent || "",
-        origin: existingBL.origin || "",
-        destination: existingBL.destination || "",
-        cargoType: existingBL.cargoType || "Personal Effects",
-        vessel: existingBL.vessel || "",
-        voyageNo: existingBL.voyageNo || "",
-        loadingPort: existingBL.loadingPort || "",
-        dischargePort: existingBL.dischargePort || "",
-        grossWeight: existingBL.grossWeight || "",
-        netWeight: existingBL.netWeight || "",
-        measurement: existingBL.measurement || "",
-        packages: existingBL.packages || "",
-        marksAndNumbers: existingBL.marksAndNumbers || "",
-        goodsDescription: existingBL.goodsDescription || "",
-        containerNo: existingBL.containerNo || "",
-        sealNo: existingBL.sealNo || "",
-        status: existingBL.status || "Shipped",
-        shippingMarks: existingBL.shippingMarks || "",
-        freightCharges: existingBL.freightCharges || "Prepaid",
-        placeOfIssue: existingBL.placeOfIssue || "",
-        dateOfIssue: existingBL.dateOfIssue || "",
-        vehicleMake: existingBL.vehicleMake || "",
-        vehicleModel: existingBL.vehicleModel || "",
-        vehicleYear: existingBL.vehicleYear || "",
-        vehicleColor: existingBL.vehicleColor || "",
-        chassisNumber: existingBL.chassisNumber || "",
-        specialInstructions: existingBL.specialInstructions || "",
-      });
+    if (!isEditing && !blData.blNumber) {
+      const timestamp = Date.now();
+      const blNumber = `BL${timestamp.toString().slice(-8)}`;
+      setBLData(prev => ({ ...prev, blNumber }));
     }
-  }, [isEditing, existingBL]);
+  }, [isEditing]);
 
-  // Destination countries
-  const destinations = [
-    "Colombo", 
-    "Nairobi", 
-    "Asmara", // Eritrea
-    "Khartoum", // Sudan
-    "Riyadh", // Saudi Arabia
-    "Dubai", // UAE
-    "Abu Dhabi", // UAE
-    "Mogadishu", // Somalia
-    "Tunis", // Tunisia - Added Tunisia
-    "Manila", // Philippines
-    "Other"
-  ];
+  // Auto-populate job number when mobile is entered
+  useEffect(() => {
+    if (blData.shipperMobile && blData.shipperMobile.length >= 10) {
+      const eritreaInvoices = JSON.parse(localStorage.getItem('eritreaInvoices') || '[]');
+      const customerFound = eritreaInvoices.find((inv: any) => 
+        inv.shipperMobile === blData.shipperMobile || inv.consigneeMobile === blData.shipperMobile
+      );
 
-  // Define cargo types based on destination
-  const getCargoTypes = (destination: string) => {
-    if (destination === "Tunis") {
-      return [
-        "Personal Effects",
-        "Household Goods",
-        "Car",
-        "Truck"
-      ];
+      if (customerFound) {
+        setBLData(prev => ({
+          ...prev,
+          jobNumber: customerFound.jobNumber || customerFound.invoiceNumber || "",
+          shipperName: customerFound.shipperName || "",
+          consigneeName: customerFound.consigneeName || ""
+        }));
+        toast.success("Customer details loaded from invoice records");
+      }
     }
-    
-    return [
-      "Personal Effects",
-      "Household Goods",
-      "Car",
-      "Truck",
-      "Commercial Goods",
-      "Other"
-    ];
-  };
-  
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    
-    // Special handling for destination to reset cargo type when destination changes
-    if (name === 'destination') {
-      setFormState(prev => ({
-        ...prev,
-        [name]: value,
-        cargoType: "Personal Effects" // Reset to default
-      }));
-    } else {
-      setFormState(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-  };
-  
-  const handleSave = () => {
-    if (!formState.blNumber) {
-      toast.error("Please enter a BL number");
-      return;
-    }
-    
-    if (!formState.date) {
-      toast.error("Please enter a date");
-      return;
-    }
-    
-    if (!formState.shipper) {
-      toast.error("Please enter shipper information");
-      return;
-    }
-    
-    if (!formState.consignee) {
-      toast.error("Please enter consignee information");
-      return;
-    }
-    
+  }, [blData.shipperMobile]);
+
+  const handleSave = async () => {
     try {
-      const blToSave = {
-        id: id || undefined,
-        ...formState
+      if (!blData.blNumber || !blData.shipperName || !blData.consigneeName) {
+        toast.error("BL Number, Shipper name, and Consignee name are required");
+        return;
+      }
+
+      const blRecord = {
+        ...blData,
+        id: blData.blNumber,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       };
+
+      const existingBLs = JSON.parse(localStorage.getItem('billsOfLading') || '[]');
+      existingBLs.push(blRecord);
+      localStorage.setItem('billsOfLading', JSON.stringify(existingBLs));
       
-      const savedBL = saveBillOfLading(blToSave);
-      console.log("Saved Bill of Lading:", savedBL);
-      toast.success("Bill of Lading saved successfully");
-      
-      navigate("/data-entry/bill-of-lading");
+      toast.success("Bill of Lading created successfully");
+      navigate("/bill-of-lading");
     } catch (error) {
       console.error("Error saving Bill of Lading:", error);
       toast.error("Failed to save Bill of Lading");
     }
   };
-  
+
   return (
-    <Layout title={isEditing ? "Update Bill of Lading" : "Create Bill of Lading"}>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <BLHeader 
-          formState={formState} 
-          handleInputChange={handleInputChange} 
-          isEditing={isEditing} 
-        />
-        
-        <div className="p-4">
-          <PartyInformation 
-            formState={formState} 
-            handleInputChange={handleInputChange} 
-          />
-          
-          <ShippingDetails 
-            formState={formState} 
-            handleInputChange={handleInputChange} 
-            destinations={destinations}
-            getCargoTypes={getCargoTypes}
-          />
-          
-          <CargoDetails 
-            formState={formState} 
-            handleInputChange={handleInputChange} 
-          />
-          
-          <FormActions handleSave={handleSave} />
+    <Layout title="House Bill of Lading">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold">Create House Bill of Lading</h1>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => navigate("/bill-of-lading")}>Back</Button>
+            <Button onClick={handleSave}>Create BL</Button>
+          </div>
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>BL Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>BL Number (Auto-generated)</Label>
+                <Input value={blData.blNumber} readOnly />
+              </div>
+              <div>
+                <Label>Job Number</Label>
+                <Input
+                  value={blData.jobNumber}
+                  onChange={(e) => setBLData(prev => ({ ...prev, jobNumber: e.target.value }))}
+                  placeholder="Auto-populated from mobile"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Shipper Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Shipper Name *</Label>
+              <Input
+                value={blData.shipperName}
+                onChange={(e) => setBLData(prev => ({ ...prev, shipperName: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Shipper Mobile (for auto-filling) *</Label>
+              <Input
+                value={blData.shipperMobile}
+                onChange={(e) => setBLData(prev => ({ ...prev, shipperMobile: e.target.value }))}
+                placeholder="Enter mobile to auto-fill job number"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Consignee Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Consignee Name *</Label>
+              <Input
+                value={blData.consigneeName}
+                onChange={(e) => setBLData(prev => ({ ...prev, consigneeName: e.target.value }))}
+              />
+            </div>
+            <div>
+              <Label>Consignee Mobile</Label>
+              <Input
+                value={blData.consigneeMobile}
+                onChange={(e) => setBLData(prev => ({ ...prev, consigneeMobile: e.target.value }))}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Delivery Agent (Leave blank for destination update)</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div>
+              <Label>Agent Name</Label>
+              <Input
+                value={blData.deliveryAgentName}
+                onChange={(e) => setBLData(prev => ({ ...prev, deliveryAgentName: e.target.value }))}
+                placeholder="To be updated at destination"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Cargo Details</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Description of Goods</Label>
+              <Textarea
+                value={blData.cargoDescription}
+                onChange={(e) => setBLData(prev => ({ ...prev, cargoDescription: e.target.value }))}
+                rows={4}
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Number of Packages</Label>
+                <Input
+                  value={blData.packagesNumber}
+                  onChange={(e) => setBLData(prev => ({ ...prev, packagesNumber: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label>Gross Weight</Label>
+                <Input
+                  value={blData.grossWeight}
+                  onChange={(e) => setBLData(prev => ({ ...prev, grossWeight: e.target.value }))}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

@@ -243,14 +243,15 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguage] = useState<Language>("en");
   
   useEffect(() => {
-    // Add Arabic font class to body when language is Arabic
+    // Add NUSKA font class to body when language is Arabic
     document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
     document.documentElement.lang = language;
     
     if (language === 'ar') {
-      document.body.classList.add('font-arabic');
-    } else {
       document.body.classList.remove('font-arabic');
+      document.body.classList.add('font-nuska');
+    } else {
+      document.body.classList.remove('font-arabic', 'font-nuska');
     }
   }, [language]);
 

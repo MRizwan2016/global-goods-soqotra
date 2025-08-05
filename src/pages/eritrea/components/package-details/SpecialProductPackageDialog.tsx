@@ -18,7 +18,17 @@ const SPECIAL_PRODUCTS = [
   "REFRIDGERATORS",
   "MICROWAVE OVEN",
   "OVEN",
-  "MATTRESS"
+  "MATTRESS",
+  "BEDROOM GLASS SET",
+  "DINING TABLE SET",
+  "SOFA SET",
+  "WARDROBE",
+  "KITCHEN APPLIANCES",
+  "AIR CONDITIONER",
+  "ELECTRONICS",
+  "HOUSEHOLD ITEMS",
+  "PERSONAL EFFECTS",
+  "CUSTOM PRODUCT"
 ];
 
 const SpecialProductPackageDialog: React.FC<SpecialProductPackageDialogProps> = ({

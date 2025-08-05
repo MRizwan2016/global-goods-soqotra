@@ -39,7 +39,14 @@ const EritreaDashboard = () => {
   // Real data will come from localStorage invoices only
 
   // Transform loaded invoices to display format - only show real data
-  const shipmentData = invoices.map((invoice, index) => ({
+  // Sort invoices by invoice number for sequential display
+  const sortedInvoices = [...invoices].sort((a, b) => {
+    const aNum = a.invoiceNumber || a.id;
+    const bNum = b.invoiceNumber || b.id;
+    return aNum.localeCompare(bNum);
+  });
+  
+  const shipmentData = sortedInvoices.map((invoice, index) => ({
     id: invoice.id || invoice.invoiceNumber,
     invoiceDate: new Date(invoice.invoiceDate || invoice.createdAt).toLocaleDateString('en-GB'),
     customer: `${invoice.consigneePrefix || ''} ${invoice.consigneeName || 'N/A'}`.trim(),
