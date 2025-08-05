@@ -807,16 +807,16 @@ const EritreaInvoiceForm = () => {
                 <div className="bg-gray-50 p-4 rounded-lg space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="font-medium">GROSS TOTAL:</span>
-                    <span className="text-lg font-bold">{formData.gross.toFixed(2)} QAR</span>
+                    <span className="text-lg font-bold">{(formData.gross || 0).toFixed(2)} QAR</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="font-medium">DISCOUNT:</span>
-                    <span className="text-lg font-bold text-red-600">-{formData.discount.toFixed(2)} QAR</span>
+                    <span className="text-lg font-bold text-red-600">-{(formData.discount || 0).toFixed(2)} QAR</span>
                   </div>
                   <hr className="border-gray-300" />
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-lg">NET TOTAL:</span>
-                    <span className="text-2xl font-bold text-green-600">{formData.net.toFixed(2)} QAR</span>
+                    <span className="text-2xl font-bold text-green-600">{(formData.net || 0).toFixed(2)} QAR</span>
                   </div>
                 </div>
 

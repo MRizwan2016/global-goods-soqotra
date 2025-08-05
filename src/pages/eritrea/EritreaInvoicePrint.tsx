@@ -306,10 +306,10 @@ const EritreaInvoicePrint = () => {
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>JOB NO.</td>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.formData?.jobNumber || displayData.jobNumber || displayData.associatedJobNumber || displayData.formData?.invoiceNumber || "010000"}</td>
                   </tr>
-                  <tr>
-                    <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>SALES REP</td>
-                    <td style={{ border: '1px solid #000', padding: '5px' }}>Mr. Idries Omar Idries</td>
-                  </tr>
+                   <tr>
+                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>SALES REP</td>
+                     <td style={{ border: '1px solid #000', padding: '5px' }}>{displayData.formData?.salesRep || displayData.salesRep || "Mr. Idries Omar Idries"}</td>
+                   </tr>
                 </table>
               </div>
             </div>
@@ -513,38 +513,38 @@ const EritreaInvoicePrint = () => {
               </div>
               
               <div style={{ padding: '10px' }}>
-                <table style={{ fontSize: '12px', borderCollapse: 'collapse' }}>
-                  <tr>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>FREIGHT</td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>650.00</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>DOCUMENTS FEE</td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>200.00</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>DISCOUNT</td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>-</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>PACKING FEE</td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>-</td>
-                  </tr>
-                  <tr>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>TRANSPORTATION</td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
-                    <td style={{ padding: '5px', textAlign: 'right' }}>-</td>
-                  </tr>
-                  <tr style={{ borderTop: '1px solid #000' }}>
-                    <td style={{ padding: '5px', textAlign: 'right', fontWeight: 'bold' }}>TOTAL</td>
-                    <td style={{ padding: '5px', textAlign: 'right', fontWeight: 'bold' }}>QAR</td>
-                    <td style={{ padding: '5px', textAlign: 'right', fontWeight: 'bold' }}>850.00</td>
-                  </tr>
-                </table>
+               <table style={{ fontSize: '12px', borderCollapse: 'collapse' }}>
+                   <tr>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>FREIGHT</td>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>{(displayData.formData?.freight || displayData.freight || 650).toFixed(2)}</td>
+                   </tr>
+                   <tr>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>DOCUMENTS FEE</td>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>{(displayData.formData?.documentsFee || displayData.documentsFee || 200).toFixed(2)}</td>
+                   </tr>
+                   <tr>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>DISCOUNT</td>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>{displayData.formData?.discount > 0 ? `-${displayData.formData.discount.toFixed(2)}` : displayData.discount > 0 ? `-${displayData.discount.toFixed(2)}` : '-'}</td>
+                   </tr>
+                   <tr>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>PACKING FEE</td>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>{displayData.formData?.packing > 0 ? displayData.formData.packing.toFixed(2) : displayData.packing > 0 ? displayData.packing.toFixed(2) : '-'}</td>
+                   </tr>
+                   <tr>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>TRANSPORTATION</td>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>QAR</td>
+                     <td style={{ padding: '5px', textAlign: 'right' }}>{displayData.formData?.localTransport > 0 ? displayData.formData.localTransport.toFixed(2) : displayData.localTransport > 0 ? displayData.localTransport.toFixed(2) : '-'}</td>
+                   </tr>
+                   <tr style={{ borderTop: '1px solid #000' }}>
+                     <td style={{ padding: '5px', textAlign: 'right', fontWeight: 'bold' }}>TOTAL</td>
+                     <td style={{ padding: '5px', textAlign: 'right', fontWeight: 'bold' }}>QAR</td>
+                     <td style={{ padding: '5px', textAlign: 'right', fontWeight: 'bold' }}>{(displayData.formData?.net || displayData.net || 850).toFixed(2)}</td>
+                   </tr>
+                 </table>
                 <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '14px', marginTop: '10px', color: displayData.paymentStatus === 'PAID' ? '#16a34a' : '#dc2626' }}>
                   {displayData.paymentStatus === 'PAID' ? 'PAID' : 'PAID / UNPAID'}
                 </div>
