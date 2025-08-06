@@ -82,10 +82,8 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
                 <h1 className="text-lg font-bold text-black leading-tight">
                   SOQOTRA
                 </h1>
-                <div className="text-right mt-2">
-                  <h2 className="text-xl font-bold text-black">DHL EXPRESS</h2>
-                  <p className="text-lg font-bold text-black">MUSSAWA BRANCH</p>
-                  <p className="text-sm text-black mt-1">MR. IDRIES OMAR IDRIES, MOBILE NO. +291 7159848</p>
+                <div className="mt-8">
+                  <p className="text-sm text-black">MR. IDRIES OMAR IDRIES, MOBILE NO. +291 7159848</p>
                 </div>
               </div>
               
