@@ -25,6 +25,7 @@ export interface EritreaFormData {
   driver: string;
   district: string;
   jobNumber: string;
+  jobDate: string;
   
   // Invoice Book Details
   bookNumber: string;
@@ -93,6 +94,7 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     driver: "",
     district: "",
     jobNumber: "",
+    jobDate: new Date().toISOString().split('T')[0],
     bookNumber: "",
     isInvoiceActivated: false,
     doorToDoor: "NO",

@@ -79,80 +79,153 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
             <div className="flex justify-between items-start">
               {/* Company Info - Left side */}
               <div className="flex-1">
-                <h1 className="text-lg font-bold text-blue-900 leading-tight">
-                  SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL.
+                <h1 className="text-lg font-bold text-black leading-tight">
+                  SOQOTRA
                 </h1>
-                <div className="text-sm text-gray-600 mt-3 leading-relaxed">
-                  <p>OFFICE NO. 3, 1ST FLOOR, ZONE 55, BUILDING 53, STREET NO. 76</p>
-                  <p>AZIZIA COMMERCIAL STREET, DOHA - QATAR</p>
-                  <p>EMAIL: ACCOUNTS@SOQOTRALOGISTICS.COM</p>
+                <div className="text-right mt-2">
+                  <h2 className="text-xl font-bold text-black">DHL EXPRESS</h2>
+                  <p className="text-lg font-bold text-black">MUSSAWA BRANCH</p>
+                  <p className="text-sm text-black mt-1">MR. IDRIES OMAR IDRIES, MOBILE NO. +291 7159848</p>
                 </div>
               </div>
               
               {/* Invoice Info - Right side */}
-              <div className="text-right">
-                <div className="border-2 border-gray-300 p-4 rounded">
-                  <h2 className="text-2xl font-bold">INVOICE</h2>
-                  <p className="text-lg font-semibold">#{formData.invoiceNumber || "010000"}</p>
-                  <p className="text-sm">DATE: {formData.invoiceDate || new Date().toISOString().split('T')[0]}</p>
-                  <p className="text-sm">PRINT DATE: {new Date().toLocaleDateString()}</p>
-                </div>
+            <div className="text-right">
+                <table className="border border-gray-300 text-sm" style={{ width: '350px' }}>
+                  <tbody>
+                    <tr>
+                      <td className="border border-gray-300 p-2 bg-gray-100 font-bold text-center" colSpan={2}>INVOICE</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-gray-300 p-2 font-bold">INVOICE</td>
+                      <td className="border border-gray-300 p-2">{formData.invoiceNumber || "010000"}</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-gray-300 p-2 font-bold">DATE</td>
+                      <td className="border border-gray-300 p-2">{formData.invoiceDate || new Date().toISOString().split('T')[0]}</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-gray-300 p-2 font-bold">JOB NO.</td>
+                      <td className="border border-gray-300 p-2">{formData.jobNumber || "010000"}</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-gray-300 p-2 font-bold">SALES REP</td>
+                      <td className="border border-gray-300 p-2">{formData.salesRep || "MR_YOUSUF"}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
+            </div>
+          </div>
+
+          {/* QR Code - Top right corner */}
+          <div className="absolute top-4 right-4 z-10">
+            <div className="border border-gray-300 p-2 bg-white rounded">
+              <p className="text-xs font-bold text-center mb-1">PAGE</p>
+              <p className="text-lg font-bold text-center">1</p>
+              <p className="text-xs text-center mt-2">QR CODE</p>
+              <QRCodeSVG 
+                value={generateQRData()} 
+                size={80} 
+                bgColor="#ffffff"
+                fgColor="#000000"
+                level="M"
+                includeMargin={true}
+              />
+              <p className="text-xs font-bold text-center mt-1">ERITREA</p>
             </div>
           </div>
 
           {/* Shipper and Consignee */}
           <div className="grid grid-cols-2 gap-8 mb-8">
-            <div className="border border-gray-300 p-4">
-              <h3 className="font-bold text-lg mb-3 text-blue-900">SHIPPER</h3>
-              <p className="font-semibold">{shippingDetails.shipper1 || "INSAF M M M"}</p>
-              <p>{shippingDetails.shipper2 || "AZHAR A S M"}</p>
-              <p className="mt-2 font-medium text-red-600">{shippingDetails.town || "THUMAMA, DOHA"}</p>
-              <p className="mt-2"><span className="font-medium">MOBILE:</span> {shippingDetails.mobile || "+94771234567"}</p>
+            <div>
+              <table className="w-full border border-gray-300">
+                <tbody>
+                  <tr>
+                    <td className="border border-gray-300 p-2 font-bold bg-gray-100">SR NO.</td>
+                    <td className="border border-gray-300 p-2 font-bold bg-gray-100">SHIPPER</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2">1</td>
+                    <td className="border border-gray-300 p-2">{formData.shipperName || "MR MR. HUSSAIN"}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2">2</td>
+                    <td className="border border-gray-300 p-2"></td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2 font-bold bg-gray-100" colSpan={2}>ADDRESS</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2" colSpan={2}>{formData.shipperAddress || "AL REYYAN"}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2 font-bold">MOBILE / TEL NO</td>
+                    <td className="border border-gray-300 p-2">{formData.shipperMobile || "31016616"}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2 font-bold">QID / PP NO</td>
+                    <td className="border border-gray-300 p-2">{formData.shipperIdNumber || "27214410871"}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             
-            <div className="border border-gray-300 p-4">
-              <h3 className="font-bold text-lg mb-3 text-blue-900">CONSIGNEE</h3>
-              <p className="font-semibold">{shippingDetails.consignee1 || "INSAF M M M"}</p>
-              <p>{shippingDetails.consignee2 || "AZHAR A S M"}</p>
-              <p className="mt-2">{shippingDetails.consigneeAddress || "NO 38 MUSLIM"}</p>
-              <p>{shippingDetails.consigneeTown || "DANOWITA, SRI LANKA"}</p>
-              <p className="mt-2"><span className="font-medium">MOBILE:</span> {shippingDetails.consigneeMobile || "+94755123456"}</p>
-              <p><span className="font-medium">ID/PASSPORT:</span> {shippingDetails.consigneePassportNic || "29876543210"}</p>
+            <div>
+              <table className="w-full border border-gray-300">
+                <tbody>
+                  <tr>
+                    <td className="border border-gray-300 p-2 font-bold bg-gray-100">SR NO</td>
+                    <td className="border border-gray-300 p-2 font-bold bg-gray-100">CONSIGNEE</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2">1</td>
+                    <td className="border border-gray-300 p-2">{formData.consigneeName || "MR HUSSAIN"}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2">2</td>
+                    <td className="border border-gray-300 p-2"></td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2 font-bold bg-gray-100" colSpan={2}>ADDRESS</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2" colSpan={2}>{formData.consigneeAddress || "ASMARA"}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2 font-bold">TEL NO:</td>
+                    <td className="border border-gray-300 p-2">{formData.consigneeMobile || "2256485"}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-gray-300 p-2 font-bold">ID NO OR PP NO</td>
+                    <td className="border border-gray-300 p-2">{formData.consigneeIdNumber || "N12548752"}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
           {/* Shipping Details */}
           <div className="border border-gray-300 mb-6">
-            <h3 className="font-bold text-lg p-3 bg-gray-100 text-blue-900">SHIPPING DETAILS</h3>
-            <div className="grid grid-cols-4 gap-4 p-4">
-              <div>
-                <p><span className="font-medium">WAREHOUSE:</span></p>
-                <p>ERITREA</p>
-              </div>
-              <div>
-                <p><span className="font-medium">SECTOR:</span></p>
-                <p>KASSALA</p>
-              </div>
-              <div>
-                <p><span className="font-medium">PAYMENT STATUS:</span></p>
-                <p className={`font-bold text-lg ${formData.paymentStatus === 'PAID' ? 'text-green-600' : 'text-red-600'}`}>
-                  {formData.paymentStatus === 'PAID' ? 'PAID' : 'UNPAID'}
-                </p>
-              </div>
-              <div>
-                <p><span className="font-medium">PAYMENT METHOD:</span></p>
-                <p>CASH</p>
-              </div>
-              <div>
-                <p><span className="font-medium">PAYMENT DATE:</span></p>
-                <p>NOT SPECIFIED</p>
-              </div>
-              <div>
-                <p><span className="font-medium">RECEIPT NUMBER:</span></p>
-                <p>NOT SPECIFIED</p>
-              </div>
-            </div>
+            <h3 className="font-bold text-lg p-3 bg-gray-100">SHIPPING DETAILS</h3>
+            <table className="w-full">
+              <tbody>
+                <tr>
+                  <td className="border border-gray-300 p-2 font-bold bg-gray-100">WAREHOUSE</td>
+                  <td className="border border-gray-300 p-2 font-bold bg-gray-100">SECTOR</td>
+                  <td className="border border-gray-300 p-2 font-bold bg-gray-100">PAYMENT STATUS</td>
+                  <td className="border border-gray-300 p-2 font-bold bg-gray-100">PAYMENT MODE</td>
+                  <td className="border border-gray-300 p-2 font-bold bg-gray-100">COUNTRY/ORIGIN</td>
+                </tr>
+                <tr>
+                  <td className="border border-gray-300 p-2">{formData.port || "ASMARA"}</td>
+                  <td className="border border-gray-300 p-2">{formData.sector || "SHUWAIKH"}</td>
+                  <td className="border border-gray-300 p-2 font-bold text-green-600">PAID</td>
+                  <td className="border border-gray-300 p-2">CASH</td>
+                  <td className="border border-gray-300 p-2">QATAR</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
 
           {/* Cargo Details */}
@@ -161,10 +234,11 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
             <table className="w-full">
               <thead>
                 <tr className="bg-gray-50">
-                  <th className="border border-gray-300 p-2 text-left">NO.</th>
+                  <th className="border border-gray-300 p-2 text-left">SR NO</th>
                   <th className="border border-gray-300 p-2 text-left">PACKAGE TYPE</th>
-                  <th className="border border-gray-300 p-2 text-left">QTY</th>
+                  <th className="border border-gray-300 p-2 text-left">QUANTITY</th>
                   <th className="border border-gray-300 p-2 text-left">WEIGHT (KG)</th>
+                  <th className="border border-gray-300 p-2 text-left">DIMENSION</th>
                   <th className="border border-gray-300 p-2 text-left">VOLUME (M³)</th>
                   <th className="border border-gray-300 p-2 text-left">DESCRIPTION</th>
                 </tr>
@@ -174,28 +248,47 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
                   packageDetails.map((pkg, index) => (
                     <tr key={index}>
                       <td className="border border-gray-300 p-2">{index + 1}</td>
-                      <td className="border border-gray-300 p-2">{pkg.name || "HOUSEHOLD ITEMS"}</td>
-                      <td className="border border-gray-300 p-2">1</td>
-                      <td className="border border-gray-300 p-2">{pkg.weight || "29.34"}</td>
-                      <td className="border border-gray-300 p-2">{pkg.cubicMetre || "0.672"}</td>
+                      <td className="border border-gray-300 p-2">{pkg.name || "BARREL"}</td>
+                      <td className="border border-gray-300 p-2">{pkg.quantity || 1}</td>
+                      <td className="border border-gray-300 p-2">{pkg.weight || "44"}</td>
+                      <td className="border border-gray-300 p-2">
+                        {pkg.length && pkg.width && pkg.height 
+                          ? `${(pkg.length / 2.54).toFixed(1)}" × ${(pkg.width / 2.54).toFixed(1)}" × ${(pkg.height / 2.54).toFixed(1)}"`
+                          : "-"
+                        }
+                      </td>
+                      <td className="border border-gray-300 p-2">{pkg.cubicMetre || "0.01875"}</td>
                       <td className="border border-gray-300 p-2">PERSONAL EFFECTS AND HOUSEHOLD GOODS</td>
                     </tr>
                   ))
                 ) : (
-                  <tr>
-                    <td className="border border-gray-300 p-2">1</td>
-                    <td className="border border-gray-300 p-2">HOUSEHOLD ITEMS</td>
-                    <td className="border border-gray-300 p-2">1</td>
-                    <td className="border border-gray-300 p-2">29.34</td>
-                    <td className="border border-gray-300 p-2">0.672</td>
-                    <td className="border border-gray-300 p-2">PERSONAL EFFECTS AND HOUSEHOLD GOODS</td>
-                  </tr>
+                  <>
+                    <tr>
+                      <td className="border border-gray-300 p-2">1</td>
+                      <td className="border border-gray-300 p-2">BARREL</td>
+                      <td className="border border-gray-300 p-2">1</td>
+                      <td className="border border-gray-300 p-2">44</td>
+                      <td className="border border-gray-300 p-2">-</td>
+                      <td className="border border-gray-300 p-2">0.01875</td>
+                      <td className="border border-gray-300 p-2">PERSONAL EFFECTS AND HOUSEHOLD GOODS</td>
+                    </tr>
+                    <tr>
+                      <td className="border border-gray-300 p-2">2</td>
+                      <td className="border border-gray-300 p-2">CARTON BOX</td>
+                      <td className="border border-gray-300 p-2">1</td>
+                      <td className="border border-gray-300 p-2">15</td>
+                      <td className="border border-gray-300 p-2">-</td>
+                      <td className="border border-gray-300 p-2">0.008</td>
+                      <td className="border border-gray-300 p-2">PERSONAL EFFECTS AND HOUSEHOLD GOODS</td>
+                    </tr>
+                  </>
                 )}
                 <tr className="bg-gray-50 font-bold">
                   <td className="border border-gray-300 p-2 text-center" colSpan={2}>TOTAL:</td>
-                  <td className="border border-gray-300 p-2">{packageDetails.length || 1}</td>
-                  <td className="border border-gray-300 p-2">{formData.weight || "29.34"} KG</td>
-                  <td className="border border-gray-300 p-2">{formData.volume || "0.672"} M³</td>
+                  <td className="border border-gray-300 p-2">{packageDetails.length || 2}</td>
+                  <td className="border border-gray-300 p-2">{formData.totalWeight || "29.34"} KG</td>
+                  <td className="border border-gray-300 p-2"></td>
+                  <td className="border border-gray-300 p-2">{formData.totalVolume || "0.672"} M³</td>
                   <td className="border border-gray-300 p-2"></td>
                 </tr>
               </tbody>
@@ -253,30 +346,14 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
             </div>
           </div>
 
-          {/* QR Code and Delivery Agent Section */}
-          <div className="mt-6 flex justify-between items-start">
-            {/* Destination Delivery Agent - Left side */}
-            <div className="flex-1">
-              <div className="border border-gray-300 p-3 bg-blue-50 rounded">
-                <h4 className="font-bold text-sm text-blue-900 mb-2">DESTINATION DELIVERY AGENT</h4>
-                <p className="font-bold text-lg">DHL EXPRESS</p>
-                <p className="text-sm">Massawa Branch, Eritrea</p>
-                <p className="text-xs text-gray-600">Contact: Mr. Idries Omar Idries</p>
-                <p className="text-xs text-gray-600">Mobile: +291 7159848</p>
-              </div>
-            </div>
-            
-            {/* QR Code - Right side */}
-            <div className="text-center ml-4">
-              <QRCodeSVG 
-                value={generateQRData()} 
-                size={120} 
-                bgColor="#ffffff"
-                fgColor="#000000"
-                level="M"
-                includeMargin={true}
-              />
-              <p className="text-xs text-gray-500 mt-2">Scan to verify invoice</p>
+          {/* Delivery Agent Section */}
+          <div className="mt-6">
+            <div className="border border-gray-300 p-3 bg-blue-50 rounded">
+              <h4 className="font-bold text-sm text-blue-900 mb-2">DESTINATION DELIVERY AGENT</h4>
+              <p className="font-bold text-lg">DHL EXPRESS</p>
+              <p className="text-sm">Massawa Branch, Eritrea</p>
+              <p className="text-xs text-gray-600">Contact: Mr. Idries Omar Idries</p>
+              <p className="text-xs text-gray-600">Mobile: +291 7159848</p>
             </div>
           </div>
 

@@ -425,6 +425,16 @@ const EritreaInvoiceForm = () => {
                 />
               </div>
 
+              {/* Job Date */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">JOB DATE:</label>
+                <Input
+                  type="date"
+                  value={formData.jobDate}
+                  onChange={(e) => handleFormChange('jobDate', e.target.value)}
+                />
+              </div>
+
               {/* Invoice Date */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">INVOICE DATE:</label>
