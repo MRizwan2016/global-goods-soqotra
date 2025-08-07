@@ -18,9 +18,9 @@ export const eritreaSectors = [
   { value: "AGORDAT", label: "AGORDAT", port: "MASSAWA", region: "GASH-BARKA" },
   { value: "BARENTU", label: "BARENTU", port: "MASSAWA", region: "GASH-BARKA" },
   { value: "TESSENEI", label: "TESSENEI", port: "MASSAWA", region: "GASH-BARKA" },
-  { value: "DEKENHARE", label: "DEKENHARE", port: "MASSAWA", region: "GASH-BARKA" },
   
   // Southern Region
+  { value: "DEKENHARE", label: "DEKENHARE", port: "MASSAWA", region: "SOUTHERN REGION" },
   { value: "MENDEFERA", label: "MENDEFERA", port: "MASSAWA", region: "SOUTHERN REGION" },
   { value: "ADI_KEY", label: "ADI KEY", port: "MASSAWA", region: "SOUTHERN REGION" },
   { value: "SANAFE", label: "SANAFE", port: "MASSAWA", region: "SOUTHERN REGION" },
@@ -144,36 +144,35 @@ export const countryCodes = {
   "JORDAN": "+962"
 };
 
-// Eritrea Project Sector Pricing (based on the uploaded pricing table)
-// Calculate total freight per kg with door-to-door charges
+// Eritrea Project Sector Pricing (Updated based on latest pricing table)
 export const eritreaSectorPricing = {
   // Central Region
   ASMARA: { freightPerKg: 11.00, doorToDoor: { available: false, charge: 0.00 } },
   KEREN: { freightPerKg: 15.00, doorToDoor: { available: true, charge: 4.00 } },
   
   // Anseba Region  
-  HAMALMALO: { freightPerKg: 16.00, doorToDoor: { available: true, charge: 5.00 } },
+  HAMALMALO: { freightPerKg: 0.00, doorToDoor: { available: false, charge: 0.00 } }, // No pricing available
   HAGAT: { freightPerKg: 16.00, doorToDoor: { available: true, charge: 5.00 } },
   
   // Gash-Barka
   AGORDAT: { freightPerKg: 16.00, doorToDoor: { available: true, charge: 5.00 } },
   BARENTU: { freightPerKg: 16.00, doorToDoor: { available: true, charge: 5.00 } },
   TESSENEI: { freightPerKg: 17.00, doorToDoor: { available: true, charge: 6.00 } },
-  DEKENHARE: { freightPerKg: 15.00, doorToDoor: { available: true, charge: 4.00 } },
   
   // Southern Region
+  DEKENHARE: { freightPerKg: 15.00, doorToDoor: { available: true, charge: 4.00 } },
   MENDEFERA: { freightPerKg: 11.00, doorToDoor: { available: true, charge: 4.00 } },
-  ADI_KEY: { freightPerKg: 11.00, doorToDoor: { available: false, charge: 0.00 } },
-  SANAFE: { freightPerKg: 11.00, doorToDoor: { available: false, charge: 0.00 } },
+  ADI_KEY: { freightPerKg: 0.00, doorToDoor: { available: false, charge: 0.00 } }, // No pricing available
+  SANAFE: { freightPerKg: 0.00, doorToDoor: { available: false, charge: 0.00 } }, // No pricing available
   
   // Northern Red Sea
   MASSAWA: { freightPerKg: 11.00, doorToDoor: { available: false, charge: 0.00 } },
-  GINDAA: { freightPerKg: 11.00, doorToDoor: { available: false, charge: 0.00 } },
-  ABFABET: { freightPerKg: 11.00, doorToDoor: { available: false, charge: 0.00 } },
-  NAKFA: { freightPerKg: 11.00, doorToDoor: { available: false, charge: 0.00 } },
+  GINDAA: { freightPerKg: 0.00, doorToDoor: { available: false, charge: 0.00 } }, // No pricing available
+  ABFABET: { freightPerKg: 0.00, doorToDoor: { available: false, charge: 0.00 } }, // No pricing available
+  NAKFA: { freightPerKg: 0.00, doorToDoor: { available: false, charge: 0.00 } }, // No pricing available
   
   // Southern Red Sea
-  ASAB: { freightPerKg: 11.00, doorToDoor: { available: false, charge: 0.00 } }
+  ASAB: { freightPerKg: 0.00, doorToDoor: { available: false, charge: 0.00 } } // No pricing available
 };
 
 // Dynamic sector management
