@@ -61,142 +61,128 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
         </DialogHeader>
         
         <div id="eritrea-invoice-print" className="bg-white p-6 text-black relative" style={{ fontSize: '11pt', fontFamily: 'Arial, sans-serif' }}>
-          {/* Logo - Absolute positioned in top-left corner */}
-          <div className="absolute top-2 left-2 z-10">
-            <img 
-              src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
-              alt="Soqotra Logo" 
-              className="w-48 h-auto object-contain"
-              style={{ 
-                imageRendering: 'crisp-edges'
-              }}
-            />
-          </div>
-
-          {/* Header with Company Info */}
-          <div className="mb-8 pt-16">
-            {/* Company Info and Invoice Details */}
-            <div className="flex justify-between items-start">
-              {/* Company Info - Left side */}
-              <div className="flex-1">
-                <h1 className="text-lg font-bold text-black leading-tight">
-                  SOQOTRA
-                </h1>
-                <div className="mt-8">
-                  <p className="text-sm text-black">MR. IDRIES OMAR IDRIES, MOBILE NO. +291 7159848</p>
-                </div>
+          {/* Main Header Layout */}
+          <div className="flex items-start justify-between mb-8">
+            {/* Left side - Logo and QR */}
+            <div className="flex flex-col items-center">
+              <div className="mb-4">
+                <h1 className="text-2xl font-bold text-black">SOQOTRA</h1>
               </div>
-              
-              {/* Invoice Info - Right side */}
-            <div className="text-right">
-                <table className="border border-gray-300 text-sm" style={{ width: '350px' }}>
-                  <tbody>
-                    <tr>
-                      <td className="border border-gray-300 p-2 bg-gray-100 font-bold text-center" colSpan={2}>INVOICE</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-300 p-2 font-bold">INVOICE</td>
-                      <td className="border border-gray-300 p-2">{formData.invoiceNumber || "010000"}</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-300 p-2 font-bold">DATE</td>
-                      <td className="border border-gray-300 p-2">{formData.invoiceDate || new Date().toISOString().split('T')[0]}</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-300 p-2 font-bold">JOB NO.</td>
-                      <td className="border border-gray-300 p-2">{formData.jobNumber || "010000"}</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-300 p-2 font-bold">SALES REP</td>
-                      <td className="border border-gray-300 p-2">{formData.salesRep || "MR_YOUSUF"}</td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div className="border border-gray-300 p-2 bg-white text-center">
+                <QRCodeSVG 
+                  value={generateQRData()} 
+                  size={80} 
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  level="M"
+                  includeMargin={true}
+                />
+                <p className="text-xs font-bold mt-1">ERITREA</p>
               </div>
             </div>
-          </div>
 
-          {/* QR Code - Top right corner */}
-          <div className="absolute top-4 right-4 z-10">
-            <div className="border border-gray-300 p-2 bg-white rounded">
-              <p className="text-xs font-bold text-center mb-1">PAGE</p>
-              <p className="text-lg font-bold text-center">1</p>
-              <p className="text-xs text-center mt-2">QR CODE</p>
-              <QRCodeSVG 
-                value={generateQRData()} 
-                size={80} 
-                bgColor="#ffffff"
-                fgColor="#000000"
-                level="M"
-                includeMargin={true}
-              />
-              <p className="text-xs font-bold text-center mt-1">ERITREA</p>
+            {/* Center - Company Info */}
+            <div className="flex-1 text-center mx-8">
+              <h2 className="text-sm font-bold text-black mb-1">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION</h2>
+              <h2 className="text-sm font-bold text-black mb-2">AND TRADING WLL</h2>
+              <p className="text-xs text-black">Office No. 3, 1st Floor, Zone 55, Building No. 53,</p>
+              <p className="text-xs text-black">Street No. 76, Saed Al Basher, Azizia Commercial</p>
+              <p className="text-xs text-black mb-1">Street - Azizia, Doha, Qatar.</p>
+              <p className="text-xs text-black font-bold">Tel : 44412770 - 44412773</p>
+              <p className="text-xs text-black font-bold">Email: accounts@soqotralogistics.com</p>
+            </div>
+
+            {/* Right side - Invoice Details */}
+            <div>
+              <table className="border-2 border-black text-sm" style={{ width: '280px' }}>
+                <tbody>
+                  <tr>
+                    <td className="border border-black p-2 bg-gray-100 font-bold text-center" colSpan={2}>INVOICE</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-black p-2 font-bold">INVOICE</td>
+                    <td className="border border-black p-2">{formData.invoiceNumber || "010000"}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-black p-2 font-bold">DATE</td>
+                    <td className="border border-black p-2">{formData.invoiceDate || new Date().toISOString().split('T')[0]}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-black p-2 font-bold">JOB NO.</td>
+                    <td className="border border-black p-2">{formData.jobNumber || ""}</td>
+                  </tr>
+                  <tr>
+                    <td className="border border-black p-2 font-bold">SALES REP</td>
+                    <td className="border border-black p-2">{formData.salesRep || "MR_YOUSUF"}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
 
           {/* Shipper and Consignee */}
-          <div className="grid grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-2 gap-6 mb-8">
             <div>
-              <table className="w-full border border-gray-300">
+              <table className="w-full border-2 border-black">
                 <tbody>
                   <tr>
-                    <td className="border border-gray-300 p-2 font-bold bg-gray-100">SR NO.</td>
-                    <td className="border border-gray-300 p-2 font-bold bg-gray-100">SHIPPER</td>
+                    <td className="border border-black p-2 font-bold bg-gray-100" style={{ width: '80px' }}>SR NO.</td>
+                    <td className="border border-black p-2 font-bold bg-gray-100">SHIPPER</td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2">1</td>
-                    <td className="border border-gray-300 p-2">{formData.shipperName || "MR MR. HUSSAIN"}</td>
+                    <td className="border border-black p-2">1</td>
+                    <td className="border border-black p-2">{formData.shipperName || "SOFIA ADEM MOHAMMED"}</td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2">2</td>
-                    <td className="border border-gray-300 p-2"></td>
+                    <td className="border border-black p-2">2</td>
+                    <td className="border border-black p-2"></td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2 font-bold bg-gray-100" colSpan={2}>ADDRESS</td>
+                    <td className="border border-black p-2 font-bold bg-gray-100" colSpan={2}>ADDRESS</td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2" colSpan={2}>{formData.shipperAddress || "AL REYYAN"}</td>
+                    <td className="border border-black p-2" colSpan={2}>{formData.shipperAddress || "LEGTAFIYA"}</td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2 font-bold">MOBILE / TEL NO</td>
-                    <td className="border border-gray-300 p-2">{formData.shipperMobile || "31016616"}</td>
+                    <td className="border border-black p-2 font-bold">MOBILE / TEL NO</td>
+                    <td className="border border-black p-2">{formData.shipperMobile || "33895442"}</td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2 font-bold">QID / PP NO</td>
-                    <td className="border border-gray-300 p-2">{formData.shipperIdNumber || "27214410871"}</td>
+                    <td className="border border-black p-2 font-bold">QID / PP NO</td>
+                    <td className="border border-black p-2">{formData.shipperIdNumber || "27708000172"}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
             
             <div>
-              <table className="w-full border border-gray-300">
+              <table className="w-full border-2 border-black">
                 <tbody>
                   <tr>
-                    <td className="border border-gray-300 p-2 font-bold bg-gray-100">SR NO</td>
-                    <td className="border border-gray-300 p-2 font-bold bg-gray-100">CONSIGNEE</td>
+                    <td className="border border-black p-2 font-bold bg-gray-100" style={{ width: '80px' }}>SR NO</td>
+                    <td className="border border-black p-2 font-bold bg-gray-100">CONSIGNEE</td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2">1</td>
-                    <td className="border border-gray-300 p-2">{formData.consigneeName || "MR HUSSAIN"}</td>
+                    <td className="border border-black p-2">1</td>
+                    <td className="border border-black p-2">{formData.consigneeName || "ROYET ADEM MOHAMMED"}</td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2">2</td>
-                    <td className="border border-gray-300 p-2"></td>
+                    <td className="border border-black p-2">2</td>
+                    <td className="border border-black p-2"></td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2 font-bold bg-gray-100" colSpan={2}>ADDRESS</td>
+                    <td className="border border-black p-2 font-bold bg-gray-100" colSpan={2}>ADDRESS</td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2" colSpan={2}>{formData.consigneeAddress || "ASMARA"}</td>
+                    <td className="border border-black p-2" colSpan={2}>{formData.consigneeAddress || "UNIVERSITY"}</td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2 font-bold">TEL NO:</td>
-                    <td className="border border-gray-300 p-2">{formData.consigneeMobile || "2256485"}</td>
+                    <td className="border border-black p-2 font-bold">TEL NO:</td>
+                    <td className="border border-black p-2">{formData.consigneeMobile || "+291 7231926"}</td>
                   </tr>
                   <tr>
-                    <td className="border border-gray-300 p-2 font-bold">ID NO OR PP NO</td>
-                    <td className="border border-gray-300 p-2">{formData.consigneeIdNumber || "N12548752"}</td>
+                    <td className="border border-black p-2 font-bold">ID NO OR PP NO</td>
+                    <td className="border border-black p-2">{formData.consigneeIdNumber || "N12548752"}</td>
                   </tr>
                 </tbody>
               </table>
