@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Printer, Eye, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
+import soqotraLogo from "@/assets/soqotra-logo.png";
 
 interface EritreaInvoicePreviewProps {
   formData: any;
@@ -66,7 +67,11 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
             {/* Left side - Logo and QR */}
             <div className="flex flex-col items-center">
               <div className="mb-4">
-                <h1 className="text-2xl font-bold text-black">SOQOTRA</h1>
+                <img 
+                  src={soqotraLogo} 
+                  alt="SOQOTRA" 
+                  className="h-12 w-auto object-contain"
+                />
               </div>
               <div className="border border-gray-300 p-2 bg-white text-center">
                 <QRCodeSVG 
