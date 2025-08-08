@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { doorToDoorPricing, eritreaPackageTypes, calculateVolumeWeight, calculateCubicFeet, countryCodes } from "../data/eritreaData";
+import { doorToDoorPricing, eritreaPackageTypes, calculateVolumeWeight, calculateCubicFeet, countryCodes, sectorCitiesMapping, eritreaSectorPricing } from "../data/eritreaData";
 import { toast } from "sonner";
 
 export interface EritreaPackageItem {
@@ -38,6 +38,7 @@ export interface EritreaFormData {
   // Shipper Details
   shipperPrefix: string;
   shipperName: string;
+  shipperName2: string;
   shipperCity: string;
   shipperAddress: string;
   shipperMobile: string;
@@ -48,9 +49,11 @@ export interface EritreaFormData {
   // Consignee Details
   consigneePrefix: string;
   consigneeName: string;
+  consigneeName2: string;
   consigneeCity: string;
   consigneeAddress: string;
   consigneeMobile: string;
+  consigneeMobile2: string;
   consigneeEmail: string;
   consigneeIdNumber: string;
   consigneeCountry: string;
@@ -101,6 +104,7 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     doorToDoorPrice: 0,
     shipperPrefix: "",
     shipperName: "",
+    shipperName2: "",
     shipperCity: "",
     shipperAddress: "",
     shipperMobile: "",
@@ -109,9 +113,11 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     shipperCountry: "QATAR",
     consigneePrefix: "",
     consigneeName: "",
+    consigneeName2: "",
     consigneeCity: "",
     consigneeAddress: "",
     consigneeMobile: "",
+    consigneeMobile2: "",
     consigneeEmail: "",
     consigneeIdNumber: "",
     consigneeCountry: "",
@@ -148,30 +154,32 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     quantity: "1"
   });
 
-  // Auto-calculate freight based on sector pricing and total weight
+  // Auto-calculate freight based on sector, district, and total weight
   useEffect(() => {
-    if (formData.sector && formData.totalWeight > 0) {
-      // Get sector pricing from localStorage or default
-      const customPricing = JSON.parse(localStorage.getItem('eritreaSectorPricing') || '{}');
-      const sectorPricing = customPricing[formData.sector] || doorToDoorPricing[formData.sector as keyof typeof doorToDoorPricing];
+    if (formData.sector && formData.district && formData.totalWeight > 0) {
+      // Get pricing for the specific city/district
+      const sectorPricing = eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing];
       
-      if (sectorPricing) {
-        // Base price calculation: Total Weight × Freight per KG
-        const baseFreight = formData.totalWeight * (sectorPricing.freightPerKg || sectorPricing.price || 11);
+      if (sectorPricing && 'cities' in sectorPricing) {
+        const cityPricing = (sectorPricing as any).cities[formData.district];
         
-        // Door-to-door calculation: if enabled, add door charge × total weight
-        let doorToDoorAmount = 0;
-        if (formData.doorToDoor === "YES") {
-          const doorCharge = sectorPricing.doorToDoor?.charge || sectorPricing.price || 0;
-          doorToDoorAmount = formData.totalWeight * doorCharge;
+        if (cityPricing) {
+          // Base price calculation: Total Weight × Freight per KG
+          const baseFreight = formData.totalWeight * cityPricing.freightPerKg;
+          
+          // Door-to-door calculation: if enabled and available, add door charge × total weight
+          let doorToDoorAmount = 0;
+          if (formData.doorToDoor === "YES" && cityPricing.doorToDoor?.available) {
+            doorToDoorAmount = formData.totalWeight * cityPricing.doorToDoor.charge;
+          }
+          
+          setFormData(prev => ({
+            ...prev,
+            freight: baseFreight,
+            doorToDoorPrice: doorToDoorAmount,
+            destinationDoorDelivery: doorToDoorAmount
+          }));
         }
-        
-        setFormData(prev => ({
-          ...prev,
-          freight: baseFreight,
-          doorToDoorPrice: doorToDoorAmount,
-          destinationDoorDelivery: doorToDoorAmount
-        }));
       }
     } else if (formData.doorToDoor === "NO") {
       setFormData(prev => ({
@@ -180,7 +188,23 @@ export const useEritreaInvoice = (invoiceId?: string) => {
         destinationDoorDelivery: 0
       }));
     }
-  }, [formData.doorToDoor, formData.sector, formData.totalWeight]);
+  }, [formData.doorToDoor, formData.sector, formData.district, formData.totalWeight]);
+
+  // Auto-update district/province when sector changes
+  useEffect(() => {
+    if (formData.sector) {
+      const availableCities = sectorCitiesMapping[formData.sector as keyof typeof sectorCitiesMapping];
+      if (availableCities && availableCities.length > 0) {
+        // If current district is not in the new sector's cities, reset it
+        if (!availableCities.includes(formData.district)) {
+          setFormData(prev => ({
+            ...prev,
+            district: "" // Reset district when sector changes
+          }));
+        }
+      }
+    }
+  }, [formData.sector]);
 
   // Auto-calculate totals when costs change
   useEffect(() => {

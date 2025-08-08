@@ -49,12 +49,21 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
           <div className="space-y-2 md:col-span-2">
             <label className="text-sm font-medium text-gray-700">SHIPPER NAME:</label>
             <Input
-              value={(formData.shipperName || "").toUpperCase()}
-              onChange={(e) => handleFormChange('shipperName', e.target.value.toUpperCase())}
-              placeholder="ENTER SHIPPER NAME"
-              className="uppercase"
+              value={formData.shipperName || ""}
+              onChange={(e) => handleFormChange('shipperName', e.target.value)}
+              placeholder="Enter shipper name"
             />
           </div>
+        </div>
+
+        {/* Second Name */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">SECOND SHIPPER NAME (Optional):</label>
+          <Input
+            value={formData.shipperName2 || ""}
+            onChange={(e) => handleFormChange('shipperName2', e.target.value)}
+            placeholder="Enter second shipper name"
+          />
         </div>
 
         {/* Country and City */}
@@ -176,7 +185,7 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
             <Input
               value={formData.shipperMobile}
               onChange={(e) => handleFormChange('shipperMobile', e.target.value)}
-              placeholder="+974 XXXX XXXX (auto-fills customer data)"
+              placeholder="+974 XXXX XXXX"
               className="border-blue-200 focus:border-blue-400"
             />
           </div>

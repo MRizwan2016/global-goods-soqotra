@@ -15,7 +15,7 @@ import UPBIntegrationCard from "@/components/invoice/UPBIntegrationCard";
 import { useEritreaInvoice, EritreaFormData } from "./hooks/useEritreaInvoice";
 import ShipperDetails from "./components/shipping/ShipperDetails";
 import ConsigneeDetails from "./components/shipping/ConsigneeDetails";
-import { 
+import {
   eritreaPorts, 
   eritreaSectors, 
   eritreaSalesReps, 
@@ -23,7 +23,8 @@ import {
   eritreaDistricts,
   eritreaPackageTypes,
   doorToDoorPricing,
-  eritreaSectorPricing 
+  eritreaSectorPricing,
+  sectorCitiesMapping
 } from "./data/eritreaData";
 import SectorManagement from "./components/SectorManagement";
 import ManualPackageDialog from "./components/package-details/ManualPackageDialog";
@@ -177,14 +178,8 @@ const EritreaInvoiceForm = () => {
         handleFormChange('shipperIdNumber', customerDetails.shipperIdNumber);
         handleFormChange('shipperCountry', customerDetails.shipperCountry);
         
-        // Auto-fill consignee details
-        handleFormChange('consigneeName', customerDetails.consigneeName);
-        handleFormChange('consigneeAddress', customerDetails.consigneeAddress);
-        handleFormChange('consigneeCity', customerDetails.consigneeCity);
-        handleFormChange('consigneeMobile', customerDetails.consigneeMobile);
-        handleFormChange('consigneeEmail', customerDetails.consigneeEmail);
-        handleFormChange('consigneeIdNumber', customerDetails.consigneeIdNumber);
-        handleFormChange('consigneeCountry', customerDetails.consigneeCountry);
+        // Don't auto-fill consignee details from shipper - they should be separate
+        // Keep consignee information independent and uppercase
         
         // Try to get associated job number
         const jobNumber = JobNumberService.getJobNumberByMobile(value);
@@ -353,19 +348,25 @@ const EritreaInvoiceForm = () => {
                 </Select>
               </div>
 
-              {/* District */}
+              {/* District/Province */}
               <div className="space-y-2">
-                <label className="text-sm font-medium">DISTRICT:</label>
+                <label className="text-sm font-medium">DISTRICT/PROVINCE:</label>
                 <Select value={formData.district} onValueChange={(value) => handleFormChange('district', value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select District" />
+                    <SelectValue placeholder="Select District/Province" />
                   </SelectTrigger>
                   <SelectContent>
-                    {eritreaDistricts.map(district => (
-                      <SelectItem key={district.value} value={district.value}>
-                        {district.label}
+                    {formData.sector && sectorCitiesMapping[formData.sector as keyof typeof sectorCitiesMapping] ? (
+                      sectorCitiesMapping[formData.sector as keyof typeof sectorCitiesMapping].map(city => (
+                        <SelectItem key={city} value={city}>
+                          {city}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="" disabled>
+                        Please select a sector first
                       </SelectItem>
-                    ))}
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -937,13 +938,14 @@ const EritreaInvoiceForm = () => {
         packageDetails={packageItems}
         shippingDetails={{
           shipper1: formData.shipperName,
-          shipper2: "",
+          shipper2: formData.shipperName2,
           mobile: formData.shipperMobile,
           email: formData.shipperEmail,
           consignee1: formData.consigneeName,
-          consignee2: "",
+          consignee2: formData.consigneeName2,
           consigneeAddress: formData.consigneeAddress,
           consigneeMobile: formData.consigneeMobile,
+          consigneeMobile2: formData.consigneeMobile2,
           consigneeEmail: formData.consigneeEmail
         }}
         costDetails={{

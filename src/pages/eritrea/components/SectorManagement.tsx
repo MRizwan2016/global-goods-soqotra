@@ -178,9 +178,8 @@ const SectorManagement: React.FC<SectorManagementProps> = ({ onSectorAdded }) =>
                     <p className="text-sm text-gray-600">Port: {sector.port}</p>
                     {eritreaSectorPricing[sector.value as keyof typeof eritreaSectorPricing] && (
                       <div className="text-xs text-gray-500 mt-1">
-                        <p>Freight: {eritreaSectorPricing[sector.value as keyof typeof eritreaSectorPricing].freightPerKg} QAR/kg</p>
-                        <p>Door-to-Door: {eritreaSectorPricing[sector.value as keyof typeof eritreaSectorPricing].doorToDoor.available ? 
-                          `${eritreaSectorPricing[sector.value as keyof typeof eritreaSectorPricing].doorToDoor.charge} QAR` : 'Not Available'}</p>
+                        <p>Sector: {sector.label}</p>
+                        <p>Port: {sector.port}</p>
                       </div>
                     )}
                   </div>

@@ -57,6 +57,17 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
           </div>
         </div>
 
+        {/* Second Name */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">SECOND CONSIGNEE NAME (Optional):</label>
+          <Input
+            value={(formData.consigneeName2 || "").toUpperCase()}
+            onChange={(e) => handleFormChange('consigneeName2', e.target.value.toUpperCase())}
+            placeholder="ENTER SECOND CONSIGNEE NAME"
+            className="uppercase"
+          />
+        </div>
+
         {/* Destination Country and City */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -166,8 +177,8 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
           />
         </div>
 
-        {/* Mobile and Email */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Mobile Numbers and Email */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
               <Phone className="h-4 w-4" />
@@ -177,6 +188,18 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
               value={formData.consigneeMobile}
               onChange={(e) => handleFormChange('consigneeMobile', e.target.value)}
               placeholder="Country code will auto-update"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+              <Phone className="h-4 w-4" />
+              EXTRA MOBILE NUMBER:
+            </label>
+            <Input
+              value={formData.consigneeMobile2}
+              onChange={(e) => handleFormChange('consigneeMobile2', e.target.value)}
+              placeholder="Enter extra mobile number"
             />
           </div>
           
