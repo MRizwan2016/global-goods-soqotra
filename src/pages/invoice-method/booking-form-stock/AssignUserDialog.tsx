@@ -42,7 +42,7 @@ const AssignUserDialog: React.FC<AssignUserDialogProps> = ({
         <DialogTitle>Assign User to Book #{selectedBook?.bookNumber}</DialogTitle>
       </DialogHeader>
       <div className="py-4">
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-muted-foreground mb-4">
           Select a user to assign to this booking form book
         </p>
         <Select value={selectedUserId} onValueChange={onUserChange}>

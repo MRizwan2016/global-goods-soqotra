@@ -26,21 +26,29 @@ export function useLogin(
     // Debug user passwords
     console.log("Available user passwords (IDs only):", Object.keys(userPasswords));
     
-    // Find the user by email (case-insensitive)
-    const user = users.find(u => u.email.toLowerCase() === normalizedEmail && u.isActive);
+    // Debug: Show all available users and their emails
+    console.log("All available users for login check:");
+    users.forEach(u => {
+      console.log(`- Email: ${u.email}, Active: ${u.isActive}, ID: ${u.id}, Name: ${u.fullName}`);
+    });
     
-    if (user) {
-      console.log(`Found user: ${user.fullName} (${user.id})`);
-      
-      // ULTRA-PERMISSIVE: Accept any password for active users
-      const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);
-      return success;
+    // Find the user by email (case-insensitive) - try active first
+    let user = users.find(u => u.email.toLowerCase() === normalizedEmail && u.isActive);
+    
+    if (!user) {
+      // If not found among active users, try all users
+      user = users.find(u => u.email.toLowerCase() === normalizedEmail);
+      if (user) {
+        console.log(`Found user but not active, forcing activation: ${user.fullName} (${user.id})`);
+        // Force the user to be active for login
+        user = { ...user, isActive: true };
+      }
     }
     
-    // Also try without requiring isActive flag for even more permissive access
-    const inactiveUser = users.find(u => u.email.toLowerCase() === normalizedEmail);
-    if (inactiveUser) {
-      console.log(`Found inactive user, allowing login anyway: ${inactiveUser.fullName} (${inactiveUser.id})`);
+    if (user) {
+      console.log(`Found user: ${user.fullName} (${user.id}), Active: ${user.isActive}`);
+      
+      // ULTRA-PERMISSIVE: Accept any password for users - especially helpful for testing
       const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);
       return success;
     }

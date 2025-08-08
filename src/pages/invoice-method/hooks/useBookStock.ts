@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Book, User } from "../booking-form-stock/types";
+import { useAuth } from "@/hooks/use-auth";
 
 export const mockUsers: User[] = [
   { id: "1", name: "Mr. Lahiru Chathuranga" },
@@ -23,6 +24,7 @@ export const mockUsers: User[] = [
 ];
 
 export function useBookStock() {
+  const { users: authUsers } = useAuth();
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedTab, setSelectedTab] = useState("active");
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
@@ -149,7 +151,7 @@ export function useBookStock() {
       return;
     }
 
-    const selectedUser = mockUsers.find(user => user.id === selectedUserId);
+    const selectedUser = availableUsers.find(user => user.id === selectedUserId);
     if (!selectedUser) {
       toast.error("Invalid user selection");
       return;
@@ -226,6 +228,18 @@ export function useBookStock() {
     }
   };
 
+  // Combine auth users with mock users for book assignment
+  const availableUsers = [
+    ...mockUsers,
+    // Convert auth users to the local User format and filter out admin
+    ...authUsers
+      .filter(authUser => !authUser.isAdmin && authUser.isActive)
+      .map(authUser => ({
+        id: authUser.id,
+        name: authUser.fullName
+      }))
+  ];
+
   return {
     books,
     selectedTab,
@@ -240,7 +254,7 @@ export function useBookStock() {
     handleAssignUser,
     handleViewDetails,
     confirmAssignment,
-    mockUsers,
+    mockUsers: availableUsers, // Now includes both mock and real users
     loadBooks
   };
 }

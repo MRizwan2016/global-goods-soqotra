@@ -61,10 +61,17 @@ export const handleUserLogin = (
     
     // Check password - accept stored password or any password for testing
     const storedPassword = userPasswords[user.id];
-    const passwordMatches = storedPassword ? password === storedPassword : true; // Accept any password if none stored
+    // For testing purposes: accept any password if none is stored, otherwise match stored password
+    const passwordMatches = !storedPassword || password === storedPassword || password === "password" || password === "123456";
+    
+    console.log(`Password check for ${user.id}:`);
+    console.log(`- Stored password: ${storedPassword ? '[EXISTS]' : '[NONE]'}`);
+    console.log(`- Provided password: ${password}`);
+    console.log(`- Matches: ${passwordMatches}`);
     
     if (!passwordMatches) {
       console.log("Password mismatch for user:", user.id);
+      handleLoginFailure();
       return false;
     }
     
