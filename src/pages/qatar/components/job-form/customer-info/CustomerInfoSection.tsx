@@ -10,10 +10,12 @@ import { useJobForm } from "../context/JobFormContext";
 import { PackageInfo } from "../details/packages/types";
 
 const CustomerInfoSection = () => {
-  const { handleInputChange } = useJobForm();
+  const { handleInputChange, setJobData } = useJobForm();
   const [selectedPackages, setSelectedPackages] = useState<PackageInfo[]>([]);
   
   const handlePackageSelect = (pkg: PackageInfo) => {
+    const { setJobData } = useJobForm();
+    
     // Check if package is already selected
     if (selectedPackages.some(p => p.sr_no === pkg.sr_no)) {
       toast.error("This package is already selected");
@@ -28,21 +30,25 @@ const CustomerInfoSection = () => {
       .map(p => `${p.description} | Dimensions: ${p.dimensions} | Volume: ${p.volume_in_meters} CBM | Price: ${p.price} | Total: ${p.total}`)
       .join(" || ");
     
-    if (handleInputChange) {
-      const syntheticEvent = {
-        target: {
-          name: 'packageDetails',
-          value: packageInfo
-        }
-      } as React.ChangeEvent<HTMLInputElement>;
-      
-      handleInputChange(syntheticEvent);
-    }
+    // Calculate total amount from selected packages
+    const totalAmount = updatedPackages.reduce((sum, p) => {
+      const priceNumber = parseFloat(p.price.replace(/[^\d.]/g, '')) || 0;
+      return sum + priceNumber;
+    }, 0);
+    
+    // Update both packageDetails and advanceAmount
+    setJobData(prevData => ({
+      ...prevData,
+      packageDetails: packageInfo,
+      advanceAmount: totalAmount
+    }));
     
     toast.success(`Package added: ${pkg.description}`);
   };
 
   const handleRemovePackage = (pkg: PackageInfo) => {
+    const { setJobData } = useJobForm();
+    
     setSelectedPackages(prev => prev.filter(p => p.sr_no !== pkg.sr_no));
     
     // Update packageDetails without the removed package
@@ -53,16 +59,18 @@ const CustomerInfoSection = () => {
           .join(" || ")
       : "";
     
-    if (handleInputChange) {
-      const syntheticEvent = {
-        target: {
-          name: 'packageDetails',
-          value: packageInfo
-        }
-      } as React.ChangeEvent<HTMLInputElement>;
-      
-      handleInputChange(syntheticEvent);
-    }
+    // Calculate total amount from remaining packages
+    const totalAmount = updatedPackages.reduce((sum, p) => {
+      const priceNumber = parseFloat(p.price.replace(/[^\d.]/g, '')) || 0;
+      return sum + priceNumber;
+    }, 0);
+    
+    // Update both packageDetails and advanceAmount
+    setJobData(prevData => ({
+      ...prevData,
+      packageDetails: packageInfo,
+      advanceAmount: totalAmount
+    }));
     
     toast.success(`Package removed: ${pkg.description}`);
   };

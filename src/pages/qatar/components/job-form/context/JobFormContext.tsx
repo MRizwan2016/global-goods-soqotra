@@ -69,7 +69,7 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
     jobNumber: '',
     customer: '',
     mobileNumber: '',
-    jobType: 'DELIVERY',
+    jobType: 'COLLECTION',
     date: new Date().toISOString().split('T')[0],
     time: '10:00',
     amPm: 'AM',
@@ -80,7 +80,7 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
     branch: '',
     vehicle: '',
     status: 'PENDING',
-    advanceAmount: 0,
+    advanceAmount: '',
     remarks: ''
   };
 
@@ -164,26 +164,11 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
               : item
           );
         case 'add': {
-          // Check if item already exists to prevent duplication
           const itemName = action.itemName || action.name || '';
           const name = action.name || action.itemName || '';
-          const existingItem = prevItems.find(item => 
-            (item.name === name || item.itemName === itemName) && 
-            item.sellPrice === action.sellPrice
-          );
-          
-          if (existingItem) {
-            // Update quantity instead of adding duplicate
-            return prevItems.map(item => 
-              item.id === existingItem.id 
-                ? { ...item, quantity: item.quantity + (action.quantity || 1) }
-                : item
-            );
-          }
-          
           const boxNumber = action.boxNumber || String(prevItems.length + 1);
           
-          return [...prevItems, { 
+          const newItem = { 
             id: action.id || uuidv4(),
             name,
             itemName,
@@ -192,7 +177,9 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
             quantity: action.quantity || 1,
             boxNumber,
             description: action.description || `${name} - Qty: ${action.quantity || 1}, Price: QAR ${action.sellPrice || 0}`
-          }];
+          };
+          
+          return [...prevItems, newItem];
         }
         default:
           return prevItems;
