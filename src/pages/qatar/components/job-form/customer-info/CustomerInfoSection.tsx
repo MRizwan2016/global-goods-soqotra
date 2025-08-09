@@ -14,8 +14,6 @@ const CustomerInfoSection = () => {
   const [selectedPackages, setSelectedPackages] = useState<PackageInfo[]>([]);
   
   const handlePackageSelect = (pkg: PackageInfo) => {
-    const { setJobData } = useJobForm();
-    
     // Check if package is already selected
     if (selectedPackages.some(p => p.sr_no === pkg.sr_no)) {
       toast.error("This package is already selected");
@@ -47,8 +45,6 @@ const CustomerInfoSection = () => {
   };
 
   const handleRemovePackage = (pkg: PackageInfo) => {
-    const { setJobData } = useJobForm();
-    
     setSelectedPackages(prev => prev.filter(p => p.sr_no !== pkg.sr_no));
     
     // Update packageDetails without the removed package
