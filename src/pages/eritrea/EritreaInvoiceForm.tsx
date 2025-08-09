@@ -363,7 +363,7 @@ const EritreaInvoiceForm = () => {
                         </SelectItem>
                       ))
                     ) : (
-                      <SelectItem value="" disabled>
+                      <SelectItem value="no-sector" disabled>
                         Please select a sector first
                       </SelectItem>
                     )}
