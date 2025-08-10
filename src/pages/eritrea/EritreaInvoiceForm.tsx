@@ -291,6 +291,20 @@ const EritreaInvoiceForm = () => {
                 </Select>
               </div>
 
+              {/* Warehouse Selection */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">WAREHOUSE:</label>
+                <Select value={formData.warehouse} onValueChange={(value) => handleFormChange('warehouse', value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Warehouse" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ASMARA">ASMARA BRANCH</SelectItem>
+                    <SelectItem value="MUSAWWA">MUSAWWA BRANCH</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
               {/* Sector Selection */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">

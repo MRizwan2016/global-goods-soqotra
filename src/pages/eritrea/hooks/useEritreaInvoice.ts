@@ -20,6 +20,7 @@ export interface EritreaFormData {
   invoiceNumber: string;
   invoiceDate: string;
   port: string;
+  warehouse: string;
   sector: string;
   salesRep: string;
   driver: string;
@@ -89,38 +90,39 @@ export interface EritreaFormData {
 
 export const useEritreaInvoice = (invoiceId?: string) => {
   const [formData, setFormData] = useState<EritreaFormData>({
-    invoiceNumber: "010000",
+    invoiceNumber: "",
     invoiceDate: new Date().toISOString().split('T')[0],
     port: "MUSSAMWA",
-    sector: "central",
-    salesRep: "MR_SALEH",
-    driver: "MR_JOHNY",
-    district: "ASMARA",
+    warehouse: "ASMARA",
+    sector: "",
+    salesRep: "",
+    driver: "",
+    district: "",
     jobNumber: "",
     jobDate: new Date().toISOString().split('T')[0],
     bookNumber: "1",
     isInvoiceActivated: true,
     doorToDoor: "NO",
     doorToDoorPrice: 0,
-    shipperPrefix: "MR",
+    shipperPrefix: "",
     shipperName: "",
     shipperName2: "",
-    shipperCity: "DOHA",
+    shipperCity: "",
     shipperAddress: "",
-    shipperMobile: "+97400000000",
+    shipperMobile: "",
     shipperEmail: "",
     shipperIdNumber: "",
-    shipperCountry: "QATAR",
-    consigneePrefix: "MR",
+    shipperCountry: "",
+    consigneePrefix: "",
     consigneeName: "",
     consigneeName2: "",
-    consigneeCity: "ASMARA",
+    consigneeCity: "",
     consigneeAddress: "",
-    consigneeMobile: "+29100000000",
-    consigneeMobile2: "+29100000001",
+    consigneeMobile: "",
+    consigneeMobile2: "",
     consigneeEmail: "",
     consigneeIdNumber: "",
-    consigneeCountry: "ERITREA",
+    consigneeCountry: "",
     totalPackages: 1,
     totalWeight: 1,
     totalVolume: 1,

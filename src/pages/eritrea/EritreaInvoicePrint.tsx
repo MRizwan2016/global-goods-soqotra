@@ -243,12 +243,24 @@ const EritreaInvoicePrint = () => {
           <div style={{ border: '3px solid #000', padding: '0', fontFamily: 'Arial, sans-serif' }}>
             {/* Header Section */}
             <div style={{ display: 'flex', padding: '10px', borderBottom: '2px solid #000' }}>
+              {/* QR Code - Top Left */}
+              <div style={{ width: '120px', marginRight: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <QRCodeSVG 
+                  value={`INVOICE:${displayData.invoiceNumber || displayData.formData?.invoiceNumber || "010009"}|DATE:${displayData.invoiceDate || displayData.formData?.invoiceDate}|TOTAL:850.00 QAR|STATUS:${displayData.paymentStatus || "UNPAID"}|VERIFIED:TRUE`}
+                  size={100}
+                  bgColor="#ffffff"
+                  fgColor="#000000"
+                  level="M"
+                  includeMargin={true}
+                />
+              </div>
+
               {/* Logo */}
               <div style={{ width: '150px', marginRight: '20px' }}>
                 <img 
                   src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
                   alt="Soqotra Logo" 
-                  style={{ width: '100%', height: 'auto', fontSize: '20px' }}
+                  style={{ width: '100%', height: 'auto', fontSize: '25px' }}
                 />
               </div>
               
@@ -280,18 +292,22 @@ const EritreaInvoicePrint = () => {
               </div>
             </div>
 
-            {/* Invoice Info & QR Section */}
+            {/* Agent Details Section - Conditional based on warehouse */}
+            <div style={{ borderBottom: '2px solid #000', padding: '10px', backgroundColor: '#f9f9f9' }}>
+              <div style={{ fontSize: '12px', fontWeight: 'bold', marginBottom: '5px' }}>AGENT DETAILS:</div>
+              {(displayData.formData?.warehouse || displayData.warehouse || "").toLowerCase().includes('musawwa') ? (
+                <div style={{ fontSize: '11px' }}>
+                  DHL EXPRESS; MUSAWWA BRANCH, Mr. Idries Omar Idries, Mobile No. +291 7159848
+                </div>
+              ) : (
+                <div style={{ fontSize: '11px' }}>
+                  DHL EXPRESS, ASMARA BRANCH, Mr. Amanuel Akole, Mobile No. +291 1126595, Tel: +291 120210, Fax: +291 1122882, Email: amanuellakole@dhlexpress.com, aakole@gmail.com
+                </div>
+              )}
+            </div>
+
+            {/* Invoice Info Section */}
             <div style={{ display: 'flex', borderBottom: '2px solid #000' }}>
-              <div style={{ flex: 1, padding: '10px', borderRight: '1px solid #000', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <QRCodeSVG 
-                  value={`INVOICE:${displayData.invoiceNumber || displayData.formData?.invoiceNumber || "010009"}|DATE:${displayData.invoiceDate || displayData.formData?.invoiceDate}|TOTAL:850.00 QAR|STATUS:${displayData.paymentStatus || "UNPAID"}|VERIFIED:TRUE`}
-                  size={100}
-                  bgColor="#ffffff"
-                  fgColor="#000000"
-                  level="M"
-                  includeMargin={true}
-                />
-              </div>
               <div style={{ flex: 1, padding: '10px' }}>
                 <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
                   <tr>
@@ -325,7 +341,7 @@ const EritreaInvoicePrint = () => {
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>
-                      {displayData.formData?.shipperPrefix || displayData.shipperPrefix || "MR."} {displayData.formData?.shipperName || displayData.shipperName || displayData.shippingDetails?.shipper1 || "MOHAMED YACOOB"}
+                      {displayData.formData?.shipperPrefix || displayData.shipperPrefix || ""} {displayData.formData?.shipperName || displayData.shipperName || displayData.shippingDetails?.shipper1 || ""}
                     </td>
                   </tr>
                   <tr>
@@ -337,19 +353,19 @@ const EritreaInvoicePrint = () => {
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px' }} colSpan={2}>
-                      {displayData.formData?.shipperCity || displayData.shipperCity || displayData.shippingDetails?.town || "UMM SALAAL ALI, QATAR"}
+                      {displayData.formData?.shipperCity || displayData.shipperCity || displayData.shippingDetails?.town || ""}
                     </td>
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>MOBILE / TEL NO</td>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>
-                      {displayData.shipperMobile || displayData.shippingDetails?.mobile || "31016516"}
+                      {displayData.formData?.shipperMobile || displayData.shipperMobile || displayData.shippingDetails?.mobile || ""}
                     </td>
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>QID / PP NO</td>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>
-                      {displayData.shipperIdNumber || "27214410871"}
+                      {displayData.formData?.shipperIdNumber || displayData.shipperIdNumber || ""}
                     </td>
                   </tr>
                 </table>
@@ -364,7 +380,7 @@ const EritreaInvoicePrint = () => {
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>1</td>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>
-                      {displayData.formData?.consigneePrefix || displayData.consigneePrefix || "MRS."} {displayData.formData?.consigneeName || displayData.consigneeName || displayData.shippingDetails?.consignee1 || "MOHAMED IDRIES"}
+                      {displayData.formData?.consigneePrefix || displayData.consigneePrefix || ""} {displayData.formData?.consigneeName || displayData.consigneeName || displayData.shippingDetails?.consignee1 || ""}
                     </td>
                   </tr>
                   <tr>
@@ -376,19 +392,19 @@ const EritreaInvoicePrint = () => {
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px' }} colSpan={2}>
-                      {displayData.formData?.consigneeCity || displayData.consigneeCity || displayData.shippingDetails?.consigneeTown || "KEREN, ASMARA, ERITREA"}
+                      {displayData.formData?.consigneeCity || displayData.consigneeCity || displayData.shippingDetails?.consigneeTown || ""}
                     </td>
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>TEL NO:</td>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>
-                      {displayData.consigneeMobile || displayData.shippingDetails?.consigneeMobile || "23568552"}
+                      {displayData.formData?.consigneeMobile || displayData.consigneeMobile || displayData.shippingDetails?.consigneeMobile || ""}
                     </td>
                   </tr>
                   <tr>
                     <td style={{ border: '1px solid #000', padding: '5px', fontWeight: 'bold' }}>ID NO OR PP NO</td>
                     <td style={{ border: '1px solid #000', padding: '5px' }}>
-                      {displayData.consigneeIdNumber || displayData.shippingDetails?.consigneePassportNic || "N12548752"}
+                      {displayData.formData?.consigneeIdNumber || displayData.consigneeIdNumber || displayData.shippingDetails?.consigneePassportNic || ""}
                     </td>
                   </tr>
                 </table>
