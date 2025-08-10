@@ -207,24 +207,28 @@ const EritreaInvoiceForm = () => {
 
   // Calculate pricing using new Eritrea sector pricing system
   const getSectorPricing = () => {
-    if (formData.sector) {
+    if (formData.sector && formData.district) {
       // Check custom pricing first
       const customPricing = JSON.parse(localStorage.getItem('eritreaSectorPricing') || '{}');
       const sectorPricing = customPricing[formData.sector] || eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing];
       
-      if (sectorPricing) {
-        const freightPerKg = sectorPricing.freightPerKg;
-        const doorCharge = formData.doorToDoor === "YES" && sectorPricing.doorToDoor.available 
-          ? sectorPricing.doorToDoor.charge 
-          : 0;
-        const totalFreight = freightPerKg + doorCharge;
+      if (sectorPricing && 'cities' in sectorPricing) {
+        const cityPricing = (sectorPricing as any).cities[formData.district];
         
-        return {
-          freightPerKg,
-          doorCharge,
-          totalFreight,
-          doorAvailable: sectorPricing.doorToDoor.available
-        };
+        if (cityPricing) {
+          const freightPerKg = cityPricing.freightPerKg;
+          const doorCharge = formData.doorToDoor === "YES" && cityPricing.doorToDoor?.available 
+            ? cityPricing.doorToDoor.charge 
+            : 0;
+          const totalFreight = freightPerKg + doorCharge;
+          
+          return {
+            freightPerKg,
+            doorCharge,
+            totalFreight,
+            doorAvailable: cityPricing.doorToDoor?.available || false
+          };
+        }
       }
     }
     return {
