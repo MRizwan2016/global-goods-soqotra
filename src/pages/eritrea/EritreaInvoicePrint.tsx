@@ -244,35 +244,35 @@ const EritreaInvoicePrint = () => {
             {/* Header Section */}
             <div style={{ display: 'flex', padding: '10px', borderBottom: '2px solid #000' }}>
               {/* Logo */}
-              <div style={{ width: '100px', marginRight: '20px' }}>
+              <div style={{ width: '150px', marginRight: '20px' }}>
                 <img 
                   src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
                   alt="Soqotra Logo" 
-                  style={{ width: '100%', height: 'auto' }}
+                  style={{ width: '100%', height: 'auto', fontSize: '20px' }}
                 />
               </div>
               
               {/* Title Section */}
               <div style={{ flex: 1, textAlign: 'center' }}>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', margin: '0' }}>
-                  DHL EXPRESS
-                </div>
-                <div style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '5px' }}>
-                  Mussawa branch
+                <div style={{ fontSize: '16px', fontWeight: 'bold', margin: '0' }}>
+                  SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL
                 </div>
                 <div style={{ fontSize: '12px', marginTop: '5px' }}>
-                  Mr. Idries Omar Idries, Mobile No. +291 7159848
+                  P.O. OFFICE NO. 3, 1ST FLOOR, BUILDING NO. 53, ZONE NO. 55
+                </div>
+                <div style={{ fontSize: '12px', marginTop: '2px' }}>
+                  AZIZIA COMMERCIAL STREET, DOHA - QATAR
+                </div>
+                <div style={{ fontSize: '12px', marginTop: '2px' }}>
+                  TEL: 4441 9187, EMAIL: ops@soqotralogistics.com
                 </div>
               </div>
               
-              {/* Page & QR Section */}
+              {/* Page Section */}
               <div style={{ width: '150px', textAlign: 'center' }}>
                 <div style={{ border: '1px solid #000', padding: '5px', marginBottom: '10px' }}>
                   <div style={{ fontSize: '10px' }}>PAGE</div>
                   <div style={{ fontSize: '16px', fontWeight: 'bold' }}>1</div>
-                </div>
-                <div style={{ border: '1px solid #ccc', padding: '5px', backgroundColor: '#f0f0f0' }}>
-                  <div style={{ fontSize: '10px' }}>QR CODE</div>
                 </div>
                 <div style={{ fontSize: '12px', fontWeight: 'bold', marginTop: '10px' }}>
                   ERITREA
