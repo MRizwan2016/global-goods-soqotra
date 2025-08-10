@@ -270,10 +270,42 @@ export const useEritreaInvoice = (invoiceId?: string) => {
   }, [formData.consigneeCountry]);
 
   const handleFormChange = (field: keyof EritreaFormData, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value
-    }));
+    setFormData(prev => {
+      const newData: EritreaFormData = {
+        ...prev,
+        [field]: value
+      };
+
+      // Auto-fill logic for shipper to consignee details
+      if (field.startsWith('shipper') && field !== 'shipperCountry') {
+        const shipperToConsigneeMap: Record<string, keyof EritreaFormData> = {
+          'shipperPrefix': 'consigneePrefix',
+          'shipperName': 'consigneeName',
+          'shipperName2': 'consigneeName2',
+          'shipperCity': 'consigneeCity',
+          'shipperAddress': 'consigneeAddress',
+          'shipperMobile': 'consigneeMobile',
+          'shipperEmail': 'consigneeEmail',
+          'shipperIdNumber': 'consigneeIdNumber'
+        };
+
+        const consigneeField = shipperToConsigneeMap[field];
+        
+        if (consigneeField) {
+          // Only auto-fill if consignee field is empty or has default value
+          const currentValue = prev[consigneeField];
+          const shouldAutoFill = !currentValue || 
+            (typeof currentValue === 'string' && 
+             (currentValue === '' || currentValue.includes('DEFAULT')));
+          
+          if (shouldAutoFill) {
+            (newData as any)[consigneeField] = value;
+          }
+        }
+      }
+
+      return newData;
+    });
   };
 
   const handlePackageTypeSelect = (packageType: string) => {
