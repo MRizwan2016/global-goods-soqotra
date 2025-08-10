@@ -96,30 +96,30 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     salesRep: "MR_SALEH",
     driver: "MR_JOHNY",
     district: "ASMARA",
-    jobNumber: "JOB-DEFAULT",
+    jobNumber: "",
     jobDate: new Date().toISOString().split('T')[0],
     bookNumber: "1",
     isInvoiceActivated: true,
     doorToDoor: "NO",
     doorToDoorPrice: 0,
     shipperPrefix: "MR",
-    shipperName: "DEFAULT SHIPPER",
-    shipperName2: "SECOND NAME",
+    shipperName: "",
+    shipperName2: "",
     shipperCity: "DOHA",
-    shipperAddress: "DEFAULT ADDRESS",
+    shipperAddress: "",
     shipperMobile: "+97400000000",
-    shipperEmail: "shipper@default.com",
-    shipperIdNumber: "ID123456",
+    shipperEmail: "",
+    shipperIdNumber: "",
     shipperCountry: "QATAR",
     consigneePrefix: "MR",
-    consigneeName: "DEFAULT CONSIGNEE",
-    consigneeName2: "SECOND CONSIGNEE",
+    consigneeName: "",
+    consigneeName2: "",
     consigneeCity: "ASMARA",
-    consigneeAddress: "DEFAULT CONSIGNEE ADDRESS",
+    consigneeAddress: "",
     consigneeMobile: "+29100000000",
     consigneeMobile2: "+29100000001",
-    consigneeEmail: "consignee@default.com",
-    consigneeIdNumber: "CONS123456",
+    consigneeEmail: "",
+    consigneeIdNumber: "",
     consigneeCountry: "ERITREA",
     totalPackages: 1,
     totalWeight: 1,
@@ -136,7 +136,7 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     gross: 11.00,
     discount: 0,
     net: 11.00,
-    remarks: "DEFAULT REMARKS",
+    remarks: "",
     giftCargo: "NO",
     prePaid: "NO",
     freightBy: "SEA",
@@ -276,7 +276,7 @@ export const useEritreaInvoice = (invoiceId?: string) => {
         [field]: value
       };
 
-      // Auto-fill logic for shipper to consignee details
+      // Auto-fill logic for shipper to consignee details (real-time copying)
       if (field.startsWith('shipper') && field !== 'shipperCountry') {
         const shipperToConsigneeMap: Record<string, keyof EritreaFormData> = {
           'shipperPrefix': 'consigneePrefix',
@@ -292,15 +292,8 @@ export const useEritreaInvoice = (invoiceId?: string) => {
         const consigneeField = shipperToConsigneeMap[field];
         
         if (consigneeField) {
-          // Only auto-fill if consignee field is empty or has default value
-          const currentValue = prev[consigneeField];
-          const shouldAutoFill = !currentValue || 
-            (typeof currentValue === 'string' && 
-             (currentValue === '' || currentValue.includes('DEFAULT')));
-          
-          if (shouldAutoFill) {
-            (newData as any)[consigneeField] = value;
-          }
+          // Auto-fill consignee details as user types shipper information
+          (newData as any)[consigneeField] = value;
         }
       }
 
