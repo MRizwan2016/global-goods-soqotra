@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useJobForm } from "./context/JobFormContext";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
+import InvoicePrintButton from "./InvoicePrintButton";
+import { QatarJob } from "../../types/jobTypes";
 
 interface JobFormActionsProps {
   isNewJob: boolean;
@@ -74,6 +76,24 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
     navigate("/qatar");
   };
 
+  // Create a complete job object for printing
+  const jobForPrint: QatarJob = {
+    ...jobData,
+    id: jobData.id || uuidv4(), // Ensure id is always present
+    items: jobItems,
+    advanceAmount: parseFloat(String(jobData.advanceAmount)) || 0,
+    jobType: (jobData.jobType === 'COLLECTION' || jobData.jobType === 'DELIVERY') 
+      ? jobData.jobType 
+      : 'COLLECTION' as const,
+    status: (jobData.status as QatarJob['status']) || 'PENDING',
+    date: jobData.date || new Date().toISOString().split('T')[0],
+    time: jobData.time || '12:00',
+    amPm: (jobData.amPm === 'AM' || jobData.amPm === 'PM') ? jobData.amPm : 'AM',
+    location: jobData.location || '',
+    city: jobData.city || '',
+    mobileNumber: jobData.mobileNumber || '',
+  };
+
   return (
     <div className="flex justify-end gap-2 mt-6">
       <Button 
@@ -85,6 +105,15 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
         <ArrowLeft size={16} />
         BACK
       </Button>
+      
+      {/* Print Invoice Button - show for existing jobs */}
+      {!isNewJob && jobData.jobNumber && (
+        <InvoicePrintButton 
+          job={jobForPrint} 
+          disabled={!jobData.customer || !jobData.jobNumber}
+        />
+      )}
+      
       {!disabled && !readOnly && (
         <Button 
           type="submit" 

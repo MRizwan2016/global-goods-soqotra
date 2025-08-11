@@ -19,6 +19,17 @@ const NewJobForm = () => {
   useEffect(() => {
     fixInvoiceLinkage();
     cleanupDummyData();
+    // Also cleanup any specific dummy entries
+    const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+    const cleanedJobs = jobs.filter((job: any) => 
+      !job.customer?.toUpperCase().includes('DUMMY') &&
+      !job.customer?.toUpperCase().includes('SAMPLE') &&
+      job.customer !== 'MRS. AMIRA SIED OSMAN' // Remove this specific dummy entry
+    );
+    if (cleanedJobs.length !== jobs.length) {
+      localStorage.setItem('jobs', JSON.stringify(cleanedJobs));
+      console.log(`Cleaned up ${jobs.length - cleanedJobs.length} dummy job entries`);
+    }
   }, []);
   
   const handleCreateJob = async (jobData: any) => {

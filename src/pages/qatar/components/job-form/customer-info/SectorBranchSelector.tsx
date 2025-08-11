@@ -15,7 +15,7 @@ import PackageSelectionDialog from "./PackageSelectionDialog";
 import { Button } from "@/components/ui/button";
 import { Package } from "lucide-react";
 import { PackageInfo } from "../details/packages/types";
-import SelectedPackagesList from "./SelectedPackagesList";
+
 
 interface SectorBranchSelectorProps {
   onPackageSelect?: (pkg: PackageInfo) => void;
@@ -24,7 +24,6 @@ interface SectorBranchSelectorProps {
 const SectorBranchSelector: React.FC<SectorBranchSelectorProps> = ({ onPackageSelect }) => {
   const { jobData, handleInputChange, handleSelectChange } = useJobForm();
   const [isPackageDialogOpen, setIsPackageDialogOpen] = useState(false);
-  const [selectedPackages, setSelectedPackages] = useState<PackageInfo[]>([]);
 
   const availableSectors = useMemo(() => {
     return jobData.country ? sectorOptions[jobData.country as keyof typeof sectorOptions] || [] : [];
@@ -36,16 +35,10 @@ const SectorBranchSelector: React.FC<SectorBranchSelectorProps> = ({ onPackageSe
   }, [jobData.country, jobData.sector]);
 
   const handlePackageSelect = (pkg: PackageInfo) => {
-    if (!selectedPackages.some(p => p.sr_no === pkg.sr_no)) {
-      setSelectedPackages(prev => [...prev, pkg]);
-      if (onPackageSelect) {
-        onPackageSelect(pkg);
-      }
+    // Only call the parent handler, don't manage local state to avoid duplication
+    if (onPackageSelect) {
+      onPackageSelect(pkg);
     }
-  };
-
-  const handleRemovePackage = (pkg: PackageInfo) => {
-    setSelectedPackages(prev => prev.filter(p => p.sr_no !== pkg.sr_no));
   };
 
   return (
@@ -99,13 +92,6 @@ const SectorBranchSelector: React.FC<SectorBranchSelectorProps> = ({ onPackageSe
           <Package size={16} />
           PACKAGES
         </Button>
-      </div>
-
-      <div className="md:col-span-2">
-        <SelectedPackagesList 
-          selectedPackages={selectedPackages}
-          onRemovePackage={handleRemovePackage}
-        />
       </div>
 
       <PackageSelectionDialog

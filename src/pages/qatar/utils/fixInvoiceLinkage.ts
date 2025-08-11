@@ -44,7 +44,7 @@ export const cleanupDummyData = () => {
   const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
   
   // Filter out dummy jobs (jobs with dummy customer names or old dates)
-  const dummyCustomers = ["QATAR NATIONAL BANK", "SAMPLE CUSTOMER", "TEST CUSTOMER"];
+  const dummyCustomers = ["QATAR NATIONAL BANK", "SAMPLE CUSTOMER", "TEST CUSTOMER", "MRS. AMIRA SIED OSMAN", "DUMMY", "Sample"];
   const today = new Date();
   const cutoffDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 days ago
   
