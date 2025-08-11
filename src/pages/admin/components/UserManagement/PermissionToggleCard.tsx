@@ -34,7 +34,7 @@ const PermissionToggleCard = ({
             onCheckedChange={onToggle}
             id={id}
           />
-          <label htmlFor={id} className="ml-2 text-sm font-medium">
+          <label htmlFor={id} className={`ml-2 text-sm font-medium ${isEnabled ? 'text-green-600' : 'text-muted-foreground'}`}>
             {isEnabled ? "Enabled" : "Disabled"}
           </label>
         </div>

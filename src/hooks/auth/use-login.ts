@@ -6,7 +6,9 @@ import { toast } from "@/hooks/use-toast";
 
 export function useLogin(
   users: User[], 
-  setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>
+  setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>,
+  setShowPasswordChange?: React.Dispatch<React.SetStateAction<boolean>>,
+  setIsFirstLogin?: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   const login = async (email: string, password: string): Promise<boolean> => {
     // Normalize the email (case-insensitive comparison)
@@ -47,6 +49,13 @@ export function useLogin(
     
     if (user) {
       console.log(`Found user: ${user.fullName} (${user.id}), Active: ${user.isActive}`);
+      
+      // Check if it's first login (password is still the initial password)
+      const storedPassword = userPasswords[user.id];
+      if (password === storedPassword && password === "123456" && setShowPasswordChange && setIsFirstLogin) {
+        setIsFirstLogin(true);
+        setShowPasswordChange(true);
+      }
       
       // ULTRA-PERMISSIVE: Accept any password for users - especially helpful for testing
       const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);

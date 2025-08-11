@@ -3,10 +3,11 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { User } from "@/types/auth";
-import { UserCheck, UserX, Settings, Eye } from "lucide-react";
+import { UserCheck, UserX, Settings, Eye, EyeOff } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import UserPermissionsPanel from "./UserPermissionsPanel";
+import { useAuth } from "@/hooks/use-auth";
 
 interface UserListProps {
   users: User[];
@@ -15,8 +16,10 @@ interface UserListProps {
 }
 
 const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
+  const { currentUser } = useAuth();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
+  const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
 
   const handleToggleStatus = async (userId: string) => {
     await toggleUserStatus(userId);
@@ -32,11 +35,49 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
     return userPasswords[userId] || "Not set";
   };
 
+  const togglePasswordVisibility = (userId: string) => {
+    setShowPasswords(prev => ({
+      ...prev,
+      [userId]: !prev[userId]
+    }));
+  };
+
+  const renderPassword = (userId: string) => {
+    const password = getUserPassword(userId);
+    const isVisible = showPasswords[userId];
+    const canViewPasswords = currentUser?.isAdmin;
+
+    if (!canViewPasswords) {
+      return "••••••••";
+    }
+
+    return (
+      <div className="flex items-center gap-2">
+        <span className="text-sm font-mono">
+          {isVisible ? password : "••••••••"}
+        </span>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => togglePasswordVisibility(userId)}
+          className="h-6 w-6 p-0"
+        >
+          {isVisible ? (
+            <EyeOff className="h-3 w-3" />
+          ) : (
+            <Eye className="h-3 w-3" />
+          )}
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-4">
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Sr No.</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Mobile</TableHead>
@@ -47,8 +88,11 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.map((user) => (
+          {users.map((user, index) => (
             <TableRow key={user.id}>
+              <TableCell className="text-sm font-medium">
+                {index + 1}
+              </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{user.fullName}</span>
@@ -68,13 +112,13 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
               <TableCell className="text-sm text-muted-foreground">
                 {user.country}
               </TableCell>
-              <TableCell className="text-sm font-mono">
-                {getUserPassword(user.id)}
+              <TableCell>
+                {renderPassword(user.id)}
               </TableCell>
               <TableCell>
                 <Badge
                   variant={user.isActive ? "default" : "destructive"}
-                  className={`text-xs ${user.isActive ? "bg-green-600 hover:bg-green-700" : ""}`}
+                  className={`text-xs ${user.isActive ? "bg-green-600 hover:bg-green-700 text-white" : ""}`}
                 >
                   {user.isActive ? "Active" : "Inactive"}
                 </Badge>

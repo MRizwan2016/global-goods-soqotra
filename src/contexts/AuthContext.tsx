@@ -5,6 +5,7 @@ import { ADMIN_EMAIL, ADMIN_PASSWORD } from "@/constants/auth";
 import { ensureUserPermissions, hasFilePermission as checkFilePermission } from "@/utils/auth-utils";
 import { useUserOperations } from "@/hooks/use-user-operations";
 import { useAuthOperations } from "@/hooks/use-auth-operations";
+import PasswordChangeDialog from "@/components/PasswordChangeDialog";
 
 // Create the context with an undefined initial value
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -12,12 +13,33 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [isFirstLogin, setIsFirstLogin] = useState(false);
 
   // Get user operations
   const { toggleUserStatus, toggleUserPermission, toggleFilePermission } = useUserOperations(users, setUsers);
   
   // Get auth operations
-  const { login, logout, register, requestPasswordReset, resetPassword } = useAuthOperations(users, setUsers, setCurrentUser);
+  const { login: baseLogin, logout, register, requestPasswordReset, resetPassword } = useAuthOperations(users, setUsers, setCurrentUser);
+  
+  // Wrap login to handle first login password change
+  const login = async (email: string, password: string): Promise<boolean> => {
+    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
+    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    
+    const success = await baseLogin(email, password);
+    
+    if (success && user) {
+      // Check if it's first login (password is still the initial password)
+      const storedPassword = userPasswords[user.id];
+      if (password === storedPassword && password === "123456") {
+        setIsFirstLogin(true);
+        setShowPasswordChange(true);
+      }
+    }
+    
+    return success;
+  };
 
   // Load data from localStorage on initial load
   useEffect(() => {
@@ -310,6 +332,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return checkFilePermission(user, fileKey);
   };
 
+  // Handle password change for first login
+  const handlePasswordChange = (newPassword: string) => {
+    if (currentUser) {
+      const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
+      userPasswords[currentUser.id] = newPassword;
+      localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
+      setIsFirstLogin(false);
+      toast({ title: "Success", description: "Password updated successfully" });
+    }
+  };
+
   // Provide all the auth context values
   const value = {
     currentUser,
@@ -331,7 +364,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     hasFilePermission
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+      
+      {currentUser && (
+        <PasswordChangeDialog
+          open={showPasswordChange}
+          onOpenChange={setShowPasswordChange}
+          userEmail={currentUser.email}
+          onPasswordChange={handlePasswordChange}
+        />
+      )}
+    </AuthContext.Provider>
+  );
 };
 
 // Remove duplicate useAuth definition here to prevent conflicts
