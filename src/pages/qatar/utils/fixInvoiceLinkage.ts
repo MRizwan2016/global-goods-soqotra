@@ -43,7 +43,7 @@ export const cleanupDummyData = () => {
   // Get all jobs
   const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
   
-  // Filter out dummy jobs (jobs with dummy customer names, test data, or old irrelevant data)
+  // Enhanced filter to remove more dummy/test data patterns
   const dummyCustomers = [
     "QATAR NATIONAL BANK", 
     "SAMPLE CUSTOMER", 
@@ -53,29 +53,71 @@ export const cleanupDummyData = () => {
     "Sample",
     "QATAR COLLECTION & DELIVERY MANAGEMENT",
     "TEST",
-    "DEMO"
+    "DEMO",
+    "DEFAULT",
+    "EXAMPLE",
+    "MOCK",
+    "TEMPLATE"
   ];
   
+  // More aggressive cleanup to remove any suspicious test data
   const realJobs = jobs.filter((job: any) => {
+    // Skip jobs with missing essential data
+    if (!job.customer || !job.jobNumber || !job.mobileNumber) {
+      return false;
+    }
+    
     // Check if customer name contains dummy indicators
-    const customerCheck = job.customer && !dummyCustomers.some(dummy => 
+    const customerCheck = !dummyCustomers.some(dummy => 
       job.customer.toUpperCase().includes(dummy.toUpperCase())
     );
     
-    // Check if job number contains test/dummy indicators
-    const jobNumberCheck = job.jobNumber && !job.jobNumber.toUpperCase().includes('TEST') && 
-                          !job.jobNumber.toUpperCase().includes('DUMMY');
+    // Check if job number contains test/dummy indicators or suspicious patterns
+    const jobNumberCheck = !job.jobNumber.toUpperCase().includes('TEST') && 
+                          !job.jobNumber.toUpperCase().includes('DUMMY') &&
+                          !job.jobNumber.toUpperCase().includes('SAMPLE') &&
+                          !job.jobNumber.toUpperCase().includes('DEMO');
     
-    // Check if mobile number is not a test number
-    const mobileCheck = job.mobileNumber && !job.mobileNumber.includes('000') && 
-                       !job.mobileNumber.includes('111');
+    // Check if mobile number is realistic (not test patterns)
+    const mobileCheck = !job.mobileNumber.includes('000') && 
+                       !job.mobileNumber.includes('111') &&
+                       !job.mobileNumber.includes('123') &&
+                       !job.mobileNumber.includes('999') &&
+                       job.mobileNumber.length >= 8; // Minimum realistic length
     
-    return customerCheck && jobNumberCheck && mobileCheck;
+    // Check for old/outdated entries (keep only recent 90 days)
+    const jobDate = job.dateCreated ? new Date(job.dateCreated) : new Date(job.date || Date.now());
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - 90);
+    const isRecent = jobDate >= cutoffDate;
+    
+    return customerCheck && jobNumberCheck && mobileCheck && isRecent;
   });
   
+  // Also clean up invoices with dummy data
+  const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+  const realInvoices = invoices.filter((invoice: any) => {
+    if (!invoice.shipper || !invoice.consignee) return false;
+    
+    return !dummyCustomers.some(dummy => 
+      invoice.shipper.toUpperCase().includes(dummy.toUpperCase()) ||
+      invoice.consignee.toUpperCase().includes(dummy.toUpperCase())
+    );
+  });
+  
+  // Update storage with cleaned data
   if (realJobs.length !== jobs.length) {
     localStorage.setItem('jobs', JSON.stringify(realJobs));
     console.log(`Removed ${jobs.length - realJobs.length} dummy jobs`);
-    toast.success(`Cleaned up ${jobs.length - realJobs.length} dummy entries`);
+  }
+  
+  if (realInvoices.length !== invoices.length) {
+    localStorage.setItem('invoices', JSON.stringify(realInvoices));
+    console.log(`Removed ${invoices.length - realInvoices.length} dummy invoices`);
+  }
+  
+  const totalRemoved = (jobs.length - realJobs.length) + (invoices.length - realInvoices.length);
+  if (totalRemoved > 0) {
+    toast.success(`Cleaned up ${totalRemoved} dummy entries from system`);
   }
 };

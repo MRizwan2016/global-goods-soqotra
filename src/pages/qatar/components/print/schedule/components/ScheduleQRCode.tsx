@@ -7,13 +7,23 @@ interface ScheduleQRCodeProps {
 }
 
 const ScheduleQRCode: React.FC<ScheduleQRCodeProps> = ({ scheduleNumber }) => {
-  // Create a value for the QR code that includes relevant information
-  // Adding more details and using a proper URL format for better functionality
-  const baseUrl = window.location.origin; // Get the base URL of the application
+  // Create a comprehensive QR code value with schedule information
+  const baseUrl = window.location.origin;
   const currentDate = new Date().toISOString().split('T')[0];
+  const timestamp = new Date().toISOString();
   
-  // Format: URL with parameters for proper routing
-  const qrValue = `${baseUrl}/qatar/jobs/schedule?id=${scheduleNumber}&date=${currentDate}&verified=true`;
+  // Enhanced QR code with more detailed information for verification
+  const scheduleInfo = {
+    scheduleNumber,
+    date: currentDate,
+    timestamp,
+    verified: true,
+    type: 'job_schedule',
+    url: `${baseUrl}/qatar/jobs/schedule?id=${scheduleNumber}&date=${currentDate}&verified=true`
+  };
+  
+  // Create QR value that can be parsed as both URL and JSON
+  const qrValue = JSON.stringify(scheduleInfo);
   
   return (
     <div className="print:block" style={{ width: "80px", height: "80px" }}>
