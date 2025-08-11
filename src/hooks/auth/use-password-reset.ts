@@ -16,8 +16,18 @@ export function usePasswordReset(users: User[]) {
       return false;
     }
     
+    // Check if user is active
+    if (!user.isActive) {
+      toast({
+        title: "Account Inactive",
+        description: "Your account is not active. Please contact an administrator.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    
     // Generate a reset token
-    const resetToken = Math.random().toString(36).substring(2, 15);
+    const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const resetExpiry = Date.now() + 3600000; // 1 hour from now
     
     // Store token in localStorage
@@ -28,13 +38,25 @@ export function usePasswordReset(users: User[]) {
     };
     localStorage.setItem("resetTokens", JSON.stringify(resetTokens));
     
-    // In a real app, send an email with a link containing the token
-    console.log(`Reset token for ${user.email}: ${resetToken}`);
+    // Create reset URL
+    const resetUrl = `${window.location.origin}/admin/reset-password?userId=${user.id}&token=${resetToken}`;
+    
+    // In a real app, send an email with the reset link
+    console.log(`Reset URL for ${user.email}: ${resetUrl}`);
     
     toast({
       title: "Password Reset Requested",
-      description: "If this email is registered, you will receive reset instructions. (For demo purposes, check console for reset token)",
+      description: `If this email is registered, you will receive reset instructions. (For demo: Check console for reset URL)`,
     });
+    
+    // For demo purposes, show the reset link
+    setTimeout(() => {
+      toast({
+        title: "Demo Reset Link",
+        description: `For testing: ${resetUrl}`,
+        duration: 10000,
+      });
+    }, 2000);
     
     return true;
   };

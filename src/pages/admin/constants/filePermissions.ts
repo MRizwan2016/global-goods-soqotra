@@ -1,52 +1,44 @@
+
 export const filePermissions = {
   masterData: {
-    label: "Master Data",
-    icon: "Database",
+    title: "Master Data Files",
     files: {
-      salesRep: { label: "Sales Rep", path: "/master/sales-rep" },
-      town: { label: "Town", path: "/master/town" },
-      item: { label: "Item", path: "/master/item" },
-      packageOptions: { label: "Package Options", path: "/master/package-options" },
-      sellingRates: { label: "Selling Rates", path: "/selling-rates" },
-      container: { label: "Container", path: "/qatar/containers" },
-      vessel: { label: "Vessel", path: "/qatar/vessels" },
-      invoiceBook: { label: "Invoice Book", path: "/master/invoice-book" },
-      driverHelper: { label: "Driver/Helper", path: "/master/driver-helper" },
+      salesRep: { label: "Sales Representative" },
+      town: { label: "Town Management" },
+      item: { label: "Item Management" },
+      packageOptions: { label: "Package Options" },
+      sellingRates: { label: "Selling Rates" },
+      container: { label: "Container Management" },
+      vessel: { label: "Vessel Management" },
+      invoiceBook: { label: "Invoice Book" },
+      driverHelper: { label: "Driver/Helper Management" }
     }
   },
   dataEntry: {
-    label: "Data Entry",
-    icon: "FileInput",
+    title: "Data Entry Files",
     files: {
-      invoicing: { label: "Invoicing", path: "/data-entry/invoicing" },
-      paymentReceivable: { label: "Payment Receivable", path: "/data-entry/payment" },
-      loadContainer: { label: "Load Container", path: "/data-entry/container" },
-      loadVessel: { label: "Load Vessel", path: "/qatar/vessels" },
-      loadAirCargo: { label: "Load Air Cargo", path: "/data-entry/air-cargo" },
-      packingList: { label: "Packing List", path: "/data-entry/packing-list" },
-      sellingRates: { label: "Selling Rates", path: "/data-entry/selling-rates" }
+      invoicing: { label: "Invoicing" },
+      paymentReceivable: { label: "Payment Receivable" },
+      loadContainer: { label: "Load Container" },
+      loadVessel: { label: "Load Vessel" },
+      loadAirCargo: { label: "Load Air Cargo" },
+      packingList: { label: "Packing List" }
     }
   },
   reports: {
-    label: "Reports",
-    icon: "BarChart4",
+    title: "Reports Files",
     files: {
-      cargoReports: { label: "Cargo Reports", path: "/reports/cargo" },
-      financialReports: { label: "Financial Reports", path: "/reports/financial" },
-      shippingReports: { label: "Shipping Reports", path: "/reports/shipping" },
+      cargoReports: { label: "Cargo Reports" },
+      financialReports: { label: "Financial Reports" },
+      shippingReports: { label: "Shipping Reports" }
     }
   },
   accounting: {
-    label: "Accounts",
-    icon: "DollarSign",
+    title: "Accounting Files",
     files: {
-      paymentMethods: { label: "Payment Methods", path: "/accounts/payment-methods" },
-      reconciliation: { label: "Reconciliation", path: "/accounts/reconciliation" },
-      profitLoss: { label: "Profit & Loss", path: "/accounts/profit-loss" },
-      financialReports: { label: "Financial Reports", path: "/accounts/financial-reports" },
-      payments: { label: "Payments", path: "/accounts/payments" },
-      addPayment: { label: "Add Payment", path: "/accounts/payment/add" },
-      paidInvoices: { label: "Paid Invoices", path: "/accounts/payments/paid" }
+      paymentMethods: { label: "Payment Methods" },
+      reconciliation: { label: "Reconciliation" },
+      profitLoss: { label: "Profit & Loss" }
     }
   }
 };

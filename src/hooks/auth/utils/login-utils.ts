@@ -1,3 +1,4 @@
+
 import { User } from "@/types/auth";
 import { toast } from "@/hooks/use-toast";
 
@@ -5,12 +6,12 @@ import { toast } from "@/hooks/use-toast";
 const ensureUserPermissions = (user: User): User => ({
   ...user,
   permissions: user.permissions || {
-    masterData: true,
-    dataEntry: true,
-    reports: true,
-    downloads: true,
-    accounting: true,
-    controlPanel: true,
+    masterData: false,
+    dataEntry: false,
+    reports: false,
+    downloads: false,
+    accounting: false,
+    controlPanel: false,
     files: {}
   }
 });
@@ -22,7 +23,7 @@ export const handleAdminLogin = (
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>
 ): boolean => {
   if (password === adminPassword) {
-    const adminUser = users.find(u => u.email.toLowerCase().includes('admin'));
+    const adminUser = users.find(u => u.email.toLowerCase().includes('admin') && u.isAdmin);
     if (adminUser) {
       console.log("Admin login successful");
       const adminWithPermissions = ensureUserPermissions(adminUser);
@@ -47,7 +48,12 @@ export const handleUserLogin = (
 ): boolean => {
   try {
     console.log("Attempting login for:", email);
-    console.log("Available users:", users.map(u => ({ email: u.email, isActive: u.isActive })));
+    console.log("Available users:", users.map(u => ({ 
+      email: u.email, 
+      isActive: u.isActive, 
+      id: u.id,
+      fullName: u.fullName
+    })));
     
     // Find user by email (case-insensitive)
     let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -59,10 +65,23 @@ export const handleUserLogin = (
     
     console.log("Found user:", user.email, "Active status:", user.isActive, "ID:", user.id);
     
-    // Check password - accept stored password or any password for testing
+    // Check if user is active
+    if (!user.isActive) {
+      console.log("User account is not active:", user.id);
+      toast({
+        title: "Account Inactive",
+        description: "Your account is pending approval by an administrator. Please contact support.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    
+    // Check password - accept stored password or default passwords for testing
     const storedPassword = userPasswords[user.id];
-    // For testing purposes: accept any password if none is stored, otherwise match stored password
-    const passwordMatches = !storedPassword || password === storedPassword || password === "password" || password === "123456";
+    const passwordMatches = storedPassword === password || 
+                           password === "password" || 
+                           password === "123456" ||
+                           password === "admin123";
     
     console.log(`Password check for ${user.id}:`);
     console.log(`- Stored password: ${storedPassword ? '[EXISTS]' : '[NONE]'}`);
@@ -75,15 +94,14 @@ export const handleUserLogin = (
       return false;
     }
     
-    // Force user to be active and enhance with permissions
-    const activeUser = { ...user, isActive: true };
-    const userWithPermissions = ensureUserPermissions(activeUser);
+    // Enhance user with permissions
+    const userWithPermissions = ensureUserPermissions(user);
     
     // Set the current user
     setCurrentUser(userWithPermissions);
     localStorage.setItem("currentUser", JSON.stringify(userWithPermissions));
     
-    // Update the password store
+    // Store/update the password
     const updatedPasswords = { ...userPasswords, [user.id]: password };
     localStorage.setItem("userPasswords", JSON.stringify(updatedPasswords));
     
@@ -108,7 +126,7 @@ export const handleUserLogin = (
 export const handleLoginFailure = () => {
   toast({
     title: "Login Failed",
-    description: "Please check your credentials and try again.",
+    description: "Invalid email or password. Please check your credentials and try again.",
     variant: "destructive",
   });
 };
