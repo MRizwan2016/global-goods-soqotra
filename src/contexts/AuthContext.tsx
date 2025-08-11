@@ -257,6 +257,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       "user-1744301929974": "123456", // MOHAMED JAVED  
       "user-1753610771083": "123456"  // LAHIRU CHATHURANGA
     };
+    
+    // Ensure passwords are accessible immediately
+    console.log("Setting up initial user passwords for: ", Object.keys(userPasswords));
     localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
   };
 

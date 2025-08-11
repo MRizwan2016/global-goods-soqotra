@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { User } from "@/types/auth";
 import { UserCheck, UserX, Settings, Eye } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import UserPermissionsPanel from "./UserPermissionsPanel";
 
 interface UserListProps {
@@ -26,67 +27,96 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
     setPermissionsDialogOpen(true);
   };
 
+  const getUserPassword = (userId: string): string => {
+    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
+    return userPasswords[userId] || "Not set";
+  };
+
   return (
     <div className="space-y-4">
-      {users.map((user) => (
-        <div
-          key={user.id}
-          className="flex items-center justify-between p-4 border rounded-lg bg-card"
-        >
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-medium">{user.fullName}</h3>
-              {user.isAdmin && (
-                <Badge variant="secondary" className="text-xs">
-                  Admin
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Mobile</TableHead>
+            <TableHead>Country</TableHead>
+            <TableHead>Password</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {users.map((user) => (
+            <TableRow key={user.id}>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{user.fullName}</span>
+                  {user.isAdmin && (
+                    <Badge variant="secondary" className="text-xs">
+                      Admin
+                    </Badge>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="text-sm text-muted-foreground">
+                {user.email}
+              </TableCell>
+              <TableCell className="text-sm text-muted-foreground">
+                {user.mobileNumber}
+              </TableCell>
+              <TableCell className="text-sm text-muted-foreground">
+                {user.country}
+              </TableCell>
+              <TableCell className="text-sm font-mono">
+                {getUserPassword(user.id)}
+              </TableCell>
+              <TableCell>
+                <Badge
+                  variant={user.isActive ? "default" : "destructive"}
+                  className={`text-xs ${user.isActive ? "bg-green-600 hover:bg-green-700" : ""}`}
+                >
+                  {user.isActive ? "Active" : "Inactive"}
                 </Badge>
-              )}
-              <Badge
-                variant={user.isActive ? "default" : "destructive"}
-                className="text-xs"
-              >
-                {user.isActive ? "Active" : "Inactive"}
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground">{user.email}</p>
-            <p className="text-xs text-muted-foreground">
-              {user.mobileNumber} • {user.country}
-            </p>
-          </div>
-          
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => openPermissionsDialog(user)}
-            >
-              <Settings className="h-4 w-4 mr-1" />
-              Permissions
-            </Button>
-            
-            {!user.isAdmin && (
-              <Button
-                variant={user.isActive ? "destructive" : "default"}
-                size="sm"
-                onClick={() => handleToggleStatus(user.id)}
-                disabled={loading[user.id]}
-              >
-                {user.isActive ? (
-                  <>
-                    <UserX className="h-4 w-4 mr-1" />
-                    Deactivate
-                  </>
-                ) : (
-                  <>
-                    <UserCheck className="h-4 w-4 mr-1" />
-                    Activate
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
-        </div>
-      ))}
+              </TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => openPermissionsDialog(user)}
+                  >
+                    <Settings className="h-4 w-4 mr-1" />
+                    Permissions
+                  </Button>
+                  
+                  {!user.isAdmin && (
+                    <Button
+                      variant={user.isActive ? "destructive" : "default"}
+                      size="sm"
+                      onClick={() => handleToggleStatus(user.id)}
+                      disabled={loading[user.id]}
+                      className={!user.isActive ? "bg-green-600 hover:bg-green-700 text-white" : ""}
+                    >
+                      {user.isActive ? (
+                        <>
+                          <UserX className="h-4 w-4 mr-1" />
+                          Deactivate
+                        </>
+                      ) : (
+                        <>
+                          <UserCheck className="h-4 w-4 mr-1" />
+                          Activate
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
       <Dialog open={permissionsDialogOpen} onOpenChange={setPermissionsDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
