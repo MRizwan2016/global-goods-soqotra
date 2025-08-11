@@ -46,7 +46,7 @@ const MenuItemList: React.FC<Props> = ({
     // Check in all file permission categories
     Object.entries(filePermissions).forEach(([category, categoryData]) => {
       Object.entries(categoryData.files).forEach(([key, data]) => {
-        if (data.path === path || path.startsWith(data.path)) {
+        if (data.path && (data.path === path || path.startsWith(data.path))) {
           fileKey = key;
         }
       });

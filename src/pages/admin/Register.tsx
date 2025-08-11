@@ -49,7 +49,13 @@ const Register = () => {
     
     try {
       const { confirmPassword, ...userData } = values;
-      const success = await register(userData);
+      const success = await register({
+        email: userData.email,
+        fullName: userData.fullName,
+        password: userData.password,
+        mobileNumber: userData.mobileNumber,
+        country: userData.country
+      });
       
       if (success) {
         navigate("/admin/login", { 

@@ -6,6 +6,7 @@ import StatCards from "./components/dashboard/StatCards";
 import PendingJobs from "./components/dashboard/PendingJobs";
 import JobListing from "./components/dashboard/JobListing";
 import VehicleStatistics from "./components/dashboard/VehicleStatistics";
+import VehicleStatisticsPanel from "./components/vehicle-statistics/VehicleStatisticsPanel";
 import { DailyJobForecast, VehicleStats } from "./types/jobTypes";
 import { useJobData } from "./hooks/useJobData";
 import { useJobManagement } from "./hooks/useJobManagement";
@@ -86,6 +87,9 @@ const QatarDashboard = () => {
         vehicleStats={vehicleStatsArray} 
         totals={vehicleTotals} 
       />
+      
+      {/* Vehicle Job Statistics after allocation */}
+      <VehicleStatisticsPanel />
     </Layout>
   );
 };

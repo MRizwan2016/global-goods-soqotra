@@ -43,17 +43,34 @@ export const cleanupDummyData = () => {
   // Get all jobs
   const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
   
-  // Filter out dummy jobs (jobs with dummy customer names or old dates)
-  const dummyCustomers = ["QATAR NATIONAL BANK", "SAMPLE CUSTOMER", "TEST CUSTOMER", "MRS. AMIRA SIED OSMAN", "DUMMY", "Sample"];
-  const today = new Date();
-  const cutoffDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000); // 30 days ago
+  // Filter out dummy jobs (jobs with dummy customer names, test data, or old irrelevant data)
+  const dummyCustomers = [
+    "QATAR NATIONAL BANK", 
+    "SAMPLE CUSTOMER", 
+    "TEST CUSTOMER", 
+    "MRS. AMIRA SIED OSMAN", 
+    "DUMMY", 
+    "Sample",
+    "QATAR COLLECTION & DELIVERY MANAGEMENT",
+    "TEST",
+    "DEMO"
+  ];
   
   const realJobs = jobs.filter((job: any) => {
-    const jobDate = new Date(job.date || job.timestamp || job.createdAt);
-    const isNotDummy = !dummyCustomers.includes(job.customer?.toUpperCase());
-    const isRecent = jobDate >= cutoffDate;
+    // Check if customer name contains dummy indicators
+    const customerCheck = job.customer && !dummyCustomers.some(dummy => 
+      job.customer.toUpperCase().includes(dummy.toUpperCase())
+    );
     
-    return isNotDummy && isRecent;
+    // Check if job number contains test/dummy indicators
+    const jobNumberCheck = job.jobNumber && !job.jobNumber.toUpperCase().includes('TEST') && 
+                          !job.jobNumber.toUpperCase().includes('DUMMY');
+    
+    // Check if mobile number is not a test number
+    const mobileCheck = job.mobileNumber && !job.mobileNumber.includes('000') && 
+                       !job.mobileNumber.includes('111');
+    
+    return customerCheck && jobNumberCheck && mobileCheck;
   });
   
   if (realJobs.length !== jobs.length) {
