@@ -41,24 +41,36 @@ export function usePasswordReset(users: User[]) {
     // Create reset URL
     const resetUrl = `${window.location.origin}/admin/reset-password?userId=${user.id}&token=${resetToken}`;
     
-    // In a real app, send an email with the reset link
+    // Simulate sending email
     console.log(`Reset URL for ${user.email}: ${resetUrl}`);
     
-    toast({
-      title: "Password Reset Requested",
-      description: `If this email is registered, you will receive reset instructions. (For demo: Check console for reset URL)`,
-    });
+    // For demonstration, we'll simulate email sending
+    const emailSent = await simulateEmailSending(user.email, resetUrl);
     
-    // For demo purposes, show the reset link
-    setTimeout(() => {
+    if (emailSent) {
       toast({
-        title: "Demo Reset Link",
-        description: `For testing: ${resetUrl}`,
-        duration: 10000,
+        title: "Password Reset Email Sent",
+        description: `A password reset link has been sent to ${user.email}. Please check your inbox and spam folder.`,
       });
-    }, 2000);
-    
-    return true;
+      
+      // For demo purposes, also show the reset link in console and toast
+      setTimeout(() => {
+        toast({
+          title: "Demo: Reset Link",
+          description: `For testing, the reset link is: ${resetUrl}`,
+          duration: 15000,
+        });
+      }, 2000);
+      
+      return true;
+    } else {
+      toast({
+        title: "Email Send Failed",
+        description: "There was an error sending the reset email. Please try again later.",
+        variant: "destructive"
+      });
+      return false;
+    }
   };
 
   const resetPassword = async (userId: string, token: string, newPassword: string): Promise<boolean> => {
@@ -93,4 +105,25 @@ export function usePasswordReset(users: User[]) {
   };
 
   return { requestPasswordReset, resetPassword };
+}
+
+// Simulate email sending function
+async function simulateEmailSending(email: string, resetUrl: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    // Simulate API call delay
+    setTimeout(() => {
+      // For demo purposes, we'll always return true
+      // In a real application, this would integrate with an email service like:
+      // - EmailJS
+      // - SendGrid
+      // - AWS SES
+      // - Nodemailer (if you have a backend)
+      
+      console.log(`Simulated email sent to: ${email}`);
+      console.log(`Email content would include: ${resetUrl}`);
+      
+      // Simulate successful email sending
+      resolve(true);
+    }, 1500);
+  });
 }

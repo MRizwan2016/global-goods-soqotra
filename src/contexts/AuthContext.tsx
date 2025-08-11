@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { toast } from "@/hooks/use-toast";
 import { User, AuthContextType } from "@/types/auth";
@@ -50,10 +49,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.setItem("users", JSON.stringify(updatedUsers));
       } catch (error) {
         console.error("Failed to parse users:", error);
-        initializeDefaultAdmin();
+        initializeDefaultUsersAndAdmin();
       }
     } else {
-      initializeDefaultAdmin();
+      initializeDefaultUsersAndAdmin();
     }
     
     // Ensure userPasswords exist for all current users
@@ -64,53 +63,112 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log("Stored user passwords (ids only):", Object.keys(userPasswords));
   }, []);
 
-  // Function to initialize the default admin user
-  const initializeDefaultAdmin = () => {
-    const adminUser: User = {
-      id: "admin-1",
-      fullName: "System Administrator",
-      email: ADMIN_EMAIL,
-      mobileNumber: "+974 5555 5555",
-      country: "Qatar",
-      isActive: true,
-      isAdmin: true,
-      createdAt: new Date().toISOString(),
-      permissions: {
-        masterData: true,
-        dataEntry: true,
-        reports: true,
-        downloads: true,
-        accounting: true,
-        controlPanel: true,
-        files: {
-          salesRep: true,
-          town: true,
-          item: true,
-          packageOptions: true,
-          sellingRates: true,
-          container: true,
-          vessel: true,
-          invoiceBook: true,
-          driverHelper: true,
-          invoicing: true,
-          paymentReceivable: true,
-          loadContainer: true,
-          loadVessel: true,
-          loadAirCargo: true,
-          packingList: true,
-          cargoReports: true,
-          financialReports: true,
-          shippingReports: true,
-          paymentMethods: true,
-          reconciliation: true,
-          profitLoss: true
+  // Function to initialize the default admin user and test users
+  const initializeDefaultUsersAndAdmin = () => {
+    const defaultUsers: User[] = [
+      {
+        id: "admin-1",
+        fullName: "System Administrator",
+        email: ADMIN_EMAIL,
+        mobileNumber: "+974 5555 5555",
+        country: "Qatar",
+        isActive: true,
+        isAdmin: true,
+        createdAt: new Date().toISOString(),
+        permissions: {
+          masterData: true,
+          dataEntry: true,
+          reports: true,
+          downloads: true,
+          accounting: true,
+          controlPanel: true,
+          files: {
+            salesRep: true,
+            town: true,
+            item: true,
+            packageOptions: true,
+            sellingRates: true,
+            container: true,
+            vessel: true,
+            invoiceBook: true,
+            driverHelper: true,
+            invoicing: true,
+            paymentReceivable: true,
+            loadContainer: true,
+            loadVessel: true,
+            loadAirCargo: true,
+            packingList: true,
+            cargoReports: true,
+            financialReports: true,
+            shippingReports: true,
+            paymentMethods: true,
+            reconciliation: true,
+            profitLoss: true
+          }
+        }
+      },
+      {
+        id: "user-1742197681223",
+        fullName: "MOHAMED RIZWAN",
+        email: "mzmrizwan2016@gmail.com",
+        mobileNumber: "+974 1234 5678",
+        country: "Qatar",
+        isActive: true,
+        isAdmin: false,
+        createdAt: new Date().toISOString(),
+        permissions: {
+          masterData: false,
+          dataEntry: true,
+          reports: true,
+          downloads: false,
+          accounting: false,
+          controlPanel: false,
+          files: {}
+        }
+      },
+      {
+        id: "user-1744301929974",
+        fullName: "MOHAMED JAVED",
+        email: "javed@soqotra.com",
+        mobileNumber: "+974 2345 6789",
+        country: "Qatar",
+        isActive: true,
+        isAdmin: false,
+        createdAt: new Date().toISOString(),
+        permissions: {
+          masterData: false,
+          dataEntry: true,
+          reports: true,
+          downloads: false,
+          accounting: false,
+          controlPanel: false,
+          files: {}
+        }
+      },
+      {
+        id: "user-1753610771083",
+        fullName: "LAHIRU CHATHURANGA",
+        email: "lahiru@soqotra.com",
+        mobileNumber: "+974 3456 7890",
+        country: "Qatar",
+        isActive: true,
+        isAdmin: false,
+        createdAt: new Date().toISOString(),
+        permissions: {
+          masterData: false,
+          dataEntry: true,
+          reports: false,
+          downloads: false,
+          accounting: false,
+          controlPanel: false,
+          files: {}
         }
       }
-    };
+    ];
     
-    setUsers([adminUser]);
-    localStorage.setItem("users", JSON.stringify([adminUser]));
-    console.log("Initialized with admin user:", [adminUser]);
+    setUsers(defaultUsers);
+    localStorage.setItem("users", JSON.stringify(defaultUsers));
+    console.log("Initialized with default users:", defaultUsers);
     
     // Set admin password in localStorage
     localStorage.setItem("admin-password", ADMIN_PASSWORD);
