@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Grid } from "@/components/ui/grid";
+import { cn } from "@/lib/utils";
 import PermissionToggleCard from "./PermissionToggleCard";
 import { User } from "@/types/auth";
 import { Database, FileInput, BarChart4, Download, DollarSign, Settings } from "lucide-react";
@@ -45,7 +45,7 @@ const CategoryPermissions = ({ user, toggleUserPermission }: CategoryPermissions
   ];
 
   return (
-    <Grid className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+    <div className={cn("grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4")}>
       {permissionCategories.map(category => (
         <PermissionToggleCard
           key={category.key}
@@ -56,7 +56,7 @@ const CategoryPermissions = ({ user, toggleUserPermission }: CategoryPermissions
           id={`${user.id}-${category.key}`}
         />
       ))}
-    </Grid>
+    </div>
   );
 };
 
