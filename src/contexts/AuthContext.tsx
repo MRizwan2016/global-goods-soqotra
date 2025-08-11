@@ -56,6 +56,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       initializeDefaultAdmin();
     }
     
+    // Ensure userPasswords exist for all current users
+    ensureUserPasswordsExist();
+    
     // Debug: Log user passwords
     const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
     console.log("Stored user passwords (ids only):", Object.keys(userPasswords));
@@ -112,9 +115,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Set admin password in localStorage
     localStorage.setItem("admin-password", ADMIN_PASSWORD);
     
-    // Setup initial userPasswords object
-    const userPasswords = { "admin-1": ADMIN_PASSWORD };
+    // Setup initial userPasswords object with default passwords for all users
+    const userPasswords = { 
+      "admin-1": ADMIN_PASSWORD,
+      "user-1742197681223": "123456", // MOHAMED RIZWAN
+      "user-1744301929974": "123456", // MOHAMED JAVED  
+      "user-1753610771083": "123456"  // LAHIRU CHATHURANGA
+    };
     localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
+  };
+
+  // Function to ensure all users have passwords set
+  const ensureUserPasswordsExist = () => {
+    const currentUsers = JSON.parse(localStorage.getItem("users") || "[]");
+    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
+    
+    let passwordsUpdated = false;
+    
+    currentUsers.forEach((user: User) => {
+      if (!userPasswords[user.id]) {
+        // Set default password for users
+        if (user.isAdmin) {
+          userPasswords[user.id] = ADMIN_PASSWORD;
+        } else {
+          userPasswords[user.id] = "123456"; // Default password for all users
+        }
+        passwordsUpdated = true;
+        console.log(`Set default password for user: ${user.fullName} (${user.id})`);
+      }
+    });
+    
+    if (passwordsUpdated) {
+      localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
+      console.log("Updated userPasswords:", Object.keys(userPasswords));
+    }
   };
 
   // Save users to localStorage whenever they change
