@@ -19,8 +19,27 @@ const PrivateRoute = ({
   requiredFile,
   requiredPermission
 }: PrivateRouteProps) => {
-  const { isAuthenticated, isAdmin, currentUser } = useAuth();
-  const { hasFilePermission } = usePermissions();
+  // Add error boundary for auth context
+  let authContext;
+  try {
+    authContext = useAuth();
+  } catch (error) {
+    console.error("AuthProvider context error:", error);
+    return <Navigate to="/admin/login" replace />;
+  }
+  
+  const { isAuthenticated, isAdmin, currentUser } = authContext;
+  
+  // Add error boundary for permissions context
+  let permissionsContext;
+  try {
+    permissionsContext = usePermissions();
+  } catch (error) {
+    console.error("Permissions context error:", error);
+    return <Navigate to="/admin/login" replace />;
+  }
+  
+  const { hasFilePermission } = permissionsContext;
   const location = useLocation();
 
   useEffect(() => {
