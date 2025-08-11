@@ -19,7 +19,26 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const { login, isAuthenticated, users } = useAuth();
+  // Add error boundary for auth context
+  let authContext;
+  try {
+    authContext = useAuth();
+  } catch (error) {
+    console.error("AuthProvider context error in Login:", error);
+    // Return a basic login form without auth functionality as fallback
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 p-4">
+        <div className="w-full max-w-md bg-white/10 rounded-2xl shadow-xl border border-white/20 p-8">
+          <div className="text-center text-white">
+            <h1 className="text-2xl font-bold mb-4">Loading...</h1>
+            <p>Please wait while the application initializes.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  const { login, isAuthenticated, users } = authContext;
   const navigate = useNavigate();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
