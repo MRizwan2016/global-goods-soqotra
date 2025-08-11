@@ -75,6 +75,14 @@ const Login = () => {
     },
   });
 
+  // Clear error message when user edits fields
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      if (error) setError(null);
+    });
+    return () => subscription.unsubscribe?.();
+  }, [form, error]);
+
   const onSubmit = async (values: LoginValues) => {
     setError(null);
     setIsLoading(true);

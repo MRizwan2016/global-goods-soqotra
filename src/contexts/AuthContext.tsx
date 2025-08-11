@@ -45,8 +45,85 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Log stored users for debugging
         console.log("Loaded users from localStorage:", updatedUsers);
         
-        setUsers(updatedUsers);
-        localStorage.setItem("users", JSON.stringify(updatedUsers));
+        // Ensure default demo users exist so known test accounts can log in
+        const requiredEmails = [
+          "mzmrizwan2016@gmail.com",
+          "javed@soqotra.com",
+          "lahiru@soqotra.com"
+        ];
+        const existingEmails = new Set(updatedUsers.map((u: any) => u.email?.toLowerCase?.()));
+        const missingDefaults = requiredEmails.filter((e) => !existingEmails.has(e));
+        if (missingDefaults.length > 0) {
+          console.log("Missing default demo users; merging them for testing:", missingDefaults);
+          const defaultsMap: Record<string, any> = {
+            "mzmrizwan2016@gmail.com": {
+              id: "user-1742197681223",
+              fullName: "MOHAMED RIZWAN",
+              email: "mzmrizwan2016@gmail.com",
+              mobileNumber: "+974 1234 5678",
+              country: "Qatar",
+              isActive: true,
+              isAdmin: false,
+              createdAt: new Date().toISOString(),
+              permissions: {
+                masterData: false,
+                dataEntry: true,
+                reports: true,
+                downloads: false,
+                accounting: false,
+                controlPanel: false,
+                files: {}
+              }
+            },
+            "javed@soqotra.com": {
+              id: "user-1744301929974",
+              fullName: "MOHAMED JAVED",
+              email: "javed@soqotra.com",
+              mobileNumber: "+974 2345 6789",
+              country: "Qatar",
+              isActive: true,
+              isAdmin: false,
+              createdAt: new Date().toISOString(),
+              permissions: {
+                masterData: false,
+                dataEntry: true,
+                reports: true,
+                downloads: false,
+                accounting: false,
+                controlPanel: false,
+                files: {}
+              }
+            },
+            "lahiru@soqotra.com": {
+              id: "user-1753610771083",
+              fullName: "LAHIRU CHATHURANGA",
+              email: "lahiru@soqotra.com",
+              mobileNumber: "+974 3456 7890",
+              country: "Qatar",
+              isActive: true,
+              isAdmin: false,
+              createdAt: new Date().toISOString(),
+              permissions: {
+                masterData: false,
+                dataEntry: true,
+                reports: false,
+                downloads: false,
+                accounting: false,
+                controlPanel: false,
+                files: {}
+              }
+            }
+          };
+          const mergedUsers = [
+            ...updatedUsers,
+            ...missingDefaults.map((email: string) => ensureUserPermissions(defaultsMap[email]))
+          ];
+          setUsers(mergedUsers);
+          localStorage.setItem("users", JSON.stringify(mergedUsers));
+        } else {
+          setUsers(updatedUsers);
+          localStorage.setItem("users", JSON.stringify(updatedUsers));
+        }
       } catch (error) {
         console.error("Failed to parse users:", error);
         initializeDefaultUsersAndAdmin();

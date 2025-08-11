@@ -1,7 +1,7 @@
 
 import { User } from "@/types/auth";
 import { toast } from "@/hooks/use-toast";
-
+import { sendPasswordResetEmail } from "@/utils/email-service";
 export function usePasswordReset(users: User[]) {
   const requestPasswordReset = async (email: string): Promise<boolean> => {
     // Find user by email (case-insensitive)
@@ -41,12 +41,11 @@ export function usePasswordReset(users: User[]) {
     // Create reset URL
     const resetUrl = `${window.location.origin}/admin/reset-password?userId=${user.id}&token=${resetToken}`;
     
-    // Simulate sending email
-    console.log(`Reset URL for ${user.email}: ${resetUrl}`);
+    // Attempt to send email using our email service utility
+    const emailSent = await sendPasswordResetEmail(user.email, resetUrl, user.fullName);
     
-    // For demonstration, we'll simulate email sending
-    const emailSent = await simulateEmailSending(user.email, resetUrl);
-    
+    // Fallback to simulated email sending in case the primary method fails
+    // const emailSent = await simulateEmailSending(user.email, resetUrl);
     if (emailSent) {
       toast({
         title: "Password Reset Email Sent",
