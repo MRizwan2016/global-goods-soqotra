@@ -173,7 +173,7 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
           </DialogHeader>
           {selectedUser && (
             <UserPermissionsPanel
-              user={selectedUser}
+              user={users.find(u => u.id === selectedUser.id) || selectedUser}
             />
           )}
         </DialogContent>
