@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import UserManagementPanel from "./components/UserManagement/UserManagementPanel";
+import BackButton from "@/components/ui/back-button";
 
 const ControlPanel = () => {
   const { users, toggleUserStatus } = useAuth();
@@ -18,6 +19,9 @@ const ControlPanel = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <div className="mb-6">
+        <BackButton to="/dashboard" />
+      </div>
       <UserManagementPanel 
         users={users}
         loading={loading}

@@ -53,7 +53,7 @@ const CategoryPermissions = ({ user, toggleUserPermission, isAdminOnly = false }
           title={category.title}
           icon={category.icon}
           isEnabled={!!user.permissions?.[category.key]}
-          onToggle={() => isAdminOnly ? null : toggleUserPermission(user.id, category.key)}
+          onToggle={() => !isAdminOnly && toggleUserPermission(user.id, category.key)}
           id={`${user.id}-${category.key}`}
           disabled={isAdminOnly}
         />
