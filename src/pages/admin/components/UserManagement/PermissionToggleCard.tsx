@@ -33,7 +33,7 @@ const PermissionToggleCard = ({
         <div className="flex items-center mb-2">
           <Switch 
             checked={isEnabled}
-            onCheckedChange={disabled ? undefined : onToggle}
+            onCheckedChange={disabled ? () => {} : onToggle}
             id={id}
             disabled={disabled}
           />
