@@ -129,9 +129,10 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
                     variant="outline"
                     size="sm"
                     onClick={() => openPermissionsDialog(user)}
+                    disabled={!currentUser?.isAdmin}
                   >
                     <Settings className="h-4 w-4 mr-1" />
-                    Permissions
+                    {currentUser?.isAdmin ? "Permissions" : "Admin Only"}
                   </Button>
                   
                   {!user.isAdmin && (
