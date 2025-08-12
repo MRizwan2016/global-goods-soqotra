@@ -50,7 +50,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const parsedUser = JSON.parse(storedUser);
         const userWithCheckedPermissions = ensureUserPermissions(parsedUser);
-        console.log("Loaded current user with permissions:", userWithCheckedPermissions);
+        console.log("=== DEBUGGING USER LOADING ===");
+        console.log("Raw stored user:", storedUser);
+        console.log("Parsed user:", parsedUser);
+        console.log("User with checked permissions:", userWithCheckedPermissions);
+        console.log("User email:", userWithCheckedPermissions.email);
+        console.log("User permissions:", userWithCheckedPermissions.permissions);
         setCurrentUser(userWithCheckedPermissions);
       } catch (error) {
         console.error("Failed to parse current user:", error);

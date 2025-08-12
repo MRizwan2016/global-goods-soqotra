@@ -43,7 +43,15 @@ export const MainNavigation: React.FC = () => {
 
   // Filter navigation sections based on user permissions
   const filteredSectionKeys = sectionKeys.filter(sectionKey => {
-    if (!currentUser || isAdmin) return true; // Admin sees everything
+    console.log('=== DEBUGGING NAVIGATION FILTER ===');
+    console.log('Current User:', currentUser);
+    console.log('Is Admin:', isAdmin);
+    console.log('Section Key:', sectionKey);
+    
+    if (!currentUser || isAdmin) {
+      console.log('Admin or no user - showing all sections');
+      return true; // Admin sees everything
+    }
     
     // Map sections to permission keys
     const sectionPermissionMap: Record<string, keyof typeof currentUser.permissions> = {
@@ -54,9 +62,18 @@ export const MainNavigation: React.FC = () => {
     };
     
     const requiredPermission = sectionPermissionMap[sectionKey];
-    if (!requiredPermission) return true; // If no specific permission required, show the section
+    console.log('Required Permission for', sectionKey, ':', requiredPermission);
     
-    return currentUser.permissions[requiredPermission] || false;
+    if (!requiredPermission) {
+      console.log('No permission required for', sectionKey, '- showing section');
+      return true; // If no specific permission required, show the section
+    }
+    
+    const hasPermission = currentUser.permissions[requiredPermission] || false;
+    console.log('User has permission', requiredPermission, ':', hasPermission);
+    console.log('All user permissions:', currentUser.permissions);
+    
+    return hasPermission;
   });
 
   console.log('Expanded sections:', expandedSections);
