@@ -1,6 +1,6 @@
 
 import { User } from "@/types/auth";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { ensureUserPermissions } from "@/utils/auth-utils";
 
 export function useUserOperations(
@@ -22,17 +22,10 @@ export function useUserOperations(
       localStorage.setItem("users", JSON.stringify(updatedUsers));
 
       const user = updatedUsers.find(u => u.id === userId);
-      toast({
-        title: "User Status Updated",
-        description: `${user?.fullName} has been ${user?.isActive ? 'activated' : 'deactivated'}.`,
-      });
+      toast.success(`${user?.fullName} has been ${user?.isActive ? 'activated' : 'deactivated'}.`);
     } catch (error) {
       console.error("Error toggling user status:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update user status.",
-        variant: "destructive",
-      });
+      toast.error("Failed to update user status.");
     }
   };
 
@@ -58,17 +51,10 @@ export function useUserOperations(
       localStorage.setItem("users", JSON.stringify(updatedUsers));
 
       const user = updatedUsers.find(u => u.id === userId);
-      toast({
-        title: "Permission Updated",
-        description: `${permissionType} permission updated for ${user?.fullName}.`,
-      });
+      toast.success(`${permissionType} permission updated for ${user?.fullName}.`);
     } catch (error) {
       console.error("Error toggling user permission:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update user permission.",
-        variant: "destructive",
-      });
+      toast.error("Failed to update user permission.");
     }
   };
 
@@ -97,17 +83,10 @@ export function useUserOperations(
       localStorage.setItem("users", JSON.stringify(updatedUsers));
 
       const user = updatedUsers.find(u => u.id === userId);
-      toast({
-        title: "File Permission Updated",
-        description: `${fileKey} access updated for ${user?.fullName}.`,
-      });
+      toast.success(`${fileKey} access updated for ${user?.fullName}.`);
     } catch (error) {
       console.error("Error toggling file permission:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update file permission.",
-        variant: "destructive",
-      });
+      toast.error("Failed to update file permission.");
     }
   };
 
