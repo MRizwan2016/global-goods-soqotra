@@ -15,9 +15,10 @@ import { filePermissions } from "../../constants/filePermissions";
 interface FilePermissionSectionProps {
   user: User;
   toggleFilePermission: (userId: string, fileKey: keyof User['permissions']['files']) => void;
+  isAdminOnly?: boolean;
 }
 
-const FilePermissionSection = ({ user, toggleFilePermission }: FilePermissionSectionProps) => {
+const FilePermissionSection = ({ user, toggleFilePermission, isAdminOnly = false }: FilePermissionSectionProps) => {
   return (
     <div className="mt-4">
       <h5 className="font-medium mb-2">File-Level Permissions</h5>
@@ -46,11 +47,11 @@ const FilePermissionSection = ({ user, toggleFilePermission }: FilePermissionSec
                   <Checkbox 
                     id={`${user.id}-${key}`}
                     checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
-                    onCheckedChange={() => toggleFilePermission(
+                    onCheckedChange={isAdminOnly ? undefined : () => toggleFilePermission(
                       user.id, 
                       key as keyof User['permissions']['files']
                     )}
-                    disabled={!user.permissions?.masterData}
+                    disabled={!user.permissions?.masterData || isAdminOnly}
                   />
                   <label 
                     htmlFor={`${user.id}-${key}`}
@@ -83,11 +84,11 @@ const FilePermissionSection = ({ user, toggleFilePermission }: FilePermissionSec
                   <Checkbox 
                     id={`${user.id}-${key}`}
                     checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
-                    onCheckedChange={() => toggleFilePermission(
+                    onCheckedChange={isAdminOnly ? undefined : () => toggleFilePermission(
                       user.id, 
                       key as keyof User['permissions']['files']
                     )}
-                    disabled={!user.permissions?.dataEntry}
+                    disabled={!user.permissions?.dataEntry || isAdminOnly}
                   />
                   <label 
                     htmlFor={`${user.id}-${key}`}
@@ -120,11 +121,11 @@ const FilePermissionSection = ({ user, toggleFilePermission }: FilePermissionSec
                   <Checkbox 
                     id={`${user.id}-${key}`}
                     checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
-                    onCheckedChange={() => toggleFilePermission(
+                    onCheckedChange={isAdminOnly ? undefined : () => toggleFilePermission(
                       user.id, 
                       key as keyof User['permissions']['files']
                     )}
-                    disabled={!user.permissions?.reports}
+                    disabled={!user.permissions?.reports || isAdminOnly}
                   />
                   <label 
                     htmlFor={`${user.id}-${key}`}
@@ -157,11 +158,11 @@ const FilePermissionSection = ({ user, toggleFilePermission }: FilePermissionSec
                   <Checkbox 
                     id={`${user.id}-${key}`}
                     checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
-                    onCheckedChange={() => toggleFilePermission(
+                    onCheckedChange={isAdminOnly ? undefined : () => toggleFilePermission(
                       user.id, 
                       key as keyof User['permissions']['files']
                     )}
-                    disabled={!user.permissions?.accounting}
+                    disabled={!user.permissions?.accounting || isAdminOnly}
                   />
                   <label 
                     htmlFor={`${user.id}-${key}`}

@@ -8,9 +8,10 @@ import { Database, FileInput, BarChart4, Download, DollarSign, Settings } from "
 interface CategoryPermissionsProps {
   user: User;
   toggleUserPermission: (userId: string, permissionType: keyof User['permissions']) => void;
+  isAdminOnly?: boolean;
 }
 
-const CategoryPermissions = ({ user, toggleUserPermission }: CategoryPermissionsProps) => {
+const CategoryPermissions = ({ user, toggleUserPermission, isAdminOnly = false }: CategoryPermissionsProps) => {
   const permissionCategories = [
     { 
       key: "masterData" as keyof User['permissions'], 
@@ -52,8 +53,9 @@ const CategoryPermissions = ({ user, toggleUserPermission }: CategoryPermissions
           title={category.title}
           icon={category.icon}
           isEnabled={!!user.permissions?.[category.key]}
-          onToggle={() => toggleUserPermission(user.id, category.key)}
+          onToggle={() => isAdminOnly ? null : toggleUserPermission(user.id, category.key)}
           id={`${user.id}-${category.key}`}
+          disabled={isAdminOnly}
         />
       ))}
     </div>
