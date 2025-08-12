@@ -88,11 +88,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               isAdmin: false,
               createdAt: new Date().toISOString(),
               permissions: {
-                masterData: false,
+                masterData: true,
                 dataEntry: true,
                 reports: true,
-                downloads: false,
-                accounting: false,
+                downloads: true,
+                accounting: true,
                 controlPanel: false,
                 files: {}
               }
