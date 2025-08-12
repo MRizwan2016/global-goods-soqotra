@@ -1,6 +1,6 @@
 
 import { User } from "@/types/auth";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 
 // Helper function to ensure user has all required permissions
 const ensureUserPermissions = (user: User): User => ({
@@ -29,10 +29,7 @@ export const handleAdminLogin = (
       const adminWithPermissions = ensureUserPermissions(adminUser);
       setCurrentUser(adminWithPermissions);
       localStorage.setItem("currentUser", JSON.stringify(adminWithPermissions));
-      toast({
-        title: "Login Successful",
-        description: `Welcome back, ${adminUser.fullName}!`,
-      });
+      toast.success(`Welcome back, ${adminUser.fullName}!`);
       return true;
     }
   }
@@ -116,28 +113,17 @@ export const handleUserLogin = (
     const updatedPasswords = { ...userPasswords, [user.id]: password };
     localStorage.setItem("userPasswords", JSON.stringify(updatedPasswords));
     
-    toast({
-      title: "Login Successful",
-      description: `Welcome, ${userWithPermissions.fullName}!`,
-    });
+    toast.success(`Welcome, ${userWithPermissions.fullName}!`);
     
     console.log("User login successful for:", user.email);
     return true;
   } catch (error) {
     console.error("Login error:", error);
-    toast({
-      title: "Login Error",
-      description: "An error occurred during login. Please try again.",
-      variant: "destructive",
-    });
+    toast.error("An error occurred during login. Please try again.");
     return false;
   }
 };
 
 export const handleLoginFailure = () => {
-  toast({
-    title: "Login Failed",
-    description: "Invalid email or password. Please check your credentials and try again.",
-    variant: "destructive",
-  });
+  toast.error("Invalid email or password. Please check your credentials and try again.");
 };
