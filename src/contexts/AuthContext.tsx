@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { User, AuthContextType } from "@/types/auth";
 import { ADMIN_EMAIL, ADMIN_PASSWORD } from "@/constants/auth";
 import { ensureUserPermissions, hasFilePermission as checkFilePermission } from "@/utils/auth-utils";
@@ -339,7 +339,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       userPasswords[currentUser.id] = newPassword;
       localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
       setIsFirstLogin(false);
-      toast({ title: "Success", description: "Password updated successfully" });
+      toast.success("Password updated successfully");
     }
   };
 
