@@ -16,7 +16,7 @@ interface UserListProps {
 }
 
 const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
-  const { currentUser } = useAuth();
+  const { currentUser, isAdmin } = useAuth();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
   const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
@@ -129,10 +129,10 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
                     variant="outline"
                     size="sm"
                     onClick={() => openPermissionsDialog(user)}
-                    disabled={!currentUser?.isAdmin}
+                    disabled={!isAdmin}
                   >
                     <Settings className="h-4 w-4 mr-1" />
-                    {currentUser?.isAdmin ? "Permissions" : "Admin Only"}
+                    {isAdmin ? "Permissions" : "Admin Only"}
                   </Button>
                   
                   {!user.isAdmin && (
