@@ -8,6 +8,7 @@ import BookStockTabs from "./components/book-stock/BookStockTabs";
 import BookStockDialogs from "./booking-form-stock/BookStockDialogs";
 import { CancelledBooksHistory } from "./components/book-stock/CancelledBooksHistory";
 import { PageSelectionDialog } from "./components/book-stock/PageSelectionDialog";
+import { ReturnedStockDialog } from "./components/book-stock/ReturnedStockDialog";
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,7 @@ const BookingFormStock = () => {
   // State for cancel/delete dialogs
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [pageSelectionOpen, setPageSelectionOpen] = useState(false);
+  const [returnedStockOpen, setReturnedStockOpen] = useState(false);
   const [currentAction, setCurrentAction] = useState<"cancel" | "delete">("cancel");
   const [bookToAction, setBookToAction] = useState<Book | null>(null);
   const [cancelledBooks, setCancelledBooks] = useState<CancelledBook[]>([]);
@@ -124,11 +126,13 @@ const BookingFormStock = () => {
 
     const currentTime = new Date().toISOString();
     const isCancel = currentAction === "cancel";
+    const totalPages = bookToAction.available.length;
+    const isEntireBook = pageNumbers.length === totalPages;
     
     // Create cancelled book entry
     const cancelledBook: CancelledBook = {
       ...bookToAction,
-      cancelledPages: pageNumbers,
+      cancelledPages: isEntireBook ? undefined : pageNumbers, // Don't store pages if entire book
       status: isCancel ? 'CANCELLED' : 'DELETED',
       reason,
       [isCancel ? 'cancelledDate' : 'deletedDate']: currentTime
@@ -140,25 +144,61 @@ const BookingFormStock = () => {
     localStorage.setItem('cancelledBooks', JSON.stringify(updatedCancelled));
     setCancelledBooks(updatedCancelled);
 
-    // Update the original book by removing the cancelled/deleted pages
+    // Get existing books
     const existingBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
-    const updatedBooks = existingBooks.map((book: Book) => {
-      if (book.bookNumber === bookToAction.bookNumber) {
-        const remainingPages = book.available.filter(page => !pageNumbers.includes(page));
-        return {
-          ...book,
-          available: remainingPages
-        };
-      }
-      return book;
-    });
+    
+    if (isEntireBook) {
+      // Remove entire book from active books (return to original stock)
+      const updatedBooks = existingBooks.filter((book: Book) => 
+        book.bookNumber !== bookToAction.bookNumber
+      );
+      localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+      
+      // Create a "returned to stock" entry for potential reassignment
+      const stockBooks = JSON.parse(localStorage.getItem('returnedStockBooks') || '[]');
+      const returnedBook = {
+        ...bookToAction,
+        status: 'RETURNED_TO_STOCK',
+        returnedDate: currentTime,
+        returnedReason: reason,
+        previousCountry: bookToAction.country,
+        previousAssignee: bookToAction.assignedTo,
+        available: Array.from({length: parseInt(bookToAction.endPage) - parseInt(bookToAction.startPage) + 1}, 
+          (_, i) => `GY${parseInt(bookToAction.startPage) + i}`) // Reset all pages as available
+      };
+      stockBooks.push(returnedBook);
+      localStorage.setItem('returnedStockBooks', JSON.stringify(stockBooks));
+      
+      toast.success(`Book ${isCancel ? 'Cancelled' : 'Deleted'}`, {
+        description: `Book #${bookToAction.bookNumber} has been completely ${isCancel ? 'cancelled' : 'deleted'} and returned to stock for reassignment.`
+      });
+    } else {
+      // Update the original book by removing only the selected pages
+      const updatedBooks = existingBooks.map((book: Book) => {
+        if (book.bookNumber === bookToAction.bookNumber) {
+          const remainingPages = book.available.filter(page => !pageNumbers.includes(page));
+          
+          // If no pages remain, remove the book entirely
+          if (remainingPages.length === 0) {
+            return null;
+          }
+          
+          return {
+            ...book,
+            available: remainingPages
+          };
+        }
+        return book;
+      }).filter(Boolean); // Remove null entries
 
-    localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+      localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+      
+      toast.success(`Pages ${isCancel ? 'Cancelled' : 'Deleted'}`, {
+        description: `${pageNumbers.length} page(s) have been ${isCancel ? 'cancelled' : 'deleted'} from Book #${bookToAction.bookNumber}`
+      });
+    }
+
     loadBooks();
-
-    toast.success(`Pages ${isCancel ? 'Cancelled' : 'Deleted'}`, {
-      description: `${pageNumbers.length} page(s) have been ${isCancel ? 'cancelled' : 'deleted'} from Book #${bookToAction.bookNumber}`
-    });
 
     // Reset states
     setPageSelectionOpen(false);
@@ -233,6 +273,7 @@ const BookingFormStock = () => {
           onGenerateReport={handleGenerateReport}
           onAddNewBook={handleAddNewBook}
           onViewHistory={() => setHistoryDialogOpen(true)}
+          onViewReturnedStock={() => setReturnedStockOpen(true)}
         />
         
         <BookStockTabs
@@ -288,6 +329,13 @@ const BookingFormStock = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Returned Stock Dialog */}
+      <ReturnedStockDialog
+        open={returnedStockOpen}
+        onOpenChange={setReturnedStockOpen}
+        onReassign={loadBooks}
+      />
     </Layout>
   );
 };

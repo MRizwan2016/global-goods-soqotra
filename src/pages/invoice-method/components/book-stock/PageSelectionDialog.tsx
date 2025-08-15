@@ -84,15 +84,22 @@ export const PageSelectionDialog: React.FC<PageSelectionDialogProps> = ({
           </div>
 
           <div className="border-t pt-4">
-            <div className="flex items-center space-x-2 mb-4">
-              <Checkbox
-                id="select-all"
-                checked={selectAll}
-                onCheckedChange={handleSelectAll}
-              />
-              <Label htmlFor="select-all" className="font-medium">
-                Select All Pages ({allPages.length} pages)
-              </Label>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="select-all"
+                  checked={selectAll}
+                  onCheckedChange={handleSelectAll}
+                />
+                <Label htmlFor="select-all" className="font-medium">
+                  Select All Pages ({allPages.length} pages) - Entire Book
+                </Label>
+              </div>
+              {selectAll && (
+                <div className="text-sm text-orange-600 font-medium">
+                  ⚠️ Entire book will be {action === "cancel" ? "cancelled" : "deleted"} and returned to stock
+                </div>
+              )}
             </div>
 
             <div className="max-h-60 overflow-y-auto border rounded-lg p-4 bg-gray-50">
@@ -135,8 +142,13 @@ export const PageSelectionDialog: React.FC<PageSelectionDialogProps> = ({
           {selectedPages.size > 0 && (
             <div className={`p-3 rounded-lg bg-${actionColor}-50 border border-${actionColor}-200`}>
               <p className={`text-sm text-${actionColor}-700 font-medium`}>
-                Warning: You are about to {action} {selectedPages.size} page(s) from this book.
-                {action === "delete" && " This action can be undone from the history."}
+                {selectedPages.size === allPages.length ? (
+                  <>⚠️ Warning: You are about to {action} the ENTIRE BOOK ({selectedPages.size} pages). 
+                  The book will be completely removed from active stock and returned to the original inventory for reassignment to another country.</>
+                ) : (
+                  <>Warning: You are about to {action} {selectedPages.size} page(s) from this book.
+                  {action === "delete" && " This action can be undone from the history."}</>
+                )}
               </p>
             </div>
           )}
@@ -152,7 +164,10 @@ export const PageSelectionDialog: React.FC<PageSelectionDialogProps> = ({
             disabled={selectedPages.size === 0}
             className={`bg-${actionColor}-600 hover:bg-${actionColor}-700`}
           >
-            {actionText} {selectedPages.size} Page(s)
+            {selectedPages.size === allPages.length 
+              ? `${actionText} Entire Book (${selectedPages.size} pages)` 
+              : `${actionText} ${selectedPages.size} Page(s)`
+            }
           </Button>
         </DialogFooter>
       </DialogContent>

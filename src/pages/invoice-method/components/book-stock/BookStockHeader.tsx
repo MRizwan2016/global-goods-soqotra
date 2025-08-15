@@ -7,12 +7,14 @@ interface BookStockHeaderProps {
   onGenerateReport: () => void;
   onAddNewBook: () => void;
   onViewHistory?: () => void;
+  onViewReturnedStock?: () => void;
 }
 
 const BookStockHeader: React.FC<BookStockHeaderProps> = ({ 
   onGenerateReport,
   onAddNewBook,
-  onViewHistory 
+  onViewHistory,
+  onViewReturnedStock 
 }) => {
   return (
     <div className="flex justify-between items-center">
@@ -25,6 +27,11 @@ const BookStockHeader: React.FC<BookStockHeaderProps> = ({
         {onViewHistory && (
           <Button variant="outline" onClick={onViewHistory} className="gap-2">
             <span>View History</span>
+          </Button>
+        )}
+        {onViewReturnedStock && (
+          <Button variant="outline" onClick={onViewReturnedStock} className="gap-2">
+            <span>Returned Stock</span>
           </Button>
         )}
       </div>
