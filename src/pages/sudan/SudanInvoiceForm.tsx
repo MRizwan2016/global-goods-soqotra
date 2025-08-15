@@ -16,6 +16,10 @@ import ShipperDetails from "./components/shipping/ShipperDetails";
 import ConsigneeDetails from "./components/shipping/ConsigneeDetails";
 import SudanInvoiceNumberSelector from "./components/invoice-selector/SudanInvoiceNumberSelector";
 
+// Import dialog components
+import ManualPackageDialog from "./components/dialogs/ManualPackageDialog";
+import SpecialProductDialog from "./components/dialogs/SpecialProductDialog";
+
 // Import components needed for the form
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -118,20 +122,21 @@ const SudanInvoiceForm = () => {
         return;
       }
       
-      if (!formData.shipperName) {
-        toast.error("Please enter shipper name");
+      if (!formData.shipperName1) {
+        toast.error("Please enter shipper name 1");
         return;
       }
       
-      if (!formData.consigneeName) {
-        toast.error("Please enter consignee name");
+      if (!formData.consigneeName1) {
+        toast.error("Please enter consignee name 1");
         return;
       }
 
       // Save customer details first
       const customerData = {
         mobile: formData.shipperMobile,
-        name: formData.shipperName,
+        name: formData.shipperName1,
+        name2: formData.shipperName2,
         prefix: formData.shipperPrefix,
         country: formData.shipperCountry,
         city: formData.shipperCity,
@@ -229,7 +234,8 @@ const SudanInvoiceForm = () => {
       const existingCustomer = customers.find(c => c.mobile === mobile);
       
       if (existingCustomer) {
-        handleFormChange('shipperName', existingCustomer.name || '');
+        handleFormChange('shipperName1', existingCustomer.name || '');
+        handleFormChange('shipperName2', existingCustomer.name2 || '');
         handleFormChange('shipperPrefix', existingCustomer.prefix || 'MR.');
         handleFormChange('shipperCountry', existingCustomer.country || 'QATAR');
         handleFormChange('shipperCity', existingCustomer.city || '');
@@ -959,7 +965,18 @@ const SudanInvoiceForm = () => {
           onPrint={handlePrintFromPreview}
         />
 
-        {/* Package dialogs would be implemented here */}
+        {/* Package Entry Dialogs */}
+        <ManualPackageDialog
+          isOpen={showManualDialog}
+          onClose={() => setShowManualDialog(false)}
+          onAddPackage={addManualPackageItem}
+        />
+        
+        <SpecialProductDialog
+          isOpen={showSpecialDialog}
+          onClose={() => setShowSpecialDialog(false)}
+          onAddPackage={addManualPackageItem}
+        />
       </div>
     </Layout>
   );

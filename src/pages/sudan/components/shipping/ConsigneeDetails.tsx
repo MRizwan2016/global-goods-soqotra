@@ -41,27 +41,51 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
             </Select>
           </div>
 
-          {/* Consignee Name */}
+          {/* Consignee Name 1 */}
           <div className="space-y-2">
-            <Label htmlFor="consigneeName">CONSIGNEE NAME *</Label>
+            <Label htmlFor="consigneeName1">CONSIGNEE NAME 1 *</Label>
             <Input
-              id="consigneeName"
-              value={formData.consigneeName || ""}
-              onChange={(e) => handleFormChange('consigneeName', e.target.value.toUpperCase())}
-              placeholder="Consignee name"
+              id="consigneeName1"
+              value={formData.consigneeName1 || ""}
+              onChange={(e) => handleFormChange('consigneeName1', e.target.value.toUpperCase())}
+              placeholder="Consignee name 1"
               className="uppercase"
             />
           </div>
 
-          {/* Mobile Number */}
+          {/* Consignee Name 2 */}
           <div className="space-y-2">
-            <Label htmlFor="consigneeMobile">MOBILE NUMBER</Label>
+            <Label htmlFor="consigneeName2">CONSIGNEE NAME 2</Label>
             <Input
-              id="consigneeMobile"
+              id="consigneeName2"
+              value={formData.consigneeName2 || ""}
+              onChange={(e) => handleFormChange('consigneeName2', e.target.value.toUpperCase())}
+              placeholder="Consignee name 2"
+              className="uppercase"
+            />
+          </div>
+
+          {/* Mobile Number 1 */}
+          <div className="space-y-2">
+            <Label htmlFor="consigneeMobile1">MOBILE NUMBER 1</Label>
+            <Input
+              id="consigneeMobile1"
               type="tel"
-              value={formData.consigneeMobile || ""}
-              onChange={(e) => handleFormChange('consigneeMobile', e.target.value)}
-              placeholder="Mobile number"
+              value={formData.consigneeMobile1 || ""}
+              onChange={(e) => handleFormChange('consigneeMobile1', e.target.value)}
+              placeholder="Mobile number 1"
+            />
+          </div>
+
+          {/* Mobile Number 2 */}
+          <div className="space-y-2">
+            <Label htmlFor="consigneeMobile2">MOBILE NUMBER 2</Label>
+            <Input
+              id="consigneeMobile2"
+              type="tel"
+              value={formData.consigneeMobile2 || ""}
+              onChange={(e) => handleFormChange('consigneeMobile2', e.target.value)}
+              placeholder="Mobile number 2"
             />
           </div>
 

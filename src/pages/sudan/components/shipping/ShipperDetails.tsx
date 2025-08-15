@@ -59,14 +59,40 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
             </Select>
           </div>
 
-          {/* Shipper Name */}
+          {/* Shipper Name 1 */}
           <div className="space-y-2">
-            <Label htmlFor="shipperName">SHIPPER NAME *</Label>
+            <Label htmlFor="shipperName1">SHIPPER NAME 1 *</Label>
             <Input
-              id="shipperName"
-              value={formData.shipperName || ""}
-              onChange={(e) => handleFormChange('shipperName', e.target.value.toUpperCase())}
-              placeholder="Shipper name"
+              id="shipperName1"
+              value={formData.shipperName1 || ""}
+              onChange={(e) => {
+                const value = e.target.value.toUpperCase();
+                handleFormChange('shipperName1', value);
+                // Auto-duplicate to consignee if not already filled
+                if (!formData.consigneeName1) {
+                  handleFormChange('consigneeName1', value);
+                }
+              }}
+              placeholder="Shipper name 1"
+              className="uppercase"
+            />
+          </div>
+
+          {/* Shipper Name 2 */}
+          <div className="space-y-2">
+            <Label htmlFor="shipperName2">SHIPPER NAME 2</Label>
+            <Input
+              id="shipperName2"
+              value={formData.shipperName2 || ""}
+              onChange={(e) => {
+                const value = e.target.value.toUpperCase();
+                handleFormChange('shipperName2', value);
+                // Auto-duplicate to consignee if not already filled
+                if (!formData.consigneeName2) {
+                  handleFormChange('consigneeName2', value);
+                }
+              }}
+              placeholder="Shipper name 2"
               className="uppercase"
             />
           </div>

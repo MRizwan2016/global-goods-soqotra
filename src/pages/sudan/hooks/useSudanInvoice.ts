@@ -51,6 +51,8 @@ export interface SudanFormData {
   // Shipper Information
   shipperPrefix: string;
   shipperName: string;
+  shipperName1: string;
+  shipperName2: string;
   shipperCountry: string;
   shipperCity: string;
   shipperAddress: string;
@@ -61,11 +63,15 @@ export interface SudanFormData {
   // Consignee Information
   consigneePrefix: string;
   consigneeName: string;
+  consigneeName1: string;
+  consigneeName2: string;
   consigneeSecondName: string;
   consigneeCountry: string;
   consigneeCity: string;
   consigneeAddress: string;
   consigneeMobile: string;
+  consigneeMobile1: string;
+  consigneeMobile2: string;
   consigneeSecondMobile: string;
   consigneeEmail: string;
   consigneeIdNumber: string;
@@ -112,6 +118,8 @@ const initialFormData: SudanFormData = {
   // Shipper Information
   shipperPrefix: "MR.",
   shipperName: "",
+  shipperName1: "",
+  shipperName2: "",
   shipperCountry: "QATAR",
   shipperCity: "",
   shipperAddress: "",
@@ -122,11 +130,15 @@ const initialFormData: SudanFormData = {
   // Consignee Information
   consigneePrefix: "MR.",
   consigneeName: "",
+  consigneeName1: "",
+  consigneeName2: "",
   consigneeSecondName: "",
   consigneeCountry: "SUDAN",
   consigneeCity: "",
   consigneeAddress: "",
   consigneeMobile: "",
+  consigneeMobile1: "",
+  consigneeMobile2: "",
   consigneeSecondMobile: "",
   consigneeEmail: "",
   consigneeIdNumber: "",
