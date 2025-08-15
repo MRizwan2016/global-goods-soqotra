@@ -55,64 +55,60 @@ const InvoiceBookForm = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    // Handle country-specific page number calculation
-    if (name === "country" || (name === "bookNumber" && value && formData.country)) {
+    // Handle page number calculation based on book number (same for all countries)
+    if (name === "bookNumber" && value) {
       let updatedFormData = { ...formData, [name]: value };
       
-      const country = name === "country" ? value : formData.country;
-      const bookNumber = name === "bookNumber" ? parseInt(value) : parseInt(formData.bookNumber);
+      const bookNumber = parseInt(value);
       
-      if (country && !isNaN(bookNumber) && bookNumber > 0) {
+      if (!isNaN(bookNumber) && bookNumber > 0) {
         let firstPage: number;
         let lastPage: number;
         
-        switch (country) {
-          case "SRI_LANKA":
-            // Sri Lanka: book 1 = 13131000-13131051, book 2 = 13131051-13131101, etc.
-            firstPage = 13131000 + ((bookNumber - 1) * 50);
-            lastPage = firstPage + 49;
-            break;
-          case "ERITREA":
-            // Eritrea: book 1 = 010000-010051, book 2 = 010052-010101, etc.
-            firstPage = 10000 + ((bookNumber - 1) * 52);
-            lastPage = firstPage + 51;
-            break;
-          case "KENYA":
-            // Kenya: book 1 = 02000-02051, book 2 = 02051-02101, etc.
-            firstPage = 2000 + ((bookNumber - 1) * 50);
-            lastPage = firstPage + 49;
-            break;
-          case "SUDAN":
-            // Sudan: book 1 = 03000-03051, book 2 = 03051-03101, etc.
-            firstPage = 3000 + ((bookNumber - 1) * 50);
-            lastPage = firstPage + 49;
-            break;
-          case "UAE":
-            // UAE: book 1 = 04000-04051, book 2 = 04051-04101, etc.
-            firstPage = 4000 + ((bookNumber - 1) * 50);
-            lastPage = firstPage + 49;
-            break;
-          default:
-            // Default fallback (keeping existing logic for other countries)
-            firstPage = 13136000 + ((bookNumber - 722) * 50) + 1;
-            lastPage = firstPage + 49;
-            break;
+        // Fixed page numbering system for all countries:
+        // Book 1: 100000-100050 (51 pages)
+        // Book 2: 100051-100100 (50 pages)  
+        // Book 3: 100101-100151 (51 pages)
+        // Pattern: alternates between 51 and 50 pages
+        
+        if (bookNumber === 1) {
+          firstPage = 100000;
+          lastPage = 100050;
+        } else {
+          // Calculate starting page based on previous books
+          let totalPages = 51; // Book 1 has 51 pages
+          
+          for (let i = 2; i < bookNumber; i++) {
+            // Alternating pattern: odd books have 51 pages, even books have 50 pages
+            totalPages += (i % 2 === 1) ? 51 : 50;
+          }
+          
+          firstPage = 100000 + totalPages;
+          // Current book pages: odd book numbers get 51 pages, even get 50 pages
+          const currentBookPages = (bookNumber % 2 === 1) ? 51 : 50;
+          lastPage = firstPage + currentBookPages - 1;
         }
         
         updatedFormData = {
           ...updatedFormData,
-          startPage: firstPage.toString().padStart(6, '0'),
-          endPage: lastPage.toString().padStart(6, '0')
+          startPage: firstPage.toString(),
+          endPage: lastPage.toString(),
+          pagesInBook: (lastPage - firstPage + 1).toString()
         };
       }
       
-      // Reset sales rep and driver when country changes
-      if (name === "country") {
-        updatedFormData.salesRepresentative = "";
-        updatedFormData.driverName = "";
-      }
-      
       setFormData(updatedFormData);
+      return;
+    }
+    
+    // Handle country changes - reset sales rep and driver
+    if (name === "country") {
+      setFormData({
+        ...formData,
+        [name]: value,
+        salesRepresentative: "",
+        driverName: ""
+      });
       return;
     }
     
@@ -168,7 +164,7 @@ const InvoiceBookForm = () => {
         driverName: formData.driverName,
         availablePages: Array.from(
           { length: parseInt(formData.endPage) - parseInt(formData.startPage) + 1 }, 
-          (_, i) => (parseInt(formData.startPage) + i).toString().padStart(6, '0')
+          (_, i) => (parseInt(formData.startPage) + i).toString()
         )
       };
       
@@ -183,13 +179,14 @@ const InvoiceBookForm = () => {
       const existingBooks = existingBooksJson ? JSON.parse(existingBooksJson) : [];
       console.log("Existing books from localStorage:", existingBooks);
       
-      // Check if a book with the same number already exists
+      // Check if a book with the same number already exists across ALL countries
       const bookExists = existingBooks.some((book: any) => book.bookNumber === formData.bookNumber);
-      console.log("Checking for existing book:", formData.bookNumber, "Found:", bookExists);
+      console.log("Checking for existing book across all countries:", formData.bookNumber, "Found:", bookExists);
       
       if (bookExists) {
-        console.log("ERROR: Book already exists");
-        toast.error(`Book #${formData.bookNumber} already exists`);
+        const existingBook = existingBooks.find((book: any) => book.bookNumber === formData.bookNumber);
+        console.log("ERROR: Book already exists in country:", existingBook?.country);
+        toast.error(`Book #${formData.bookNumber} is already assigned to ${existingBook?.country || 'another country'}. Book numbers cannot be duplicated.`);
         return;
       }
       
