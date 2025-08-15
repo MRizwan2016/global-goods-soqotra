@@ -11,6 +11,11 @@ import { useSudanInvoice } from "./hooks/useSudanInvoice";
 import SudanInvoicePreview from "./components/SudanInvoicePreview";
 import { sudanSectors, sudanSalesReps, sudanDrivers, sudanDistricts, sudanPorts } from "./data/sudanData";
 
+// Import shipping components
+import ShipperDetails from "./components/shipping/ShipperDetails";
+import ConsigneeDetails from "./components/shipping/ConsigneeDetails";
+import SudanInvoiceNumberSelector from "./components/invoice-selector/SudanInvoiceNumberSelector";
+
 // Import components needed for the form
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -259,33 +264,33 @@ const SudanInvoiceForm = () => {
           <div className="flex gap-2">
             <Button onClick={handlePreview} variant="outline">
               <Eye className="h-4 w-4 mr-2" />
-              Preview
+              Print Preview
             </Button>
             <Button onClick={handlePrint} variant="outline">
               <Printer className="h-4 w-4 mr-2" />
-              Print
+              Print Invoice
             </Button>
             <Button onClick={handleSave}>
               <Save className="h-4 w-4 mr-2" />
-              {id ? 'Update' : 'Save'}
+              Save Invoice
             </Button>
           </div>
         </div>
 
-        {/* Invoice Form Content - Similar to Eritrea but Sudan-specific */}
+        {/* Invoice Number Selection with UPB Integration */}
+        <SudanInvoiceNumberSelector
+          formData={formData}
+          handleFormChange={handleFormChange}
+          onSalesRepChange={(rep) => handleFormChange('salesRep', rep)}
+          onDriverChange={(driver) => handleFormChange('driver', driver)}
+        />
+
+        {/* Basic Details */}
         <Card>
           <CardHeader>
             <CardTitle>Basic Details</CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 md:grid-cols-3">
-            <div>
-              <Label htmlFor="invoiceNumber">Invoice Number</Label>
-              <Input
-                id="invoiceNumber"
-                value={formData.invoiceNumber}
-                onChange={(e) => handleFormChange('invoiceNumber', e.target.value)}
-              />
-            </div>
             <div>
               <Label htmlFor="invoiceDate">Invoice Date</Label>
               <Input
@@ -296,17 +301,30 @@ const SudanInvoiceForm = () => {
               />
             </div>
             <div>
-              <Label htmlFor="jobNumber">Job Number</Label>
+              <Label htmlFor="jobNumber">Job Number (Auto-filled)</Label>
               <Input
                 id="jobNumber"
                 value={formData.jobNumber}
                 onChange={(e) => handleFormChange('jobNumber', e.target.value)}
+                className={formData.jobNumber ? "bg-green-50 border-green-300" : ""}
+                placeholder="Job number will auto-fill"
               />
             </div>
           </CardContent>
         </Card>
 
-        {/* Basic Shipping/Consignee forms would go here - simplified for now */}
+        {/* Shipper Details */}
+        <ShipperDetails
+          formData={formData}
+          handleFormChange={handleFormChange}
+          onMobileNumberChange={handleMobileNumberChange}
+        />
+
+        {/* Consignee Details */}
+        <ConsigneeDetails
+          formData={formData}
+          handleFormChange={handleFormChange}
+        />
 
         {/* Shipping Information */}
         <Card>
@@ -405,7 +423,17 @@ const SudanInvoiceForm = () => {
             </div>
             <div>
               <Label htmlFor="doorToDoor">Door to Door</Label>
-              <Select value={formData.doorToDoor} onValueChange={(value) => handleFormChange('doorToDoor', value)}>
+              <Select value={formData.doorToDoor} onValueChange={(value) => {
+                handleFormChange('doorToDoor', value);
+                // Auto-calculate price when Door to Door is selected
+                if (value === 'YES' && formData.totalWeight > 0) {
+                  const doorCharges = getSectorPricing().doorCharges;
+                  const weightBasedCharges = formData.totalWeight * 5; // Example calculation
+                  const totalDoorCharges = doorCharges + weightBasedCharges;
+                  handleFormChange('doorCharges', totalDoorCharges);
+                  toast.success(`Door to door charges calculated: QAR ${totalDoorCharges.toFixed(2)}`);
+                }
+              }}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select option" />
                 </SelectTrigger>
@@ -415,6 +443,19 @@ const SudanInvoiceForm = () => {
                 </SelectContent>
               </Select>
             </div>
+            {formData.doorToDoor === 'YES' && (
+              <div>
+                <Label htmlFor="doorCharges">Door to Door Charges (Auto-calculated)</Label>
+                <Input
+                  id="doorCharges"
+                  type="number"
+                  value={formData.doorCharges || 0}
+                  onChange={(e) => handleFormChange('doorCharges', parseFloat(e.target.value) || 0)}
+                  className="bg-green-50 border-green-300"
+                  placeholder="Auto-calculated based on weight"
+                />
+              </div>
+            )}
             <div>
               <Label htmlFor="remarks">Remarks</Label>
               <Textarea
@@ -549,17 +590,19 @@ const SudanInvoiceForm = () => {
                     const volume = length * width * height;
                     const volumeWeight = volume * 167; // Standard calculation
 
+                    // Create package item and add to table first (without weight)
                     const newPackage = {
                       id: `package-${Date.now()}`,
                       name: packageInput.name,
                       length: parseFloat(packageInput.length),
                       width: parseFloat(packageInput.width),
                       height: parseFloat(packageInput.height),
-                      weight: parseFloat(packageInput.weight) || 0,
+                      weight: 0, // Weight starts as 0, can be manually added later
                       quantity: parseInt(packageInput.quantity) || 1,
                       cubicMetre: volume,
                       cubicFeet: volume * 35.3147,
-                      volumeWeight: volumeWeight
+                      volumeWeight: volumeWeight,
+                      isPending: true // Flag to indicate weight is pending
                     };
 
                     addPackageItem(newPackage);
@@ -571,29 +614,29 @@ const SudanInvoiceForm = () => {
                       weight: '',
                       quantity: '1'
                     });
-                    toast.success("Package added successfully");
+                    toast.success("Package added to table. Please enter weight manually for calculations.");
                   } else {
-                    toast.error("Please fill all required fields");
+                    toast.error("Please fill package name and dimensions");
                   }
                 }}
                 className="w-40"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Package
+                Add to Table
               </Button>
             </div>
 
-            {/* Package Table */}
+            {/* Package Table with Weight Input */}
             {packageItems.length > 0 && (
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-blue-500 hover:bg-blue-500">
                       <TableHead className="text-white">No.</TableHead>
-                      <TableHead className="text-white">PACKAGE</TableHead>
+                      <TableHead className="text-white">PACKAGE NAME</TableHead>
                       <TableHead className="text-white">DIMENSIONS</TableHead>
                       <TableHead className="text-white">VOLUME (m³)</TableHead>
-                      <TableHead className="text-white">WEIGHT (kg)</TableHead>
+                      <TableHead className="text-white">GROSS WEIGHT (kg)</TableHead>
                       <TableHead className="text-white">QTY</TableHead>
                       <TableHead className="text-white">VOL. WEIGHT</TableHead>
                       <TableHead className="text-white">ACTIONS</TableHead>
@@ -601,12 +644,34 @@ const SudanInvoiceForm = () => {
                   </TableHeader>
                   <TableBody>
                     {packageItems.map((item, index) => (
-                      <TableRow key={item.id}>
+                      <TableRow key={item.id} className={item.isPending ? "bg-yellow-50" : ""}>
                         <TableCell>{index + 1}</TableCell>
                         <TableCell className="font-medium">{item.name}</TableCell>
                         <TableCell>{item.length}×{item.width}×{item.height} cm</TableCell>
                         <TableCell>{item.cubicMetre?.toFixed(3) || '0.000'}</TableCell>
-                        <TableCell>{item.weight}</TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={item.weight || ""}
+                            onChange={(e) => {
+                              const weight = parseFloat(e.target.value) || 0;
+                              updatePackageItem(item.id, { 
+                                weight, 
+                                isPending: weight === 0 
+                              });
+                              // Auto-calculate door charges if Door to Door is YES
+                              if (formData.doorToDoor === 'YES') {
+                                const totalWeight = packageItems.reduce((sum, pkg) => 
+                                  sum + (pkg.id === item.id ? weight : pkg.weight || 0), 0
+                                );
+                                const doorCharges = getSectorPricing().doorCharges + (totalWeight * 5);
+                                handleFormChange('doorCharges', doorCharges);
+                              }
+                            }}
+                            placeholder="Enter weight"
+                            className={item.isPending ? "border-yellow-400 bg-yellow-50" : ""}
+                          />
+                        </TableCell>
                         <TableCell>{item.quantity}</TableCell>
                         <TableCell>{item.volumeWeight?.toFixed(2) || '0.00'} kg</TableCell>
                         <TableCell>
@@ -677,7 +742,7 @@ const SudanInvoiceForm = () => {
           </Card>
         )}
 
-        {/* Cost Details */}
+        {/* Enhanced Cost Details */}
         <Card>
           <CardHeader className="bg-blue-500 text-white">
             <CardTitle>CHARGES BREAKDOWN</CardTitle>
@@ -696,11 +761,33 @@ const SudanInvoiceForm = () => {
                     />
                   </div>
                   <div className="space-y-2">
+                    <label className="text-sm font-medium">FREIGHT TYPE:</label>
+                    <Select value={formData.freightType || "PREPAID"} onValueChange={(value) => handleFormChange('freightType', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PREPAID">PREPAID</SelectItem>
+                        <SelectItem value="COLLECT">COLLECT</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
                     <label className="text-sm font-medium">DOOR CHARGES:</label>
                     <Input
                       type="number"
                       value={formData.doorCharges}
                       onChange={(e) => handleFormChange('doorCharges', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                      className={formData.doorToDoor === 'YES' ? "bg-green-50 border-green-300" : ""}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">PACKING CHARGES:</label>
+                    <Input
+                      type="number"
+                      value={formData.packingCharges || 0}
+                      onChange={(e) => handleFormChange('packingCharges', parseFloat(e.target.value) || 0)}
                       placeholder="0.00"
                     />
                   </div>
@@ -711,7 +798,20 @@ const SudanInvoiceForm = () => {
                       value={formData.totalFreight}
                       onChange={(e) => handleFormChange('totalFreight', parseFloat(e.target.value) || 0)}
                       placeholder="0.00"
+                      className="bg-blue-50 border-blue-300"
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">FREIGHT STATUS:</label>
+                    <Select value={formData.freightStatus || "UNPAID"} onValueChange={(value) => handleFormChange('freightStatus', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PAID">PAID</SelectItem>
+                        <SelectItem value="UNPAID">UNPAID</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">DISCOUNT:</label>
@@ -725,17 +825,21 @@ const SudanInvoiceForm = () => {
                 </div>
               </div>
 
-              {/* Summary */}
+              {/* Enhanced Summary */}
               <div className="bg-gray-50 p-4 rounded-lg space-y-3">
                 <h3 className="font-semibold text-gray-800">CHARGES SUMMARY</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span>FREIGHT:</span>
+                    <span>FREIGHT ({formData.freightType || 'PREPAID'}):</span>
                     <span>{formData.freight.toFixed(2)} QAR</span>
                   </div>
                   <div className="flex justify-between">
                     <span>DOOR CHARGES:</span>
                     <span>{formData.doorCharges.toFixed(2)} QAR</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>PACKING CHARGES:</span>
+                    <span>{(formData.packingCharges || 0).toFixed(2)} QAR</span>
                   </div>
                   <div className="flex justify-between">
                     <span>TOTAL FREIGHT:</span>
@@ -749,6 +853,12 @@ const SudanInvoiceForm = () => {
                   <div className="flex justify-between font-bold text-lg">
                     <span>NET AMOUNT:</span>
                     <span className="text-green-600">{formData.netAmount.toFixed(2)} QAR</span>
+                  </div>
+                  <div className="flex justify-between text-xs text-gray-600">
+                    <span>FREIGHT STATUS:</span>
+                    <span className={formData.freightStatus === 'PAID' ? 'text-green-600' : 'text-red-600'}>
+                      {formData.freightStatus || 'UNPAID'}
+                    </span>
                   </div>
                 </div>
                 

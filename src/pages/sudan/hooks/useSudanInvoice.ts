@@ -24,6 +24,7 @@ export interface SudanPackageItem {
   };
   volume?: number;
   grossWeight?: number;
+  isPending?: boolean;
 }
 
 // Main form data interface
@@ -83,6 +84,9 @@ export interface SudanFormData {
   discount: number;
   netAmount: number;
   paymentStatus: string;
+  freightType?: string;
+  packingCharges?: number;
+  freightStatus?: string;
 }
 
 const initialFormData: SudanFormData = {
@@ -141,6 +145,9 @@ const initialFormData: SudanFormData = {
   discount: 0,
   netAmount: 0,
   paymentStatus: "UNPAID",
+  freightType: "PREPAID",
+  packingCharges: 0,
+  freightStatus: "UNPAID",
 };
 
 export const useSudanInvoice = () => {
@@ -173,7 +180,7 @@ export const useSudanInvoice = () => {
 
       // Door-to-door charges
       const doorCharges = formData.doorToDoor === "YES" ? 15 : 0;
-      const totalFreight = baseFreight + doorCharges;
+      const totalFreight = baseFreight + doorCharges + (formData.packingCharges || 0);
 
       setFormData(prev => ({
         ...prev,

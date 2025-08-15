@@ -90,7 +90,7 @@ export const saudiCities = [
 ];
 
 // Country codes for phone numbers
-export const countryCodes = {
+export const phoneCountryCodes = {
   "QATAR": "+974",
   "SUDAN": "+249",
   "SAUDI ARABIA": "+966",
@@ -99,6 +99,17 @@ export const countryCodes = {
   "BAHRAIN": "+973",
   "OMAN": "+968"
 };
+
+// Country codes for select dropdown
+export const countryCodes = [
+  { value: "QATAR", label: "QATAR" },
+  { value: "SUDAN", label: "SUDAN" },
+  { value: "SAUDI ARABIA", label: "SAUDI ARABIA" },
+  { value: "UAE", label: "UAE" },
+  { value: "KUWAIT", label: "KUWAIT" },
+  { value: "BAHRAIN", label: "BAHRAIN" },
+  { value: "OMAN", label: "OMAN" }
+];
 
 // Sudan sector pricing
 export const sudanSectorPricing = {
