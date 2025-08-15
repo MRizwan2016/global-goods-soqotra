@@ -29,14 +29,16 @@ const SudanInvoiceNumberSelector: React.FC<SudanInvoiceNumberSelectorProps> = ({
   useEffect(() => {
     const loadBooks = () => {
       try {
-        const bookingFormStock = JSON.parse(localStorage.getItem('bookingFormStock') || '[]');
+        const bookingFormStock = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+        
         const activeBooks = bookingFormStock.filter(book => 
-          book.status === 'active' && 
+          book.status === 'ACTIVE' && 
           book.assignedTo && 
           book.available && 
           book.available.length > 0 &&
           book.country === 'SUDAN'
         );
+        
         setAvailableBooks(activeBooks);
       } catch (error) {
         console.error('Error loading books:', error);
@@ -48,7 +50,7 @@ const SudanInvoiceNumberSelector: React.FC<SudanInvoiceNumberSelectorProps> = ({
     
     // Listen for storage changes
     const handleStorageChange = (e) => {
-      if (e.key === 'bookingFormStock') {
+      if (e.key === 'invoiceBooks') {
         loadBooks();
       }
     };
