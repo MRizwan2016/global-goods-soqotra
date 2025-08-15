@@ -29,6 +29,12 @@ const InvoiceBookForm = () => {
           { value: "MR_ABDUL_QADER", label: "Mr. Abdul Qader" },
           { value: "MR_YASIR", label: "Mr. Yasir" }
         ];
+      case "SUDAN":
+        return [
+          { value: "MR_ABDULLA_YOUSUF", label: "Mr. Abdulla Yousuf" },
+          { value: "MR_SALIH", label: "Mr. Salih" },
+          { value: "MR_ABDUL_QADER", label: "Mr. Abdul Qader" }
+        ];
       default:
         return [
           { value: "DEFAULT_REP", label: "Default Representative" }
@@ -43,6 +49,15 @@ const InvoiceBookForm = () => {
           { value: "MR_JOHNY_VENAKADY", label: "Mr. Johny Venakady" },
           { value: "MR_SALIH", label: "Mr. Salih" },
           { value: "MR_BAKHEETH", label: "Mr. Bakheeth" },
+          { value: "MR_IDRIS_KARAR", label: "Mr. Idris Karar" }
+        ];
+      case "SUDAN":
+        return [
+          { value: "MR_JOHNNY_VENAKADY", label: "Mr. Johnny Venakady" },
+          { value: "MR_SALIH", label: "Mr. Salih" },
+          { value: "MR_BAKEETH", label: "Mr. Bakeeth" },
+          { value: "MR_SALEH", label: "Mr. Saleh" },
+          { value: "MR_KANAYA", label: "Mr. Kanaya" },
           { value: "MR_IDRIS_KARAR", label: "Mr. Idris Karar" }
         ];
       default:
@@ -186,7 +201,10 @@ const InvoiceBookForm = () => {
       if (bookExists) {
         const existingBook = existingBooks.find((book: any) => book.bookNumber === formData.bookNumber);
         console.log("ERROR: Book already exists in country:", existingBook?.country);
-        toast.error(`Book #${formData.bookNumber} is already assigned to ${existingBook?.country || 'another country'}. Book numbers cannot be duplicated.`);
+        
+        // Enhanced error message with country-specific guidance
+        const nextBookNumber = parseInt(formData.bookNumber) + 1;
+        toast.error(`Book #${formData.bookNumber} is already assigned to ${existingBook?.country || 'another country'}. Choose the next book number (${nextBookNumber}) for assignment.`);
         return;
       }
       
