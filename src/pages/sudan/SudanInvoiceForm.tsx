@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Save, Eye, Printer, Plus, Settings } from "lucide-react";
+import { ArrowLeft, Save, Eye, Printer, Settings } from "lucide-react";
 import { toast } from "sonner";
 
 // Import Sudan-specific components and data
@@ -11,20 +11,23 @@ import { useSudanInvoice } from "./hooks/useSudanInvoice";
 import SudanInvoicePreview from "./components/SudanInvoicePreview";
 import { sudanSectors, sudanSalesReps, sudanDrivers, sudanDistricts, sudanPorts } from "./data/sudanData";
 
-// Remove problematic imports for now
+// Import components needed for the form
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { calculateCubicMeter } from "@/pages/invoicing/utils/packageDimensions";
-import {
+import { Checkbox } from "@/components/ui/checkbox";
+import { Trash2, Plus } from "lucide-react";
+import { 
+  sudanPackageTypes,
   namePrefixes,
   qatarCities,
   sudanCities,
   destinationCountries,
   countryCodes
 } from "./data/sudanData";
-import { Checkbox } from "@/components/ui/checkbox";
+import { calculateCubicMeter } from "@/pages/invoicing/utils/packageDimensions";
 
 const SudanInvoiceForm = () => {
   const navigate = useNavigate();
@@ -38,6 +41,16 @@ const SudanInvoiceForm = () => {
   
   // Custom sectors
   const [customSectors, setCustomSectors] = useState([]);
+  
+  // State for package input form
+  const [packageInput, setPackageInput] = useState({
+    name: '',
+    length: '',
+    width: '',
+    height: '',
+    weight: '',
+    quantity: '1'
+  });
 
   // Sudan invoice hook
   const {
@@ -414,95 +427,356 @@ const SudanInvoiceForm = () => {
           </CardContent>
         </Card>
 
-        {/* Package Details */}
+        {/* Package Details - Complete Implementation */}
         <Card>
-          <CardHeader>
-            <CardTitle>Package Details</CardTitle>
+          <CardHeader className="bg-orange-500 text-white">
+            <CardTitle>PACKAGE DETAILS</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="mb-4">
-              <Button onClick={() => setShowManualDialog(true)} variant="outline" size="sm">
+          <CardContent className="space-y-6 pt-6">
+            {/* Package Type Selection */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">PACKAGE TYPE:</label>
+                <Select 
+                  value="" 
+                  onValueChange={(value) => {
+                    const packageType = sudanPackageTypes.find(p => p.name === value);
+                    if (packageType) {
+                      handlePackageTypeSelect(packageType);
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select package type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {sudanPackageTypes.map((pkg) => (
+                      <SelectItem key={pkg.name} value={pkg.name}>
+                        {pkg.name} ({pkg.length}×{pkg.width}×{pkg.height} cm)
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowManualDialog(true)}
+                  className="flex-1"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Manual Entry
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowSpecialDialog(true)}
+                  className="flex-1"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Special Product
+                </Button>
+              </div>
+            </div>
+
+            {/* Package Input Form */}
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">LENGTH (cm):</label>
+                <Input
+                  type="number"
+                  value={packageInput.length || ""}
+                  onChange={(e) => setPackageInput(prev => ({ ...prev, length: e.target.value }))}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">WIDTH (cm):</label>
+                <Input
+                  type="number"
+                  value={packageInput.width || ""}
+                  onChange={(e) => setPackageInput(prev => ({ ...prev, width: e.target.value }))}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">HEIGHT (cm):</label>
+                <Input
+                  type="number"
+                  value={packageInput.height || ""}
+                  onChange={(e) => setPackageInput(prev => ({ ...prev, height: e.target.value }))}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">WEIGHT (kg):</label>
+                <Input
+                  type="number"
+                  value={packageInput.weight || ""}
+                  onChange={(e) => setPackageInput(prev => ({ ...prev, weight: e.target.value }))}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">QUANTITY:</label>
+                <Input
+                  type="number"
+                  value={packageInput.quantity || "1"}
+                  onChange={(e) => setPackageInput(prev => ({ ...prev, quantity: e.target.value }))}
+                  placeholder="1"
+                  min="1"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">PACKAGE NAME:</label>
+                <Input
+                  value={packageInput.name || ""}
+                  onChange={(e) => setPackageInput(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="Package name"
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-center">
+              <Button
+                type="button"
+                onClick={() => {
+                  if (packageInput.length && packageInput.width && packageInput.height && packageInput.name) {
+                    const length = parseFloat(packageInput.length) / 100; // cm to m
+                    const width = parseFloat(packageInput.width) / 100;
+                    const height = parseFloat(packageInput.height) / 100;
+                    const volume = length * width * height;
+                    const volumeWeight = volume * 167; // Standard calculation
+
+                    const newPackage = {
+                      id: `package-${Date.now()}`,
+                      name: packageInput.name,
+                      length: parseFloat(packageInput.length),
+                      width: parseFloat(packageInput.width),
+                      height: parseFloat(packageInput.height),
+                      weight: parseFloat(packageInput.weight) || 0,
+                      quantity: parseInt(packageInput.quantity) || 1,
+                      cubicMetre: volume,
+                      cubicFeet: volume * 35.3147,
+                      volumeWeight: volumeWeight
+                    };
+
+                    addPackageItem(newPackage);
+                    setPackageInput({
+                      name: '',
+                      length: '',
+                      width: '',
+                      height: '',
+                      weight: '',
+                      quantity: '1'
+                    });
+                    toast.success("Package added successfully");
+                  } else {
+                    toast.error("Please fill all required fields");
+                  }
+                }}
+                className="w-40"
+              >
                 <Plus className="h-4 w-4 mr-2" />
-                Add Manual Package
-              </Button>
-              <Button onClick={() => setShowSpecialDialog(true)} variant="outline" size="sm" className="ml-2">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Special Product
+                Add Package
               </Button>
             </div>
+
+            {/* Package Table */}
             {packageItems.length > 0 && (
-              <div className="mt-4">
-                <h4 className="font-semibold mb-2">Package Summary</h4>
-                <p>Total Packages: {packageItems.length}</p>
-                <p>Total Weight: {formData.totalWeight} kg</p>
-                <p>Total Volume: {formData.totalVolume} m³</p>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="bg-blue-500 hover:bg-blue-500">
+                      <TableHead className="text-white">No.</TableHead>
+                      <TableHead className="text-white">PACKAGE</TableHead>
+                      <TableHead className="text-white">DIMENSIONS</TableHead>
+                      <TableHead className="text-white">VOLUME (m³)</TableHead>
+                      <TableHead className="text-white">WEIGHT (kg)</TableHead>
+                      <TableHead className="text-white">QTY</TableHead>
+                      <TableHead className="text-white">VOL. WEIGHT</TableHead>
+                      <TableHead className="text-white">ACTIONS</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {packageItems.map((item, index) => (
+                      <TableRow key={item.id}>
+                        <TableCell>{index + 1}</TableCell>
+                        <TableCell className="font-medium">{item.name}</TableCell>
+                        <TableCell>{item.length}×{item.width}×{item.height} cm</TableCell>
+                        <TableCell>{item.cubicMetre?.toFixed(3) || '0.000'}</TableCell>
+                        <TableCell>{item.weight}</TableCell>
+                        <TableCell>{item.quantity}</TableCell>
+                        <TableCell>{item.volumeWeight?.toFixed(2) || '0.00'} kg</TableCell>
+                        <TableCell>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-red-600"
+                            onClick={() => removePackageItem(item.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+
+            {/* Package Summary */}
+            {packageItems.length > 0 && (
+              <div className="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-lg">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-600">{formData.packageCount}</div>
+                  <div className="text-sm text-gray-600">Total Packages</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-600">{formData.totalWeight.toFixed(2)} kg</div>
+                  <div className="text-sm text-gray-600">Total Weight</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-purple-600">{formData.totalVolume.toFixed(3)} m³</div>
+                  <div className="text-sm text-gray-600">Total Volume</div>
+                </div>
               </div>
             )}
           </CardContent>
         </Card>
 
+        {/* Sudan Sector Pricing Calculator */}
+        {formData.sector && (
+          <Card>
+            <CardHeader className="bg-green-600 text-white">
+              <CardTitle>SUDAN PROJECT PRICING</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded-lg">
+                <div className="text-center">
+                  <div className="text-sm text-gray-600">FREIGHT</div>
+                  <div className="text-xl font-bold text-blue-600">QAR {getSectorPricing().freight.toFixed(2)}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm text-gray-600">DOOR TO DOOR</div>
+                  <div className="text-xl font-bold text-orange-600">
+                    {formData.doorToDoor === 'YES' ? 'YES' : 'NO'}
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm text-gray-600">DOOR CHARGE</div>
+                  <div className="text-xl font-bold text-purple-600">QAR {getSectorPricing().doorCharges.toFixed(2)}</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm text-gray-600">TOTAL FREIGHT</div>
+                  <div className="text-xl font-bold text-green-600">QAR {(getSectorPricing().freight + getSectorPricing().doorCharges).toFixed(2)}</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Cost Details */}
         <Card>
-          <CardHeader>
-            <CardTitle>Cost Details</CardTitle>
+          <CardHeader className="bg-blue-500 text-white">
+            <CardTitle>CHARGES BREAKDOWN</CardTitle>
           </CardHeader>
-          <CardContent className="grid gap-4 md:grid-cols-3">
-            <div>
-              <Label htmlFor="freight">Freight (QAR)</Label>
-              <Input
-                type="number"
-                id="freight"
-                value={formData.freight}
-                onChange={(e) => handleFormChange('freight', parseFloat(e.target.value))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="doorCharges">Door Charges (QAR)</Label>
-              <Input
-                type="number"
-                id="doorCharges"
-                value={formData.doorCharges}
-                onChange={(e) => handleFormChange('doorCharges', parseFloat(e.target.value))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="totalFreight">Total Freight (QAR)</Label>
-              <Input
-                type="number"
-                id="totalFreight"
-                value={formData.totalFreight}
-                onChange={(e) => handleFormChange('totalFreight', parseFloat(e.target.value))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="discount">Discount (QAR)</Label>
-              <Input
-                type="number"
-                id="discount"
-                value={formData.discount}
-                onChange={(e) => handleFormChange('discount', parseFloat(e.target.value))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="netAmount">Net Amount (QAR)</Label>
-              <Input
-                type="number"
-                id="netAmount"
-                value={formData.netAmount}
-                onChange={(e) => handleFormChange('netAmount', parseFloat(e.target.value))}
-              />
-            </div>
-            <div>
-              <Label htmlFor="paymentStatus">Payment Status</Label>
-              <Select value={formData.paymentStatus} onValueChange={(value) => handleFormChange('paymentStatus', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PAID">PAID</SelectItem>
-                  <SelectItem value="UNPAID">UNPAID</SelectItem>
-                </SelectContent>
-              </Select>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">FREIGHT:</label>
+                    <Input
+                      type="number"
+                      value={formData.freight}
+                      onChange={(e) => handleFormChange('freight', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">DOOR CHARGES:</label>
+                    <Input
+                      type="number"
+                      value={formData.doorCharges}
+                      onChange={(e) => handleFormChange('doorCharges', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">TOTAL FREIGHT:</label>
+                    <Input
+                      type="number"
+                      value={formData.totalFreight}
+                      onChange={(e) => handleFormChange('totalFreight', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">DISCOUNT:</label>
+                    <Input
+                      type="number"
+                      value={formData.discount}
+                      onChange={(e) => handleFormChange('discount', parseFloat(e.target.value) || 0)}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Summary */}
+              <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+                <h3 className="font-semibold text-gray-800">CHARGES SUMMARY</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>FREIGHT:</span>
+                    <span>{formData.freight.toFixed(2)} QAR</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>DOOR CHARGES:</span>
+                    <span>{formData.doorCharges.toFixed(2)} QAR</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>TOTAL FREIGHT:</span>
+                    <span>{formData.totalFreight.toFixed(2)} QAR</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>DISCOUNT:</span>
+                    <span>({formData.discount.toFixed(2)}) QAR</span>
+                  </div>
+                  <hr className="border-gray-300" />
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>NET AMOUNT:</span>
+                    <span className="text-green-600">{formData.netAmount.toFixed(2)} QAR</span>
+                  </div>
+                </div>
+                
+                {/* Payment Status */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">PAYMENT STATUS:</label>
+                  <Select value={formData.paymentStatus} onValueChange={(value) => handleFormChange('paymentStatus', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PAID">PAID</SelectItem>
+                      <SelectItem value="UNPAID">UNPAID</SelectItem>
+                      <SelectItem value="PARTIAL">PARTIAL</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Remarks */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">REMARKS:</label>
+                  <Input
+                    value={formData.remarks}
+                    onChange={(e) => handleFormChange('remarks', e.target.value)}
+                    placeholder="Additional notes..."
+                  />
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
