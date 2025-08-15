@@ -82,6 +82,16 @@ export const mockSalesReps = [
     id: "sr16",
     name: "Mr. Paolo Fernando",
     code: "PF016"
+  },
+  {
+    id: "sr17",
+    name: "Mr. Ranatunghe",
+    code: "RN017"
+  },
+  {
+    id: "sr18",
+    name: "Mr. Daminda",
+    code: "DM018"
   }
 ];
 
