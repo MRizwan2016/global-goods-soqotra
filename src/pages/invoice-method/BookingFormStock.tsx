@@ -141,7 +141,7 @@ const BookingFormStock = () => {
     setCancelledBooks(updatedCancelled);
 
     // Update the original book by removing the cancelled/deleted pages
-    const existingBooks = JSON.parse(localStorage.getItem('bookingFormStock') || '[]');
+    const existingBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
     const updatedBooks = existingBooks.map((book: Book) => {
       if (book.bookNumber === bookToAction.bookNumber) {
         const remainingPages = book.available.filter(page => !pageNumbers.includes(page));
@@ -153,7 +153,7 @@ const BookingFormStock = () => {
       return book;
     });
 
-    localStorage.setItem('bookingFormStock', JSON.stringify(updatedBooks));
+    localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
     loadBooks();
 
     toast.success(`Pages ${isCancel ? 'Cancelled' : 'Deleted'}`, {
@@ -179,9 +179,9 @@ const BookingFormStock = () => {
       };
 
       // Add back to active books
-      const existingBooks = JSON.parse(localStorage.getItem('bookingFormStock') || '[]');
+      const existingBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
       const updatedBooks = [...existingBooks, restoredBook];
-      localStorage.setItem('bookingFormStock', JSON.stringify(updatedBooks));
+      localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
 
       // Remove from cancelled books
       const existingCancelled = JSON.parse(localStorage.getItem('cancelledBooks') || '[]');
@@ -192,7 +192,7 @@ const BookingFormStock = () => {
       setCancelledBooks(updatedCancelled);
     } else {
       // Restore specific pages back to the original book
-      const existingBooks = JSON.parse(localStorage.getItem('bookingFormStock') || '[]');
+      const existingBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
       const updatedBooks = existingBooks.map((existingBook: Book) => {
         if (existingBook.bookNumber === book.bookNumber) {
           // Add the cancelled pages back to available pages
@@ -205,7 +205,7 @@ const BookingFormStock = () => {
         return existingBook;
       });
 
-      localStorage.setItem('bookingFormStock', JSON.stringify(updatedBooks));
+      localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
 
       // Remove from cancelled books
       const existingCancelled = JSON.parse(localStorage.getItem('cancelledBooks') || '[]');
