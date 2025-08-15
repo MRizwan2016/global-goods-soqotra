@@ -47,8 +47,14 @@ const SalesRepReport: React.FC = () => {
       const schedulesResult = await ScheduleService.getSchedules({});
       const schedules = schedulesResult.success ? schedulesResult.schedules || [] : [];
       
-      // Get all jobs
-      const jobs = JobStorageService.getAllJobs();
+      // Get all jobs safely with error handling
+      let jobs = [];
+      try {
+        jobs = JobStorageService.getAllJobs() || [];
+      } catch (error) {
+        console.warn("Could not load jobs from storage:", error);
+        jobs = [];
+      }
       
       // Process data by sales rep
       const salesRepMap = new Map<string, SalesRepData>();
@@ -168,6 +174,19 @@ const SalesRepReport: React.FC = () => {
   };
 
   const totalStats = getTotalStats();
+
+  if (loading) {
+    return (
+      <Layout title="Sales Representative Report">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+            <p>Loading sales representative data...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout title="Sales Representative Report">
