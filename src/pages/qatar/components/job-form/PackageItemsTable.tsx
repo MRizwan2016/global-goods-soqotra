@@ -40,54 +40,55 @@ const PackageItemsTable: React.FC = () => {
       <h3 className="font-bold text-lg text-gray-800 mb-5 border-b pb-2">PACKAGE ITEMS</h3>
       
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Box #</th>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Package Name</th>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dimensions</th>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volume (m³)</th>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
-              <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Price</th>
+        <table className="min-w-full">
+          <thead>
+            <tr className="bg-blue-600 text-white">
+              <th className="px-3 py-2 text-center text-xs font-bold uppercase">Num</th>
+              <th className="px-3 py-2 text-center text-xs font-bold uppercase">Item</th>
+              <th className="px-3 py-2 text-center text-xs font-bold uppercase">Quantity</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {jobItems.map((item, index) => {
-              const packageInfo = getPackageDimensions(item.name || item.itemName || '');
-              const totalVolume = packageInfo.vol * (item.quantity || 1);
-              const totalPrice = (item.sellPrice || 0) * (item.quantity || 1);
-              
-              return (
-                <tr key={item.id}>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{item.boxNumber || (index + 1)}</td>
-                  <td className="px-4 py-4 text-sm font-medium text-gray-900">{item.name || item.itemName}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{packageInfo.dim}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{item.quantity || 1}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">{totalVolume.toFixed(3)}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500">QAR {item.sellPrice || 0}</td>
-                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">QAR {totalPrice}</td>
-                </tr>
-              );
-            })}
-            <tr className="bg-gray-50 font-medium">
-              <td className="px-4 py-4 text-sm text-gray-900" colSpan={3}>TOTALS:</td>
-              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                {jobItems.reduce((sum, item) => sum + (item.quantity || 1), 0)}
-              </td>
-              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                {jobItems.reduce((sum, item) => {
-                  const packageInfo = getPackageDimensions(item.name || item.itemName || '');
-                  return sum + (packageInfo.vol * (item.quantity || 1));
-                }, 0).toFixed(3)} m³
-              </td>
-              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">-</td>
-              <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">
-                QAR {jobItems.reduce((sum, item) => sum + ((item.sellPrice || 0) * (item.quantity || 1)), 0)}
-              </td>
-            </tr>
+          <tbody className="divide-y divide-gray-200">
+            {jobItems.map((item, index) => (
+              <tr key={item.id} className="hover:bg-gray-50">
+                <td className="px-3 py-2 text-center text-sm">{index + 1}</td>
+                <td className="px-3 py-2 text-sm font-medium text-gray-900">
+                  {item.name || item.itemName}
+                </td>
+                <td className="px-3 py-2 text-center text-sm">{item.quantity || 1}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
+        
+        {/* Summary Table */}
+        <div className="mt-6">
+          <table className="min-w-full">
+            <thead>
+              <tr className="bg-blue-600 text-white">
+                <th className="px-3 py-2 text-center text-xs font-bold uppercase">Num</th>
+                <th className="px-3 py-2 text-center text-xs font-bold uppercase">Item</th>
+                <th className="px-3 py-2 text-center text-xs font-bold uppercase">Quantity</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {/* Group items by name and sum quantities */}
+              {Object.entries(
+                jobItems.reduce((acc: Record<string, number>, item) => {
+                  const itemName = item.name || item.itemName || '';
+                  acc[itemName] = (acc[itemName] || 0) + (item.quantity || 1);
+                  return acc;
+                }, {})
+              ).map(([itemName, totalQuantity], index) => (
+                <tr key={itemName} className="hover:bg-gray-50">
+                  <td className="px-3 py-2 text-center text-sm">{index + 1}</td>
+                  <td className="px-3 py-2 text-sm font-medium text-gray-900">{itemName}</td>
+                  <td className="px-3 py-2 text-center text-sm">{String(totalQuantity)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
