@@ -28,7 +28,7 @@ const SalesRepReport: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [selectedSalesRep, setSelectedSalesRep] = useState<string>("");
+  const [selectedSalesRep, setSelectedSalesRep] = useState<string>("all");
   const [salesRepList, setSalesRepList] = useState<string[]>([]);
 
   useEffect(() => {
@@ -131,7 +131,7 @@ const SalesRepReport: React.FC = () => {
   const filterData = () => {
     let filtered = salesRepData.filter(data => {
       const matchesSearch = data.salesRep.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesSalesRep = !selectedSalesRep || data.salesRep === selectedSalesRep;
+      const matchesSalesRep = selectedSalesRep === "all" || data.salesRep === selectedSalesRep;
       
       // Date filtering on schedules
       let matchesDate = true;
@@ -251,7 +251,7 @@ const SalesRepReport: React.FC = () => {
                   <SelectValue placeholder="Select Sales Rep" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Sales Reps</SelectItem>
+                  <SelectItem value="all">All Sales Reps</SelectItem>
                   {salesRepList.map((salesRep) => (
                     <SelectItem key={salesRep} value={salesRep}>
                       {salesRep}
