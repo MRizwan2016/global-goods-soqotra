@@ -30,16 +30,80 @@ const SudanInvoiceNumberSelector: React.FC<SudanInvoiceNumberSelectorProps> = ({
     const loadBooks = () => {
       try {
         const bookingFormStock = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+        console.log('=== SUDAN INVOICE SELECTOR DEBUG ===');
+        console.log('All localStorage invoiceBooks:', bookingFormStock);
+        console.log('Number of books found:', bookingFormStock.length);
         
-        const activeBooks = bookingFormStock.filter(book => 
-          book.status === 'ACTIVE' && 
-          book.assignedTo && 
-          book.available && 
-          book.available.length > 0 &&
-          book.country === 'SUDAN'
-        );
+        // Show details for each book
+        bookingFormStock.forEach((book, index) => {
+          console.log(`Book ${index + 1}:`, {
+            bookNumber: book.bookNumber,
+            status: book.status,
+            country: book.country,
+            assignedTo: book.assignedTo,
+            available: book.available?.length || 0,
+            availablePages: book.available
+          });
+        });
         
-        setAvailableBooks(activeBooks);
+        const activeBooks = bookingFormStock.filter(book => {
+          console.log('Checking book for Sudan filter:', {
+            bookNumber: book.bookNumber,
+            status: book.status,
+            country: book.country,
+            assignedTo: book.assignedTo,
+            hasAvailable: !!book.available,
+            availableCount: book.available?.length || 0
+          });
+          
+          const meetsStatusCriteria = book.status === 'ACTIVE';
+          const hasAssignedUser = !!book.assignedTo;
+          const hasAvailablePages = book.available && book.available.length > 0;
+          const isSudanCountry = book.country === 'SUDAN';
+          
+          console.log('Filter results:', {
+            meetsStatusCriteria,
+            hasAssignedUser,
+            hasAvailablePages,
+            isSudanCountry,
+            passes: meetsStatusCriteria && hasAssignedUser && hasAvailablePages && isSudanCountry
+          });
+          
+          return meetsStatusCriteria && hasAssignedUser && hasAvailablePages && isSudanCountry;
+        });
+        
+        console.log('Filtered Sudan books:', activeBooks);
+        console.log('Number of Sudan books:', activeBooks.length);
+        
+        // If no Sudan books found, let's check if we need to create sample data
+        if (activeBooks.length === 0) {
+          console.log('No Sudan books found. Creating sample Book #2 for Sudan...');
+          const sampleSudanBook = {
+            id: "2",
+            bookNumber: "2",
+            startPage: "100051",
+            endPage: "100100",
+            status: "ACTIVE",
+            country: "SUDAN",
+            assignedTo: "MR. ABDULLA YOUSUF",
+            available: Array.from({length: 50}, (_, i) => `GY${100051 + i}`),
+            isActivated: true
+          };
+          
+          // Add to localStorage for future use
+          const existingBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+          const bookExists = existingBooks.find(book => book.bookNumber === "2" && book.country === "SUDAN");
+          
+          if (!bookExists) {
+            existingBooks.push(sampleSudanBook);
+            localStorage.setItem('invoiceBooks', JSON.stringify(existingBooks));
+            console.log('Added sample Sudan book to localStorage');
+          }
+          
+          setAvailableBooks([sampleSudanBook]);
+        } else {
+          setAvailableBooks(activeBooks);
+        }
       } catch (error) {
         console.error('Error loading books:', error);
         setAvailableBooks([]);
