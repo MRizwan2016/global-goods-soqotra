@@ -112,6 +112,22 @@ const SudanInvoiceForm = () => {
   // Event handlers
   const handleSave = async () => {
     try {
+      // Validate required fields
+      if (!formData.invoiceNumber) {
+        toast.error("Please enter an invoice number");
+        return;
+      }
+      
+      if (!formData.shipperName) {
+        toast.error("Please enter shipper name");
+        return;
+      }
+      
+      if (!formData.consigneeName) {
+        toast.error("Please enter consignee name");
+        return;
+      }
+
       // Save customer details first
       const customerData = {
         mobile: formData.shipperMobile,
@@ -138,23 +154,64 @@ const SudanInvoiceForm = () => {
 
       // Save invoice
       const invoiceId = await saveInvoice(id);
+      
+      // Store the current invoice ID for printing if it's a new invoice
+      if (!id) {
+        // Update the URL to include the new invoice ID
+        window.history.replaceState({}, '', `/sudan/invoice/edit/${invoiceId}`);
+      }
+      
       toast.success(`Invoice ${id ? 'updated' : 'saved'} successfully`);
-      navigate("/sudan");
+      
+      // Don't navigate away, stay on the form for further actions
     } catch (error) {
       console.error('Save error:', error);
       toast.error(`Failed to ${id ? 'update' : 'save'} invoice`);
     }
   };
 
-  const handlePreview = () => {
-    setShowPreview(true);
+  const handlePreview = async () => {
+    // Auto-save before preview if there are changes
+    try {
+      if (!formData.invoiceNumber) {
+        toast.error("Please enter an invoice number before preview");
+        return;
+      }
+      
+      // Save the invoice first
+      const invoiceId = await saveInvoice(id);
+      
+      // Update the current ID if it's a new invoice
+      if (!id) {
+        window.history.replaceState({}, '', `/sudan/invoice/edit/${invoiceId}`);
+      }
+      
+      // Now show preview
+      setShowPreview(true);
+    } catch (error) {
+      toast.error("Please save the invoice first");
+    }
   };
 
-  const handlePrint = () => {
-    if (id) {
-      navigate(`/sudan/invoice/print/${id}`);
-    } else {
-      toast.error("Please save the invoice first");
+  const handlePrint = async () => {
+    try {
+      // Auto-save before printing
+      if (!formData.invoiceNumber) {
+        toast.error("Please enter an invoice number before printing");
+        return;
+      }
+      
+      const invoiceId = await saveInvoice(id);
+      
+      // Update URL if it's a new invoice
+      if (!id) {
+        window.history.replaceState({}, '', `/sudan/invoice/edit/${invoiceId}`);
+      }
+      
+      // Open print page in new tab
+      window.open(`/sudan/invoice/print/${invoiceId}`, '_blank');
+    } catch (error) {
+      toast.error("Failed to save invoice before printing");
     }
   };
 
@@ -270,7 +327,7 @@ const SudanInvoiceForm = () => {
               <Printer className="h-4 w-4 mr-2" />
               Print Invoice
             </Button>
-            <Button onClick={handleSave}>
+            <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
               <Save className="h-4 w-4 mr-2" />
               Save Invoice
             </Button>
