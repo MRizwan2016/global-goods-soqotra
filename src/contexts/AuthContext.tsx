@@ -186,6 +186,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           downloads: true,
           accounting: true,
           controlPanel: true,
+          cargoDelivery: true,
+          accountFunctions: true,
+          accountRegistrations: true,
+          accountFinancialEntities: true,
+          accountCountryReconciliations: true,
           files: {
             salesRep: true,
             town: true,
@@ -227,6 +232,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           downloads: true,
           accounting: true,
           controlPanel: false,
+          cargoDelivery: true,
+          accountFunctions: false,
+          accountRegistrations: false,
+          accountFinancialEntities: false,
+          accountCountryReconciliations: false,
           files: {}
         }
       },
@@ -246,6 +256,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           downloads: false,
           accounting: false,
           controlPanel: false,
+          cargoDelivery: true,
+          accountFunctions: false,
+          accountRegistrations: false,
+          accountFinancialEntities: false,
+          accountCountryReconciliations: false,
           files: {}
         }
       },
@@ -265,6 +280,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           downloads: false,
           accounting: false,
           controlPanel: false,
+          cargoDelivery: true,
+          accountFunctions: false,
+          accountRegistrations: false,
+          accountFinancialEntities: false,
+          accountCountryReconciliations: false,
           files: {}
         }
       }

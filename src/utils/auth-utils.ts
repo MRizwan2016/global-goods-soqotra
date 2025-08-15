@@ -20,6 +20,11 @@ export function ensureUserPermissions(user: User): User {
         downloads: user.isAdmin ? true : false,
         accounting: user.isAdmin ? true : false,
         controlPanel: user.isAdmin ? true : false,
+        cargoDelivery: true, // Default enabled for all users
+        accountFunctions: user.isAdmin ? true : false,
+        accountRegistrations: user.isAdmin ? true : false,
+        accountFinancialEntities: user.isAdmin ? true : false,
+        accountCountryReconciliations: user.isAdmin ? true : false,
         files: {
           // Default all files to false for regular users, true for admins
           salesRep: user.isAdmin ? true : false,
@@ -32,7 +37,12 @@ export function ensureUserPermissions(user: User): User {
           driverHelper: user.isAdmin ? true : false,
           invoicing: user.isAdmin ? true : false,
           paymentReceivable: user.isAdmin ? true : false,
-          item: user.isAdmin ? true : false
+          item: user.isAdmin ? true : false,
+          // Account section files
+          accountFunctionFiles: user.isAdmin ? true : false,
+          accountRegistrationFiles: user.isAdmin ? true : false,
+          accountFinancialFiles: user.isAdmin ? true : false,
+          accountCountryFiles: user.isAdmin ? true : false
         }
       }
     };
@@ -44,6 +54,11 @@ export function ensureUserPermissions(user: User): User {
         ...user.permissions,
         accounting: user.permissions.accounting ?? user.isAdmin,
         controlPanel: user.permissions.controlPanel ?? user.isAdmin,
+        cargoDelivery: user.permissions.cargoDelivery ?? true,
+        accountFunctions: user.permissions.accountFunctions ?? user.isAdmin,
+        accountRegistrations: user.permissions.accountRegistrations ?? user.isAdmin,
+        accountFinancialEntities: user.permissions.accountFinancialEntities ?? user.isAdmin,
+        accountCountryReconciliations: user.permissions.accountCountryReconciliations ?? user.isAdmin,
         files: {
           // Default all files to false for regular users, true for admins
           salesRep: user.isAdmin ? true : false,
@@ -56,7 +71,12 @@ export function ensureUserPermissions(user: User): User {
           driverHelper: user.isAdmin ? true : false,
           invoicing: user.isAdmin ? true : false,
           paymentReceivable: user.isAdmin ? true : false,
-          item: user.isAdmin ? true : false
+          item: user.isAdmin ? true : false,
+          // Account section files
+          accountFunctionFiles: user.isAdmin ? true : false,
+          accountRegistrationFiles: user.isAdmin ? true : false,
+          accountFinancialFiles: user.isAdmin ? true : false,
+          accountCountryFiles: user.isAdmin ? true : false
         }
       }
     };
@@ -71,6 +91,11 @@ export function ensureUserPermissions(user: User): User {
         ...user.permissions,
         accounting: user.permissions.accounting ?? user.isAdmin,
         controlPanel: user.permissions.controlPanel ?? user.isAdmin,
+        cargoDelivery: user.permissions.cargoDelivery ?? true,
+        accountFunctions: user.permissions.accountFunctions ?? user.isAdmin,
+        accountRegistrations: user.permissions.accountRegistrations ?? user.isAdmin,
+        accountFinancialEntities: user.permissions.accountFinancialEntities ?? user.isAdmin,
+        accountCountryReconciliations: user.permissions.accountCountryReconciliations ?? user.isAdmin,
         files: {
           ...currentFiles,
           // Only set defaults for missing properties
@@ -84,7 +109,12 @@ export function ensureUserPermissions(user: User): User {
           driverHelper: currentFiles.driverHelper ?? (user.isAdmin ? true : false),
           invoicing: currentFiles.invoicing ?? (user.isAdmin ? true : false),
           paymentReceivable: currentFiles.paymentReceivable ?? (user.isAdmin ? true : false),
-          item: currentFiles.item ?? (user.isAdmin ? true : false)
+          item: currentFiles.item ?? (user.isAdmin ? true : false),
+          // Account section files
+          accountFunctionFiles: currentFiles.accountFunctionFiles ?? (user.isAdmin ? true : false),
+          accountRegistrationFiles: currentFiles.accountRegistrationFiles ?? (user.isAdmin ? true : false),
+          accountFinancialFiles: currentFiles.accountFinancialFiles ?? (user.isAdmin ? true : false),
+          accountCountryFiles: currentFiles.accountCountryFiles ?? (user.isAdmin ? true : false)
         }
       }
     };
@@ -160,7 +190,13 @@ export function hasFilePermission(user: User | null, fileKey: keyof User['permis
     // Accounting files
     paymentMethods: 'accounting',
     reconciliation: 'accounting',
-    profitLoss: 'accounting'
+    profitLoss: 'accounting',
+    
+    // Account section files
+    accountFunctionFiles: 'accountFunctions',
+    accountRegistrationFiles: 'accountRegistrations',
+    accountFinancialFiles: 'accountFinancialEntities',
+    accountCountryFiles: 'accountCountryReconciliations'
   };
   
   // Check if the user has the category permission for this file

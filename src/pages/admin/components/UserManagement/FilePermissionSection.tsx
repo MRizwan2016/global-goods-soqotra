@@ -9,7 +9,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { User } from "@/types/auth";
-import { Database, FileInput, BarChart4, DollarSign } from "lucide-react";
+import { Database, FileInput, BarChart4, DollarSign, Building2, Users, FileText, Globe } from "lucide-react";
 import { filePermissions } from "../../constants/filePermissions";
 
 interface FilePermissionSectionProps {
@@ -167,6 +167,154 @@ const FilePermissionSection = ({ user, toggleFilePermission, isAdminOnly = false
                   <label 
                     htmlFor={`${user.id}-${key}`}
                     className={`text-sm cursor-pointer ${!user.permissions?.accounting ? 'text-gray-400' : ''}`}
+                  >
+                    {value.label}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="accountFunctions">
+          <AccordionTrigger className="py-2">
+            <div className="flex items-center">
+              <Building2 className="h-4 w-4 mr-2" />
+              <span>Account Functions</span>
+              {user.permissions?.accountFunctions ? (
+                <Badge className="ml-2 bg-green-100 text-green-800">Category Enabled</Badge>
+              ) : (
+                <Badge className="ml-2 bg-gray-100 text-gray-800" variant="outline">Category Disabled</Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-6 py-2">
+              {Object.entries(filePermissions.accountFunctions.files).map(([key, value]) => (
+                <div key={key} className="flex items-center space-x-2 py-1">
+                  <Checkbox 
+                    id={`${user.id}-${key}`}
+                    checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
+                    onCheckedChange={isAdminOnly ? undefined : () => toggleFilePermission(
+                      user.id, 
+                      key as keyof User['permissions']['files']
+                    )}
+                    disabled={!user.permissions?.accountFunctions || isAdminOnly}
+                  />
+                  <label 
+                    htmlFor={`${user.id}-${key}`}
+                    className={`text-sm cursor-pointer ${!user.permissions?.accountFunctions ? 'text-gray-400' : ''}`}
+                  >
+                    {value.label}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="accountRegistrations">
+          <AccordionTrigger className="py-2">
+            <div className="flex items-center">
+              <Users className="h-4 w-4 mr-2" />
+              <span>Account Registrations</span>
+              {user.permissions?.accountRegistrations ? (
+                <Badge className="ml-2 bg-green-100 text-green-800">Category Enabled</Badge>
+              ) : (
+                <Badge className="ml-2 bg-gray-100 text-gray-800" variant="outline">Category Disabled</Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-6 py-2">
+              {Object.entries(filePermissions.accountRegistrations.files).map(([key, value]) => (
+                <div key={key} className="flex items-center space-x-2 py-1">
+                  <Checkbox 
+                    id={`${user.id}-${key}`}
+                    checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
+                    onCheckedChange={isAdminOnly ? undefined : () => toggleFilePermission(
+                      user.id, 
+                      key as keyof User['permissions']['files']
+                    )}
+                    disabled={!user.permissions?.accountRegistrations || isAdminOnly}
+                  />
+                  <label 
+                    htmlFor={`${user.id}-${key}`}
+                    className={`text-sm cursor-pointer ${!user.permissions?.accountRegistrations ? 'text-gray-400' : ''}`}
+                  >
+                    {value.label}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="accountFinancialEntities">
+          <AccordionTrigger className="py-2">
+            <div className="flex items-center">
+              <FileText className="h-4 w-4 mr-2" />
+              <span>Account Financial Entities</span>
+              {user.permissions?.accountFinancialEntities ? (
+                <Badge className="ml-2 bg-green-100 text-green-800">Category Enabled</Badge>
+              ) : (
+                <Badge className="ml-2 bg-gray-100 text-gray-800" variant="outline">Category Disabled</Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-6 py-2">
+              {Object.entries(filePermissions.accountFinancialEntities.files).map(([key, value]) => (
+                <div key={key} className="flex items-center space-x-2 py-1">
+                  <Checkbox 
+                    id={`${user.id}-${key}`}
+                    checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
+                    onCheckedChange={isAdminOnly ? undefined : () => toggleFilePermission(
+                      user.id, 
+                      key as keyof User['permissions']['files']
+                    )}
+                    disabled={!user.permissions?.accountFinancialEntities || isAdminOnly}
+                  />
+                  <label 
+                    htmlFor={`${user.id}-${key}`}
+                    className={`text-sm cursor-pointer ${!user.permissions?.accountFinancialEntities ? 'text-gray-400' : ''}`}
+                  >
+                    {value.label}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        <AccordionItem value="accountCountryReconciliations">
+          <AccordionTrigger className="py-2">
+            <div className="flex items-center">
+              <Globe className="h-4 w-4 mr-2" />
+              <span>Account Country Reconciliations</span>
+              {user.permissions?.accountCountryReconciliations ? (
+                <Badge className="ml-2 bg-green-100 text-green-800">Category Enabled</Badge>
+              ) : (
+                <Badge className="ml-2 bg-gray-100 text-gray-800" variant="outline">Category Disabled</Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 pl-6 py-2">
+              {Object.entries(filePermissions.accountCountryReconciliations.files).map(([key, value]) => (
+                <div key={key} className="flex items-center space-x-2 py-1">
+                  <Checkbox 
+                    id={`${user.id}-${key}`}
+                    checked={!!user.permissions?.files?.[key as keyof User['permissions']['files']]}
+                    onCheckedChange={isAdminOnly ? undefined : () => toggleFilePermission(
+                      user.id, 
+                      key as keyof User['permissions']['files']
+                    )}
+                    disabled={!user.permissions?.accountCountryReconciliations || isAdminOnly}
+                  />
+                  <label 
+                    htmlFor={`${user.id}-${key}`}
+                    className={`text-sm cursor-pointer ${!user.permissions?.accountCountryReconciliations ? 'text-gray-400' : ''}`}
                   >
                     {value.label}
                   </label>

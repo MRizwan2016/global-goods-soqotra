@@ -40,5 +40,29 @@ export const filePermissions = {
       reconciliation: { label: "Reconciliation", path: "/accounting/reconciliation" },
       profitLoss: { label: "Profit & Loss", path: "/accounts/profit-loss" }
     }
+  },
+  accountFunctions: {
+    title: "Account Functions",
+    files: {
+      accountFunctionFiles: { label: "Function Management", path: "/accounts/functions" }
+    }
+  },
+  accountRegistrations: {
+    title: "Account Registrations", 
+    files: {
+      accountRegistrationFiles: { label: "Registration Management", path: "/accounts/registrations" }
+    }
+  },
+  accountFinancialEntities: {
+    title: "Account Financial Entities",
+    files: {
+      accountFinancialFiles: { label: "Financial Entity Management", path: "/accounts/financial-entities" }
+    }
+  },
+  accountCountryReconciliations: {
+    title: "Account Country Reconciliations",
+    files: {
+      accountCountryFiles: { label: "Country Reconciliation Reports", path: "/accounts/country-reconciliations" }
+    }
   }
 };

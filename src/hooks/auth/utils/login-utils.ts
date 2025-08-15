@@ -12,6 +12,11 @@ const ensureUserPermissions = (user: User): User => ({
     downloads: false,
     accounting: false,
     controlPanel: false,
+    cargoDelivery: true,
+    accountFunctions: false,
+    accountRegistrations: false,
+    accountFinancialEntities: false,
+    accountCountryReconciliations: false,
     files: {}
   }
 });

@@ -3,7 +3,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import PermissionToggleCard from "./PermissionToggleCard";
 import { User } from "@/types/auth";
-import { Database, FileInput, BarChart4, Download, DollarSign, Settings } from "lucide-react";
+import { Database, FileInput, BarChart4, Download, DollarSign, Settings, Truck, Building2, Users, Globe, FileText } from "lucide-react";
 
 interface CategoryPermissionsProps {
   user: User;
@@ -42,6 +42,31 @@ const CategoryPermissions = ({ user, toggleUserPermission, isAdminOnly = false }
       key: "controlPanel" as keyof User['permissions'], 
       title: "Control Panel Access", 
       icon: <Settings />
+    },
+    { 
+      key: "cargoDelivery" as keyof User['permissions'], 
+      title: "Cargo Collection & Delivery", 
+      icon: <Truck />
+    },
+    { 
+      key: "accountFunctions" as keyof User['permissions'], 
+      title: "Account Functions", 
+      icon: <Building2 />
+    },
+    { 
+      key: "accountRegistrations" as keyof User['permissions'], 
+      title: "Account Registrations", 
+      icon: <Users />
+    },
+    { 
+      key: "accountFinancialEntities" as keyof User['permissions'], 
+      title: "Account Financial Entities", 
+      icon: <FileText />
+    },
+    { 
+      key: "accountCountryReconciliations" as keyof User['permissions'], 
+      title: "Account Country Reconciliations", 
+      icon: <Globe />
     }
   ];
 
