@@ -20,20 +20,18 @@ export const sudanSectors = [
 
 // Sudan sales representatives
 export const sudanSalesReps = [
-  { value: "AHMED_HASSAN", label: "Ahmed Hassan" },
-  { value: "MOHAMED_ALI", label: "Mohamed Ali" },
-  { value: "FATIMA_OMAR", label: "Fatima Omar" },
-  { value: "KHALID_IBRAHIM", label: "Khalid Ibrahim" },
-  { value: "AISHA_MOHAMMED", label: "Aisha Mohammed" }
+  { value: "MR_YOUSUF_ABDULLAH", label: "Mr. Yousuf Abdullah" },
+  { value: "MR_SALIH", label: "Mr. Salih" },
+  { value: "MR_ABDUL_QADER", label: "Mr. Abdul Qader" }
 ];
 
 // Sudan drivers
 export const sudanDrivers = [
-  { value: "OMAR_ABDALLA", label: "Omar Abdalla" },
-  { value: "HASSAN_AHMED", label: "Hassan Ahmed" },
-  { value: "ALI_MOHAMED", label: "Ali Mohamed" },
-  { value: "IBRAHIM_HASSAN", label: "Ibrahim Hassan" },
-  { value: "MOHAMMED_ALI", label: "Mohammed Ali" }
+  { value: "MR_SALIH", label: "Mr. Salih" },
+  { value: "MR_JOHNY_VENAKDI", label: "Mr. Johny Venakdi" },
+  { value: "MR_SALEH", label: "Mr. Saleh" },
+  { value: "MR_IDRIS_KARAR", label: "Mr. Idris Karar" },
+  { value: "MR_BAKEETH", label: "Mr. Bakeeth" }
 ];
 
 // Sudan districts

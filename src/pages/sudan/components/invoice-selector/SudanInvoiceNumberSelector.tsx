@@ -34,7 +34,8 @@ const SudanInvoiceNumberSelector: React.FC<SudanInvoiceNumberSelectorProps> = ({
           book.status === 'active' && 
           book.assignedTo && 
           book.available && 
-          book.available.length > 0
+          book.available.length > 0 &&
+          book.country === 'SUDAN'
         );
         setAvailableBooks(activeBooks);
       } catch (error) {
