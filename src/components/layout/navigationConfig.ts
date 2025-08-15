@@ -25,6 +25,7 @@ export const navigationSections: NavigationSections = {
         items: [
           { name: "FINANCIAL REPORTS", path: "/reports/financial" },
           { name: "CARGO REPORTS", path: "/reports/cargo" },
+          { name: "SALES REP REPORT", path: "/reports/sales-rep" },
         ],
       },
       {
@@ -130,6 +131,7 @@ export const navigationSections: NavigationSections = {
           { name: "ADD NEW JOB", path: "/qatar/job/new" },
           { name: "JOB TRACKING", path: "/qatar/jobs" },
           { name: "JOB SCHEDULE", path: "/qatar/jobs/generate" },
+          { name: "VIEW SCHEDULES", path: "/schedules" },
           { name: "PRINT SCHEDULES", path: "/qatar/jobs/print" },
           { name: "VEHICLES", path: "/qatar/vehicles" },
           { name: "DRIVERS", path: "/qatar/drivers" },

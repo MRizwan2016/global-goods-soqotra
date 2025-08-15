@@ -5,6 +5,7 @@ import CargoStatistics from "@/pages/reports/CargoStatistics";
 import FinancialReports from "@/pages/reports/FinancialReports";
 import FinancialReportsPage from "@/pages/reports/FinancialReportsPage";
 import { InvoiceDetailsView } from "@/components/reports/InvoiceDetailsView";
+import SalesRepReport from "@/pages/reports/SalesRepReport";
 import { RouteConfig } from "./types";
 
 export const reportsRoutes: RouteConfig[] = [
@@ -36,6 +37,11 @@ export const reportsRoutes: RouteConfig[] = [
   {
     path: "/reports/financial/:section",
     element: FinancialReports,
+    private: true,
+  },
+  {
+    path: "/reports/sales-rep",
+    element: SalesRepReport,
     private: true,
   }
 ];

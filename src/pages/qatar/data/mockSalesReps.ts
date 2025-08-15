@@ -135,5 +135,15 @@ export const mockDrivers = [
     id: "d9",
     name: "Mr. Idries Karar",
     license: "QT-90123"
+  },
+  {
+    id: "d10",
+    name: "Mr. Ranatunghe",
+    license: "QT-01234"
+  },
+  {
+    id: "d11",
+    name: "Mr. Daminda",
+    license: "QT-01235"
   }
 ];
