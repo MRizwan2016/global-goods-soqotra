@@ -61,7 +61,7 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
   const [pendingAddition, setPendingAddition] = useState(false);
 
   const handleAddItem = () => {
-    if (selectedItem && !pendingAddition) {
+    if (selectedItem && quantity > 0 && !pendingAddition) {
       setPendingAddition(true);
       
       // Create a more detailed description with package information
@@ -71,20 +71,20 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
         id: uuidv4(),
         name: selectedItem,
         itemName: selectedItem,
-        sellPrice,
-        quantity,
+        sellPrice: sellPrice || 0,
+        quantity: quantity || 1,
         description: packageDescription
       };
       
       onAddItem(newItem);
       
       // Don't reset selectedItem so user can add the same package multiple times
-      // Only reset price and quantity if needed
+      // Reset price and quantity
       setSellPrice(0);
       setQuantity(1);
       
       // Reset pending state after a short delay
-      setTimeout(() => setPendingAddition(false), 500);
+      setTimeout(() => setPendingAddition(false), 300);
     }
   };
 
@@ -100,9 +100,13 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
           <SelectTrigger id="packageOption" className="bg-white">
             <SelectValue placeholder="SELECT PACKAGE" />
           </SelectTrigger>
-          <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]" position="popper">
+          <SelectContent className="bg-white max-h-64 overflow-y-auto z-[1000] shadow-lg border border-gray-200" side="bottom" align="start" sideOffset={4}>
             {packageOptions.map((option, index) => (
-              <SelectItem key={index} value={option}>
+              <SelectItem 
+                key={index} 
+                value={option}
+                className="hover:bg-gray-100 focus:bg-gray-100 cursor-pointer py-2 px-3"
+              >
                 {option}
               </SelectItem>
             ))}
@@ -136,8 +140,8 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
       <div className="flex items-end">
         <Button 
           onClick={handleAddItem} 
-          disabled={!selectedItem || sellPrice <= 0 || pendingAddition}
-          className="bg-blue-600 hover:bg-blue-700 w-full"
+          disabled={!selectedItem || quantity <= 0 || pendingAddition}
+          className="bg-blue-600 hover:bg-blue-700 w-full disabled:bg-gray-300"
         >
           {pendingAddition ? "ADDING..." : "INSERT"}
         </Button>
