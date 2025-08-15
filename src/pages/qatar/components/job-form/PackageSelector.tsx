@@ -87,8 +87,8 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
       
       onAddItem(newItem);
       
-      // Reset fields after adding but keep selected packages
-      setSelectedItem("");
+      // Don't reset selectedItem so user can add the same package multiple times
+      // Only reset price and quantity if needed
       setSellPrice(0);
       setQuantity(1);
       
