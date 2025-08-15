@@ -23,6 +23,7 @@ const AssignedBooksTable: React.FC<AssignedBooksTableProps> = ({ books, onAssign
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book #</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Page Range</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pages</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Available Pages</th>
@@ -35,7 +36,7 @@ const AssignedBooksTable: React.FC<AssignedBooksTableProps> = ({ books, onAssign
           <tbody className="bg-white divide-y divide-gray-200">
             {books.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-6 py-8 text-center text-gray-500">
+                <td colSpan={9} className="px-6 py-8 text-center text-gray-500">
                   No assigned books found.
                 </td>
               </tr>
@@ -43,6 +44,11 @@ const AssignedBooksTable: React.FC<AssignedBooksTableProps> = ({ books, onAssign
               books.map((book, index) => (
                 <tr key={index} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{book.bookNumber}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <span className="bg-primary/10 text-primary px-2 py-1 rounded-full text-xs font-medium">
+                      {book.country || 'Not specified'}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <span className="text-blue-600 font-mono">GY {book.startPage} - GY {book.endPage}</span>
                   </td>

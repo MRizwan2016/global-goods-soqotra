@@ -14,4 +14,5 @@ export interface Book {
   isAssigned?: boolean;
   assignedDate?: string;
   id?: string;
+  country?: string;
 }

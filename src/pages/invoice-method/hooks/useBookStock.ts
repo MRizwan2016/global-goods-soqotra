@@ -119,8 +119,9 @@ export function useBookStock() {
           startPage: book.startPage || book.startNumber,
           endPage: book.endPage || book.endNumber,
           status: book.isActivated ? "ACTIVE" : "INACTIVE",
-          available: book.availablePages || [],
-          assignedTo: book.assignedTo || book.salesRepresentative || undefined
+          available: book.availablePages || book.available || [],
+          assignedTo: book.assignedTo || book.salesRepresentative || undefined,
+          country: book.country || "Qatar" // Default to Qatar if no country specified
         }));
         console.log("Transformed books:", transformedBooks);
         setBooks(transformedBooks);
@@ -129,8 +130,46 @@ export function useBookStock() {
         setBooks([]);
       }
     } else {
-      console.log("No books found in localStorage");
-      setBooks([]);
+      console.log("No books found in localStorage - creating sample books with countries");
+      // Create sample books with country assignments and available pages
+      const sampleBooks = [
+        {
+          id: "BOOK001",
+          bookNumber: "BOOK001",
+          startPage: "1001",
+          endPage: "1100", 
+          status: "ACTIVE",
+          country: "Qatar",
+          available: Array.from({length: 100}, (_, i) => `GY${1001 + i}`),
+          isActivated: true
+        },
+        {
+          id: "BOOK002",
+          bookNumber: "BOOK002", 
+          startPage: "2001",
+          endPage: "2100",
+          status: "ACTIVE",
+          country: "Sudan",
+          available: Array.from({length: 100}, (_, i) => `GY${2001 + i}`),
+          isActivated: true
+        },
+        {
+          id: "BOOK003",
+          bookNumber: "BOOK003",
+          startPage: "3001",
+          endPage: "3100", 
+          status: "ACTIVE",
+          country: "Eritrea",
+          available: Array.from({length: 50}, (_, i) => `GY${3051 + i}`), // Only 50 pages available 
+          assignedTo: "John Doe",
+          assignedDate: new Date().toISOString(),
+          isActivated: true
+        }
+      ];
+      
+      // Save sample books to localStorage
+      localStorage.setItem('invoiceBooks', JSON.stringify(sampleBooks));
+      setBooks(sampleBooks);
     }
   };
 

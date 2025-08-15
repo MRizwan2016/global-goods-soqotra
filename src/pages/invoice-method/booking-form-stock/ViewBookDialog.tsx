@@ -51,6 +51,10 @@ const ViewBookDialog: React.FC<ViewBookDialogProps> = ({
                 <dd className="text-sm text-gray-900 sm:col-span-2">{selectedBook?.available.length}</dd>
               </div>
               <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
+                <dt className="text-sm font-medium text-gray-500">Country</dt>
+                <dd className="text-sm text-gray-900 sm:col-span-2">{selectedBook?.country || "Not specified"}</dd>
+              </div>
+              <div className="px-4 py-2 sm:grid sm:grid-cols-3 sm:gap-4">
                 <dt className="text-sm font-medium text-gray-500">Assigned To</dt>
                 <dd className="text-sm text-gray-900 sm:col-span-2">
                   {selectedBook?.assignedTo || "Not assigned"}
