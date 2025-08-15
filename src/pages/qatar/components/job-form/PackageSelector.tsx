@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 
 interface PackageSelectorProps {
-  onAddItem: (item: JobItem) => void;
+  onAddItem: (action: any) => void;
 }
 
 const packageOptions = [
@@ -67,16 +67,17 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
       // Create a more detailed description with package information
       const packageDescription = `${selectedItem} - Qty: ${quantity}, Price: QAR ${sellPrice}`;
       
-      const newItem: JobItem = {
+      const itemAction = {
         id: uuidv4(),
+        type: 'add' as const,
         name: selectedItem,
         itemName: selectedItem,
         sellPrice: sellPrice || 0,
         quantity: quantity || 1,
-        description: packageDescription
+        jobId: 'temp'
       };
       
-      onAddItem(newItem);
+      onAddItem(itemAction);
       
       // Don't reset selectedItem so user can add the same package multiple times
       // Reset price and quantity
@@ -100,7 +101,7 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
           <SelectTrigger id="packageOption" className="bg-white">
             <SelectValue placeholder="SELECT PACKAGE" />
           </SelectTrigger>
-          <SelectContent className="bg-white max-h-64 overflow-y-auto z-[1000] shadow-lg border border-gray-200" side="bottom" align="start" sideOffset={4}>
+          <SelectContent className="bg-white max-h-48 overflow-y-scroll z-[1000] shadow-lg border border-gray-200" position="popper" side="bottom" align="start" sideOffset={4}>
             {packageOptions.map((option, index) => (
               <SelectItem 
                 key={index} 
