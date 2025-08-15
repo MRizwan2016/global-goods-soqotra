@@ -64,7 +64,31 @@ const UniversalInvoiceFormWithUPB: React.FC<UniversalInvoiceFormProps> = ({
 
   // Invoice number selector hook for UPB integration
   const handleSelectInvoice = (invoiceNumber: string) => {
-    setFormData(prev => ({ ...prev, invoiceNumber }));
+    // Get the full invoice data from localStorage when invoice is selected
+    const existingInvoices = JSON.parse(localStorage.getItem('invoices') || '[]');
+    const selectedInvoiceData = existingInvoices.find((inv: any) => inv.invoiceNumber === invoiceNumber);
+    
+    if (selectedInvoiceData) {
+      // Auto-populate shipper details from the selected invoice
+      setFormData(prev => ({ 
+        ...prev, 
+        invoiceNumber,
+        // Auto-populate shipper fields
+        shipperPrefix: selectedInvoiceData.shipperPrefix || selectedInvoiceData.shipper1?.split(' ')[0] || "",
+        shipperName: selectedInvoiceData.shipperName || selectedInvoiceData.shipper1 || "",
+        shipperCountry: selectedInvoiceData.shipperCountry || "Qatar",
+        shipperCity: selectedInvoiceData.shipperCity || "Doha",
+        shipperMobile: selectedInvoiceData.shipperMobile || "",
+        // Keep other existing data
+        sector: prev.sector,
+        branch: prev.branch,
+        warehouse: prev.warehouse,
+        salesRep: prev.salesRep,
+        driver: prev.driver
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, invoiceNumber }));
+    }
   };
   
   const {

@@ -82,7 +82,6 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
                   level="M"
                   includeMargin={true}
                 />
-                <p className="text-xs font-bold mt-1">ERITREA</p>
               </div>
             </div>
 
@@ -338,11 +337,9 @@ const EritreaInvoicePreview: React.FC<EritreaInvoicePreviewProps> = ({
           {/* Delivery Agent Section */}
           <div className="mt-6">
             <div className="border border-gray-300 p-3 bg-blue-50 rounded">
-              <h4 className="font-bold text-sm text-blue-900 mb-2">DESTINATION DELIVERY AGENT</h4>
-              <p className="font-bold text-lg">DHL EXPRESS</p>
-              <p className="text-sm">Massawa Branch, Eritrea</p>
-              <p className="text-xs text-gray-600">Contact: Mr. Idries Omar Idries</p>
-              <p className="text-xs text-gray-600">Mobile: +291 7159848</p>
+              <h4 className="font-bold text-sm text-blue-900 mb-2">AGENT DETAILS:</h4>
+              <p className="font-bold text-lg">DHL EXPRESS: MUSAWWA BRANCH, Mr. Idries Omar Idries, Mobile No. +291 7159848</p>
+              <p className="text-sm">Massawa Branch, <span className="font-bold">ERITREA</span></p>
             </div>
           </div>
 
