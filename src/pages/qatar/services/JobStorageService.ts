@@ -264,28 +264,9 @@ export class JobStorageService {
    */
   private static cleanupDummyData() {
     try {
-      const jobs = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
-      
-      // Define dummy customer names to remove
-      const dummyCustomers = ["QATAR NATIONAL BANK", "SAMPLE CUSTOMER", "TEST CUSTOMER"];
-      
-      // Keep only real jobs from today onwards
-      const today = new Date();
-      const cutoffDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
-      
-      const realJobs = jobs.filter((job: any) => {
-        const jobDate = new Date(job.date || job.timestamp || job.createdAt);
-        const isNotDummy = !dummyCustomers.includes(job.customer?.toUpperCase());
-        const isRecent = jobDate >= cutoffDate;
-        
-        return isNotDummy && isRecent;
-      });
-      
-      // Only update if we actually removed dummy data
-      if (realJobs.length !== jobs.length) {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(realJobs));
-        console.log(`Removed ${jobs.length - realJobs.length} dummy jobs`);
-      }
+      // Always return empty array to prevent dummy data loading
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify([]));
+      console.log('Dummy data cleanup completed - storage cleared');
     } catch (error) {
       console.error('Error cleaning up dummy data:', error);
     }
