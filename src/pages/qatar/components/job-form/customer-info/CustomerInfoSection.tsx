@@ -8,22 +8,26 @@ import SelectedPackagesList from "./SelectedPackagesList";
 import RemarksTextarea from "./RemarksTextarea";
 import { useJobForm } from "../context/JobFormContext";
 import { PackageInfo } from "../details/packages/types";
+import { v4 as uuidv4 } from 'uuid';
+
+interface SelectedPackageWithId extends PackageInfo {
+  selectionId: string;
+}
 
 const CustomerInfoSection = () => {
   const { handleInputChange, setJobData } = useJobForm();
-  const [selectedPackages, setSelectedPackages] = useState<PackageInfo[]>([]);
+  const [selectedPackages, setSelectedPackages] = useState<SelectedPackageWithId[]>([]);
   
   const handlePackageSelect = (pkg: PackageInfo) => {
-    // Check if package is already selected
-    if (selectedPackages.some(p => p.sr_no === pkg.sr_no)) {
-      toast.error("This package is already selected");
-      return;
-    }
-    
-    setSelectedPackages(prev => [...prev, pkg]);
+    // Allow duplicate packages - each selection creates a new entry with unique ID
+    const packageWithId: SelectedPackageWithId = {
+      ...pkg,
+      selectionId: uuidv4()
+    };
+    setSelectedPackages(prev => [...prev, packageWithId]);
     
     // Update the packageDetails string with detailed package information
-    const updatedPackages = [...selectedPackages, pkg];
+    const updatedPackages = [...selectedPackages, packageWithId];
     const packageInfo = updatedPackages
       .map(p => `${p.description} | Dimensions: ${p.dimensions} | Volume: ${p.volume_in_meters} CBM | Price: ${p.price} | Total: ${p.total}`)
       .join(" || ");
@@ -44,11 +48,11 @@ const CustomerInfoSection = () => {
     toast.success(`Package added: ${pkg.description}`);
   };
 
-  const handleRemovePackage = (pkg: PackageInfo) => {
-    setSelectedPackages(prev => prev.filter(p => p.sr_no !== pkg.sr_no));
+  const handleRemovePackage = (pkg: SelectedPackageWithId) => {
+    setSelectedPackages(prev => prev.filter(p => p.selectionId !== pkg.selectionId));
     
     // Update packageDetails without the removed package
-    const updatedPackages = selectedPackages.filter(p => p.sr_no !== pkg.sr_no);
+    const updatedPackages = selectedPackages.filter(p => p.selectionId !== pkg.selectionId);
     const packageInfo = updatedPackages.length > 0
       ? updatedPackages
           .map(p => `${p.description} | Dimensions: ${p.dimensions} | Volume: ${p.volume_in_meters} CBM | Price: ${p.price} | Total: ${p.total}`)
