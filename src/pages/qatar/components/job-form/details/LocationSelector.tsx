@@ -46,8 +46,8 @@ const LocationSelector = ({
   const industrialAreaStreets = Array.from({ length: 52 }, (_, i) => `STREET NO. ${i + 1}`);
 
   useEffect(() => {
-    // Check if selected town is an industrial area
-    setIsIndustrialArea(town === "INDUSTRIAL AREA");
+    // Check if selected town is an industrial area (check both cases)
+    setIsIndustrialArea(town === "INDUSTRIAL AREA" || town === "Industrial Area");
   }, [town]);
 
   const handleAddNewTown = () => {
@@ -152,7 +152,7 @@ const LocationSelector = ({
             <SelectTrigger id="location" className="bg-blue-600 text-white">
               <SelectValue placeholder="SELECT STREET NUMBER" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-80 bg-white border border-gray-200 shadow-lg z-50">
               {industrialAreaStreets.length > 0 ? (
                 industrialAreaStreets.map((street) => (
                   <SelectItem key={street} value={street || `unknown-street-${Date.now()}`}>
