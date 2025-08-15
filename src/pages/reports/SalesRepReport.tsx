@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, startTransition } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,20 +32,37 @@ const SalesRepReport: React.FC = () => {
   const [salesRepList, setSalesRepList] = useState<string[]>([]);
 
   useEffect(() => {
-    loadData();
+    startTransition(() => {
+      loadData();
+    });
   }, []);
 
   useEffect(() => {
-    filterData();
+    startTransition(() => {
+      filterData();
+    });
   }, [salesRepData, searchTerm, selectedSalesRep, dateFrom, dateTo]);
 
   const loadData = async () => {
     try {
       setLoading(true);
       
-      // Get all schedules
-      const schedulesResult = await ScheduleService.getSchedules({});
-      const schedules = schedulesResult.success ? schedulesResult.schedules || [] : [];
+      // Initialize with empty data first
+      setSalesRepData([]);
+      setFilteredData([]);
+      setSalesRepList([]);
+      
+      await new Promise(resolve => setTimeout(resolve, 0)); // Allow render cycle
+      
+      // Get all schedules with error handling
+      let schedules = [];
+      try {
+        const schedulesResult = await ScheduleService.getSchedules({});
+        schedules = schedulesResult.success ? schedulesResult.schedules || [] : [];
+      } catch (scheduleError) {
+        console.warn("Could not load schedules:", scheduleError);
+        schedules = [];
+      }
       
       // Get all jobs safely with error handling
       let jobs = [];
@@ -114,21 +131,33 @@ const SalesRepReport: React.FC = () => {
       });
       
       const salesRepArray = Array.from(salesRepMap.values());
-      setSalesRepData(salesRepArray);
       
-      // Extract unique sales rep names for filter
-      const uniqueSalesReps = [...new Set(salesRepArray.map(data => data.salesRep))].sort();
-      setSalesRepList(uniqueSalesReps);
+      // Use startTransition for state updates
+      startTransition(() => {
+        setSalesRepData(salesRepArray);
+        
+        // Extract unique sales rep names for filter
+        const uniqueSalesReps = [...new Set(salesRepArray.map(data => data.salesRep))].sort();
+        setSalesRepList(uniqueSalesReps);
+      });
       
     } catch (error) {
       console.error("Error loading data:", error);
       toast.error("Failed to load sales rep data");
+      
+      // Set empty data on error
+      startTransition(() => {
+        setSalesRepData([]);
+        setFilteredData([]);
+        setSalesRepList([]);
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const filterData = () => {
+    try {
     let filtered = salesRepData.filter(data => {
       const matchesSearch = data.salesRep.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesSalesRep = selectedSalesRep === "all" || data.salesRep === selectedSalesRep;
@@ -150,7 +179,15 @@ const SalesRepReport: React.FC = () => {
       return matchesSearch && matchesSalesRep && matchesDate;
     });
     
-    setFilteredData(filtered);
+    startTransition(() => {
+      setFilteredData(filtered);
+    });
+    } catch (error) {
+      console.error("Error filtering data:", error);
+      startTransition(() => {
+        setFilteredData([]);
+      });
+    }
   };
 
   const handlePrint = () => {
