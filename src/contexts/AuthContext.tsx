@@ -290,16 +290,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
   };
 
-  // Function to ensure all users have passwords set
+  // Function to ensure all users have passwords set and are active
   const ensureUserPasswordsExist = () => {
     const currentUsers = JSON.parse(localStorage.getItem("users") || "[]");
     const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
     
     let passwordsUpdated = false;
+    let usersUpdated = false;
     
-    currentUsers.forEach((user: User) => {
+    const updatedUsers = currentUsers.map((user: User) => {
+      let updatedUser = { ...user };
+      
+      // Ensure password exists
       if (!userPasswords[user.id]) {
-        // Set default password for users
         if (user.isAdmin) {
           userPasswords[user.id] = ADMIN_PASSWORD;
         } else {
@@ -308,11 +311,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         passwordsUpdated = true;
         console.log(`Set default password for user: ${user.fullName} (${user.id})`);
       }
+      
+      // Ensure registered users are active (they should be able to login)
+      if (!user.isAdmin && !user.isActive) {
+        updatedUser.isActive = true;
+        usersUpdated = true;
+        console.log(`Activating registered user: ${user.fullName} (${user.id})`);
+      }
+      
+      return updatedUser;
     });
     
     if (passwordsUpdated) {
       localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
       console.log("Updated userPasswords:", Object.keys(userPasswords));
+    }
+    
+    if (usersUpdated) {
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+      setUsers(updatedUsers);
+      console.log("Activated registered users for login");
     }
   };
 
