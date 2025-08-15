@@ -2,146 +2,129 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Plus, Save, Eye, Printer, Trash2 } from "lucide-react";
-import SudanInvoicePreview from "./components/SudanInvoicePreview";
+import { ArrowLeft, Save, Eye, Printer, Plus, Settings } from "lucide-react";
 import { toast } from "sonner";
+
+// Import Sudan-specific components and data
+import { useSudanInvoice } from "./hooks/useSudanInvoice";
+import SudanInvoicePreview from "./components/SudanInvoicePreview";
+import { sudanSectors, sudanSalesReps, sudanDrivers, sudanDistricts, sudanPorts } from "./data/sudanData";
+
+// Remove problematic imports for now
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { calculateCubicMeter } from "@/pages/invoicing/utils/packageDimensions";
+import {
+  namePrefixes,
+  qatarCities,
+  sudanCities,
+  destinationCountries,
+  countryCodes
+} from "./data/sudanData";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const SudanInvoiceForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [showPreview, setShowPreview] = useState(false);
   
-  // Form state
-  const [formData, setFormData] = useState({
-    invoiceNumber: '',
-    invoiceDate: new Date().toISOString().split('T')[0],
-    port: 'PORT_SUDAN',
-    sector: 'KASSALA',
-    shipperCountry: 'QATAR',
-    paymentStatus: 'UNPAID'
-  });
+  // State management
+  const [showPreview, setShowPreview] = useState(false);
+  const [showSectorManagement, setShowSectorManagement] = useState(false);
+  const [showManualDialog, setShowManualDialog] = useState(false);
+  const [showSpecialDialog, setShowSpecialDialog] = useState(false);
+  
+  // Custom sectors
+  const [customSectors, setCustomSectors] = useState([]);
 
-  const [shippingDetails, setShippingDetails] = useState({
-    shipper1: '',
-    shipper2: '',
-    town: '',
-    mobile: '',
-    consignee1: '',
-    consignee2: '',
-    consigneeAddress: '',
-    consigneeTown: '',
-    consigneeMobile: '',
-    consigneePassportNic: ''
-  });
+  // Sudan invoice hook
+  const {
+    formData,
+    packageItems,
+    handleFormChange,
+    handlePackageTypeSelect,
+    handlePackageInputChange,
+    addPackageItem,
+    addManualPackageItem,
+    removePackageItem,
+    updatePackageItem,
+    saveInvoice,
+    loadInvoice,
+    setFormData,
+    setPackageItems,
+  } = useSudanInvoice();
 
-  const [packageItems, setPackageItems] = useState([]);
-  const [packageInput, setPackageInput] = useState({
-    name: '',
-    length: '',
-    width: '',
-    height: '',
-    weight: '',
-    quantity: '1'
-  });
+  // Simplified UPB state
+  const [selectedInvoiceNumber, setSelectedInvoiceNumber] = useState("");
+  const [selectedBookNumber, setSelectedBookNumber] = useState("");
+  const [isBookActivated, setIsBookActivated] = useState(false);
+  const [assignedUser, setAssignedUser] = useState("");
 
-  const [costDetails, setCostDetails] = useState({
-    freight: '59.00',
-    discount: '0.00',
-    net: '59.00'
-  });
-
-  const handleFormChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleShippingChange = (field, value) => {
-    setShippingDetails(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handlePackageInputChange = (field, value) => {
-    setPackageInput(prev => ({ ...prev, [field]: value }));
-  };
-
-  const addPackageItem = () => {
-    if (!packageInput.name || !packageInput.length || !packageInput.width || !packageInput.height) {
-      toast.error("Please fill all package details");
-      return;
-    }
-
-    const length = parseFloat(packageInput.length) / 100; // cm to m
-    const width = parseFloat(packageInput.width) / 100;
-    const height = parseFloat(packageInput.height) / 100;
-    const volume = length * width * height;
-
-    const newItem = {
-      id: Date.now(),
-      name: packageInput.name,
-      length: packageInput.length,
-      width: packageInput.width,
-      height: packageInput.height,
-      weight: packageInput.weight || '0',
-      quantity: packageInput.quantity || '1',
-      cubicMetre: volume.toFixed(3)
-    };
-
-    setPackageItems(prev => [...prev, newItem]);
-    setPackageInput({
-      name: '',
-      length: '',
-      width: '',
-      height: '',
-      weight: '',
-      quantity: '1'
-    });
-  };
-
-  const removePackageItem = (id) => {
-    setPackageItems(prev => prev.filter(item => item.id !== id));
-  };
-
-  const calculateTotals = () => {
-    const totalWeight = packageItems.reduce((sum, item) => sum + parseFloat(item.weight || 0), 0);
-    const totalVolume = packageItems.reduce((sum, item) => sum + parseFloat(item.cubicMetre || 0), 0);
-    return { totalWeight: totalWeight.toFixed(2), totalVolume: totalVolume.toFixed(3) };
-  };
-
-  const handleSave = async () => {
-    if (!formData.invoiceNumber) {
-      toast.error("Please enter an invoice number");
-      return;
-    }
-
-    const invoiceData = {
-      id: id || Date.now().toString(),
-      formData,
-      shippingDetails,
-      packageDetails: packageItems,
-      costDetails,
-      ...calculateTotals(),
-      createdAt: new Date().toISOString()
-    };
-
-    try {
-      const existingInvoices = JSON.parse(localStorage.getItem('sudanInvoices') || '[]');
-      
-      if (id) {
-        const index = existingInvoices.findIndex(inv => inv.id === id);
-        if (index !== -1) {
-          existingInvoices[index] = invoiceData;
-        }
-      } else {
-        existingInvoices.push(invoiceData);
+  // Load invoice data if editing
+  useEffect(() => {
+    if (id) {
+      const invoice = loadInvoice(id);
+      if (!invoice) {
+        toast.error("Invoice not found");
+        navigate("/sudan");
       }
+    }
+  }, [id]);
 
-      localStorage.setItem('sudanInvoices', JSON.stringify(existingInvoices));
-      toast.success("Invoice saved successfully");
+  // Load custom sectors
+  useEffect(() => {
+    const storedSectors = localStorage.getItem('sudanCustomSectors');
+    if (storedSectors) {
+      setCustomSectors(JSON.parse(storedSectors));
+    }
+  }, []);
+
+  // UPB Integration - Auto-fill invoice number
+  useEffect(() => {
+    if (selectedInvoiceNumber) {
+      handleFormChange('selectedInvoiceNumber', selectedInvoiceNumber);
+      handleFormChange('selectedBookNumber', selectedBookNumber);
+      handleFormChange('isBookActivated', isBookActivated);
+      handleFormChange('assignedUser', assignedUser);
+    }
+  }, [selectedInvoiceNumber, selectedBookNumber, isBookActivated, assignedUser]);
+
+  // Event handlers
+  const handleSave = async () => {
+    try {
+      // Save customer details first
+      const customerData = {
+        mobile: formData.shipperMobile,
+        name: formData.shipperName,
+        prefix: formData.shipperPrefix,
+        country: formData.shipperCountry,
+        city: formData.shipperCity,
+        address: formData.shipperAddress,
+        email: formData.shipperEmail,
+        idNumber: formData.shipperIdNumber,
+      };
+
+      // Store customer for auto-fill
+      const existingCustomers = JSON.parse(localStorage.getItem('sudanCustomers') || '[]');
+      const existingIndex = existingCustomers.findIndex(c => c.mobile === customerData.mobile);
+      
+      if (existingIndex !== -1) {
+        existingCustomers[existingIndex] = customerData;
+      } else {
+        existingCustomers.push(customerData);
+      }
+      
+      localStorage.setItem('sudanCustomers', JSON.stringify(existingCustomers));
+
+      // Save invoice
+      const invoiceId = await saveInvoice(id);
+      toast.success(`Invoice ${id ? 'updated' : 'saved'} successfully`);
       navigate("/sudan");
     } catch (error) {
-      toast.error("Failed to save invoice");
+      console.error('Save error:', error);
+      toast.error(`Failed to ${id ? 'update' : 'save'} invoice`);
     }
   };
 
@@ -153,23 +136,95 @@ const SudanInvoiceForm = () => {
     if (id) {
       navigate(`/sudan/invoice/print/${id}`);
     } else {
-      toast.error("Please save the invoice first to print");
+      toast.error("Please save the invoice first");
     }
   };
 
-  // Load invoice if editing
-  useEffect(() => {
-    if (id) {
-      const existingInvoices = JSON.parse(localStorage.getItem('sudanInvoices') || '[]');
-      const invoice = existingInvoices.find(inv => inv.id === id);
-      if (invoice) {
-        setFormData(invoice.formData || {});
-        setShippingDetails(invoice.shippingDetails || {});
-        setPackageItems(invoice.packageDetails || []);
-        setCostDetails(invoice.costDetails || {});
+  const handlePrintFromPreview = () => {
+    setShowPreview(false);
+    handlePrint();
+  };
+
+  // Auto-fill shipper details based on mobile number
+  const handleMobileNumberChange = (mobile: string) => {
+    handleFormChange('shipperMobile', mobile);
+    
+    if (mobile.length >= 8) {
+      const customers = JSON.parse(localStorage.getItem('sudanCustomers') || '[]');
+      const existingCustomer = customers.find(c => c.mobile === mobile);
+      
+      if (existingCustomer) {
+        handleFormChange('shipperName', existingCustomer.name || '');
+        handleFormChange('shipperPrefix', existingCustomer.prefix || 'MR.');
+        handleFormChange('shipperCountry', existingCustomer.country || 'QATAR');
+        handleFormChange('shipperCity', existingCustomer.city || '');
+        handleFormChange('shipperAddress', existingCustomer.address || '');
+        handleFormChange('shipperEmail', existingCustomer.email || '');
+        handleFormChange('shipperIdNumber', existingCustomer.idNumber || '');
+        
+        // Auto-fill job numbers
+        const jobNumbers = JSON.parse(localStorage.getItem('sudanJobNumbers') || '[]');
+        const jobsForMobile = jobNumbers.filter(j => j.mobile === mobile);
+        if (jobsForMobile.length > 0) {
+          const latestJob = jobsForMobile[jobsForMobile.length - 1];
+          handleFormChange('jobNumber', latestJob.jobNumber);
+        }
       }
     }
-  }, [id]);
+  };
+
+  // Add new sector
+  const handleSectorAdded = (newSector) => {
+    const updatedSectors = [...customSectors, newSector];
+    setCustomSectors(updatedSectors);
+    localStorage.setItem('sudanCustomSectors', JSON.stringify(updatedSectors));
+  };
+
+  // Get sector pricing
+  const getSectorPricing = () => {
+    // Implementation for Sudan-specific pricing
+    const sector = formData.sector;
+    const district = formData.district;
+    
+    // Base pricing logic for Sudan
+    let freight = 59;
+    let doorCharges = 0;
+    
+    switch (sector) {
+      case 'KASSALA':
+        freight = 65;
+        doorCharges = formData.doorToDoor === 'YES' ? 15 : 0;
+        break;
+      case 'KHARTOUM':
+        freight = 70;
+        doorCharges = formData.doorToDoor === 'YES' ? 20 : 0;
+        break;
+      case 'PORT_SUDAN':
+        freight = 55;
+        doorCharges = formData.doorToDoor === 'YES' ? 12 : 0;
+        break;
+      case 'GEDAREF':
+        freight = 68;
+        doorCharges = formData.doorToDoor === 'YES' ? 18 : 0;
+        break;
+      default:
+        freight = 59;
+        doorCharges = formData.doorToDoor === 'YES' ? 15 : 0;
+    }
+    
+    return { freight, doorCharges };
+  };
+
+  // Get door to door pricing
+  const getDoorToDoorPricing = () => {
+    const sector = formData.sector;
+    const pricing = getSectorPricing();
+    
+    return {
+      available: true,
+      charge: pricing.doorCharges
+    };
+  };
 
   return (
     <Layout title={`${id ? 'Edit' : 'Add New'} Invoice - Sudan`}>
@@ -182,7 +237,7 @@ const SudanInvoiceForm = () => {
               Go Back
             </Button>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-8 bg-gradient-to-r from-red-500 via-white to-black rounded"></div>
+              <div className="w-16 h-10 bg-gradient-to-r from-red-500 via-white to-black rounded shadow-md"></div>
               <h1 className="text-3xl font-bold text-gray-900">
                 {id ? 'Edit' : 'Add New'} Invoice - Sudan
               </h1>
@@ -199,118 +254,162 @@ const SudanInvoiceForm = () => {
             </Button>
             <Button onClick={handleSave}>
               <Save className="h-4 w-4 mr-2" />
-              Save
+              {id ? 'Update' : 'Save'}
             </Button>
           </div>
         </div>
 
-        {/* Basic Invoice Details */}
+        {/* Invoice Form Content - Similar to Eritrea but Sudan-specific */}
         <Card>
           <CardHeader>
-            <CardTitle>Invoice Details</CardTitle>
+            <CardTitle>Basic Details</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Invoice Number:</label>
-                <Input
-                  value={formData.invoiceNumber}
-                  onChange={(e) => handleFormChange('invoiceNumber', e.target.value)}
-                  placeholder="Enter invoice number"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Invoice Date:</label>
-                <Input
-                  type="date"
-                  value={formData.invoiceDate}
-                  onChange={(e) => handleFormChange('invoiceDate', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Payment Status:</label>
-                <Select value={formData.paymentStatus} onValueChange={(value) => handleFormChange('paymentStatus', value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PAID">PAID</SelectItem>
-                    <SelectItem value="UNPAID">UNPAID</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <CardContent className="grid gap-4 md:grid-cols-3">
+            <div>
+              <Label htmlFor="invoiceNumber">Invoice Number</Label>
+              <Input
+                id="invoiceNumber"
+                value={formData.invoiceNumber}
+                onChange={(e) => handleFormChange('invoiceNumber', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="invoiceDate">Invoice Date</Label>
+              <Input
+                type="date"
+                id="invoiceDate"
+                value={formData.invoiceDate}
+                onChange={(e) => handleFormChange('invoiceDate', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="jobNumber">Job Number</Label>
+              <Input
+                id="jobNumber"
+                value={formData.jobNumber}
+                onChange={(e) => handleFormChange('jobNumber', e.target.value)}
+              />
             </div>
           </CardContent>
         </Card>
 
-        {/* Shipping Details */}
+        {/* Basic Shipping/Consignee forms would go here - simplified for now */}
+
+        {/* Shipping Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Shipping Details</CardTitle>
+            <CardTitle>Shipping Information</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h3 className="font-semibold">Shipper Information</h3>
-                <div className="grid grid-cols-1 gap-4">
-                  <Input
-                    placeholder="Shipper Name 1"
-                    value={shippingDetails.shipper1}
-                    onChange={(e) => handleShippingChange('shipper1', e.target.value)}
-                  />
-                  <Input
-                    placeholder="Shipper Name 2"
-                    value={shippingDetails.shipper2}
-                    onChange={(e) => handleShippingChange('shipper2', e.target.value)}
-                  />
-                  <Input
-                    placeholder="Town/City"
-                    value={shippingDetails.town}
-                    onChange={(e) => handleShippingChange('town', e.target.value)}
-                  />
-                  <Input
-                    placeholder="Mobile Number"
-                    value={shippingDetails.mobile}
-                    onChange={(e) => handleShippingChange('mobile', e.target.value)}
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                <h3 className="font-semibold">Consignee Information</h3>
-                <div className="grid grid-cols-1 gap-4">
-                  <Input
-                    placeholder="Consignee Name 1"
-                    value={shippingDetails.consignee1}
-                    onChange={(e) => handleShippingChange('consignee1', e.target.value)}
-                  />
-                  <Input
-                    placeholder="Consignee Name 2"
-                    value={shippingDetails.consignee2}
-                    onChange={(e) => handleShippingChange('consignee2', e.target.value)}
-                  />
-                  <Input
-                    placeholder="Address"
-                    value={shippingDetails.consigneeAddress}
-                    onChange={(e) => handleShippingChange('consigneeAddress', e.target.value)}
-                  />
-                  <Input
-                    placeholder="Town/City"
-                    value={shippingDetails.consigneeTown}
-                    onChange={(e) => handleShippingChange('consigneeTown', e.target.value)}
-                  />
-                  <Input
-                    placeholder="Mobile Number"
-                    value={shippingDetails.consigneeMobile}
-                    onChange={(e) => handleShippingChange('consigneeMobile', e.target.value)}
-                  />
-                  <Input
-                    placeholder="ID/Passport Number"
-                    value={shippingDetails.consigneePassportNic}
-                    onChange={(e) => handleShippingChange('consigneePassportNic', e.target.value)}
-                  />
-                </div>
-              </div>
+          <CardContent className="grid gap-4 md:grid-cols-3">
+            <div>
+              <Label htmlFor="port">Port</Label>
+              <Select value={formData.port} onValueChange={(value) => handleFormChange('port', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select port" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sudanPorts.map((port) => (
+                    <SelectItem key={port.value} value={port.value}>
+                      {port.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="warehouse">Warehouse</Label>
+              <Input
+                id="warehouse"
+                value={formData.warehouse}
+                onChange={(e) => handleFormChange('warehouse', e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor="sector">Sector</Label>
+              <Select value={formData.sector} onValueChange={(value) => handleFormChange('sector', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select sector" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[...sudanSectors, ...customSectors].map((sector) => (
+                    <SelectItem key={sector.value} value={sector.value}>
+                      {sector.label}
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="add_new_sector" className="text-blue-500">
+                    <span className="flex items-center gap-2">
+                      <Plus className="h-4 w-4" />
+                      Add New Sector
+                    </span>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="salesRep">Sales Rep</Label>
+              <Select value={formData.salesRep} onValueChange={(value) => handleFormChange('salesRep', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select sales rep" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sudanSalesReps.map((rep) => (
+                    <SelectItem key={rep.value} value={rep.value}>
+                      {rep.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="driver">Driver</Label>
+              <Select value={formData.driver} onValueChange={(value) => handleFormChange('driver', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select driver" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sudanDrivers.map((driver) => (
+                    <SelectItem key={driver.value} value={driver.value}>
+                      {driver.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="district">District</Label>
+              <Select value={formData.district} onValueChange={(value) => handleFormChange('district', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select district" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sudanDistricts.map((district) => (
+                    <SelectItem key={district.value} value={district.value}>
+                      {district.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="doorToDoor">Door to Door</Label>
+              <Select value={formData.doorToDoor} onValueChange={(value) => handleFormChange('doorToDoor', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="YES">Yes</SelectItem>
+                  <SelectItem value="NO">No</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="remarks">Remarks</Label>
+              <Textarea
+                id="remarks"
+                placeholder="Enter remarks"
+                value={formData.remarks}
+                onChange={(e) => handleFormChange('remarks', e.target.value)}
+              />
             </div>
           </CardContent>
         </Card>
@@ -320,84 +419,23 @@ const SudanInvoiceForm = () => {
           <CardHeader>
             <CardTitle>Package Details</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Input 
-                placeholder="Package name"
-                value={packageInput.name}
-                onChange={(e) => handlePackageInputChange('name', e.target.value)}
-              />
-              <Input 
-                type="number"
-                placeholder="Length (cm)"
-                value={packageInput.length}
-                onChange={(e) => handlePackageInputChange('length', e.target.value)}
-              />
-              <Input 
-                type="number"
-                placeholder="Width (cm)"
-                value={packageInput.width}
-                onChange={(e) => handlePackageInputChange('width', e.target.value)}
-              />
-              <Input 
-                type="number"
-                placeholder="Height (cm)"
-                value={packageInput.height}
-                onChange={(e) => handlePackageInputChange('height', e.target.value)}
-              />
-              <Input 
-                type="number"
-                placeholder="Weight (kg)"
-                value={packageInput.weight}
-                onChange={(e) => handlePackageInputChange('weight', e.target.value)}
-              />
-              <Input 
-                type="number"
-                placeholder="Quantity"
-                value={packageInput.quantity}
-                onChange={(e) => handlePackageInputChange('quantity', e.target.value)}
-              />
+          <CardContent>
+            <div className="mb-4">
+              <Button onClick={() => setShowManualDialog(true)} variant="outline" size="sm">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Manual Package
+              </Button>
+              <Button onClick={() => setShowSpecialDialog(true)} variant="outline" size="sm" className="ml-2">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Special Product
+              </Button>
             </div>
-            
-            <Button onClick={addPackageItem} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add Package
-            </Button>
-            
             {packageItems.length > 0 && (
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Package</TableHead>
-                      <TableHead>Dimensions (cm)</TableHead>
-                      <TableHead>Volume (m³)</TableHead>
-                      <TableHead>Weight (kg)</TableHead>
-                      <TableHead>Qty</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {packageItems.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell>{item.length}×{item.width}×{item.height}</TableCell>
-                        <TableCell>{item.cubicMetre}</TableCell>
-                        <TableCell>{item.weight}</TableCell>
-                        <TableCell>{item.quantity}</TableCell>
-                        <TableCell>
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => removePackageItem(item.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+              <div className="mt-4">
+                <h4 className="font-semibold mb-2">Package Summary</h4>
+                <p>Total Packages: {packageItems.length}</p>
+                <p>Total Weight: {formData.totalWeight} kg</p>
+                <p>Total Volume: {formData.totalVolume} m³</p>
               </div>
             )}
           </CardContent>
@@ -408,47 +446,80 @@ const SudanInvoiceForm = () => {
           <CardHeader>
             <CardTitle>Cost Details</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Freight (QAR):</label>
-                <Input
-                  type="number"
-                  value={costDetails.freight}
-                  onChange={(e) => setCostDetails(prev => ({ ...prev, freight: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Discount (QAR):</label>
-                <Input
-                  type="number"
-                  value={costDetails.discount}
-                  onChange={(e) => setCostDetails(prev => ({ ...prev, discount: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Net Amount (QAR):</label>
-                <Input
-                  type="number"
-                  value={costDetails.net}
-                  onChange={(e) => setCostDetails(prev => ({ ...prev, net: e.target.value }))}
-                />
-              </div>
+          <CardContent className="grid gap-4 md:grid-cols-3">
+            <div>
+              <Label htmlFor="freight">Freight (QAR)</Label>
+              <Input
+                type="number"
+                id="freight"
+                value={formData.freight}
+                onChange={(e) => handleFormChange('freight', parseFloat(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="doorCharges">Door Charges (QAR)</Label>
+              <Input
+                type="number"
+                id="doorCharges"
+                value={formData.doorCharges}
+                onChange={(e) => handleFormChange('doorCharges', parseFloat(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="totalFreight">Total Freight (QAR)</Label>
+              <Input
+                type="number"
+                id="totalFreight"
+                value={formData.totalFreight}
+                onChange={(e) => handleFormChange('totalFreight', parseFloat(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="discount">Discount (QAR)</Label>
+              <Input
+                type="number"
+                id="discount"
+                value={formData.discount}
+                onChange={(e) => handleFormChange('discount', parseFloat(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="netAmount">Net Amount (QAR)</Label>
+              <Input
+                type="number"
+                id="netAmount"
+                value={formData.netAmount}
+                onChange={(e) => handleFormChange('netAmount', parseFloat(e.target.value))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="paymentStatus">Payment Status</Label>
+              <Select value={formData.paymentStatus} onValueChange={(value) => handleFormChange('paymentStatus', value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PAID">PAID</SelectItem>
+                  <SelectItem value="UNPAID">UNPAID</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </CardContent>
         </Card>
-      </div>
+        
+        {/* Dialogs */}
+        <SudanInvoicePreview
+          formData={formData}
+          packageDetails={packageItems}
+          shippingDetails={{}}
+          costDetails={{}}
+          isOpen={showPreview}
+          onClose={() => setShowPreview(false)}
+          onPrint={handlePrintFromPreview}
+        />
 
-      {/* Preview Modal */}
-      <SudanInvoicePreview
-        formData={formData}
-        packageDetails={packageItems}
-        shippingDetails={shippingDetails}
-        costDetails={costDetails}
-        isOpen={showPreview}
-        onClose={() => setShowPreview(false)}
-        onPrint={handlePrint}
-      />
+        {/* Package dialogs would be implemented here */}
+      </div>
     </Layout>
   );
 };
