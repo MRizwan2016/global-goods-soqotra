@@ -4,7 +4,7 @@ import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScheduleService } from "@/pages/qatar/services/ScheduleService";
+import { ScheduleService } from "@/services/ScheduleService";
 import { ArrowLeft, Printer, Calendar, Truck, User } from "lucide-react";
 import { toast } from "sonner";
 
