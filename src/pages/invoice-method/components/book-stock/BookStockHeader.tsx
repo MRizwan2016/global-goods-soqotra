@@ -5,6 +5,7 @@ import BookingFormActions from "../../booking-form-stock/BookingFormActions";
 interface BookStockHeaderProps {
   onGenerateReport: () => void;
   onAddNewBook: () => void;
+  onViewHistory?: () => void;
 }
 
 const BookStockHeader: React.FC<BookStockHeaderProps> = ({ 

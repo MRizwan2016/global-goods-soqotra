@@ -12,6 +12,8 @@ interface BookStockTabsProps {
   onAssignUser: (book: Book) => void;
   onViewDetails: (book: Book) => void;
   onAddNewBook: () => void;
+  onCancelBook?: (book: any) => void;
+  onDeleteBook?: (book: any) => void;
 }
 
 const BookStockTabs: React.FC<BookStockTabsProps> = ({
