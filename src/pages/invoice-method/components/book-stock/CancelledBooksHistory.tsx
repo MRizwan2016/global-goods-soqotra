@@ -16,6 +16,7 @@ interface CancelledBook extends Book {
   cancelledDate?: string;
   deletedDate?: string;
   reason?: string;
+  cancelledPages?: string[];
 }
 
 interface CancelledBooksHistoryProps {
@@ -44,6 +45,7 @@ export const CancelledBooksHistory: React.FC<CancelledBooksHistoryProps> = ({
             <TableRow className="bg-red-50">
               <TableHead className="font-semibold text-red-900">Book #</TableHead>
               <TableHead className="font-semibold text-red-900">Page Range</TableHead>
+              <TableHead className="font-semibold text-red-900">Cancelled/Deleted Pages</TableHead>
               <TableHead className="font-semibold text-red-900">Was Assigned To</TableHead>
               <TableHead className="font-semibold text-red-900">Status</TableHead>
               <TableHead className="font-semibold text-red-900">Date Cancelled/Deleted</TableHead>
@@ -54,7 +56,7 @@ export const CancelledBooksHistory: React.FC<CancelledBooksHistoryProps> = ({
           <TableBody>
             {cancelledBooks.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={8} className="text-center py-8 text-gray-500">
                   No cancelled or deleted books found.
                 </TableCell>
               </TableRow>
@@ -63,6 +65,20 @@ export const CancelledBooksHistory: React.FC<CancelledBooksHistoryProps> = ({
                 <TableRow key={book.id || book.bookNumber} className="hover:bg-gray-50">
                   <TableCell className="font-medium">{book.bookNumber}</TableCell>
                   <TableCell>{book.startPage} - {book.endPage}</TableCell>
+                  <TableCell>
+                    {book.cancelledPages ? (
+                      <div className="max-w-xs">
+                        <span className="text-sm font-medium text-red-600">
+                          {book.cancelledPages.length} pages: 
+                        </span>
+                        <div className="text-xs text-gray-600 mt-1 max-h-20 overflow-y-auto">
+                          {book.cancelledPages.join(', ')}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className="text-red-600 font-medium">Entire Book</span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <span className="text-gray-600">{book.assignedTo || 'Not Assigned'}</span>
                   </TableCell>
