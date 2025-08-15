@@ -14,9 +14,9 @@ const SudanDashboard = () => {
   const navigate = useNavigate();
   const [invoices, setInvoices] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sectorFilter, setSectorFilter] = useState("");
-  const [branchFilter, setBranchFilter] = useState("");
-  const [warehouseFilter, setWarehouseFilter] = useState("");
+  const [sectorFilter, setSectorFilter] = useState("all");
+  const [branchFilter, setBranchFilter] = useState("all");
+  const [warehouseFilter, setWarehouseFilter] = useState("all");
 
   useEffect(() => {
     loadInvoices();
@@ -75,8 +75,8 @@ const SudanDashboard = () => {
       item.shipper.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.consignee.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesSector = sectorFilter === "" || item.sector === sectorFilter;
-    const matchesWarehouse = warehouseFilter === "" || item.warehouse === warehouseFilter;
+    const matchesSector = sectorFilter === "" || sectorFilter === "all" || item.sector === sectorFilter;
+    const matchesWarehouse = warehouseFilter === "" || warehouseFilter === "all" || item.warehouse === warehouseFilter;
     
     return matchesSearch && matchesSector && matchesWarehouse;
   });
@@ -209,7 +209,7 @@ const SudanDashboard = () => {
                   <SelectValue placeholder="Filter by Sector" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Sectors</SelectItem>
+                  <SelectItem value="all">All Sectors</SelectItem>
                   <SelectItem value="KASSALA">KASSALA</SelectItem>
                   <SelectItem value="KHARTOUM">KHARTOUM</SelectItem>
                   <SelectItem value="PORT_SUDAN">PORT SUDAN</SelectItem>
@@ -222,7 +222,7 @@ const SudanDashboard = () => {
                   <SelectValue placeholder="Filter by Warehouse" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Warehouses</SelectItem>
+                  <SelectItem value="all">All Warehouses</SelectItem>
                   <SelectItem value="SUDAN">SUDAN</SelectItem>
                 </SelectContent>
               </Select>
@@ -231,8 +231,8 @@ const SudanDashboard = () => {
                 variant="outline" 
                 onClick={() => {
                   setSearchTerm("");
-                  setSectorFilter("");
-                  setWarehouseFilter("");
+                  setSectorFilter("all");
+                  setWarehouseFilter("all");
                 }}
               >
                 Clear Filters
@@ -327,7 +327,7 @@ const SudanDashboard = () => {
               
               {filteredData.length === 0 && (
                 <div className="text-center py-8 text-gray-500">
-                  {searchTerm || sectorFilter || warehouseFilter 
+                  {searchTerm || (sectorFilter !== "all") || (warehouseFilter !== "all")
                     ? "No shipments match your filter criteria" 
                     : "No shipments found. Create your first invoice to get started."}
                 </div>
