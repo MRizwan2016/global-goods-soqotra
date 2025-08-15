@@ -47,17 +47,17 @@ export const cleanupDummyData = () => {
   const dummyCustomers = [
     "QATAR NATIONAL BANK", 
     "SAMPLE CUSTOMER", 
-    "TEST CUSTOMER", 
-    "MRS. AMIRA SIED OSMAN", 
-    "DUMMY", 
-    "Sample",
-    "QATAR COLLECTION & DELIVERY MANAGEMENT",
+    "TEST CUSTOMER",
+    "MRS. AMIRA SIED OSMAN",
+    "DUMMY",
+    "SAMPLE",
     "TEST",
     "DEMO",
     "DEFAULT",
     "EXAMPLE",
     "MOCK",
-    "TEMPLATE"
+    "TEMPLATE",
+    "QATAR COLLECTION & DELIVERY MANAGEMENT"
   ];
   
   // More aggressive cleanup to remove any suspicious test data
