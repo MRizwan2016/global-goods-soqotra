@@ -11,6 +11,7 @@ export interface QatarJob {
   town?: string;
   sector?: string;
   branch?: string; // Added the branch property
+  destination?: string; // Added destination for international shipping
   mobileNumber: string;
   jobType: 'COLLECTION' | 'DELIVERY';
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'SCHEDULED';

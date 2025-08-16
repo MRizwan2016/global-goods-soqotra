@@ -15,6 +15,7 @@ export interface JobData {
   country?: string;
   sector?: string;
   branch?: string;
+  destination?: string;
   vehicle: string;
   jobType: string;
   location: string;
@@ -78,6 +79,7 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
     town: '',
     sector: '',
     branch: '',
+    destination: '',
     vehicle: '',
     status: 'PENDING',
     advanceAmount: '',

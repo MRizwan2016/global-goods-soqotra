@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { toast } from "sonner";
 import CustomerBasicInfo from "./CustomerBasicInfo";
 import CountrySelector from "./CountrySelector";
+import DestinationSelector from "./DestinationSelector";
 import SectorBranchSelector from "./SectorBranchSelector";
 import SelectedPackagesList from "./SelectedPackagesList";
 import RemarksTextarea from "./RemarksTextarea";
@@ -82,6 +83,7 @@ const CustomerInfoSection = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <CustomerBasicInfo />
         <CountrySelector />
+        <DestinationSelector />
         <SectorBranchSelector onPackageSelect={handlePackageSelect} />
         <div className="md:col-span-2">
           <SelectedPackagesList 

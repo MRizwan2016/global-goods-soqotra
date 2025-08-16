@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Save, ArrowLeft, Truck } from "lucide-react";
 import { JobStorageService } from "./services/JobStorageService";
 import { JobNumberService } from "@/services/JobNumberService";
+import { JobInvoiceInterconnectService } from "./services/JobInvoiceInterconnectService";
 import { cityVehicleMapping } from "./data/cityVehicleMapping";
 import { fixInvoiceLinkage, cleanupDummyData } from "./utils/fixInvoiceLinkage";
 
@@ -49,6 +50,12 @@ const NewJobForm = () => {
         setIsSaving(false);
         return;
       }
+
+      if (!jobData.destination) {
+        toast.error("Destination country is required");
+        setIsSaving(false);
+        return;
+      }
       
       // Ensure we have an ID
       if (!jobData.id) {
@@ -71,17 +78,13 @@ const NewJobForm = () => {
         const savedJob = JobStorageService.saveJob(jobData);
         console.log("Job saved successfully:", savedJob);
 
-        // If there's an invoice number, update the invoice to include the job number
+        // Link job to invoice and create interconnection for mobile number lookup
         if (savedJob.invoiceNumber) {
           try {
-            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            const matchingInvoice = invoices.find((inv: any) => inv.invoiceNumber === savedJob.invoiceNumber);
-            if (matchingInvoice) {
-              matchingInvoice.jobNumber = savedJob.jobNumber;
-              localStorage.setItem('invoices', JSON.stringify(invoices));
-            }
+            // Use new interconnect service for comprehensive linking
+            JobInvoiceInterconnectService.linkJobToInvoice(savedJob, savedJob.invoiceNumber);
             
-            // Also link via the JobNumberService
+            // Also link via the JobNumberService for backward compatibility
             JobNumberService.linkJobToInvoice(savedJob.jobNumber, savedJob.invoiceNumber);
             
             // Link mobile number if available
@@ -90,6 +93,15 @@ const NewJobForm = () => {
             }
           } catch (error) {
             console.error('Error linking job number with invoice:', error);
+          }
+        }
+
+        // Always link mobile number for future invoice auto-population
+        if (savedJob.mobileNumber) {
+          try {
+            JobNumberService.linkJobToMobile(savedJob.jobNumber, savedJob.mobileNumber);
+          } catch (error) {
+            console.error('Error linking mobile number:', error);
           }
         }
         
