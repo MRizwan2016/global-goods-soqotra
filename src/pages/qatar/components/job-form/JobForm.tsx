@@ -30,7 +30,11 @@ const JobForm: React.FC<JobFormProps> = ({
       isSaving={isSaving}
       readOnly={readOnly}
     >
-      <form id="job-form" className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+      <form id="job-form" className="space-y-6" onSubmit={(e) => {
+        e.preventDefault();
+        console.log("Form submit event triggered - calling onSubmit via ref");
+        // This will be handled by JobFormActions via useImperativeHandle
+      }}>
         <JobFormHeader isNewJob={isNewJob} />
         
         <CustomerInfoSection />

@@ -45,10 +45,12 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
       return;
     }
     
-    if (!jobData.customer) {
+    if (!jobData.customer?.trim()) {
       toast.error("Please enter customer name");
       return;
     }
+
+    console.log("All validations passed, proceeding with job submission...");
     
     // Ensure job has an ID
     const jobDataWithId = {
@@ -98,6 +100,27 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
     mobileNumber: jobData.mobileNumber || '',
   };
 
+  // Listen for form submission events
+  React.useEffect(() => {
+    const form = document.getElementById('job-form');
+    const handleFormSubmit = (e: Event) => {
+      e.preventDefault();
+      console.log("JobFormActions: Form submit event received");
+      // Create a synthetic React FormEvent
+      const syntheticEvent = {
+        preventDefault: () => {},
+        currentTarget: e.currentTarget,
+        target: e.target
+      } as React.FormEvent;
+      handleSubmit(syntheticEvent);
+    };
+
+    if (form) {
+      form.addEventListener('submit', handleFormSubmit);
+      return () => form.removeEventListener('submit', handleFormSubmit);
+    }
+  }, [handleSubmit]);
+
   return (
     <div className="flex justify-end gap-2 mt-6">
       <Button 
@@ -120,7 +143,7 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
       
       {!disabled && !readOnly && (
         <Button 
-          type="submit" 
+          type="button"
           className="bg-green-600 hover:bg-green-700 flex items-center gap-2 transition-colors"
           disabled={isFormDisabled}
           onClick={handleSubmit}
