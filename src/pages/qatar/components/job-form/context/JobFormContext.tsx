@@ -130,21 +130,30 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
   }, []);
 
   const handleGenerateJobNumber = useCallback(() => {
+    console.log("=== GENERATING JOB NUMBER ===");
     // Generate a new job number
     const prefix = "QJB";
     const timestamp = Date.now().toString().slice(-6);
     const randomDigits = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
     const newJobNumber = `${prefix}-${timestamp}-${randomDigits}`;
     
-    setJobData(prevData => ({
-      ...prevData,
-      jobNumber: newJobNumber,
-      id: prevData.id || uuidv4()  // Ensure we have an ID
-    }));
+    console.log("Generated job number:", newJobNumber);
+    console.log("Current job data before update:", jobData);
+    
+    setJobData(prevData => {
+      const updatedData = {
+        ...prevData,
+        jobNumber: newJobNumber,
+        id: prevData.id || uuidv4()  // Ensure we have an ID
+      };
+      console.log("Updated job data:", updatedData);
+      return updatedData;
+    });
     
     setIsJobNumberGenerated(true);
+    console.log("Job number generation completed");
     toast.success("Job Number Generated: " + newJobNumber);
-  }, []);
+  }, [jobData]);
 
   const handleAddItem = useCallback((action: any) => {
     setJobItems(prevItems => {

@@ -35,6 +35,8 @@ const NewJobForm = () => {
   
   const handleCreateJob = async (jobData: any) => {
     try {
+      console.log("=== NEW JOB CREATION STARTED ===");
+      JobStorageService.debugStorage(); // Debug storage before saving
       setIsSaving(true);
       console.log("Creating new job:", jobData);
       
@@ -110,6 +112,8 @@ const NewJobForm = () => {
           setIsSaving(false);
           // Force refresh of job lists by dispatching event
           window.dispatchEvent(new CustomEvent('jobsUpdated'));
+          console.log("=== NEW JOB CREATION COMPLETED ===");
+          JobStorageService.debugStorage(); // Debug storage after saving
           navigate("/qatar/jobs");  // Navigate to jobs page after successful creation
         }, 800);
       } catch (error) {
@@ -125,9 +129,11 @@ const NewJobForm = () => {
   };
   
   const handleClickSaveJob = () => {
-    console.log("Save button clicked - attempting to submit form");
+    console.log("=== SAVE BUTTON CLICKED ===");
+    console.log("Looking for job-form element...");
     const form = document.getElementById('job-form') as HTMLFormElement;
     if (form) {
+      console.log("Found job-form element, creating submit event...");
       // Create and dispatch a form submit event
       const submitEvent = new Event('submit', { 
         bubbles: true, 
@@ -137,6 +143,17 @@ const NewJobForm = () => {
       form.dispatchEvent(submitEvent);
     } else {
       console.error("Could not find job-form element");
+      // Fallback: try to call handleCreateJob directly
+      console.log("Attempting direct job creation as fallback...");
+      const currentFormData = {
+        id: crypto.randomUUID(),
+        jobNumber: '',
+        customer: '',
+        mobileNumber: '',
+        status: 'PENDING',
+        timestamp: new Date().toISOString()
+      };
+      handleCreateJob(currentFormData);
     }
   };
   
@@ -156,6 +173,13 @@ const NewJobForm = () => {
             >
               <ArrowLeft size={16} />
               Back
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => JobStorageService.debugStorage()}
+              className="flex items-center gap-2 transition-colors bg-yellow-50 border-yellow-300"
+            >
+              Debug Storage
             </Button>
             <Button 
               onClick={handleClickSaveJob}

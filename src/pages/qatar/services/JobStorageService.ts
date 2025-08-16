@@ -9,6 +9,27 @@ export class JobStorageService {
   private static STORAGE_KEY = 'jobs';
 
   /**
+   * Debug localStorage contents
+   */
+  static debugStorage() {
+    console.log("=== DEBUGGING LOCALSTORAGE ===");
+    const allKeys = Object.keys(localStorage);
+    console.log("All localStorage keys:", allKeys);
+    const jobsData = localStorage.getItem(this.STORAGE_KEY);
+    console.log("Raw jobs data from localStorage:", jobsData);
+    if (jobsData) {
+      try {
+        const parsed = JSON.parse(jobsData);
+        console.log("Parsed jobs data:", parsed);
+        console.log("Jobs count:", Array.isArray(parsed) ? parsed.length : "Not an array");
+      } catch (e) {
+        console.error("Error parsing jobs data:", e);
+      }
+    }
+    console.log("=== END DEBUG ===");
+  }
+
+  /**
    * Get all jobs from storage
    */
   static getAllJobs() {

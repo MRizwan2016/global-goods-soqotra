@@ -33,19 +33,29 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("=== JOB FORM SUBMISSION STARTED ===");
+    console.log("Form disabled:", disabled);
+    console.log("Read only:", readOnly);
+    console.log("Is saving:", isSaving);
+    console.log("Job number generated:", isJobNumberGenerated);
+    console.log("Is new job:", isNewJob);
+    console.log("Current job data:", jobData);
     
     if (disabled || readOnly) {
+      console.log("BLOCKED: Form is disabled or read-only");
       toast.error("This job cannot be modified");
       return;
     }
     
     // Validate required fields
     if (!isJobNumberGenerated && isNewJob) {
+      console.log("BLOCKED: Job number not generated");
       toast.error("Please generate a Job Number first");
       return;
     }
     
     if (!jobData.customer?.trim()) {
+      console.log("BLOCKED: Customer name missing");
       toast.error("Please enter customer name");
       return;
     }
@@ -65,17 +75,20 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
     };
     
     // Submit the form with complete data
-    console.log("Submitting job form data:", jobDataWithId);
+    console.log("Calling onSubmit with job data:", jobDataWithId);
     try {
       onSubmit(jobDataWithId);
+      console.log("onSubmit called successfully");
       // Dispatch event to notify all job lists to refresh
       setTimeout(() => {
+        console.log("Dispatching jobsUpdated event");
         window.dispatchEvent(new CustomEvent('jobsUpdated'));
       }, 100);
     } catch (error) {
       console.error("Error submitting job:", error);
       toast.error(`Error submitting job: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
+    console.log("=== JOB FORM SUBMISSION COMPLETED ===");
   };
 
   const handleCancel = () => {
