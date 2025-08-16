@@ -9,7 +9,19 @@ interface JobFormHeaderProps {
 }
 
 const JobFormHeader: React.FC<JobFormHeaderProps> = ({ isNewJob }) => {
-  const { jobData, handleInputChange, isJobNumberGenerated, handleGenerateJobNumber } = useJobForm();
+  console.log("JobFormHeader rendering, trying to get context...");
+  
+  // Try to get the context with error handling
+  let contextData;
+  try {
+    contextData = useJobForm();
+    console.log("JobFormHeader: Successfully got context:", contextData);
+  } catch (error) {
+    console.error("JobFormHeader: Failed to get context:", error);
+    throw error; // Re-throw to maintain the error behavior
+  }
+  
+  const { jobData, handleInputChange, isJobNumberGenerated, handleGenerateJobNumber } = contextData;
   
   return (
     <div className="col-span-2 flex items-center space-x-3 mb-2">

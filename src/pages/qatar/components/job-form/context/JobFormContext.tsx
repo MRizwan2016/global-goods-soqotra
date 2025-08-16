@@ -59,6 +59,9 @@ interface JobFormProviderProps {
 
 export const JobFormContext = React.createContext<JobFormContextType | undefined>(undefined);
 
+// Add debug logging for context creation
+console.log("JobFormContext created:", JobFormContext);
+
 export const JobFormProvider: React.FC<JobFormProviderProps> = ({
   children,
   isNewJob = true,
@@ -66,6 +69,7 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
   isSaving = false,
   readOnly = false
 }) => {
+  console.log("JobFormProvider rendering with props:", { isNewJob, jobId, isSaving, readOnly });
   const initialJobData: JobData = {
     jobNumber: '',
     customer: '',
@@ -198,23 +202,25 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
     });
   }, [jobData.id]);
 
+  const contextValue = {
+    jobData,
+    jobItems,
+    setJobData,
+    setJobItems,
+    handleInputChange,
+    handleSelectChange,
+    handleGenerateJobNumber,
+    handleAddItem,
+    isJobNumberGenerated,
+    setIsJobNumberGenerated,
+    isSaving,
+    readOnly
+  };
+
+  console.log("JobFormProvider providing context value:", contextValue);
+
   return (
-    <JobFormContext.Provider
-      value={{
-        jobData,
-        jobItems,
-        setJobData,
-        setJobItems,
-        handleInputChange,
-        handleSelectChange,
-        handleGenerateJobNumber,
-        handleAddItem,
-        isJobNumberGenerated,
-        setIsJobNumberGenerated,
-        isSaving,
-        readOnly
-      }}
-    >
+    <JobFormContext.Provider value={contextValue}>
       {children}
     </JobFormContext.Provider>
   );
@@ -223,6 +229,8 @@ export const JobFormProvider: React.FC<JobFormProviderProps> = ({
 export const useJobForm = () => {
   const context = React.useContext(JobFormContext);
   if (!context) {
+    console.error("useJobForm called outside of JobFormProvider. Make sure the component is wrapped in JobFormProvider.");
+    console.error("Current context value:", context);
     throw new Error("useJobForm must be used within a JobFormProvider");
   }
   return context;
