@@ -108,6 +108,8 @@ const NewJobForm = () => {
         setTimeout(() => {
           toast.success("Job created successfully!");
           setIsSaving(false);
+          // Force refresh of job lists by dispatching event
+          window.dispatchEvent(new CustomEvent('jobsUpdated'));
           navigate("/qatar/jobs");  // Navigate to jobs page after successful creation
         }, 800);
       } catch (error) {

@@ -14,11 +14,33 @@ export const useJobTracking = () => {
   // Load jobs from storage
   const loadJobs = () => {
     const allJobs = JobStorageService.getAllJobs();
+    console.log("useJobTracking: Loading jobs count:", allJobs.length);
     setJobs(allJobs);
   };
 
   useEffect(() => {
     loadJobs();
+    
+    // Listen for storage changes and custom events
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'jobs') {
+        console.log("useJobTracking: Jobs storage changed, reloading...");
+        loadJobs();
+      }
+    };
+
+    const handleJobsUpdated = () => {
+      console.log("useJobTracking: Jobs updated event received, reloading...");
+      loadJobs();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('jobsUpdated', handleJobsUpdated);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('jobsUpdated', handleJobsUpdated);
+    };
   }, []);
 
   // Filter jobs based on search text and selected filters

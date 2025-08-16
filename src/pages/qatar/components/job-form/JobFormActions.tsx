@@ -66,6 +66,10 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
     console.log("Submitting job form data:", jobDataWithId);
     try {
       onSubmit(jobDataWithId);
+      // Dispatch event to notify all job lists to refresh
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent('jobsUpdated'));
+      }, 100);
     } catch (error) {
       console.error("Error submitting job:", error);
       toast.error(`Error submitting job: ${error instanceof Error ? error.message : "Unknown error"}`);

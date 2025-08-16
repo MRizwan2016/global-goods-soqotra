@@ -119,8 +119,18 @@ export class JobStorageService {
       }
       
       console.log("Saving jobs to localStorage, count:", jobs.length);
+      console.log("Jobs array before save:", jobs.map(j => ({ id: j.id, jobNumber: j.jobNumber, customer: j.customer })));
+      
       // Save to localStorage
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(jobs));
+      
+      // Dispatch custom event to notify other parts of the app
+      window.dispatchEvent(new CustomEvent('jobsUpdated'));
+      
+      // Verify the save by reading back from localStorage
+      const savedJobs = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
+      console.log("Verification: Jobs count after save:", savedJobs.length);
+      console.log("Verification: Saved job exists:", savedJobs.some((j: any) => j.id === jobToSave.id));
       
       // Update invoices with the job number if there's an invoice number
       if (jobToSave.invoiceNumber) {
