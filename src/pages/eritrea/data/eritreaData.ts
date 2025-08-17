@@ -137,25 +137,25 @@ export const eritreaSectorPricing = {
   "central": {
     cities: {
       "ASMARA": { freightPerKg: 11, doorToDoor: { available: true, charge: 4 } },
-      "KEREN": { freightPerKg: 15, doorToDoor: { available: true, charge: 4 } }
+      "KEREN": { freightPerKg: 11, doorToDoor: { available: true, charge: 4 } }
     }
   },
   "anseba": {
     cities: {
       "HAMELMALO": { freightPerKg: 0, doorToDoor: { available: true, charge: 4 } },
-      "HAGAT": { freightPerKg: 16, doorToDoor: { available: true, charge: 5 } }
+      "HAGAT": { freightPerKg: 11, doorToDoor: { available: true, charge: 5 } }
     }
   },
   "gash-barka": {
     cities: {
-      "AGORDAT": { freightPerKg: 16, doorToDoor: { available: true, charge: 5 } },
-      "BARENTU": { freightPerKg: 16, doorToDoor: { available: true, charge: 6 } },
-      "TESSENEI": { freightPerKg: 17, doorToDoor: { available: true, charge: 6 } }
+      "AGORDAT": { freightPerKg: 11, doorToDoor: { available: true, charge: 5 } },
+      "BARENTU": { freightPerKg: 11, doorToDoor: { available: true, charge: 6 } },
+      "TESSENEI": { freightPerKg: 11, doorToDoor: { available: true, charge: 6 } }
     }
   },
   "southern": {
     cities: {
-      "DEKEMHARE": { freightPerKg: 15, doorToDoor: { available: true, charge: 4 } },
+      "DEKEMHARE": { freightPerKg: 11, doorToDoor: { available: true, charge: 4 } },
       "MENDEFERA": { freightPerKg: 11, doorToDoor: { available: true, charge: 4 } },
       "ADI KEYH": { freightPerKg: 0, doorToDoor: { available: true, charge: 6 } },
       "SENAFE": { freightPerKg: 0, doorToDoor: { available: true, charge: 5 } }
@@ -164,9 +164,9 @@ export const eritreaSectorPricing = {
   "northern-red-sea": {
     cities: {
       "MASSAWWA": { freightPerKg: 11, doorToDoor: { available: true, charge: 5 } },
-      "GINDAA": { freightPerKg: 0, doorToDoor: { available: true, charge: 5 } },
-      "AFABET": { freightPerKg: 0, doorToDoor: { available: true, charge: 5 } },
-      "NAKFA": { freightPerKg: 0, doorToDoor: { available: true, charge: 6 } }
+      "GINDAA": { freightPerKg: 11, doorToDoor: { available: true, charge: 5 } },
+      "AFABET": { freightPerKg: 11, doorToDoor: { available: true, charge: 5 } },
+      "NAKFA": { freightPerKg: 11, doorToDoor: { available: true, charge: 6 } }
     }
   },
   "southern-red-sea": {
