@@ -159,9 +159,9 @@ export const useEritreaInvoice = (invoiceId?: string) => {
   // Auto-calculate freight based on sector, district, and total weight
   useEffect(() => {
     if (formData.totalWeight > 0) {
-      // Default Massawa Port rate: QAR 11/kg
-      const defaultFreightRate = 11;
-      let totalFreightRate = defaultFreightRate;
+      // Base freight rate to Massawa Port: QAR 11/kg
+      const baseFreightRate = 11;
+      let calculatedFreight = 0;
       let doorToDoorAmount = 0;
       
       // Check for specific sector and district pricing
@@ -172,37 +172,33 @@ export const useEritreaInvoice = (invoiceId?: string) => {
           const cityPricing = (sectorPricing as any).cities[formData.district];
           
           if (cityPricing) {
-            // Use specific city freight rate if available, otherwise use default
-            const cityFreightRate = cityPricing.freightPerKg > 0 ? cityPricing.freightPerKg : defaultFreightRate;
-            
-            // Door-to-door calculation: if enabled and available, add to total freight rate
             if (formData.doorToDoor === "YES" && cityPricing?.doorToDoor?.available) {
-              totalFreightRate = cityFreightRate + cityPricing.doorToDoor.charge;
-              doorToDoorAmount = formData.totalWeight * cityPricing.doorToDoor.charge;
+              // Door-to-door calculation: Base freight (QAR 11/kg) + Door-to-door charge (e.g., QAR 6/kg for Barentu)
+              // Combined rate: QAR 11 + QAR 6 = QAR 17/kg
+              // Total: QAR 17 × weight = freight amount
+              const combinedRate = baseFreightRate + cityPricing.doorToDoor.charge;
+              calculatedFreight = formData.totalWeight * combinedRate;
+              doorToDoorAmount = 0; // Already included in freight calculation
             } else {
-              totalFreightRate = cityFreightRate;
+              // Only base freight to port
+              calculatedFreight = formData.totalWeight * baseFreightRate;
               doorToDoorAmount = 0;
             }
+          } else {
+            // No city pricing found, use base rate only
+            calculatedFreight = formData.totalWeight * baseFreightRate;
+            doorToDoorAmount = 0;
           }
+        } else {
+          // No sector pricing found, use base rate only  
+          calculatedFreight = formData.totalWeight * baseFreightRate;
+          doorToDoorAmount = 0;
         }
       } else {
-        // No specific city selected, use default rates
-        totalFreightRate = defaultFreightRate;
+        // No sector/district selected, use base rate only
+        calculatedFreight = formData.totalWeight * baseFreightRate;
         doorToDoorAmount = 0;
       }
-      
-      // If door-to-door is disabled, use base freight only
-      if (formData.doorToDoor === "NO") {
-        totalFreightRate = formData.sector && formData.district ? 
-          (eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing] && 
-           'cities' in eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing] &&
-           (eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing] as any).cities[formData.district]?.freightPerKg > 0 ?
-           (eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing] as any).cities[formData.district].freightPerKg :
-           defaultFreightRate) : defaultFreightRate;
-        doorToDoorAmount = 0;
-      }
-      
-      const calculatedFreight = formData.totalWeight * totalFreightRate;
       
       setFormData(prev => ({
         ...prev,
