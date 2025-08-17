@@ -61,51 +61,68 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
         const job = JobStorageService.getJobById(jobId);
         const jobDestination = job?.destination || '';
         
-        // Load available invoices from books
+        // Load available invoices from assigned books
         const activeBooks = JSON.parse(localStorage.getItem('active-books') || '[]');
         const storedBooks = JSON.parse(localStorage.getItem('books') || '[]');
         const usedInvoices = JSON.parse(localStorage.getItem('used-invoices') || '[]');
         
         let invoiceList: InvoiceDetails[] = [];
         
-        // Helper function to filter books by destination
-        const isBookForDestination = (book: any, destination: string) => {
-          // If book has specific destination assignment, use it
+        // Helper function to check if book is assigned to destination
+        const isBookAssignedToDestination = (book: any, destination: string) => {
+          // Check if book has specific destination assignment
           if (book.destination) {
             return book.destination.toUpperCase() === destination.toUpperCase();
           }
           
-          // Default book assignment based on destination
-          const destinationBookMap: { [key: string]: string[] } = {
-            'SUDAN': ['BOOK-SD-', 'SUDAN-BOOK-', '00BOOK-S'],
-            'ERITREA': ['BOOK-ER-', 'ERITREA-BOOK-', '00BOOK-E'],
-            'SOMALIA': ['BOOK-SO-', 'SOMALIA-BOOK-', '00BOOK-O'],
-            'ETHIOPIA': ['BOOK-ET-', 'ETHIOPIA-BOOK-', '00BOOK-T'],
-            'SRI LANKA': ['BOOK-LK-', 'SRILANKA-BOOK-', '00BOOK-L'],
-            'PHILIPPINES': ['BOOK-PH-', 'PHILIPPINES-BOOK-', '00BOOK-P']
-          };
+          // Check if book country matches destination
+          if (book.country) {
+            return book.country.toUpperCase() === destination.toUpperCase();
+          }
           
-          const bookPrefixes = destinationBookMap[destination.toUpperCase()] || [];
-          return bookPrefixes.some(prefix => book.bookNumber?.startsWith(prefix));
+          return false;
         };
         
-        // Process active books first - filter by destination
+        // Process active books first - filter by destination assignment
         if (activeBooks.length > 0) {
           activeBooks.forEach((book: any) => {
-            if (book.isActivated && book.availablePages && Array.isArray(book.availablePages) && 
-                isBookForDestination(book, jobDestination)) {
-              const availableFromBook = book.availablePages
-                .filter((invoiceNo: string) => !usedInvoices.includes(invoiceNo))
-                .map((invoiceNo: string) => ({
-                  invoiceNumber: invoiceNo,
-                  bookNumber: book.bookNumber,
-                  assignedTo: book.assignedTo,
-                  driverName: book.driverName,
-                  amount: book.defaultAmount || 0,
-                  date: book.activationDate || new Date().toISOString().split('T')[0]
-                }));
-              
-              invoiceList = [...invoiceList, ...availableFromBook];
+            if (book.isActivated && isBookAssignedToDestination(book, jobDestination)) {
+              // Generate invoice numbers from the book's page range
+              if (book.pageRangeStart && book.pageRangeEnd) {
+                const startPage = parseInt(book.pageRangeStart);
+                const endPage = parseInt(book.pageRangeEnd);
+                
+                for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
+                  const invoiceNumber = `GY ${pageNum}`;
+                  
+                  // Only add if not already used
+                  if (!usedInvoices.includes(invoiceNumber)) {
+                    invoiceList.push({
+                      invoiceNumber: invoiceNumber,
+                      bookNumber: `#${book.bookId || book.id}`,
+                      assignedTo: book.assignedTo || `${jobDestination} Sales Rep`,
+                      driverName: book.driverName || `${jobDestination} Driver`,
+                      amount: book.defaultAmount || 500,
+                      date: book.activationDate || new Date().toISOString().split('T')[0]
+                    });
+                  }
+                }
+              }
+              // Fallback to availablePages if page range not defined
+              else if (book.availablePages && Array.isArray(book.availablePages)) {
+                const availableFromBook = book.availablePages
+                  .filter((invoiceNo: string) => !usedInvoices.includes(invoiceNo))
+                  .map((invoiceNo: string) => ({
+                    invoiceNumber: invoiceNo,
+                    bookNumber: `#${book.bookId || book.id}`,
+                    assignedTo: book.assignedTo || `${jobDestination} Sales Rep`,
+                    driverName: book.driverName || `${jobDestination} Driver`,
+                    amount: book.defaultAmount || 500,
+                    date: book.activationDate || new Date().toISOString().split('T')[0]
+                  }));
+                
+                invoiceList = [...invoiceList, ...availableFromBook];
+              }
             }
           });
         }
@@ -113,20 +130,43 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
         // If no active books for destination, try stored books
         if (invoiceList.length === 0 && storedBooks.length > 0) {
           storedBooks.forEach((book: any) => {
-            if (book.isActivated && book.availablePages && Array.isArray(book.availablePages) && 
-                isBookForDestination(book, jobDestination)) {
-              const availableFromBook = book.availablePages
-                .filter((invoiceNo: string) => !usedInvoices.includes(invoiceNo))
-                .map((invoiceNo: string) => ({
-                  invoiceNumber: invoiceNo,
-                  bookNumber: book.bookNumber,
-                  assignedTo: book.assignedTo,
-                  driverName: book.driverName,
-                  amount: book.defaultAmount || 0,
-                  date: book.activationDate || new Date().toISOString().split('T')[0]
-                }));
-              
-              invoiceList = [...invoiceList, ...availableFromBook];
+            if (book.isActivated && isBookAssignedToDestination(book, jobDestination)) {
+              // Generate invoice numbers from the book's page range
+              if (book.pageRangeStart && book.pageRangeEnd) {
+                const startPage = parseInt(book.pageRangeStart);
+                const endPage = parseInt(book.pageRangeEnd);
+                
+                for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
+                  const invoiceNumber = `GY ${pageNum}`;
+                  
+                  // Only add if not already used
+                  if (!usedInvoices.includes(invoiceNumber)) {
+                    invoiceList.push({
+                      invoiceNumber: invoiceNumber,
+                      bookNumber: `#${book.bookId || book.id}`,
+                      assignedTo: book.assignedTo || `${jobDestination} Sales Rep`,
+                      driverName: book.driverName || `${jobDestination} Driver`,
+                      amount: book.defaultAmount || 500,
+                      date: book.activationDate || new Date().toISOString().split('T')[0]
+                    });
+                  }
+                }
+              }
+              // Fallback to availablePages if page range not defined
+              else if (book.availablePages && Array.isArray(book.availablePages)) {
+                const availableFromBook = book.availablePages
+                  .filter((invoiceNo: string) => !usedInvoices.includes(invoiceNo))
+                  .map((invoiceNo: string) => ({
+                    invoiceNumber: invoiceNo,
+                    bookNumber: `#${book.bookId || book.id}`,
+                    assignedTo: book.assignedTo || `${jobDestination} Sales Rep`,
+                    driverName: book.driverName || `${jobDestination} Driver`,
+                    amount: book.defaultAmount || 500,
+                    date: book.activationDate || new Date().toISOString().split('T')[0]
+                  }));
+                
+                invoiceList = [...invoiceList, ...availableFromBook];
+              }
             }
           });
         }
