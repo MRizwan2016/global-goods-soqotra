@@ -55,6 +55,48 @@ const SriLankaDashboard: React.FC = () => {
       {/* Stats Section */}
       <StatCards />
       
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Link 
+          to="/sri-lanka/invoice/add"
+          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:from-blue-600 hover:to-blue-700"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Create New Invoice</h3>
+              <p className="text-blue-100 text-sm">Generate invoice for Sri Lanka shipments</p>
+            </div>
+            <FileText className="h-8 w-8 text-blue-200" />
+          </div>
+        </Link>
+        
+        <Link 
+          to="#"
+          className="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:from-green-600 hover:to-green-700"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Manage Invoices</h3>
+              <p className="text-green-100 text-sm">View and edit existing invoices</p>
+            </div>
+            <FileText className="h-8 w-8 text-green-200" />
+          </div>
+        </Link>
+        
+        <Link 
+          to="#"
+          className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:from-purple-600 hover:to-purple-700"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Track Shipments</h3>
+              <p className="text-purple-100 text-sm">Monitor delivery status</p>
+            </div>
+            <Ship className="h-8 w-8 text-purple-200" />
+          </div>
+        </Link>
+      </div>
+      
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
