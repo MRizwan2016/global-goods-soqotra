@@ -63,6 +63,27 @@ const CustomerBasicInfo = () => {
       </div>
 
       <div>
+        <Label htmlFor="customerPrefix" className="font-medium text-gray-700 mb-1 block">
+          NAME PREFIX:
+        </Label>
+        <select
+          id="customerPrefix"
+          name="customerPrefix"
+          value={jobData.customerPrefix || ""}
+          onChange={handleInputChange}
+          className="border border-gray-300 px-3 py-2 rounded w-full focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition-colors"
+          disabled={!isJobNumberGenerated}
+        >
+          <option value="">Select prefix</option>
+          <option value="Mr.">Mr.</option>
+          <option value="Mrs.">Mrs.</option>
+          <option value="Ms.">Ms.</option>
+          <option value="Dr.">Dr.</option>
+          <option value="Prof.">Prof.</option>
+        </select>
+      </div>
+
+      <div>
         <Label htmlFor="customer" className="font-medium text-gray-700 mb-1 block">
           CUSTOMER:
         </Label>

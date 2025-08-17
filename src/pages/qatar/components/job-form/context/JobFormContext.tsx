@@ -10,6 +10,7 @@ export interface JobData {
   id?: string;
   jobNumber: string;
   customer: string;
+  customerPrefix?: string;
   mobileNumber: string;
   landNumber?: string;
   country?: string;

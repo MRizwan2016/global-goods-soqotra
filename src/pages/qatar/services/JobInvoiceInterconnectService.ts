@@ -4,24 +4,39 @@ export class JobInvoiceInterconnectService {
   // Get job information by mobile number for invoice auto-population
   static getJobByMobile(mobileNumber: string): QatarJob | null {
     try {
-      const jobs = JSON.parse(localStorage.getItem('jobs') || '[]') as QatarJob[];
+      // Check both 'jobs' and 'qatarJobs' keys for comprehensive search
+      const jobs1 = JSON.parse(localStorage.getItem('jobs') || '[]') as QatarJob[];
+      const jobs2 = JSON.parse(localStorage.getItem('qatarJobs') || '[]') as QatarJob[];
+      const allJobs = [...jobs1, ...jobs2];
+      
+      console.log(`Searching for mobile ${mobileNumber} in ${allJobs.length} total jobs`);
       
       // Clean mobile number for comparison
       const cleanMobile = mobileNumber.replace(/\D/g, '');
       
       // Find most recent job for this mobile number
-      const matchingJobs = jobs.filter(job => {
+      const matchingJobs = allJobs.filter(job => {
         const jobMobile = job.mobileNumber?.replace(/\D/g, '') || '';
-        return jobMobile === cleanMobile;
+        const isMatch = jobMobile === cleanMobile || jobMobile.includes(cleanMobile);
+        if (isMatch) {
+          console.log(`Found matching job: ${job.jobNumber} for mobile ${job.mobileNumber}`);
+        }
+        return isMatch;
       });
+      
+      console.log(`Found ${matchingJobs.length} matching jobs for mobile ${mobileNumber}`);
       
       // Return the most recent job (sorted by date descending)
       if (matchingJobs.length > 0) {
-        return matchingJobs.sort((a, b) => 
-          new Date(b.date).getTime() - new Date(a.date).getTime()
+        const recentJob = matchingJobs.sort((a, b) => 
+          new Date(b.date || b.collectDate || '').getTime() - new Date(a.date || a.collectDate || '').getTime()
         )[0];
+        
+        console.log(`Returning most recent job: ${recentJob.jobNumber} - ${recentJob.customer}`);
+        return recentJob;
       }
       
+      console.log(`No matching jobs found for mobile ${mobileNumber}`);
       return null;
     } catch (error) {
       console.error('Error getting job by mobile:', error);

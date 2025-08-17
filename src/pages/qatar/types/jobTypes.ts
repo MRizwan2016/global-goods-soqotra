@@ -3,6 +3,7 @@ export interface QatarJob {
   id: string;
   jobNumber: string;
   customer: string;
+  customerPrefix?: string;
   date: string;
   time: string;
   amPm: 'AM' | 'PM';
