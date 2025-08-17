@@ -5,6 +5,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, Save, Eye, User, MapPin, Phone, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { PackageItem } from '@/pages/invoicing/types/invoiceForm';
+import { packageOptions } from '@/data/packageOptions';
+import PackageDetailsSection from '@/pages/invoicing/components/PackageDetailsSection';
 
 const SriLankaInvoiceForm = () => {
   const navigate = useNavigate();
@@ -34,8 +37,17 @@ const SriLankaInvoiceForm = () => {
     documentsFee: '25',
     total: '',
     paymentMethod: '',
-    remarks: ''
+    remarks: '',
+    // Package details fields
+    packagesName: '',
+    length: '',
+    width: '',
+    height: '',
+    price: ''
   });
+
+  // Package items state
+  const [packageItems, setPackageItems] = useState<PackageItem[]>([]);
 
   // Sri Lanka specific data
   const SERVICE_TYPES = ['Sea Freight', 'Air Freight'];
@@ -132,6 +144,66 @@ const SriLankaInvoiceForm = () => {
   const handlePreview = () => {
     // Preview functionality would go here
     console.log('Preview invoice:', formData);
+  };
+
+  // Package handlers
+  const handlePackageSelect = (description: string) => {
+    const selectedPackage = packageOptions.find(pkg => pkg.description === description);
+    if (selectedPackage) {
+      setFormData(prev => ({
+        ...prev,
+        packagesName: selectedPackage.description,
+        length: selectedPackage.dimensions.length.toString(),
+        width: selectedPackage.dimensions.width.toString(),
+        height: selectedPackage.dimensions.height.toString(),
+        price: selectedPackage.pricing.sriLanka.price.toString()
+      }));
+    }
+  };
+
+  const handleManualPackage = (packageName: string, price: string) => {
+    setFormData(prev => ({
+      ...prev,
+      packagesName: packageName,
+      price: price
+    }));
+  };
+
+  const handleAddPackage = () => {
+    if (!formData.packagesName || !formData.price) {
+      toast.error('Please fill in package name and price');
+      return;
+    }
+
+    const newPackage: PackageItem = {
+      id: Date.now().toString(),
+      description: formData.packagesName,
+      price: parseFloat(formData.price),
+      quantity: 1,
+      total: parseFloat(formData.price),
+      length: formData.length,
+      width: formData.width,
+      height: formData.height
+    };
+
+    setPackageItems(prev => [...prev, newPackage]);
+    
+    // Clear the form
+    setFormData(prev => ({
+      ...prev,
+      packagesName: '',
+      length: '',
+      width: '',
+      height: '',
+      price: ''
+    }));
+
+    toast.success('Package added successfully');
+  };
+
+  const handleRemovePackage = (id: string) => {
+    setPackageItems(prev => prev.filter(item => item.id !== id));
+    toast.success('Package removed');
   };
 
   return (
@@ -407,48 +479,17 @@ const SriLankaInvoiceForm = () => {
             </div>
           </div>
 
-          {/* Package Details */}
-          <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-teal-500/10 to-cyan-500/10">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-teal-800">
-              <Mail className="h-5 w-5" />
-              Package Details
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Number of Packages</label>
-                <Input
-                  name="packages"
-                  type="number"
-                  value={formData.packages}
-                  onChange={handleInputChange}
-                  placeholder="Enter number of packages"
-                  className="bg-white/80 border-teal-200 focus:border-teal-400"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Weight (kg)</label>
-                <Input
-                  name="weight"
-                  type="number"
-                  step="0.1"
-                  value={formData.weight}
-                  onChange={handleInputChange}
-                  placeholder="Enter weight in kg"
-                  className="bg-white/80 border-teal-200 focus:border-teal-400"
-                />
-              </div>
-              <div className="md:col-span-1">
-                <label className="block text-sm font-medium mb-1 text-gray-700">Description</label>
-                <Input
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  placeholder="Package description"
-                  className="bg-white/80 border-teal-200 focus:border-teal-400"
-                />
-              </div>
-            </div>
-          </div>
+          {/* Package Details Section from Eritrea Project */}
+          <PackageDetailsSection 
+            formState={formData}
+            handleInputChange={handleInputChange}
+            packageOptions={packageOptions}
+            handlePackageSelect={handlePackageSelect}
+            handleManualPackage={handleManualPackage}
+            handleAddPackage={handleAddPackage}
+            packageItems={packageItems}
+            handleRemovePackage={handleRemovePackage}
+          />
 
           {/* Pricing Details */}
           <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
