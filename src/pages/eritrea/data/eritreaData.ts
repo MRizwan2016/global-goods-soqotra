@@ -133,46 +133,46 @@ export const countryCodes = {
   "JORDAN": "+962"
 };
 
-// Updated Eritrea Sector Pricing based on the provided table
+// Updated Eritrea Sector Pricing with final door-to-door prices
 export const eritreaSectorPricing = {
   "central": {
     cities: {
-      "ASMARA": { freightPerKg: 11, doorToDoor: { available: false, charge: 0 } },
+      "ASMARA": { freightPerKg: 11, doorToDoor: { available: true, charge: 4 } },
       "KEREN": { freightPerKg: 15, doorToDoor: { available: true, charge: 4 } }
     }
   },
   "anseba": {
     cities: {
-      "HAMALMALO": { freightPerKg: 0, doorToDoor: { available: false, charge: 0 } },
+      "HAMELMALO": { freightPerKg: 0, doorToDoor: { available: true, charge: 4 } },
       "HAGAT": { freightPerKg: 16, doorToDoor: { available: true, charge: 5 } }
     }
   },
   "gash-barka": {
     cities: {
       "AGORDAT": { freightPerKg: 16, doorToDoor: { available: true, charge: 5 } },
-      "BARENTU": { freightPerKg: 16, doorToDoor: { available: true, charge: 5 } },
+      "BARENTU": { freightPerKg: 16, doorToDoor: { available: true, charge: 6 } },
       "TESSENEI": { freightPerKg: 17, doorToDoor: { available: true, charge: 6 } }
     }
   },
   "southern": {
     cities: {
-      "DEKENHARE": { freightPerKg: 15, doorToDoor: { available: true, charge: 4 } },
+      "DEKEMHARE": { freightPerKg: 15, doorToDoor: { available: true, charge: 4 } },
       "MENDEFERA": { freightPerKg: 11, doorToDoor: { available: true, charge: 4 } },
-      "ADI KEY": { freightPerKg: 0, doorToDoor: { available: false, charge: 0 } },
-      "SANAFE": { freightPerKg: 0, doorToDoor: { available: false, charge: 0 } }
+      "ADI KEYH": { freightPerKg: 0, doorToDoor: { available: true, charge: 6 } },
+      "SENAFE": { freightPerKg: 0, doorToDoor: { available: true, charge: 5 } }
     }
   },
   "northern-red-sea": {
     cities: {
-      "MASSAWA": { freightPerKg: 11, doorToDoor: { available: false, charge: 0 } },
-      "GINDAA": { freightPerKg: 0, doorToDoor: { available: false, charge: 0 } },
-      "ABFABET": { freightPerKg: 0, doorToDoor: { available: false, charge: 0 } },
-      "NAKFA": { freightPerKg: 0, doorToDoor: { available: false, charge: 0 } }
+      "MASSAWWA": { freightPerKg: 11, doorToDoor: { available: true, charge: 5 } },
+      "GINDAA": { freightPerKg: 0, doorToDoor: { available: true, charge: 5 } },
+      "AFABET": { freightPerKg: 0, doorToDoor: { available: true, charge: 5 } },
+      "NAKFA": { freightPerKg: 0, doorToDoor: { available: true, charge: 6 } }
     }
   },
   "southern-red-sea": {
     cities: {
-      "ASAB": { freightPerKg: 0, doorToDoor: { available: false, charge: 0 } }
+      "ASAB": { freightPerKg: 0, doorToDoor: { available: true, charge: 6 } }
     }
   }
 };
