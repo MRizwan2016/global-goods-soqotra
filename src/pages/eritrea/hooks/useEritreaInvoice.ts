@@ -158,36 +158,41 @@ export const useEritreaInvoice = (invoiceId?: string) => {
 
   // Auto-calculate freight based on sector, district, and total weight
   useEffect(() => {
-    if (formData.sector && formData.district && formData.totalWeight > 0) {
-      // Get pricing for the specific city/district
-      const sectorPricing = eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing];
+    if (formData.totalWeight > 0) {
+      // Default Massawa Port rate: QAR 11/kg
+      const defaultFreightRate = 11;
+      let baseFreight = formData.totalWeight * defaultFreightRate;
+      let doorToDoorAmount = 0;
       
-      if (sectorPricing && 'cities' in sectorPricing) {
-        const cityPricing = (sectorPricing as any).cities[formData.district];
+      // Check for specific sector and district pricing
+      if (formData.sector && formData.district) {
+        const sectorPricing = eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing];
         
-        if (cityPricing) {
-          // Base price calculation: Total Weight × Freight per KG
-          const baseFreight = formData.totalWeight * cityPricing.freightPerKg;
+        if (sectorPricing && 'cities' in sectorPricing) {
+          const cityPricing = (sectorPricing as any).cities[formData.district];
           
-          // Door-to-door calculation: if enabled and available, add door charge × total weight
-          let doorToDoorAmount = 0;
-          if (formData.doorToDoor === "YES" && cityPricing.doorToDoor?.available) {
-            doorToDoorAmount = formData.totalWeight * cityPricing.doorToDoor.charge;
+          if (cityPricing && cityPricing.freightPerKg > 0) {
+            // Use specific city freight rate if available
+            baseFreight = formData.totalWeight * cityPricing.freightPerKg;
           }
           
-          setFormData(prev => ({
-            ...prev,
-            freight: baseFreight,
-            doorToDoorPrice: doorToDoorAmount,
-            destinationDoorDelivery: doorToDoorAmount
-          }));
+          // Door-to-door calculation: if enabled and available, multiply charge by gross weight
+          if (formData.doorToDoor === "YES" && cityPricing?.doorToDoor?.available) {
+            doorToDoorAmount = formData.totalWeight * cityPricing.doorToDoor.charge;
+          }
         }
       }
-    } else if (formData.doorToDoor === "NO") {
+      
+      // If door-to-door is disabled, reset the charges
+      if (formData.doorToDoor === "NO") {
+        doorToDoorAmount = 0;
+      }
+      
       setFormData(prev => ({
         ...prev,
-        doorToDoorPrice: 0,
-        destinationDoorDelivery: 0
+        freight: baseFreight,
+        doorToDoorPrice: doorToDoorAmount,
+        destinationDoorDelivery: doorToDoorAmount
       }));
     }
   }, [formData.doorToDoor, formData.sector, formData.district, formData.totalWeight]);
