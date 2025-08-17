@@ -25,9 +25,8 @@ export const sectorCitiesMapping = {
 };
 
 export const eritreaSalesReps = [
-  { value: "MR_SALEH", label: "MR. SALEH" },
-  { value: "MR_YOUSUF", label: "MR. YOUSUF" },
-  { value: "MR_ABDUL_QADAR", label: "MR. ABDUL QADAR" }
+  { value: "MR_YOUSUF_MOHAMED_IBRAHIM", label: "MR. YOUSUF MOHAMED IBRAHIM" },
+  { value: "MR_SALEH_MOHAMED_IBRAHIM", label: "MR. SALEH MOHAMED IBRAHIM" }
 ];
 
 export const eritreaDrivers = [

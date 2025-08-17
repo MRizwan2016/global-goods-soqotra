@@ -20,9 +20,8 @@ export const sudanSectors = [
 
 // Sudan sales representatives
 export const sudanSalesReps = [
-  { value: "MR_YOUSUF_ABDULLAH", label: "Mr. Yousuf Abdullah" },
-  { value: "MR_SALIH", label: "Mr. Salih" },
-  { value: "MR_ABDUL_QADER", label: "Mr. Abdul Qader" }
+  { value: "MR_YOUSUF_MOHAMED_IBRAHIM", label: "Mr. YOUSUF MOHAMED IBRAHIM" },
+  { value: "MR_SALEH_MOHAMED_IBRAHIM", label: "Mr. SALEH MOHAMED IBRAHIM" }
 ];
 
 // Sudan drivers

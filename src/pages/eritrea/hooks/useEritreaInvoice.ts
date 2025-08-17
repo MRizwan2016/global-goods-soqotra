@@ -161,7 +161,7 @@ export const useEritreaInvoice = (invoiceId?: string) => {
     if (formData.totalWeight > 0) {
       // Default Massawa Port rate: QAR 11/kg
       const defaultFreightRate = 11;
-      let baseFreight = formData.totalWeight * defaultFreightRate;
+      let totalFreightRate = defaultFreightRate;
       let doorToDoorAmount = 0;
       
       // Check for specific sector and district pricing
@@ -171,26 +171,42 @@ export const useEritreaInvoice = (invoiceId?: string) => {
         if (sectorPricing && 'cities' in sectorPricing) {
           const cityPricing = (sectorPricing as any).cities[formData.district];
           
-          if (cityPricing && cityPricing.freightPerKg > 0) {
-            // Use specific city freight rate if available
-            baseFreight = formData.totalWeight * cityPricing.freightPerKg;
-          }
-          
-          // Door-to-door calculation: if enabled and available, multiply charge by gross weight
-          if (formData.doorToDoor === "YES" && cityPricing?.doorToDoor?.available) {
-            doorToDoorAmount = formData.totalWeight * cityPricing.doorToDoor.charge;
+          if (cityPricing) {
+            // Use specific city freight rate if available, otherwise use default
+            const cityFreightRate = cityPricing.freightPerKg > 0 ? cityPricing.freightPerKg : defaultFreightRate;
+            
+            // Door-to-door calculation: if enabled and available, add to total freight rate
+            if (formData.doorToDoor === "YES" && cityPricing?.doorToDoor?.available) {
+              totalFreightRate = cityFreightRate + cityPricing.doorToDoor.charge;
+              doorToDoorAmount = formData.totalWeight * cityPricing.doorToDoor.charge;
+            } else {
+              totalFreightRate = cityFreightRate;
+              doorToDoorAmount = 0;
+            }
           }
         }
-      }
-      
-      // If door-to-door is disabled, reset the charges
-      if (formData.doorToDoor === "NO") {
+      } else {
+        // No specific city selected, use default rates
+        totalFreightRate = defaultFreightRate;
         doorToDoorAmount = 0;
       }
       
+      // If door-to-door is disabled, use base freight only
+      if (formData.doorToDoor === "NO") {
+        totalFreightRate = formData.sector && formData.district ? 
+          (eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing] && 
+           'cities' in eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing] &&
+           (eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing] as any).cities[formData.district]?.freightPerKg > 0 ?
+           (eritreaSectorPricing[formData.sector as keyof typeof eritreaSectorPricing] as any).cities[formData.district].freightPerKg :
+           defaultFreightRate) : defaultFreightRate;
+        doorToDoorAmount = 0;
+      }
+      
+      const calculatedFreight = formData.totalWeight * totalFreightRate;
+      
       setFormData(prev => ({
         ...prev,
-        freight: baseFreight,
+        freight: calculatedFreight,
         doorToDoorPrice: doorToDoorAmount,
         destinationDoorDelivery: doorToDoorAmount
       }));
