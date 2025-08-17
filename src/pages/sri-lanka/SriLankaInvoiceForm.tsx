@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -8,6 +8,14 @@ import { toast } from 'sonner';
 import { PackageItem } from '@/pages/invoicing/types/invoiceForm';
 import { packageOptions } from '@/data/packageOptions';
 import PackageDetailsSection from '@/pages/invoicing/components/PackageDetailsSection';
+import { 
+  calculateAirFreightPricing, 
+  calculateSeaFreightPricing,
+  getWarehouseDestination,
+  calculateVolumeCBM,
+  AIR_FREIGHT_RATE_PER_KG,
+  AIR_FREIGHT_DOCUMENTATION_FEE
+} from './utils/sriLankaPricing';
 
 const SriLankaInvoiceForm = () => {
   const navigate = useNavigate();
@@ -32,9 +40,10 @@ const SriLankaInvoiceForm = () => {
     terminal: '',
     packages: '',
     weight: '',
+    volume: '',
     description: '',
     rate: '',
-    documentsFee: '25',
+    documentsFee: '0',
     total: '',
     paymentMethod: '',
     remarks: '',
@@ -53,10 +62,6 @@ const SriLankaInvoiceForm = () => {
   const SERVICE_TYPES = ['Sea Freight', 'Air Freight'];
   const SEA_TERMINALS = ['JCT Terminal', 'ICIC Terminal', 'P&O Terminal', 'Hambanthota Terminal'];
   const AIR_DESTINATIONS = ['Bandaranayake International Airport'];
-  
-  // Pricing rates
-  const AIR_FREIGHT_RATE = 10; // QAR 10/kg
-  const DOCUMENTATION_FEE = 25; // QAR 25/HAWB
 
   // Prefix options
   const NAME_PREFIXES = ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.'];
@@ -83,22 +88,50 @@ const SriLankaInvoiceForm = () => {
   const DISTRICTS = Object.values(SRI_LANKA_DATA).flat();
   const PROVINCES = Object.keys(SRI_LANKA_DATA);
 
+  // Auto-calculate pricing when relevant fields change
+  useEffect(() => {
+    if (formData.serviceType === 'Air Freight' && formData.weight) {
+      const weight = parseFloat(formData.weight) || 0;
+      const pricing = calculateAirFreightPricing(weight);
+      
+      setFormData(prev => ({
+        ...prev,
+        rate: pricing.rate.toString(),
+        documentsFee: pricing.documentsFee.toString(),
+        total: pricing.total.toString()
+      }));
+    } else if (formData.serviceType === 'Sea Freight' && formData.volume && formData.terminal) {
+      const volume = parseFloat(formData.volume) || 0;
+      const warehouseDestination = getWarehouseDestination(formData.terminal);
+      const pricing = calculateSeaFreightPricing(volume, warehouseDestination);
+      
+      setFormData(prev => ({
+        ...prev,
+        rate: pricing.rate.toString(),
+        documentsFee: pricing.documentsFee.toString(),
+        total: pricing.total.toString()
+      }));
+    }
+  }, [formData.serviceType, formData.weight, formData.volume, formData.terminal]);
+
+  // Auto-calculate volume from package dimensions
+  useEffect(() => {
+    if (formData.length && formData.width && formData.height) {
+      const length = parseFloat(formData.length) || 0;
+      const width = parseFloat(formData.width) || 0;
+      const height = parseFloat(formData.height) || 0;
+      const volume = calculateVolumeCBM(length, width, height);
+      
+      setFormData(prev => ({
+        ...prev,
+        volume: volume.toFixed(4)
+      }));
+    }
+  }, [formData.length, formData.width, formData.height]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => {
-      const updated = { ...prev, [name]: value };
-      
-      // Auto-calculate total for air freight
-      if (name === 'weight' && updated.serviceType === 'Air Freight') {
-        const weight = parseFloat(value) || 0;
-        const rate = AIR_FREIGHT_RATE * weight;
-        const total = rate + DOCUMENTATION_FEE;
-        updated.rate = rate.toString();
-        updated.total = total.toString();
-      }
-      
-      return updated;
-    });
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -110,18 +143,12 @@ const SriLankaInvoiceForm = () => {
         if (value === 'Air Freight') {
           updated.destination = 'Bandaranayake International Airport';
           updated.terminal = '';
-          updated.documentsFee = DOCUMENTATION_FEE.toString();
-          // Calculate rate if weight is available
-          if (updated.weight) {
-            const weight = parseFloat(updated.weight);
-            const rate = AIR_FREIGHT_RATE * weight;
-            updated.rate = rate.toString();
-            updated.total = (rate + DOCUMENTATION_FEE).toString();
-          }
+          updated.documentsFee = AIR_FREIGHT_DOCUMENTATION_FEE.toString();
         } else if (value === 'Sea Freight') {
           updated.destination = 'Colombo Port';
           updated.terminal = '';
           updated.rate = '';
+          updated.documentsFee = '';
           updated.total = '';
         }
       }
@@ -479,17 +506,61 @@ const SriLankaInvoiceForm = () => {
             </div>
           </div>
 
-          {/* Package Details Section from Eritrea Project */}
-          <PackageDetailsSection 
-            formState={formData}
-            handleInputChange={handleInputChange}
-            packageOptions={packageOptions}
-            handlePackageSelect={handlePackageSelect}
-            handleManualPackage={handleManualPackage}
-            handleAddPackage={handleAddPackage}
-            packageItems={packageItems}
-            handleRemovePackage={handleRemovePackage}
-          />
+          {/* Package Details Section */}
+          <div className="border-b border-gray-100 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
+            <div className="p-6">
+              <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-cyan-800">
+                📦 Package Details
+              </h3>
+              <PackageDetailsSection 
+                formState={formData}
+                handleInputChange={handleInputChange}
+                packageOptions={packageOptions}
+                handlePackageSelect={handlePackageSelect}
+                handleManualPackage={handleManualPackage}
+                handleAddPackage={handleAddPackage}
+                packageItems={packageItems}
+                handleRemovePackage={handleRemovePackage}
+              />
+              
+              {/* Volume and Weight Information */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Volume (CBM)</label>
+                  <Input
+                    name="volume"
+                    value={formData.volume}
+                    onChange={handleInputChange}
+                    placeholder="Auto-calculated from dimensions"
+                    className="bg-white/80 border-cyan-200 focus:border-cyan-400"
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Total Weight (kg) *</label>
+                  <Input
+                    name="weight"
+                    type="number"
+                    step="0.01"
+                    value={formData.weight}
+                    onChange={handleInputChange}
+                    placeholder="Enter total weight"
+                    className="bg-white/80 border-cyan-200 focus:border-cyan-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1 text-gray-700">Description</label>
+                  <Input
+                    name="description"
+                    value={formData.description}
+                    onChange={handleInputChange}
+                    placeholder="Package description"
+                    className="bg-white/80 border-cyan-200 focus:border-cyan-400"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
 
           {/* Pricing Details */}
           <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
@@ -500,7 +571,14 @@ const SriLankaInvoiceForm = () => {
             {formData.serviceType === 'Air Freight' && (
               <div className="mb-4 p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg border border-blue-200">
                 <p className="text-sm text-blue-800 font-medium">
-                  🚀 Air Freight Rate: QAR {AIR_FREIGHT_RATE}/kg | ✈️ Documentation Fee: QAR {DOCUMENTATION_FEE}/HAWB
+                  🚀 Air Freight Rate: QAR {AIR_FREIGHT_RATE_PER_KG}/kg | ✈️ Documentation Fee: QAR {AIR_FREIGHT_DOCUMENTATION_FEE}/HAWB
+                </p>
+              </div>
+            )}
+            {formData.serviceType === 'Sea Freight' && (
+              <div className="mb-4 p-4 bg-gradient-to-r from-green-500/20 to-teal-500/20 rounded-lg border border-green-200">
+                <p className="text-sm text-green-800 font-medium">
+                  🚢 Sea Freight Rates: Colombo (QAR 259/CBM) | Kurunegala/Galle (QAR 269/CBM) | 📄 Doc Fee: QAR 50/invoice
                 </p>
               </div>
             )}
