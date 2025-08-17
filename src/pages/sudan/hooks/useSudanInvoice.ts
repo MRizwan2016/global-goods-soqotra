@@ -166,43 +166,37 @@ export const useSudanInvoice = () => {
   const [formData, setFormData] = useState<SudanFormData>(initialFormData);
   const [packageItems, setPackageItems] = useState<SudanPackageItem[]>([]);
 
-  // Auto-calculate freight based on sector and district
+  // Auto-calculate freight based on total weight
   useEffect(() => {
-    if (formData.sector && formData.district) {
-      // Sudan specific freight calculation logic
-      let baseFreight = 59; // Base freight for Sudan
+    if (formData.totalWeight > 0) {
+      // Base freight rate to Port Sudan: QAR 6/kg
+      const baseFreightRate = 6;
+      const documentationFee = 200;
       
-      // Sector-based pricing
-      switch (formData.sector) {
-        case 'KASSALA':
-          baseFreight = 65;
-          break;
-        case 'KHARTOUM':
-          baseFreight = 70;
-          break;
-        case 'PORT_SUDAN':
-          baseFreight = 55;
-          break;
-        case 'GEDAREF':
-          baseFreight = 68;
-          break;
-        default:
-          baseFreight = 59;
-      }
-
-      // Door-to-door charges
-      const doorCharges = formData.doorToDoor === "YES" ? 15 : 0;
-      const totalFreight = baseFreight + doorCharges + (formData.packingCharges || 0);
-
+      // Calculate freight: QAR 6/kg × weight
+      const calculatedFreight = formData.totalWeight * baseFreightRate;
+      
+      // Total: Freight + Documentation Fee
+      const totalFreight = calculatedFreight + documentationFee;
+      
       setFormData(prev => ({
         ...prev,
-        freight: baseFreight,
-        doorCharges,
+        freight: calculatedFreight,
+        doorCharges: 0, // No door-to-door charges for now (fixed)
         totalFreight,
         netAmount: totalFreight - prev.discount
       }));
+    } else {
+      // Reset values when no weight
+      setFormData(prev => ({
+        ...prev,
+        freight: 0,
+        doorCharges: 0,
+        totalFreight: 0,
+        netAmount: 0 - prev.discount
+      }));
     }
-  }, [formData.sector, formData.district, formData.doorToDoor, formData.discount]);
+  }, [formData.totalWeight, formData.discount]);
 
   // Auto-calculate totals when package items change
   useEffect(() => {
