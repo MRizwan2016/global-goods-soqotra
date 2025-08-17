@@ -33,12 +33,27 @@ export const useInvoiceNumberSelector = ({
     loadAvailableInvoices();
   }, []);
   
-  // Filter invoices when book number changes
+  // Filter invoices when book number changes with project restrictions
   useEffect(() => {
     if (selectedBookNumber) {
-      const filtered = availableInvoiceList.filter(invoice => 
+      let filtered = availableInvoiceList.filter(invoice => 
         invoice.bookNumber === selectedBookNumber
       );
+      
+      // Apply project restrictions for Book #1 (Eritrea exclusive)
+      if (selectedBookNumber === "1") {
+        const currentPath = window.location.pathname;
+        const isEritreaProject = currentPath.includes('/eritrea');
+        
+        if (!isEritreaProject) {
+          // Restrict Book #1 to Eritrea project only
+          toast.error("Book #1 is exclusively assigned to ERITREA PROJECT", {
+            description: "Please use other books for non-Eritrea invoices"
+          });
+          filtered = []; // No invoices available for non-Eritrea projects
+        }
+      }
+      
       console.log(`Filtered invoices by book ${selectedBookNumber}:`, filtered);
       setFilteredInvoiceList(filtered);
       
@@ -121,22 +136,32 @@ export const useInvoiceNumberSelector = ({
     // If still no invoices, create some demo ones
     if (invoiceList.length === 0) {
       console.log("No invoices found in books, creating demo invoices");
-      // Add book 734 with pages 1001-1010
-      for (let i = 1001; i <= 1010; i++) {
+      // Add Book #1 (Eritrea Project Exclusive)
+      for (let i = 13001; i <= 13010; i++) {
         invoiceList.push({ 
-          invoiceNumber: `734-${i}`, 
-          bookNumber: "734", 
-          assignedTo: undefined
+          invoiceNumber: `${i}`, 
+          bookNumber: "1", 
+          assignedTo: "Mr. YOUSUF MOHAMED IBRAHIM",
+          projectType: "ERITREA"
         });
       }
       
-      // Add other demo invoice numbers
+      // Add book 734 with pages
+      for (let i = 73401; i <= 73410; i++) {
+        invoiceList.push({ 
+          invoiceNumber: `${i}`, 
+          bookNumber: "734", 
+          assignedTo: "Mr. SALEH MOHAMED IBRAHIM"
+        });
+      }
+      
+      // Add other demo invoice numbers for Sudan project
       invoiceList = [
         ...invoiceList,
-        { invoiceNumber: "GY100001", bookNumber: "B001", assignedTo: undefined },
-        { invoiceNumber: "GY100002", bookNumber: "B001", assignedTo: undefined },
-        { invoiceNumber: "GY100003", bookNumber: "B001", assignedTo: undefined },
-        { invoiceNumber: "GY200001", bookNumber: "B002", assignedTo: undefined }
+        { invoiceNumber: "B00101", bookNumber: "B001", assignedTo: "Mr. YOUSUF MOHAMED IBRAHIM", projectType: "SUDAN" },
+        { invoiceNumber: "B00102", bookNumber: "B001", assignedTo: "Mr. YOUSUF MOHAMED IBRAHIM", projectType: "SUDAN" },
+        { invoiceNumber: "B00103", bookNumber: "B001", assignedTo: "Mr. YOUSUF MOHAMED IBRAHIM", projectType: "SUDAN" },
+        { invoiceNumber: "B00201", bookNumber: "B002", assignedTo: "Mr. SALEH MOHAMED IBRAHIM", projectType: "SUDAN" }
       ];
     }
     
@@ -253,9 +278,23 @@ export const useInvoiceNumberSelector = ({
     }
   };
 
-  // Custom handler for book selection
+  // Custom handler for book selection with project restrictions
   const handleBookSelect = (bookNumber: string) => {
     console.log("Book selected:", bookNumber);
+    
+    // Check if Book #1 is being selected for non-Eritrea projects
+    if (bookNumber === "1") {
+      const currentPath = window.location.pathname;
+      const isEritreaProject = currentPath.includes('/eritrea');
+      
+      if (!isEritreaProject) {
+        toast.error("Book #1 is exclusively assigned to ERITREA PROJECT", {
+          description: "This book can only be used for Eritrea project invoices"
+        });
+        return; // Don't allow selection
+      }
+    }
+    
     setSelectedBookNumber(bookNumber);
     
     // Filter available invoices by the selected book
@@ -266,7 +305,8 @@ export const useInvoiceNumberSelector = ({
     setFilteredInvoiceList(filtered);
     
     // Show toast about the book selection
-    toast.success(`Book #${bookNumber} selected`, {
+    const projectInfo = bookNumber === "1" ? " (ERITREA PROJECT EXCLUSIVE)" : "";
+    toast.success(`Book #${bookNumber} selected${projectInfo}`, {
       description: `${filtered.length} invoice pages available in this book`,
     });
   };

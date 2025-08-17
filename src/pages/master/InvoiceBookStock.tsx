@@ -50,6 +50,8 @@ const mockUsers: User[] = [
   { id: "11", name: "Mr. Evans" },
   { id: "12", name: "Mr. Paul Onchana" },
   { id: "13", name: "Mr. Edwin Mbuguo" },
+  { id: "14", name: "Mr. YOUSUF MOHAMED IBRAHIM" }, // Eritrea & Sudan Project
+  { id: "15", name: "Mr. SALEH MOHAMED IBRAHIM" },  // Eritrea & Sudan Project
 ];
 
 const InvoiceBookStock = () => {
