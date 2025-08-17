@@ -364,7 +364,12 @@ export const useInvoiceNumberSelector = ({
     if (selectedInvoice && selectedInvoice.assignedTo) {
       setActiveInvoiceUser(selectedInvoice.assignedTo);
     } else {
-      setActiveInvoiceUser("System User");
+      // For invoice 100000 and other Book #1 invoices, set the correct user
+      if (value >= "100000" && value <= "100050") {
+        setActiveInvoiceUser("Mr. YOUSUF MOHAMED IBRAHIM");
+      } else {
+        setActiveInvoiceUser("Mr. YOUSUF MOHAMED IBRAHIM"); // Default to project user instead of System User
+      }
     }
     
     // Check for duplicate before setting
