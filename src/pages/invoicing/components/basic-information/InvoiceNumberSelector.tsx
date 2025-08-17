@@ -47,7 +47,11 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
     onInvoiceSelect,
     handleManualSubmit,
     loadAvailableInvoices,
-    handleBookSelect
+    handleBookSelect,
+    // Enhanced UPB integration properties
+    bookActivationStatus,
+    driverName,
+    bookAssignedUser
   } = useInvoiceNumberSelector({
     formState,
     isEditing,
@@ -125,6 +129,9 @@ const InvoiceNumberSelector: React.FC<InvoiceNumberSelectorProps> = ({
         activeUser={activeInvoiceUser}
         isDuplicate={isDuplicate}
         isEditing={isEditing}
+        bookActivationStatus={bookActivationStatus}
+        driverName={driverName}
+        bookAssignedUser={bookAssignedUser}
       />
     </div>
   );
