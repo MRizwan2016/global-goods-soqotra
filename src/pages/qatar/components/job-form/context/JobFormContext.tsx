@@ -231,7 +231,9 @@ export const useJobForm = () => {
   if (!context) {
     console.error("useJobForm called outside of JobFormProvider. Make sure the component is wrapped in JobFormProvider.");
     console.error("Current context value:", context);
+    console.error("Stack trace:", new Error().stack);
     throw new Error("useJobForm must be used within a JobFormProvider");
   }
+  console.log("useJobForm: Successfully returning context:", !!context);
   return context;
 };

@@ -8,7 +8,8 @@ interface JobNumberSectionProps {
 }
 
 const JobNumberSection: React.FC<JobNumberSectionProps> = ({ isNewJob = true }) => {
-  const jobFormContext = useJobForm();
+  // This component should only be used within JobFormProvider context
+  // If used standalone, it will cause context errors
   
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">

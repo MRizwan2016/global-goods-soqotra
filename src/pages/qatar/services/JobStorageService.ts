@@ -37,11 +37,11 @@ export class JobStorageService {
       const jobs = localStorage.getItem(this.STORAGE_KEY);
       const parsedJobs = jobs ? JSON.parse(jobs) : [];
       
-      // Auto-cleanup dummy data on first access
-      if (parsedJobs.length > 0) {
-        this.cleanupDummyData();
-        return JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
-      }
+      // TEMPORARILY DISABLED - Auto-cleanup dummy data on first access
+      // if (parsedJobs.length > 0) {
+      //   this.cleanupDummyData();
+      //   return JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
+      // }
       
       return parsedJobs;
     } catch (error) {
@@ -76,7 +76,15 @@ export class JobStorageService {
         throw new Error('No job data provided');
       }
 
-      console.log("Starting to save job with data:", jobData);
+      console.log("🔍 STEP 1: Starting saveJob with data:", JSON.stringify(jobData, null, 2));
+      
+      // Check what mobile number format we have
+      if (jobData.mobileNumber) {
+        console.log("🔍 Mobile number format:", jobData.mobileNumber);
+        if (jobData.mobileNumber.includes('555-')) {
+          console.warn("⚠️ Job has 555- mobile number, will be filtered as dummy!");
+        }
+      }
       
       const jobs = this.getAllJobs();
       
@@ -156,6 +164,37 @@ export class JobStorageService {
       // Update invoices with the job number if there's an invoice number
       if (jobToSave.invoiceNumber) {
         this.updateInvoiceWithJobNumber(jobToSave.invoiceNumber, jobToSave.jobNumber);
+      }
+      
+      console.log("✅ STEP 6: Job saved successfully with ID:", jobToSave.id);
+      console.log("✅ SAVED JOB DETAILS:", {
+        id: jobToSave.id,
+        jobNumber: jobToSave.jobNumber,
+        customer: jobToSave.customer,
+        mobileNumber: jobToSave.mobileNumber,
+        status: jobToSave.status
+      });
+      
+      // Check if this job will be filtered as dummy
+      const willBeFiltered = jobToSave.jobNumber.includes('TEST') ||
+                            jobToSave.jobNumber.includes('DUMMY') ||
+                            jobToSave.customer.includes('TEST') ||
+                            jobToSave.customer.includes('DUMMY') ||
+                            jobToSave.customer.includes('Mock') ||
+                            jobToSave.mobileNumber.includes('555-');
+      
+      if (willBeFiltered) {
+        console.warn("⚠️ WARNING: This job will be filtered out as dummy data!");
+        console.warn("⚠️ Filter reasons:", {
+          hasTestJobNumber: jobToSave.jobNumber.includes('TEST'),
+          hasDummyJobNumber: jobToSave.jobNumber.includes('DUMMY'),
+          hasTestCustomer: jobToSave.customer.includes('TEST'),
+          hasDummyCustomer: jobToSave.customer.includes('DUMMY'),
+          hasMockCustomer: jobToSave.customer.includes('Mock'),
+          has555Mobile: jobToSave.mobileNumber.includes('555-')
+        });
+      } else {
+        console.log("✅ Job passed real job filter - will appear in dashboard");
       }
       
       return jobToSave;
