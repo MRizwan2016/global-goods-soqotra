@@ -136,8 +136,8 @@ export const useInvoiceNumberSelector = ({
     // If still no invoices, create some demo ones
     if (invoiceList.length === 0) {
       console.log("No invoices found in books, creating demo invoices");
-      // Add Book #1 (Eritrea Project Exclusive)
-      for (let i = 13001; i <= 13010; i++) {
+      // Add Book #1 (Eritrea Project Exclusive) - 100000-100050 range
+      for (let i = 100000; i <= 100050; i++) {
         invoiceList.push({ 
           invoiceNumber: `${i}`, 
           bookNumber: "1", 
@@ -213,8 +213,14 @@ export const useInvoiceNumberSelector = ({
     
     // Check if it's one of our specific Eritrea/Sudan project invoices
     if (!foundUser) {
-      // For Book #1 invoices (Eritrea Project - 13001-13010)
-      if (invoiceNumber >= "13001" && invoiceNumber <= "13010") {
+      // For Book #1 invoices (Eritrea Project - 100000-100050)
+      if (invoiceNumber >= "100000" && invoiceNumber <= "100050") {
+        foundUser = "Mr. YOUSUF MOHAMED IBRAHIM";
+        foundDriver = "Ahmed Al-Rashid";
+        activationStatus = "ACTIVATED";
+      }
+      // Also handle the old range for backward compatibility (13001-13010)
+      else if (invoiceNumber >= "13001" && invoiceNumber <= "13010") {
         foundUser = "Mr. YOUSUF MOHAMED IBRAHIM";
         foundDriver = "Ahmed Al-Rashid";
         activationStatus = "ACTIVATED";

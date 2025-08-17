@@ -2,9 +2,9 @@
 export const mockInvoiceBooks = [
   {
     bookNumber: "1", // Book #1 - Eritrea Project Exclusive
-    invoiceNumbers: ["13001", "13002", "13003", "13004", "13005", "13006", "13007", "13008", "13009", "13010"],
+    invoiceNumbers: Array.from({length: 51}, (_, i) => (100000 + i).toString()), // 100000-100050
     active: true,
-    available: ["13001", "13002", "13003", "13004", "13005", "13006", "13007", "13008", "13009", "13010"],
+    available: Array.from({length: 51}, (_, i) => (100000 + i).toString()), // 100000-100050
     assignedTo: "Mr. YOUSUF MOHAMED IBRAHIM",
     projectType: "ERITREA", // Exclusive to Eritrea project
     country: "Eritrea"
