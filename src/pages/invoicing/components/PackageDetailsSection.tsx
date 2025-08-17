@@ -29,7 +29,7 @@ const PackageDetailsSection: React.FC<PackageDetailsSectionProps> = ({
   return (
     <div className="mt-8">
       <div className="bg-gradient-to-r from-cyan-400 to-blue-400 text-white py-2 px-4 font-medium flex justify-between items-center">
-        <span>PACKAGES DETAILS</span>
+        <span className="uppercase">PACKAGES DETAILS</span>
       </div>
       
       <PackageSelector 

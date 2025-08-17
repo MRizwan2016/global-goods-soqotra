@@ -23,6 +23,7 @@ const SriLankaInvoiceForm = () => {
   const [formData, setFormData] = useState({
     invoiceNumber: '',
     date: new Date().toISOString().split('T')[0],
+    cargoType: '',
     shipperPrefix: '',
     shipperName: '',
     shipperAddress: '',
@@ -59,12 +60,13 @@ const SriLankaInvoiceForm = () => {
   const [packageItems, setPackageItems] = useState<PackageItem[]>([]);
 
   // Sri Lanka specific data
-  const SERVICE_TYPES = ['Sea Freight', 'Air Freight'];
-  const SEA_TERMINALS = ['JCT Terminal', 'ICIC Terminal', 'P&O Terminal', 'Hambanthota Terminal'];
-  const AIR_DESTINATIONS = ['Bandaranayake International Airport'];
+  const CARGO_TYPES = ['GIFT CARGO', 'UPB CARGO'];
+  const SERVICE_TYPES = ['SEA FREIGHT', 'AIR FREIGHT'];
+  const SEA_TERMINALS = ['JCT TERMINAL', 'ICIC TERMINAL', 'P&O TERMINAL', 'HAMBANTHOTA TERMINAL'];
+  const AIR_DESTINATIONS = ['BANDARANAYAKE INTERNATIONAL AIRPORT'];
 
   // Prefix options
-  const NAME_PREFIXES = ['Mr.', 'Ms.', 'Mrs.', 'Dr.', 'Prof.'];
+  const NAME_PREFIXES = ['MR.', 'MS.', 'MRS.', 'DR.', 'PROF.'];
 
   // Mock invoice numbers (normally from Invoice Book Stock Management)
   const AVAILABLE_INVOICES = [
@@ -90,7 +92,7 @@ const SriLankaInvoiceForm = () => {
 
   // Auto-calculate pricing when relevant fields change
   useEffect(() => {
-    if (formData.serviceType === 'Air Freight' && formData.weight) {
+    if (formData.serviceType === 'AIR FREIGHT' && formData.weight) {
       const weight = parseFloat(formData.weight) || 0;
       const pricing = calculateAirFreightPricing(weight);
       
@@ -100,7 +102,7 @@ const SriLankaInvoiceForm = () => {
         documentsFee: pricing.documentsFee.toString(),
         total: pricing.total.toString()
       }));
-    } else if (formData.serviceType === 'Sea Freight' && formData.volume && formData.terminal) {
+    } else if (formData.serviceType === 'SEA FREIGHT' && formData.volume && formData.terminal) {
       const volume = parseFloat(formData.volume) || 0;
       const warehouseDestination = getWarehouseDestination(formData.terminal);
       const pricing = calculateSeaFreightPricing(volume, warehouseDestination);
@@ -140,12 +142,12 @@ const SriLankaInvoiceForm = () => {
       
       // Set default values based on service type
       if (name === 'serviceType') {
-        if (value === 'Air Freight') {
-          updated.destination = 'Bandaranayake International Airport';
+        if (value === 'AIR FREIGHT') {
+          updated.destination = 'BANDARANAYAKE INTERNATIONAL AIRPORT';
           updated.terminal = '';
           updated.documentsFee = AIR_FREIGHT_DOCUMENTATION_FEE.toString();
-        } else if (value === 'Sea Freight') {
-          updated.destination = 'Colombo Port';
+        } else if (value === 'SEA FREIGHT') {
+          updated.destination = 'COLOMBO PORT';
           updated.terminal = '';
           updated.rate = '';
           updated.documentsFee = '';
@@ -269,43 +271,64 @@ const SriLankaInvoiceForm = () => {
         <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-white/20">
           {/* Basic Information */}
           <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-t-xl">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-blue-800">
+            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-blue-800 uppercase">
               <User className="h-5 w-5" />
-              Basic Information
+              BASIC INFORMATION
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Invoice Number *</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">CARGO TYPE *</label>
+                <div className="flex gap-2">
+                  {CARGO_TYPES.map(type => (
+                    <Button
+                      key={type}
+                      type="button"
+                      variant={formData.cargoType === type ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handleSelectChange('cargoType', type)}
+                      className={`flex-1 text-xs uppercase ${
+                        formData.cargoType === type 
+                          ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700' 
+                          : 'bg-white/80 hover:bg-white'
+                      }`}
+                    >
+                      {type}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">INVOICE NUMBER *</label>
                 <Select value={formData.invoiceNumber} onValueChange={(value) => handleSelectChange('invoiceNumber', value)}>
                   <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
-                    <SelectValue placeholder="Select invoice number" />
+                    <SelectValue placeholder="SELECT INVOICE NUMBER" className="uppercase" />
                   </SelectTrigger>
                   <SelectContent className="bg-white/95 backdrop-blur-sm">
                     {AVAILABLE_INVOICES.map(invoice => (
-                      <SelectItem key={invoice} value={invoice}>{invoice}</SelectItem>
+                      <SelectItem key={invoice} value={invoice} className="uppercase">{invoice}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Date *</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DATE *</label>
                 <Input
                   type="date"
                   name="date"
                   value={formData.date}
                   onChange={handleInputChange}
-                  className="bg-white/80 border-blue-200 focus:border-blue-400"
+                  className="bg-white/80 border-blue-200 focus:border-blue-400 uppercase"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Service Type *</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SERVICE TYPE *</label>
                 <Select value={formData.serviceType} onValueChange={(value) => handleSelectChange('serviceType', value)}>
                   <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
-                    <SelectValue placeholder="Select service type" />
+                    <SelectValue placeholder="SELECT SERVICE TYPE" className="uppercase" />
                   </SelectTrigger>
                   <SelectContent className="bg-white/95 backdrop-blur-sm">
                     {SERVICE_TYPES.map(type => (
-                      <SelectItem key={type} value={type}>{type}</SelectItem>
+                      <SelectItem key={type} value={type} className="uppercase">{type}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -315,37 +338,37 @@ const SriLankaInvoiceForm = () => {
 
           {/* Destination Details */}
           <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-green-500/10 to-teal-500/10">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-green-800">
+            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-green-800 uppercase">
               <MapPin className="h-5 w-5" />
-              Destination Details
+              DESTINATION DETAILS
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Destination</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DESTINATION</label>
                 <Select value={formData.destination} onValueChange={(value) => handleSelectChange('destination', value)}>
                   <SelectTrigger className="bg-white/80 border-green-200 focus:border-green-400">
-                    <SelectValue placeholder="Select destination" />
+                    <SelectValue placeholder="SELECT DESTINATION" className="uppercase" />
                   </SelectTrigger>
                   <SelectContent className="bg-white/95 backdrop-blur-sm">
-                    {formData.serviceType === 'Sea Freight' && (
-                      <SelectItem value="Colombo Port">Colombo Port</SelectItem>
+                    {formData.serviceType === 'SEA FREIGHT' && (
+                      <SelectItem value="COLOMBO PORT" className="uppercase">COLOMBO PORT</SelectItem>
                     )}
-                    {formData.serviceType === 'Air Freight' && (
-                      <SelectItem value="Bandaranayake International Airport">Bandaranayake International Airport</SelectItem>
+                    {formData.serviceType === 'AIR FREIGHT' && (
+                      <SelectItem value="BANDARANAYAKE INTERNATIONAL AIRPORT" className="uppercase">BANDARANAYAKE INTERNATIONAL AIRPORT</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
               </div>
-              {formData.serviceType === 'Sea Freight' && (
+              {formData.serviceType === 'SEA FREIGHT' && (
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700">Terminal</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">TERMINAL</label>
                   <Select value={formData.terminal} onValueChange={(value) => handleSelectChange('terminal', value)}>
                     <SelectTrigger className="bg-white/80 border-green-200 focus:border-green-400">
-                      <SelectValue placeholder="Select terminal" />
+                      <SelectValue placeholder="SELECT TERMINAL" className="uppercase" />
                     </SelectTrigger>
                     <SelectContent className="bg-white/95 backdrop-blur-sm">
                       {SEA_TERMINALS.map(terminal => (
-                        <SelectItem key={terminal} value={terminal}>{terminal}</SelectItem>
+                        <SelectItem key={terminal} value={terminal} className="uppercase">{terminal}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -356,52 +379,52 @@ const SriLankaInvoiceForm = () => {
 
           {/* Shipper Details */}
           <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-orange-500/10 to-red-500/10">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-orange-800">
+            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-orange-800 uppercase">
               <User className="h-5 w-5" />
-              Shipper Details
+              SHIPPER DETAILS
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Prefix</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PREFIX</label>
                 <Select value={formData.shipperPrefix} onValueChange={(value) => handleSelectChange('shipperPrefix', value)}>
                   <SelectTrigger className="bg-white/80 border-orange-200 focus:border-orange-400">
-                    <SelectValue placeholder="Select prefix" />
+                    <SelectValue placeholder="SELECT PREFIX" className="uppercase" />
                   </SelectTrigger>
                   <SelectContent className="bg-white/95 backdrop-blur-sm">
                     {NAME_PREFIXES.map(prefix => (
-                      <SelectItem key={prefix} value={prefix}>{prefix}</SelectItem>
+                      <SelectItem key={prefix} value={prefix} className="uppercase">{prefix}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1 text-gray-700">Shipper Name *</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SHIPPER NAME *</label>
                 <Input
                   name="shipperName"
                   value={formData.shipperName}
                   onChange={handleInputChange}
-                  placeholder="Enter shipper name"
-                  className="bg-white/80 border-orange-200 focus:border-orange-400"
+                  placeholder="ENTER SHIPPER NAME"
+                  className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Mobile Number</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">MOBILE NUMBER</label>
                 <Input
                   name="shipperMobile"
                   value={formData.shipperMobile}
                   onChange={handleInputChange}
-                  placeholder="+974 xxxx xxxx"
-                  className="bg-white/80 border-orange-200 focus:border-orange-400"
+                  placeholder="+974 XXXX XXXX"
+                  className="bg-white/80 border-orange-200 focus:border-orange-400 placeholder:uppercase"
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1 text-gray-700">Address</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">ADDRESS</label>
                 <Input
                   name="shipperAddress"
                   value={formData.shipperAddress}
                   onChange={handleInputChange}
-                  placeholder="Enter shipper address"
-                  className="bg-white/80 border-orange-200 focus:border-orange-400"
+                  placeholder="ENTER SHIPPER ADDRESS"
+                  className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
                 />
               </div>
             </div>
@@ -409,98 +432,98 @@ const SriLankaInvoiceForm = () => {
 
           {/* Consignee Details */}
           <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-purple-500/10 to-pink-500/10">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-purple-800">
+            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-purple-800 uppercase">
               <User className="h-5 w-5" />
-              Consignee Details
+              CONSIGNEE DETAILS
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Prefix</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PREFIX</label>
                 <Select value={formData.consigneePrefix} onValueChange={(value) => handleSelectChange('consigneePrefix', value)}>
                   <SelectTrigger className="bg-white/80 border-purple-200 focus:border-purple-400">
-                    <SelectValue placeholder="Select prefix" />
+                    <SelectValue placeholder="SELECT PREFIX" className="uppercase" />
                   </SelectTrigger>
                   <SelectContent className="bg-white/95 backdrop-blur-sm">
                     {NAME_PREFIXES.map(prefix => (
-                      <SelectItem key={prefix} value={prefix}>{prefix}</SelectItem>
+                      <SelectItem key={prefix} value={prefix} className="uppercase">{prefix}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1 text-gray-700">Consignee Name *</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">CONSIGNEE NAME *</label>
                 <Input
                   name="consigneeName"
                   value={formData.consigneeName}
                   onChange={handleInputChange}
-                  placeholder="Enter consignee name"
-                  className="bg-white/80 border-purple-200 focus:border-purple-400"
+                  placeholder="ENTER CONSIGNEE NAME"
+                  className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">District</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DISTRICT</label>
                 <Select value={formData.consigneeDistrict} onValueChange={(value) => handleSelectChange('consigneeDistrict', value)}>
                   <SelectTrigger className="bg-white/80 border-purple-200 focus:border-purple-400">
-                    <SelectValue placeholder="Select district" />
+                    <SelectValue placeholder="SELECT DISTRICT" className="uppercase" />
                   </SelectTrigger>
                   <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60 overflow-y-auto">
                     {DISTRICTS.map(district => (
-                      <SelectItem key={district} value={district}>{district}</SelectItem>
+                      <SelectItem key={district} value={district} className="uppercase">{district.toUpperCase()}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Province</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PROVINCE</label>
                 <Select value={formData.consigneeProvince} onValueChange={(value) => handleSelectChange('consigneeProvince', value)}>
                   <SelectTrigger className="bg-white/80 border-purple-200 focus:border-purple-400">
-                    <SelectValue placeholder="Select province" />
+                    <SelectValue placeholder="SELECT PROVINCE" className="uppercase" />
                   </SelectTrigger>
                   <SelectContent className="bg-white/95 backdrop-blur-sm">
                     {PROVINCES.map(province => (
-                      <SelectItem key={province} value={province}>{province}</SelectItem>
+                      <SelectItem key={province} value={province} className="uppercase">{province.toUpperCase()}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Mobile Number</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">MOBILE NUMBER</label>
                 <Input
                   name="consigneeMobile"
                   value={formData.consigneeMobile}
                   onChange={handleInputChange}
-                  placeholder="+94 xxxx xxxx"
-                  className="bg-white/80 border-purple-200 focus:border-purple-400"
+                  placeholder="+94 XXXX XXXX"
+                  className="bg-white/80 border-purple-200 focus:border-purple-400 placeholder:uppercase"
                 />
               </div>
               <div className="md:col-span-3">
-                <label className="block text-sm font-medium mb-1 text-gray-700">Address</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">ADDRESS</label>
                 <Input
                   name="consigneeAddress"
                   value={formData.consigneeAddress}
                   onChange={handleInputChange}
-                  placeholder="Enter consignee address"
-                  className="bg-white/80 border-purple-200 focus:border-purple-400"
+                  placeholder="ENTER CONSIGNEE ADDRESS"
+                  className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
                 />
               </div>
               <div className="md:col-span-3">
-                <label className="block text-sm font-medium mb-1 text-gray-700">Delivery Address</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DELIVERY ADDRESS</label>
                 <Input
                   name="deliveryAddress"
                   value={formData.deliveryAddress}
                   onChange={handleInputChange}
-                  placeholder="Enter delivery address (if different from consignee address)"
-                  className="bg-white/80 border-purple-200 focus:border-purple-400"
+                  placeholder="ENTER DELIVERY ADDRESS (IF DIFFERENT FROM CONSIGNEE ADDRESS)"
+                  className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">ID/Passport Number</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">ID/PASSPORT NUMBER</label>
                 <Input
                   name="consigneeId"
                   value={formData.consigneeId}
                   onChange={handleInputChange}
-                  placeholder="Enter ID or passport number"
-                  className="bg-white/80 border-purple-200 focus:border-purple-400"
+                  placeholder="ENTER ID OR PASSPORT NUMBER"
+                  className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
                 />
               </div>
             </div>
@@ -509,8 +532,8 @@ const SriLankaInvoiceForm = () => {
           {/* Package Details Section */}
           <div className="border-b border-gray-100 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
             <div className="p-6">
-              <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-cyan-800">
-                📦 Package Details
+              <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-cyan-800 uppercase">
+                📦 PACKAGE DETAILS
               </h3>
               <PackageDetailsSection 
                 formState={formData}
@@ -526,36 +549,36 @@ const SriLankaInvoiceForm = () => {
               {/* Volume and Weight Information */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700">Volume (CBM)</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">VOLUME (CBM)</label>
                   <Input
                     name="volume"
                     value={formData.volume}
                     onChange={handleInputChange}
-                    placeholder="Auto-calculated from dimensions"
-                    className="bg-white/80 border-cyan-200 focus:border-cyan-400"
+                    placeholder="AUTO-CALCULATED FROM DIMENSIONS"
+                    className="bg-white/80 border-cyan-200 focus:border-cyan-400 placeholder:uppercase"
                     readOnly
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700">Total Weight (kg) *</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">TOTAL WEIGHT (KG) *</label>
                   <Input
                     name="weight"
                     type="number"
                     step="0.01"
                     value={formData.weight}
                     onChange={handleInputChange}
-                    placeholder="Enter total weight"
-                    className="bg-white/80 border-cyan-200 focus:border-cyan-400"
+                    placeholder="ENTER TOTAL WEIGHT"
+                    className="bg-white/80 border-cyan-200 focus:border-cyan-400 placeholder:uppercase"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700">Description</label>
+                  <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DESCRIPTION</label>
                   <Input
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    placeholder="Package description"
-                    className="bg-white/80 border-cyan-200 focus:border-cyan-400"
+                    placeholder="PACKAGE DESCRIPTION"
+                    className="bg-white/80 border-cyan-200 focus:border-cyan-400 uppercase placeholder:uppercase"
                   />
                 </div>
               </div>
@@ -564,62 +587,62 @@ const SriLankaInvoiceForm = () => {
 
           {/* Pricing Details */}
           <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-yellow-500/10 to-orange-500/10">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-yellow-800">
+            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-yellow-800 uppercase">
               <Phone className="h-5 w-5" />
-              Pricing Details
+              PRICING DETAILS
             </h3>
-            {formData.serviceType === 'Air Freight' && (
+            {formData.serviceType === 'AIR FREIGHT' && (
               <div className="mb-4 p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-800 font-medium">
-                  🚀 Air Freight Rate: QAR {AIR_FREIGHT_RATE_PER_KG}/kg | ✈️ Documentation Fee: QAR {AIR_FREIGHT_DOCUMENTATION_FEE}/HAWB
+                <p className="text-sm text-blue-800 font-medium uppercase">
+                  🚀 AIR FREIGHT RATE: QAR {AIR_FREIGHT_RATE_PER_KG}/KG | ✈️ DOCUMENTATION FEE: QAR {AIR_FREIGHT_DOCUMENTATION_FEE}/HAWB
                 </p>
               </div>
             )}
-            {formData.serviceType === 'Sea Freight' && (
+            {formData.serviceType === 'SEA FREIGHT' && (
               <div className="mb-4 p-4 bg-gradient-to-r from-green-500/20 to-teal-500/20 rounded-lg border border-green-200">
-                <p className="text-sm text-green-800 font-medium">
-                  🚢 Sea Freight Rates: Colombo (QAR 259/CBM) | Kurunegala/Galle (QAR 269/CBM) | 📄 Doc Fee: QAR 50/invoice
+                <p className="text-sm text-green-800 font-medium uppercase">
+                  🚢 SEA FREIGHT RATES: COLOMBO (QAR 259/CBM) | KURUNEGALA/GALLE (QAR 269/CBM) | 📄 DOC FEE: QAR 50/INVOICE
                 </p>
               </div>
             )}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Rate (QAR)</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">RATE (QAR)</label>
                 <Input
                   name="rate"
                   type="number"
                   step="0.01"
                   value={formData.rate}
                   onChange={handleInputChange}
-                  readOnly={formData.serviceType === 'Air Freight'}
-                  placeholder="Enter rate"
-                  className="bg-white/80 border-yellow-200 focus:border-yellow-400"
+                  readOnly={formData.serviceType === 'AIR FREIGHT'}
+                  placeholder="ENTER RATE"
+                  className="bg-white/80 border-yellow-200 focus:border-yellow-400 placeholder:uppercase"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Documentation Fee (QAR)</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DOCUMENTATION FEE (QAR)</label>
                 <Input
                   name="documentsFee"
                   type="number"
                   step="0.01"
                   value={formData.documentsFee}
                   onChange={handleInputChange}
-                  readOnly={formData.serviceType === 'Air Freight'}
-                  placeholder="Enter documentation fee"
-                  className="bg-white/80 border-yellow-200 focus:border-yellow-400"
+                  readOnly={formData.serviceType === 'AIR FREIGHT'}
+                  placeholder="ENTER DOCUMENTATION FEE"
+                  className="bg-white/80 border-yellow-200 focus:border-yellow-400 placeholder:uppercase"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Total (QAR)</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">TOTAL (QAR)</label>
                 <Input
                   name="total"
                   type="number"
                   step="0.01"
                   value={formData.total}
                   onChange={handleInputChange}
-                  readOnly={formData.serviceType === 'Air Freight'}
-                  placeholder="Total amount"
-                  className="font-bold bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 focus:border-green-500"
+                  readOnly={formData.serviceType === 'AIR FREIGHT'}
+                  placeholder="TOTAL AMOUNT"
+                  className="font-bold bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 focus:border-green-500 placeholder:uppercase"
                 />
               </div>
             </div>
@@ -627,33 +650,33 @@ const SriLankaInvoiceForm = () => {
 
           {/* Payment & Additional Details */}
           <div className="p-6 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-b-xl">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-indigo-800">
+            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-indigo-800 uppercase">
               <Phone className="h-5 w-5" />
-              Payment & Additional Details
+              PAYMENT & ADDITIONAL DETAILS
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Payment Method</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PAYMENT METHOD</label>
                 <Select value={formData.paymentMethod} onValueChange={(value) => handleSelectChange('paymentMethod', value)}>
                   <SelectTrigger className="bg-white/80 border-indigo-200 focus:border-indigo-400">
-                    <SelectValue placeholder="Select payment method" />
+                    <SelectValue placeholder="SELECT PAYMENT METHOD" className="uppercase" />
                   </SelectTrigger>
                   <SelectContent className="bg-white/95 backdrop-blur-sm">
-                    <SelectItem value="cash">💵 Cash</SelectItem>
-                    <SelectItem value="card">💳 Card</SelectItem>
-                    <SelectItem value="bank_transfer">🏦 Bank Transfer</SelectItem>
-                    <SelectItem value="cheque">📝 Cheque</SelectItem>
+                    <SelectItem value="cash" className="uppercase">💵 CASH</SelectItem>
+                    <SelectItem value="card" className="uppercase">💳 CARD</SelectItem>
+                    <SelectItem value="bank_transfer" className="uppercase">🏦 BANK TRANSFER</SelectItem>
+                    <SelectItem value="cheque" className="uppercase">📝 CHEQUE</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700">Remarks</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">REMARKS</label>
                 <Input
                   name="remarks"
                   value={formData.remarks}
                   onChange={handleInputChange}
-                  placeholder="Additional remarks"
-                  className="bg-white/80 border-indigo-200 focus:border-indigo-400"
+                  placeholder="ADDITIONAL REMARKS"
+                  className="bg-white/80 border-indigo-200 focus:border-indigo-400 uppercase placeholder:uppercase"
                 />
               </div>
             </div>
