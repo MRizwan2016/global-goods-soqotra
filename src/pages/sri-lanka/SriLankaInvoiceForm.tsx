@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Save, Eye, User, MapPin, Phone, Mail } from 'lucide-react';
+import { ArrowLeft, Save, Eye, User, MapPin, Phone, Mail, Printer } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PackageItem } from '@/pages/invoicing/types/invoiceForm';
@@ -120,6 +120,20 @@ const SriLankaInvoiceForm = () => {
     }
   }, [formData.serviceType, formData.weight, formData.volume, formData.terminal]);
 
+  // Auto-calculate total when rate or documentsFee changes
+  useEffect(() => {
+    const rate = parseFloat(formData.rate) || 0;
+    const docFee = parseFloat(formData.documentsFee) || 0;
+    const total = rate + docFee;
+    
+    if (total > 0 && formData.total !== total.toString()) {
+      setFormData(prev => ({
+        ...prev,
+        total: total.toString()
+      }));
+    }
+  }, [formData.rate, formData.documentsFee]);
+
   // Auto-calculate volume from package dimensions
   useEffect(() => {
     if (formData.length && formData.width && formData.height) {
@@ -199,8 +213,21 @@ const SriLankaInvoiceForm = () => {
   };
 
   const handlePreview = () => {
-    // Preview functionality would go here
-    console.log('Preview invoice:', formData);
+    if (!formData.invoiceNumber) {
+      toast.error('Please save the invoice first before previewing');
+      return;
+    }
+    // Open preview in new tab
+    window.open(`/sri-lanka/invoice/print/preview_${formData.invoiceNumber}`, '_blank');
+  };
+
+  const handlePrint = () => {
+    if (!formData.invoiceNumber) {
+      toast.error('Please save the invoice first before printing');
+      return;
+    }
+    // Open print in new tab
+    window.open(`/sri-lanka/invoice/print/preview_${formData.invoiceNumber}`, '_blank');
   };
 
   // Package handlers
@@ -289,6 +316,10 @@ const SriLankaInvoiceForm = () => {
               <Eye className="h-4 w-4 mr-2" />
               Preview
             </Button>
+            <Button onClick={handlePrint} variant="outline" className="bg-white/80 backdrop-blur-sm hover:bg-white">
+              <Printer className="h-4 w-4 mr-2" />
+              Print
+            </Button>
             <Button onClick={handleSave} className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
               <Save className="h-4 w-4 mr-2" />
               Save
@@ -350,11 +381,12 @@ const SriLankaInvoiceForm = () => {
                   </div>
                 ) : (
                   <div className="flex gap-2">
-                    <Input 
+                     <Input 
                       placeholder="Enter GY invoice number (e.g., GY000123)"
                       value={manualInvoiceNumber}
                       onChange={(e) => setManualInvoiceNumber(e.target.value.toUpperCase())}
-                      className="flex-1 bg-white/80 border-blue-200 focus:border-blue-400"
+                      className="flex-1 bg-white/80 border-blue-200 focus:border-blue-400 w-full min-w-[200px] font-mono text-lg tracking-wider"
+                      maxLength={8}
                     />
                     <Button 
                       type="button" 

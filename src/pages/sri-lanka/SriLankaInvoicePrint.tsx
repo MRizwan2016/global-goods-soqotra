@@ -3,6 +3,10 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import SriLankaHAWB from './documents/SriLankaHAWB';
+import SriLankaHBL from './documents/SriLankaHBL';
+import SriLankaAirManifest from './documents/SriLankaAirManifest';
+import SriLankaSeaManifest from './documents/SriLankaSeaManifest';
 
 const SriLankaInvoicePrint = () => {
   const { id } = useParams();
@@ -12,6 +16,7 @@ const SriLankaInvoicePrint = () => {
   const [invoiceData, setInvoiceData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isPaid, setIsPaid] = useState(false);
+  const [currentDocument, setCurrentDocument] = useState<'invoice' | 'hawb' | 'hbl' | 'air-manifest' | 'sea-manifest'>('invoice');
 
   useEffect(() => {
     if (id) {
