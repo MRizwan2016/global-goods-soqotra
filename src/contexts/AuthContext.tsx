@@ -287,6 +287,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           accountCountryReconciliations: false,
           files: {}
         }
+      },
+      {
+        id: "user-1755499093379",
+        fullName: "MOHAMED IDRIS MOHAMED",
+        email: "gm@almaraamcc.com",
+        mobileNumber: "+974 5555 1234",
+        country: "Qatar",
+        isActive: true,
+        isAdmin: false,
+        createdAt: new Date().toISOString(),
+        permissions: {
+          masterData: true,
+          dataEntry: true,
+          reports: true,
+          downloads: true,
+          accounting: true,
+          controlPanel: true,
+          cargoDelivery: true,
+          accountFunctions: true,
+          accountRegistrations: true,
+          accountFinancialEntities: true,
+          accountCountryReconciliations: true,
+          files: {
+            salesRep: true,
+            town: true,
+            item: true,
+            packageOptions: true,
+            sellingRates: true,
+            container: true,
+            vessel: true,
+            invoiceBook: true,
+            driverHelper: true,
+            invoicing: true,
+            paymentReceivable: true,
+            loadContainer: true,
+            loadVessel: true,
+            loadAirCargo: true,
+            packingList: true,
+            cargoReports: true,
+            financialReports: true,
+            shippingReports: true,
+            paymentMethods: true,
+            reconciliation: true,
+            profitLoss: true,
+            accountFunctionFiles: true,
+            accountRegistrationFiles: true,
+            accountFinancialFiles: true,
+            accountCountryFiles: true
+          }
+        }
       }
     ];
     
