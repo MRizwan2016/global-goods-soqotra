@@ -241,6 +241,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
       },
       {
+        id: "user-gm-2025",
+        fullName: "General Manager",
+        email: "gm@almaraamcc.com",
+        mobileNumber: "+974 1111 2222",
+        country: "Qatar",
+        isActive: true,
+        isAdmin: false,
+        createdAt: new Date().toISOString(),
+        permissions: {
+          masterData: true,
+          dataEntry: true,
+          reports: true,
+          downloads: true,
+          accounting: true,
+          controlPanel: false,
+          cargoDelivery: true,
+          accountFunctions: true,
+          accountRegistrations: true,
+          accountFinancialEntities: true,
+          accountCountryReconciliations: true,
+          files: {
+            salesRep: true,
+            town: true,
+            item: true,
+            packageOptions: true,
+            sellingRates: true,
+            container: true,
+            vessel: true,
+            invoiceBook: true,
+            driverHelper: true,
+            invoicing: true,
+            paymentReceivable: true,
+            loadContainer: true,
+            loadVessel: true,
+            loadAirCargo: true,
+            packingList: true,
+            cargoReports: true,
+            financialReports: true,
+            shippingReports: true,
+            paymentMethods: true,
+            reconciliation: true,
+            profitLoss: true,
+            accountFunctionFiles: true,
+            accountRegistrationFiles: true,
+            accountFinancialFiles: true,
+            accountCountryFiles: true,
+          }
+        }
+      },
+      {
         id: "user-1744301929974",
         fullName: "MOHAMED JAVED",
         email: "javed@soqotra.com",
@@ -301,6 +351,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const userPasswords = { 
       "admin-1": ADMIN_PASSWORD,
       "user-1742197681223": "123456", // MOHAMED RIZWAN
+      "user-gm-2025": "123456", // GM user
       "user-1744301929974": "123456", // MOHAMED JAVED  
       "user-1753610771083": "123456"  // LAHIRU CHATHURANGA
     };
