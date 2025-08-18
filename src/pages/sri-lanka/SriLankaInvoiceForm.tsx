@@ -74,6 +74,10 @@ const SriLankaInvoiceForm = () => {
     'SL-006', 'SL-007', 'SL-008', 'SL-009', 'SL-010'
   ];
 
+  // Manual entry state
+  const [showManualEntry, setShowManualEntry] = useState(false);
+  const [manualInvoiceNumber, setManualInvoiceNumber] = useState('');
+
   // Sri Lanka Districts and Provinces
   const SRI_LANKA_DATA = {
     'Northern': ['Jaffna', 'Killinochchi', 'Mannar', 'Mullaitivu', 'Vavuniya'],
@@ -157,6 +161,30 @@ const SriLankaInvoiceForm = () => {
       
       return updated;
     });
+  };
+
+  const handleManualInvoiceSubmit = () => {
+    if (!manualInvoiceNumber.trim()) {
+      toast.error('Please enter an invoice number');
+      return;
+    }
+    
+    // Validate GY format
+    const gyPattern = /^GY\d{6}$/;
+    if (!gyPattern.test(manualInvoiceNumber)) {
+      toast.error('Invoice number must be in GY format (e.g., GY000123)');
+      return;
+    }
+    
+    setFormData(prev => ({ ...prev, invoiceNumber: manualInvoiceNumber }));
+    setShowManualEntry(false);
+    setManualInvoiceNumber('');
+    toast.success('Invoice number set successfully');
+  };
+
+  const handleManualInvoiceCancel = () => {
+    setShowManualEntry(false);
+    setManualInvoiceNumber('');
   };
 
   const handleSave = () => {
@@ -299,16 +327,52 @@ const SriLankaInvoiceForm = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">INVOICE NUMBER *</label>
-                <Select value={formData.invoiceNumber} onValueChange={(value) => handleSelectChange('invoiceNumber', value)}>
-                  <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
-                    <SelectValue placeholder="SELECT INVOICE NUMBER" className="uppercase" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white/95 backdrop-blur-sm">
-                    {AVAILABLE_INVOICES.map(invoice => (
-                      <SelectItem key={invoice} value={invoice} className="uppercase">{invoice}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                {!showManualEntry ? (
+                  <div className="space-y-2">
+                    <Select value={formData.invoiceNumber} onValueChange={(value) => handleSelectChange('invoiceNumber', value)}>
+                      <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                        <SelectValue placeholder="SELECT INVOICE NUMBER" className="uppercase" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white/95 backdrop-blur-sm">
+                        {AVAILABLE_INVOICES.map(invoice => (
+                          <SelectItem key={invoice} value={invoice} className="uppercase">{invoice}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button 
+                      type="button" 
+                      variant="link" 
+                      className="p-0 h-auto text-xs text-blue-600"
+                      onClick={() => setShowManualEntry(true)}
+                    >
+                      Enter GY invoice number manually
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input 
+                      placeholder="Enter GY invoice number (e.g., GY000123)"
+                      value={manualInvoiceNumber}
+                      onChange={(e) => setManualInvoiceNumber(e.target.value.toUpperCase())}
+                      className="flex-1 bg-white/80 border-blue-200 focus:border-blue-400"
+                    />
+                    <Button 
+                      type="button" 
+                      onClick={handleManualInvoiceSubmit}
+                      className="whitespace-nowrap bg-green-500 hover:bg-green-600"
+                    >
+                      Submit
+                    </Button>
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={handleManualInvoiceCancel}
+                      className="whitespace-nowrap"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DATE *</label>

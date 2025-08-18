@@ -13,8 +13,8 @@ const StatCards: React.FC = () => {
           </div>
           <div>
             <p className="text-sm font-medium text-blue-700">Total Shipments</p>
-            <h3 className="text-2xl font-bold text-blue-900">1,247</h3>
-            <p className="text-xs text-blue-600">+8% from last month</p>
+            <h3 className="text-2xl font-bold text-blue-900">-</h3>
+            <p className="text-xs text-blue-600">No data available</p>
           </div>
         </CardContent>
       </Card>
@@ -26,8 +26,8 @@ const StatCards: React.FC = () => {
           </div>
           <div>
             <p className="text-sm font-medium text-green-700">Active Deliveries</p>
-            <h3 className="text-2xl font-bold text-green-900">86</h3>
-            <p className="text-xs text-green-600">23 scheduled today</p>
+            <h3 className="text-2xl font-bold text-green-900">-</h3>
+            <p className="text-xs text-green-600">No data available</p>
           </div>
         </CardContent>
       </Card>
@@ -39,8 +39,8 @@ const StatCards: React.FC = () => {
           </div>
           <div>
             <p className="text-sm font-medium text-amber-700">Warehouses</p>
-            <h3 className="text-2xl font-bold text-amber-900">5</h3>
-            <p className="text-xs text-amber-600">84% avg. capacity</p>
+            <h3 className="text-2xl font-bold text-amber-900">3</h3>
+            <p className="text-xs text-amber-600">Operational</p>
           </div>
         </CardContent>
       </Card>
@@ -52,8 +52,8 @@ const StatCards: React.FC = () => {
           </div>
           <div>
             <p className="text-sm font-medium text-purple-700">Scheduled Arrivals</p>
-            <h3 className="text-2xl font-bold text-purple-900">12</h3>
-            <p className="text-xs text-purple-600">Next arrival: 14 hours</p>
+            <h3 className="text-2xl font-bold text-purple-900">-</h3>
+            <p className="text-xs text-purple-600">No data available</p>
           </div>
         </CardContent>
       </Card>
