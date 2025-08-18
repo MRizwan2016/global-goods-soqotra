@@ -43,128 +43,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Load data from localStorage on initial load
   useEffect(() => {
+    // Force clear localStorage to fix login issues
+    localStorage.removeItem("users");
+    localStorage.removeItem("userPasswords");
+    localStorage.removeItem("currentUser");
+    
+    console.log("=== FORCED REINITIALIZATION ===");
+    initializeDefaultUsersAndAdmin();
+    
     const storedUser = localStorage.getItem("currentUser");
-    const storedUsers = localStorage.getItem("users");
-
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
         const userWithCheckedPermissions = ensureUserPermissions(parsedUser);
-        console.log("=== DEBUGGING USER LOADING ===");
-        console.log("Raw stored user:", storedUser);
-        console.log("Parsed user:", parsedUser);
-        console.log("User with checked permissions:", userWithCheckedPermissions);
-        console.log("User email:", userWithCheckedPermissions.email);
-        console.log("User permissions:", userWithCheckedPermissions.permissions);
         setCurrentUser(userWithCheckedPermissions);
       } catch (error) {
         console.error("Failed to parse current user:", error);
         localStorage.removeItem("currentUser");
       }
     }
-    
-    if (storedUsers) {
-      try {
-        const parsedUsers = JSON.parse(storedUsers);
-        
-        const updatedUsers = parsedUsers.map((user: any) => ensureUserPermissions(user));
-        
-        // Log stored users for debugging
-        console.log("Loaded users from localStorage:", updatedUsers);
-        
-        // Ensure default demo users exist so known test accounts can log in
-        const requiredEmails = [
-          "mzmrizwan2016@gmail.com",
-          "javed@soqotra.com",
-          "lahiru@soqotra.com"
-        ];
-        const existingEmails = new Set(updatedUsers.map((u: any) => u.email?.toLowerCase?.()));
-        const missingDefaults = requiredEmails.filter((e) => !existingEmails.has(e));
-        if (missingDefaults.length > 0) {
-          console.log("Missing default demo users; merging them for testing:", missingDefaults);
-          const defaultsMap: Record<string, any> = {
-            "mzmrizwan2016@gmail.com": {
-              id: "user-1742197681223",
-              fullName: "MOHAMED RIZWAN",
-              email: "mzmrizwan2016@gmail.com",
-              mobileNumber: "+974 1234 5678",
-              country: "Qatar",
-              isActive: true,
-              isAdmin: false,
-              createdAt: new Date().toISOString(),
-              permissions: {
-                masterData: true,
-                dataEntry: true,
-                reports: true,
-                downloads: true,
-                accounting: true,
-                controlPanel: false,
-                files: {}
-              }
-            },
-            "javed@soqotra.com": {
-              id: "user-1744301929974",
-              fullName: "MOHAMED JAVED",
-              email: "javed@soqotra.com",
-              mobileNumber: "+974 2345 6789",
-              country: "Qatar",
-              isActive: true,
-              isAdmin: false,
-              createdAt: new Date().toISOString(),
-              permissions: {
-                masterData: false,
-                dataEntry: true,
-                reports: true,
-                downloads: false,
-                accounting: false,
-                controlPanel: false,
-                files: {}
-              }
-            },
-            "lahiru@soqotra.com": {
-              id: "user-1753610771083",
-              fullName: "LAHIRU CHATHURANGA",
-              email: "lahiru@soqotra.com",
-              mobileNumber: "+974 3456 7890",
-              country: "Qatar",
-              isActive: true,
-              isAdmin: false,
-              createdAt: new Date().toISOString(),
-              permissions: {
-                masterData: false,
-                dataEntry: true,
-                reports: false,
-                downloads: false,
-                accounting: false,
-                controlPanel: false,
-                files: {}
-              }
-            }
-          };
-          const mergedUsers = [
-            ...updatedUsers,
-            ...missingDefaults.map((email: string) => ensureUserPermissions(defaultsMap[email]))
-          ];
-          setUsers(mergedUsers);
-          localStorage.setItem("users", JSON.stringify(mergedUsers));
-        } else {
-          setUsers(updatedUsers);
-          localStorage.setItem("users", JSON.stringify(updatedUsers));
-        }
-      } catch (error) {
-        console.error("Failed to parse users:", error);
-        initializeDefaultUsersAndAdmin();
-      }
-    } else {
-      initializeDefaultUsersAndAdmin();
-    }
-    
-    // Ensure userPasswords exist for all current users
-    ensureUserPasswordsExist();
-    
-    // Debug: Log user passwords
-    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-    console.log("Stored user passwords (ids only):", Object.keys(userPasswords));
   }, []);
 
   // Function to initialize the default admin user and test users
