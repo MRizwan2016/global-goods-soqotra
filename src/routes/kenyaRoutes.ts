@@ -7,6 +7,7 @@ import VehicleManagement from "@/pages/kenya/VehicleManagement";
 import DriverManagement from "@/pages/kenya/DriverManagement";
 import KenyaFinancialSystem from "@/pages/kenya/KenyaFinancialSystem";
 import StaffTestingPage from "@/pages/kenya/StaffTestingPage";
+import KenyaCustomerPortal from "@/pages/kenya/KenyaCustomerPortal";
 import { RouteConfig } from "./types";
 
 export const kenyaRoutes: RouteConfig[] = [
@@ -49,5 +50,10 @@ export const kenyaRoutes: RouteConfig[] = [
     path: "/kenya/testing",
     element: StaffTestingPage,
     private: true
+  },
+  {
+    path: "/kenya/customer-portal",
+    element: KenyaCustomerPortal,
+    private: false
   }
 ];
