@@ -49,16 +49,20 @@ export const handleUserLogin = (
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>
 ): boolean => {
   try {
-    console.log("Attempting login for:", email);
-    console.log("Available users:", users.map(u => ({ 
-      email: u.email, 
-      isActive: u.isActive, 
-      id: u.id,
-      fullName: u.fullName
-    })));
+    console.log("=== LOGIN ATTEMPT DETAILS ===");
+    console.log("Email attempting to login:", email);
+    console.log("Total users in system:", users.length);
+    console.log("User passwords stored:", Object.keys(userPasswords));
+    
+    console.log("All users in system:");
+    users.forEach((u, index) => {
+      console.log(`${index + 1}. Email: "${u.email}" | Active: ${u.isActive} | ID: ${u.id} | Name: ${u.fullName}`);
+    });
     
     // Find user by email (case-insensitive)
     let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    
+    console.log("User lookup result:", user ? `Found: ${user.email}` : "NOT FOUND");
     
     if (!user) {
       console.log("No user found with email:", email);
