@@ -51,6 +51,7 @@ export const handleUserLogin = (
   try {
     console.log("=== LOGIN ATTEMPT DETAILS ===");
     console.log("Email attempting to login:", email);
+    console.log("Password attempting to login:", password);
     console.log("Total users in system:", users.length);
     console.log("User passwords stored:", Object.keys(userPasswords));
     
@@ -62,7 +63,7 @@ export const handleUserLogin = (
     // Find user by email (case-insensitive)
     let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
     
-    console.log("User lookup result:", user ? `Found: ${user.email}` : "NOT FOUND");
+    console.log("User lookup result:", user ? `Found: ${user.email} (Active: ${user.isActive})` : "NOT FOUND");
     
     if (!user) {
       console.log("No user found with email:", email);
