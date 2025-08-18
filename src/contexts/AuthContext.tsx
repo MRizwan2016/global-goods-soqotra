@@ -393,6 +393,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return updatedUser;
     });
     
+    // Force set password for gm@almaraamcc.com if it doesn't exist
+    const gmUser = updatedUsers.find((u: User) => u.email === "gm@almaraamcc.com");
+    if (gmUser && !userPasswords[gmUser.id]) {
+      userPasswords[gmUser.id] = "123456";
+      passwordsUpdated = true;
+      console.log(`Force set password for GM user: ${gmUser.fullName} (${gmUser.id})`);
+    }
+    
     if (passwordsUpdated) {
       localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
       console.log("Updated userPasswords:", Object.keys(userPasswords));
