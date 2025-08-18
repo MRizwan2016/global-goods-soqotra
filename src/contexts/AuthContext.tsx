@@ -234,6 +234,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             accountCountryFiles: true
           }
         }
+      },
+      {
+        id: "user-documentation",
+        fullName: "DOCUMENTATION USER",
+        email: "documentation@almaraamcc.com",
+        mobileNumber: "+974 6666 7777",
+        country: "Qatar",
+        isActive: true,
+        isAdmin: false,
+        createdAt: new Date().toISOString(),
+        permissions: {
+          masterData: true,
+          dataEntry: true,
+          reports: true,
+          downloads: true,
+          accounting: true,
+          controlPanel: true,
+          cargoDelivery: true,
+          accountFunctions: true,
+          accountRegistrations: true,
+          accountFinancialEntities: true,
+          accountCountryReconciliations: true,
+          files: {
+            salesRep: true,
+            town: true,
+            item: true,
+            packageOptions: true,
+            sellingRates: true,
+            container: true,
+            vessel: true,
+            invoiceBook: true,
+            driverHelper: true,
+            invoicing: true,
+            paymentReceivable: true,
+            loadContainer: true,
+            loadVessel: true,
+            loadAirCargo: true,
+            packingList: true,
+            cargoReports: true,
+            financialReports: true,
+            shippingReports: true,
+            paymentMethods: true,
+            reconciliation: true,
+            profitLoss: true,
+            accountFunctionFiles: true,
+            accountRegistrationFiles: true,
+            accountFinancialFiles: true,
+            accountCountryFiles: true
+          }
+        }
       }
     ];
     
@@ -250,7 +300,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       "user-1742197681223": "123456", // MOHAMED RIZWAN
       "user-1744301929974": "123456", // MOHAMED JAVED  
       "user-1753610771083": "123456", // LAHIRU CHATHURANGA
-      "user-1755499093379": "123456"  // MOHAMED IDRIS MOHAMED (GM)
+      "user-1755499093379": "123456", // MOHAMED IDRIS MOHAMED (GM)
+      "user-documentation": "123456"  // DOCUMENTATION USER
     };
     
     // Ensure passwords are accessible immediately
