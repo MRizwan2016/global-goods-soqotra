@@ -24,8 +24,12 @@ const SriLankaInvoiceForm = () => {
     invoiceNumber: '',
     date: new Date().toISOString().split('T')[0],
     cargoType: '',
+    jobNumber: '',
     shipperPrefix: '',
     shipperName: '',
+    shipperCountry: '',
+    shipperCity: '',
+    shipperCustomCity: '',
     shipperAddress: '',
     shipperMobile: '',
     consigneePrefix: '',
@@ -67,6 +71,31 @@ const SriLankaInvoiceForm = () => {
 
   // Prefix options
   const NAME_PREFIXES = ['MR.', 'MS.', 'MRS.', 'DR.', 'PROF.'];
+
+  // Countries and cities as requested
+  const COUNTRIES = ['QATAR', 'KSA', 'OMAN', 'KUWAIT', 'KENYA', 'MOZAMBIQUE', 'UGANDA', 'TUNISIA', 'SRI LANKA', 'ETHIOPIA', 'SOMALIA'];
+  
+  const QATAR_CITIES = [
+    'MANSOORA', 'NAJMA', 'WEST BAY', 'LUSAIL', 'AL KHOR', 'HILAL', 'NUAIJA', 'MUAITHAR', 'DUHAIL', 
+    'UMM SALAAL ALI', 'UMM SALAAL MOHAMMED', 'PEARL QATAR', 'KATARA', 'MATHAR AL QADEEM', 'DOHA JADEED', 
+    'FEREEJ AL SUDAN', 'BIN MAHMOUD', 'BIN OMRAN', 'INDUSTRIAL AREA', 'NEW INDUSTRIAL AREA', 'BAAYA', 
+    'AZIZIA', 'AL WAAB', 'THUMMAMA', 'DAFNA', 'BU FANTAS', 'ABU NAKLA', 'ABU HAMOOR', 'ABU SAMRA', 
+    'BU SIDRA', 'AIN KHALITH', 'AL ASIRI', 'AL HITMI', 'AL JUMAILIYA', 'AL KEESHA', 'AL MESSILA', 
+    'AL MIRQAB', 'AL NASAR STREET', 'SOUQ AL NAJDA', 'WAKRA', 'WUKAIR', 'AL RAWDA', 'AL RUWAIS', 
+    'AL WAJBA', 'AL SAAD', 'ASIAN CITY', 'LABOUR CAMP', 'BIRKATH AL AWAMAR', 'BANI HAJAR', 'BARWA CITY', 
+    'BARWA MADINA', 'DOHA CITY', 'DUKAAN', 'EDUCATION CITY', 'NEW SALATHA', 'OLD SALATHA', 'SHEHELIYA', 
+    'OLD AL GHANAM', 'ONAIZA', 'MUGALINA', 'MESSAIMEER', 'MESHAF', 'MARKEEYA', 'MAMOORA', 'MAKAINIS', 
+    'MADEENA KHALEEFA', 'LUAIB', 'LEQTAFIYA', 'LAKTHA', 'GARAFA', 'JEMILIA', 'FURUSIYA STREET', 
+    'AL REYYAN', 'FEREEJ ABDUL AZIZ', 'EZDAN OASIA', 'UMM AL AHAMED', 'UMM AL SANEEM', 'UMM LEKHBA', 
+    'UMM AL AFFAI', 'UMBAB', 'WAJBA', 'WAREHOUSE STREET NO. 47', 'ZIKREET', 'RAWDATH AL KHAIL', 
+    'RAS LAFFAN', 'RUMAILAH', 'SALWA ROAD', 'SHAHANIYA', 'SHAMAL', 'SHAKAMA'
+  ];
+
+  const getCitiesForCountry = (country: string) => {
+    if (country === 'QATAR') return QATAR_CITIES;
+    // For other countries, return empty array so they can use custom input
+    return [];
+  };
 
   // Mock invoice numbers (normally from Invoice Book Stock Management)
   const AVAILABLE_INVOICES = [
@@ -202,8 +231,29 @@ const SriLankaInvoiceForm = () => {
   };
 
   const handleSave = () => {
-    if (!formData.invoiceNumber || !formData.shipperName || !formData.consigneeName) {
-      toast.error('Please fill in all required fields');
+    // Check all required fields
+    const requiredFields = {
+      'Invoice Number': formData.invoiceNumber,
+      'Cargo Type': formData.cargoType,
+      'Service Type': formData.serviceType,
+      'Shipper Name': formData.shipperName,
+      'Consignee Name': formData.consigneeName,
+      'Total Weight': formData.weight,
+      'Description': formData.description
+    };
+
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => !value || value.trim() === '')
+      .map(([field, _]) => field);
+
+    if (missingFields.length > 0) {
+      toast.error(`Please fill in required fields: ${missingFields.join(', ')}`);
+      return;
+    }
+    
+    // Additional validation for air freight pricing
+    if (formData.serviceType === 'AIR FREIGHT' && (!formData.rate || !formData.documentsFee || !formData.total)) {
+      toast.error('Please ensure pricing is calculated correctly');
       return;
     }
     
@@ -334,7 +384,7 @@ const SriLankaInvoiceForm = () => {
               <User className="h-5 w-5" />
               BASIC INFORMATION
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">CARGO TYPE *</label>
                 <div className="flex gap-2">
@@ -381,12 +431,13 @@ const SriLankaInvoiceForm = () => {
                   </div>
                 ) : (
                   <div className="flex gap-2">
-                     <Input 
+                    <Input 
                       placeholder="Enter GY invoice number (e.g., GY000123)"
                       value={manualInvoiceNumber}
                       onChange={(e) => setManualInvoiceNumber(e.target.value.toUpperCase())}
-                      className="flex-1 bg-white/80 border-blue-200 focus:border-blue-400 w-full min-w-[200px] font-mono text-lg tracking-wider"
+                      className="flex-1 bg-white/80 border-blue-200 focus:border-blue-400 w-full min-w-[250px] font-mono text-lg tracking-wider px-4 py-2"
                       maxLength={8}
+                      style={{ minWidth: '250px', fontSize: '18px', letterSpacing: '0.1em' }}
                     />
                     <Button 
                       type="button" 
@@ -415,6 +466,17 @@ const SriLankaInvoiceForm = () => {
                   onChange={handleInputChange}
                   className="bg-white/80 border-blue-200 focus:border-blue-400 uppercase"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">JOB NUMBER</label>
+                 <Input
+                   name="jobNumber"
+                   value={formData.jobNumber}
+                   onChange={handleInputChange}
+                   placeholder="AUTO-GENERATED"
+                   className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
+                   readOnly
+                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SERVICE TYPE *</label>
@@ -479,7 +541,7 @@ const SriLankaInvoiceForm = () => {
               <User className="h-5 w-5" />
               SHIPPER DETAILS
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PREFIX</label>
                 <Select value={formData.shipperPrefix} onValueChange={(value) => handleSelectChange('shipperPrefix', value)}>
@@ -493,7 +555,7 @@ const SriLankaInvoiceForm = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="md:col-span-2">
+              <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SHIPPER NAME *</label>
                 <Input
                   name="shipperName"
@@ -502,6 +564,52 @@ const SriLankaInvoiceForm = () => {
                   placeholder="ENTER SHIPPER NAME"
                   className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">COUNTRY</label>
+                <Select value={formData.shipperCountry} onValueChange={(value) => handleSelectChange('shipperCountry', value)}>
+                  <SelectTrigger className="bg-white/80 border-orange-200 focus:border-orange-400">
+                    <SelectValue placeholder="SELECT COUNTRY" className="uppercase" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60 overflow-y-auto">
+                    {COUNTRIES.map(country => (
+                      <SelectItem key={country} value={country} className="uppercase">{country}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">CITY</label>
+                {formData.shipperCountry && getCitiesForCountry(formData.shipperCountry).length > 0 ? (
+                  <Select value={formData.shipperCity} onValueChange={(value) => handleSelectChange('shipperCity', value)}>
+                    <SelectTrigger className="bg-white/80 border-orange-200 focus:border-orange-400">
+                      <SelectValue placeholder="SELECT CITY" className="uppercase" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60 overflow-y-auto">
+                      {getCitiesForCountry(formData.shipperCountry).map(city => (
+                        <SelectItem key={city} value={city} className="uppercase">{city}</SelectItem>
+                      ))}
+                      <SelectItem value="CUSTOM" className="uppercase border-t border-gray-200 font-medium">+ ADD CUSTOM CITY</SelectItem>
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    name="shipperCustomCity"
+                    value={formData.shipperCustomCity}
+                    onChange={handleInputChange}
+                    placeholder="ENTER CITY NAME"
+                    className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
+                  />
+                )}
+                {formData.shipperCity === 'CUSTOM' && (
+                  <Input
+                    name="shipperCustomCity"
+                    value={formData.shipperCustomCity}
+                    onChange={handleInputChange}
+                    placeholder="ENTER CUSTOM CITY NAME"
+                    className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase mt-2"
+                  />
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">MOBILE NUMBER</label>
@@ -513,7 +621,7 @@ const SriLankaInvoiceForm = () => {
                   className="bg-white/80 border-orange-200 focus:border-orange-400 placeholder:uppercase"
                 />
               </div>
-              <div className="md:col-span-2">
+              <div className="md:col-span-3">
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">ADDRESS</label>
                 <Input
                   name="shipperAddress"
@@ -532,7 +640,7 @@ const SriLankaInvoiceForm = () => {
               <User className="h-5 w-5" />
               CONSIGNEE DETAILS
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PREFIX</label>
                 <Select value={formData.consigneePrefix} onValueChange={(value) => handleSelectChange('consigneePrefix', value)}>
@@ -592,7 +700,7 @@ const SriLankaInvoiceForm = () => {
                   className="bg-white/80 border-purple-200 focus:border-purple-400 placeholder:uppercase"
                 />
               </div>
-              <div className="md:col-span-3">
+              <div className="md:col-span-4">
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">ADDRESS</label>
                 <Input
                   name="consigneeAddress"
@@ -602,7 +710,7 @@ const SriLankaInvoiceForm = () => {
                   className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
                 />
               </div>
-              <div className="md:col-span-3">
+              <div className="md:col-span-4">
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DELIVERY ADDRESS</label>
                 <Input
                   name="deliveryAddress"
