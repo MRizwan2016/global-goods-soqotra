@@ -4,9 +4,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import SriLankaHAWB from './documents/SriLankaHAWB';
-import SriLankaHBL from './documents/SriLankaHBL';
 import SriLankaAirManifest from './documents/SriLankaAirManifest';
-import SriLankaSeaManifest from './documents/SriLankaSeaManifest';
 
 const SriLankaInvoicePrint = () => {
   const { id } = useParams();
@@ -440,7 +438,10 @@ const SriLankaInvoicePrint = () => {
             )}
             
             {mode === 'hbl' && invoiceData?.serviceType === 'SEA FREIGHT' && (
-              <SriLankaHBL invoiceData={invoiceData} onPrint={handlePrint} />
+              <div className="p-8 text-center text-gray-500">
+                <h2 className="text-2xl font-bold mb-4">House Bill of Lading (HBL)</h2>
+                <p>HBL Document - Coming Soon</p>
+              </div>
             )}
             
             {mode === 'air-manifest' && invoiceData?.serviceType === 'AIR FREIGHT' && (
@@ -448,7 +449,10 @@ const SriLankaInvoicePrint = () => {
             )}
             
             {mode === 'sea-manifest' && invoiceData?.serviceType === 'SEA FREIGHT' && (
-              <SriLankaSeaManifest shipments={[invoiceData]} vesselInfo={invoiceData} />
+              <div className="p-8 text-center text-gray-500">
+                <h2 className="text-2xl font-bold mb-4">Sea Freight Manifest</h2>
+                <p>Sea Manifest Document - Coming Soon</p>
+              </div>
             )}
           </>
         )}

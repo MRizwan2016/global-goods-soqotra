@@ -1,446 +1,226 @@
-import React from "react";
-import Layout from "@/components/layout/Layout";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tooltip } from "@/components/ui/tooltip";
-import { ArrowRight, Phone, MapPin, Ship, Truck, FileText, Clock, Calendar } from "lucide-react";
-import { Link } from "react-router-dom";
-import { sriLankaShipmentData } from "@/data/mockData";
-import CountryBackButton from "@/components/ui/country-back-button";
-import LanguageSwitcher from "@/components/ui/language-switcher";
-import { useLanguage } from "@/contexts/LanguageContext";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus, FileText, Printer, Edit, Trash2, Eye } from 'lucide-react';
+import { toast } from 'sonner';
+import Layout from '@/components/layout/Layout';
 
-import StatCards from "./components/dashboard/StatCards";
-import DeliveryCharts from "./components/dashboard/DeliveryCharts";
-import ImageGallery from "./components/dashboard/ImageGallery";
+interface SriLankaInvoice {
+  id: string;
+  invoiceNumber: string;
+  date: string;
+  shipperName: string;
+  consigneeName: string;
+  serviceType: string;
+  total: string;
+  status?: string;
+}
 
-const SriLankaDashboard: React.FC = () => {
-  const [activeTab, setActiveTab] = React.useState("overview");
-  const { language } = useLanguage();
-  
+const SriLankaDashboard = () => {
+  const navigate = useNavigate();
+  const [invoices, setInvoices] = useState<SriLankaInvoice[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  useEffect(() => {
+    loadInvoices();
+  }, []);
+
+  const loadInvoices = () => {
+    const stored = localStorage.getItem('sriLankaInvoices');
+    if (stored) {
+      const parsedInvoices = JSON.parse(stored);
+      setInvoices(parsedInvoices);
+    }
+  };
+
+  const filteredInvoices = invoices.filter(invoice =>
+    invoice.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    invoice.shipperName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    invoice.consigneeName?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleNewInvoice = () => {
+    navigate('/sri-lanka/invoice/add');
+  };
+
+  const handleEditInvoice = (id: string) => {
+    navigate(`/sri-lanka/invoice/edit/${id}`);
+  };
+
+  const handlePrintInvoice = (id: string) => {
+    navigate(`/sri-lanka/invoice/print/${id}`);
+  };
+
+  const handleDeleteInvoice = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this invoice?')) {
+      const updatedInvoices = invoices.filter(inv => inv.id !== id);
+      localStorage.setItem('sriLankaInvoices', JSON.stringify(updatedInvoices));
+      setInvoices(updatedInvoices);
+      toast.success('Invoice deleted successfully');
+    }
+  };
+
   return (
-    <Layout title="Sri Lanka Operations">
-      {/* Header Section */}
-      <div className="border-b pb-4 mb-6">
-        <div className="flex justify-between items-center">
+    <Layout title="Sri Lanka Invoices">
+      <div className="container mx-auto px-4 py-6">
+        <div className="flex justify-between items-center mb-6">
           <div>
-            <CountryBackButton className="mb-2" />
-            <h1 className="text-3xl font-bold text-gray-800 mb-1">Sri Lanka Operations</h1>
-            <p className="text-gray-600">
-              Central hub for all Sri Lanka-related logistics operations
-            </p>
+            <h1 className="text-3xl font-bold text-gray-900">Sri Lanka Invoices</h1>
+            <p className="text-gray-600 mt-1">Manage your Sri Lanka shipping invoices</p>
           </div>
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
-            <Tooltip content="Contact Sri Lanka Office">
-              <Link 
-                to="#" 
-                className="p-2 bg-blue-50 rounded-full text-blue-600 hover:bg-blue-100 transition-colors"
-              >
-                <Phone size={20} />
-              </Link>
-            </Tooltip>
-            <Tooltip content="View Locations">
-              <Link 
-                to="#" 
-                className="p-2 bg-green-50 rounded-full text-green-600 hover:bg-green-100 transition-colors"
-              >
-                <MapPin size={20} />
-              </Link>
-            </Tooltip>
-          </div>
+          <Button onClick={handleNewInvoice} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            New Invoice
+          </Button>
         </div>
-      </div>
 
-      {/* Stats Section */}
-      <StatCards />
-      
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Link 
-          to="/sri-lanka/invoice/add"
-          className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:from-blue-600 hover:to-blue-700"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Create New Invoice</h3>
-              <p className="text-blue-100 text-sm">Generate invoice for Sri Lanka shipments</p>
-            </div>
-            <FileText className="h-8 w-8 text-blue-200" />
-          </div>
-        </Link>
-        
-        <Link 
-          to="#"
-          className="bg-gradient-to-r from-green-500 to-green-600 text-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:from-green-600 hover:to-green-700"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Manage Invoices</h3>
-              <p className="text-green-100 text-sm">View and edit existing invoices</p>
-            </div>
-            <FileText className="h-8 w-8 text-green-200" />
-          </div>
-        </Link>
-        
-        <Link 
-          to="#"
-          className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-6 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:from-purple-600 hover:to-purple-700"
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Track Shipments</h3>
-              <p className="text-purple-100 text-sm">Monitor delivery status</p>
-            </div>
-            <Ship className="h-8 w-8 text-purple-200" />
-          </div>
-        </Link>
-      </div>
-      
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div className="lg:col-span-2">
+        {/* Search Bar */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search by invoice number, shipper, or consignee..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
-            <CardContent className="p-6">
-              <h2 className="text-2xl font-semibold mb-4">Country Overview</h2>
-              <div className="flex flex-col gap-4">
-                <p>
-                  Sri Lanka, officially the Democratic Socialist Republic of Sri Lanka, is an island nation in South Asia. 
-                  It is situated in the Indian Ocean, southwest of the Bay of Bengal, and southeast of the Arabian Sea.
-                </p>
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <Ship className="text-blue-600" size={18} />
-                    <span className="font-medium">Main Ports:</span> Colombo, Hambantota, Trincomalee
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <Truck className="text-green-600" size={18} />
-                    <span className="font-medium">Major Logistics Hubs:</span> Colombo, Kurunegala, Galle
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <FileText className="text-amber-600" size={18} />
-                    <span className="font-medium">Customs Documentation:</span> Electronic submission required
-                  </div>
-                </div>
-                
-                <div className="mt-2">
-                  <h3 className="text-lg font-medium mb-2">Key Operational Information</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
-                    <li>Currency: Sri Lankan Rupee (LKR)</li>
-                    <li>Business Hours: Monday-Friday, 8:30 AM - 5:00 PM</li>
-                    <li>Major Trade Partners: India, China, UAE, USA, UK</li>
-                    <li>Main Exports: Textiles, tea, spices, rubber, gems</li>
-                    <li>Import Regulations: Strict documentation requirements for all shipments</li>
-                  </ul>
-                </div>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Invoices</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{invoices.length}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Air Freight</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {invoices.filter(inv => inv.serviceType === 'AIR FREIGHT').length}
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Sea Freight</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {invoices.filter(inv => inv.serviceType === 'SEA FREIGHT').length}
               </div>
             </CardContent>
           </Card>
         </div>
-        
-        <div>
-          <ImageGallery />
-        </div>
-      </div>
-      
-      {/* Shipment Charts */}
-      <div className="mb-6">
-        <DeliveryCharts />
-      </div>
-      
-      {/* Tabs Section */}
-      <Card>
-        <CardContent className="p-0">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="w-full border-b rounded-none p-0 h-auto">
-              <TabsTrigger 
-                value="overview" 
-                className="flex-1 rounded-none border-r data-[state=active]:bg-white data-[state=active]:shadow-none data-[state=active]:border-b-0 data-[state=active]:border-b-transparent py-3"
-              >
-                Overview
-              </TabsTrigger>
-              <TabsTrigger 
-                value="deliveries" 
-                className="flex-1 rounded-none border-r data-[state=active]:bg-white data-[state=active]:shadow-none data-[state=active]:border-b-0 data-[state=active]:border-b-transparent py-3"
-              >
-                Deliveries
-              </TabsTrigger>
-              <TabsTrigger 
-                value="warehouses" 
-                className="flex-1 rounded-none border-r data-[state=active]:bg-white data-[state=active]:shadow-none data-[state=active]:border-b-0 data-[state=active]:border-b-transparent py-3"
-              >
-                Warehouses
-              </TabsTrigger>
-              <TabsTrigger 
-                value="carriers" 
-                className="flex-1 rounded-none border-r data-[state=active]:bg-white data-[state=active]:shadow-none data-[state=active]:border-b-0 data-[state=active]:border-b-transparent py-3"
-              >
-                Carriers
-              </TabsTrigger>
-              <TabsTrigger 
-                value="customs" 
-                className="flex-1 rounded-none data-[state=active]:bg-white data-[state=active]:shadow-none data-[state=active]:border-b-0 data-[state=active]:border-b-transparent py-3"
-              >
-                Customs
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="overview" className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Sri Lanka Operations Overview</h3>
-              <p className="mb-4">
-                Our Sri Lanka operations focus on efficient cargo handling through our network of warehouses and
-                logistics partners across the country. We handle both import and export operations, with special
-                expertise in textiles, tea, spices, and electronics shipments.
-              </p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div className="border rounded-md p-4">
-                  <h4 className="font-medium text-lg mb-2">Import Operations</h4>
-                  <p className="text-gray-600 mb-2">
-                    We specialize in handling imports into Sri Lanka with efficient customs clearance and last-mile delivery.
-                  </p>
-                  <Link to="#" className="text-blue-600 flex items-center hover:underline text-sm font-medium">
-                    View import procedures <ArrowRight size={14} className="ml-1" />
-                  </Link>
-                </div>
-                
-                <div className="border rounded-md p-4">
-                  <h4 className="font-medium text-lg mb-2">Export Operations</h4>
-                  <p className="text-gray-600 mb-2">
-                    Our export services include documentation, packaging, container loading, and freight forwarding.
-                  </p>
-                  <Link to="#" className="text-blue-600 flex items-center hover:underline text-sm font-medium">
-                    View export procedures <ArrowRight size={14} className="ml-1" />
-                  </Link>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="deliveries" className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Delivery Operations</h3>
-              <p className="mb-4">
-                Our delivery network in Sri Lanka covers all major cities and regions, with specialized services
-                for different cargo types and delivery urgencies.
-              </p>
-              <div className="border rounded-md p-4 mb-4">
-                <h4 className="font-medium text-lg mb-2">Current Deliveries</h4>
-                <p className="text-gray-600">
-                  Track and manage ongoing deliveries across Sri Lanka
+
+        {/* Invoices Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Saved Invoices</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {filteredInvoices.length === 0 ? (
+              <div className="text-center py-8">
+                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No invoices found</h3>
+                <p className="text-gray-600 mb-4">
+                  {searchTerm ? 'No invoices match your search criteria.' : 'Get started by creating your first invoice.'}
                 </p>
-                <div className="mt-3">
-                  <Link to="#" className="bg-blue-50 text-blue-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-100 transition-colors inline-flex items-center">
-                    View active deliveries <ArrowRight size={14} className="ml-1" />
-                  </Link>
-                </div>
+                {!searchTerm && (
+                  <Button onClick={handleNewInvoice}>Create Invoice</Button>
+                )}
               </div>
-              <div className="border rounded-md p-4">
-                <h4 className="font-medium text-lg mb-2">Delivery Analytics</h4>
-                <p className="text-gray-600">
-                  Performance metrics and statistics for Sri Lanka delivery operations
-                </p>
-                <div className="mt-3">
-                  <Link to="#" className="bg-green-50 text-green-700 px-4 py-2 rounded-md text-sm font-medium hover:bg-green-100 transition-colors inline-flex items-center">
-                    View analytics <ArrowRight size={14} className="ml-1" />
-                  </Link>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="warehouses" className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Warehouse Network</h3>
-              <p className="mb-4">
-                We operate multiple warehouses across Sri Lanka to ensure efficient cargo handling and storage.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div className="border rounded-md p-4">
-                  <h4 className="font-medium text-lg mb-1">Colombo UPB Distribution Warehouse</h4>
-                  <p className="text-gray-500 text-sm mb-2">Main Warehouse</p>
-                  <div className="text-gray-600 text-sm space-y-1">
-                    <div className="flex items-start gap-2">
-                      <MapPin size={16} className="text-gray-400 mt-0.5" />
-                      <span>50K Cyril C Perera Mawatha, Colombo - 13, Sri Lanka</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Phone size={16} className="text-gray-400 mt-0.5" />
-                      <span>+94 11 244 4400</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Phone size={16} className="text-gray-400 mt-0.5" />
-                      <span>WhatsApp: +94 76 600 2222</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Calendar size={16} className="text-gray-400 mt-0.5" />
-                      <span>Open: Monday to Friday</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Clock size={16} className="text-gray-400 mt-0.5" />
-                      <span>Timing: 8:00 am to 3:00 PM</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="border rounded-md p-4">
-                  <h4 className="font-medium text-lg mb-1">Kurunegala Distribution Center</h4>
-                  <p className="text-gray-500 text-sm mb-2">Regional Hub</p>
-                  <div className="text-gray-600 text-sm space-y-1">
-                    <div className="flex items-start gap-2">
-                      <MapPin size={16} className="text-gray-400 mt-0.5" />
-                      <span>Hambara Road, Sandagala, Kurunegala, Sri Lanka</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Phone size={16} className="text-gray-400 mt-0.5" />
-                      <span>+94 37 223 8924-5</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Phone size={16} className="text-gray-400 mt-0.5" />
-                      <span>Mobile: +94 773028348</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Phone size={16} className="text-gray-400 mt-0.5" />
-                      <span>WhatsApp: +94 76 600 2222</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Calendar size={16} className="text-gray-400 mt-0.5" />
-                      <span>Open: Monday to Friday</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Clock size={16} className="text-gray-400 mt-0.5" />
-                      <span>Timing: 8:00 am to 5:00 PM</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="border rounded-md p-4">
-                  <h4 className="font-medium text-lg mb-1">Galle UPB Distribution Warehouse</h4>
-                  <p className="text-gray-500 text-sm mb-2">Port Operations</p>
-                  <div className="text-gray-600 text-sm space-y-1">
-                    <div className="flex items-start gap-2">
-                      <MapPin size={16} className="text-gray-400 mt-0.5" />
-                      <span>331, Matara Road, Katugoda, Galle, Sri Lanka</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Phone size={16} className="text-gray-400 mt-0.5" />
-                      <span>+94 91 223 4842-4</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Phone size={16} className="text-gray-400 mt-0.5" />
-                      <span>Mobile: +94 77 7776214</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Phone size={16} className="text-gray-400 mt-0.5" />
-                      <span>Mobile: +94 77 7699817</span>
-                    </div>
-                    <div className="flex items-start gap-2">
-                      <Clock size={16} className="text-gray-400 mt-0.5" />
-                      <span>Timing: 8:00 am to 3:00 PM</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="carriers" className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Carrier Partners</h3>
-              <p className="mb-4">
-                We work with reliable carrier partners to ensure smooth operations in Sri Lanka.
-              </p>
+            ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Carrier Name
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Type
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Service Areas
-                      </th>
-                      <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Contact
-                      </th>
+                <table className="w-full table-auto">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Invoice #</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Date</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Shipper</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Consignee</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Service</th>
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">Total</th>
+                      <th className="text-center py-3 px-4 font-medium text-gray-900">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    <tr>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">Lanka Logistics</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">Road Transport</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">All Regions</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        +94 11 2345678
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">Ceylon Express</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">Last Mile Delivery</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">Urban Areas</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        +94 11 3456789
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">Island Freight</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">Heavy Cargo</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-500">Industrial Zones</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        +94 11 4567890
-                      </td>
-                    </tr>
+                  <tbody>
+                    {filteredInvoices.map((invoice) => (
+                      <tr key={invoice.id} className="border-b hover:bg-gray-50">
+                        <td className="py-3 px-4 font-medium text-blue-600">
+                          {invoice.invoiceNumber}
+                        </td>
+                        <td className="py-3 px-4 text-gray-900">
+                          {invoice.date}
+                        </td>
+                        <td className="py-3 px-4 text-gray-900">
+                          {invoice.shipperName || 'N/A'}
+                        </td>
+                        <td className="py-3 px-4 text-gray-900">
+                          {invoice.consigneeName || 'N/A'}
+                        </td>
+                        <td className="py-3 px-4">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            invoice.serviceType === 'AIR FREIGHT' 
+                              ? 'bg-blue-100 text-blue-800' 
+                              : 'bg-green-100 text-green-800'
+                          }`}>
+                            {invoice.serviceType}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4 font-medium text-gray-900">
+                          QAR {parseFloat(invoice.total || '0').toFixed(2)}
+                        </td>
+                        <td className="py-3 px-4">
+                          <div className="flex items-center justify-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEditInvoice(invoice.id)}
+                              className="flex items-center gap-1"
+                            >
+                              <Edit className="h-3 w-3" />
+                              Edit
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handlePrintInvoice(invoice.id)}
+                              className="flex items-center gap-1"
+                            >
+                              <Eye className="h-3 w-3" />
+                              View
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleDeleteInvoice(invoice.id)}
+                              className="flex items-center gap-1 text-red-600 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                              Delete
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
-            </TabsContent>
-            
-            <TabsContent value="customs" className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Customs Information</h3>
-              <p className="mb-4">
-                Important information about customs procedures and documentation requirements for Sri Lanka.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border rounded-md p-4">
-                  <h4 className="font-medium text-lg mb-2">Documentation Requirements</h4>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
-                    <li>Commercial Invoice (original and 3 copies)</li>
-                    <li>Packing List (original and 3 copies)</li>
-                    <li>Bill of Lading/Airway Bill</li>
-                    <li>Certificate of Origin</li>
-                    <li>Import License (for restricted items)</li>
-                    <li>SLTB Approval (for textile imports)</li>
-                  </ul>
-                </div>
-                <div className="border rounded-md p-4">
-                  <h4 className="font-medium text-lg mb-2">Customs Process</h4>
-                  <ol className="list-decimal list-inside space-y-1 text-gray-700">
-                    <li>Submit electronic declaration via ASYCUDA system</li>
-                    <li>Pay applicable duties and taxes</li>
-                    <li>Document verification by customs officer</li>
-                    <li>Physical inspection (if required)</li>
-                    <li>Release approval</li>
-                    <li>Cargo clearance and delivery</li>
-                  </ol>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </Layout>
   );
 };

@@ -171,15 +171,19 @@ const SriLankaInvoiceForm = () => {
 
   // Auto-calculate total when rate or documentsFee changes
   useEffect(() => {
-    const rate = parseFloat(formData.rate) || 0;
-    const docFee = parseFloat(formData.documentsFee) || 0;
+    const rate = parseFloat(formData.rate?.toString() || '0') || 0;
+    const docFee = parseFloat(formData.documentsFee?.toString() || '0') || 0;
     const calculatedTotal = rate + docFee;
     
+    console.log('Auto-calculation:', { rate, docFee, calculatedTotal, formDataRate: formData.rate, formDataDocFee: formData.documentsFee });
+    
     // Always update the total when rate or docs fee changes
-    setFormData(prev => ({
-      ...prev,
-      total: calculatedTotal.toFixed(2)
-    }));
+    if (calculatedTotal >= 0) {
+      setFormData(prev => ({
+        ...prev,
+        total: calculatedTotal.toString()
+      }));
+    }
   }, [formData.rate, formData.documentsFee]);
 
   // Auto-calculate volume from package dimensions
@@ -992,13 +996,11 @@ const SriLankaInvoiceForm = () => {
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">TOTAL (QAR)</label>
                 <Input
                   name="total"
-                  type="number"
-                  step="0.01"
+                  type="text"
                   value={formData.total}
-                  onChange={handleInputChange}
                   readOnly
                   placeholder="AUTO-CALCULATED"
-                  className="font-bold bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 focus:border-green-500 placeholder:uppercase cursor-not-allowed"
+                  className="font-bold bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 focus:border-green-500 placeholder:uppercase cursor-not-allowed text-lg"
                 />
               </div>
             </div>
