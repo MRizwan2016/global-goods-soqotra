@@ -119,7 +119,7 @@ const SriLankaInvoiceForm = () => {
 
   // Mock invoice numbers (normally from Invoice Book Stock Management)
   const AVAILABLE_INVOICES = [
-    'SL-001', 'SL-002', 'SL-003', 'SL-004', 'SL-005',
+    'GY-13138406', 'GY-13136939', 'GY-13138380', 'GY-13138520', 'GY-13138523',
     'SL-006', 'SL-007', 'SL-008', 'SL-009', 'SL-010'
   ];
 
@@ -236,7 +236,7 @@ const SriLankaInvoiceForm = () => {
     // Validate GY format
     const gyPattern = /^GY\d{6}$/;
     if (!gyPattern.test(manualInvoiceNumber)) {
-      toast.error('Invoice number must be in GY format (e.g., GY000123)');
+      toast.error('Invoice number must be in GY format (e.g., GY-000123)');
       return;
     }
     
