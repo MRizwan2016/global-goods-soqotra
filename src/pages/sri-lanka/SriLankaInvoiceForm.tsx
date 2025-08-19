@@ -257,9 +257,36 @@ const SriLankaInvoiceForm = () => {
       return;
     }
     
-    // Save functionality would go here
-    toast.success('Invoice saved successfully');
-    console.log('Saving invoice:', formData);
+    try {
+      // Get existing invoices from localStorage
+      const existingInvoices = JSON.parse(localStorage.getItem('sriLankaInvoices') || '[]');
+      
+      // Create invoice object with all form data and package items
+      const invoiceData = {
+        id: `sri-lanka-${Date.now()}`,
+        ...formData,
+        packageItems: packageItems,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        country: 'SRI LANKA'
+      };
+      
+      // Add to existing invoices
+      const updatedInvoices = [...existingInvoices, invoiceData];
+      
+      // Save back to localStorage
+      localStorage.setItem('sriLankaInvoices', JSON.stringify(updatedInvoices));
+      
+      toast.success('Invoice saved successfully');
+      console.log('Invoice saved:', invoiceData);
+      
+      // Navigate to edit page with the saved invoice ID
+      navigate(`/sri-lanka/invoice/edit/${invoiceData.id}`);
+      
+    } catch (error) {
+      console.error('Error saving invoice:', error);
+      toast.error('Failed to save invoice. Please try again.');
+    }
   };
 
   const handlePreview = () => {
