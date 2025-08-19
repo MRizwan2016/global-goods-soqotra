@@ -8,12 +8,14 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { TunisiaContainer, TunisiaVehicle, PersonalEffects } from "./types/tunisiaTypes";
 import ContainerSelection from "./components/ContainerSelection";
 import ContainerLoadingView from "./components/ContainerLoadingView";
+import SealedContainersView from "./components/SealedContainersView";
+import ContainerDetailsView from "./components/ContainerDetailsView";
 
 const TunisiaDashboard: React.FC = () => {
   const { language } = useLanguage();
   const [containers, setContainers] = useState<TunisiaContainer[]>([]);
   const [selectedContainer, setSelectedContainer] = useState<TunisiaContainer | null>(null);
-  const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading' | 'sealed-containers' | 'container-details'>('dashboard');
 
   const handleContainerCreate = (containerData: Omit<TunisiaContainer, 'id'>) => {
     const newContainer: TunisiaContainer = {
@@ -79,6 +81,13 @@ const TunisiaDashboard: React.FC = () => {
 
     setContainers(prev => prev.map(c => c.id === selectedContainer.id ? updatedContainer : c));
     setSelectedContainer(updatedContainer);
+    // Auto-navigate to sealed containers view after sealing
+    setView('sealed-containers');
+  };
+
+  const handleContainerView = (container: TunisiaContainer) => {
+    setSelectedContainer(container);
+    setView('container-details');
   };
 
   if (view === 'container-select') {
@@ -118,6 +127,41 @@ const TunisiaDashboard: React.FC = () => {
     );
   }
 
+  if (view === 'sealed-containers') {
+    return (
+      <Layout title="Tunisia Sealed Containers">
+        <div className="mb-8">
+          <div className="flex justify-between mb-4">
+            <CountryBackButton />
+            <LanguageSwitcher />
+          </div>
+        </div>
+        <SealedContainersView
+          containers={containers}
+          onBack={() => setView('dashboard')}
+          onContainerView={handleContainerView}
+        />
+      </Layout>
+    );
+  }
+
+  if (view === 'container-details' && selectedContainer) {
+    return (
+      <Layout title="Tunisia Container Details">
+        <div className="mb-8">
+          <div className="flex justify-between mb-4">
+            <CountryBackButton />
+            <LanguageSwitcher />
+          </div>
+        </div>
+        <ContainerDetailsView
+          container={selectedContainer}
+          onBack={() => setView('sealed-containers')}
+        />
+      </Layout>
+    );
+  }
+
   return (
     <Layout title="Tunisia Operations">
       <div className="mb-8">
@@ -150,6 +194,26 @@ const TunisiaDashboard: React.FC = () => {
               <div>• Container Types: 40' HC, 45'</div>
               <div>• Photo Upload for Documentation</div>
               <div>• Personal Effects: QAR 600/CBM</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="cursor-pointer hover:shadow-lg transition-shadow border-2 border-blue-200 hover:border-blue-400"
+          onClick={() => setView('sealed-containers')}
+        >
+          <CardHeader>
+            <CardTitle className="text-blue-600">Sealed Container Management</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              View and manage sealed containers with complete loading manifests.
+            </p>
+            <div className="space-y-2 text-xs">
+              <div>• View Sealed Container Details</div>
+              <div>• Loading Manifests</div>
+              <div>• Vehicle & Personal Effects Documentation</div>
+              <div>• Photo Gallery</div>
             </div>
           </CardContent>
         </Card>
