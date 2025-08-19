@@ -20,26 +20,63 @@ const SriLankaInvoicePrint = () => {
 
   useEffect(() => {
     if (id) {
+      console.log('Loading invoice with ID:', id);
       const storedInvoices = localStorage.getItem('sriLankaInvoices');
+      console.log('Stored invoices:', storedInvoices);
+      
       if (storedInvoices) {
         const invoices = JSON.parse(storedInvoices);
         const invoice = invoices.find((inv: any) => inv.id === id);
+        console.log('Found invoice:', invoice);
+        
         if (invoice) {
-          setInvoiceData(invoice);
+          // Ensure proper data structure for printing
+          const processedInvoice = {
+            ...invoice,
+            packages: invoice.packageItems?.map((pkg: any) => ({
+              id: pkg.id,
+              name: pkg.name || pkg.description || "PACKAGE",
+              length: parseFloat(pkg.length || '0'),
+              width: parseFloat(pkg.width || '0'),
+              height: parseFloat(pkg.height || '0'),
+              volume: parseFloat(pkg.volume || '0') || ((parseFloat(pkg.length || '0') * parseFloat(pkg.width || '0') * parseFloat(pkg.height || '0')) / 1000000)
+            })) || [],
+            shipper: {
+              name: invoice.shipperName || "SAMPLE SHIPPER",
+              address: `${invoice.shipperCity || 'DOHA'}, ${invoice.shipperCountry || 'QATAR'}`,
+              mobile: invoice.shipperMobile || "+974 1234 5678"
+            },
+            consignee: {
+              name: invoice.consigneeName || "SAMPLE CONSIGNEE", 
+              address: `${invoice.consigneeAddress || 'NO 47/2'}, ${invoice.consigneeDistrict || 'COLOMBO'}, SRI LANKA`,
+              mobile: invoice.consigneeMobile || "+94 77 123 4567",
+              idNumber: invoice.consigneeId || "123456789V"
+            },
+            totalWeight: parseFloat(invoice.weight || '0'),
+            pricing: {
+              gross: parseFloat(invoice.rate || '0') + parseFloat(invoice.documentsFee || '0'),
+              discount: 0,
+              net: parseFloat(invoice.total || '0')
+            }
+          };
+          
+          setInvoiceData(processedInvoice);
           
           // Check payment status
           const payments = localStorage.getItem('payments');
           if (payments) {
             const paymentData = JSON.parse(payments);
-            const payment = paymentData.find((p: any) => p.invoiceNumber === invoice.invoiceNumber);
+            const payment = paymentData.find((p: any) => p.invoiceNumber === processedInvoice.invoiceNumber);
             setIsPaid(!!payment);
           }
         } else {
+          console.log('Invoice not found, using fallback data');
           // Fallback data
           setInvoiceData({
             id: id,
             invoiceNumber: `SL${Date.now()}`,
             date: new Date().toLocaleDateString('en-GB'),
+            serviceType: 'SEA FREIGHT',
             shipper: {
               name: "SAMPLE SHIPPER",
               address: "DOHA, QATAR",
@@ -47,7 +84,7 @@ const SriLankaInvoicePrint = () => {
             },
             consignee: {
               name: "SAMPLE CONSIGNEE",
-              address: "COLOMBO, SRI LANKA",
+              address: "COLOMBO, SRI LANKA", 
               mobile: "+94 77 123 4567",
               idNumber: "123456789V"
             },
@@ -62,6 +99,9 @@ const SriLankaInvoicePrint = () => {
             }
           });
         }
+      } else {
+        console.log('No stored invoices found');
+        setInvoiceData(null);
       }
     }
     setLoading(false);

@@ -399,12 +399,25 @@ const SriLankaInvoiceForm = () => {
   const handlePackageSelect = (description: string) => {
     const selectedPackage = packageOptions.find(pkg => pkg.description === description);
     if (selectedPackage) {
+      // Calculate volume from dimensions
+      const volume = calculateVolumeCBM(
+        selectedPackage.dimensions.length,
+        selectedPackage.dimensions.width, 
+        selectedPackage.dimensions.height
+      );
+      
+      // Calculate weight from volume (assuming 1 CBM = 167 kg for air freight)
+      const estimatedWeight = volume * 167;
+      
       setFormData(prev => ({
         ...prev,
         packagesName: selectedPackage.description,
+        description: 'PERSONAL EFFECTS', // Default description
         length: selectedPackage.dimensions.length.toString(),
         width: selectedPackage.dimensions.width.toString(),
         height: selectedPackage.dimensions.height.toString(),
+        volume: volume.toFixed(4),
+        weight: estimatedWeight.toFixed(1),
         price: selectedPackage.pricing.sriLanka.price.toString()
       }));
     }
@@ -424,27 +437,53 @@ const SriLankaInvoiceForm = () => {
       return;
     }
 
+    // Calculate documentation fee based on service type
+    let docFee = 0;
+    if (formData.serviceType === 'AIR FREIGHT') {
+      docFee = AIR_FREIGHT_DOCUMENTATION_FEE;
+    } else if (formData.serviceType === 'SEA FREIGHT') {
+      const volume = parseFloat(formData.volume) || 0;
+      docFee = volume > 1 ? 50 : 0;
+    }
+
+    const price = parseFloat(formData.price) || 0;
+    const total = price + docFee;
+
     const newPackage: PackageItem = {
       id: Date.now().toString(),
-      description: formData.packagesName,
-      price: parseFloat(formData.price),
+      name: formData.packagesName, // Use name field for display
+      description: formData.description || 'PERSONAL EFFECTS',
+      price: price,
       quantity: 1,
-      total: parseFloat(formData.price),
+      total: total,
       length: formData.length,
       width: formData.width,
-      height: formData.height
+      height: formData.height,
+      volume: formData.volume,
+      weight: formData.weight,
+      documentsFee: docFee.toString(),
+      volumeWeight: formData.volume
     };
 
     setPackageItems(prev => [...prev, newPackage]);
     
-    // Clear the form
+    // Update form totals based on all packages
+    const updatedPackages = [...packageItems, newPackage];
+    const totalVolume = updatedPackages.reduce((sum, pkg) => sum + (parseFloat(pkg.volume || '0') || 0), 0);
+    const totalWeight = updatedPackages.reduce((sum, pkg) => sum + (parseFloat(pkg.weight || '0') || 0), 0);
+    const totalPrice = updatedPackages.reduce((sum, pkg) => sum + (pkg.total || 0), 0);
+    
     setFormData(prev => ({
       ...prev,
       packagesName: '',
       length: '',
       width: '',
       height: '',
-      price: ''
+      price: '',
+      volume: totalVolume.toFixed(4),
+      weight: totalWeight.toString(),
+      total: totalPrice.toFixed(2),
+      packages: updatedPackages.length.toString()
     }));
 
     toast.success('Package added successfully');
