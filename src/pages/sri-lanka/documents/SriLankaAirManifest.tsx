@@ -335,7 +335,7 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
                     <td className="border border-black p-1 text-xs">{shipment.destination || shipment.consigneeDistrict || "COLOMBO"}</td>
                     <td className="border border-black p-1 text-center text-xs">{shipment.pieces || 1}</td>
                     <td className="border border-black p-1 text-center text-xs">{shipment.weight || "25.0"}</td>
-                    <td className="border border-black p-1 text-xs">{shipment.dimensions || shipment.length && shipment.width && shipment.height ? `${shipment.length}×${shipment.width}×${shipment.height}` : "50×40×30"}</td>
+                    <td className="border border-black p-1 text-xs">{shipment.dimensions || shipment.length && shipment.width && shipment.height ? `${shipment.length}×${shipment.width}×${shipment.height}` : "50×50×50"}</td>
                     <td className="border border-black p-1 text-xs">{shipment.description || "PERSONAL EFFECTS"}</td>
                     <td className="border border-black p-1 text-xs">{shipment.remarks || "NIL"}</td>
                   </tr>
@@ -350,7 +350,7 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
                       <td className="border border-black p-1 text-xs">COLOMBO</td>
                       <td className="border border-black p-1 text-center text-xs">1</td>
                       <td className="border border-black p-1 text-center text-xs">25.0</td>
-                      <td className="border border-black p-1 text-xs">50×40×30</td>
+                      <td className="border border-black p-1 text-xs">50×50×50</td>
                       <td className="border border-black p-1 text-xs">PERSONAL EFFECTS</td>
                       <td className="border border-black p-1 text-xs">NIL</td>
                     </tr>
