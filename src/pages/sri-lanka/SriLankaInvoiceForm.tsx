@@ -232,40 +232,64 @@ const SriLankaInvoiceForm = () => {
   };
 
   const handleSave = () => {
-    // Check all required fields
+    console.log('Form data before validation:', formData);
+    
+    // Check all required fields with more precise validation
     const requiredFields = {
-      'Invoice Number': formData.invoiceNumber,
-      'Cargo Type': formData.cargoType,
-      'Service Type': formData.serviceType,
-      'Shipper Name': formData.shipperName,
-      'Consignee Name': formData.consigneeName,
-      'Total Weight': formData.weight,
-      'Description': formData.description
+      'Invoice Number': formData.invoiceNumber?.trim(),
+      'Cargo Type': formData.cargoType?.trim(),
+      'Service Type': formData.serviceType?.trim(),
+      'Shipper Name': formData.shipperName?.trim(),
+      'Consignee Name': formData.consigneeName?.trim(),
+      'Total Weight': formData.weight?.trim(),
+      'Description': formData.description?.trim()
     };
 
+    console.log('Required fields check:', requiredFields);
+
     const missingFields = Object.entries(requiredFields)
-      .filter(([_, value]) => !value || value.trim() === '')
+      .filter(([_, value]) => !value || value === '')
       .map(([field, _]) => field);
 
     if (missingFields.length > 0) {
+      console.log('Missing fields:', missingFields);
       toast.error(`Please fill in required fields: ${missingFields.join(', ')}`);
       return;
     }
     
-    // Additional validation for air freight pricing
-    if (formData.serviceType === 'AIR FREIGHT' && (!formData.rate || !formData.documentsFee || !formData.total)) {
+    // Additional validation for pricing
+    if (!formData.rate || !formData.total) {
       toast.error('Please ensure pricing is calculated correctly');
       return;
+    }
+    
+    // Validate total calculation
+    const rate = parseFloat(formData.rate) || 0;
+    const docFee = parseFloat(formData.documentsFee) || 0;
+    const expectedTotal = rate + docFee;
+    const actualTotal = parseFloat(formData.total) || 0;
+    
+    if (Math.abs(expectedTotal - actualTotal) > 0.01) {
+      console.log('Price mismatch:', { rate, docFee, expectedTotal, actualTotal });
+      setFormData(prev => ({
+        ...prev,
+        total: expectedTotal.toFixed(2)
+      }));
+      toast.warning('Total price was adjusted to match rate + documentation fee');
     }
     
     try {
       // Get existing invoices from localStorage
       const existingInvoices = JSON.parse(localStorage.getItem('sriLankaInvoices') || '[]');
       
+      // Auto-generate job number if not present
+      const jobNumber = formData.jobNumber || `SL-JOB-${Date.now()}`;
+      
       // Create invoice object with all form data and package items
       const invoiceData = {
         id: `sri-lanka-${Date.now()}`,
         ...formData,
+        jobNumber,
         packageItems: packageItems,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
