@@ -19,7 +19,7 @@ const PaymentDetailsTable: React.FC<PaymentDetailsTableProps> = ({
   const customerName = paymentInfo?.customerName || invoice?.consignee1 || invoice?.consignee || "";
   const bookingForm = paymentInfo?.bookingForm || invoice?.bookingForm || invoice?.bookNumber || invoice?.awbNumber || "";
   const shipper = paymentInfo?.shipper || invoice?.shipper1 || invoice?.shipper || "";
-  const consignee = paymentInfo?.consignee || invoice?.consignee1 || invoice?.consignee || "";
+  const consignee = paymentInfo?.consignee || invoice?.consignee1 || (typeof invoice?.consignee === 'object' ? invoice?.consignee?.name : invoice?.consignee) || "";
   const warehouse = paymentInfo?.warehouse || invoice?.warehouse || invoice?.destination || "";
   const shipmentType = paymentInfo?.shipmentType || invoice?.freightType || invoice?.shipmentType || invoice?.serviceType || "";
   const remarks = paymentInfo?.remarks || "";
