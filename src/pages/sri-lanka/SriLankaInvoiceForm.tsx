@@ -153,12 +153,13 @@ const SriLankaInvoiceForm = () => {
   useEffect(() => {
     const rate = parseFloat(formData.rate) || 0;
     const docFee = parseFloat(formData.documentsFee) || 0;
-    const total = rate + docFee;
+    const calculatedTotal = rate + docFee;
     
-    if (total > 0 && formData.total !== total.toString()) {
+    // Only update if there's a meaningful change and both values exist
+    if (calculatedTotal > 0 && parseFloat(formData.total) !== calculatedTotal) {
       setFormData(prev => ({
         ...prev,
-        total: total.toString()
+        total: calculatedTotal.toFixed(2)
       }));
     }
   }, [formData.rate, formData.documentsFee]);
