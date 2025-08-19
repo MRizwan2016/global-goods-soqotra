@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, FileText, Printer, Edit, Trash2, Eye } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Plus, FileText, Printer, Edit, Trash2, Eye, Plane, Ship } from 'lucide-react';
 import { toast } from 'sonner';
 import Layout from '@/components/layout/Layout';
 
@@ -21,6 +22,8 @@ const SriLankaDashboard = () => {
   const navigate = useNavigate();
   const [invoices, setInvoices] = useState<SriLankaInvoice[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedInvoices, setSelectedInvoices] = useState<string[]>([]);
+  const [showManifestOptions, setShowManifestOptions] = useState(false);
 
   useEffect(() => {
     loadInvoices();
@@ -61,6 +64,58 @@ const SriLankaDashboard = () => {
     }
   };
 
+  const handleInvoiceSelection = (invoiceId: string, checked: boolean) => {
+    if (checked) {
+      setSelectedInvoices(prev => [...prev, invoiceId]);
+    } else {
+      setSelectedInvoices(prev => prev.filter(id => id !== invoiceId));
+    }
+  };
+
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedInvoices(filteredInvoices.map(inv => inv.id));
+    } else {
+      setSelectedInvoices([]);
+    }
+  };
+
+  const handleCreateManifest = (type: 'air' | 'sea') => {
+    if (selectedInvoices.length === 0) {
+      toast.error('Please select invoices to include in the manifest');
+      return;
+    }
+
+    const selectedInvoiceData = invoices.filter(inv => selectedInvoices.includes(inv.id));
+    const manifestData = {
+      invoices: selectedInvoiceData,
+      type,
+      createdAt: new Date().toISOString()
+    };
+
+    // Save manifest data to localStorage
+    const manifests = JSON.parse(localStorage.getItem('sriLankaManifests') || '[]');
+    const manifestId = `MAN-${Date.now()}`;
+    manifests.push({ id: manifestId, ...manifestData });
+    localStorage.setItem('sriLankaManifests', JSON.stringify(manifests));
+
+    // Navigate to manifest page
+    if (type === 'air') {
+      navigate(`/sri-lanka/manifest/air/${manifestId}`);
+    } else {
+      navigate(`/sri-lanka/manifest/sea/${manifestId}`);
+    }
+    
+    toast.success(`${type === 'air' ? 'Air' : 'Sea'} manifest created successfully`);
+  };
+
+  const selectedServiceTypes = selectedInvoices.length > 0 
+    ? [...new Set(invoices.filter(inv => selectedInvoices.includes(inv.id)).map(inv => inv.serviceType))]
+    : [];
+
+  const canCreateAirManifest = selectedServiceTypes.includes('AIR FREIGHT');
+  const canCreateSeaManifest = selectedServiceTypes.includes('SEA FREIGHT');
+
   return (
     <Layout title="Sri Lanka Invoices">
       <div className="container mx-auto px-4 py-6">
@@ -69,10 +124,46 @@ const SriLankaDashboard = () => {
             <h1 className="text-3xl font-bold text-gray-900">Sri Lanka Invoices</h1>
             <p className="text-gray-600 mt-1">Manage your Sri Lanka shipping invoices</p>
           </div>
-          <Button onClick={handleNewInvoice} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            New Invoice
-          </Button>
+          <div className="flex items-center gap-3">
+            {selectedInvoices.length > 0 && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowManifestOptions(!showManifestOptions)}
+                  className="flex items-center gap-2"
+                >
+                  <FileText className="h-4 w-4" />
+                  Create Manifest ({selectedInvoices.length})
+                </Button>
+                {showManifestOptions && (
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleCreateManifest('air')}
+                      disabled={!canCreateAirManifest}
+                      className="flex items-center gap-2"
+                    >
+                      <Plane className="h-4 w-4" />
+                      Air Manifest
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => handleCreateManifest('sea')}
+                      disabled={!canCreateSeaManifest}
+                      className="flex items-center gap-2"
+                    >
+                      <Ship className="h-4 w-4" />
+                      Sea Manifest
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
+            <Button onClick={handleNewInvoice} className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              New Invoice
+            </Button>
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -145,6 +236,12 @@ const SriLankaDashboard = () => {
                 <table className="w-full table-auto">
                   <thead>
                     <tr className="border-b">
+                      <th className="text-left py-3 px-4 font-medium text-gray-900">
+                        <Checkbox
+                          checked={selectedInvoices.length === filteredInvoices.length && filteredInvoices.length > 0}
+                          onCheckedChange={handleSelectAll}
+                        />
+                      </th>
                       <th className="text-left py-3 px-4 font-medium text-gray-900">Invoice #</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-900">Date</th>
                       <th className="text-left py-3 px-4 font-medium text-gray-900">Shipper</th>
@@ -157,6 +254,12 @@ const SriLankaDashboard = () => {
                   <tbody>
                     {filteredInvoices.map((invoice) => (
                       <tr key={invoice.id} className="border-b hover:bg-gray-50">
+                        <td className="py-3 px-4">
+                          <Checkbox
+                            checked={selectedInvoices.includes(invoice.id)}
+                            onCheckedChange={(checked) => handleInvoiceSelection(invoice.id, checked as boolean)}
+                          />
+                        </td>
                         <td className="py-3 px-4 font-medium text-blue-600">
                           {invoice.invoiceNumber}
                         </td>

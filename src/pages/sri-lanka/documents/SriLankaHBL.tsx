@@ -172,8 +172,12 @@ const SriLankaHBL: React.FC<HBLProps> = ({ invoiceData, onPrint }) => {
                   <td className="border border-black p-2 text-center">{invoiceData.weight || invoiceData.totalWeight || "25.0"} KG</td>
                   <td className="border border-black p-2 text-center">
                     {invoiceData.length && invoiceData.width && invoiceData.height 
-                      ? `${invoiceData.length}x${invoiceData.width}x${invoiceData.height}cm`
-                      : "50x40x30cm"
+                      ? invoiceData.serviceType === 'SEA FREIGHT' 
+                        ? `${invoiceData.length}x${invoiceData.width}x${invoiceData.height}in`
+                        : `${invoiceData.length}x${invoiceData.width}x${invoiceData.height}cm`
+                      : invoiceData.serviceType === 'SEA FREIGHT' 
+                        ? "20x16x12in"
+                        : "50x40x30cm"
                     }
                   </td>
                   <td className="border border-black p-2 text-center">{invoiceData.volume || "0.0600"}</td>

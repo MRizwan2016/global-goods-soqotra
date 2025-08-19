@@ -72,8 +72,19 @@ export const getWarehouseDestination = (terminal: string): string => {
 };
 
 /**
- * Calculate volume in CBM from dimensions
+ * Calculate volume in CBM from dimensions in CM (Air Freight)
  */
 export const calculateVolumeCBM = (length: number, width: number, height: number): number => {
   return (length * width * height) / 1000000; // Convert from cm³ to m³
+};
+
+/**
+ * Calculate volume in CBM from dimensions in Inches (Sea Freight)
+ */
+export const calculateVolumeCBMFromInches = (length: number, width: number, height: number): number => {
+  // Convert inches to cm first (1 inch = 2.54 cm), then to m³
+  const lengthCm = length * 2.54;
+  const widthCm = width * 2.54;
+  const heightCm = height * 2.54;
+  return (lengthCm * widthCm * heightCm) / 1000000;
 };

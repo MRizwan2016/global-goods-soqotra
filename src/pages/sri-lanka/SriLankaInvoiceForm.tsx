@@ -13,6 +13,7 @@ import {
   calculateSeaFreightPricing,
   getWarehouseDestination,
   calculateVolumeCBM,
+  calculateVolumeCBMFromInches,
   AIR_FREIGHT_RATE_PER_KG,
   AIR_FREIGHT_DOCUMENTATION_FEE
 } from './utils/sriLankaPricing';
@@ -188,18 +189,28 @@ const SriLankaInvoiceForm = () => {
 
   // Auto-calculate volume from package dimensions
   useEffect(() => {
-    if (formData.length && formData.width && formData.height) {
+    if (formData.length && formData.width && formData.height && formData.serviceType) {
       const length = parseFloat(formData.length) || 0;
       const width = parseFloat(formData.width) || 0;
       const height = parseFloat(formData.height) || 0;
-      const volume = calculateVolumeCBM(length, width, height);
+      
+      let volume: number;
+      if (formData.serviceType === 'AIR FREIGHT') {
+        // Air freight: dimensions in CM
+        volume = calculateVolumeCBM(length, width, height);
+      } else if (formData.serviceType === 'SEA FREIGHT') {
+        // Sea freight: dimensions in Inches
+        volume = calculateVolumeCBMFromInches(length, width, height);
+      } else {
+        volume = 0;
+      }
       
       setFormData(prev => ({
         ...prev,
         volume: volume.toFixed(4)
       }));
     }
-  }, [formData.length, formData.width, formData.height]);
+  }, [formData.length, formData.width, formData.height, formData.serviceType]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -401,12 +412,25 @@ const SriLankaInvoiceForm = () => {
   const handlePackageSelect = (description: string) => {
     const selectedPackage = packageOptions.find(pkg => pkg.description === description);
     if (selectedPackage) {
-      // Calculate volume from dimensions
-      const volume = calculateVolumeCBM(
-        selectedPackage.dimensions.length,
-        selectedPackage.dimensions.width, 
-        selectedPackage.dimensions.height
-      );
+      // Calculate volume from dimensions based on service type
+      let volume: number;
+      if (formData.serviceType === 'AIR FREIGHT') {
+        // Air freight: dimensions in CM
+        volume = calculateVolumeCBM(
+          selectedPackage.dimensions.length,
+          selectedPackage.dimensions.width, 
+          selectedPackage.dimensions.height
+        );
+      } else if (formData.serviceType === 'SEA FREIGHT') {
+        // Sea freight: dimensions in Inches
+        volume = calculateVolumeCBMFromInches(
+          selectedPackage.dimensions.length,
+          selectedPackage.dimensions.width, 
+          selectedPackage.dimensions.height
+        );
+      } else {
+        volume = 0;
+      }
       
       // Calculate weight from volume (assuming 1 CBM = 167 kg for air freight)
       const estimatedWeight = volume * 167;
