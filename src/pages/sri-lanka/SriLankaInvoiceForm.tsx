@@ -176,12 +176,10 @@ const SriLankaInvoiceForm = () => {
     const calculatedTotal = rate + docFee;
     
     // Always update the total when rate or docs fee changes
-    if (rate > 0 || docFee > 0) {
-      setFormData(prev => ({
-        ...prev,
-        total: calculatedTotal.toFixed(2)
-      }));
-    }
+    setFormData(prev => ({
+      ...prev,
+      total: calculatedTotal.toFixed(2)
+    }));
   }, [formData.rate, formData.documentsFee]);
 
   // Auto-calculate volume from package dimensions
@@ -998,9 +996,9 @@ const SriLankaInvoiceForm = () => {
                   step="0.01"
                   value={formData.total}
                   onChange={handleInputChange}
-                  readOnly={formData.serviceType === 'AIR FREIGHT'}
-                  placeholder="TOTAL AMOUNT"
-                  className="font-bold bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 focus:border-green-500 placeholder:uppercase"
+                  readOnly
+                  placeholder="AUTO-CALCULATED"
+                  className="font-bold bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 focus:border-green-500 placeholder:uppercase cursor-not-allowed"
                 />
               </div>
             </div>
