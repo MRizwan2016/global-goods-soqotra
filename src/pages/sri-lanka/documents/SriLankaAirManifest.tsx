@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Printer, Download } from 'lucide-react';
 
 interface AirManifestProps {
@@ -7,10 +8,38 @@ interface AirManifestProps {
   flightInfo?: any;
 }
 
+interface AirlineInfo {
+  name: string;
+  prefix: string;
+  iataCode: string;
+}
+
+const AIRLINES: Record<string, AirlineInfo> = {
+  'qatar': { name: 'QATAR AIRWAYS', prefix: '157', iataCode: 'QR' },
+  'sri-lankan': { name: 'SRI LANKAN AIRWAYS', prefix: '603', iataCode: 'UL' },
+  'gulf': { name: 'GULF AIRWAYS', prefix: '072', iataCode: 'GF' },
+  'oman': { name: 'OMAN AIRWAYS', prefix: '910', iataCode: 'WY' },
+  'air-india': { name: 'AIR INDIA AIRWAYS', prefix: '098', iataCode: 'AI' },
+  'etihad': { name: 'ETIHAD AIRWAYS', prefix: '607', iataCode: 'EY' },
+  'emirates': { name: 'EMIRATES AIRWAYS', prefix: '176', iataCode: 'EK' }
+};
+
 const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo }) => {
   const printRef = useRef<HTMLDivElement>(null);
+  const [selectedAirline, setSelectedAirline] = useState<string>('qatar');
+  const [mawbNumber, setMawbNumber] = useState<string>('');
 
   const manifestNumber = `AM${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}001`;
+  
+  const generateMawbNumber = (airlineKey: string) => {
+    const airline = AIRLINES[airlineKey];
+    const randomSuffix = Math.floor(100000 + Math.random() * 900000);
+    return `${airline.prefix}-${randomSuffix}`;
+  };
+
+  React.useEffect(() => {
+    setMawbNumber(generateMawbNumber(selectedAirline));
+  }, [selectedAirline]);
 
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
@@ -61,7 +90,26 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
       {/* Toolbar */}
       <div className="flex justify-between items-center p-4 border-b no-print">
         <h2 className="text-xl font-bold">Air Freight Manifest</h2>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Airline:</label>
+            <Select value={selectedAirline} onValueChange={setSelectedAirline}>
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.entries(AIRLINES).map(([key, airline]) => (
+                  <SelectItem key={key} value={key}>
+                    {airline.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">MAWB:</label>
+            <span className="px-2 py-1 bg-gray-100 rounded text-sm font-mono">{mawbNumber}</span>
+          </div>
           <Button onClick={handlePrint} className="flex items-center gap-2">
             <Printer className="h-4 w-4" />
             Print Manifest
@@ -88,6 +136,24 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
             </div>
           </div>
 
+          {/* MAWB Information */}
+          <div className="border border-black mb-3">
+            <table className="w-full">
+              <tr className="bg-gray-100">
+                <td className="font-bold p-2">AIRLINE</td>
+                <td className="font-bold p-2">AIRLINE CODE</td>
+                <td className="font-bold p-2">MAWB NUMBER</td>
+                <td className="font-bold p-2">FLIGHT NUMBER</td>
+              </tr>
+              <tr>
+                <td className="p-2">{AIRLINES[selectedAirline].name}</td>
+                <td className="p-2">{AIRLINES[selectedAirline].iataCode}</td>
+                <td className="p-2 font-bold">{mawbNumber}</td>
+                <td className="p-2">{AIRLINES[selectedAirline].iataCode} {String(Math.floor(100 + Math.random() * 900))}</td>
+              </tr>
+            </table>
+          </div>
+
           {/* Flight Information */}
           <div className="border border-black mb-3">
             <table className="w-full">
@@ -98,7 +164,7 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
                 <td className="font-bold p-2">ARRIVAL</td>
               </tr>
               <tr>
-                <td className="p-2">QR XXX (Placeholder)</td>
+                <td className="p-2">{AIRLINES[selectedAirline].iataCode} {String(Math.floor(100 + Math.random() * 900))}</td>
                 <td className="p-2">DOH → CMB</td>
                 <td className="p-2">{new Date().toLocaleDateString()} 23:59</td>
                 <td className="p-2">{new Date(Date.now() + 86400000).toLocaleDateString()} 06:30</td>
@@ -191,7 +257,6 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
           <div className="flex border-t border-black mt-3 pt-3">
             <div className="w-1/3 pr-3">
               <div className="text-xs font-bold mb-1">PREPARED BY:</div>
-              <div className="text-xs">Mohammed Rizwan</div>
               <div className="text-xs">Cargo Executive</div>
               <div className="text-xs">Date: {new Date().toLocaleDateString()}</div>
               <div className="border-t border-black mt-8 pt-1 text-center text-xs">
@@ -202,7 +267,6 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
             <div className="w-1/3 px-3 border-l border-black">
               <div className="text-xs font-bold mb-1">CHECKED BY:</div>
               <div className="text-xs">Operations Manager</div>
-              <div className="text-xs">Quality Control</div>
               <div className="text-xs">Date: {new Date().toLocaleDateString()}</div>
               <div className="border-t border-black mt-8 pt-1 text-center text-xs">
                 SIGNATURE & STAMP
@@ -211,8 +275,7 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
 
             <div className="w-1/3 pl-3 border-l border-black">
               <div className="text-xs font-bold mb-1">APPROVED BY:</div>
-              <div className="text-xs">Branch Manager</div>
-              <div className="text-xs">ALMARAAM LOGISTICS</div>
+              <div className="text-xs">Manager - Operations & Pricing</div>
               <div className="text-xs">Date: {new Date().toLocaleDateString()}</div>
               <div className="border-t border-black mt-8 pt-1 text-center text-xs">
                 MANAGER SIGNATURE
