@@ -61,7 +61,27 @@ const SriLankaInvoiceForm = () => {
   });
 
   // Package items state
+  // Package items state
   const [packageItems, setPackageItems] = useState<PackageItem[]>([]);
+  
+  // Load existing invoice if editing
+  useEffect(() => {
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/edit/')) {
+      const invoiceId = currentPath.split('/edit/')[1];
+      const storedInvoices = localStorage.getItem('sriLankaInvoices');
+      if (storedInvoices) {
+        const invoices = JSON.parse(storedInvoices);
+        const existingInvoice = invoices.find((inv: any) => inv.id === invoiceId);
+        if (existingInvoice) {
+          setFormData(existingInvoice);
+          if (existingInvoice.packageItems) {
+            setPackageItems(existingInvoice.packageItems);
+          }
+        }
+      }
+    }
+  }, []);
 
   // Sri Lanka specific data
   const CARGO_TYPES = ['GIFT CARGO', 'UPB CARGO'];
@@ -155,8 +175,8 @@ const SriLankaInvoiceForm = () => {
     const docFee = parseFloat(formData.documentsFee) || 0;
     const calculatedTotal = rate + docFee;
     
-    // Only update if there's a meaningful change and both values exist
-    if (calculatedTotal > 0 && parseFloat(formData.total) !== calculatedTotal) {
+    // Always update the total when rate or docs fee changes
+    if (rate > 0 || docFee > 0) {
       setFormData(prev => ({
         ...prev,
         total: calculatedTotal.toFixed(2)
@@ -285,7 +305,7 @@ const SriLankaInvoiceForm = () => {
       // Auto-generate job number if not present
       const jobNumber = formData.jobNumber || `SL-JOB-${Date.now()}`;
       
-      // Create invoice object with all form data and package items
+      // Create proper invoice structure for printing
       const invoiceData = {
         id: `sri-lanka-${Date.now()}`,
         ...formData,
@@ -293,7 +313,32 @@ const SriLankaInvoiceForm = () => {
         packageItems: packageItems,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
-        country: 'SRI LANKA'
+        country: 'SRI LANKA',
+        // Map to print structure
+        shipper: {
+          name: formData.shipperName,
+          address: `${formData.shipperCity}, ${formData.shipperCountry}`,
+          mobile: formData.shipperMobile
+        },
+        consignee: {
+          name: formData.consigneeName,
+          address: `${formData.consigneeAddress}, ${formData.consigneeDistrict}, SRI LANKA`,
+          mobile: formData.consigneeMobile,
+          idNumber: formData.consigneeId
+        },
+        packages: packageItems.map(item => ({
+          name: item.description,
+          length: parseFloat(item.length || '0'),
+          width: parseFloat(item.width || '0'),
+          height: parseFloat(item.height || '0'),
+          volume: (parseFloat(item.length || '0') * parseFloat(item.width || '0') * parseFloat(item.height || '0')) / 1000000
+        })),
+        totalWeight: parseFloat(formData.weight || '0'),
+        pricing: {
+          gross: parseFloat(formData.rate || '0') + parseFloat(formData.documentsFee || '0'),
+          discount: 0,
+          net: parseFloat(formData.total || '0')
+        }
       };
       
       // Add to existing invoices
@@ -315,21 +360,39 @@ const SriLankaInvoiceForm = () => {
   };
 
   const handlePreview = () => {
-    if (!formData.invoiceNumber) {
+    // For existing invoices, use saved ID, otherwise require save first
+    const currentInvoiceId = window.location.pathname.includes('/edit/') 
+      ? window.location.pathname.split('/edit/')[1] 
+      : null;
+    
+    if (!currentInvoiceId && !formData.invoiceNumber) {
       toast.error('Please save the invoice first before previewing');
       return;
     }
-    // Open preview in new tab
-    window.open(`/sri-lanka/invoice/print/preview_${formData.invoiceNumber}`, '_blank');
+    
+    if (currentInvoiceId) {
+      window.open(`/sri-lanka/invoice/print/${currentInvoiceId}`, '_blank');
+    } else {
+      window.open(`/sri-lanka/invoice/print/preview_${formData.invoiceNumber}`, '_blank');
+    }
   };
 
   const handlePrint = () => {
-    if (!formData.invoiceNumber) {
+    // For existing invoices, use saved ID, otherwise require save first
+    const currentInvoiceId = window.location.pathname.includes('/edit/') 
+      ? window.location.pathname.split('/edit/')[1] 
+      : null;
+    
+    if (!currentInvoiceId && !formData.invoiceNumber) {
       toast.error('Please save the invoice first before printing');
       return;
     }
-    // Open print in new tab
-    window.open(`/sri-lanka/invoice/print/preview_${formData.invoiceNumber}`, '_blank');
+    
+    if (currentInvoiceId) {
+      window.open(`/sri-lanka/invoice/print/${currentInvoiceId}`, '_blank');
+    } else {
+      window.open(`/sri-lanka/invoice/print/preview_${formData.invoiceNumber}`, '_blank');
+    }
   };
 
   // Package handlers

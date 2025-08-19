@@ -16,7 +16,7 @@ const SriLankaInvoicePrint = () => {
   const [invoiceData, setInvoiceData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isPaid, setIsPaid] = useState(false);
-  const [currentDocument, setCurrentDocument] = useState<'invoice' | 'hawb' | 'hbl' | 'air-manifest' | 'sea-manifest'>('invoice');
+  const [mode, setMode] = useState<'invoice' | 'hawb' | 'hbl' | 'air-manifest' | 'sea-manifest'>('invoice');
 
   useEffect(() => {
     if (id) {
@@ -169,26 +169,74 @@ const SriLankaInvoicePrint = () => {
       {/* Toolbar */}
       <div className="max-w-4xl mx-auto mb-6 no-print">
         <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-          <Button onClick={handleBack} variant="outline" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-          <Button onClick={handlePrint} className="flex items-center gap-2">
-            <Printer className="h-4 w-4" />
-            Print
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={handleBack} variant="outline" className="flex items-center gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+            <span className="text-sm font-medium ml-2">Invoice #{invoiceData?.invoiceNumber || 'Loading...'}</span>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <div className="flex border rounded-md overflow-hidden">
+              <button
+                onClick={() => setMode("invoice")}
+                className={`px-3 py-1.5 text-sm ${mode === "invoice" ? "bg-gray-100" : "hover:bg-gray-50"}`}
+              >
+                Invoice
+              </button>
+              {invoiceData?.serviceType === 'AIR FREIGHT' && (
+                <>
+                  <button
+                    onClick={() => setMode("hawb")}
+                    className={`px-3 py-1.5 text-sm border-l ${mode === "hawb" ? "bg-gray-100" : "hover:bg-gray-50"}`}
+                  >
+                    HAWB
+                  </button>
+                  <button
+                    onClick={() => setMode("air-manifest")}
+                    className={`px-3 py-1.5 text-sm border-l ${mode === "air-manifest" ? "bg-gray-100" : "hover:bg-gray-50"}`}
+                  >
+                    Air Manifest
+                  </button>
+                </>
+              )}
+              {invoiceData?.serviceType === 'SEA FREIGHT' && (
+                <>
+                  <button
+                    onClick={() => setMode("hbl")}
+                    className={`px-3 py-1.5 text-sm border-l ${mode === "hbl" ? "bg-gray-100" : "hover:bg-gray-50"}`}
+                  >
+                    HBL
+                  </button>
+                  <button
+                    onClick={() => setMode("sea-manifest")}
+                    className={`px-3 py-1.5 text-sm border-l ${mode === "sea-manifest" ? "bg-gray-100" : "hover:bg-gray-50"}`}
+                  >
+                    Sea Manifest
+                  </button>
+                </>
+              )}
+            </div>
+            <Button onClick={handlePrint} className="flex items-center gap-2">
+              <Printer className="h-4 w-4" />
+              Print Document
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Invoice Content */}
+      {/* Document Content */}
       <div className="max-w-4xl mx-auto bg-white shadow-lg" ref={printRef}>
         {invoiceData && (
-          <div className="border border-black">
-            {/* Header */}
-            <div className="flex p-2 border-b border-gray-300">
-              <div className="w-1/4 flex items-center justify-center">
-                <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Soqotra Logo" className="h-24 w-32 object-contain" />
-              </div>
+          <>
+            {mode === 'invoice' && (
+              <div className="border border-black">
+                {/* Header */}
+                <div className="flex p-2 border-b border-gray-300">
+                  <div className="w-1/4 flex items-center justify-center">
+                    <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Soqotra Logo" className="h-24 w-32 object-contain" />
+                  </div>
               
               <div className="w-1/4 flex items-center justify-center">
                 <QRCodeSVG 
@@ -344,7 +392,25 @@ const SriLankaInvoicePrint = () => {
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+            )}
+            
+            {mode === 'hawb' && invoiceData?.serviceType === 'AIR FREIGHT' && (
+              <SriLankaHAWB invoiceData={invoiceData} onPrint={handlePrint} />
+            )}
+            
+            {mode === 'hbl' && invoiceData?.serviceType === 'SEA FREIGHT' && (
+              <SriLankaHBL invoiceData={invoiceData} onPrint={handlePrint} />
+            )}
+            
+            {mode === 'air-manifest' && invoiceData?.serviceType === 'AIR FREIGHT' && (
+              <SriLankaAirManifest shipments={[invoiceData]} flightInfo={invoiceData} />
+            )}
+            
+            {mode === 'sea-manifest' && invoiceData?.serviceType === 'SEA FREIGHT' && (
+              <SriLankaSeaManifest shipments={[invoiceData]} vesselInfo={invoiceData} />
+            )}
+          </>
         )}
       </div>
     </div>
