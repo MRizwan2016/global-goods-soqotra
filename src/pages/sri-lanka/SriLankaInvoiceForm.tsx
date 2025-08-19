@@ -8,6 +8,8 @@ import { toast } from 'sonner';
 import { PackageItem } from '@/pages/invoicing/types/invoiceForm';
 import { packageOptions } from '@/data/packageOptions';
 import PackageDetailsSection from '@/pages/invoicing/components/PackageDetailsSection';
+import PaymentDetailsSection from './components/PaymentDetailsSection';
+import OfficialReceipt from './components/OfficialReceipt';
 import { 
   calculateAirFreightPricing, 
   calculateSeaFreightPricing,
@@ -17,6 +19,11 @@ import {
   AIR_FREIGHT_RATE_PER_KG,
   AIR_FREIGHT_DOCUMENTATION_FEE
 } from './utils/sriLankaPricing';
+import { 
+  getProvinceForDistrict, 
+  getAllDistricts, 
+  getAllProvinces 
+} from './utils/districtProvinceMapping';
 
 const SriLankaInvoiceForm = () => {
   const navigate = useNavigate();
@@ -35,6 +42,7 @@ const SriLankaInvoiceForm = () => {
     shipperMobile: '',
     consigneePrefix: '',
     consigneeName: '',
+    consigneeCountry: 'SRI LANKA', // Default to Sri Lanka
     consigneeDistrict: '',
     consigneeProvince: '',
     consigneeAddress: '',
@@ -52,6 +60,12 @@ const SriLankaInvoiceForm = () => {
     documentsFee: '0',
     total: '',
     paymentMethod: '',
+    paymentStatus: 'UNPAID',
+    paymentDate: '',
+    receiptNumber: '',
+    discount: '0',
+    packingCharges: '0',
+    transportationFee: '0',
     remarks: '',
     // Package details fields
     packagesName: '',
@@ -62,8 +76,10 @@ const SriLankaInvoiceForm = () => {
   });
 
   // Package items state
-  // Package items state
   const [packageItems, setPackageItems] = useState<PackageItem[]>([]);
+  
+  // Receipt modal state
+  const [showReceipt, setShowReceipt] = useState(false);
   
   // Load existing invoice if editing
   useEffect(() => {
@@ -170,22 +186,25 @@ const SriLankaInvoiceForm = () => {
     }
   }, [formData.serviceType, formData.weight, formData.volume, formData.terminal]);
 
-  // Auto-calculate total when rate or documentsFee changes
+  // Auto-calculate total when rate, documentsFee, discount, packing, or transport changes
   useEffect(() => {
     const rate = parseFloat(formData.rate?.toString() || '0') || 0;
     const docFee = parseFloat(formData.documentsFee?.toString() || '0') || 0;
-    const calculatedTotal = rate + docFee;
+    const discount = parseFloat(formData.discount?.toString() || '0') || 0;
+    const packing = parseFloat(formData.packingCharges?.toString() || '0') || 0;
+    const transport = parseFloat(formData.transportationFee?.toString() || '0') || 0;
+    const calculatedTotal = rate + docFee - discount + packing + transport;
     
-    console.log('Auto-calculation:', { rate, docFee, calculatedTotal, formDataRate: formData.rate, formDataDocFee: formData.documentsFee });
+    console.log('Auto-calculation:', { rate, docFee, discount, packing, transport, calculatedTotal });
     
-    // Always update the total when rate or docs fee changes
+    // Always update the total when any pricing field changes
     if (calculatedTotal >= 0) {
       setFormData(prev => ({
         ...prev,
-        total: calculatedTotal.toString()
+        total: calculatedTotal.toFixed(2)
       }));
     }
-  }, [formData.rate, formData.documentsFee]);
+  }, [formData.rate, formData.documentsFee, formData.discount, formData.packingCharges, formData.transportationFee]);
 
   // Auto-calculate volume from package dimensions
   useEffect(() => {
@@ -221,6 +240,14 @@ const SriLankaInvoiceForm = () => {
     setFormData(prev => {
       const updated = { ...prev, [name]: value };
       
+      // Auto-update province when district changes
+      if (name === 'consigneeDistrict') {
+        const province = getProvinceForDistrict(value);
+        if (province) {
+          updated.consigneeProvince = province;
+        }
+      }
+      
       // Set default values based on service type
       if (name === 'serviceType') {
         if (value === 'AIR FREIGHT') {
@@ -234,6 +261,12 @@ const SriLankaInvoiceForm = () => {
           updated.documentsFee = '';
           updated.total = '';
         }
+      }
+      
+      // Auto-generate receipt number when payment status changes to PAID
+      if (name === 'paymentStatus' && value === 'PAID' && !updated.receiptNumber) {
+        updated.receiptNumber = `REC-${Date.now()}`;
+        updated.paymentDate = new Date().toISOString().split('T')[0];
       }
       
       return updated;
@@ -299,16 +332,19 @@ const SriLankaInvoiceForm = () => {
     // Validate total calculation
     const rate = parseFloat(formData.rate) || 0;
     const docFee = parseFloat(formData.documentsFee) || 0;
-    const expectedTotal = rate + docFee;
+    const discount = parseFloat(formData.discount) || 0;
+    const packing = parseFloat(formData.packingCharges) || 0;
+    const transport = parseFloat(formData.transportationFee) || 0;
+    const expectedTotal = rate + docFee - discount + packing + transport;
     const actualTotal = parseFloat(formData.total) || 0;
     
     if (Math.abs(expectedTotal - actualTotal) > 0.01) {
-      console.log('Price mismatch:', { rate, docFee, expectedTotal, actualTotal });
+      console.log('Price mismatch:', { rate, docFee, discount, packing, transport, expectedTotal, actualTotal });
       setFormData(prev => ({
         ...prev,
         total: expectedTotal.toFixed(2)
       }));
-      toast.warning('Total price was adjusted to match rate + documentation fee');
+      toast.warning('Total price was adjusted to match calculated total');
     }
     
     try {
@@ -335,7 +371,7 @@ const SriLankaInvoiceForm = () => {
         },
         consignee: {
           name: formData.consigneeName,
-          address: `${formData.consigneeAddress}, ${formData.consigneeDistrict}, SRI LANKA`,
+          address: `${formData.consigneeAddress}, ${formData.consigneeDistrict}, ${formData.consigneeCountry}`,
           mobile: formData.consigneeMobile,
           idNumber: formData.consigneeId
         },
@@ -349,9 +385,16 @@ const SriLankaInvoiceForm = () => {
         totalWeight: parseFloat(formData.weight || '0'),
         pricing: {
           gross: parseFloat(formData.rate || '0') + parseFloat(formData.documentsFee || '0'),
-          discount: 0,
+          discount: parseFloat(formData.discount || '0'),
           net: parseFloat(formData.total || '0')
-        }
+        },
+        // Payment details
+        paymentStatus: formData.paymentStatus,
+        paymentMethod: formData.paymentMethod,
+        paymentDate: formData.paymentDate,
+        receiptNumber: formData.receiptNumber,
+        packingCharges: parseFloat(formData.packingCharges || '0'),
+        transportationFee: parseFloat(formData.transportationFee || '0')
       };
       
       // Add to existing invoices
@@ -370,6 +413,20 @@ const SriLankaInvoiceForm = () => {
       console.error('Error saving invoice:', error);
       toast.error('Failed to save invoice. Please try again.');
     }
+  };
+
+  const handlePrintReceipt = () => {
+    if (formData.paymentStatus !== 'PAID') {
+      toast.error('Receipt can only be generated for paid invoices');
+      return;
+    }
+    
+    if (!formData.receiptNumber) {
+      toast.error('Receipt number is required');
+      return;
+    }
+    
+    setShowReceipt(true);
   };
 
   const handlePreview = () => {
@@ -844,32 +901,40 @@ const SriLankaInvoiceForm = () => {
                   className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DISTRICT</label>
-                <Select value={formData.consigneeDistrict} onValueChange={(value) => handleSelectChange('consigneeDistrict', value)}>
-                  <SelectTrigger className="bg-white/80 border-purple-200 focus:border-purple-400">
-                    <SelectValue placeholder="SELECT DISTRICT" className="uppercase" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60 overflow-y-auto">
-                    {DISTRICTS.map(district => (
-                      <SelectItem key={district} value={district} className="uppercase">{district.toUpperCase()}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PROVINCE</label>
-                <Select value={formData.consigneeProvince} onValueChange={(value) => handleSelectChange('consigneeProvince', value)}>
-                  <SelectTrigger className="bg-white/80 border-purple-200 focus:border-purple-400">
-                    <SelectValue placeholder="SELECT PROVINCE" className="uppercase" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white/95 backdrop-blur-sm">
-                    {PROVINCES.map(province => (
-                      <SelectItem key={province} value={province} className="uppercase">{province.toUpperCase()}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+               <div>
+                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">COUNTRY</label>
+                 <Input
+                   name="consigneeCountry"
+                   value={formData.consigneeCountry}
+                   onChange={handleInputChange}
+                   className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase"
+                   readOnly
+                 />
+               </div>
+               <div>
+                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DISTRICT</label>
+                 <Select value={formData.consigneeDistrict} onValueChange={(value) => handleSelectChange('consigneeDistrict', value)}>
+                   <SelectTrigger className="bg-white/80 border-purple-200 focus:border-purple-400">
+                     <SelectValue placeholder="SELECT DISTRICT" className="uppercase" />
+                   </SelectTrigger>
+                   <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60 overflow-y-auto">
+                     {getAllDistricts().map(district => (
+                       <SelectItem key={district} value={district} className="uppercase">{district}</SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
+               </div>
+               <div>
+                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PROVINCE</label>
+                 <Input
+                   name="consigneeProvince"
+                   value={formData.consigneeProvince}
+                   onChange={handleInputChange}
+                   placeholder="AUTO-FILLED FROM DISTRICT"
+                   className="bg-gray-50 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
+                   readOnly
+                 />
+               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">MOBILE NUMBER</label>
                 <Input
@@ -1032,39 +1097,108 @@ const SriLankaInvoiceForm = () => {
 
           {/* Payment & Additional Details */}
           <div className="p-6 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-b-xl">
-            <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-indigo-800 uppercase">
-              <Phone className="h-5 w-5" />
-              PAYMENT & ADDITIONAL DETAILS
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PAYMENT METHOD</label>
-                <Select value={formData.paymentMethod} onValueChange={(value) => handleSelectChange('paymentMethod', value)}>
-                  <SelectTrigger className="bg-white/80 border-indigo-200 focus:border-indigo-400">
-                    <SelectValue placeholder="SELECT PAYMENT METHOD" className="uppercase" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white/95 backdrop-blur-sm">
-                    <SelectItem value="cash" className="uppercase">💵 CASH</SelectItem>
-                    <SelectItem value="card" className="uppercase">💳 CARD</SelectItem>
-                    <SelectItem value="bank_transfer" className="uppercase">🏦 BANK TRANSFER</SelectItem>
-                    <SelectItem value="cheque" className="uppercase">📝 CHEQUE</SelectItem>
-                  </SelectContent>
-                </Select>
+            <PaymentDetailsSection 
+              formData={formData}
+              handleInputChange={handleInputChange}
+              handleSelectChange={handleSelectChange}
+            />
+            
+            {/* Receipt Print Button */}
+            {formData.paymentStatus === 'PAID' && (
+              <div className="mt-4 flex justify-center">
+                <Button 
+                  onClick={handlePrintReceipt}
+                  className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
+                >
+                  <Printer className="h-4 w-4 mr-2" />
+                  Print Official Receipt
+                </Button>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">REMARKS</label>
-                <Input
-                  name="remarks"
-                  value={formData.remarks}
-                  onChange={handleInputChange}
-                  placeholder="ADDITIONAL REMARKS"
-                  className="bg-white/80 border-indigo-200 focus:border-indigo-400 uppercase placeholder:uppercase"
-                />
-              </div>
+            )}
+            
+            <div className="mt-4">
+              <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">REMARKS</label>
+              <Input
+                name="remarks"
+                value={formData.remarks}
+                onChange={handleInputChange}
+                placeholder="ADDITIONAL REMARKS"
+                className="bg-white/80 border-indigo-200 focus:border-indigo-400 uppercase placeholder:uppercase"
+              />
             </div>
           </div>
         </div>
       </div>
+      
+      {/* Receipt Modal */}
+      {showReceipt && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-4 border-b flex justify-between items-center">
+              <h2 className="text-xl font-bold">Official Receipt</h2>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => {
+                    const printWindow = window.open('', '_blank');
+                    if (printWindow) {
+                      const receiptElement = document.getElementById('receipt-content');
+                      if (receiptElement) {
+                        printWindow.document.write(`
+                          <!DOCTYPE html>
+                          <html>
+                            <head>
+                              <title>Official Receipt</title>
+                              <style>
+                                body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+                                table { width: 100%; border-collapse: collapse; }
+                                th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+                                .font-bold { font-weight: bold; }
+                                .text-center { text-align: center; }
+                                .text-right { text-align: right; }
+                                .text-red-600 { color: #dc2626; }
+                                .bg-gray-100 { background-color: #f3f4f6; }
+                                img { max-width: 100%; height: auto; }
+                              </style>
+                            </head>
+                            <body>
+                              ${receiptElement.innerHTML}
+                            </body>
+                          </html>
+                        `);
+                        printWindow.document.close();
+                        printWindow.print();
+                      }
+                    }
+                  }}
+                  className="bg-blue-500 hover:bg-blue-600"
+                >
+                  <Printer className="h-4 w-4 mr-2" />
+                  Print
+                </Button>
+                <Button variant="outline" onClick={() => setShowReceipt(false)}>
+                  Close
+                </Button>
+              </div>
+            </div>
+            <div id="receipt-content" className="p-4">
+              <OfficialReceipt 
+                receiptData={{
+                  receiptNumber: formData.receiptNumber || '',
+                  invoiceNumber: formData.invoiceNumber || '',
+                  date: formData.date || '',
+                  paymentDate: formData.paymentDate || '',
+                  consigneeName: formData.consigneeName || '',
+                  paymentMethod: formData.paymentMethod || '',
+                  total: formData.total || '0',
+                  discount: formData.discount || '0',
+                  packingCharges: formData.packingCharges || '0',
+                  transportationFee: formData.transportationFee || '0'
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
