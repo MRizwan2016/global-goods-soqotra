@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Printer, Download } from 'lucide-react';
 
@@ -27,19 +28,20 @@ const AIRLINES: Record<string, AirlineInfo> = {
 const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo }) => {
   const printRef = useRef<HTMLDivElement>(null);
   const [selectedAirline, setSelectedAirline] = useState<string>('qatar');
-  const [mawbNumber, setMawbNumber] = useState<string>('');
+  const [mawbSuffix, setMawbSuffix] = useState<string>('');
+  const [flightNumber, setFlightNumber] = useState<string>('');
 
   const manifestNumber = `AM${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}001`;
   
-  const generateMawbNumber = (airlineKey: string) => {
-    const airline = AIRLINES[airlineKey];
-    const randomSuffix = Math.floor(100000 + Math.random() * 900000);
-    return `${airline.prefix}-${randomSuffix}`;
+  const getMawbNumber = () => {
+    const airline = AIRLINES[selectedAirline];
+    return mawbSuffix ? `${airline.prefix}-${mawbSuffix}` : `${airline.prefix}-`;
   };
 
-  React.useEffect(() => {
-    setMawbNumber(generateMawbNumber(selectedAirline));
-  }, [selectedAirline]);
+  const getFlightNumber = () => {
+    const airline = AIRLINES[selectedAirline];
+    return flightNumber ? `${airline.iataCode} ${flightNumber}` : `${airline.iataCode} `;
+  };
 
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
@@ -107,8 +109,24 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
             </Select>
           </div>
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium">MAWB:</label>
-            <span className="px-2 py-1 bg-gray-100 rounded text-sm font-mono">{mawbNumber}</span>
+            <label className="text-sm font-medium">MAWB Suffix:</label>
+            <Input 
+              type="text" 
+              placeholder="8-9 digits" 
+              value={mawbSuffix}
+              onChange={(e) => setMawbSuffix(e.target.value)}
+              className="w-32"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium">Flight No:</label>
+            <Input 
+              type="text" 
+              placeholder="Flight number" 
+              value={flightNumber}
+              onChange={(e) => setFlightNumber(e.target.value)}
+              className="w-32"
+            />
           </div>
           <Button onClick={handlePrint} className="flex items-center gap-2">
             <Printer className="h-4 w-4" />
@@ -148,8 +166,8 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
               <tr>
                 <td className="p-2">{AIRLINES[selectedAirline].name}</td>
                 <td className="p-2">{AIRLINES[selectedAirline].iataCode}</td>
-                <td className="p-2 font-bold">{mawbNumber}</td>
-                <td className="p-2">{AIRLINES[selectedAirline].iataCode} {String(Math.floor(100 + Math.random() * 900))}</td>
+                <td className="p-2 font-bold">{getMawbNumber()}</td>
+                <td className="p-2">{getFlightNumber()}</td>
               </tr>
             </table>
           </div>
@@ -164,7 +182,7 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
                 <td className="font-bold p-2">ARRIVAL</td>
               </tr>
               <tr>
-                <td className="p-2">{AIRLINES[selectedAirline].iataCode} {String(Math.floor(100 + Math.random() * 900))}</td>
+                <td className="p-2">{getFlightNumber()}</td>
                 <td className="p-2">DOH → CMB</td>
                 <td className="p-2">{new Date().toLocaleDateString()} 23:59</td>
                 <td className="p-2">{new Date(Date.now() + 86400000).toLocaleDateString()} 06:30</td>
@@ -210,10 +228,10 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
                 {shipments.length > 0 ? shipments.map((shipment, index) => (
                   <tr key={index}>
                     <td className="border border-black p-1 text-center text-xs">{index + 1}</td>
-                    <td className="border border-black p-1 text-xs">HAWB-{shipment.invoiceNumber || `SL${index + 1}`}</td>
-                    <td className="border border-black p-1 text-xs">{shipment.shipperName || "SHIPPER NAME"}</td>
-                    <td className="border border-black p-1 text-xs">{shipment.consigneeName || "CONSIGNEE NAME"}</td>
-                    <td className="border border-black p-1 text-xs">{shipment.consigneeDistrict || "COLOMBO"}</td>
+                    <td className="border border-black p-1 text-xs">HAWB-{shipment.awbNumber || shipment.invoiceNumber || `SL${index + 1}`}</td>
+                    <td className="border border-black p-1 text-xs">{shipment.shipper || shipment.shipperName || "SHIPPER NAME"}</td>
+                    <td className="border border-black p-1 text-xs">{shipment.consignee || shipment.consigneeName || "CONSIGNEE NAME"}</td>
+                    <td className="border border-black p-1 text-xs">{shipment.destination || shipment.consigneeDistrict || "COLOMBO"}</td>
                     <td className="border border-black p-1 text-center text-xs">{shipment.pieces || 1}</td>
                     <td className="border border-black p-1 text-center text-xs">{shipment.weight || "25.0"}</td>
                     <td className="border border-black p-1 text-xs">{shipment.description || "PERSONAL EFFECTS"}</td>
