@@ -249,10 +249,16 @@ const TunisiaDashboard: React.FC = () => {
                     <div>
                       <p className="font-medium">{invoice.customer.name}</p>
                       <p className="text-sm text-muted-foreground">{invoice.customer.mobile}</p>
+                      {invoice.hblNumber && (
+                        <p className="text-xs text-blue-600 font-medium">HBL: {invoice.hblNumber}</p>
+                      )}
                     </div>
                     <div>
                       <p className="font-medium">{invoice.vehicle.make} {invoice.vehicle.model}</p>
                       <p className="text-sm text-muted-foreground">{invoice.vehicle.year} • {invoice.vehicle.color}</p>
+                      {invoice.vehicle.exportPlate && (
+                        <p className="text-xs text-green-600 font-medium">Export: {invoice.vehicle.exportPlate}</p>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -292,10 +298,11 @@ const TunisiaDashboard: React.FC = () => {
               Load vehicles and personal effects into containers with photo documentation.
             </p>
             <div className="space-y-2 text-xs">
-              <div>• Vehicle Types: Sedan, SUV, Hilux, Double Pickup</div>
+              <div>• Vehicle Types: Sedan, SUV, Hilux, Double Pickup, Station Wagon, Super Saloon, Saloon</div>
               <div>• Container Types: 40' HC, 45'</div>
               <div>• Photo Upload for Documentation</div>
               <div>• Personal Effects: QAR 600/CBM</div>
+              <div>• Auto-fill from Invoices</div>
             </div>
           </CardContent>
         </Card>
@@ -333,9 +340,11 @@ const TunisiaDashboard: React.FC = () => {
             </p>
             <div className="space-y-2 text-xs">
               <div>• Customer & Vehicle Details</div>
+              <div>• House B/L Number Management</div>
               <div>• Personal Effects Documentation</div>
               <div>• Photo Upload & Management</div>
               <div>• Auto-fill Loading Details</div>
+              <div>• Payment Receipt Generation</div>
             </div>
           </CardContent>
         </Card>
@@ -349,6 +358,8 @@ const TunisiaDashboard: React.FC = () => {
               <div><strong>Sedan Cars:</strong> QAR 5,000 - 6,000</div>
               <div><strong>SUV & Hilux:</strong> QAR 6,000</div>
               <div><strong>Double Pickup:</strong> QAR 6,500 - 7,000</div>
+              <div><strong>Station Wagon & Super Saloon:</strong> QAR 5,500 - 6,000</div>
+              <div><strong>Saloon:</strong> QAR 5,000 - 5,500</div>
               <div><strong>Personal Effects:</strong> QAR 600/CBM</div>
             </div>
           </CardContent>

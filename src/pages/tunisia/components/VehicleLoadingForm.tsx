@@ -139,6 +139,9 @@ const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
                 <SelectItem value="SUV">SUV (QAR 6000)</SelectItem>
                 <SelectItem value="HILUX">Hilux (QAR 6000)</SelectItem>
                 <SelectItem value="DOUBLE_PICKUP">Double Pickup (QAR 6500-7000)</SelectItem>
+                <SelectItem value="STATION_WAGON">Station Wagon (QAR 5500-6000)</SelectItem>
+                <SelectItem value="SUPER_SALOON">Super Saloon (QAR 5500-6000)</SelectItem>
+                <SelectItem value="SALOON">Saloon (QAR 5000-5500)</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -222,9 +225,43 @@ const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
             <label className="text-sm font-medium">Export Plate</label>
             <Input
               value={vehicle.exportPlate}
-              onChange={(e) => setVehicle({...vehicle, exportPlate: e.target.value})}
-              placeholder="3805674"
+              onChange={(e) => {
+                const exportPlate = e.target.value;
+                setVehicle({...vehicle, exportPlate});
+                
+                // Auto-populate from existing invoices
+                if (exportPlate.trim()) {
+                  const matchingInvoice = invoices.find(invoice => 
+                    invoice.vehicle.exportPlate.toLowerCase() === exportPlate.toLowerCase()
+                  );
+                  
+                  if (matchingInvoice) {
+                    setVehicle(prev => ({
+                      ...prev,
+                      make: matchingInvoice.vehicle.make,
+                      model: matchingInvoice.vehicle.model,
+                      year: matchingInvoice.vehicle.year,
+                      color: matchingInvoice.vehicle.color,
+                      chassisNumber: matchingInvoice.vehicle.chassisNumber,
+                      plateNumber: matchingInvoice.vehicle.plateNumber,
+                      engineNumber: matchingInvoice.vehicle.engineNumber,
+                      country: matchingInvoice.vehicle.country,
+                      hsCode: matchingInvoice.vehicle.hsCode,
+                      type: matchingInvoice.vehicle.type,
+                      freightCharge: matchingInvoice.vehicle.freightCharge,
+                      customerInfo: matchingInvoice.customer
+                    }));
+                  }
+                }
+              }}
+              placeholder="3805674 - Auto-fills details from invoice"
+              className="bg-yellow-50 border-yellow-300"
             />
+            {vehicle.customerInfo && (
+              <div className="text-xs text-green-600 mt-1">
+                ✓ Auto-filled from invoice for {vehicle.customerInfo.name}
+              </div>
+            )}
           </div>
         </div>
 

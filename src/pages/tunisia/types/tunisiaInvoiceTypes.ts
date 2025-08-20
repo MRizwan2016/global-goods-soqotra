@@ -10,6 +10,7 @@ export interface TunisiaCustomer {
 export interface TunisiaInvoice {
   id: string;
   invoiceNumber: string;
+  hblNumber?: string;
   customer: TunisiaCustomer;
   vehicle: {
     make: string;
@@ -22,7 +23,7 @@ export interface TunisiaInvoice {
     country: string;
     hsCode: string;
     exportPlate: string;
-    type: "SEDAN" | "SUV" | "HILUX" | "DOUBLE_PICKUP";
+    type: "SEDAN" | "SUV" | "HILUX" | "DOUBLE_PICKUP" | "STATION_WAGON" | "SUPER_SALOON" | "SALOON";
     freightCharge: number;
     photos: string[];
   };

@@ -57,6 +57,10 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
     existingInvoice?.invoiceNumber || `TN-${Date.now()}`
   );
 
+  const [hblNumber, setHblNumber] = useState(
+    existingInvoice?.hblNumber || `2025/`
+  );
+
   const handleVehicleTypeChange = (type: string) => {
     const selectedType = type as "SEDAN" | "SUV" | "HILUX" | "DOUBLE_PICKUP";
     const rate = VEHICLE_RATES.find(r => r.type === selectedType);
@@ -132,6 +136,7 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
     const invoice: TunisiaInvoice = {
       id: existingInvoice?.id || Date.now().toString(),
       invoiceNumber,
+      hblNumber,
       customer: {
         ...customer,
         id: customer.id || Date.now().toString()
@@ -228,6 +233,9 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                   <SelectItem value="SUV">SUV</SelectItem>
                   <SelectItem value="HILUX">Hilux</SelectItem>
                   <SelectItem value="DOUBLE_PICKUP">Double Pickup</SelectItem>
+                  <SelectItem value="STATION_WAGON">Station Wagon</SelectItem>
+                  <SelectItem value="SUPER_SALOON">Super Saloon</SelectItem>
+                  <SelectItem value="SALOON">Saloon</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -456,6 +464,15 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                 value={invoiceNumber}
                 onChange={(e) => setInvoiceNumber(e.target.value)}
                 className="w-48 text-right"
+              />
+            </div>
+            <div className="flex justify-between">
+              <span>House B/L Number:</span>
+              <Input
+                value={hblNumber}
+                onChange={(e) => setHblNumber(e.target.value)}
+                className="w-48 text-right"
+                placeholder="2025/XXXXX"
               />
             </div>
             <div className="flex justify-between">
