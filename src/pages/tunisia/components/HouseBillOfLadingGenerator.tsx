@@ -108,7 +108,7 @@ const HouseBillOfLadingGenerator: React.FC<HouseBillOfLadingGeneratorProps> = ({
         return {
           ...prev,
           [nested]: {
-            ...prev[nested as keyof HouseBillOfLading],
+            ...(prev[nested as keyof HouseBillOfLading] as any),
             [field]: value
           }
         };

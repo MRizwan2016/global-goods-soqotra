@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Camera, Upload, X } from "lucide-react";
 import { TunisiaVehicle, VEHICLE_RATES } from "../types/tunisiaTypes";
+import { TunisiaInvoice } from "../types/tunisiaInvoiceTypes";
 
 interface VehicleLoadingFormProps {
   onVehicleAdd: (vehicle: Omit<TunisiaVehicle, 'id'>) => void;
