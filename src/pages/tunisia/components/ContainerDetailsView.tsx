@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Truck, Calendar, MapPin, Hash, Lock } from "lucide-react";
+import { ArrowLeft, Truck, Calendar, MapPin, Hash, Lock, FileText } from "lucide-react";
 import { TunisiaContainer } from "../types/tunisiaTypes";
+import HouseBillOfLadingGenerator from "./HouseBillOfLadingGenerator";
 
 interface ContainerDetailsViewProps {
   container: TunisiaContainer;
@@ -14,15 +15,31 @@ const ContainerDetailsView: React.FC<ContainerDetailsViewProps> = ({
   container,
   onBack
 }) => {
+  const [showHBLGenerator, setShowHBLGenerator] = useState(false);
+
+  if (showHBLGenerator) {
+    return (
+      <HouseBillOfLadingGenerator
+        container={container}
+        onBack={() => setShowHBLGenerator(false)}
+      />
+    );
+  }
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
+        <div className="flex gap-4">
           <Button variant="outline" onClick={onBack}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Sealed Containers
           </Button>
+          <Button onClick={() => setShowHBLGenerator(true)}>
+            <FileText className="h-4 w-4 mr-2" />
+            Generate House Bill of Lading
+          </Button>
+        </div>
           <div>
             <h2 className="text-2xl font-bold text-primary">
               Container Details: {container.containerNumber}

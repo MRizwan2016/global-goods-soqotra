@@ -14,6 +14,14 @@ export interface TunisiaVehicle {
   photos: string[];
   freightCharge: number;
   loadedAt?: string;
+  customerInfo?: {
+    id: string;
+    name: string;
+    address: string;
+    mobile: string;
+    email?: string;
+    idNumber?: string;
+  };
 }
 
 export interface PersonalEffects {

@@ -13,6 +13,7 @@ interface ContainerLoadingViewProps {
   onVehicleAdd: (vehicle: Omit<TunisiaVehicle, 'id'>) => void;
   onPersonalEffectsAdd: (effects: Omit<PersonalEffects, 'id'>) => void;
   onContainerSeal: () => void;
+  invoices: any[];
 }
 
 const ContainerLoadingView: React.FC<ContainerLoadingViewProps> = ({
@@ -20,7 +21,8 @@ const ContainerLoadingView: React.FC<ContainerLoadingViewProps> = ({
   onBack,
   onVehicleAdd,
   onPersonalEffectsAdd,
-  onContainerSeal
+  onContainerSeal,
+  invoices
 }) => {
   const [activeForm, setActiveForm] = useState<'none' | 'vehicle' | 'effects'>('none');
 
@@ -47,6 +49,7 @@ const ContainerLoadingView: React.FC<ContainerLoadingViewProps> = ({
         onCancel={() => setActiveForm('none')}
         maxVehicles={container.maxVehicles}
         currentVehicleCount={container.loadedVehicles.length}
+        invoices={invoices}
       />
     );
   }

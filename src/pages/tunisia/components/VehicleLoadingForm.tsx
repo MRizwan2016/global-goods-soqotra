@@ -11,14 +11,18 @@ interface VehicleLoadingFormProps {
   onCancel: () => void;
   maxVehicles: number;
   currentVehicleCount: number;
+  invoices: TunisiaInvoice[];
 }
 
 const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
   onVehicleAdd,
   onCancel,
   maxVehicles,
-  currentVehicleCount
+  currentVehicleCount,
+  invoices
 }) => {
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<TunisiaInvoice | null>(null);
   const [vehicle, setVehicle] = useState<Partial<TunisiaVehicle>>({
     type: "SEDAN",
     make: "",
