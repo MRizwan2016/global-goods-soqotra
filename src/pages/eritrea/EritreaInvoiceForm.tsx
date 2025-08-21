@@ -454,6 +454,17 @@ const EritreaInvoiceForm = () => {
                 />
               </div>
 
+              {/* HBL Number */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">HBL NUMBER:</label>
+                <Input
+                  type="text"
+                  value={formData.hblNumber || ""}
+                  onChange={(e) => handleFormChange('hblNumber', e.target.value)}
+                  placeholder="Enter HBL Number"
+                />
+              </div>
+
               {/* Invoice Date */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">INVOICE DATE:</label>

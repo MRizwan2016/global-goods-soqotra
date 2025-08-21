@@ -27,6 +27,7 @@ export interface EritreaFormData {
   district: string;
   jobNumber: string;
   jobDate: string;
+  hblNumber?: string;
   
   // Invoice Book Details
   bookNumber: string;

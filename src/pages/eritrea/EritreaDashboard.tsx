@@ -111,6 +111,14 @@ const EritreaDashboard = () => {
               Add New
             </Button>
             <Button 
+              variant="secondary"
+              className="gap-2"
+              onClick={() => navigate("/eritrea/hbl/generate")}
+            >
+              <FileText className="h-4 w-4" />
+              Generate House Bill of Lading
+            </Button>
+            <Button 
               variant="outline"
               className="gap-2"
               onClick={() => {
