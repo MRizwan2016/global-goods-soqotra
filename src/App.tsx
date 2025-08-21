@@ -1,6 +1,7 @@
 
 import { Toaster } from "sonner";
 import AppRoutes from "@/components/routing/AppRoutes";
+import { useAutoBackup } from "@/hooks/useAutoBackup";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 
@@ -8,6 +9,9 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import "./App.css";
 
 function App() {
+  // Enable auto-backup every 30 minutes
+  useAutoBackup(30, true);
+
   return (
     <AuthProvider>
       <LanguageProvider>

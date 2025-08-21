@@ -30,6 +30,7 @@ import NotFound from "@/pages/NotFound";
 import Index from "@/pages/Index";
 import Landing from "@/pages/Landing";
 import InvoicePrint from "@/pages/invoicing/InvoicePrint";
+import { DataBackupManager } from "@/components/data-backup/DataBackupManager";
 
 const baseRoutes: RouteConfig[] = [
   {
@@ -51,6 +52,12 @@ const baseRoutes: RouteConfig[] = [
     path: "/invoicing/print/:id",
     element: InvoicePrint,
     private: true
+  },
+  {
+    path: "/data-backup",
+    element: DataBackupManager,
+    private: true,
+    requiredPermission: "controlPanel"
   },
   {
     path: "*",
