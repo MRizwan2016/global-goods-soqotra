@@ -308,6 +308,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             accountCountryFiles: true
           }
         }
+      },
+      {
+        id: "user-yousif",
+        fullName: "YOUSIF ALI IBRAHIM",
+        email: "yousifalibrahimi55@gmail.com",
+        mobileNumber: "+974 9999 1111",
+        country: "Qatar",
+        isActive: true,
+        isAdmin: false,
+        createdAt: new Date().toISOString(),
+        permissions: {
+          masterData: true,
+          dataEntry: true,
+          reports: true,
+          downloads: true,
+          accounting: false,
+          controlPanel: false,
+          cargoDelivery: true,
+          accountFunctions: false,
+          accountRegistrations: false,
+          accountFinancialEntities: false,
+          accountCountryReconciliations: false,
+          files: {
+            salesRep: true,
+            town: true,
+            item: true,
+            packageOptions: true,
+            sellingRates: true,
+            container: true,
+            vessel: true,
+            invoiceBook: true,
+            driverHelper: true,
+            invoicing: true,
+            paymentReceivable: true,
+            loadContainer: true,
+            loadVessel: true,
+            loadAirCargo: true,
+            packingList: true,
+            cargoReports: true,
+            financialReports: true,
+            shippingReports: true,
+            paymentMethods: false,
+            reconciliation: false,
+            profitLoss: false,
+            accountFunctionFiles: false,
+            accountRegistrationFiles: false,
+            accountFinancialFiles: false,
+            accountCountryFiles: false
+          }
+        }
       }
     ];
     
@@ -326,7 +376,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       "user-1753610771083": "123456", // LAHIRU CHATHURANGA
       "user-1755499093379": "123456", // MOHAMED IDRIS MOHAMED (GM)
       "user-documentation": "123456", // DOCUMENTATION USER
-      "user-accounts": "123456"       // ACCOUNTS USER
+      "user-accounts": "123456",      // ACCOUNTS USER
+      "user-yousif": "123456"         // YOUSIF ALI IBRAHIM
     };
     
     // Ensure passwords are accessible immediately
