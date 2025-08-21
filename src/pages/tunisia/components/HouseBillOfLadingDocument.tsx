@@ -7,7 +7,7 @@ interface HouseBillOfLadingDocumentProps {
 
 const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingDocumentProps> = ({ hbl }) => {
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-white print:p-4 print:shadow-none shadow-lg">
+    <div className="max-w-4xl mx-auto p-8 bg-white print:p-0 print:m-0 print:max-w-none print:shadow-none shadow-lg bill-of-lading-document">
       {/* Header */}
       <div className="border-2 border-black mb-4">
         <div className="grid grid-cols-12 text-xs">

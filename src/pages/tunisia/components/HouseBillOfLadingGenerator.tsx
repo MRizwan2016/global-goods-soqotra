@@ -8,6 +8,7 @@ import { FileText, Download, ArrowLeft } from "lucide-react";
 import { TunisiaContainer } from "../types/tunisiaTypes";
 import { HouseBillOfLading } from "../types/tunisiaInvoiceTypes";
 import HouseBillOfLadingDocument from "./HouseBillOfLadingDocument";
+import TunisiaPrintStyles from "./TunisiaPrintStyles";
 
 interface HouseBillOfLadingGeneratorProps {
   container: TunisiaContainer;
@@ -126,19 +127,24 @@ const HouseBillOfLadingGenerator: React.FC<HouseBillOfLadingGeneratorProps> = ({
 
   if (showPreview) {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-4 print:hidden">
-          <Button variant="outline" onClick={() => setShowPreview(false)}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Edit Details
-          </Button>
-          <Button onClick={handlePrint}>
-            <Download className="h-4 w-4 mr-2" />
-            Print / Download
-          </Button>
+      <>
+        <TunisiaPrintStyles />
+        <div className="space-y-4">
+          <div className="flex items-center gap-4 print:hidden no-print">
+            <Button variant="outline" onClick={() => setShowPreview(false)}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Edit Details
+            </Button>
+            <Button onClick={handlePrint}>
+              <Download className="h-4 w-4 mr-2" />
+              Print / Download
+            </Button>
+          </div>
+          <div id="hbl-printable-content" className="print:block">
+            <HouseBillOfLadingDocument hbl={hblData} />
+          </div>
         </div>
-        <HouseBillOfLadingDocument hbl={hblData} />
-      </div>
+      </>
     );
   }
 
