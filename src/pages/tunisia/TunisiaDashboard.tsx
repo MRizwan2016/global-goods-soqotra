@@ -12,6 +12,7 @@ import ContainerLoadingView from "./components/ContainerLoadingView";
 import SealedContainersView from "./components/SealedContainersView";
 import ContainerDetailsView from "./components/ContainerDetailsView";
 import TunisiaInvoiceForm from "./components/TunisiaInvoiceForm";
+import LoadingRecordsView from "./components/LoadingRecordsView";
 import { Button } from "@/components/ui/button";
 
 const TunisiaDashboard: React.FC = () => {
@@ -19,7 +20,7 @@ const TunisiaDashboard: React.FC = () => {
   const [containers, setContainers] = useState<TunisiaContainer[]>([]);
   const [selectedContainer, setSelectedContainer] = useState<TunisiaContainer | null>(null);
   const [invoices, setInvoices] = useState<TunisiaInvoice[]>([]);
-  const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading' | 'sealed-containers' | 'container-details' | 'invoice-form' | 'invoice-management'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading' | 'sealed-containers' | 'container-details' | 'invoice-form' | 'invoice-management' | 'loading-records'>('dashboard');
 
   const handleContainerCreate = (containerData: Omit<TunisiaContainer, 'id'>) => {
     const newContainer: TunisiaContainer = {
@@ -97,10 +98,43 @@ const TunisiaDashboard: React.FC = () => {
   const handleInvoiceSave = (invoice: TunisiaInvoice) => {
     if (invoices.find(inv => inv.id === invoice.id)) {
       setInvoices(prev => prev.map(inv => inv.id === invoice.id ? invoice : inv));
+      // Update any container vehicles that match the updated invoice
+      syncInvoiceToContainers(invoice);
     } else {
       setInvoices(prev => [...prev, invoice]);
     }
     setView('invoice-management');
+  };
+
+  // Sync invoice updates to loaded vehicles in containers
+  const syncInvoiceToContainers = (updatedInvoice: TunisiaInvoice) => {
+    setContainers(prev => prev.map(container => ({
+      ...container,
+      loadedVehicles: container.loadedVehicles.map(vehicle => {
+        // Match by export plate or chassis number
+        if (vehicle.exportPlate === updatedInvoice.vehicle.exportPlate ||
+            vehicle.chassisNumber === updatedInvoice.vehicle.chassisNumber) {
+          return {
+            ...vehicle,
+            make: updatedInvoice.vehicle.make,
+            model: updatedInvoice.vehicle.model,
+            year: updatedInvoice.vehicle.year,
+            color: updatedInvoice.vehicle.color,
+            chassisNumber: updatedInvoice.vehicle.chassisNumber,
+            plateNumber: updatedInvoice.vehicle.plateNumber,
+            engineNumber: updatedInvoice.vehicle.engineNumber,
+            country: updatedInvoice.vehicle.country,
+            hsCode: updatedInvoice.vehicle.hsCode,
+            exportPlate: updatedInvoice.vehicle.exportPlate,
+            type: updatedInvoice.vehicle.type,
+            freightCharge: updatedInvoice.vehicle.freightCharge,
+            photos: updatedInvoice.vehicle.photos,
+            customerInfo: updatedInvoice.customer
+          };
+        }
+        return vehicle;
+      })
+    })));
   };
 
   if (view === 'container-select') {
@@ -188,6 +222,23 @@ const TunisiaDashboard: React.FC = () => {
         <TunisiaInvoiceForm
           onBack={() => setView('invoice-management')}
           onInvoiceSave={handleInvoiceSave}
+        />
+      </Layout>
+    );
+  }
+
+  if (view === 'loading-records') {
+    return (
+      <Layout title="Tunisia Loading Records">
+        <div className="mb-8">
+          <div className="flex justify-between mb-4">
+            <CountryBackButton />
+            <LanguageSwitcher />
+          </div>
+        </div>
+        <LoadingRecordsView
+          containers={containers}
+          onBack={() => setView('dashboard')}
         />
       </Layout>
     );
@@ -345,6 +396,28 @@ const TunisiaDashboard: React.FC = () => {
               <div>• Photo Upload & Management</div>
               <div>• Auto-fill Loading Details</div>
               <div>• Payment Receipt Generation</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="cursor-pointer hover:shadow-lg transition-shadow border-2 border-purple-200 hover:border-purple-400"
+          onClick={() => setView('loading-records')}
+        >
+          <CardHeader>
+            <CardTitle className="text-purple-600">Loading Records</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              View comprehensive loading history and records for all vehicles and personal effects.
+            </p>
+            <div className="space-y-2 text-xs">
+              <div>• Complete Loading History</div>
+              <div>• Vehicle & Customer Records</div>
+              <div>• Personal Effects Tracking</div>
+              <div>• Revenue Summary Reports</div>
+              <div>• Container-wise Analysis</div>
+              <div>• Export Documentation</div>
             </div>
           </CardContent>
         </Card>

@@ -232,7 +232,7 @@ const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
                 // Auto-populate from existing invoices
                 if (exportPlate.trim()) {
                   const matchingInvoice = invoices.find(invoice => 
-                    invoice.vehicle.exportPlate.toLowerCase() === exportPlate.toLowerCase()
+                    invoice.vehicle.exportPlate?.toLowerCase().trim() === exportPlate.toLowerCase().trim()
                   );
                   
                   if (matchingInvoice) {
@@ -249,6 +249,7 @@ const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
                       hsCode: matchingInvoice.vehicle.hsCode,
                       type: matchingInvoice.vehicle.type,
                       freightCharge: matchingInvoice.vehicle.freightCharge,
+                      photos: matchingInvoice.vehicle.photos || [],
                       customerInfo: matchingInvoice.customer
                     }));
                   }

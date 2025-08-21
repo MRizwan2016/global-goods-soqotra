@@ -160,6 +160,20 @@ const ContainerDetailsView: React.FC<ContainerDetailsViewProps> = ({
                       </Badge>
                     </div>
                     
+                    {/* Customer Information */}
+                    {vehicle.customerInfo && (
+                      <div className="bg-blue-50 border border-blue-200 rounded p-2 mb-3">
+                        <div className="text-xs text-blue-700 font-medium mb-1">Customer Information:</div>
+                        <div className="text-xs">
+                          <div className="font-medium">{vehicle.customerInfo.name}</div>
+                          <div className="text-muted-foreground">{vehicle.customerInfo.mobile}</div>
+                          {vehicle.customerInfo.email && (
+                            <div className="text-muted-foreground">{vehicle.customerInfo.email}</div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="grid grid-cols-2 gap-2 text-sm mb-3">
                       <div>
                         <span className="text-muted-foreground">Make/Model:</span>
@@ -191,7 +205,7 @@ const ContainerDetailsView: React.FC<ContainerDetailsViewProps> = ({
                       </div>
                       <div>
                         <span className="text-muted-foreground">Export Plate:</span>
-                        <div className="font-medium">{vehicle.exportPlate}</div>
+                        <div className="font-medium text-blue-600 font-semibold">{vehicle.exportPlate}</div>
                       </div>
                       <div>
                         <span className="text-muted-foreground">HS Code:</span>
