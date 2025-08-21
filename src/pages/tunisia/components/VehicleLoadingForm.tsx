@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Camera, Upload, X } from "lucide-react";
 import { TunisiaVehicle, VEHICLE_RATES } from "../types/tunisiaTypes";
 import { TunisiaInvoice } from "../types/tunisiaInvoiceTypes";
+import { TunisiaStorageService } from "../services/TunisiaStorageService";
 
 interface VehicleLoadingFormProps {
   onVehicleAdd: (vehicle: Omit<TunisiaVehicle, 'id'>) => void;
@@ -229,11 +230,9 @@ const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
                 const exportPlate = e.target.value;
                 setVehicle({...vehicle, exportPlate});
                 
-                // Auto-populate from existing invoices
+                // Auto-populate from existing invoices using storage service
                 if (exportPlate.trim()) {
-                  const matchingInvoice = invoices.find(invoice => 
-                    invoice.vehicle.exportPlate?.toLowerCase().trim() === exportPlate.toLowerCase().trim()
-                  );
+                  const matchingInvoice = TunisiaStorageService.getInvoiceByExportPlate(exportPlate);
                   
                   if (matchingInvoice) {
                     setVehicle(prev => ({

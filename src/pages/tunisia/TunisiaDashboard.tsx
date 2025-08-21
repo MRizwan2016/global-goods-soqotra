@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CountryBackButton from "@/components/ui/country-back-button";
@@ -14,6 +14,8 @@ import ContainerDetailsView from "./components/ContainerDetailsView";
 import TunisiaInvoiceForm from "./components/TunisiaInvoiceForm";
 import LoadingRecordsView from "./components/LoadingRecordsView";
 import { Button } from "@/components/ui/button";
+import { TunisiaStorageService } from "./services/TunisiaStorageService";
+import { toast } from "sonner";
 
 const TunisiaDashboard: React.FC = () => {
   const { language } = useLanguage();
@@ -22,12 +24,31 @@ const TunisiaDashboard: React.FC = () => {
   const [invoices, setInvoices] = useState<TunisiaInvoice[]>([]);
   const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading' | 'sealed-containers' | 'container-details' | 'invoice-form' | 'invoice-management' | 'loading-records'>('dashboard');
 
+  // Load data on component mount
+  useEffect(() => {
+    const loadedInvoices = TunisiaStorageService.loadInvoices();
+    const loadedContainers = TunisiaStorageService.loadContainers();
+    
+    setInvoices(loadedInvoices);
+    setContainers(loadedContainers);
+    
+    console.log('Loaded Tunisia data:', { 
+      invoices: loadedInvoices.length, 
+      containers: loadedContainers.length 
+    });
+  }, []);
+
   const handleContainerCreate = (containerData: Omit<TunisiaContainer, 'id'>) => {
     const newContainer: TunisiaContainer = {
       ...containerData,
       id: Date.now().toString()
     };
+    
+    // Save to storage
+    TunisiaStorageService.addContainer(newContainer);
     setContainers(prev => [...prev, newContainer]);
+    
+    toast.success("Container created successfully!");
   };
 
   const handleContainerSelect = (container: TunisiaContainer) => {
@@ -51,9 +72,14 @@ const TunisiaDashboard: React.FC = () => {
       totalCharge: selectedContainer.totalFreightCharge + newVehicle.freightCharge + selectedContainer.totalPersonalEffectsCharge
     };
 
+    // Save to storage
+    TunisiaStorageService.updateContainer(updatedContainer);
+    
     // Update container in state
     setContainers(prev => prev.map(c => c.id === selectedContainer.id ? updatedContainer : c));
     setSelectedContainer(updatedContainer);
+    
+    toast.success(`Vehicle loaded successfully! (${updatedContainer.loadedVehicles.length}/${updatedContainer.maxVehicles})`);
   };
 
   const handlePersonalEffectsAdd = (effectsData: Omit<PersonalEffects, 'id'>) => {
@@ -71,9 +97,14 @@ const TunisiaDashboard: React.FC = () => {
       totalCharge: selectedContainer.totalFreightCharge + selectedContainer.totalPersonalEffectsCharge + newEffects.charges
     };
 
+    // Save to storage
+    TunisiaStorageService.updateContainer(updatedContainer);
+    
     // Update container in state
     setContainers(prev => prev.map(c => c.id === selectedContainer.id ? updatedContainer : c));
     setSelectedContainer(updatedContainer);
+    
+    toast.success("Personal effects added successfully!");
   };
 
   const handleContainerSeal = () => {
@@ -84,8 +115,14 @@ const TunisiaDashboard: React.FC = () => {
       status: 'SEALED'
     };
 
+    // Save to storage
+    TunisiaStorageService.updateContainer(updatedContainer);
+    
     setContainers(prev => prev.map(c => c.id === selectedContainer.id ? updatedContainer : c));
     setSelectedContainer(updatedContainer);
+    
+    toast.success("Container sealed successfully!");
+    
     // Auto-navigate to sealed containers view after sealing
     setView('sealed-containers');
   };
@@ -96,18 +133,27 @@ const TunisiaDashboard: React.FC = () => {
   };
 
   const handleInvoiceSave = (invoice: TunisiaInvoice) => {
+    // Save to storage first
+    TunisiaStorageService.addInvoice(invoice);
+    
     if (invoices.find(inv => inv.id === invoice.id)) {
       setInvoices(prev => prev.map(inv => inv.id === invoice.id ? invoice : inv));
       // Update any container vehicles that match the updated invoice
       syncInvoiceToContainers(invoice);
+      toast.success("Invoice updated successfully!");
     } else {
       setInvoices(prev => [...prev, invoice]);
+      toast.success("Invoice created successfully!");
     }
     setView('invoice-management');
   };
 
   // Sync invoice updates to loaded vehicles in containers
   const syncInvoiceToContainers = (updatedInvoice: TunisiaInvoice) => {
+    // Use storage service for proper sync
+    TunisiaStorageService.syncInvoiceToContainers(updatedInvoice);
+    
+    // Also update local state
     setContainers(prev => prev.map(container => ({
       ...container,
       loadedVehicles: container.loadedVehicles.map(vehicle => {
