@@ -8,11 +8,11 @@ const Landing = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // If authenticated, redirect to dashboard, otherwise to login
+    // If authenticated, redirect to dashboard, otherwise to registration
     if (isAuthenticated) {
       navigate("/dashboard");
     } else {
-      navigate("/login");
+      navigate("/admin/register");
     }
   }, [isAuthenticated, navigate]);
 
