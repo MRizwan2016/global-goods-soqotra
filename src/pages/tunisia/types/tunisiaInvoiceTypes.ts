@@ -1,8 +1,10 @@
 export interface TunisiaCustomer {
   id: string;
+  prefix?: "MR." | "MRS." | "MS." | "DR." | "PROF.";
   name: string;
   address: string;
   mobile: string;
+  metrashMobile?: string;
   email?: string;
   idNumber?: string;
 }
@@ -34,9 +36,18 @@ export interface TunisiaInvoice {
     charges: number;
     photos: string[];
   }[];
+  supportingDocuments?: string[];
   totalAmount: number;
   date: string;
   status: "DRAFT" | "CONFIRMED" | "LOADED";
+}
+
+export interface PaymentDetails {
+  method: "CASH" | "CARD" | "BANK_TRANSFER" | "CHEQUE";
+  transactionId?: string;
+  amount: number;
+  date: string;
+  notes?: string;
 }
 
 export interface HouseBillOfLading {

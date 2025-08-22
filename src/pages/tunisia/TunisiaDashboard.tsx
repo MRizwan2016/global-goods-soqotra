@@ -13,6 +13,8 @@ import SealedContainersView from "./components/SealedContainersView";
 import ContainerDetailsView from "./components/ContainerDetailsView";
 import TunisiaInvoiceForm from "./components/TunisiaInvoiceForm";
 import LoadingRecordsView from "./components/LoadingRecordsView";
+import TunisiaPaymentReceiptGenerator from "./components/TunisiaPaymentReceiptGenerator";
+import TunisiaHBLGenerator from "./components/TunisiaHBLGenerator";
 import { Button } from "@/components/ui/button";
 import { TunisiaStorageService } from "./services/TunisiaStorageService";
 import { toast } from "sonner";
@@ -22,7 +24,8 @@ const TunisiaDashboard: React.FC = () => {
   const [containers, setContainers] = useState<TunisiaContainer[]>([]);
   const [selectedContainer, setSelectedContainer] = useState<TunisiaContainer | null>(null);
   const [invoices, setInvoices] = useState<TunisiaInvoice[]>([]);
-  const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading' | 'sealed-containers' | 'container-details' | 'invoice-form' | 'invoice-management' | 'loading-records'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading' | 'sealed-containers' | 'container-details' | 'invoice-form' | 'invoice-management' | 'loading-records' | 'payment-receipt' | 'hbl-generator'>('dashboard');
+  const [selectedInvoice, setSelectedInvoice] = useState<TunisiaInvoice | null>(null);
 
   // Load data on component mount
   useEffect(() => {
@@ -342,10 +345,13 @@ const TunisiaDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <p className="font-medium">{invoice.customer.name}</p>
+                      <p className="font-medium">{invoice.customer.prefix} {invoice.customer.name}</p>
                       <p className="text-sm text-muted-foreground">{invoice.customer.mobile}</p>
+                      {invoice.customer.metrashMobile && (
+                        <p className="text-xs text-purple-600 font-medium">Metrash: {invoice.customer.metrashMobile}</p>
+                      )}
                       {invoice.hblNumber && (
                         <p className="text-xs text-blue-600 font-medium">HBL: {invoice.hblNumber}</p>
                       )}
@@ -358,11 +364,73 @@ const TunisiaDashboard: React.FC = () => {
                       )}
                     </div>
                   </div>
+
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedInvoice(invoice);
+                        setView('payment-receipt');
+                      }}
+                    >
+                      Payment Receipt
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        // Edit invoice functionality can be added here
+                        console.log('Edit invoice:', invoice.id);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             ))
           )}
         </div>
+      </Layout>
+    );
+  }
+
+  if (view === 'payment-receipt' && selectedInvoice) {
+    return (
+      <Layout title="Tunisia Payment Receipt">
+        <div className="mb-8">
+          <div className="flex justify-between mb-4">
+            <CountryBackButton />
+            <LanguageSwitcher />
+          </div>
+        </div>
+        <TunisiaPaymentReceiptGenerator
+          invoice={selectedInvoice}
+          onBack={() => {
+            setView('invoice-management');
+            setSelectedInvoice(null);
+          }}
+        />
+      </Layout>
+    );
+  }
+
+  if (view === 'hbl-generator') {
+    return (
+      <Layout title="Tunisia HBL Generator">
+        <div className="mb-8">
+          <div className="flex justify-between mb-4">
+            <CountryBackButton />
+            <LanguageSwitcher />
+          </div>
+        </div>
+        <TunisiaHBLGenerator
+          invoices={invoices}
+          onBack={() => setView('dashboard')}
+        />
       </Layout>
     );
   }
@@ -455,15 +523,35 @@ const TunisiaDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground mb-4">
-              View comprehensive loading history and records for all vehicles and personal effects.
+              View comprehensive loading records and container utilization reports.
             </p>
             <div className="space-y-2 text-xs">
-              <div>• Complete Loading History</div>
-              <div>• Vehicle & Customer Records</div>
-              <div>• Personal Effects Tracking</div>
-              <div>• Revenue Summary Reports</div>
-              <div>• Container-wise Analysis</div>
-              <div>• Export Documentation</div>
+              <div>• Container Loading History</div>
+              <div>• Vehicle Loading Timeline</div>
+              <div>• Personal Effects Summary</div>
+              <div>• Photo Documentation Archive</div>
+              <div>• Financial Summary Reports</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="cursor-pointer hover:shadow-lg transition-shadow border-2 border-orange-200 hover:border-orange-400"
+          onClick={() => setView('hbl-generator')}
+        >
+          <CardHeader>
+            <CardTitle className="text-orange-600">House Bill of Lading</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Generate House Bill of Lading documents for customer invoices.
+            </p>
+            <div className="space-y-2 text-xs">
+              <div>• Auto-fill from Invoice Details</div>
+              <div>• One HBL per Customer Invoice</div>
+              <div>• Professional Documentation</div>
+              <div>• Print & Preview Options</div>
+              <div>• Customer Consignee Details</div>
             </div>
           </CardContent>
         </Card>

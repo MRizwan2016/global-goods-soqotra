@@ -23,9 +23,11 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
   const [customer, setCustomer] = useState<TunisiaCustomer>(
     existingInvoice?.customer || {
       id: "",
+      prefix: "MR.",
       name: "",
       address: "",
       mobile: "",
+      metrashMobile: "",
       email: "",
       idNumber: ""
     }
@@ -54,7 +56,11 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
   );
 
   const [invoiceNumber, setInvoiceNumber] = useState(
-    existingInvoice?.invoiceNumber || `TN-${Date.now()}`
+    existingInvoice?.invoiceNumber || `2025/${String(Date.now()).slice(-6)}`
+  );
+  
+  const [supportingDocuments, setSupportingDocuments] = useState<string[]>(
+    existingInvoice?.supportingDocuments || []
   );
 
   const [hblNumber, setHblNumber] = useState(
@@ -132,6 +138,28 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
     return vehicleTotal + effectsTotal;
   };
 
+  const handleAddDocument = (url: string) => {
+    if (url.trim()) {
+      setSupportingDocuments(prev => [...prev, url.trim()]);
+    }
+  };
+
+  const handleRemoveDocument = (index: number) => {
+    setSupportingDocuments(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDocumentUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        handleAddDocument(result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = () => {
     const invoice: TunisiaInvoice = {
       id: existingInvoice?.id || Date.now().toString(),
@@ -143,6 +171,7 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
       },
       vehicle,
       personalEffects: personalEffects.length > 0 ? personalEffects : undefined,
+      supportingDocuments: supportingDocuments.length > 0 ? supportingDocuments : undefined,
       totalAmount: calculateTotal(),
       date: new Date().toISOString().split('T')[0],
       status: "DRAFT"
@@ -170,13 +199,32 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label>Customer Name *</Label>
-              <Input
-                value={customer.name}
-                onChange={(e) => setCustomer(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="Enter customer name"
-              />
+            <div className="md:col-span-2">
+              <div className="grid grid-cols-3 gap-2">
+                <div>
+                  <Label>Prefix</Label>
+                  <Select value={customer.prefix} onValueChange={(value) => setCustomer(prev => ({ ...prev, prefix: value as any }))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="MR.">MR.</SelectItem>
+                      <SelectItem value="MRS.">MRS.</SelectItem>
+                      <SelectItem value="MS.">MS.</SelectItem>
+                      <SelectItem value="DR.">DR.</SelectItem>
+                      <SelectItem value="PROF.">PROF.</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-2">
+                  <Label>Customer Name *</Label>
+                  <Input
+                    value={customer.name}
+                    onChange={(e) => setCustomer(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="Enter customer name"
+                  />
+                </div>
+              </div>
             </div>
             <div>
               <Label>Mobile Number *</Label>
@@ -184,6 +232,14 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                 value={customer.mobile}
                 onChange={(e) => setCustomer(prev => ({ ...prev, mobile: e.target.value }))}
                 placeholder="Enter mobile number"
+              />
+            </div>
+            <div>
+              <Label>Metrash Registered Mobile No.</Label>
+              <Input
+                value={customer.metrashMobile}
+                onChange={(e) => setCustomer(prev => ({ ...prev, metrashMobile: e.target.value }))}
+                placeholder="Enter Metrash mobile number"
               />
             </div>
             <div className="md:col-span-2">
@@ -210,6 +266,54 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                 onChange={(e) => setCustomer(prev => ({ ...prev, idNumber: e.target.value }))}
                 placeholder="Enter ID number"
               />
+            </div>
+          </div>
+          
+          {/* Supporting Documents */}
+          <div>
+            <Label>Supporting Documents</Label>
+            <div className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter document URL"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleAddDocument((e.target as HTMLInputElement).value);
+                      (e.target as HTMLInputElement).value = '';
+                    }
+                  }}
+                />
+                <input
+                  type="file"
+                  accept="image/*,.pdf,.doc,.docx"
+                  onChange={handleDocumentUpload}
+                  style={{ display: 'none' }}
+                  id="document-file-upload"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => document.getElementById('document-file-upload')?.click()}
+                >
+                  <Upload className="h-4 w-4" />
+                </Button>
+              </div>
+              {supportingDocuments.length > 0 && (
+                <div className="space-y-2">
+                  {supportingDocuments.map((doc, index) => (
+                    <div key={index} className="flex items-center justify-between p-2 border rounded">
+                      <span className="text-sm truncate">{doc.slice(0, 50)}...</span>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleRemoveDocument(index)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
