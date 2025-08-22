@@ -33,8 +33,12 @@ export interface TunisiaInvoice {
     description: string;
     quantity: number;
     volume: number; // CBM
+    grossWeight: number; // KG
     charges: number;
     photos: string[];
+    ownerName: string;
+    loadingLocation: "INSIDE_CAR" | "OUTSIDE_CAR";
+    requiresHBL: boolean;
   }[];
   supportingDocuments?: string[];
   totalAmount: number;

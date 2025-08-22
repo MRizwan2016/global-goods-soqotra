@@ -29,9 +29,13 @@ export interface PersonalEffects {
   description: string;
   quantity: number;
   volume: number; // in CBM
+  grossWeight: number; // in KG
   photos: string[];
   hsCode: string;
-  charges: number; // QAR 600/CBM
+  charges: number; // QAR 600/CBM only for OUTSIDE_CAR
+  ownerName: string;
+  loadingLocation: "INSIDE_CAR" | "OUTSIDE_CAR";
+  requiresHBL: boolean;
 }
 
 export interface TunisiaContainer {

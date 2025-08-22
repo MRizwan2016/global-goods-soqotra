@@ -110,8 +110,12 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
       description: "",
       quantity: 1,
       volume: 1,
+      grossWeight: 0,
       charges: PERSONAL_EFFECTS_RATE,
-      photos: []
+      photos: [],
+      ownerName: "",
+      loadingLocation: "OUTSIDE_CAR",
+      requiresHBL: true
     }]);
   };
 
@@ -120,7 +124,11 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
       if (i === index) {
         const updated = { ...effect, [field]: value };
         if (field === 'volume') {
-          updated.charges = value * PERSONAL_EFFECTS_RATE;
+          updated.charges = effect.loadingLocation === "OUTSIDE_CAR" ? value * PERSONAL_EFFECTS_RATE : 0;
+        }
+        if (field === 'loadingLocation') {
+          updated.charges = value === "OUTSIDE_CAR" ? effect.volume * PERSONAL_EFFECTS_RATE : 0;
+          updated.requiresHBL = value === "OUTSIDE_CAR";
         }
         return updated;
       }
@@ -552,7 +560,7 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label>Description</Label>
                       <Input
@@ -560,6 +568,26 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                         onChange={(e) => updatePersonalEffect(index, 'description', e.target.value)}
                         placeholder="Describe the items"
                       />
+                    </div>
+                    <div>
+                      <Label>Owner Name *</Label>
+                      <Input
+                        value={effect.ownerName}
+                        onChange={(e) => updatePersonalEffect(index, 'ownerName', e.target.value)}
+                        placeholder="Enter owner's name"
+                      />
+                    </div>
+                    <div>
+                      <Label>Loading Location *</Label>
+                      <Select value={effect.loadingLocation} onValueChange={(value) => updatePersonalEffect(index, 'loadingLocation', value)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="OUTSIDE_CAR">Outside Car (Charges Apply)</SelectItem>
+                          <SelectItem value="INSIDE_CAR">Inside Car (No Charges)</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     <div>
                       <Label>Quantity</Label>
@@ -573,16 +601,37 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                       <Label>Volume (CBM)</Label>
                       <Input
                         type="number"
-                        step="0.1"
+                        step="0.01"
                         value={effect.volume}
                         onChange={(e) => updatePersonalEffect(index, 'volume', Number(e.target.value))}
                       />
                     </div>
+                    <div>
+                      <Label>Gross Weight (KG)</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        value={effect.grossWeight}
+                        onChange={(e) => updatePersonalEffect(index, 'grossWeight', Number(e.target.value))}
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">
-                      Charges: QAR {effect.charges.toLocaleString()} (QAR 600/CBM)
-                    </p>
+                  
+                  {/* Charging Information */}
+                  <div className={`p-3 rounded-lg border ${effect.loadingLocation === "INSIDE_CAR" ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">
+                        {effect.loadingLocation === "INSIDE_CAR" 
+                          ? "✓ No charges - Inside car loading"
+                          : `⚠️ Charges: QAR ${effect.charges.toLocaleString()} (QAR ${PERSONAL_EFFECTS_RATE}/CBM)`
+                        }
+                      </span>
+                      {effect.requiresHBL && (
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          HBL Required
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}

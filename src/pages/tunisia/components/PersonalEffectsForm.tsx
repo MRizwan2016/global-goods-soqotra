@@ -19,18 +19,40 @@ const PersonalEffectsForm: React.FC<PersonalEffectsFormProps> = ({
     description: "",
     quantity: 1,
     volume: 0,
+    grossWeight: 0,
     photos: [],
     hsCode: "980100",
-    charges: 0
+    charges: 0,
+    ownerName: "",
+    loadingLocation: "OUTSIDE_CAR",
+    requiresHBL: false
   });
 
   const [photoInput, setPhotoInput] = useState("");
 
   const handleVolumeChange = (volume: number) => {
-    setEffects({
-      ...effects,
-      volume,
-      charges: volume * PERSONAL_EFFECTS_RATE
+    setEffects(prev => {
+      const charges = prev.loadingLocation === "OUTSIDE_CAR" ? volume * PERSONAL_EFFECTS_RATE : 0;
+      const requiresHBL = prev.loadingLocation === "OUTSIDE_CAR";
+      return {
+        ...prev,
+        volume,
+        charges,
+        requiresHBL
+      };
+    });
+  };
+
+  const handleLoadingLocationChange = (location: "INSIDE_CAR" | "OUTSIDE_CAR") => {
+    setEffects(prev => {
+      const charges = location === "OUTSIDE_CAR" ? (prev.volume || 0) * PERSONAL_EFFECTS_RATE : 0;
+      const requiresHBL = location === "OUTSIDE_CAR";
+      return {
+        ...prev,
+        loadingLocation: location,
+        charges,
+        requiresHBL
+      };
     });
   };
 
@@ -69,7 +91,7 @@ const PersonalEffectsForm: React.FC<PersonalEffectsFormProps> = ({
   };
 
   const handleSubmit = () => {
-    if (effects.description && effects.quantity && effects.volume) {
+    if (effects.description && effects.quantity && effects.volume && effects.ownerName) {
       onPersonalEffectsAdd(effects as Omit<PersonalEffects, 'id'>);
     }
   };
@@ -95,6 +117,25 @@ const PersonalEffectsForm: React.FC<PersonalEffectsFormProps> = ({
             />
           </div>
           <div>
+            <label className="text-sm font-medium">Owner Name *</label>
+            <Input
+              value={effects.ownerName}
+              onChange={(e) => setEffects({...effects, ownerName: e.target.value})}
+              placeholder="Enter owner's name"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium">Loading Location *</label>
+            <select
+              value={effects.loadingLocation}
+              onChange={(e) => handleLoadingLocationChange(e.target.value as "INSIDE_CAR" | "OUTSIDE_CAR")}
+              className="w-full px-3 py-2 border border-input bg-background rounded-md text-sm"
+            >
+              <option value="OUTSIDE_CAR">Outside Car (Charges Apply)</option>
+              <option value="INSIDE_CAR">Inside Car (No Charges)</option>
+            </select>
+          </div>
+          <div>
             <label className="text-sm font-medium">Quantity</label>
             <Input
               type="number"
@@ -113,8 +154,8 @@ const PersonalEffectsForm: React.FC<PersonalEffectsFormProps> = ({
           </div>
         </div>
 
-        {/* Volume and Pricing */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Volume, Weight and Pricing */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="text-sm font-medium">Volume (CBM)</label>
             <Input
@@ -126,9 +167,19 @@ const PersonalEffectsForm: React.FC<PersonalEffectsFormProps> = ({
             />
           </div>
           <div>
+            <label className="text-sm font-medium">Gross Weight (KG)</label>
+            <Input
+              type="number"
+              step="0.1"
+              value={effects.grossWeight}
+              onChange={(e) => setEffects({...effects, grossWeight: Number(e.target.value)})}
+              placeholder="0.0"
+            />
+          </div>
+          <div>
             <label className="text-sm font-medium">Rate (QAR/CBM)</label>
             <Input
-              value={PERSONAL_EFFECTS_RATE}
+              value={effects.loadingLocation === "OUTSIDE_CAR" ? PERSONAL_EFFECTS_RATE : "FREE"}
               disabled
               className="bg-gray-100"
             />
@@ -138,9 +189,24 @@ const PersonalEffectsForm: React.FC<PersonalEffectsFormProps> = ({
             <Input
               value={effects.charges?.toFixed(2)}
               disabled
-              className="bg-gray-100 font-semibold text-primary"
+              className={`bg-gray-100 font-semibold ${effects.charges === 0 ? 'text-green-600' : 'text-primary'}`}
             />
           </div>
+        </div>
+
+        {/* Charging Notice */}
+        <div className={`p-4 rounded-lg border ${effects.loadingLocation === "INSIDE_CAR" ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+          <p className="text-sm font-medium">
+            {effects.loadingLocation === "INSIDE_CAR" 
+              ? "✓ No charges applied - Personal effects loaded inside the car"
+              : `⚠️ Charges applied - Personal effects loaded outside the car (QAR ${PERSONAL_EFFECTS_RATE}/CBM)`
+            }
+          </p>
+          {effects.loadingLocation === "OUTSIDE_CAR" && (
+            <p className="text-xs text-muted-foreground mt-1">
+              HBL (House Bill of Lading) will be required for customs clearance.
+            </p>
+          )}
         </div>
 
         {/* Photo Upload Section */}
@@ -205,7 +271,7 @@ const PersonalEffectsForm: React.FC<PersonalEffectsFormProps> = ({
           <Button 
             onClick={handleSubmit}
             className="flex-1 bg-primary hover:bg-primary/90"
-            disabled={!effects.description || !effects.quantity || !effects.volume}
+            disabled={!effects.description || !effects.quantity || !effects.volume || !effects.ownerName}
           >
             Add Personal Effects
           </Button>
