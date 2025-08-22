@@ -2,19 +2,23 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Eye, Truck, Calendar, Package, Car } from "lucide-react";
+import { ArrowLeft, Eye, Truck, Calendar, Package, Car, Unlock } from "lucide-react";
 import { TunisiaContainer } from "../types/tunisiaTypes";
 
 interface SealedContainersViewProps {
   containers: TunisiaContainer[];
   onBack: () => void;
   onContainerView: (container: TunisiaContainer) => void;
+  onContainerReopen?: (containerId: string) => void;
+  isAdmin?: boolean;
 }
 
 const SealedContainersView: React.FC<SealedContainersViewProps> = ({
   containers,
   onBack,
-  onContainerView
+  onContainerView,
+  onContainerReopen,
+  isAdmin = false
 }) => {
   const sealedContainers = containers.filter(container => container.status === 'SEALED');
 
@@ -135,15 +139,28 @@ const SealedContainersView: React.FC<SealedContainersViewProps> = ({
                   </div>
                 )}
 
-                {/* View Details Button */}
-                <Button 
-                  onClick={() => onContainerView(container)}
-                  className="w-full mt-3"
-                  variant="outline"
-                >
-                  <Eye className="h-4 w-4 mr-2" />
-                  View Details
-                </Button>
+                {/* Action Buttons */}
+                <div className="flex gap-2 mt-3">
+                  <Button 
+                    onClick={() => onContainerView(container)}
+                    className="flex-1"
+                    variant="outline"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Details
+                  </Button>
+                  {isAdmin && onContainerReopen && (
+                    <Button 
+                      onClick={() => onContainerReopen(container.id)}
+                      variant="outline"
+                      size="icon"
+                      className="text-orange-600 hover:text-orange-700 border-orange-300 hover:border-orange-400"
+                      title="Reopen for more loading (Admin only)"
+                    >
+                      <Unlock className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}

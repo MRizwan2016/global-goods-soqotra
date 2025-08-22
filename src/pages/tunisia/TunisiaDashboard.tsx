@@ -131,6 +131,23 @@ const TunisiaDashboard: React.FC = () => {
     setView('sealed-containers');
   };
 
+  const handleContainerReopen = (containerId: string) => {
+    const container = containers.find(c => c.id === containerId);
+    if (!container) return;
+
+    const updatedContainer: TunisiaContainer = {
+      ...container,
+      status: 'LOADING'
+    };
+
+    // Save to storage
+    TunisiaStorageService.updateContainer(updatedContainer);
+    
+    setContainers(prev => prev.map(c => c.id === containerId ? updatedContainer : c));
+    
+    toast.success("Container reopened for additional loading!");
+  };
+
   const handleContainerView = (container: TunisiaContainer) => {
     setSelectedContainer(container);
     setView('container-details');
@@ -238,6 +255,8 @@ const TunisiaDashboard: React.FC = () => {
           containers={containers}
           onBack={() => setView('dashboard')}
           onContainerView={handleContainerView}
+          onContainerReopen={handleContainerReopen}
+          isAdmin={true}
         />
       </Layout>
     );

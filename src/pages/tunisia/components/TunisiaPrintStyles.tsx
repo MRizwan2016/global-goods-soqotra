@@ -113,7 +113,23 @@ const TunisiaPrintStyles = () => {
           .layout-sidebar,
           .page-header:not(.document-header),
           .page-nav,
-          .content-header:not(.document-header) {
+          .content-header:not(.document-header),
+          .layout-container,
+          .layout-wrapper,
+          .app-layout,
+          [data-radix-portal],
+          .dialog-overlay,
+          .dialog-content > div:first-child:not(.receipt-content):not(.hbl-content),
+          .lovable-app-sidebar,
+          .app-container > aside,
+          .app-container > nav,
+          .print-dialog-actions,
+          .system-admin-info,
+          .logout-section,
+          .url-display,
+          .browser-chrome,
+          .print-options,
+          .print-controls {
             display: none !important;
           }
           
