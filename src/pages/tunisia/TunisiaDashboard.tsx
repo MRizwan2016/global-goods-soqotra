@@ -33,12 +33,19 @@ const TunisiaDashboard: React.FC = () => {
     const loadedInvoices = TunisiaStorageService.loadInvoices();
     const loadedContainers = TunisiaStorageService.loadContainers();
     
+    console.log('Raw localStorage data:', {
+      invoicesData: localStorage.getItem('tunisia-invoices'),
+      containersData: localStorage.getItem('tunisia-containers')
+    });
+    
     setInvoices(loadedInvoices);
     setContainers(loadedContainers);
     
     console.log('Loaded Tunisia data:', { 
       invoices: loadedInvoices.length, 
-      containers: loadedContainers.length 
+      containers: loadedContainers.length,
+      invoiceDetails: loadedInvoices,
+      containerDetails: loadedContainers
     });
   }, []);
 
