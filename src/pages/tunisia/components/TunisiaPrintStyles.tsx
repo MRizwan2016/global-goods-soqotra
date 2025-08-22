@@ -6,8 +6,24 @@ const TunisiaPrintStyles = () => {
       {`
         @media print {
           @page {
-            size: A4;
-            margin: 15mm;
+            size: A5;
+            margin: 10mm;
+          }
+          
+          /* Payment receipt specific page size */
+          .payment-receipt-print {
+            @page {
+              size: A5;
+              margin: 10mm;
+            }
+          }
+          
+          /* HBL specific page size */
+          .hbl-print {
+            @page {
+              size: A4;
+              margin: 15mm;
+            }
           }
           
           body {
@@ -26,6 +42,15 @@ const TunisiaPrintStyles = () => {
           .dashboard-nav,
           .dashboard-sidebar,
           .top-bar,
+          .app-sidebar,
+          .main-nav,
+          .side-nav,
+          .layout-sidebar,
+          .bg-sidebar,
+          [data-sidebar],
+          [class*="sidebar"],
+          [role="navigation"],
+          [role="banner"],
           button:not(.print-button),
           .btn:not(.print-button),
           .floating-action,

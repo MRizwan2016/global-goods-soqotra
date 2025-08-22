@@ -15,6 +15,7 @@ import TunisiaInvoiceForm from "./components/TunisiaInvoiceForm";
 import LoadingRecordsView from "./components/LoadingRecordsView";
 import TunisiaPaymentReceiptGenerator from "./components/TunisiaPaymentReceiptGenerator";
 import TunisiaHBLGenerator from "./components/TunisiaHBLGenerator";
+import TunisiaDocumentViewer from "./components/TunisiaDocumentViewer";
 import { Button } from "@/components/ui/button";
 import { TunisiaStorageService } from "./services/TunisiaStorageService";
 import { toast } from "sonner";
@@ -24,7 +25,7 @@ const TunisiaDashboard: React.FC = () => {
   const [containers, setContainers] = useState<TunisiaContainer[]>([]);
   const [selectedContainer, setSelectedContainer] = useState<TunisiaContainer | null>(null);
   const [invoices, setInvoices] = useState<TunisiaInvoice[]>([]);
-  const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading' | 'sealed-containers' | 'container-details' | 'invoice-form' | 'invoice-management' | 'loading-records' | 'payment-receipt' | 'hbl-generator'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading' | 'sealed-containers' | 'container-details' | 'invoice-form' | 'invoice-management' | 'loading-records' | 'payment-receipt' | 'hbl-generator' | 'document-viewer'>('dashboard');
   const [selectedInvoice, setSelectedInvoice] = useState<TunisiaInvoice | null>(null);
 
   // Load data on component mount
@@ -365,7 +366,7 @@ const TunisiaDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 flex-wrap">
                     <Button
                       size="sm"
                       variant="outline"
@@ -377,6 +378,19 @@ const TunisiaDashboard: React.FC = () => {
                     >
                       Payment Receipt
                     </Button>
+                    {invoice.supportingDocuments && invoice.supportingDocuments.length > 0 && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedInvoice(invoice);
+                          setView('document-viewer');
+                        }}
+                      >
+                        View Documents ({invoice.supportingDocuments.length})
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="outline"
@@ -430,6 +444,27 @@ const TunisiaDashboard: React.FC = () => {
         <TunisiaHBLGenerator
           invoices={invoices}
           onBack={() => setView('dashboard')}
+        />
+      </Layout>
+    );
+  }
+
+  if (view === 'document-viewer' && selectedInvoice) {
+    return (
+      <Layout title="Tunisia Document Viewer">
+        <div className="mb-8">
+          <div className="flex justify-between mb-4">
+            <CountryBackButton />
+            <LanguageSwitcher />
+          </div>
+        </div>
+        <TunisiaDocumentViewer
+          documents={selectedInvoice.supportingDocuments || []}
+          title={`${selectedInvoice.invoiceNumber} - ${selectedInvoice.customer.name}`}
+          onBack={() => {
+            setView('invoice-management');
+            setSelectedInvoice(null);
+          }}
         />
       </Layout>
     );

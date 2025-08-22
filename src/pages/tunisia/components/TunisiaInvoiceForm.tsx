@@ -220,8 +220,9 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                   <Label>Customer Name *</Label>
                   <Input
                     value={customer.name}
-                    onChange={(e) => setCustomer(prev => ({ ...prev, name: e.target.value }))}
-                    placeholder="Enter customer name"
+                    onChange={(e) => setCustomer(prev => ({ ...prev, name: e.target.value.toUpperCase() }))}
+                    placeholder="ENTER CUSTOMER NAME"
+                    className="uppercase"
                   />
                 </div>
               </div>
@@ -347,16 +348,18 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
               <Label>Make *</Label>
               <Input
                 value={vehicle.make}
-                onChange={(e) => setVehicle(prev => ({ ...prev, make: e.target.value }))}
-                placeholder="e.g., ISUZU"
+                onChange={(e) => setVehicle(prev => ({ ...prev, make: e.target.value.toUpperCase() }))}
+                placeholder="E.G., ISUZU"
+                className="uppercase"
               />
             </div>
             <div>
               <Label>Model *</Label>
               <Input
                 value={vehicle.model}
-                onChange={(e) => setVehicle(prev => ({ ...prev, model: e.target.value }))}
-                placeholder="e.g., D-MAX PICKUP"
+                onChange={(e) => setVehicle(prev => ({ ...prev, model: e.target.value.toUpperCase() }))}
+                placeholder="E.G., D-MAX PICKUP"
+                className="uppercase"
               />
             </div>
             <div>
@@ -377,11 +380,44 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
             </div>
             <div>
               <Label>Country *</Label>
-              <Input
-                value={vehicle.country}
-                onChange={(e) => setVehicle(prev => ({ ...prev, country: e.target.value }))}
-                placeholder="e.g., MADE IN INDIA"
-              />
+              <div className="space-y-2">
+                <Select value={vehicle.country} onValueChange={(value) => setVehicle(prev => ({ ...prev, country: value }))}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="MADE IN INDIA">MADE IN INDIA</SelectItem>
+                    <SelectItem value="P R C CHINA">P R C CHINA</SelectItem>
+                    <SelectItem value="MADE IN GERMANY">MADE IN GERMANY</SelectItem>
+                    <SelectItem value="MADE IN SOUTH KOREA">MADE IN SOUTH KOREA</SelectItem>
+                    <SelectItem value="MADE IN NORTH KOREA">MADE IN NORTH KOREA</SelectItem>
+                    <SelectItem value="MADE IN SWITZERLAND">MADE IN SWITZERLAND</SelectItem>
+                    <SelectItem value="MADE IN POLAND">MADE IN POLAND</SelectItem>
+                    <SelectItem value="MADE IN NEW ZEALAND">MADE IN NEW ZEALAND</SelectItem>
+                    <SelectItem value="MADE IN JAPAN">MADE IN JAPAN</SelectItem>
+                    <SelectItem value="MADE IN TAIWAN">MADE IN TAIWAN</SelectItem>
+                    <SelectItem value="MADE IN VIETNAM">MADE IN VIETNAM</SelectItem>
+                    <SelectItem value="MADE IN THAILAND">MADE IN THAILAND</SelectItem>
+                    <SelectItem value="MADE IN AUSTRIA">MADE IN AUSTRIA</SelectItem>
+                    <SelectItem value="MADE IN AUSTRALIA">MADE IN AUSTRALIA</SelectItem>
+                    <SelectItem value="MADE IN USA">MADE IN USA</SelectItem>
+                    <SelectItem value="MADE IN UK">MADE IN UK</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Input
+                  placeholder="OR ENTER COUNTRY MANUALLY"
+                  className="uppercase text-xs"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      const value = (e.target as HTMLInputElement).value.toUpperCase();
+                      if (value.trim()) {
+                        setVehicle(prev => ({ ...prev, country: value.trim() }));
+                        (e.target as HTMLInputElement).value = '';
+                      }
+                    }
+                  }}
+                />
+              </div>
             </div>
             <div>
               <Label>Chassis Number *</Label>
