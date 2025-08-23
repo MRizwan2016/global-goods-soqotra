@@ -10,88 +10,67 @@ const TunisiaPrintStyles = () => {
             margin: 10mm;
           }
           
-          /* Reset all elements to ensure proper printing */
+          /* Hide everything first */
           * {
-            box-sizing: border-box;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            color-adjust: exact !important;
-          }
-          
-          /* Make sure everything is visible in print */
-          body, html {
-            visibility: visible !important;
-            overflow: visible !important;
-            background-color: white !important;
-            height: auto !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            color: black !important;
-            font-family: Arial, sans-serif !important;
-            font-size: 9pt !important;
-          }
-          
-          /* Hide non-printable elements */
-          .print\\:hidden,
-          .no-print,
-          button,
-          .button,
-          [role="button"],
-          input,
-          select,
-          .sidebar,
-          nav,
-          header,
-          aside,
-          [class*="sidebar"],
-          [class*="nav"],
-          [class*="menu"],
-          .dashboard,
-          [class*="dashboard"] {
-            display: none !important;
             visibility: hidden !important;
           }
           
-          /* Make sure the print container is visible */
-          #tunisia-payment-receipt-print,
-          .tunisia-payment-receipt,
-          .max-w-4xl {
-            display: block !important;
-            visibility: visible !important;
-            position: relative !important;
-            width: 100% !important;
-            max-width: none !important;
-            overflow: visible !important;
-            page-break-inside: avoid !important;
-            color: black !important;
-            background-color: white !important;
+          body, html {
+            background: white !important;
+            font-size: 9pt !important;
             margin: 0 !important;
+            padding: 0 !important;
+          }
+          
+          /* Only show the specific Tunisia payment receipt */
+          #tunisia-payment-receipt-print,
+          #tunisia-payment-receipt-print * {
+            visibility: visible !important;
+            display: block !important;
+          }
+          
+          #tunisia-payment-receipt-print {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            background: white !important;
+            color: black !important;
             padding: 8mm !important;
+            margin: 0 !important;
             box-shadow: none !important;
             border: none !important;
             border-radius: 0 !important;
+            page-break-inside: avoid !important;
           }
           
-          /* Make headings and text print with the right colors */
-          h1, h2, h3, h4, h5, h6, p, div, span, table {
+          /* Ensure all text in the receipt is black */
+          #tunisia-payment-receipt-print h1,
+          #tunisia-payment-receipt-print h2,
+          #tunisia-payment-receipt-print h3,
+          #tunisia-payment-receipt-print p,
+          #tunisia-payment-receipt-print div,
+          #tunisia-payment-receipt-print span {
             color: black !important;
+            background: transparent !important;
           }
           
-          /* Ensure tables print properly */
-          table {
-            border-collapse: collapse;
-            width: 100%;
-            page-break-inside: auto;
+          /* Grid and flex styles for print */
+          #tunisia-payment-receipt-print .grid {
+            display: grid !important;
           }
           
-          table, th, td {
-            border: 1px solid #ddd !important;
-            padding: 8px !important;
+          #tunisia-payment-receipt-print .grid-cols-2 {
+            grid-template-columns: 1fr 1fr !important;
           }
           
-          th {
-            background-color: #f2f2f2 !important;
-            color: black !important;
+          #tunisia-payment-receipt-print .flex {
+            display: flex !important;
+          }
+          
+          #tunisia-payment-receipt-print .justify-between {
+            justify-content: space-between !important;
           }
         }
       `}
