@@ -26,7 +26,7 @@ const TunisiaPrintStyles = () => {
           body > div,
           #root,
           #root > *,
-          body > *:not(.tunisia-payment-receipt) {
+          body > *:not(.tunisia-payment-receipt):not(.max-w-4xl) {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
@@ -99,7 +99,8 @@ const TunisiaPrintStyles = () => {
             height: 100% !important;
           }
           
-          /* FORCE SHOW ONLY payment receipt */
+          /* FORCE SHOW ONLY payment receipt containers */
+          .max-w-4xl,
           .tunisia-payment-receipt {
             display: block !important;
             visibility: visible !important;
@@ -126,7 +127,8 @@ const TunisiaPrintStyles = () => {
             z-index: 999999 !important;
           }
           
-          /* Show all receipt children */
+          /* Show all receipt children and containers */
+          .max-w-4xl *,
           .tunisia-payment-receipt * {
             display: block !important;
             visibility: visible !important;
