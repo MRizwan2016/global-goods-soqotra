@@ -23,10 +23,9 @@ const TunisiaPrintStyles = () => {
           .flex-1.p-6,
           main.flex-1,
           .bg-slate-50,
-          body > div,
-          #root,
-          #root > *,
-          body > *:not(.tunisia-payment-receipt):not(.max-w-4xl) {
+          body > div:not(:has(.max-w-4xl)),
+          #root > *:not(:has(.max-w-4xl)),
+          body > *:not(:has(.tunisia-payment-receipt)):not(:has(.max-w-4xl)):not(.max-w-4xl) {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;

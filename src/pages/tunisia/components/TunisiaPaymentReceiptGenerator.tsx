@@ -53,7 +53,8 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
         {/* Payment Receipt */}
         <div className="tunisia-payment-receipt bg-white p-8 border rounded-lg print:border-0 print:shadow-none print:p-4">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-primary mb-2">SOQOTRA SHIPPING SERVICES</h1>
+            <h1 className="text-2xl font-bold text-primary mb-2">SOQOTRA LOGISTICS SERVICES,</h1>
+            <h2 className="text-lg font-semibold text-primary">TRANSPORTATION & TRADING WLL</h2>
             <p className="text-sm text-muted-foreground">Vehicle & Personal Effects Shipping</p>
             <div className="mt-4 text-lg font-semibold">PAYMENT RECEIPT</div>
           </div>
@@ -177,7 +178,7 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
 
           <div className="border-t pt-4 text-center">
             <p className="text-xs text-muted-foreground">
-              This is a computer-generated receipt. Thank you for choosing Soqotra Shipping Services.
+              This is a computer-generated receipt. Thank you for choosing Soqotra Logistics Services.
             </p>
             <p className="text-xs text-muted-foreground mt-2">
               For queries, contact: +974-XXXX-XXXX | Email: info@soqotra.com
