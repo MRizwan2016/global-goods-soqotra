@@ -49,7 +49,7 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
         </div>
 
         {/* Payment Receipt */}
-        <div className="bg-white p-8 border rounded-lg print:border-0 print:shadow-none">
+        <div className="tunisia-payment-receipt bg-white p-8 border rounded-lg print:border-0 print:shadow-none print:p-4">
           <div className="text-center mb-8">
             <h1 className="text-2xl font-bold text-primary mb-2">SOQOTRA SHIPPING SERVICES</h1>
             <p className="text-sm text-muted-foreground">Vehicle & Personal Effects Shipping</p>

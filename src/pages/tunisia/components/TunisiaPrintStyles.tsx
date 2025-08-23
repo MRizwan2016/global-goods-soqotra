@@ -10,6 +10,14 @@ const TunisiaPrintStyles = () => {
             margin: 10mm;
           }
           
+          /* Tunisia Payment receipt specific page size */
+          .tunisia-payment-receipt {
+            @page {
+              size: A5;
+              margin: 10mm;
+            }
+          }
+          
           /* Payment receipt specific page size */
           .payment-receipt-print {
             @page {
@@ -304,6 +312,44 @@ const TunisiaPrintStyles = () => {
             display: block !important;
             background: white !important;
             color: black !important;
+          }
+          
+          /* Tunisia Payment Receipt specific styles */
+          .tunisia-payment-receipt {
+            display: block !important;
+            background: white !important;
+            color: black !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 15mm !important;
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            font-size: 11pt !important;
+            line-height: 1.4 !important;
+            page-break-inside: avoid;
+          }
+          
+          .tunisia-payment-receipt h1 {
+            font-size: 18pt !important;
+            margin-bottom: 8px !important;
+          }
+          
+          .tunisia-payment-receipt h3 {
+            font-size: 12pt !important;
+            margin-bottom: 6px !important;
+            margin-top: 12px !important;
+          }
+          
+          .tunisia-payment-receipt .grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 20px !important;
+          }
+          
+          .tunisia-payment-receipt .space-y-2 > div {
+            margin-bottom: 4px !important;
           }
           
           /* Page breaks */
