@@ -61,6 +61,18 @@ const TunisiaPrintStyles = () => {
           [role="banner"],
           button:not(.print-button),
           .btn:not(.print-button),
+          /* Dashboard specific elements */
+          .dashboard,
+          [class*="dashboard"]:not([class*="receipt"]):not([class*="payment"]),
+          .app-container,
+          .layout-container,
+          .flex.min-h-screen,
+          .min-h-screen > *:not(.tunisia-payment-receipt):not([class*="receipt"]),
+          /* Specific dashboard navigation */
+          aside,
+          .bg-card:not(.tunisia-payment-receipt),
+          .rounded-lg:not(.tunisia-payment-receipt),
+          .shadow-sm:not(.tunisia-payment-receipt),
           .floating-action,
           .tooltip,
           .dropdown,
@@ -146,13 +158,21 @@ const TunisiaPrintStyles = () => {
           .tunisia-navigation,
           .app-top-bar,
           .top-header,
-          /* Generic layout elements that should be hidden */
-          .min-h-screen > div:first-child:not([class*="receipt"]):not([class*="payment"]),
+          /* Complete dashboard hiding */
+          body > div:first-child > div:first-child:not(.tunisia-payment-receipt),
+          .min-h-screen > div:first-child:not(.tunisia-payment-receipt):not([class*="receipt"]):not([class*="payment"]),
           .flex.min-h-screen > aside,
           .flex.min-h-screen > nav,
-          .bg-card,
-          .rounded-lg:not([class*="receipt"]):not([class*="payment"]),
-          .shadow-sm:not([class*="receipt"]):not([class*="payment"]),
+          .flex.min-h-screen > div:first-child:not(.tunisia-payment-receipt),
+          /* All dashboard containers */
+          .bg-card:not(.tunisia-payment-receipt),
+          .rounded-lg:not(.tunisia-payment-receipt),
+          .shadow-sm:not(.tunisia-payment-receipt),
+          /* Layout wrappers */
+          .app-layout,
+          .main-layout,
+          .page-layout,
+          [data-vaul-drawer-wrapper],
           /* Back buttons and navigation controls */
           [class*="back"],
           .go-back,
@@ -171,17 +191,31 @@ const TunisiaPrintStyles = () => {
             display: none !important;
           }
           
+          /* Force hide everything except receipt */
+          body * {
+            visibility: hidden !important;
+          }
+          
+          /* Show only payment receipt and its children */
+          .tunisia-payment-receipt,
+          .tunisia-payment-receipt * {
+            visibility: visible !important;
+          }
+          
           /* Show only printable content */
           .print\\:block {
             display: block !important;
+            visibility: visible !important;
           }
           
           .print\\:inline {
             display: inline !important;
+            visibility: visible !important;
           }
           
           .print\\:flex {
             display: flex !important;
+            visibility: visible !important;
           }
           
           /* Bill of Lading specific styles */

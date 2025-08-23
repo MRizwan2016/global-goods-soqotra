@@ -147,14 +147,14 @@ const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
                         <Download className="h-4 w-4" />
                         Download
                       </Button>
-                      <Button
+                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handlePrint(docUrl)}
                         className="flex items-center gap-2 print:hidden"
                       >
                         <FileText className="h-4 w-4" />
-                        Print A4
+                        Print
                       </Button>
                     </div>
                   </CardTitle>
