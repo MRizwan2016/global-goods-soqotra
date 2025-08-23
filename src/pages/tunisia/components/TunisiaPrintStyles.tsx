@@ -191,15 +191,27 @@ const TunisiaPrintStyles = () => {
             display: none !important;
           }
           
-          /* Force hide everything except receipt */
-          body * {
-            visibility: hidden !important;
+          /* Force hide everything except receipt - more aggressive approach */
+          body > * {
+            display: none !important;
           }
           
-          /* Show only payment receipt and its children */
-          .tunisia-payment-receipt,
+          /* Only show elements with receipt classes */
+          .tunisia-payment-receipt {
+            display: block !important;
+            visibility: visible !important;
+            position: relative !important;
+            z-index: 9999 !important;
+          }
+          
           .tunisia-payment-receipt * {
             visibility: visible !important;
+            display: revert !important;
+          }
+          
+          /* Force show specific receipt content */
+          body .tunisia-payment-receipt {
+            display: block !important;
           }
           
           /* Show only printable content */
