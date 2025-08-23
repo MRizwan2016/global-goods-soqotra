@@ -6,146 +6,119 @@ const TunisiaPrintStyles = () => {
       {`
         @media print {
           @page {
-            size: A5;
-            margin: 15mm;
+            size: A5 portrait;
+            margin: 10mm;
           }
           
-          /* NUCLEAR APPROACH: Hide absolutely everything first */
+          /* TOTAL ISOLATION - Create new print context */
+          html {
+            font-size: 9pt !important;
+            font-family: Arial, sans-serif !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            color: black !important;
+          }
+          
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            color: black !important;
+            font-family: Arial, sans-serif !important;
+            font-size: 9pt !important;
+            line-height: 1.3 !important;
+            overflow: visible !important;
+            position: relative !important;
+          }
+          
+          /* NUCLEAR HIDE: Hide absolutely everything */
           * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             color-adjust: exact !important;
           }
           
-          /* DESTROY EVERYTHING - Complete reset */
-          html, body, #root, [data-reactroot], main, div:not(.tunisia-payment-receipt):not(.tunisia-payment-receipt *) {
+          /* Hide EVERYTHING except tunisia payment receipt */
+          body > *,
+          #root > *,
+          main > *,
+          div:not(.tunisia-payment-receipt),
+          nav, header, aside, footer,
+          .sidebar, .navigation, .nav, .menu, .header, .footer,
+          .dashboard, .admin, .accounts, .upb, .cargo,
+          [class*="dashboard"], [class*="admin"], [class*="accounts"],
+          [class*="upb"], [class*="cargo"], [class*="collection"],
+          [class*="delivery"], [class*="nav"], [class*="menu"],
+          [class*="sidebar"], [class*="header"], [class*="footer"],
+          [class*="toolbar"], [class*="breadcrumb"] {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            position: absolute !important;
+            left: -99999px !important;
+            top: -99999px !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
             margin: 0 !important;
             padding: 0 !important;
-            background: white !important;
-            font-family: Arial, sans-serif !important;
-            font-size: 11pt !important;
-            line-height: 1.4 !important;
-            color: black !important;
-            overflow: hidden !important;
+            border: none !important;
+            background: transparent !important;
           }
           
-          /* Hide every single element that's not the receipt */
-          body > *:not(.tunisia-payment-receipt):not([class*="tunisia-payment-receipt"]) {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            position: absolute !important;
-            left: -9999px !important;
-            width: 0 !important;
-            height: 0 !important;
-            overflow: hidden !important;
-          }
-          
-          /* Target specific React app containers */
-          #root > *:not(.tunisia-payment-receipt):not([class*="tunisia-payment-receipt"]) {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            position: absolute !important;
-            left: -9999px !important;
-          }
-          
-          /* Hide navigation, sidebars, headers, etc. */
-          nav, 
-          header, 
-          aside, 
-          footer,
-          .sidebar,
-          .navigation,
-          .nav,
-          .menu,
-          .header,
-          .footer,
-          .controls,
-          .toolbar,
-          .breadcrumb,
-          [class*="nav"],
-          [class*="menu"],
-          [class*="sidebar"],
-          [class*="header"],
-          [class*="footer"],
-          [class*="toolbar"],
-          [id*="nav"],
-          [id*="menu"],
-          [id*="sidebar"],
-          [id*="header"],
-          [id*="footer"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            position: absolute !important;
-            left: -9999px !important;
-            width: 0 !important;
-            height: 0 !important;
-          }
-          
-          /* Hide dashboard specific elements */
-          .dashboard,
-          .admin,
-          .accounts,
-          .upb,
-          .cargo,
-          [class*="dashboard"],
-          [class*="admin"],
-          [class*="accounts"],
-          [class*="upb"],
-          [class*="cargo"],
-          [class*="collection"],
-          [class*="delivery"] {
-            display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            position: absolute !important;
-            left: -9999px !important;
-          }
-          
-          /* Only show tunisia payment receipt */
+          /* FORCE SHOW ONLY payment receipt */
           .tunisia-payment-receipt {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
             position: static !important;
-            left: auto !important;
+            left: 0 !important;
+            top: 0 !important;
             width: 100% !important;
             height: auto !important;
+            max-width: none !important;
             margin: 0 !important;
-            padding: 15mm !important;
+            padding: 8mm !important;
             background: white !important;
             color: black !important;
+            font-family: Arial, sans-serif !important;
+            font-size: 9pt !important;
+            line-height: 1.3 !important;
             overflow: visible !important;
             box-shadow: none !important;
             border: none !important;
             border-radius: 0 !important;
-            font-size: 11pt !important;
-            line-height: 1.4 !important;
-            page-break-inside: avoid;
+            transform: none !important;
+            filter: none !important;
+            z-index: 999999 !important;
           }
           
-          /* Show all children of the payment receipt */
-          .tunisia-payment-receipt,
+          /* Show all receipt children */
           .tunisia-payment-receipt * {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
             color: black !important;
-            background-color: transparent !important;
+            background: white !important;
             position: static !important;
-            left: auto !important;
-            width: auto !important;
-            height: auto !important;
+            margin: auto !important;
+            padding: auto !important;
+            border: none !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
+            filter: none !important;
+            transform: none !important;
+            transition: none !important;
+            animation: none !important;
           }
           
-          /* Layout for receipt content */
+          /* Receipt layout fixes */
           .tunisia-payment-receipt .grid {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
-            gap: 15px !important;
-            margin-bottom: 15px !important;
+            gap: 8px !important;
+            margin-bottom: 10px !important;
           }
           
           .tunisia-payment-receipt .flex {
@@ -161,37 +134,44 @@ const TunisiaPrintStyles = () => {
           }
           
           .tunisia-payment-receipt .space-y-2 > * + * {
-            margin-top: 4px !important;
+            margin-top: 3px !important;
           }
           
-          /* Typography for receipt */
+          /* Receipt typography */
           .tunisia-payment-receipt h1 {
-            font-size: 18pt !important;
+            font-size: 14pt !important;
             font-weight: bold !important;
             color: black !important;
-            margin: 0 0 8px 0 !important;
+            margin: 0 0 6px 0 !important;
             text-align: center !important;
+            background: white !important;
           }
           
           .tunisia-payment-receipt h3 {
-            font-size: 12pt !important;
+            font-size: 10pt !important;
             font-weight: 600 !important;
             color: black !important;
-            margin: 12px 0 6px 0 !important;
+            margin: 8px 0 4px 0 !important;
+            background: white !important;
           }
           
           .tunisia-payment-receipt p {
             margin: 2px 0 !important;
-            font-size: 10pt !important;
+            font-size: 8pt !important;
             color: black !important;
+            background: white !important;
           }
           
           .tunisia-payment-receipt .text-lg {
-            font-size: 14pt !important;
+            font-size: 11pt !important;
           }
           
           .tunisia-payment-receipt .text-sm {
-            font-size: 9pt !important;
+            font-size: 7pt !important;
+          }
+          
+          .tunisia-payment-receipt .text-xs {
+            font-size: 6pt !important;
           }
           
           .tunisia-payment-receipt .font-bold {
@@ -206,35 +186,33 @@ const TunisiaPrintStyles = () => {
             font-weight: 500 !important;
           }
           
-          /* Margins for receipt sections */
+          /* Receipt spacing */
           .tunisia-payment-receipt .mb-8 {
-            margin-bottom: 15px !important;
+            margin-bottom: 10px !important;
           }
           
           .tunisia-payment-receipt .mb-3 {
-            margin-bottom: 6px !important;
-          }
-          
-          .tunisia-payment-receipt .mb-2 {
             margin-bottom: 4px !important;
           }
           
+          .tunisia-payment-receipt .mb-2 {
+            margin-bottom: 3px !important;
+          }
+          
           .tunisia-payment-receipt .mt-4 {
-            margin-top: 8px !important;
+            margin-top: 6px !important;
           }
           
-          .tunisia-payment-receipt .pt-2 {
-            padding-top: 4px !important;
+          .tunisia-payment-receipt .pt-2,
+          .tunisia-payment-receipt .pt-4 {
+            padding-top: 3px !important;
           }
           
-          /* Remove all effects */
+          /* Force white backgrounds and black text */
+          .tunisia-payment-receipt,
           .tunisia-payment-receipt * {
-            box-shadow: none !important;
-            text-shadow: none !important;
-            filter: none !important;
-            transform: none !important;
-            transition: none !important;
-            animation: none !important;
+            background-color: white !important;
+            color: black !important;
           }
         }
       `}
