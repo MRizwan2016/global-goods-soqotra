@@ -17,8 +17,8 @@ const TunisiaPrintStyles = () => {
             color-adjust: exact !important;
           }
           
-          /* Hide all body content completely */
-          body {
+          /* DESTROY EVERYTHING - Complete reset */
+          html, body, #root, [data-reactroot], main, div:not(.tunisia-payment-receipt):not(.tunisia-payment-receipt *) {
             margin: 0 !important;
             padding: 0 !important;
             background: white !important;
@@ -29,8 +29,8 @@ const TunisiaPrintStyles = () => {
             overflow: hidden !important;
           }
           
-          /* Hide every single element in the body */
-          body > * {
+          /* Hide every single element that's not the receipt */
+          body > *:not(.tunisia-payment-receipt):not([class*="tunisia-payment-receipt"]) {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
@@ -39,6 +39,15 @@ const TunisiaPrintStyles = () => {
             width: 0 !important;
             height: 0 !important;
             overflow: hidden !important;
+          }
+          
+          /* Target specific React app containers */
+          #root > *:not(.tunisia-payment-receipt):not([class*="tunisia-payment-receipt"]) {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            position: absolute !important;
+            left: -9999px !important;
           }
           
           /* Hide navigation, sidebars, headers, etc. */
