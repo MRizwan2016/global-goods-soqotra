@@ -93,15 +93,15 @@ const TunisiaPrintStyles = () => {
           [class*="nav"],
           [class*="menu"]:not([class*="print"]),
           [class*="sidebar"],
-          [class*="header"]:not([class*="document"]):not([class*="bill"]):not([class*="hbl"]),
-          [class*="footer"]:not([class*="document"]):not([class*="bill"]):not([class*="hbl"]),
+          [class*="header"]:not([class*="document"]):not([class*="bill"]):not([class*="hbl"]):not([class*="receipt"]),
+          [class*="footer"]:not([class*="document"]):not([class*="bill"]):not([class*="hbl"]):not([class*="receipt"]),
           [class*="toolbar"],
           [class*="action"],
           [class*="control"],
           [class*="button"]:not([class*="print"]),
           [class*="tab"],
           [class*="breadcrumb"],
-          [class*="dashboard"],
+          [class*="dashboard"]:not([class*="receipt"]):not([class*="invoice"]),
           .bg-sidebar,
           .bg-navigation,
           .main-nav,
@@ -111,9 +111,9 @@ const TunisiaPrintStyles = () => {
           .app-sidebar,
           .layout-header,
           .layout-sidebar,
-          .page-header:not(.document-header),
+          .page-header:not(.document-header):not(.receipt-header),
           .page-nav,
-          .content-header:not(.document-header),
+          .content-header:not(.document-header):not(.receipt-header),
           .layout-container,
           .layout-wrapper,
           .app-layout,
@@ -129,7 +129,37 @@ const TunisiaPrintStyles = () => {
           .url-display,
           .browser-chrome,
           .print-options,
-          .print-controls {
+          .print-controls,
+          /* Tunisia specific navigation elements */
+          .tunisia-dashboard-nav,
+          .tunisia-sidebar,
+          .tunisia-header,
+          .tunisia-top-bar,
+          .tunisia-navigation,
+          .app-top-bar,
+          .top-header,
+          /* Generic layout elements that should be hidden */
+          .min-h-screen > div:first-child:not([class*="receipt"]):not([class*="payment"]),
+          .flex.min-h-screen > aside,
+          .flex.min-h-screen > nav,
+          .bg-card,
+          .rounded-lg:not([class*="receipt"]):not([class*="payment"]),
+          .shadow-sm:not([class*="receipt"]):not([class*="payment"]),
+          /* Back buttons and navigation controls */
+          [class*="back"],
+          .go-back,
+          .return-button,
+          /* Language selectors */
+          [class*="language"],
+          [class*="locale"],
+          .lang-selector,
+          /* Logout buttons */
+          [class*="logout"],
+          .sign-out,
+          /* Any flex containers that contain navigation */
+          .flex.justify-between:has(button),
+          .flex.items-center:has([class*="logout"]),
+          .flex.items-center:has([class*="language"]) {
             display: none !important;
           }
           
