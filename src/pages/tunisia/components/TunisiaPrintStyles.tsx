@@ -17,28 +17,55 @@ const TunisiaPrintStyles = () => {
             color-adjust: exact !important;
           }
           
-          /* TOTAL DESTRUCTION - Hide the entire Layout system */
+          /* FORCE HIDE LAYOUT AND DASHBOARD ELEMENTS */
+          body > div#root > div,
+          .min-h-screen,
           .flex.min-h-screen,
           .flex-1.flex.flex-col,
           .flex-1.p-6,
           main.flex-1,
           .bg-slate-50,
-          body > div:not(:has(.max-w-4xl)),
-          #root > *:not(:has(.max-w-4xl)),
-          body > *:not(:has(.tunisia-payment-receipt)):not(:has(.max-w-4xl)):not(.max-w-4xl) {
+          [class*="sidebar"],
+          [class*="Sidebar"],
+          [class*="header"], 
+          [class*="Header"],
+          nav, header, aside, footer {
             display: none !important;
-            visibility: hidden !important;
-            opacity: 0 !important;
-            position: absolute !important;
-            left: -99999px !important;
-            top: -99999px !important;
-            width: 0 !important;
-            height: 0 !important;
-            overflow: hidden !important;
+          }
+          
+          /* FORCE SHOW ONLY THE RECEIPT */
+          body, html {
+            background: white !important;
             margin: 0 !important;
             padding: 0 !important;
+          }
+          
+          .max-w-4xl,
+          .tunisia-payment-receipt,
+          .max-w-4xl .tunisia-payment-receipt {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            position: static !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+            height: auto !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 8mm !important;
+            background: white !important;
+            color: black !important;
+            font-family: Arial, sans-serif !important;
+            font-size: 9pt !important;
+            line-height: 1.3 !important;
+            overflow: visible !important;
+            box-shadow: none !important;
             border: none !important;
-            background: transparent !important;
+            border-radius: 0 !important;
+            transform: none !important;
+            filter: none !important;
+            z-index: 999999 !important;
           }
           
           /* OBLITERATE SIDEBAR AND HEADER COMPLETELY */

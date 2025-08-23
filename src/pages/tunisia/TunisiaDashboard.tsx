@@ -296,8 +296,12 @@ const TunisiaDashboard: React.FC = () => {
           </div>
         </div>
         <TunisiaInvoiceForm
-          onBack={() => setView('invoice-management')}
+          onBack={() => {
+            setView('invoice-management');
+            setSelectedInvoice(null);
+          }}
           onInvoiceSave={handleInvoiceSave}
+          existingInvoice={selectedInvoice || undefined}
         />
       </Layout>
     );
@@ -422,8 +426,8 @@ const TunisiaDashboard: React.FC = () => {
                       variant="outline"
                       onClick={(e) => {
                         e.stopPropagation();
-                        // Edit invoice functionality can be added here
-                        console.log('Edit invoice:', invoice.id);
+                        setSelectedInvoice(invoice);
+                        setView('invoice-form');
                       }}
                     >
                       Edit
