@@ -7,211 +7,183 @@ const TunisiaPrintStyles = () => {
         @media print {
           @page {
             size: A5;
-            margin: 10mm;
+            margin: 15mm;
           }
           
-          /* Tunisia Payment receipt specific page size */
-          .tunisia-payment-receipt {
-            @page {
-              size: A5;
-              margin: 10mm;
-            }
+          /* Reset everything for print */
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+            color-adjust: exact !important;
+            box-sizing: border-box !important;
           }
           
-          /* Payment receipt specific page size */
-          .payment-receipt-print {
-            @page {
-              size: A5;
-              margin: 10mm;
-            }
-          }
-          
-          /* HBL specific page size */
-          .hbl-print {
-            @page {
-              size: A4;
-              margin: 15mm;
-            }
-          }
-          
-          body {
+          /* Hide the entire document first */
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            height: auto !important;
+            overflow: visible !important;
             background: white !important;
-            font-size: 12pt !important;
-            line-height: 1.2 !important;
+            font-family: Arial, sans-serif !important;
+            font-size: 11pt !important;
+            line-height: 1.4 !important;
+            color: black !important;
           }
           
-          /* Hide all non-printable elements */
-          .print\\:hidden,
-          .no-print,
-          nav,
-          header,
-          .sidebar,
-          .navigation,
-          .dashboard-nav,
-          .dashboard-sidebar,
-          .top-bar,
-          .app-sidebar,
-          .main-nav,
-          .side-nav,
-          .layout-sidebar,
-          .bg-sidebar,
-          [data-sidebar],
-          [class*="sidebar"],
-          [role="navigation"],
-          [role="banner"],
-          button:not(.print-button),
-          .btn:not(.print-button),
-          /* Dashboard specific elements */
-          .dashboard,
-          [class*="dashboard"]:not([class*="receipt"]):not([class*="payment"]),
-          .app-container,
-          .layout-container,
-          .flex.min-h-screen,
-          .min-h-screen > *:not(.tunisia-payment-receipt):not([class*="receipt"]),
-          /* Specific dashboard navigation */
-          aside,
-          .bg-card:not(.tunisia-payment-receipt),
-          .rounded-lg:not(.tunisia-payment-receipt),
-          .shadow-sm:not(.tunisia-payment-receipt),
-          .floating-action,
-          .tooltip,
-          .dropdown,
-          .modal-backdrop,
-          .loading-spinner,
-          .breadcrumb,
-          .tab-navigation,
-          .pagination,
-          .search-bar,
-          .filter-controls,
-          .action-buttons,
-          .edit-controls,
-          .form-controls,
-          input,
-          select,
-          textarea,
-          .card-header .actions,
-          .card-footer,
-          .toolbar,
-          .status-bar,
-          .notification,
-          .alert:not(.print-alert),
-          .drawer,
-          .overlay,
-          .backdrop,
-          .menu,
-          .dropdown-menu,
-          .context-menu,
-          .popover,
-          .toast,
-          .snackbar,
-          [role="navigation"],
-          [role="banner"],
-          [role="complementary"],
-          [data-testid*="nav"],
-          [data-testid*="menu"],
-          [data-testid*="button"]:not([data-testid*="print"]),
-          [class*="nav"],
-          [class*="menu"]:not([class*="print"]),
-          [class*="sidebar"],
-          [class*="header"]:not([class*="document"]):not([class*="bill"]):not([class*="hbl"]):not([class*="receipt"]),
-          [class*="footer"]:not([class*="document"]):not([class*="bill"]):not([class*="hbl"]):not([class*="receipt"]),
-          [class*="toolbar"],
-          [class*="action"],
-          [class*="control"],
-          [class*="button"]:not([class*="print"]),
-          [class*="tab"],
-          [class*="breadcrumb"],
-          [class*="dashboard"]:not([class*="receipt"]):not([class*="invoice"]),
-          .bg-sidebar,
-          .bg-navigation,
-          .main-nav,
-          .side-nav,
-          .top-nav,
-          .app-header,
-          .app-sidebar,
-          .layout-header,
-          .layout-sidebar,
-          .page-header:not(.document-header):not(.receipt-header),
-          .page-nav,
-          .content-header:not(.document-header):not(.receipt-header),
-          .layout-container,
-          .layout-wrapper,
-          .app-layout,
-          [data-radix-portal],
-          .dialog-overlay,
-          .dialog-content > div:first-child:not(.receipt-content):not(.hbl-content),
-          .lovable-app-sidebar,
-          .app-container > aside,
-          .app-container > nav,
-          .print-dialog-actions,
-          .system-admin-info,
-          .logout-section,
-          .url-display,
-          .browser-chrome,
-          .print-options,
-          .print-controls,
-          /* Tunisia specific navigation elements */
-          .tunisia-dashboard-nav,
-          .tunisia-sidebar,
-          .tunisia-header,
-          .tunisia-top-bar,
-          .tunisia-navigation,
-          .app-top-bar,
-          .top-header,
-          /* Complete dashboard hiding */
-          body > div:first-child > div:first-child:not(.tunisia-payment-receipt),
-          .min-h-screen > div:first-child:not(.tunisia-payment-receipt):not([class*="receipt"]):not([class*="payment"]),
-          .flex.min-h-screen > aside,
-          .flex.min-h-screen > nav,
-          .flex.min-h-screen > div:first-child:not(.tunisia-payment-receipt),
-          /* All dashboard containers */
-          .bg-card:not(.tunisia-payment-receipt),
-          .rounded-lg:not(.tunisia-payment-receipt),
-          .shadow-sm:not(.tunisia-payment-receipt),
-          /* Layout wrappers */
-          .app-layout,
-          .main-layout,
-          .page-layout,
-          [data-vaul-drawer-wrapper],
-          /* Back buttons and navigation controls */
-          [class*="back"],
-          .go-back,
-          .return-button,
-          /* Language selectors */
-          [class*="language"],
-          [class*="locale"],
-          .lang-selector,
-          /* Logout buttons */
-          [class*="logout"],
-          .sign-out,
-          /* Any flex containers that contain navigation */
-          .flex.justify-between:has(button),
-          .flex.items-center:has([class*="logout"]),
-          .flex.items-center:has([class*="language"]) {
+          /* Hide everything by default */
+          body * {
             display: none !important;
+            visibility: hidden !important;
           }
           
-          /* Force hide everything except receipt - more aggressive approach */
-          body > * {
-            display: none !important;
-          }
-          
-          /* Only show elements with receipt classes */
+          /* Only show the tunisia payment receipt and make it the entire page */
           .tunisia-payment-receipt {
             display: block !important;
             visibility: visible !important;
-            position: relative !important;
-            z-index: 9999 !important;
+            position: static !important;
+            width: 100% !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            color: black !important;
+            page-break-after: avoid !important;
+            overflow: visible !important;
+            box-shadow: none !important;
+            border: none !important;
+            border-radius: 0 !important;
           }
           
+          /* Show all children of the receipt */
+          .tunisia-payment-receipt,
           .tunisia-payment-receipt * {
+            display: block !important;
             visibility: visible !important;
-            display: revert !important;
+            color: black !important;
+            background-color: transparent !important;
           }
           
-          /* Force show specific receipt content */
-          body .tunisia-payment-receipt {
+          /* Specific layout overrides for receipt content */
+          .tunisia-payment-receipt .grid {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+            gap: 15px !important;
+            margin-bottom: 15px !important;
+          }
+          
+          .tunisia-payment-receipt .flex {
+            display: flex !important;
+          }
+          
+          .tunisia-payment-receipt .text-center {
+            text-align: center !important;
+          }
+          
+          .tunisia-payment-receipt .justify-between {
+            justify-content: space-between !important;
+          }
+          
+          .tunisia-payment-receipt .space-y-2 > * + * {
+            margin-top: 4px !important;
+          }
+          
+          .tunisia-payment-receipt .mb-8 {
+            margin-bottom: 15px !important;
+          }
+          
+          .tunisia-payment-receipt .mb-3 {
+            margin-bottom: 6px !important;
+          }
+          
+          .tunisia-payment-receipt .mb-2 {
+            margin-bottom: 4px !important;
+          }
+          
+          .tunisia-payment-receipt .mt-4 {
+            margin-top: 8px !important;
+          }
+          
+          .tunisia-payment-receipt .pt-2 {
+            padding-top: 4px !important;
+          }
+          
+          /* Typography */
+          .tunisia-payment-receipt h1 {
+            font-size: 18pt !important;
+            font-weight: bold !important;
+            color: black !important;
+            margin: 0 0 8px 0 !important;
             display: block !important;
+          }
+          
+          .tunisia-payment-receipt h3 {
+            font-size: 12pt !important;
+            font-weight: 600 !important;
+            color: black !important;
+            margin: 0 0 6px 0 !important;
+            display: block !important;
+          }
+          
+          .tunisia-payment-receipt p {
+            display: block !important;
+            margin: 2px 0 !important;
+            font-size: 10pt !important;
+          }
+          
+          .tunisia-payment-receipt .text-lg {
+            font-size: 14pt !important;
+            display: block !important;
+          }
+          
+          .tunisia-payment-receipt .text-sm {
+            font-size: 9pt !important;
+          }
+          
+          .tunisia-payment-receipt .font-bold {
+            font-weight: bold !important;
+          }
+          
+          .tunisia-payment-receipt .font-semibold {
+            font-weight: 600 !important;
+          }
+          
+          .tunisia-payment-receipt .font-medium {
+            font-weight: 500 !important;
+          }
+          
+          /* Borders */
+          .tunisia-payment-receipt .border-t {
+            border-top: 1px solid black !important;
+          }
+          
+          .tunisia-payment-receipt .border-b {
+            border-bottom: 1px solid black !important;
+          }
+          
+          /* Tables if any */
+          .tunisia-payment-receipt table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            display: table !important;
+          }
+          
+          .tunisia-payment-receipt th,
+          .tunisia-payment-receipt td {
+            border: 1px solid black !important;
+            padding: 4px !important;
+            text-align: left !important;
+            display: table-cell !important;
+          }
+          
+          /* Remove all box shadows, transitions, and effects */
+          .tunisia-payment-receipt * {
+            box-shadow: none !important;
+            text-shadow: none !important;
+            filter: none !important;
+            transform: none !important;
+            transition: none !important;
+            animation: none !important;
           }
           
           /* Show only printable content */
