@@ -10,48 +10,23 @@ const TunisiaPrintStyles = () => {
             margin: 10mm;
           }
           
-          /* TOTAL ISOLATION - Create new print context */
-          html {
-            font-size: 9pt !important;
-            font-family: Arial, sans-serif !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-            color: black !important;
-          }
-          
-          body {
-            margin: 0 !important;
-            padding: 0 !important;
-            background: white !important;
-            color: black !important;
-            font-family: Arial, sans-serif !important;
-            font-size: 9pt !important;
-            line-height: 1.3 !important;
-            overflow: visible !important;
-            position: relative !important;
-          }
-          
-          /* NUCLEAR HIDE: Hide absolutely everything */
+          /* NUCLEAR ANNIHILATION OF EVERYTHING */
           * {
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
             color-adjust: exact !important;
           }
           
-          /* Hide EVERYTHING except tunisia payment receipt */
-          body > *,
+          /* TOTAL DESTRUCTION - Hide the entire Layout system */
+          .flex.min-h-screen,
+          .flex-1.flex.flex-col,
+          .flex-1.p-6,
+          main.flex-1,
+          .bg-slate-50,
+          body > div,
+          #root,
           #root > *,
-          main > *,
-          div:not(.tunisia-payment-receipt),
-          nav, header, aside, footer,
-          .sidebar, .navigation, .nav, .menu, .header, .footer,
-          .dashboard, .admin, .accounts, .upb, .cargo,
-          [class*="dashboard"], [class*="admin"], [class*="accounts"],
-          [class*="upb"], [class*="cargo"], [class*="collection"],
-          [class*="delivery"], [class*="nav"], [class*="menu"],
-          [class*="sidebar"], [class*="header"], [class*="footer"],
-          [class*="toolbar"], [class*="breadcrumb"] {
+          body > *:not(.tunisia-payment-receipt) {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
@@ -65,6 +40,63 @@ const TunisiaPrintStyles = () => {
             padding: 0 !important;
             border: none !important;
             background: transparent !important;
+          }
+          
+          /* OBLITERATE SIDEBAR AND HEADER COMPLETELY */
+          [class*="sidebar"],
+          [class*="Sidebar"],
+          [class*="header"], 
+          [class*="Header"],
+          nav, header, aside, footer,
+          .navigation, .nav, .menu,
+          .dashboard, .admin, .accounts, .upb, .cargo,
+          [class*="dashboard"], [class*="admin"], [class*="accounts"],
+          [class*="upb"], [class*="cargo"], [class*="collection"],
+          [class*="delivery"], [class*="nav"], [class*="menu"],
+          [class*="toolbar"], [class*="breadcrumb"],
+          [data-testid*="sidebar"],
+          [data-testid*="header"],
+          .min-h-screen > *:first-child,
+          .flex.min-h-screen > *:first-child {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+            position: absolute !important;
+            left: -99999px !important;
+            top: -99999px !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: none !important;
+            background: transparent !important;
+          }
+          
+          /* RESET EVERYTHING TO CLEAN STATE */
+          html {
+            font-size: 9pt !important;
+            font-family: Arial, sans-serif !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            color: black !important;
+            width: 100% !important;
+            height: 100% !important;
+          }
+          
+          body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+            color: black !important;
+            font-family: Arial, sans-serif !important;
+            font-size: 9pt !important;
+            line-height: 1.3 !important;
+            overflow: visible !important;
+            position: static !important;
+            width: 100% !important;
+            height: 100% !important;
           }
           
           /* FORCE SHOW ONLY payment receipt */
