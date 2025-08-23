@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Printer } from "lucide-react";
 import { TunisiaInvoice, PaymentDetails } from "../types/tunisiaInvoiceTypes";
+import TunisiaPrintStyles from "./TunisiaPrintStyles";
 
 interface TunisiaPaymentReceiptGeneratorProps {
   invoice: TunisiaInvoice;
@@ -37,6 +38,7 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
   if (showReceipt) {
     return (
       <div className="max-w-4xl mx-auto space-y-4">
+        <TunisiaPrintStyles />
         <div className="flex gap-4 print:hidden">
           <Button variant="outline" onClick={() => setShowReceipt(false)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
