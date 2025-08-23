@@ -177,11 +177,8 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
           )}
 
           <div className="border-t pt-4 text-center">
-            <p className="text-xs text-muted-foreground">
-              This is a computer-generated receipt. Thank you for choosing Soqotra Logistics Services.
-            </p>
             <p className="text-xs text-muted-foreground mt-2">
-              For queries, contact: +974-XXXX-XXXX | Email: info@soqotra.com
+              For queries, contact: +974-44412770 & +974-44412773 | Email: accounts@soqotralogistics.com
             </p>
           </div>
         </div>
