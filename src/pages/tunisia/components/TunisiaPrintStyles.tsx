@@ -6,7 +6,7 @@ const TunisiaPrintStyles = () => {
       {`
         @media print {
           @page {
-            size: A5 landscape;
+            size: A5;
             margin: 10mm;
           }
           
