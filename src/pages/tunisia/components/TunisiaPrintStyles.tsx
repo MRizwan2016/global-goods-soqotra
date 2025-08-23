@@ -6,35 +6,28 @@ const TunisiaPrintStyles = () => {
       {`
         @media print {
           @page {
-            size: A5 portrait;
-            margin: 10mm;
+            size: A4 portrait;
+            margin: 15mm;
           }
           
-          /* NUCLEAR ANNIHILATION OF EVERYTHING */
-          * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            color-adjust: exact !important;
-          }
-          
-          /* HIDE EVERYTHING BY DEFAULT */
+          /* Hide everything first */
           * {
             visibility: hidden !important;
           }
           
-          /* RESET BODY AND HTML */
+          /* Reset body and html */
           body, html {
             background: white !important;
             margin: 0 !important;
             padding: 0 !important;
             font-family: Arial, sans-serif !important;
-            font-size: 10pt !important;
-            line-height: 1.3 !important;
+            font-size: 11pt !important;
+            line-height: 1.4 !important;
             color: black !important;
             visibility: visible !important;
           }
           
-          /* SHOW RECEIPT CONTAINER AND ALL CHILDREN */
+          /* Show the main container */
           .max-w-4xl {
             visibility: visible !important;
             display: block !important;
@@ -43,39 +36,41 @@ const TunisiaPrintStyles = () => {
             margin: 0 !important;
             padding: 0 !important;
             background: white !important;
-            position: static !important;
           }
           
+          /* Show all children of the main container */
+          .max-w-4xl * {
+            visibility: visible !important;
+            color: black !important;
+            background: white !important;
+            font-family: Arial, sans-serif !important;
+          }
+          
+          /* Show the receipt specifically */
           .tunisia-payment-receipt {
             visibility: visible !important;
             display: block !important;
             width: 100% !important;
-            padding: 15mm !important;
+            padding: 10mm !important;
             margin: 0 !important;
             background: white !important;
             color: black !important;
-            font-family: Arial, sans-serif !important;
-            font-size: 10pt !important;
-            line-height: 1.3 !important;
-            box-shadow: none !important;
             border: none !important;
             border-radius: 0 !important;
-            position: static !important;
+            box-shadow: none !important;
           }
           
-          /* SHOW ALL CHILDREN OF RECEIPT */
+          /* Show all receipt children */
           .tunisia-payment-receipt * {
             visibility: visible !important;
-            display: revert !important;
             color: black !important;
-            background: transparent !important;
+            background: white !important;
             font-family: Arial, sans-serif !important;
-            box-shadow: none !important;
             border-radius: 0 !important;
+            box-shadow: none !important;
             text-shadow: none !important;
             filter: none !important;
             transform: none !important;
-            position: static !important;
           }
           
           /* OBLITERATE SIDEBAR AND HEADER COMPLETELY */
