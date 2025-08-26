@@ -50,18 +50,18 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
         </div>
 
         {/* HBL Print View - Front */}
-        <div className="bg-white p-6 shadow-lg print:shadow-none print:p-0 print:m-0" style={{ width: "210mm", minHeight: "297mm", margin: "0 auto" }}>
+        <div className="bg-white shadow-lg print:shadow-none" style={{ width: "210mm", height: "297mm", margin: "0 auto", padding: "10mm", fontSize: "10px", lineHeight: "1.2" }}>
           {/* Header */}
-          <div className="border-2 border-black mb-4">
-            <div className="flex justify-between items-center p-2">
+          <div className="border-2 border-black mb-2">
+            <div className="flex justify-between items-center p-1">
               <div>
-                <h1 className="text-xl font-bold">BILL OF LADING</h1>
-                <p className="text-sm">FOR MULTIMODAL TRANSPORT OR PORT TO PORT SHIPMENT</p>
+                <h1 className="text-lg font-bold">BILL OF LADING</h1>
+                <p className="text-xs">FOR MULTIMODAL TRANSPORT OR PORT TO PORT SHIPMENT</p>
               </div>
               <div className="text-right">
-                <p className="font-bold">NEGOTIABLE</p>
-                <p className="font-bold">ORIGINAL</p>
-                <div className="border border-black p-1 mt-2">
+                <p className="font-bold text-sm">NEGOTIABLE</p>
+                <p className="font-bold text-sm">ORIGINAL</p>
+                <div className="border border-black p-1 mt-1">
                   <p className="text-xs">Page</p>
                   <p className="font-bold">1 / 1</p>
                 </div>
@@ -70,31 +70,31 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
           </div>
 
           {/* BL Number and Reference */}
-          <div className="flex justify-between mb-4">
+          <div className="flex justify-between mb-2">
             <div>
-              <p className="text-sm"><strong>B/L no.</strong></p>
-              <p className="font-bold">{hblData.blNumber}</p>
+              <p className="text-xs"><strong>B/L no.</strong></p>
+              <p className="font-bold text-sm">{hblData.blNumber}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm">Reference no.</p>
-              <p>256893702</p>
+              <p className="text-xs">Reference no.</p>
+              <p className="text-sm">256893702</p>
             </div>
           </div>
 
           {/* Shipper and Agent */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="border border-black p-2">
-              <p className="text-sm font-bold">Shipper</p>
-              <p className="font-bold">{hblData.shipper.name}</p>
-              <p>{hblData.shipper.address}</p>
+          <div className="grid grid-cols-2 gap-2 mb-2">
+            <div className="border border-black p-1">
+              <p className="text-xs font-bold">Shipper</p>
+              <p className="font-bold text-sm">{hblData.shipper.name}</p>
+              <p className="text-xs">{hblData.shipper.address}</p>
             </div>
             <div className="text-center">
-              <div className="mb-4">
-                <p className="text-sm">Agent</p>
+              <div className="mb-2">
+                <p className="text-xs">Agent</p>
                 <div className="text-center">
-                  <h2 className="text-2xl font-bold text-green-600">SOQOTRA</h2>
-                  <p className="text-sm">LOGISTICS SERVICES AND TRADING</p>
-                  <div className="text-xs mt-2">
+                  <h2 className="text-lg font-bold text-green-600">SOQOTRA</h2>
+                  <p className="text-xs">LOGISTICS SERVICES AND TRADING</p>
+                  <div className="text-xs mt-1">
                     <p>SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING W.L.L.</p>
                     <p>Office 3, 1st Floor, Building 53, Street 76, Azizja Commercial Street,</p>
                     <p>P.O. Box: 55881, Al Aziziyah, Doha, State of Qatar.</p>
@@ -105,79 +105,79 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
           </div>
 
           {/* Consignee */}
-          <div className="grid grid-cols-2 gap-4 mb-4">
-            <div className="border border-black p-2">
-              <p className="text-sm font-bold">Consignee</p>
-              <p className="font-bold">{hblData.consignee.name}</p>
-              <p>{hblData.consignee.address}</p>
+          <div className="grid grid-cols-2 gap-2 mb-2">
+            <div className="border border-black p-1">
+              <p className="text-xs font-bold">Consignee</p>
+              <p className="font-bold text-sm">{hblData.consignee.name}</p>
+              <p className="text-xs">{hblData.consignee.address}</p>
             </div>
             <div>
-              <p className="text-sm">Name of carrier</p>
-              <p className="font-bold">MAERSK LINE</p>
+              <p className="text-xs">Name of carrier</p>
+              <p className="font-bold text-sm">MAERSK LINE</p>
             </div>
           </div>
 
           {/* Vessel and Port Information */}
-          <div className="grid grid-cols-4 gap-2 mb-4 text-sm">
-            <div className="border border-black p-2">
+          <div className="grid grid-cols-4 gap-1 mb-2 text-xs">
+            <div className="border border-black p-1">
               <p className="font-bold">Vessel</p>
               <p>{hblData.vessel}</p>
             </div>
-            <div className="border border-black p-2">
+            <div className="border border-black p-1">
               <p className="font-bold">Port of loading</p>
               <p>{hblData.portOfLoading}</p>
             </div>
-            <div className="border border-black p-2">
+            <div className="border border-black p-1">
               <p className="font-bold">Port of discharge</p>
               <p>{hblData.portOfDischarge}</p>
             </div>
-            <div className="border border-black p-2">
+            <div className="border border-black p-1">
               <p className="font-bold">Final destination</p>
               <p>TUNIS</p>
             </div>
           </div>
 
           {/* Cargo Details */}
-          <div className="border border-black mb-4">
+          <div className="border border-black mb-2">
             <div className="grid grid-cols-4 gap-0">
-              <div className="border-r border-black p-2">
+              <div className="border-r border-black p-1">
                 <p className="text-xs font-bold">Marks and nos; Container no.</p>
               </div>
-              <div className="border-r border-black p-2 col-span-2">
+              <div className="border-r border-black p-1 col-span-2">
                 <p className="text-xs font-bold">Number and kind of packages; Description of goods</p>
               </div>
-              <div className="p-2">
+              <div className="p-1">
                 <p className="text-xs font-bold">Gross weight</p>
               </div>
             </div>
-            <div className="grid grid-cols-4 gap-0 min-h-[200px]">
-              <div className="border-r border-black p-2">
-                <p className="text-sm">{hblData.containerNumber}</p>
-                <p className="text-sm">SEAL: ML-SA0029977</p>
+            <div className="grid grid-cols-4 gap-0" style={{ minHeight: "120px" }}>
+              <div className="border-r border-black p-1">
+                <p className="text-xs">{hblData.containerNumber}</p>
+                <p className="text-xs">SEAL: ML-SA0029977</p>
               </div>
-              <div className="border-r border-black p-2 col-span-2">
-                <div className="whitespace-pre-line text-sm">
+              <div className="border-r border-black p-1 col-span-2">
+                <div className="whitespace-pre-line text-xs">
                   {hblData.cargoDescription}
                 </div>
-                <div className="mt-8 text-center">
-                  <p className="font-bold">SHIPPER ON BOARD : 03/08/2025</p>
+                <div className="mt-4 text-center">
+                  <p className="font-bold text-xs">SHIPPER ON BOARD : 03/08/2025</p>
                 </div>
               </div>
-              <div className="p-2">
-                <p className="font-bold">{hblData.weight}</p>
+              <div className="p-1">
+                <p className="font-bold text-xs">{hblData.weight}</p>
               </div>
             </div>
           </div>
 
           {/* Legal Text & Footer */}
-          <div className="text-xs leading-tight mb-4">
+          <div className="text-xs leading-tight mb-2">
             <p className="font-bold">
               RECEIVED the goods in apparent good order and condition and, as far as ascertained by 
               reasonable means of checking, as specified above unless otherwise stated.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-3 gap-2 text-xs">
             <div>
               <p className="font-bold">Freight payable at</p>
               <p>DOHA, QATAR</p>
@@ -191,7 +191,7 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
             </div>
             <div>
               <p className="font-bold">Signature</p>
-              <div className="h-16 border-b border-black mt-8"></div>
+              <div className="h-8 border-b border-black mt-4"></div>
             </div>
           </div>
         </div>
@@ -225,6 +225,17 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
             [role="navigation"], [role="banner"], [role="complementary"] {
               display: none !important;
               visibility: hidden !important;
+            }
+            
+            /* Ensure HBL fits properly on A4 */
+            .bg-white[style*="210mm"] {
+              width: 210mm !important;
+              height: 297mm !important;
+              margin: 0 !important;
+              padding: 10mm !important;
+              font-size: 10px !important;
+              line-height: 1.2 !important;
+              box-sizing: border-box !important;
             }
             
             @page { 
