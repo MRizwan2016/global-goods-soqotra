@@ -201,11 +201,16 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
             .no-print { display: none !important; }
             body { margin: 0; padding: 0; }
             html { margin: 0; padding: 0; }
-            body > div:first-child { display: none !important; }
-            nav, aside, header:not(.hbl-header), footer:not(.hbl-footer), .sidebar, [role="navigation"], [role="banner"], [role="complementary"] { display: none !important; }
-            * { visibility: hidden; }
-            .bg-white[style*="210mm"] { visibility: visible !important; }
-            .bg-white[style*="210mm"] * { visibility: visible !important; }
+            /* Hide all root level containers except our HBL */
+            body > div:not(:has(.bg-white[style*="210mm"])) { display: none !important; }
+            /* Hide navigation, sidebar, and dashboard elements */
+            nav, aside, header:not(.print-header), footer:not(.print-footer), 
+            .sidebar, [role="navigation"], [role="banner"], [role="complementary"],
+            .flex.items-center.gap-4, .space-y-6 > .flex.items-center.gap-4,
+            /* Hide any elements that contain dashboard menu items */
+            [class*="UPB"], [class*="ACCOUNTS"], [class*="ADMIN"], [class*="CARGO"] { 
+              display: none !important; 
+            }
             @page { 
               size: A4; 
               margin: 0mm; 
