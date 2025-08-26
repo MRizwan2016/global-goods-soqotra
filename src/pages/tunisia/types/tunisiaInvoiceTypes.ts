@@ -44,6 +44,8 @@ export interface TunisiaInvoice {
   totalAmount: number;
   date: string;
   status: "DRAFT" | "CONFIRMED" | "LOADED";
+  paymentStatus?: "paid" | "unpaid" | "partial";
+  paymentDetails?: PaymentDetails;
 }
 
 export interface PaymentDetails {
