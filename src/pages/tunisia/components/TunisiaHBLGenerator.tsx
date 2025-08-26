@@ -201,6 +201,11 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
             .no-print { display: none !important; }
             body { margin: 0; padding: 0; }
             html { margin: 0; padding: 0; }
+            body > div:first-child { display: none !important; }
+            nav, aside, header:not(.hbl-header), footer:not(.hbl-footer), .sidebar, [role="navigation"], [role="banner"], [role="complementary"] { display: none !important; }
+            * { visibility: hidden; }
+            .bg-white[style*="210mm"] { visibility: visible !important; }
+            .bg-white[style*="210mm"] * { visibility: visible !important; }
             @page { 
               size: A4; 
               margin: 0mm; 
