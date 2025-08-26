@@ -50,7 +50,7 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
         </div>
 
         {/* HBL Print View - Front */}
-        <div className="bg-white p-8 shadow-lg print:shadow-none print:p-0" style={{ minHeight: "11in" }}>
+        <div className="bg-white p-6 shadow-lg print:shadow-none print:p-0 print:m-0" style={{ width: "210mm", minHeight: "297mm", margin: "0 auto" }}>
           {/* Header */}
           <div className="border-2 border-black mb-4">
             <div className="flex justify-between items-center p-2">
@@ -199,9 +199,15 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
         <style>{`
           @media print {
             .no-print { display: none !important; }
-            body { margin: 0; }
+            body { margin: 0; padding: 0; }
+            html { margin: 0; padding: 0; }
+            @page { 
+              size: A4; 
+              margin: 0mm; 
+            }
             .print\\:p-0 { padding: 0 !important; }
             .print\\:shadow-none { box-shadow: none !important; }
+            .print\\:m-0 { margin: 0 !important; }
           }
         `}</style>
       </div>
