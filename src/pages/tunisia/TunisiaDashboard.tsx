@@ -16,8 +16,13 @@ import LoadingRecordsView from "./components/LoadingRecordsView";
 import TunisiaPaymentReceiptGenerator from "./components/TunisiaPaymentReceiptGenerator";
 import TunisiaHBLGenerator from "./components/TunisiaHBLGenerator";
 import TunisiaDocumentViewer from "./components/TunisiaDocumentViewer";
+import TunisiaPaymentTracker from "./components/TunisiaPaymentTracker";
+import TunisiaInvoiceBookManager from "./components/TunisiaInvoiceBookManager";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Search, CreditCard, BookOpen, Ship } from "lucide-react";
 import { TunisiaStorageService } from "./services/TunisiaStorageService";
+import { TunisiaInvoiceBookService } from "./services/TunisiaInvoiceBookService";
 import { toast } from "sonner";
 
 const TunisiaDashboard: React.FC = () => {
@@ -25,8 +30,14 @@ const TunisiaDashboard: React.FC = () => {
   const [containers, setContainers] = useState<TunisiaContainer[]>([]);
   const [selectedContainer, setSelectedContainer] = useState<TunisiaContainer | null>(null);
   const [invoices, setInvoices] = useState<TunisiaInvoice[]>([]);
-  const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading' | 'sealed-containers' | 'container-details' | 'invoice-form' | 'invoice-management' | 'loading-records' | 'payment-receipt' | 'hbl-generator' | 'document-viewer'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading' | 'sealed-containers' | 'container-details' | 'invoice-form' | 'invoice-management' | 'loading-records' | 'payment-receipt' | 'hbl-generator' | 'document-viewer' | 'payment-tracker' | 'book-manager'>('dashboard');
   const [selectedInvoice, setSelectedInvoice] = useState<TunisiaInvoice | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Initialize invoice books on mount
+  useEffect(() => {
+    TunisiaInvoiceBookService.initializeDefaultBooks();
+  }, []);
 
   // Load data on component mount
   useEffect(() => {
@@ -472,7 +483,6 @@ const TunisiaDashboard: React.FC = () => {
           </div>
         </div>
         <TunisiaHBLGenerator
-          invoices={invoices}
           onBack={() => setView('dashboard')}
         />
       </Layout>
@@ -500,6 +510,34 @@ const TunisiaDashboard: React.FC = () => {
     );
   }
 
+  if (view === 'payment-tracker') {
+    return (
+      <Layout title="Tunisia Payment Tracker">
+        <div className="mb-8">
+          <div className="flex justify-between mb-4">
+            <CountryBackButton />
+            <LanguageSwitcher />
+          </div>
+        </div>
+        <TunisiaPaymentTracker />
+      </Layout>
+    );
+  }
+
+  if (view === 'book-manager') {
+    return (
+      <Layout title="Tunisia Invoice Book Manager">
+        <div className="mb-8">
+          <div className="flex justify-between mb-4">
+            <CountryBackButton />
+            <LanguageSwitcher />
+          </div>
+        </div>
+        <TunisiaInvoiceBookManager />
+      </Layout>
+    );
+  }
+
   return (
     <Layout title="Tunisia Operations">
       <div className="mb-8">
@@ -515,7 +553,101 @@ const TunisiaDashboard: React.FC = () => {
         </p>
       </div>
       
+      {/* Search functionality */}
+      <div className="mb-6">
+        <div className="relative max-w-md">
+          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search invoices by number, customer, or vehicle plate..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        {searchQuery && (
+          <div className="mt-2 text-sm text-muted-foreground">
+            {invoices.filter(inv => 
+              inv.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              inv.customer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              inv.vehicle.exportPlate.toLowerCase().includes(searchQuery.toLowerCase())
+            ).length} invoice(s) found matching "{searchQuery}"
+          </div>
+        )}
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card 
+          className="cursor-pointer hover:shadow-lg transition-shadow border-2 border-red-200 hover:border-red-400"
+          onClick={() => setView('payment-tracker')}
+        >
+          <CardHeader>
+            <CardTitle className="text-red-600 flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Payment Tracker
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Track customer payments for vehicles and personal effects with receipt generation.
+            </p>
+            <div className="space-y-2 text-xs">
+              <div>• Paid/Unpaid Invoice Tracking</div>
+              <div>• Payment Receipt Generation</div>
+              <div>• Payment Method Recording</div>
+              <div>• Invoice Search & Filtering</div>
+              <div>• Payment Status Updates</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="cursor-pointer hover:shadow-lg transition-shadow border-2 border-indigo-200 hover:border-indigo-400"
+          onClick={() => setView('book-manager')}
+        >
+          <CardHeader>
+            <CardTitle className="text-indigo-600 flex items-center gap-2">
+              <BookOpen className="h-5 w-5" />
+              Invoice Book Manager
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Manage Tunisia invoice books and assign invoice numbers to users.
+            </p>
+            <div className="space-y-2 text-xs">
+              <div>• Book No. 1: 013100-013150 (50 pages)</div>
+              <div>• User Assignment System</div>
+              <div>• Available Page Tracking</div>
+              <div>• Dropdown Invoice Selection</div>
+              <div>• Book Status Management</div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card 
+          className="cursor-pointer hover:shadow-lg transition-shadow border-2 border-teal-200 hover:border-teal-400"
+          onClick={() => setView('hbl-generator')}
+        >
+          <CardHeader>
+            <CardTitle className="text-teal-600 flex items-center gap-2">
+              <Ship className="h-5 w-5" />
+              House Bill of Lading
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-sm text-muted-foreground mb-4">
+              Generate professional HBL documents with legal terms for shipping.
+            </p>
+            <div className="space-y-2 text-xs">
+              <div>• Front & Back Legal Terms</div>
+              <div>• Auto-fill from Invoice Data</div>
+              <div>• Professional Layout Design</div>
+              <div>• Print-Ready Format</div>
+              <div>• Carrier Information</div>
+            </div>
+          </CardContent>
+        </Card>
+
         <Card 
           className="cursor-pointer hover:shadow-lg transition-shadow border-2 border-primary/20 hover:border-primary/40"
           onClick={() => setView('container-select')}

@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowLeft, Printer } from "lucide-react";
 import { TunisiaInvoice, PaymentDetails } from "../types/tunisiaInvoiceTypes";
+import { TunisiaStorageService } from "../services/TunisiaStorageService";
+import { toast } from "sonner";
 import TunisiaPrintStyles from "./TunisiaPrintStyles";
 
 interface TunisiaPaymentReceiptGeneratorProps {
@@ -32,7 +34,18 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
   };
 
   const handleGenerateReceipt = () => {
+    // Update invoice payment status
+    const updatedInvoice = {
+      ...invoice,
+      paymentStatus: "paid" as const,
+      paymentDetails: paymentDetails
+    };
+    
+    // Save updated invoice
+    TunisiaStorageService.addInvoice(updatedInvoice);
+    
     setShowReceipt(true);
+    toast.success("Payment recorded successfully!");
   };
 
   if (showReceipt) {
