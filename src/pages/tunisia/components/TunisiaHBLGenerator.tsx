@@ -277,7 +277,8 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
         </div>
 
         {/* HBL Print View - Back Side */}
-        <div className="bg-white shadow-lg print:shadow-none print-page mt-4" style={{ width: "210mm", height: "297mm", margin: "0 auto", padding: "8mm", fontSize: "8px", lineHeight: "1.1", pageBreakBefore: "always" }}>
+        <div className="page-break"></div>
+        <div className="bg-white shadow-lg print:shadow-none print-page print-page-2" style={{ width: "210mm", height: "297mm", margin: "0 auto", padding: "8mm", fontSize: "8px", lineHeight: "1.1" }}>
           <div className="text-xs">
             <h2 className="font-bold mb-2">Definitions</h2>
             <div className="space-y-1 text-justify">
@@ -349,6 +350,10 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
         </div>
 
         <style>{`
+          .page-break {
+            display: none;
+          }
+          
           @media print {
             /* Hide everything first */
             body * {
@@ -369,24 +374,34 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
               visibility: visible !important;
             }
             
+            /* Force page break between front and back */
+            .page-break {
+              display: block !important;
+              page-break-before: always !important;
+              height: 0 !important;
+              visibility: visible !important;
+            }
+            
             /* Position print pages correctly */
             .print-page {
-              position: absolute !important;
-              left: 0 !important;
-              top: 0 !important;
+              position: relative !important;
               width: 210mm !important;
               height: 297mm !important;
               margin: 0 !important;
               padding: 8mm !important;
               box-sizing: border-box !important;
-              page-break-after: always !important;
+            }
+            
+            /* Ensure second page starts on new page */
+            .print-page-2 {
+              page-break-before: always !important;
             }
             
             /* Hide all other elements */
             .no-print,
             nav, aside, header, footer, button,
             [role="navigation"], [role="banner"], [role="complementary"],
-            .sidebar, .dashboard, .container > *:not(.print-page) {
+            .sidebar, .dashboard, .container > *:not(.print-page):not(.page-break) {
               display: none !important;
               visibility: hidden !important;
             }
