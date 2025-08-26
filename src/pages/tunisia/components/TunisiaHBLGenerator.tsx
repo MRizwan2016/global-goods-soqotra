@@ -198,26 +198,39 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
 
         <style>{`
           @media print {
-            .no-print { display: none !important; }
-            body { margin: 0; padding: 0; }
-            html { margin: 0; padding: 0; }
-            /* Hide all root level containers except our HBL */
-            body > div:not(:has(.bg-white[style*="210mm"])) { display: none !important; }
-            /* Hide navigation, sidebar, and dashboard elements */
-            nav, aside, header:not(.print-header), footer:not(.print-footer), 
-            .sidebar, [role="navigation"], [role="banner"], [role="complementary"],
-            .flex.items-center.gap-4, .space-y-6 > .flex.items-center.gap-4,
-            /* Hide any elements that contain dashboard menu items */
-            [class*="UPB"], [class*="ACCOUNTS"], [class*="ADMIN"], [class*="CARGO"] { 
-              display: none !important; 
+            * {
+              visibility: hidden !important;
             }
+            
+            /* Only show the HBL container and its children */
+            .bg-white[style*="210mm"],
+            .bg-white[style*="210mm"] * {
+              visibility: visible !important;
+            }
+            
+            /* Hide everything else completely */
+            body > div:not(:has(.bg-white[style*="210mm"])) {
+              display: none !important;
+            }
+            
+            /* Reset body and html margins */
+            body, html {
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+            
+            /* Hide any navigation, buttons, or dashboard elements */
+            .no-print, nav, aside, header:not(.print-header), 
+            footer:not(.print-footer), button, .sidebar,
+            [role="navigation"], [role="banner"], [role="complementary"] {
+              display: none !important;
+              visibility: hidden !important;
+            }
+            
             @page { 
               size: A4; 
               margin: 0mm; 
             }
-            .print\\:p-0 { padding: 0 !important; }
-            .print\\:shadow-none { box-shadow: none !important; }
-            .print\\:m-0 { margin: 0 !important; }
           }
         `}</style>
       </div>
