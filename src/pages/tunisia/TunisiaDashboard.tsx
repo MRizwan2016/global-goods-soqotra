@@ -532,6 +532,7 @@ const TunisiaDashboard: React.FC = () => {
         </div>
         <TunisiaHBLGenerator
           onBack={() => setView('dashboard')}
+          invoices={invoices}
         />
       </Layout>
     );

@@ -3,13 +3,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Printer, Search } from "lucide-react";
+import { TunisiaInvoice } from "../types/tunisiaInvoiceTypes";
+import InvoiceSelectionModal from "./InvoiceSelectionModal";
 
 interface TunisiaHBLGeneratorProps {
   onBack: () => void;
+  invoices: TunisiaInvoice[];
 }
 
-const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => {
+const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack, invoices }) => {
+  const [selectedInvoice, setSelectedInvoice] = useState<TunisiaInvoice | null>(null);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  
   // Initialize with editable vessel/voyage and auto-filled data from invoices
   const [hblData, setHblData] = useState({
     blNumber: "2025/04726/15134",
@@ -34,6 +40,24 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
   
   const [showPrintView, setShowPrintView] = useState(false);
 
+  const handleInvoiceSelect = (invoice: TunisiaInvoice) => {
+    setSelectedInvoice(invoice);
+    // Auto-fill HBL data from selected invoice
+    setHblData(prev => ({
+      ...prev,
+      shipper: {
+        name: invoice.customer.name,
+        address: invoice.customer.address
+      },
+      consignee: {
+        name: invoice.customer.name,
+        address: invoice.customer.address
+      },
+      cargoDescription: `SAID TO CONTAIN\n01 X 40' HC (PART) CONTAINER\n1 UNIT OF ${invoice.vehicle.make} ${invoice.vehicle.model}\nMAKE: ${invoice.vehicle.make}\nMODEL: ${invoice.vehicle.model}\nMODEL YEAR: ${invoice.vehicle.year}\nCHASSIS NO: ${invoice.vehicle.chassisNumber}\nENGINE NO: ${invoice.vehicle.engineNumber}\nCYLINDERS: 4\nCOLOR: ${invoice.vehicle.color}\nMADE IN ${invoice.vehicle.country}\nEXPORT PLATE: ${invoice.vehicle.exportPlate}\nH.S. CODE: ${invoice.vehicle.hsCode}\nGROSS WEIGHT: 1450 KGS`,
+      weight: "1,450.00KGS"
+    }));
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -53,7 +77,7 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
         </div>
 
         {/* HBL Print View - Front */}
-        <div className="bg-white shadow-lg print:shadow-none print-page" style={{ width: "210mm", height: "297mm", margin: "0 auto", padding: "8mm", fontSize: "9px", lineHeight: "1.1" }}>
+        <div className="bg-white shadow-lg print:shadow-none print-page" style={{ width: "210mm", height: "297mm", margin: "0 auto", padding: "8mm", fontSize: "9px", lineHeight: "1.1", pageBreakAfter: "always" }}>
           {/* Header */}
           <div className="flex justify-between items-start mb-1">
             <div>
@@ -280,8 +304,7 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
         </div>
 
         {/* HBL Print View - Back Side */}
-        <div className="page-break"></div>
-        <div className="bg-white shadow-lg print:shadow-none print-page print-page-2" style={{ width: "210mm", height: "297mm", margin: "0 auto", padding: "8mm", fontSize: "8px", lineHeight: "1.1" }}>
+        <div className="bg-white shadow-lg print:shadow-none print-page-2" style={{ width: "210mm", height: "297mm", margin: "0 auto", padding: "8mm", fontSize: "8px", lineHeight: "1.1", pageBreakBefore: "always" }}>
           <div className="text-xs">
             <h2 className="font-bold mb-2">Definitions</h2>
             <div className="space-y-1 text-justify">
@@ -415,23 +438,57 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
+    <div className="space-y-6 p-6 bg-gray-50 min-h-screen">
+      <div className="flex justify-between items-center">
         <Button variant="outline" onClick={onBack}>
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back
+          Back to Dashboard
         </Button>
-        <h1 className="text-2xl font-bold">Tunisia House Bill of Lading Generator</h1>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>HBL Information</CardTitle>
+          <CardTitle>House Bill of Lading Generator</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Select an invoice to auto-fill HBL details. Only vessel, voyage, and shipped on board date are editable.
+          </p>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
+          {/* Invoice Selection */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium">Select Invoice for HBL Generation</label>
+              <Button
+                variant="outline"
+                onClick={() => setShowInvoiceModal(true)}
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4" />
+                {selectedInvoice ? 'Change Invoice' : 'Select Invoice'}
+              </Button>
+            </div>
+            
+            {selectedInvoice && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-semibold text-lg">{selectedInvoice.invoiceNumber}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedInvoice.customer.name} • {selectedInvoice.vehicle.make} {selectedInvoice.vehicle.model}
+                    </p>
+                  </div>
+                  <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
+                    Selected
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Vessel Information - Editable Fields Only */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Vessel (Editable)</label>
+              <label className="text-sm font-medium">Vessel *</label>
               <Input
                 value={hblData.vessel}
                 onChange={(e) => setHblData(prev => ({ ...prev, vessel: e.target.value }))}
@@ -439,7 +496,7 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Voyage (Editable)</label>
+              <label className="text-sm font-medium">Voyage *</label>
               <Input
                 value={hblData.voyage}
                 onChange={(e) => setHblData(prev => ({ ...prev, voyage: e.target.value }))}
@@ -447,7 +504,7 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Shipped on Board (Editable)</label>
+              <label className="text-sm font-medium">Shipped on Board Date *</label>
               <Input
                 type="date"
                 value={hblData.shippedOnBoard}
@@ -455,34 +512,27 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
               />
             </div>
           </div>
-          
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h4 className="font-medium text-blue-800 mb-2">Auto-filled from Invoice Management</h4>
-            <p className="text-sm text-blue-600">
-              All other details are automatically populated from invoice management. 
-              Only vessel, voyage, and shipped on board date can be edited.
-            </p>
-          </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Cargo Description</h3>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Detailed Description</label>
-              <Textarea
-                rows={8}
-                value={hblData.cargoDescription}
-                onChange={(e) => setHblData(prev => ({ ...prev, cargoDescription: e.target.value }))}
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end">
-            <Button onClick={() => setShowPrintView(true)}>
-              Generate HBL
+          <div className="flex justify-center">
+            <Button 
+              onClick={() => setShowPrintView(true)} 
+              size="lg"
+              disabled={!selectedInvoice}
+            >
+              <Printer className="h-4 w-4 mr-2" />
+              Generate HBL Document
             </Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* Invoice Selection Modal */}
+      <InvoiceSelectionModal
+        isOpen={showInvoiceModal}
+        onClose={() => setShowInvoiceModal(false)}
+        invoices={invoices}
+        onInvoiceSelect={handleInvoiceSelect}
+      />
     </div>
   );
 };
