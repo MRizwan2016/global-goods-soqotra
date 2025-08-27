@@ -13,6 +13,8 @@ interface ContainerLoadingViewProps {
   onVehicleAdd: (vehicle: Omit<TunisiaVehicle, 'id'>) => void;
   onPersonalEffectsAdd: (effects: Omit<PersonalEffects, 'id'>) => void;
   onContainerSeal: () => void;
+  onVehicleRemove: (vehicleId: string) => void;
+  onPersonalEffectsRemove: (effectsId: string) => void;
   invoices: any[];
 }
 
@@ -22,6 +24,8 @@ const ContainerLoadingView: React.FC<ContainerLoadingViewProps> = ({
   onVehicleAdd,
   onPersonalEffectsAdd,
   onContainerSeal,
+  onVehicleRemove,
+  onPersonalEffectsRemove,
   invoices
 }) => {
   const [activeForm, setActiveForm] = useState<'none' | 'vehicle' | 'effects'>('none');
@@ -182,9 +186,21 @@ const ContainerLoadingView: React.FC<ContainerLoadingViewProps> = ({
                       <div className="font-semibold text-green-800">
                         Vehicle {index + 1}
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        {vehicle.type}
-                      </Badge>
+                      <div className="flex gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {vehicle.type}
+                        </Badge>
+                        {container.status !== 'SEALED' && (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="h-6 px-2 text-xs"
+                            onClick={() => onVehicleRemove(vehicle.id)}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     <div className="text-sm space-y-1">
                       <div><strong>Make/Model:</strong> {vehicle.make} {vehicle.model}</div>
@@ -238,9 +254,21 @@ const ContainerLoadingView: React.FC<ContainerLoadingViewProps> = ({
                       <div className="font-semibold text-blue-800">
                         Effects Package {index + 1}
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        {effects.volume} CBM
-                      </Badge>
+                      <div className="flex gap-2">
+                        <Badge variant="outline" className="text-xs">
+                          {effects.volume} CBM
+                        </Badge>
+                        {container.status !== 'SEALED' && (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            className="h-6 px-2 text-xs"
+                            onClick={() => onPersonalEffectsRemove(effects.id)}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </div>
                     </div>
                     <div className="text-sm space-y-1">
                       <div><strong>Description:</strong> {effects.description}</div>

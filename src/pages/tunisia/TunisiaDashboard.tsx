@@ -129,6 +129,52 @@ const TunisiaDashboard: React.FC = () => {
     toast.success("Personal effects added successfully!");
   };
 
+  const handleVehicleRemove = (vehicleId: string) => {
+    if (!selectedContainer) return;
+
+    const vehicleToRemove = selectedContainer.loadedVehicles.find(v => v.id === vehicleId);
+    if (!vehicleToRemove) return;
+
+    const updatedContainer: TunisiaContainer = {
+      ...selectedContainer,
+      loadedVehicles: selectedContainer.loadedVehicles.filter(v => v.id !== vehicleId),
+      totalFreightCharge: selectedContainer.totalFreightCharge - vehicleToRemove.freightCharge,
+      totalCharge: (selectedContainer.totalFreightCharge - vehicleToRemove.freightCharge) + selectedContainer.totalPersonalEffectsCharge
+    };
+
+    // Save to storage
+    TunisiaStorageService.updateContainer(updatedContainer);
+    
+    // Update container in state
+    setContainers(prev => prev.map(c => c.id === selectedContainer.id ? updatedContainer : c));
+    setSelectedContainer(updatedContainer);
+    
+    toast.success("Vehicle removed successfully!");
+  };
+
+  const handlePersonalEffectsRemove = (effectsId: string) => {
+    if (!selectedContainer) return;
+
+    const effectsToRemove = selectedContainer.personalEffects.find(e => e.id === effectsId);
+    if (!effectsToRemove) return;
+
+    const updatedContainer: TunisiaContainer = {
+      ...selectedContainer,
+      personalEffects: selectedContainer.personalEffects.filter(e => e.id !== effectsId),
+      totalPersonalEffectsCharge: selectedContainer.totalPersonalEffectsCharge - effectsToRemove.charges,
+      totalCharge: selectedContainer.totalFreightCharge + (selectedContainer.totalPersonalEffectsCharge - effectsToRemove.charges)
+    };
+
+    // Save to storage
+    TunisiaStorageService.updateContainer(updatedContainer);
+    
+    // Update container in state
+    setContainers(prev => prev.map(c => c.id === selectedContainer.id ? updatedContainer : c));
+    setSelectedContainer(updatedContainer);
+    
+    toast.success("Personal effects removed successfully!");
+  };
+
   const handleContainerSeal = () => {
     if (!selectedContainer) return;
 
@@ -254,6 +300,8 @@ const TunisiaDashboard: React.FC = () => {
           onVehicleAdd={handleVehicleAdd}
           onPersonalEffectsAdd={handlePersonalEffectsAdd}
           onContainerSeal={handleContainerSeal}
+          onVehicleRemove={handleVehicleRemove}
+          onPersonalEffectsRemove={handlePersonalEffectsRemove}
           invoices={invoices}
         />
       </Layout>

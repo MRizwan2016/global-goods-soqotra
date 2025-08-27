@@ -10,6 +10,7 @@ interface TunisiaHBLGeneratorProps {
 }
 
 const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => {
+  // Initialize with editable vessel/voyage and auto-filled data from invoices
   const [hblData, setHblData] = useState({
     blNumber: "2025/04726/15134",
     date: new Date().toISOString().split('T')[0],
@@ -18,10 +19,12 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
       address: "DOHA, QATAR"
     },
     consignee: {
-      name: "MR. ALGHAMMAM DHAKER",
+      name: "MR. ALGHAMMAM DHAKER", 
       address: "TUNIS, TUNISIA"
     },
-    vessel: "SOURCE BLESSING / 531S",
+    vessel: "SOURCE BLESSING / 531S", // Editable
+    voyage: "531S", // Editable
+    shippedOnBoard: new Date().toISOString().split('T')[0], // Editable
     portOfLoading: "HAMAD SEA PORT",
     portOfDischarge: "TUNIS",
     containerNumber: "MSKU1359156 / 40'HC",
@@ -203,7 +206,7 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
                   {hblData.cargoDescription}
                 </div>
                 <div className="mt-4 text-center">
-                  <p className="font-bold text-xs">SHIPPER ON BOARD :03/08/2025</p>
+                  <p className="font-bold text-xs">SHIPPED ON BOARD: {new Date(hblData.shippedOnBoard).toLocaleDateString('en-GB')}</p>
                 </div>
               </div>
               <div className="border-r border-black p-1 col-span-1 text-center">
@@ -350,22 +353,23 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
         </div>
 
         <style>{`
-          .page-break {
-            display: none;
-          }
-          
           @media print {
+            @page {
+              size: A4;
+              margin: 0;
+            }
+            
             /* Hide everything first */
             body * {
               visibility: hidden !important;
             }
             
-            /* Reset page settings */
-            body, html {
+            body {
               margin: 0 !important;
               padding: 0 !important;
-              height: auto !important;
-              overflow: visible !important;
+              background: white !important;
+              -webkit-print-color-adjust: exact !important;
+              color-adjust: exact !important;
             }
             
             /* Show only print pages */
@@ -374,15 +378,7 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
               visibility: visible !important;
             }
             
-            /* Force page break between front and back */
-            .page-break {
-              display: block !important;
-              page-break-before: always !important;
-              height: 0 !important;
-              visibility: visible !important;
-            }
-            
-            /* Position print pages correctly */
+            /* Position print pages correctly for A4 */
             .print-page {
               position: relative !important;
               width: 210mm !important;
@@ -390,11 +386,13 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
               margin: 0 !important;
               padding: 8mm !important;
               box-sizing: border-box !important;
+              page-break-after: always !important;
+              display: block !important;
             }
             
-            /* Ensure second page starts on new page */
-            .print-page-2 {
-              page-break-before: always !important;
+            /* Remove page break after last page */
+            .print-page:last-child {
+              page-break-after: avoid !important;
             }
             
             /* Hide all other elements */
@@ -431,22 +429,39 @@ const TunisiaHBLGenerator: React.FC<TunisiaHBLGeneratorProps> = ({ onBack }) => 
           <CardTitle>HBL Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">B/L Number</label>
+              <label className="text-sm font-medium">Vessel (Editable)</label>
               <Input
-                value={hblData.blNumber}
-                onChange={(e) => setHblData(prev => ({ ...prev, blNumber: e.target.value }))}
+                value={hblData.vessel}
+                onChange={(e) => setHblData(prev => ({ ...prev, vessel: e.target.value }))}
+                placeholder="Enter vessel name"
               />
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Date</label>
+              <label className="text-sm font-medium">Voyage (Editable)</label>
+              <Input
+                value={hblData.voyage}
+                onChange={(e) => setHblData(prev => ({ ...prev, voyage: e.target.value }))}
+                placeholder="Enter voyage number"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Shipped on Board (Editable)</label>
               <Input
                 type="date"
-                value={hblData.date}
-                onChange={(e) => setHblData(prev => ({ ...prev, date: e.target.value }))}
+                value={hblData.shippedOnBoard}
+                onChange={(e) => setHblData(prev => ({ ...prev, shippedOnBoard: e.target.value }))}
               />
             </div>
+          </div>
+          
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <h4 className="font-medium text-blue-800 mb-2">Auto-filled from Invoice Management</h4>
+            <p className="text-sm text-blue-600">
+              All other details are automatically populated from invoice management. 
+              Only vessel, voyage, and shipped on board date can be edited.
+            </p>
           </div>
 
           <div className="space-y-4">
