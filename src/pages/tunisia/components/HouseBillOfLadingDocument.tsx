@@ -9,8 +9,8 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingDocumentProps> = ({ h
   return (
     <div className="bill-of-lading-document">
       {/* FRONT PAGE */}
-      <div className="hbl-front-page" style={{ minHeight: '100vh', pageBreakAfter: 'always' }}>
-        <div className="max-w-4xl mx-auto p-8 bg-white print:p-0 print:m-0 print:max-w-none print:shadow-none shadow-lg">
+      <div className="hbl-front-page">
+        <div className="w-full h-full p-4 bg-white">
           {/* Header */}
           <div className="border-2 border-black mb-4">
             <div className="grid grid-cols-12 text-xs">
@@ -182,8 +182,8 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingDocumentProps> = ({ h
       </div>
 
       {/* BACK PAGE */}
-      <div className="hbl-back-page" style={{ minHeight: '100vh' }}>
-        <div className="max-w-4xl mx-auto p-8 bg-white print:p-0 print:m-0 print:max-w-none print:shadow-none shadow-lg">
+      <div className="hbl-back-page">
+        <div className="w-full h-full p-4 bg-white">
           {/* Bottom section - Terms and Conditions */}
           <div className="border-2 border-black">
             <div className="border-b border-black">
