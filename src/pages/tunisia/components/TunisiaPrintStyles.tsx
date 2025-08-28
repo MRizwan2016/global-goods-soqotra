@@ -86,7 +86,8 @@ const TunisiaPrintStyles = () => {
           /* HBL Front Page */
           .hbl-front-page {
             width: 210mm !important;
-            height: 297mm !important;
+            min-height: 297mm !important;
+            height: auto !important;
             background: white !important;
             color: black !important;
             padding: 10mm !important;
@@ -96,14 +97,15 @@ const TunisiaPrintStyles = () => {
             page-break-inside: avoid !important;
             display: block !important;
             box-sizing: border-box !important;
-            overflow: hidden !important;
+            overflow: visible !important;
             position: relative !important;
           }
           
           /* HBL Back Page */
           .hbl-back-page {
             width: 210mm !important;
-            height: 297mm !important;
+            min-height: 297mm !important;
+            height: auto !important;
             background: white !important;
             color: black !important;
             padding: 10mm !important;
@@ -113,7 +115,7 @@ const TunisiaPrintStyles = () => {
             page-break-inside: avoid !important;
             display: block !important;
             box-sizing: border-box !important;
-            overflow: hidden !important;
+            overflow: visible !important;
             position: relative !important;
           }
           
