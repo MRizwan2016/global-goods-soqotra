@@ -28,8 +28,6 @@ const TunisiaPrintStyles = () => {
           /* Show receipt and HBL documents */
           #tunisia-payment-receipt-print,
           #tunisia-payment-receipt-print *,
-          .bill-of-lading-document,
-          .bill-of-lading-document *,
           .hbl-front-page,
           .hbl-front-page *,
           .hbl-back-page,
@@ -65,6 +63,8 @@ const TunisiaPrintStyles = () => {
             page-break-inside: avoid !important;
             display: block !important;
             box-sizing: border-box !important;
+            overflow: hidden !important;
+            position: relative !important;
           }
           
           /* HBL Back Page */
@@ -80,6 +80,8 @@ const TunisiaPrintStyles = () => {
             page-break-inside: avoid !important;
             display: block !important;
             box-sizing: border-box !important;
+            overflow: hidden !important;
+            position: relative !important;
           }
           
           /* Remove all margins and paddings inside print containers */
