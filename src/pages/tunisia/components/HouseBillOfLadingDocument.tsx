@@ -7,7 +7,14 @@ interface HouseBillOfLadingDocumentProps {
 
 const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingDocumentProps> = ({ hbl }) => {
   return (
-    <>
+    <div className="hbl-document"
+         style={{
+           width: '100%',
+           height: 'auto',
+           backgroundColor: 'white',
+           color: 'black'
+         }}>
+      {/* HBL Content */}
       {/* FRONT PAGE - Full A4 size with inline styles for print */}
       <div 
         className="hbl-front-page"
@@ -264,7 +271,7 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingDocumentProps> = ({ h
           <p>AWBEDITOR.COM</p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

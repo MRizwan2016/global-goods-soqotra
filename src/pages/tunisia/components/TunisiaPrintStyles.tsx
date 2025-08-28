@@ -28,6 +28,8 @@ const TunisiaPrintStyles = () => {
           /* Show receipt and HBL documents */
           #tunisia-payment-receipt-print,
           #tunisia-payment-receipt-print *,
+          .hbl-document,
+          .hbl-document *,
           .hbl-front-page,
           .hbl-front-page *,
           .hbl-back-page,
@@ -50,6 +52,19 @@ const TunisiaPrintStyles = () => {
             position: relative !important;
           }
           
+          /* HBL Document Container */
+          .hbl-document {
+            width: 100% !important;
+            height: auto !important;
+            background: white !important;
+            color: black !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
+            border: none !important;
+            position: relative !important;
+          }
+
           /* HBL Front Page */
           .hbl-front-page {
             width: 210mm !important;
@@ -57,7 +72,7 @@ const TunisiaPrintStyles = () => {
             background: white !important;
             color: black !important;
             padding: 10mm !important;
-            margin: 0 auto !important;
+            margin: 0 !important;
             box-shadow: none !important;
             page-break-after: always !important;
             page-break-inside: avoid !important;
@@ -74,7 +89,7 @@ const TunisiaPrintStyles = () => {
             background: white !important;
             color: black !important;
             padding: 10mm !important;
-            margin: 0 auto !important;
+            margin: 0 !important;
             box-shadow: none !important;
             page-break-before: always !important;
             page-break-inside: avoid !important;
