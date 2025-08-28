@@ -20,25 +20,24 @@ const TunisiaPrintStyles = () => {
             color-adjust: exact !important;
           }
           
-          /* Hide everything first */
+          /* Show everything by default for print */
           * {
-            visibility: hidden !important;
+            visibility: visible !important;
+            color: black !important;
           }
           
-          /* Show receipt and HBL documents */
-          #tunisia-payment-receipt-print,
-          #tunisia-payment-receipt-print *,
-          #hbl-printable-content,
-          #hbl-printable-content *,
-          .hbl-document,
-          .hbl-document *,
-          .hbl-front-page,
-          .hbl-front-page *,
-          .hbl-back-page,
-          .hbl-back-page *,
-          .house-bill-of-lading,
-          .house-bill-of-lading * {
-            visibility: visible !important;
+          /* Hide non-printable elements */
+          .print\\:hidden,
+          .no-print,
+          button,
+          .button,
+          [role="button"],
+          input,
+          select,
+          .print\\:hidden *,
+          .no-print * {
+            display: none !important;
+            visibility: hidden !important;
           }
           
           /* Receipt on first page */
