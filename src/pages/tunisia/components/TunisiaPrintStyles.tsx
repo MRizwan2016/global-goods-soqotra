@@ -7,7 +7,7 @@ const TunisiaPrintStyles = () => {
         @media print {
           @page {
             size: A4;
-            margin: 10mm;
+            margin: 0;
           }
           
           body, html {
@@ -35,7 +35,9 @@ const TunisiaPrintStyles = () => {
           .hbl-front-page,
           .hbl-front-page *,
           .hbl-back-page,
-          .hbl-back-page * {
+          .hbl-back-page *,
+          .house-bill-of-lading,
+          .house-bill-of-lading * {
             visibility: visible !important;
           }
           
@@ -65,6 +67,8 @@ const TunisiaPrintStyles = () => {
             box-shadow: none !important;
             border: none !important;
             position: relative !important;
+            overflow: visible !important;
+            max-width: none !important;
           }
 
           /* HBL Document Container */
@@ -175,8 +179,16 @@ const TunisiaPrintStyles = () => {
           }
           
           /* Borders */
-          .border, .border-2 {
+          .border {
             border: 1px solid black !important;
+          }
+          
+          .border-2 {
+            border: 2px solid black !important;
+          }
+          
+          .border-black {
+            border-color: black !important;
           }
           
           .border-r {
@@ -189,6 +201,10 @@ const TunisiaPrintStyles = () => {
           
           .border-t {
             border-top: 1px solid black !important;
+          }
+          
+          .border-l {
+            border-left: 1px solid black !important;
           }
           
           /* Typography */
@@ -259,6 +275,40 @@ const TunisiaPrintStyles = () => {
           
           .min-h-\\[300px\\] {
             min-height: 90pt !important;
+          }
+          
+          /* Additional spacing utilities */
+          .gap-2 {
+            gap: 2pt !important;
+          }
+          
+          .gap-4 {
+            gap: 4pt !important;
+          }
+          
+          .space-y-1 > * + * {
+            margin-top: 1pt !important;
+          }
+          
+          .space-y-4 > * + * {
+            margin-top: 4pt !important;
+          }
+          
+          /* Utility classes */
+          .uppercase {
+            text-transform: uppercase !important;
+          }
+          
+          .max-w-4xl {
+            max-width: 100% !important;
+          }
+          
+          /* Remove any container constraints */
+          .container {
+            max-width: 100% !important;
+            width: 100% !important;
+            padding: 0 !important;
+            margin: 0 !important;
           }
         }
       `}
