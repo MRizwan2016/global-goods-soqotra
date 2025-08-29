@@ -86,37 +86,39 @@ const TunisiaPrintStyles = () => {
           /* HBL Front Page */
           .hbl-front-page {
             width: 210mm !important;
-            min-height: 297mm !important;
-            height: auto !important;
+            height: 297mm !important;
             background: white !important;
             color: black !important;
-            padding: 10mm !important;
+            padding: 5mm !important;
             margin: 0 !important;
             box-shadow: none !important;
             page-break-after: always !important;
             page-break-inside: avoid !important;
             display: block !important;
             box-sizing: border-box !important;
-            overflow: visible !important;
+            overflow: hidden !important;
             position: relative !important;
+            transform: scale(1) !important;
+            transform-origin: top left !important;
           }
           
           /* HBL Back Page */
           .hbl-back-page {
             width: 210mm !important;
-            min-height: 297mm !important;
-            height: auto !important;
+            height: 297mm !important;
             background: white !important;
             color: black !important;
-            padding: 10mm !important;
+            padding: 5mm !important;
             margin: 0 !important;
             box-shadow: none !important;
             page-break-before: always !important;
             page-break-inside: avoid !important;
             display: block !important;
             box-sizing: border-box !important;
-            overflow: visible !important;
+            overflow: hidden !important;
             position: relative !important;
+            transform: scale(1) !important;
+            transform-origin: top left !important;
           }
           
           /* Remove all margins and paddings inside print containers */

@@ -240,12 +240,40 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingDocumentProps> = ({ h
             </div>
           </div>
 
-          <div className="p-4 text-xs space-y-3">
-            <p><strong>RECEIVED</strong> the goods in apparent good order and condition, and as far as ascertained by reasonable means of checking, as specified above unless otherwise stated.</p>
-            <p>The Carrier, in accordance with and to the extent of the provisions contained in this Bill of Lading, undertakes to perform and/or to procure performance of the combined transport and the delivery of the goods, including all services related to perform from the place and time of taking the goods in charge until delivery, taking the goods in charge and accepts responsibility for such transport and such services.</p>
-            <p>The surrender and accepts responsibility for such transport and such services endorsed in exchange for the goods or delivery order.</p>
-            <p><strong>One of the Bills of Lading</strong> has/have been signed in the number indicated below, one of which being accomplished the other(s) to be void.</p>
-            <p><strong>IN WITNESS whereof</strong> Bill(s) of Lading has/have been signed in the number indicated below, one of which being accomplished the other(s) to be void.</p>
+          <div className="p-4 text-xs space-y-2">
+            <div className="text-center font-bold text-lg mb-4">TERMS AND CONDITIONS</div>
+            
+            <div className="space-y-2">
+              <p><strong>1. DEFINITIONS</strong></p>
+              <p>"Carrier" means SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING W.L.L. on whose behalf this Bill of Lading has been signed.</p>
+              <p>"Merchant" includes the shipper, consignee, receiver, holder of this Bill of Lading and the owner of the goods.</p>
+              
+              <p><strong>2. CARRIER'S RESPONSIBILITY</strong></p>
+              <p>The Carrier shall be liable for loss or damage to the goods occurring between the time when the goods are loaded on and the time when they are discharged from the vessel, but not otherwise.</p>
+              
+              <p><strong>3. LIMITATION OF LIABILITY</strong></p>
+              <p>The Carrier's liability shall not exceed the lesser of the actual value of the goods lost or damaged or the equivalent of 2 Special Drawing Rights per kilogram of gross weight of the goods lost or damaged.</p>
+              
+              <p><strong>4. NOTICE OF CLAIM</strong></p>
+              <p>Unless notice of loss or damage and the general nature of such loss or damage is given in writing to the Carrier before or at the time of removal of the goods, such removal shall be prima facie evidence of delivery by the Carrier of the goods as described in this Bill of Lading.</p>
+              
+              <p><strong>5. TIME BAR</strong></p>
+              <p>The Carrier shall be discharged from all liability in respect of loss or damage unless suit is brought within one year after delivery of the goods or the date when the goods should have been delivered.</p>
+              
+              <p><strong>6. GENERAL AVERAGE</strong></p>
+              <p>General Average shall be adjusted according to York-Antwerp Rules 1994 and settled at any port or place at the option of the Carrier.</p>
+              
+              <p><strong>7. GOVERNING LAW</strong></p>
+              <p>This Bill of Lading shall be governed by and construed in accordance with English law and any dispute arising hereunder shall be decided in the English courts.</p>
+              
+              <p><strong>8. BOTH TO BLAME COLLISION CLAUSE</strong></p>
+              <p>If the ship comes into collision with another ship as a result of the negligence of the other ship and any act, neglect or default of the master, mariner, pilot or the servants of the Carrier in the navigation or in the management of the ship, the merchants will indemnify the Carrier against all loss or liability.</p>
+            </div>
+            
+            <div className="mt-4 pt-2 border-t border-black">
+              <p><strong>RECEIVED</strong> the goods herein described in apparent good order and condition unless otherwise noted above to be transported and delivered subject to the terms and conditions herein.</p>
+              <p><strong>IN WITNESS WHEREOF</strong>, the number of Bills of Lading indicated below have been signed, one of which being accomplished, the others to stand void.</p>
+            </div>
           </div>
 
           <div className="grid grid-cols-3 border-t border-black">
