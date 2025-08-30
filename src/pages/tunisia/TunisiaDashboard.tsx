@@ -217,6 +217,32 @@ const TunisiaDashboard: React.FC = () => {
     setView('container-details');
   };
 
+  const handleContainerEdit = (containerId: string, updatedData: Partial<TunisiaContainer>) => {
+    const container = containers.find(c => c.id === containerId);
+    if (!container) return;
+
+    const updatedContainer: TunisiaContainer = {
+      ...container,
+      ...updatedData
+    };
+
+    // Save to storage
+    TunisiaStorageService.updateContainer(updatedContainer);
+    
+    setContainers(prev => prev.map(c => c.id === containerId ? updatedContainer : c));
+    
+    toast.success("Container updated successfully!");
+  };
+
+  const handleContainerDelete = (containerId: string) => {
+    // Save to storage
+    TunisiaStorageService.deleteContainer(containerId);
+    
+    setContainers(prev => prev.filter(c => c.id !== containerId));
+    
+    toast.success("Container deleted successfully!");
+  };
+
   const handleInvoiceSave = (invoice: TunisiaInvoice) => {
     // Save to storage first
     TunisiaStorageService.addInvoice(invoice);
@@ -286,6 +312,8 @@ const TunisiaDashboard: React.FC = () => {
           containers={containers}
           onContainerSelect={handleContainerSelect}
           onContainerCreate={handleContainerCreate}
+          onContainerEdit={handleContainerEdit}
+          onContainerDelete={handleContainerDelete}
         />
       </Layout>
     );
@@ -322,6 +350,8 @@ const TunisiaDashboard: React.FC = () => {
           onBack={() => setView('dashboard')}
           onContainerView={handleContainerView}
           onContainerReopen={handleContainerReopen}
+          onContainerEdit={handleContainerEdit}
+          onContainerDelete={handleContainerDelete}
           isAdmin={true}
         />
       </Layout>

@@ -161,32 +161,51 @@ const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
                 </CardHeader>
                 <CardContent>
                   <div className="document-preview bg-gray-50 p-4 rounded-lg">
-                    {docUrl.toLowerCase().includes('.pdf') ? (
-                      <div className="text-center">
-                        <FileText className="h-16 w-16 mx-auto text-blue-500 mb-2" />
-                        <p className="text-sm text-muted-foreground">PDF Document</p>
-                        <p className="text-xs text-muted-foreground break-all mt-1">{docUrl}</p>
-                      </div>
-                    ) : (
-                      <div className="text-center">
-                        <img 
-                          src={docUrl} 
-                          alt={`Document ${index + 1}`}
-                          className="max-w-full h-auto max-h-96 mx-auto rounded border"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.style.display = 'none';
-                            target.parentElement!.innerHTML = `
-                              <div class="text-center">
-                                <FileText class="h-16 w-16 mx-auto text-gray-400 mb-2" />
-                                <p class="text-sm text-muted-foreground">Unable to preview document</p>
-                                <p class="text-xs text-muted-foreground break-all mt-1">${docUrl}</p>
-                              </div>
-                            `;
-                          }}
-                        />
-                      </div>
-                    )}
+                     {docUrl.toLowerCase().includes('.pdf') ? (
+                       <div className="text-center">
+                         <iframe 
+                           src={docUrl} 
+                           className="w-full h-96 border rounded"
+                           title={`PDF Document ${index + 1}`}
+                           onError={() => {
+                             // Fallback to icon if iframe fails
+                           }}
+                         />
+                         <p className="text-sm text-muted-foreground mt-2">PDF Document</p>
+                         <p className="text-xs text-muted-foreground break-all mt-1">{docUrl}</p>
+                       </div>
+                     ) : (
+                       <div className="text-center">
+                         <img 
+                           src={docUrl} 
+                           alt={`Document ${index + 1}`}
+                           className="max-w-full h-auto max-h-96 mx-auto rounded border"
+                           onLoad={(e) => {
+                             // Image loaded successfully
+                             const target = e.target as HTMLImageElement;
+                             target.style.display = 'block';
+                           }}
+                           onError={(e) => {
+                             const target = e.target as HTMLImageElement;
+                             target.style.display = 'none';
+                             const errorDiv = document.createElement('div');
+                             errorDiv.className = 'text-center p-4';
+                             errorDiv.innerHTML = `
+                               <div class="text-center">
+                                 <div class="h-16 w-16 mx-auto text-gray-400 mb-2 flex items-center justify-center">
+                                   <svg class="h-16 w-16" fill="currentColor" viewBox="0 0 20 20">
+                                     <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
+                                   </svg>
+                                 </div>
+                                 <p class="text-sm text-muted-foreground">Unable to preview document</p>
+                                 <p class="text-xs text-muted-foreground break-all mt-1">${docUrl}</p>
+                               </div>
+                             `;
+                             target.parentElement?.appendChild(errorDiv);
+                           }}
+                         />
+                       </div>
+                     )}
                   </div>
                 </CardContent>
               </Card>

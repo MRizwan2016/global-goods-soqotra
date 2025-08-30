@@ -2,7 +2,7 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Eye, Truck, Calendar, Package, Car, Unlock } from "lucide-react";
+import { ArrowLeft, Eye, Truck, Calendar, Package, Car, Unlock, Edit2, Trash2 } from "lucide-react";
 import { TunisiaContainer } from "../types/tunisiaTypes";
 
 interface SealedContainersViewProps {
@@ -10,6 +10,8 @@ interface SealedContainersViewProps {
   onBack: () => void;
   onContainerView: (container: TunisiaContainer) => void;
   onContainerReopen?: (containerId: string) => void;
+  onContainerEdit?: (containerId: string, updatedContainer: Partial<TunisiaContainer>) => void;
+  onContainerDelete?: (containerId: string) => void;
   isAdmin?: boolean;
 }
 
@@ -18,6 +20,8 @@ const SealedContainersView: React.FC<SealedContainersViewProps> = ({
   onBack,
   onContainerView,
   onContainerReopen,
+  onContainerEdit,
+  onContainerDelete,
   isAdmin = false
 }) => {
   const sealedContainers = containers.filter(container => container.status === 'SEALED');
@@ -149,16 +153,42 @@ const SealedContainersView: React.FC<SealedContainersViewProps> = ({
                     <Eye className="h-4 w-4 mr-2" />
                     View Details
                   </Button>
-                  {isAdmin && onContainerReopen && (
-                    <Button 
-                      onClick={() => onContainerReopen(container.id)}
-                      variant="outline"
-                      size="icon"
-                      className="text-orange-600 hover:text-orange-700 border-orange-300 hover:border-orange-400"
-                      title="Reopen for more loading (Admin only)"
-                    >
-                      <Unlock className="h-4 w-4" />
-                    </Button>
+                  {isAdmin && (
+                    <div className="flex gap-1">
+                      {onContainerEdit && (
+                        <Button 
+                          onClick={() => onContainerEdit && onContainerEdit(container.id, {})}
+                          variant="outline"
+                          size="icon"
+                          className="text-blue-600 hover:text-blue-700 border-blue-300 hover:border-blue-400"
+                          title="Edit container details"
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {onContainerReopen && (
+                        <Button 
+                          onClick={() => onContainerReopen(container.id)}
+                          variant="outline"
+                          size="icon"
+                          className="text-orange-600 hover:text-orange-700 border-orange-300 hover:border-orange-400"
+                          title="Reopen for more loading (Admin only)"
+                        >
+                          <Unlock className="h-4 w-4" />
+                        </Button>
+                      )}
+                      {onContainerDelete && (
+                        <Button 
+                          onClick={() => onContainerDelete && confirm('Are you sure you want to delete this sealed container?') && onContainerDelete(container.id)}
+                          variant="outline"
+                          size="icon"
+                          className="text-red-600 hover:text-red-700 border-red-300 hover:border-red-400"
+                          title="Delete container (Admin only)"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </div>
               </CardContent>

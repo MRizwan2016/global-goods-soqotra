@@ -3,25 +3,37 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Edit2, Trash2 } from "lucide-react";
 import { TunisiaContainer } from "../types/tunisiaTypes";
 
 interface ContainerSelectionProps {
   containers: TunisiaContainer[];
   onContainerSelect: (container: TunisiaContainer) => void;
   onContainerCreate: (container: Omit<TunisiaContainer, 'id'>) => void;
+  onContainerEdit?: (containerId: string, updatedContainer: Partial<TunisiaContainer>) => void;
+  onContainerDelete?: (containerId: string) => void;
 }
 
 const ContainerSelection: React.FC<ContainerSelectionProps> = ({
   containers,
   onContainerSelect,
-  onContainerCreate
+  onContainerCreate,
+  onContainerEdit,
+  onContainerDelete
 }) => {
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingContainer, setEditingContainer] = useState<string | null>(null);
   const [newContainer, setNewContainer] = useState({
     containerNumber: "",
     sealNumber: "",
     type: "40HC" as "40HC" | "45",
     dateOfLoading: new Date().toISOString().split('T')[0]
+  });
+  const [editContainer, setEditContainer] = useState({
+    containerNumber: "",
+    sealNumber: "",
+    type: "40HC" as "40HC" | "45",
+    dateOfLoading: ""
   });
 
   const handleCreateContainer = () => {
@@ -46,6 +58,39 @@ const ContainerSelection: React.FC<ContainerSelectionProps> = ({
     });
   };
 
+  const handleEditContainer = (container: TunisiaContainer) => {
+    setEditingContainer(container.id);
+    setEditContainer({
+      containerNumber: container.containerNumber,
+      sealNumber: container.sealNumber,
+      type: container.type,
+      dateOfLoading: container.dateOfLoading
+    });
+  };
+
+  const handleSaveEdit = () => {
+    if (editingContainer && onContainerEdit) {
+      onContainerEdit(editingContainer, editContainer);
+      setEditingContainer(null);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingContainer(null);
+    setEditContainer({
+      containerNumber: "",
+      sealNumber: "",
+      type: "40HC",
+      dateOfLoading: ""
+    });
+  };
+
+  const handleDeleteContainer = (containerId: string) => {
+    if (onContainerDelete && confirm('Are you sure you want to delete this container?')) {
+      onContainerDelete(containerId);
+    }
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -57,35 +102,126 @@ const ContainerSelection: React.FC<ContainerSelectionProps> = ({
           {containers.map((container) => (
             <Card 
               key={container.id}
-              className={`cursor-pointer border-2 transition-all hover:shadow-lg ${
+              className={`border-2 transition-all hover:shadow-lg ${
                 container.status === 'LOADING' ? 'border-orange-500 bg-orange-50' :
                 container.status === 'LOADED' ? 'border-green-500 bg-green-50' :
                 container.status === 'SEALED' ? 'border-blue-500 bg-blue-50' :
                 'border-gray-300'
               }`}
-              onClick={() => onContainerSelect(container)}
             >
               <CardContent className="p-4">
-                <div className="text-sm font-semibold text-primary">
-                  {container.containerNumber}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Seal: {container.sealNumber}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  Type: {container.type}
-                </div>
-                <div className="text-xs">
-                  Vehicles: {container.loadedVehicles.length}/{container.maxVehicles}
-                </div>
-                <div className={`text-xs font-medium mt-2 px-2 py-1 rounded ${
-                  container.status === 'EMPTY' ? 'bg-gray-100 text-gray-800' :
-                  container.status === 'LOADING' ? 'bg-orange-100 text-orange-800' :
-                  container.status === 'LOADED' ? 'bg-green-100 text-green-800' :
-                  'bg-blue-100 text-blue-800'
-                }`}>
-                  {container.status}
-                </div>
+                {editingContainer === container.id ? (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-xs font-medium">Container Number</label>
+                      <Input
+                        value={editContainer.containerNumber}
+                        onChange={(e) => setEditContainer({...editContainer, containerNumber: e.target.value})}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium">Seal Number</label>
+                      <Input
+                        value={editContainer.sealNumber}
+                        onChange={(e) => setEditContainer({...editContainer, sealNumber: e.target.value})}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium">Container Type</label>
+                      <Select 
+                        value={editContainer.type} 
+                        onValueChange={(value: "40HC" | "45") => setEditContainer({...editContainer, type: value})}
+                      >
+                        <SelectTrigger className="text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="40HC">40' HC</SelectItem>
+                          <SelectItem value="45">45'</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium">Date of Loading</label>
+                      <Input
+                        type="date"
+                        value={editContainer.dateOfLoading}
+                        onChange={(e) => setEditContainer({...editContainer, dateOfLoading: e.target.value})}
+                        className="text-sm"
+                      />
+                    </div>
+                    <div className="flex gap-1">
+                      <Button onClick={handleSaveEdit} size="sm" className="flex-1 text-xs">
+                        Save
+                      </Button>
+                      <Button onClick={handleCancelEdit} variant="outline" size="sm" className="flex-1 text-xs">
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div 
+                      className="cursor-pointer"
+                      onClick={() => onContainerSelect(container)}
+                    >
+                      <div className="text-sm font-semibold text-primary">
+                        {container.containerNumber}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Seal: {container.sealNumber}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Type: {container.type}
+                      </div>
+                      <div className="text-xs">
+                        Vehicles: {container.loadedVehicles.length}/{container.maxVehicles}
+                      </div>
+                      <div className={`text-xs font-medium mt-2 px-2 py-1 rounded ${
+                        container.status === 'EMPTY' ? 'bg-gray-100 text-gray-800' :
+                        container.status === 'LOADING' ? 'bg-orange-100 text-orange-800' :
+                        container.status === 'LOADED' ? 'bg-green-100 text-green-800' :
+                        'bg-blue-100 text-blue-800'
+                      }`}>
+                        {container.status}
+                      </div>
+                    </div>
+                    {(onContainerEdit || onContainerDelete) && container.status !== 'SEALED' && (
+                      <div className="flex gap-1 mt-2">
+                        {onContainerEdit && (
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleEditContainer(container);
+                            }}
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 text-xs"
+                          >
+                            <Edit2 className="h-3 w-3 mr-1" />
+                            Edit
+                          </Button>
+                        )}
+                        {onContainerDelete && (
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteContainer(container.id);
+                            }}
+                            variant="destructive"
+                            size="sm"
+                            className="flex-1 text-xs"
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            Delete
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
