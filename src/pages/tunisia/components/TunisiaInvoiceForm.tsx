@@ -78,7 +78,7 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
   };
 
   const handleAddVehiclePhoto = (url: string) => {
-    if (url.trim()) {
+    if (url.trim() && vehicle.photos.length < 3) {
       setVehicle(prev => ({
         ...prev,
         photos: [...prev.photos, url.trim()]
@@ -94,14 +94,20 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        handleAddVehiclePhoto(result);
-      };
-      reader.readAsDataURL(file);
+    const files = event.target.files;
+    if (files) {
+      // Check if adding these files would exceed the limit
+      const remainingSlots = 3 - vehicle.photos.length;
+      const filesToProcess = Array.from(files).slice(0, remainingSlots);
+      
+      filesToProcess.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          handleAddVehiclePhoto(result);
+        };
+        reader.readAsDataURL(file);
+      });
     }
   };
 
@@ -481,30 +487,44 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
           <div>
             <Label>Vehicle Photos</Label>
             <div className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter photo URL"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleAddVehiclePhoto((e.target as HTMLInputElement).value);
-                      (e.target as HTMLInputElement).value = '';
-                    }
-                  }}
-                />
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileUpload}
-                  style={{ display: 'none' }}
-                  id="vehicle-file-upload"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => document.getElementById('vehicle-file-upload')?.click()}
-                >
-                  <Upload className="h-4 w-4" />
-                </Button>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Vehicle Photos ({vehicle.photos.length}/3)</span>
+                  {vehicle.photos.length >= 3 && (
+                    <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
+                      Maximum 3 photos allowed
+                    </span>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter photo URL"
+                    disabled={vehicle.photos.length >= 3}
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        handleAddVehiclePhoto((e.target as HTMLInputElement).value);
+                        (e.target as HTMLInputElement).value = '';
+                      }
+                    }}
+                  />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleFileUpload}
+                    style={{ display: 'none' }}
+                    id="vehicle-file-upload"
+                    disabled={vehicle.photos.length >= 3}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={vehicle.photos.length >= 3}
+                    onClick={() => document.getElementById('vehicle-file-upload')?.click()}
+                  >
+                    <Upload className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {vehicle.photos.map((photo, index) => (

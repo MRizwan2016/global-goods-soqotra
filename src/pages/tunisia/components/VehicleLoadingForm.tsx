@@ -53,7 +53,7 @@ const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
   };
 
   const handleAddPhoto = () => {
-    if (photoInput.trim()) {
+    if (photoInput.trim() && (vehicle.photos || []).length < 3) {
       setVehicle({
         ...vehicle,
         photos: [...(vehicle.photos || []), photoInput.trim()]
@@ -72,17 +72,23 @@ const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
   };
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setVehicle({
-          ...vehicle,
-          photos: [...(vehicle.photos || []), result]
-        });
-      };
-      reader.readAsDataURL(file);
+    const files = event.target.files;
+    if (files && (vehicle.photos || []).length < 3) {
+      // Check how many slots are available
+      const remainingSlots = 3 - (vehicle.photos || []).length;
+      const filesToProcess = Array.from(files).slice(0, remainingSlots);
+      
+      filesToProcess.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const result = e.target?.result as string;
+          setVehicle(prev => ({
+            ...prev,
+            photos: [...(prev.photos || []), result]
+          }));
+        };
+        reader.readAsDataURL(file);
+      });
     }
   };
 
@@ -267,7 +273,14 @@ const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
 
         {/* Photo Upload Section */}
         <div className="space-y-4">
-          <label className="text-sm font-medium">Vehicle Photos</label>
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium">Vehicle Photos ({(vehicle.photos || []).length}/3)</label>
+            {(vehicle.photos || []).length >= 3 && (
+              <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded">
+                Maximum 3 photos allowed
+              </span>
+            )}
+          </div>
           
           {/* Photo Upload Methods */}
           <div className="flex gap-2">
@@ -276,13 +289,24 @@ const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
                 value={photoInput}
                 onChange={(e) => setPhotoInput(e.target.value)}
                 placeholder="Paste image URL or take photo"
+                disabled={(vehicle.photos || []).length >= 3}
               />
             </div>
-            <Button onClick={handleAddPhoto} variant="outline" size="sm">
+            <Button 
+              onClick={handleAddPhoto} 
+              variant="outline" 
+              size="sm"
+              disabled={(vehicle.photos || []).length >= 3}
+            >
               Add URL
             </Button>
             <label className="cursor-pointer">
-              <Button variant="outline" size="sm" asChild>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                asChild
+                disabled={(vehicle.photos || []).length >= 3}
+              >
                 <span>
                   <Upload className="h-4 w-4 mr-1" />
                   Upload
@@ -292,8 +316,10 @@ const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
                 type="file"
                 accept="image/*"
                 capture="environment"
+                multiple
                 onChange={handleFileUpload}
                 className="hidden"
+                disabled={(vehicle.photos || []).length >= 3}
               />
             </label>
           </div>
