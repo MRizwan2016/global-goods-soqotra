@@ -41,33 +41,37 @@ const TunisiaDashboard: React.FC = () => {
 
   // Load data on component mount
   useEffect(() => {
-    const loadedInvoices = TunisiaStorageService.loadInvoices();
-    const loadedContainers = TunisiaStorageService.loadContainers();
+    const loadData = async () => {
+      const loadedInvoices = await TunisiaStorageService.loadInvoices();
+      const loadedContainers = await TunisiaStorageService.loadContainers();
+      
+      console.log('Raw localStorage data:', {
+        invoicesData: localStorage.getItem('tunisia-invoices'),
+        containersData: localStorage.getItem('tunisia-containers')
+      });
+      
+      setInvoices(loadedInvoices);
+      setContainers(loadedContainers);
+      
+      console.log('Loaded Tunisia data:', { 
+        invoices: loadedInvoices.length, 
+        containers: loadedContainers.length,
+        invoiceDetails: loadedInvoices,
+        containerDetails: loadedContainers
+      });
+    };
     
-    console.log('Raw localStorage data:', {
-      invoicesData: localStorage.getItem('tunisia-invoices'),
-      containersData: localStorage.getItem('tunisia-containers')
-    });
-    
-    setInvoices(loadedInvoices);
-    setContainers(loadedContainers);
-    
-    console.log('Loaded Tunisia data:', { 
-      invoices: loadedInvoices.length, 
-      containers: loadedContainers.length,
-      invoiceDetails: loadedInvoices,
-      containerDetails: loadedContainers
-    });
+    loadData();
   }, []);
 
-  const handleContainerCreate = (containerData: Omit<TunisiaContainer, 'id'>) => {
+  const handleContainerCreate = async (containerData: Omit<TunisiaContainer, 'id'>) => {
     const newContainer: TunisiaContainer = {
       ...containerData,
       id: Date.now().toString()
     };
     
     // Save to storage
-    TunisiaStorageService.addContainer(newContainer);
+    await TunisiaStorageService.addContainer(newContainer);
     setContainers(prev => [...prev, newContainer]);
     
     toast.success("Container created successfully!");
@@ -243,26 +247,31 @@ const TunisiaDashboard: React.FC = () => {
     toast.success("Container deleted successfully!");
   };
 
-  const handleInvoiceSave = (invoice: TunisiaInvoice) => {
-    // Save to storage first
-    TunisiaStorageService.addInvoice(invoice);
-    
-    if (invoices.find(inv => inv.id === invoice.id)) {
-      setInvoices(prev => prev.map(inv => inv.id === invoice.id ? invoice : inv));
-      // Update any container vehicles that match the updated invoice
-      syncInvoiceToContainers(invoice);
-      toast.success("Invoice updated successfully!");
-    } else {
-      setInvoices(prev => [...prev, invoice]);
-      toast.success("Invoice created successfully!");
+  const handleInvoiceSave = async (invoice: TunisiaInvoice) => {
+    try {
+      // Save to storage first
+      await TunisiaStorageService.addInvoice(invoice);
+      
+      if (invoices.find(inv => inv.id === invoice.id)) {
+        setInvoices(prev => prev.map(inv => inv.id === invoice.id ? invoice : inv));
+        // Update any container vehicles that match the updated invoice
+        await syncInvoiceToContainers(invoice);
+        toast.success("Invoice updated successfully!");
+      } else {
+        setInvoices(prev => [...prev, invoice]);
+        toast.success("Invoice created successfully!");
+      }
+      setView('invoice-management');
+    } catch (error) {
+      console.error('Error saving invoice:', error);
+      toast.error("Failed to save invoice. Please try again.");
     }
-    setView('invoice-management');
   };
 
   // Sync invoice updates to loaded vehicles in containers
-  const syncInvoiceToContainers = (updatedInvoice: TunisiaInvoice) => {
+  const syncInvoiceToContainers = async (updatedInvoice: TunisiaInvoice) => {
     // Use storage service for proper sync
-    TunisiaStorageService.syncInvoiceToContainers(updatedInvoice);
+    await TunisiaStorageService.syncInvoiceToContainers(updatedInvoice);
     
     // Also update local state
     setContainers(prev => prev.map(container => ({

@@ -232,13 +232,13 @@ const VehicleLoadingForm: React.FC<VehicleLoadingFormProps> = ({
             <label className="text-sm font-medium">Export Plate</label>
             <Input
               value={vehicle.exportPlate}
-              onChange={(e) => {
+              onChange={async (e) => {
                 const exportPlate = e.target.value;
                 setVehicle({...vehicle, exportPlate});
                 
                 // Auto-populate from existing invoices using storage service
                 if (exportPlate.trim()) {
-                  const matchingInvoice = TunisiaStorageService.getInvoiceByExportPlate(exportPlate);
+                  const matchingInvoice = await TunisiaStorageService.getInvoiceByExportPlate(exportPlate);
                   
                   if (matchingInvoice) {
                     setVehicle(prev => ({

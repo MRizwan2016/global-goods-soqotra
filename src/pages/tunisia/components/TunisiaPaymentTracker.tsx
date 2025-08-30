@@ -18,8 +18,8 @@ const TunisiaPaymentTracker = () => {
   const [statusFilter, setStatusFilter] = useState<"all" | "paid" | "unpaid">("all");
 
   useEffect(() => {
-    const loadInvoices = () => {
-      const storedInvoices = TunisiaStorageService.loadInvoices();
+    const loadInvoices = async () => {
+      const storedInvoices = await TunisiaStorageService.loadInvoices();
       setInvoices(storedInvoices);
       setFilteredInvoices(storedInvoices);
     };
@@ -59,11 +59,11 @@ const TunisiaPaymentTracker = () => {
     console.log("View invoice:", invoice);
   };
 
-  const handleBackFromReceipt = () => {
+  const handleBackFromReceipt = async () => {
     setShowReceiptGenerator(false);
     setSelectedInvoice(null);
     // Reload invoices to reflect any status updates
-    const storedInvoices = TunisiaStorageService.loadInvoices();
+    const storedInvoices = await TunisiaStorageService.loadInvoices();
     setInvoices(storedInvoices);
   };
 

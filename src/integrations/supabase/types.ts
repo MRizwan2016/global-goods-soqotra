@@ -91,6 +91,146 @@ export type Database = {
         }
         Relationships: []
       }
+      tunisia_containers: {
+        Row: {
+          arrival_date: string | null
+          container_number: string
+          created_at: string
+          departure_date: string | null
+          id: string
+          loaded_vehicles: Json
+          port_of_discharge: string | null
+          port_of_loading: string | null
+          seal_number: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          vessel_name: string | null
+        }
+        Insert: {
+          arrival_date?: string | null
+          container_number: string
+          created_at?: string
+          departure_date?: string | null
+          id?: string
+          loaded_vehicles?: Json
+          port_of_discharge?: string | null
+          port_of_loading?: string | null
+          seal_number?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          vessel_name?: string | null
+        }
+        Update: {
+          arrival_date?: string | null
+          container_number?: string
+          created_at?: string
+          departure_date?: string | null
+          id?: string
+          loaded_vehicles?: Json
+          port_of_discharge?: string | null
+          port_of_loading?: string | null
+          seal_number?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          vessel_name?: string | null
+        }
+        Relationships: []
+      }
+      tunisia_customers: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          id: string
+          id_number: string | null
+          name: string
+          phone: string | null
+          prefix: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          id_number?: string | null
+          name: string
+          phone?: string | null
+          prefix?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          id_number?: string | null
+          name?: string
+          phone?: string | null
+          prefix?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tunisia_invoices: {
+        Row: {
+          created_at: string
+          customer_id: string
+          date: string
+          id: string
+          invoice_number: string
+          payment_details: Json | null
+          personal_effects: Json | null
+          status: string
+          total_amount: number
+          updated_at: string
+          user_id: string
+          vehicle: Json
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          date: string
+          id?: string
+          invoice_number: string
+          payment_details?: Json | null
+          personal_effects?: Json | null
+          status?: string
+          total_amount: number
+          updated_at?: string
+          user_id: string
+          vehicle: Json
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          date?: string
+          id?: string
+          invoice_number?: string
+          payment_details?: Json | null
+          personal_effects?: Json | null
+          status?: string
+          total_amount?: number
+          updated_at?: string
+          user_id?: string
+          vehicle?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tunisia_invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "tunisia_customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
