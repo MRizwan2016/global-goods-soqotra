@@ -26,18 +26,16 @@ const TunisiaPrintStyles = () => {
             color: black !important;
           }
           
-          /* Hide non-receipt elements for print */
+          /* Hide everything by default for print */
+          body > *:not(.tunisia-payment-receipt) {
+            display: none !important;
+          }
+          
+          /* Hide non-receipt elements */
           .print\\:hidden,
           .no-print,
-          button:not(.tunisia-payment-receipt button),
-          .button:not(.tunisia-payment-receipt .button),
-          input:not(.tunisia-payment-receipt input),
-          select:not(.tunisia-payment-receipt select),
           .sidebar,
           .navigation,
-          nav:not(.tunisia-payment-receipt nav),
-          header:not(.tunisia-payment-receipt header),
-          .header:not(.tunisia-payment-receipt .header),
           .navbar,
           .menu,
           .layout,
@@ -50,11 +48,26 @@ const TunisiaPrintStyles = () => {
             visibility: hidden !important;
           }
           
-          /* Show only the receipt */
+          /* Force show the receipt and all its content */
+          .tunisia-payment-receipt,
           #tunisia-payment-receipt-print,
+          .tunisia-payment-receipt *,
           #tunisia-payment-receipt-print * {
             display: block !important;
             visibility: visible !important;
+            color: black !important;
+            background: white !important;
+          }
+          
+          /* Specific display types for receipt content */
+          .tunisia-payment-receipt .grid,
+          #tunisia-payment-receipt-print .grid {
+            display: grid !important;
+          }
+          
+          .tunisia-payment-receipt .flex,
+          #tunisia-payment-receipt-print .flex {
+            display: flex !important;
           }
           
           /* Receipt on A5 page */
