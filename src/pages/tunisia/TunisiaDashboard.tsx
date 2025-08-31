@@ -20,7 +20,7 @@ import TunisiaPaymentTracker from "./components/TunisiaPaymentTracker";
 import TunisiaInvoiceBookManager from "./components/TunisiaInvoiceBookManager";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, CreditCard, BookOpen, Ship } from "lucide-react";
+import { Search, CreditCard, BookOpen, Ship, Trash2 } from "lucide-react";
 import { TunisiaStorageService } from "./services/TunisiaStorageService";
 import { TunisiaInvoiceBookService } from "./services/TunisiaInvoiceBookService";
 import { toast } from "sonner";
@@ -269,6 +269,23 @@ const TunisiaDashboard: React.FC = () => {
   };
 
   // Sync invoice updates to loaded vehicles in containers
+  const handleDeleteInvoice = async (invoiceId: string, invoiceNumber: string) => {
+    if (window.confirm(`Are you sure you want to delete invoice ${invoiceNumber}? This action cannot be undone.`)) {
+      try {
+        await TunisiaStorageService.deleteInvoice(invoiceId);
+        
+        // Reload invoices after deletion
+        const updatedInvoices = await TunisiaStorageService.loadInvoices();
+        setInvoices(updatedInvoices);
+        
+        toast.success(`Invoice ${invoiceNumber} deleted successfully`);
+      } catch (error) {
+        console.error('Error deleting invoice:', error);
+        toast.error('Failed to delete invoice. Please try again.');
+      }
+    }
+  };
+
   const syncInvoiceToContainers = async (updatedInvoice: TunisiaInvoice) => {
     // Use storage service for proper sync
     await TunisiaStorageService.syncInvoiceToContainers(updatedInvoice);
@@ -529,6 +546,17 @@ const TunisiaDashboard: React.FC = () => {
                       }}
                     >
                       Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteInvoice(invoice.id, invoice.invoiceNumber);
+                      }}
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Delete
                     </Button>
                   </div>
                 </CardContent>

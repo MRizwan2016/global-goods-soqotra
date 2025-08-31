@@ -8,6 +8,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Plus, Trash2, Upload, Camera } from "lucide-react";
 import { TunisiaInvoice, TunisiaCustomer } from "../types/tunisiaInvoiceTypes";
 import { VEHICLE_RATES, PERSONAL_EFFECTS_RATE } from "../types/tunisiaTypes";
+import { TunisiaStorageService } from "../services/TunisiaStorageService";
+import { toast } from "sonner";
 
 interface TunisiaInvoiceFormProps {
   onBack: () => void;
@@ -174,24 +176,56 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
     }
   };
 
-  const handleSave = () => {
-    const invoice: TunisiaInvoice = {
-      id: existingInvoice?.id || Date.now().toString(),
-      invoiceNumber,
-      hblNumber,
-      customer: {
-        ...customer,
-        id: customer.id || Date.now().toString()
-      },
-      vehicle,
-      personalEffects: personalEffects.length > 0 ? personalEffects : undefined,
-      supportingDocuments: supportingDocuments.length > 0 ? supportingDocuments : undefined,
-      totalAmount: calculateTotal(),
-      date: new Date().toISOString().split('T')[0],
-      status: "DRAFT"
-    };
+  const handleSave = async () => {
+    try {
+      // Load existing invoices for duplicate checking
+      const existingInvoices = await TunisiaStorageService.loadInvoices();
+      
+      // Check for duplicate invoice number (skip check if editing existing invoice)
+      if (!existingInvoice) {
+        const duplicateInvoiceNumber = existingInvoices.find(inv => 
+          inv.invoiceNumber === invoiceNumber && inv.id !== existingInvoice?.id
+        );
+        if (duplicateInvoiceNumber) {
+          toast.error(`Invoice number ${invoiceNumber} already exists. Please use a different number.`);
+          return;
+        }
+      }
+      
+      // Check for duplicate export plate (if export plate is provided)
+      if (vehicle.exportPlate?.trim()) {
+        const duplicateExportPlate = existingInvoices.find(inv => 
+          inv.vehicle.exportPlate?.toLowerCase().trim() === vehicle.exportPlate.toLowerCase().trim() && 
+          inv.id !== existingInvoice?.id
+        );
+        if (duplicateExportPlate) {
+          toast.error(`Export plate ${vehicle.exportPlate} already exists for another vehicle. Please check the plate number.`);
+          return;
+        }
+      }
 
-    onInvoiceSave(invoice);
+      const invoice: TunisiaInvoice = {
+        id: existingInvoice?.id || Date.now().toString(),
+        invoiceNumber,
+        hblNumber,
+        customer: {
+          ...customer,
+          id: customer.id || Date.now().toString()
+        },
+        vehicle,
+        personalEffects: personalEffects.length > 0 ? personalEffects : undefined,
+        supportingDocuments: supportingDocuments.length > 0 ? supportingDocuments : undefined,
+        totalAmount: calculateTotal(),
+        date: new Date().toISOString().split('T')[0],
+        status: "DRAFT"
+      };
+
+      onInvoiceSave(invoice);
+      toast.success(`Invoice ${existingInvoice ? 'updated' : 'created'} successfully!`);
+    } catch (error) {
+      console.error('Error saving invoice:', error);
+      toast.error('Failed to save invoice. Please try again.');
+    }
   };
 
   return (

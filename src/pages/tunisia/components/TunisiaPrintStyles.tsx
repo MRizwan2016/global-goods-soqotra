@@ -6,8 +6,8 @@ const TunisiaPrintStyles = () => {
       {`
         @media print {
           @page {
-            size: A4;
-            margin: 0;
+            size: A5;
+            margin: 10mm;
           }
           
           body, html {
@@ -26,7 +26,8 @@ const TunisiaPrintStyles = () => {
             color: black !important;
           }
           
-          /* Hide non-printable elements */
+          /* Hide ALL non-receipt elements for print */
+          body > *:not(#tunisia-payment-receipt-print),
           .print\\:hidden,
           .no-print,
           button,
@@ -35,24 +36,47 @@ const TunisiaPrintStyles = () => {
           input,
           select,
           .print\\:hidden *,
-          .no-print * {
+          .no-print *,
+          .sidebar,
+          .navigation,
+          nav,
+          header,
+          .header,
+          .navbar,
+          .menu,
+          .layout,
+          .dashboard,
+          [data-radix-popper-content-wrapper],
+          [data-state="open"],
+          aside,
+          .aside {
             display: none !important;
             visibility: hidden !important;
           }
           
-          /* Receipt on first page */
+          /* Show only the receipt */
+          #tunisia-payment-receipt-print,
+          #tunisia-payment-receipt-print * {
+            display: block !important;
+            visibility: visible !important;
+          }
+          
+          /* Receipt on A5 page */
           #tunisia-payment-receipt-print {
-            width: 100% !important;
-            height: auto !important;
+            width: 148mm !important;
+            height: 210mm !important;
             background: white !important;
             color: black !important;
-            padding: 0 !important;
-            margin: 0 !important;
+            padding: 10mm !important;
+            margin: 0 auto !important;
             box-shadow: none !important;
             border: none !important;
             page-break-after: always !important;
             page-break-inside: avoid !important;
             position: relative !important;
+            box-sizing: border-box !important;
+            font-size: 9pt !important;
+            line-height: 1.3 !important;
           }
           
           /* HBL Printable Content Container */
