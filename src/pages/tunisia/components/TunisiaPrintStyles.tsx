@@ -26,22 +26,18 @@ const TunisiaPrintStyles = () => {
             color: black !important;
           }
           
-          /* Hide ALL non-receipt elements for print */
-          body > *:not(#tunisia-payment-receipt-print),
+          /* Hide non-receipt elements for print */
           .print\\:hidden,
           .no-print,
-          button,
-          .button,
-          [role="button"],
-          input,
-          select,
-          .print\\:hidden *,
-          .no-print *,
+          button:not(.tunisia-payment-receipt button),
+          .button:not(.tunisia-payment-receipt .button),
+          input:not(.tunisia-payment-receipt input),
+          select:not(.tunisia-payment-receipt select),
           .sidebar,
           .navigation,
-          nav,
-          header,
-          .header,
+          nav:not(.tunisia-payment-receipt nav),
+          header:not(.tunisia-payment-receipt header),
+          .header:not(.tunisia-payment-receipt .header),
           .navbar,
           .menu,
           .layout,
