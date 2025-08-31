@@ -221,15 +221,7 @@ export type Database = {
           user_id?: string
           vehicle?: Json
         }
-        Relationships: [
-          {
-            foreignKeyName: "tunisia_invoices_customer_id_fkey"
-            columns: ["customer_id"]
-            isOneToOne: false
-            referencedRelation: "tunisia_customers"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {
