@@ -26,12 +26,7 @@ const TunisiaPrintStyles = () => {
             color: black !important;
           }
           
-          /* Hide everything by default for print */
-          body > *:not(.tunisia-payment-receipt) {
-            display: none !important;
-          }
-          
-          /* Hide non-receipt elements */
+          /* Hide non-receipt elements for print */
           .print\\:hidden,
           .no-print,
           .sidebar,
@@ -43,16 +38,19 @@ const TunisiaPrintStyles = () => {
           [data-radix-popper-content-wrapper],
           [data-state="open"],
           aside,
-          .aside {
+          .aside,
+          nav,
+          header:not(.tunisia-payment-receipt header),
+          button:not(.tunisia-payment-receipt button) {
             display: none !important;
             visibility: hidden !important;
           }
           
-          /* Force show the receipt and all its content */
-          .tunisia-payment-receipt,
+          /* Ensure receipt container and content are visible */
           #tunisia-payment-receipt-print,
-          .tunisia-payment-receipt *,
-          #tunisia-payment-receipt-print * {
+          .tunisia-payment-receipt,
+          #tunisia-payment-receipt-print *,
+          .tunisia-payment-receipt * {
             display: block !important;
             visibility: visible !important;
             color: black !important;
