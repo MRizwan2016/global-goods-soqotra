@@ -40,10 +40,23 @@ const TunisiaPrintStyles = () => {
           aside,
           .aside,
           nav,
-          header:not(.tunisia-payment-receipt header),
-          button:not(.tunisia-payment-receipt button) {
+          header:not(#tunisia-payment-receipt-print header),
+          button:not(#tunisia-payment-receipt-print button),
+          .space-y-4:not(#tunisia-payment-receipt-print .space-y-4),
+          .flex:not(#tunisia-payment-receipt-print .flex):not(#tunisia-payment-receipt-print .flex *),
+          .Button:not(#tunisia-payment-receipt-print .Button) {
             display: none !important;
             visibility: hidden !important;
+          }
+          
+          /* Show only the receipt container */
+          body * {
+            visibility: hidden !important;
+          }
+          
+          #tunisia-payment-receipt-print,
+          #tunisia-payment-receipt-print * {
+            visibility: visible !important;
           }
           
           /* Ensure receipt container and content are visible */
