@@ -6,8 +6,8 @@ const TunisiaPrintStyles = () => {
       {`
         @media print {
           @page {
-            size: A5;
-            margin: 10mm;
+            size: A5 portrait;
+            margin: 5mm;
           }
           
           body, html {
@@ -70,20 +70,22 @@ const TunisiaPrintStyles = () => {
           
           /* Receipt on A5 page */
           #tunisia-payment-receipt-print {
-            width: 148mm !important;
-            height: 210mm !important;
+            width: 138mm !important;
+            height: 200mm !important;
             background: white !important;
             color: black !important;
-            padding: 10mm !important;
-            margin: 0 auto !important;
+            padding: 5mm !important;
+            margin: 0 !important;
             box-shadow: none !important;
             border: none !important;
             page-break-after: always !important;
             page-break-inside: avoid !important;
             position: relative !important;
             box-sizing: border-box !important;
-            font-size: 9pt !important;
-            line-height: 1.3 !important;
+            font-size: 8pt !important;
+            line-height: 1.2 !important;
+            max-width: none !important;
+            transform: scale(1) !important;
           }
           
           /* HBL Printable Content Container */

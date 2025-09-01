@@ -43,7 +43,7 @@ const PaymentReceiptGenerator: React.FC<PaymentReceiptGeneratorProps> = ({
         </div>
 
         {/* Payment Receipt */}
-        <div className="max-w-2xl mx-auto p-8 bg-white print:p-4 print:shadow-none shadow-lg border">
+        <div id="tunisia-payment-receipt-print" className="tunisia-payment-receipt max-w-2xl mx-auto p-8 bg-white print:p-4 print:shadow-none shadow-lg border">
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold text-primary mb-2">PAYMENT RECEIPT</h1>
             <div className="text-lg font-bold text-green-600">SOQOTRA LOGISTICS</div>
