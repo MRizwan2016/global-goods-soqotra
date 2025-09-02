@@ -50,152 +50,154 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
 
   if (showReceipt) {
     return (
-      <div className="max-w-4xl mx-auto space-y-4">
+      <>
         <TunisiaPrintStyles />
-        <div className="flex gap-4 print:hidden">
-          <Button variant="outline" onClick={() => setShowReceipt(false)}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Edit Payment
-          </Button>
-          <Button onClick={handlePrint}>
-            <Printer className="h-4 w-4 mr-2" />
-            Print Receipt
-          </Button>
-        </div>
-
-        {/* Payment Receipt */}
-        <div id="tunisia-payment-receipt-print" className="tunisia-payment-receipt bg-white p-8 border rounded-lg print:border-0 print:shadow-none print:p-4 print:fixed print:top-0 print:left-0 print:z-50">
-          <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold text-primary mb-2">SOQOTRA LOGISTICS SERVICES,</h1>
-            <h2 className="text-lg font-semibold text-primary">TRANSPORTATION & TRADING WLL</h2>
-            <p className="text-sm text-muted-foreground">Vehicle & Personal Effects Shipping</p>
-            <div className="mt-4 text-lg font-semibold">PAYMENT RECEIPT</div>
+        <div className="max-w-4xl mx-auto space-y-4">
+          <div className="flex gap-4 print:hidden">
+            <Button variant="outline" onClick={() => setShowReceipt(false)}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Edit Payment
+            </Button>
+            <Button onClick={handlePrint}>
+              <Printer className="h-4 w-4 mr-2" />
+              Print Receipt
+            </Button>
           </div>
 
-          <div className="grid grid-cols-2 gap-8 mb-8">
-            <div>
-              <h3 className="font-semibold mb-3 text-primary">Payment Details</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Receipt No:</span>
-                  <span className="font-medium">RCT-{invoice.invoiceNumber}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Payment Date:</span>
-                  <span className="font-medium">{new Date(paymentDetails.date).toLocaleDateString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Payment Method:</span>
-                  <span className="font-medium">{paymentDetails.method}</span>
-                </div>
-                {paymentDetails.transactionId && (
+          {/* Payment Receipt - This is what gets printed */}
+          <div id="tunisia-payment-receipt-print" className="bg-white p-8 border rounded-lg shadow-sm">
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold mb-2">SOQOTRA LOGISTICS SERVICES,</h1>
+              <h2 className="text-lg font-semibold">TRANSPORTATION & TRADING WLL</h2>
+              <p className="text-sm">Vehicle & Personal Effects Shipping</p>
+              <div className="mt-4 text-lg font-semibold">PAYMENT RECEIPT</div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8 mb-8">
+              <div>
+                <h3 className="font-semibold mb-3">Payment Details</h3>
+                <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span>Transaction ID:</span>
-                    <span className="font-medium">{paymentDetails.transactionId}</span>
+                    <span>Receipt No:</span>
+                    <span className="font-medium">RCT-{invoice.invoiceNumber}</span>
                   </div>
-                )}
-                <div className="flex justify-between border-t pt-2">
-                  <span className="font-semibold">Amount Paid:</span>
-                  <span className="font-bold text-lg">QAR {paymentDetails.amount.toLocaleString()}</span>
+                  <div className="flex justify-between">
+                    <span>Payment Date:</span>
+                    <span className="font-medium">{new Date(paymentDetails.date).toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Payment Method:</span>
+                    <span className="font-medium">{paymentDetails.method}</span>
+                  </div>
+                  {paymentDetails.transactionId && (
+                    <div className="flex justify-between">
+                      <span>Transaction ID:</span>
+                      <span className="font-medium">{paymentDetails.transactionId}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between border-t pt-2">
+                    <span className="font-semibold">Amount Paid:</span>
+                    <span className="font-bold text-lg">QAR {paymentDetails.amount.toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="font-semibold mb-3">Customer Information</h3>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Name:</span>
+                    <span className="font-medium">{invoice.customer.prefix} {invoice.customer.name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Mobile:</span>
+                    <span className="font-medium">{invoice.customer.mobile}</span>
+                  </div>
+                  {invoice.customer.metrashMobile && (
+                    <div className="flex justify-between">
+                      <span>Metrash Mobile:</span>
+                      <span className="font-medium">{invoice.customer.metrashMobile}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span>Invoice No:</span>
+                    <span className="font-medium">{invoice.invoiceNumber}</span>
+                  </div>
+                  {invoice.hblNumber && (
+                    <div className="flex justify-between">
+                      <span>HBL No:</span>
+                      <span className="font-medium">{invoice.hblNumber}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
 
-            <div>
-              <h3 className="font-semibold mb-3 text-primary">Customer Information</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Name:</span>
-                  <span className="font-medium">{invoice.customer.prefix} {invoice.customer.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Mobile:</span>
-                  <span className="font-medium">{invoice.customer.mobile}</span>
-                </div>
-                {invoice.customer.metrashMobile && (
-                  <div className="flex justify-between">
-                    <span>Metrash Mobile:</span>
-                    <span className="font-medium">{invoice.customer.metrashMobile}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span>Invoice No:</span>
-                  <span className="font-medium">{invoice.invoiceNumber}</span>
-                </div>
-                {invoice.hblNumber && (
-                  <div className="flex justify-between">
-                    <span>HBL No:</span>
-                    <span className="font-medium">{invoice.hblNumber}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className="mb-8">
-            <h3 className="font-semibold mb-3 text-primary">Vehicle Details</h3>
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Make/Model:</span>
-                  <span className="font-medium">{invoice.vehicle.make} {invoice.vehicle.model}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Year/Color:</span>
-                  <span className="font-medium">{invoice.vehicle.year} • {invoice.vehicle.color}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Type:</span>
-                  <span className="font-medium">{invoice.vehicle.type}</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Chassis No:</span>
-                  <span className="font-medium">{invoice.vehicle.chassisNumber}</span>
-                </div>
-                {invoice.vehicle.exportPlate && (
-                  <div className="flex justify-between">
-                    <span>Export Plate:</span>
-                    <span className="font-medium">{invoice.vehicle.exportPlate}</span>
-                  </div>
-                )}
-                <div className="flex justify-between">
-                  <span>Freight Charge:</span>
-                  <span className="font-medium">QAR {invoice.vehicle.freightCharge.toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {invoice.personalEffects && invoice.personalEffects.length > 0 && (
             <div className="mb-8">
-              <h3 className="font-semibold mb-3 text-primary">Personal Effects</h3>
-              <div className="space-y-2 text-sm">
-                {invoice.personalEffects.map((effect, index) => (
-                  <div key={index} className="flex justify-between">
-                    <span>{effect.description} ({effect.quantity} items, {effect.volume} CBM)</span>
-                    <span className="font-medium">QAR {effect.charges.toLocaleString()}</span>
+              <h3 className="font-semibold mb-3">Vehicle Details</h3>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Make/Model:</span>
+                    <span className="font-medium">{invoice.vehicle.make} {invoice.vehicle.model}</span>
                   </div>
-                ))}
+                  <div className="flex justify-between">
+                    <span>Year/Color:</span>
+                    <span className="font-medium">{invoice.vehicle.year} • {invoice.vehicle.color}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Type:</span>
+                    <span className="font-medium">{invoice.vehicle.type}</span>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Chassis No:</span>
+                    <span className="font-medium">{invoice.vehicle.chassisNumber}</span>
+                  </div>
+                  {invoice.vehicle.exportPlate && (
+                    <div className="flex justify-between">
+                      <span>Export Plate:</span>
+                      <span className="font-medium">{invoice.vehicle.exportPlate}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between">
+                    <span>Freight Charge:</span>
+                    <span className="font-medium">QAR {invoice.vehicle.freightCharge.toLocaleString()}</span>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
 
-          {paymentDetails.notes && (
-            <div className="mb-8">
-              <h3 className="font-semibold mb-3 text-primary">Notes</h3>
-              <p className="text-sm">{paymentDetails.notes}</p>
+            {invoice.personalEffects && invoice.personalEffects.length > 0 && (
+              <div className="mb-8">
+                <h3 className="font-semibold mb-3">Personal Effects</h3>
+                <div className="space-y-2 text-sm">
+                  {invoice.personalEffects.map((effect, index) => (
+                    <div key={index} className="flex justify-between">
+                      <span>{effect.description} ({effect.quantity} items, {effect.volume} CBM)</span>
+                      <span className="font-medium">QAR {effect.charges.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {paymentDetails.notes && (
+              <div className="mb-8">
+                <h3 className="font-semibold mb-3">Notes</h3>
+                <p className="text-sm">{paymentDetails.notes}</p>
+              </div>
+            )}
+
+            <div className="border-t pt-4 text-center">
+              <p className="text-xs mt-2">
+                For queries, contact: +974-44412770 & +974-44412773 | Email: accounts@soqotralogistics.com
+              </p>
             </div>
-          )}
-
-          <div className="border-t pt-4 text-center">
-            <p className="text-xs text-muted-foreground mt-2">
-              For queries, contact: +974-44412770 & +974-44412773 | Email: accounts@soqotralogistics.com
-            </p>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
