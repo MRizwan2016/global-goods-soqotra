@@ -660,10 +660,17 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle>Personal Effects & Household Goods</CardTitle>
-              <Button onClick={addPersonalEffect} variant="outline">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Item
-              </Button>
+              <div className="flex gap-2">
+                <Button onClick={addPersonalEffect} variant="outline">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Package
+                </Button>
+                {personalEffects.length > 0 && (
+                  <div className="text-sm text-muted-foreground flex items-center">
+                    Total Packages: <span className="font-semibold ml-1">{personalEffects.length}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </CardHeader>
           <CardContent>

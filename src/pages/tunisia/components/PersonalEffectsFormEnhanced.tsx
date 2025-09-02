@@ -134,6 +134,28 @@ const PersonalEffectsFormEnhanced: React.FC<PersonalEffectsFormEnhancedProps> = 
     }
   };
 
+  const handleSubmitAndAddAnother = () => {
+    if (effects.description && effects.quantity && effects.volume && effects.ownerName) {
+      onPersonalEffectsAdd(effects as Omit<PersonalEffects, 'id'>);
+      // Reset form for next package
+      setEffects({
+        description: '',
+        quantity: 1,
+        volume: 0,
+        grossWeight: 0,
+        hsCode: '980100',
+        ownerName: vehicleOwnerName || '',
+        loadingLocation: 'INSIDE_CAR',
+        requiresHBL: false,
+        charges: 0,
+        photos: []
+      });
+      setPhotoInput('');
+      setSelectedCategory('All');
+      setSelectedItem(null);
+    }
+  };
+
   const filteredItems = selectedCategory === "All" 
     ? HOUSEHOLD_ITEMS 
     : HOUSEHOLD_ITEMS.filter(item => item.category === selectedCategory);
@@ -344,14 +366,21 @@ const PersonalEffectsFormEnhanced: React.FC<PersonalEffectsFormEnhancedProps> = 
             className="flex-1 bg-primary hover:bg-primary/90"
             disabled={!effects.description || !effects.quantity || !effects.volume || !effects.ownerName}
           >
-            Add Personal Effects
+            Add Package
+          </Button>
+          <Button 
+            onClick={handleSubmitAndAddAnother}
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+            disabled={!effects.description || !effects.quantity || !effects.volume || !effects.ownerName}
+          >
+            Add & Continue
           </Button>
           <Button 
             variant="outline" 
             onClick={onCancel}
             className="flex-1"
           >
-            Cancel
+            Done
           </Button>
         </div>
       </CardContent>
