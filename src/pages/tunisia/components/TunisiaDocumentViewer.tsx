@@ -98,6 +98,37 @@ const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
     document.body.removeChild(link);
   };
 
+  // Helper function to determine if the data is base64 encoded
+  const isBase64Data = (str: string) => {
+    return str.startsWith('data:') || str.match(/^[A-Za-z0-9+/]*={0,2}$/);
+  };
+
+  // Helper function to create a proper data URL for base64 content
+  const processDocumentUrl = (docUrl: string) => {
+    if (docUrl.startsWith('data:')) {
+      return docUrl; // Already a proper data URL
+    }
+    
+    // If it looks like base64 data, try to create a proper data URL
+    if (isBase64Data(docUrl)) {
+      // Try to determine if it's a PDF based on content or assume PDF
+      const isPdf = docUrl.includes('PDF') || docUrl.includes('%PDF');
+      const mimeType = isPdf ? 'application/pdf' : 'image/jpeg';
+      return `data:${mimeType};base64,${docUrl}`;
+    }
+    
+    return docUrl; // Regular URL
+  };
+
+  // Helper function to check if document is PDF
+  const isPdfDocument = (docUrl: string) => {
+    const processedUrl = processDocumentUrl(docUrl);
+    return processedUrl.includes('application/pdf') || 
+           processedUrl.toLowerCase().includes('.pdf') ||
+           processedUrl.includes('PDF') ||
+           processedUrl.includes('%PDF');
+  };
+
   return (
     <>
       <TunisiaPrintStyles />
@@ -123,93 +154,92 @@ const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
           </Card>
         ) : (
           <div className="grid gap-6">
-            {documents.map((docUrl, index) => (
-              <Card key={index} className="overflow-hidden">
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span>Document {index + 1}</span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(docUrl, '_blank')}
-                        className="flex items-center gap-2"
-                      >
-                        <Eye className="h-4 w-4" />
-                        View
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDownload(docUrl, index)}
-                        className="flex items-center gap-2"
-                      >
-                        <Download className="h-4 w-4" />
-                        Download
-                      </Button>
-                       <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePrint(docUrl)}
-                        className="flex items-center gap-2 print:hidden"
-                      >
-                        <FileText className="h-4 w-4" />
-                        Print
-                      </Button>
+            {documents.map((docUrl, index) => {
+              const processedUrl = processDocumentUrl(docUrl);
+              const isDisplayable = processedUrl.startsWith('data:') || processedUrl.startsWith('http') || processedUrl.startsWith('blob:');
+              
+              return (
+                <Card key={index} className="overflow-hidden">
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>Document {index + 1}</span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (isDisplayable) {
+                              window.open(processedUrl, '_blank');
+                            } else {
+                              alert('Document preview not available');
+                            }
+                          }}
+                          className="flex items-center gap-2"
+                        >
+                          <Eye className="h-4 w-4" />
+                          View
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownload(processedUrl, index)}
+                          className="flex items-center gap-2"
+                        >
+                          <Download className="h-4 w-4" />
+                          Download
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePrint(processedUrl)}
+                          className="flex items-center gap-2 print:hidden"
+                        >
+                          <FileText className="h-4 w-4" />
+                          Print
+                        </Button>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="document-preview bg-gray-50 p-4 rounded-lg">
+                      {isDisplayable ? (
+                        isPdfDocument(docUrl) ? (
+                          <div className="text-center">
+                            <iframe 
+                              src={processedUrl}
+                              className="w-full h-96 border rounded bg-white"
+                              title={`PDF Document ${index + 1}`}
+                              style={{ minHeight: '400px' }}
+                            />
+                            <p className="text-sm text-muted-foreground mt-2">PDF Document</p>
+                          </div>
+                        ) : (
+                          <div className="text-center">
+                            <img 
+                              src={processedUrl}
+                              alt={`Document ${index + 1}`}
+                              className="max-w-full h-auto max-h-96 mx-auto rounded border bg-white"
+                              style={{ maxHeight: '400px' }}
+                            />
+                            <p className="text-sm text-muted-foreground mt-2">Image Document</p>
+                          </div>
+                        )
+                      ) : (
+                        <div className="text-center p-8">
+                          <div className="h-16 w-16 mx-auto text-gray-400 mb-4 flex items-center justify-content">
+                            <svg className="h-16 w-16" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd"></path>
+                            </svg>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">Unable to preview document</p>
+                          <p className="text-xs text-gray-500">Document format not supported for preview</p>
+                        </div>
+                      )}
                     </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="document-preview bg-gray-50 p-4 rounded-lg">
-                     {docUrl.toLowerCase().includes('.pdf') ? (
-                       <div className="text-center">
-                         <iframe 
-                           src={docUrl} 
-                           className="w-full h-96 border rounded"
-                           title={`PDF Document ${index + 1}`}
-                           onError={() => {
-                             // Fallback to icon if iframe fails
-                           }}
-                         />
-                         <p className="text-sm text-muted-foreground mt-2">PDF Document</p>
-                         <p className="text-xs text-muted-foreground break-all mt-1">{docUrl}</p>
-                       </div>
-                     ) : (
-                       <div className="text-center">
-                         <img 
-                           src={docUrl} 
-                           alt={`Document ${index + 1}`}
-                           className="max-w-full h-auto max-h-96 mx-auto rounded border"
-                           onLoad={(e) => {
-                             // Image loaded successfully
-                             const target = e.target as HTMLImageElement;
-                             target.style.display = 'block';
-                           }}
-                           onError={(e) => {
-                             const target = e.target as HTMLImageElement;
-                             target.style.display = 'none';
-                             const errorDiv = document.createElement('div');
-                             errorDiv.className = 'text-center p-4';
-                             errorDiv.innerHTML = `
-                               <div class="text-center">
-                                 <div class="h-16 w-16 mx-auto text-gray-400 mb-2 flex items-center justify-center">
-                                   <svg class="h-16 w-16" fill="currentColor" viewBox="0 0 20 20">
-                                     <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
-                                   </svg>
-                                 </div>
-                                 <p class="text-sm text-muted-foreground">Unable to preview document</p>
-                                 <p class="text-xs text-muted-foreground break-all mt-1">${docUrl}</p>
-                               </div>
-                             `;
-                             target.parentElement?.appendChild(errorDiv);
-                           }}
-                         />
-                       </div>
-                     )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
