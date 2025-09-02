@@ -111,10 +111,19 @@ const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
     
     // If it looks like base64 data, try to create a proper data URL
     if (isBase64Data(docUrl)) {
-      // Try to determine if it's a PDF based on content or assume PDF
-      const isPdf = docUrl.includes('PDF') || docUrl.includes('%PDF');
-      const mimeType = isPdf ? 'application/pdf' : 'image/jpeg';
-      return `data:${mimeType};base64,${docUrl}`;
+      // Clean the base64 string - remove any whitespace or newlines
+      const cleanBase64 = docUrl.replace(/\s/g, '');
+      
+      // Check if it's a PDF by looking at the first few bytes when decoded
+      try {
+        const binaryString = atob(cleanBase64.substring(0, 100));
+        const isPdf = binaryString.includes('%PDF') || docUrl.includes('PDF') || docUrl.includes('%PDF');
+        const mimeType = isPdf ? 'application/pdf' : 'image/jpeg';
+        return `data:${mimeType};base64,${cleanBase64}`;
+      } catch (e) {
+        // If decoding fails, assume it's a PDF
+        return `data:application/pdf;base64,${cleanBase64}`;
+      }
     }
     
     return docUrl; // Regular URL
@@ -205,12 +214,26 @@ const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
                       {isDisplayable ? (
                         isPdfDocument(docUrl) ? (
                           <div className="text-center">
-                            <iframe 
-                              src={processedUrl}
-                              className="w-full h-96 border rounded bg-white"
-                              title={`PDF Document ${index + 1}`}
-                              style={{ minHeight: '400px' }}
-                            />
+                            <div className="relative">
+                              <iframe 
+                                src={`${processedUrl}#toolbar=1&navpanes=1&scrollbar=1`}
+                                className="w-full h-96 border rounded bg-white"
+                                title={`PDF Document ${index + 1}`}
+                                style={{ minHeight: '400px' }}
+                                onLoad={() => console.log('PDF loaded successfully')}
+                                onError={() => {
+                                  console.error('PDF failed to load');
+                                }}
+                              />
+                              {/* Fallback for when PDF fails to load */}
+                              <div className="absolute inset-0 hidden bg-gray-100 flex items-center justify-center rounded" id={`fallback-${index}`}>
+                                <div className="text-center">
+                                  <FileText className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+                                  <p className="text-sm text-gray-600">PDF preview unavailable</p>
+                                  <p className="text-xs text-gray-500">Use View or Download buttons</p>
+                                </div>
+                              </div>
+                            </div>
                             <p className="text-sm text-muted-foreground mt-2">PDF Document</p>
                           </div>
                         ) : (
