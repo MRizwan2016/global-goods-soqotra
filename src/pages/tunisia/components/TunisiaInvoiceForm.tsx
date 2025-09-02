@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { ArrowLeft, Plus, Trash2, Upload, Camera } from "lucide-react";
 import { TunisiaInvoice, TunisiaCustomer } from "../types/tunisiaInvoiceTypes";
 import { VEHICLE_RATES, PERSONAL_EFFECTS_RATE } from "../types/tunisiaTypes";
 import { TunisiaStorageService } from "../services/TunisiaStorageService";
+import { TunisiaInvoiceBookService, TunisiaInvoiceBook } from "../services/TunisiaInvoiceBookService";
 import { toast } from "sonner";
 
 interface TunisiaInvoiceFormProps {
@@ -68,6 +69,41 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
   const [hblNumber, setHblNumber] = useState(
     existingInvoice?.hblNumber || `2025/`
   );
+
+  // Book and page selection state
+  const [availableBooks, setAvailableBooks] = useState<TunisiaInvoiceBook[]>([]);
+  const [selectedBookId, setSelectedBookId] = useState<string>("");
+  const [availablePages, setAvailablePages] = useState<string[]>([]);
+  const [selectedPage, setSelectedPage] = useState<string>("");
+
+  // Load available books on component mount
+  useEffect(() => {
+    TunisiaInvoiceBookService.initializeDefaultBooks();
+    loadAvailableBooks();
+  }, []);
+
+  const loadAvailableBooks = () => {
+    const books = TunisiaInvoiceBookService.getAvailableBooks();
+    setAvailableBooks(books);
+  };
+
+  const handleBookSelect = (bookId: string) => {
+    setSelectedBookId(bookId);
+    setSelectedPage("");
+    
+    const book = availableBooks.find(b => b.id === bookId);
+    if (book) {
+      setAvailablePages(book.available);
+    } else {
+      setAvailablePages([]);
+    }
+  };
+
+  const handlePageSelect = (pageNumber: string) => {
+    setSelectedPage(pageNumber);
+    // Update invoice number with the selected page format
+    setInvoiceNumber(`2025/${pageNumber}`);
+  };
 
   const handleVehicleTypeChange = (type: string) => {
     const selectedType = type as "SEDAN" | "SUV" | "HILUX" | "DOUBLE_PICKUP";
@@ -709,36 +745,80 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
           <CardTitle>Invoice Summary</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <span>Invoice Number:</span>
-              <Input
-                value={invoiceNumber}
-                onChange={(e) => setInvoiceNumber(e.target.value)}
-                className="w-48 text-right"
-              />
+          <div className="space-y-4">
+            {/* Book Number Selection */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label>Book Number</Label>
+                <Select value={selectedBookId} onValueChange={handleBookSelect}>
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Select book number" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-[100]">
+                    {availableBooks.map((book) => (
+                      <SelectItem key={book.id} value={book.id}>
+                        {book.bookNumber} ({book.startPage} - {book.endPage})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Page Number Selection */}
+              <div>
+                <Label>Page Number</Label>
+                <Select 
+                  value={selectedPage} 
+                  onValueChange={handlePageSelect}
+                  disabled={!selectedBookId || availablePages.length === 0}
+                >
+                  <SelectTrigger className="bg-white">
+                    <SelectValue placeholder="Select page number" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-[100] max-h-60 overflow-y-auto">
+                    {availablePages.map((page) => (
+                      <SelectItem key={page} value={page}>
+                        {page}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span>House B/L Number:</span>
-              <Input
-                value={hblNumber}
-                onChange={(e) => setHblNumber(e.target.value)}
-                className="w-48 text-right"
-                placeholder="2025/XXXXX"
-              />
-            </div>
-            <div className="flex justify-between">
-              <span>Vehicle Freight:</span>
-              <span>QAR {vehicle.freightCharge.toLocaleString()}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Personal Effects:</span>
-              <span>QAR {personalEffects.reduce((sum, effect) => sum + effect.charges, 0).toLocaleString()}</span>
-            </div>
-            <div className="border-t pt-2">
-              <div className="flex justify-between font-bold text-lg">
-                <span>Total Amount:</span>
-                <span>QAR {calculateTotal().toLocaleString()}</span>
+
+            {/* Invoice Details */}
+            <div className="space-y-2 border-t pt-4">
+              <div className="flex justify-between">
+                <span>Invoice Number:</span>
+                <Input
+                  value={invoiceNumber}
+                  onChange={(e) => setInvoiceNumber(e.target.value)}
+                  className="w-48 text-right"
+                  placeholder="2025/000000"
+                />
+              </div>
+              <div className="flex justify-between">
+                <span>House B/L Number:</span>
+                <Input
+                  value={hblNumber}
+                  onChange={(e) => setHblNumber(e.target.value)}
+                  className="w-48 text-right"
+                  placeholder="2025/XXXXX"
+                />
+              </div>
+              <div className="flex justify-between">
+                <span>Vehicle Freight:</span>
+                <span>QAR {vehicle.freightCharge.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Personal Effects:</span>
+                <span>QAR {personalEffects.reduce((sum, effect) => sum + effect.charges, 0).toLocaleString()}</span>
+              </div>
+              <div className="border-t pt-2">
+                <div className="flex justify-between font-bold text-lg">
+                  <span>Total Amount:</span>
+                  <span>QAR {calculateTotal().toLocaleString()}</span>
+                </div>
               </div>
             </div>
           </div>
