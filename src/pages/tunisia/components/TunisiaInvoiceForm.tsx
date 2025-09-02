@@ -10,6 +10,7 @@ import { TunisiaInvoice, TunisiaCustomer } from "../types/tunisiaInvoiceTypes";
 import { VEHICLE_RATES, PERSONAL_EFFECTS_RATE } from "../types/tunisiaTypes";
 import { TunisiaStorageService } from "../services/TunisiaStorageService";
 import { TunisiaInvoiceBookService, TunisiaInvoiceBook } from "../services/TunisiaInvoiceBookService";
+import PersonalEffectsFormEnhanced from "./PersonalEffectsFormEnhanced";
 import { toast } from "sonner";
 
 interface TunisiaInvoiceFormProps {
@@ -69,6 +70,27 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
   const [hblNumber, setHblNumber] = useState(
     existingInvoice?.hblNumber || `2025/`
   );
+
+  // HBL Number generation state
+  const [availableFileNumbers, setAvailableFileNumbers] = useState<string[]>([]);
+  
+  // Generate file numbers for HBL
+  const generateFileNumbers = () => {
+    const fileNumbers = [];
+    // Starting from 04746 with 10 numbers
+    for (let i = 4746; i <= 4755; i++) {
+      fileNumbers.push(i.toString().padStart(5, '0'));
+    }
+    // Continue from 15160 onwards
+    for (let i = 15160; i <= 15169; i++) {
+      fileNumbers.push(i.toString());
+    }
+    return fileNumbers;
+  };
+
+  useEffect(() => {
+    setAvailableFileNumbers(generateFileNumbers());
+  }, []);
 
   // Book and page selection state
   const [availableBooks, setAvailableBooks] = useState<TunisiaInvoiceBook[]>([]);
@@ -149,18 +171,15 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
     }
   };
 
+  const [showPersonalEffectsForm, setShowPersonalEffectsForm] = useState(false);
+
   const addPersonalEffect = () => {
-    setPersonalEffects(prev => [...prev, {
-      description: "",
-      quantity: 1,
-      volume: 1,
-      grossWeight: 0,
-      charges: PERSONAL_EFFECTS_RATE,
-      photos: [],
-      ownerName: "",
-      loadingLocation: "OUTSIDE_CAR",
-      requiresHBL: true
-    }]);
+    setShowPersonalEffectsForm(true);
+  };
+
+  const handlePersonalEffectsAdd = (effects: any) => {
+    setPersonalEffects(prev => [...prev, effects]);
+    setShowPersonalEffectsForm(false);
   };
 
   const updatePersonalEffect = (index: number, field: string, value: any) => {
@@ -630,114 +649,80 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
       </Card>
 
       {/* Personal Effects */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle>Personal Effects & Household Goods</CardTitle>
-            <Button onClick={addPersonalEffect} variant="outline">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Item
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {personalEffects.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
-              No personal effects added. Click "Add Item" to include household goods.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {personalEffects.map((effect, index) => (
-                <div key={index} className="border rounded-lg p-4 space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium">Item {index + 1}</h4>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => removePersonalEffect(index)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label>Description</Label>
-                      <Input
-                        value={effect.description}
-                        onChange={(e) => updatePersonalEffect(index, 'description', e.target.value)}
-                        placeholder="Describe the items"
-                      />
-                    </div>
-                    <div>
-                      <Label>Owner Name *</Label>
-                      <Input
-                        value={effect.ownerName}
-                        onChange={(e) => updatePersonalEffect(index, 'ownerName', e.target.value)}
-                        placeholder="Enter owner's name"
-                      />
-                    </div>
-                    <div>
-                      <Label>Loading Location *</Label>
-                      <Select value={effect.loadingLocation} onValueChange={(value) => updatePersonalEffect(index, 'loadingLocation', value)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="OUTSIDE_CAR">Outside Car (Charges Apply)</SelectItem>
-                          <SelectItem value="INSIDE_CAR">Inside Car (No Charges)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Quantity</Label>
-                      <Input
-                        type="number"
-                        value={effect.quantity}
-                        onChange={(e) => updatePersonalEffect(index, 'quantity', Number(e.target.value))}
-                      />
-                    </div>
-                    <div>
-                      <Label>Volume (CBM)</Label>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={effect.volume}
-                        onChange={(e) => updatePersonalEffect(index, 'volume', Number(e.target.value))}
-                      />
-                    </div>
-                    <div>
-                      <Label>Gross Weight (KG)</Label>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        value={effect.grossWeight}
-                        onChange={(e) => updatePersonalEffect(index, 'grossWeight', Number(e.target.value))}
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Charging Information */}
-                  <div className={`p-3 rounded-lg border ${effect.loadingLocation === "INSIDE_CAR" ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium">
-                        {effect.loadingLocation === "INSIDE_CAR" 
-                          ? "✓ No charges - Inside car loading"
-                          : `⚠️ Charges: QAR ${effect.charges.toLocaleString()} (QAR ${PERSONAL_EFFECTS_RATE}/CBM)`
-                        }
-                      </span>
-                      {effect.requiresHBL && (
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                          HBL Required
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
+      {showPersonalEffectsForm ? (
+        <PersonalEffectsFormEnhanced 
+          onPersonalEffectsAdd={handlePersonalEffectsAdd}
+          onCancel={() => setShowPersonalEffectsForm(false)}
+          vehicleOwnerName={customer.name}
+        />
+      ) : (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>Personal Effects & Household Goods</CardTitle>
+              <Button onClick={addPersonalEffect} variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Item
+              </Button>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            {personalEffects.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                No personal effects added. Click "Add Item" to include household goods.
+              </p>
+            ) : (
+              <div className="space-y-4">
+                {personalEffects.map((effect, index) => (
+                  <div key={index} className="border rounded-lg p-4 space-y-4">
+                    <div className="flex justify-between items-center">
+                      <h4 className="font-medium">Item {index + 1}: {effect.description}</h4>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => removePersonalEffect(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <span className="font-medium">Owner:</span> {effect.ownerName}
+                      </div>
+                      <div>
+                        <span className="font-medium">Volume:</span> {effect.volume} CBM
+                      </div>
+                      <div>
+                        <span className="font-medium">Weight:</span> {effect.grossWeight} KG
+                      </div>
+                      <div>
+                        <span className="font-medium">Charges:</span> QAR {effect.charges}
+                      </div>
+                    </div>
+                    
+                    {/* Charging Information */}
+                    <div className={`p-3 rounded-lg border ${effect.loadingLocation === "INSIDE_CAR" ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">
+                          {effect.loadingLocation === "INSIDE_CAR" 
+                            ? "✓ No charges - Inside car loading"
+                            : `⚠️ Charges: QAR ${effect.charges.toLocaleString()} (QAR ${PERSONAL_EFFECTS_RATE}/CBM)`
+                          }
+                        </span>
+                        {effect.requiresHBL && (
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            HBL Required
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Invoice Summary */}
       <Card>
@@ -797,14 +782,26 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                   placeholder="2025/000000"
                 />
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between items-center">
                 <span>House B/L Number:</span>
-                <Input
-                  value={hblNumber}
-                  onChange={(e) => setHblNumber(e.target.value)}
-                  className="w-48 text-right"
-                  placeholder="2025/XXXXX"
-                />
+                <div className="flex items-center gap-2">
+                  <span className="text-sm">2025/</span>
+                  <Select 
+                    value={hblNumber.split('/')[1] || ''} 
+                    onValueChange={(value) => setHblNumber(`2025/${value}`)}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue placeholder="Select file no." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white z-[100] max-h-60">
+                      {availableFileNumbers.map((fileNum) => (
+                        <SelectItem key={fileNum} value={fileNum}>
+                          {fileNum}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="flex justify-between">
                 <span>Vehicle Freight:</span>
