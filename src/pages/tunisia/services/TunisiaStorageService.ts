@@ -56,17 +56,31 @@ export class TunisiaStorageService {
       if (error) throw error;
       
       // Transform database data to TunisiaInvoice format
-      return (data || []).map(item => ({
-        id: item.id,
-        invoiceNumber: item.invoice_number,
-        customer: item.customer_id as any, // This will need proper customer lookup
-        vehicle: item.vehicle as any,
-        personalEffects: item.personal_effects as any,
-        totalAmount: Number(item.total_amount),
-        date: item.date,
-        status: (item.status as "DRAFT" | "CONFIRMED" | "LOADED") || "DRAFT",
-        paymentDetails: item.payment_details as any
-      }));
+      return (data || []).map(item => {
+        // Parse customer data properly
+        let customer;
+        try {
+          customer = typeof item.customer_id === 'string' 
+            ? JSON.parse(item.customer_id) 
+            : item.customer_id;
+        } catch {
+          customer = { id: item.customer_id, name: 'Unknown Customer' };
+        }
+
+        return {
+          id: item.id,
+          invoiceNumber: item.invoice_number,
+          customer: customer,
+          vehicle: item.vehicle as any,
+          personalEffects: item.personal_effects as any,
+          totalAmount: Number(item.total_amount),
+          date: item.date,
+          status: (item.status as "DRAFT" | "CONFIRMED" | "LOADED") || "DRAFT",
+          paymentDetails: item.payment_details as any,
+          supportingDocuments: (item as any).supporting_documents || undefined,
+          hblNumber: (item as any).hbl_number || undefined
+        };
+      });
     } catch (error) {
       console.error("Error loading invoices:", error);
       return [];
@@ -77,19 +91,31 @@ export class TunisiaStorageService {
     // Use a default user ID for Tunisia project (no authentication required)
     const defaultUserId = 'tunisia-user-default';
 
+    // Prepare the data to save with proper customer information
+    const dataToSave = {
+      id: invoice.id, // Include ID for proper upsert
+      user_id: defaultUserId,
+      invoice_number: invoice.invoiceNumber,
+      customer_id: typeof invoice.customer === 'object' ? JSON.stringify(invoice.customer) : invoice.customer,
+      vehicle: invoice.vehicle as any,
+      personal_effects: invoice.personalEffects as any,
+      total_amount: invoice.totalAmount,
+      date: invoice.date,
+      status: invoice.status,
+      payment_details: invoice.paymentDetails as any
+    };
+
+    // Add supporting documents and HBL number if they exist in the invoice
+    if (invoice.supportingDocuments) {
+      (dataToSave as any).supporting_documents = invoice.supportingDocuments;
+    }
+    if (invoice.hblNumber) {
+      (dataToSave as any).hbl_number = invoice.hblNumber;
+    }
+
     const { error } = await supabase
       .from('tunisia_invoices')
-      .upsert({
-        user_id: defaultUserId,
-        invoice_number: invoice.invoiceNumber,
-        customer_id: typeof invoice.customer === 'object' ? invoice.customer.id : invoice.customer,
-        vehicle: invoice.vehicle as any,
-        personal_effects: invoice.personalEffects as any,
-        total_amount: invoice.totalAmount,
-        date: invoice.date,
-        status: invoice.status,
-        payment_details: invoice.paymentDetails as any
-      });
+      .upsert(dataToSave);
 
     if (error) throw error;
   }
@@ -122,16 +148,28 @@ export class TunisiaStorageService {
       if (error) throw error;
       if (!data) return null;
       
+      // Parse customer data properly
+      let customer;
+      try {
+        customer = typeof data.customer_id === 'string' 
+          ? JSON.parse(data.customer_id) 
+          : data.customer_id;
+      } catch {
+        customer = { id: data.customer_id, name: 'Unknown Customer' };
+      }
+
       return {
         id: data.id,
         invoiceNumber: data.invoice_number,
-        customer: data.customer_id as any,
+        customer: customer,
         vehicle: data.vehicle as any,
         personalEffects: data.personal_effects as any,
         totalAmount: Number(data.total_amount),
         date: data.date,
         status: (data.status as "DRAFT" | "CONFIRMED" | "LOADED") || "DRAFT",
-        paymentDetails: data.payment_details as any
+        paymentDetails: data.payment_details as any,
+        supportingDocuments: (data as any).supporting_documents || undefined,
+        hblNumber: (data as any).hbl_number || undefined
       };
     } catch (error) {
       console.error("Error getting invoice:", error);

@@ -184,7 +184,16 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
       // Check for duplicate invoice number (skip check if editing existing invoice)
       if (!existingInvoice) {
         const duplicateInvoiceNumber = existingInvoices.find(inv => 
-          inv.invoiceNumber === invoiceNumber && inv.id !== existingInvoice?.id
+          inv.invoiceNumber === invoiceNumber
+        );
+        if (duplicateInvoiceNumber) {
+          toast.error(`Invoice number ${invoiceNumber} already exists. Please use a different number.`);
+          return;
+        }
+      } else {
+        // For existing invoice, check duplicates excluding current invoice
+        const duplicateInvoiceNumber = existingInvoices.find(inv => 
+          inv.invoiceNumber === invoiceNumber && inv.id !== existingInvoice.id
         );
         if (duplicateInvoiceNumber) {
           toast.error(`Invoice number ${invoiceNumber} already exists. Please use a different number.`);
