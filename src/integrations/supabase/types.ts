@@ -183,11 +183,13 @@ export type Database = {
           created_at: string
           customer_id: string
           date: string
+          hbl_number: string | null
           id: string
           invoice_number: string
           payment_details: Json | null
           personal_effects: Json | null
           status: string
+          supporting_documents: Json | null
           total_amount: number
           updated_at: string
           user_id: string
@@ -197,11 +199,13 @@ export type Database = {
           created_at?: string
           customer_id: string
           date: string
+          hbl_number?: string | null
           id?: string
           invoice_number: string
           payment_details?: Json | null
           personal_effects?: Json | null
           status?: string
+          supporting_documents?: Json | null
           total_amount: number
           updated_at?: string
           user_id: string
@@ -211,11 +215,13 @@ export type Database = {
           created_at?: string
           customer_id?: string
           date?: string
+          hbl_number?: string | null
           id?: string
           invoice_number?: string
           payment_details?: Json | null
           personal_effects?: Json | null
           status?: string
+          supporting_documents?: Json | null
           total_amount?: number
           updated_at?: string
           user_id?: string
