@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Printer } from "lucide-react";
 import { TunisiaInvoice, PaymentDetails } from "../types/tunisiaInvoiceTypes";
 import { TunisiaStorageService } from "../services/TunisiaStorageService";
+import { TunisiaPaymentReceiptService } from "../services/TunisiaPaymentReceiptService";
 import { toast } from "sonner";
 import TunisiaPrintStyles from "./TunisiaPrintStyles";
 
@@ -27,25 +28,46 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
     notes: ""
   });
 
+  const [receiptNumber] = useState(`RCT${invoice.invoiceNumber}`);
+
   const [showReceipt, setShowReceipt] = useState(false);
 
   const handlePrint = () => {
     window.print();
   };
 
-  const handleGenerateReceipt = () => {
-    // Update invoice payment status
-    const updatedInvoice = {
-      ...invoice,
-      paymentStatus: "paid" as const,
-      paymentDetails: paymentDetails
-    };
-    
-    // Save updated invoice
-    TunisiaStorageService.addInvoice(updatedInvoice);
-    
-    setShowReceipt(true);
-    toast.success("Payment recorded successfully!");
+  const handleGenerateReceipt = async () => {
+    try {
+      // Update invoice payment status
+      const updatedInvoice = {
+        ...invoice,
+        paymentStatus: "paid" as const,
+        paymentDetails: paymentDetails
+      };
+      
+      // Save updated invoice
+      TunisiaStorageService.addInvoice(updatedInvoice);
+
+      // Save payment receipt to database
+      const receiptData = {
+        receipt_number: receiptNumber,
+        invoice_id: invoice.id,
+        invoice_number: invoice.invoiceNumber,
+        amount: paymentDetails.amount,
+        payment_method: paymentDetails.method,
+        payment_date: paymentDetails.date,
+        notes: paymentDetails.notes,
+        user_id: "current-user" // This should be replaced with actual user ID from auth
+      };
+
+      await TunisiaPaymentReceiptService.createPaymentReceipt(receiptData);
+      
+      setShowReceipt(true);
+      toast.success(`Payment receipt ${receiptNumber} saved successfully!`);
+    } catch (error) {
+      console.error('Error saving payment receipt:', error);
+      toast.error('Failed to save payment receipt. Please try again.');
+    }
   };
 
   if (showReceipt) {
@@ -79,7 +101,7 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span>Receipt No:</span>
-                    <span className="font-medium">RCT-{invoice.invoiceNumber}</span>
+                    <span className="font-medium">{receiptNumber}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Payment Date:</span>
