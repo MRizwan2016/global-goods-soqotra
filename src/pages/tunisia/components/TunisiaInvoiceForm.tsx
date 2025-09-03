@@ -5,13 +5,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Plus, Trash2, Upload, Camera } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ArrowLeft, Plus, Trash2, Upload, Camera, Car, Package } from "lucide-react";
 import { TunisiaInvoice, TunisiaCustomer } from "../types/tunisiaInvoiceTypes";
 import { VEHICLE_RATES, PERSONAL_EFFECTS_RATE } from "../types/tunisiaTypes";
 import { TunisiaStorageService } from "../services/TunisiaStorageService";
 import { TunisiaInvoiceBookService, TunisiaInvoiceBook } from "../services/TunisiaInvoiceBookService";
 import PersonalEffectsFormEnhanced from "./PersonalEffectsFormEnhanced";
 import { toast } from "sonner";
+import { v4 as uuidv4 } from 'uuid';
 
 interface TunisiaInvoiceFormProps {
   onBack: () => void;
@@ -62,6 +64,11 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
   const [invoiceNumber, setInvoiceNumber] = useState(
     existingInvoice?.invoiceNumber || `2025/${String(Date.now()).slice(-6)}`
   );
+
+  // Invoice type toggle - vehicle + personal effects OR only personal effects
+  const [hasVehicle, setHasVehicle] = useState(
+    existingInvoice?.vehicle ? true : true  // Default to having vehicle
+  );
   
   const [supportingDocuments, setSupportingDocuments] = useState<string[]>(
     existingInvoice?.supportingDocuments || []
@@ -73,6 +80,7 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
 
   // HBL Number generation state
   const [availableFileNumbers, setAvailableFileNumbers] = useState<string[]>([]);
+  const [availableRunningNumbers, setAvailableRunningNumbers] = useState<string[]>([]);
   
   // Generate file numbers for HBL
   const generateFileNumbers = () => {
@@ -81,15 +89,21 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
     for (let i = 4746; i <= 4755; i++) {
       fileNumbers.push(i.toString().padStart(5, '0'));
     }
-    // Continue from 15160 onwards
-    for (let i = 15160; i <= 15169; i++) {
-      fileNumbers.push(i.toString());
-    }
     return fileNumbers;
+  };
+
+  // Generate running numbers for HBL (15100-17100)
+  const generateRunningNumbers = () => {
+    const runningNumbers = [];
+    for (let i = 15100; i <= 17100; i++) {
+      runningNumbers.push(i.toString());
+    }
+    return runningNumbers;
   };
 
   useEffect(() => {
     setAvailableFileNumbers(generateFileNumbers());
+    setAvailableRunningNumbers(generateRunningNumbers());
   }, []);
 
   // Book and page selection state
@@ -204,9 +218,14 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
   };
 
   const calculateTotal = () => {
-    const vehicleTotal = vehicle.freightCharge;
+    const vehicleTotal = hasVehicle ? vehicle.freightCharge : 0;
     const effectsTotal = personalEffects.reduce((sum, effect) => sum + effect.charges, 0);
     return vehicleTotal + effectsTotal;
+  };
+
+  // Calculate total packages (sum of all quantities)
+  const getTotalPackages = () => {
+    return personalEffects.reduce((sum, effect) => sum + effect.quantity, 0);
   };
 
   const handleAddDocument = (url: string) => {
@@ -269,14 +288,14 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
       }
 
       const invoice: TunisiaInvoice = {
-        id: existingInvoice?.id || Date.now().toString(),
+        id: existingInvoice?.id || uuidv4(),
         invoiceNumber,
         hblNumber,
         customer: {
           ...customer,
-          id: customer.id || Date.now().toString()
+          id: customer.id || uuidv4()
         },
-        vehicle,
+        vehicle: hasVehicle ? vehicle : undefined,
         personalEffects: personalEffects.length > 0 ? personalEffects : undefined,
         supportingDocuments: supportingDocuments.length > 0 ? supportingDocuments : undefined,
         totalAmount: calculateTotal(),
@@ -432,8 +451,49 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
         </CardContent>
       </Card>
 
-      {/* Vehicle Information */}
+      {/* Invoice Type Selection */}
       <Card>
+        <CardHeader>
+          <CardTitle>Invoice Type</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="has-vehicle"
+                checked={hasVehicle}
+                onCheckedChange={(checked) => setHasVehicle(Boolean(checked))}
+              />
+              <Label htmlFor="has-vehicle" className="flex items-center gap-2">
+                <Car className="h-4 w-4" />
+                Vehicle + Personal Effects
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="personal-only"
+                checked={!hasVehicle}
+                onCheckedChange={(checked) => setHasVehicle(!Boolean(checked))}
+              />
+              <Label htmlFor="personal-only" className="flex items-center gap-2">
+                <Package className="h-4 w-4" />
+                Personal Effects Only (Requires HBL)
+              </Label>
+            </div>
+          </div>
+          {!hasVehicle && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-700">
+                <strong>Note:</strong> Personal effects only shipments require House B/L number and will be loaded into containers along with vehicles.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Vehicle Information */}
+      {hasVehicle && (
+        <Card>
         <CardHeader>
           <CardTitle>Vehicle Information</CardTitle>
         </CardHeader>
@@ -647,6 +707,7 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
           </div>
         </CardContent>
       </Card>
+      )}
 
       {/* Personal Effects */}
       {showPersonalEffectsForm ? (
@@ -666,8 +727,9 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                   Add Package
                 </Button>
                 {personalEffects.length > 0 && (
-                  <div className="text-sm text-muted-foreground flex items-center">
-                    Total Packages: <span className="font-semibold ml-1">{personalEffects.length}</span>
+                  <div className="text-sm text-muted-foreground flex items-center gap-4">
+                    <span>Items: <span className="font-semibold">{personalEffects.length}</span></span>
+                    <span>Total Packages: <span className="font-semibold">{getTotalPackages()}</span></span>
                   </div>
                 )}
               </div>
@@ -676,7 +738,7 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
           <CardContent>
             {personalEffects.length === 0 ? (
               <p className="text-muted-foreground text-center py-8">
-                No personal effects added. Click "Add Item" to include household goods.
+                No personal effects added. Click "Add Package" to include household goods.
               </p>
             ) : (
               <div className="space-y-4">
@@ -692,9 +754,12 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-sm">
                       <div>
                         <span className="font-medium">Owner:</span> {effect.ownerName}
+                      </div>
+                      <div>
+                        <span className="font-medium">Quantity:</span> {effect.quantity} packages
                       </div>
                       <div>
                         <span className="font-medium">Volume:</span> {effect.volume} CBM
@@ -791,14 +856,18 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
               </div>
               <div className="flex justify-between items-center">
                 <span>House B/L Number:</span>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
                   <span className="text-sm">2025/</span>
                   <Select 
-                    value={hblNumber.split('/')[1] || ''} 
-                    onValueChange={(value) => setHblNumber(`2025/${value}`)}
+                    value={hblNumber.split('/')[1]?.split('-')[0] || ''} 
+                    onValueChange={(value) => {
+                      const runningPart = hblNumber.split('/')[1]?.split('-')[1] || '';
+                      const newHbl = runningPart ? `2025/${value}-${runningPart}` : `2025/${value}`;
+                      setHblNumber(newHbl);
+                    }}
                   >
-                    <SelectTrigger className="w-32">
-                      <SelectValue placeholder="Select file no." />
+                    <SelectTrigger className="w-24">
+                      <SelectValue placeholder="File" />
                     </SelectTrigger>
                     <SelectContent className="bg-white z-[100] max-h-60">
                       {availableFileNumbers.map((fileNum) => (
@@ -808,12 +877,34 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
                       ))}
                     </SelectContent>
                   </Select>
+                  <span className="text-sm">-</span>
+                  <Select 
+                    value={hblNumber.split('/')[1]?.split('-')[1] || ''} 
+                    onValueChange={(value) => {
+                      const filePart = hblNumber.split('/')[1]?.split('-')[0] || '';
+                      const newHbl = filePart ? `2025/${filePart}-${value}` : `2025/${value}`;
+                      setHblNumber(newHbl);
+                    }}
+                  >
+                    <SelectTrigger className="w-24">
+                      <SelectValue placeholder="Running" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white z-[100] max-h-60">
+                      {availableRunningNumbers.map((runningNum) => (
+                        <SelectItem key={runningNum} value={runningNum}>
+                          {runningNum}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-              <div className="flex justify-between">
-                <span>Vehicle Freight:</span>
-                <span>QAR {vehicle.freightCharge.toLocaleString()}</span>
-              </div>
+              {hasVehicle && (
+                <div className="flex justify-between">
+                  <span>Vehicle Freight:</span>
+                  <span>QAR {vehicle.freightCharge.toLocaleString()}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span>Personal Effects:</span>
                 <span>QAR {personalEffects.reduce((sum, effect) => sum + effect.charges, 0).toLocaleString()}</span>
@@ -833,7 +924,10 @@ const TunisiaInvoiceForm: React.FC<TunisiaInvoiceFormProps> = ({
         <Button variant="outline" onClick={onBack}>
           Cancel
         </Button>
-        <Button onClick={handleSave} disabled={!customer.name || !vehicle.make || !vehicle.chassisNumber}>
+        <Button 
+          onClick={handleSave} 
+          disabled={!customer.name || (hasVehicle && (!vehicle.make || !vehicle.chassisNumber)) || (!hasVehicle && personalEffects.length === 0)}
+        >
           {existingInvoice ? 'Update' : 'Save'} Invoice
         </Button>
       </div>
