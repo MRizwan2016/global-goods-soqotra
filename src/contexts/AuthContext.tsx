@@ -408,6 +408,56 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             accountCountryFiles: true
           }
         }
+      },
+      {
+        id: "user-paolo-fernando",
+        fullName: "Paolo Fernando",
+        email: "sales@almaraamcc.com",
+        mobileNumber: "+974 5555 9999",
+        country: "Qatar",
+        isActive: true,
+        isAdmin: false,
+        createdAt: new Date().toISOString(),
+        permissions: {
+          masterData: true,
+          dataEntry: true,
+          reports: true,
+          downloads: true,
+          accounting: true,
+          controlPanel: true,
+          cargoDelivery: true,
+          accountFunctions: true,
+          accountRegistrations: true,
+          accountFinancialEntities: true,
+          accountCountryReconciliations: true,
+          files: {
+            salesRep: true,
+            town: true,
+            item: true,
+            packageOptions: true,
+            sellingRates: true,
+            container: true,
+            vessel: true,
+            invoiceBook: true,
+            driverHelper: true,
+            invoicing: true,
+            paymentReceivable: true,
+            loadContainer: true,
+            loadVessel: true,
+            loadAirCargo: true,
+            packingList: true,
+            cargoReports: true,
+            financialReports: true,
+            shippingReports: true,
+            paymentMethods: true,
+            reconciliation: true,
+            profitLoss: true,
+            accountFunctionFiles: true,
+            accountRegistrationFiles: true,
+            accountFinancialFiles: true,
+            accountCountryFiles: true
+          }
+        }
       }
     ];
     
@@ -428,7 +478,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       "user-documentation": "123456", // DOCUMENTATION USER
       "user-accounts": "123456",      // ACCOUNTS USER
       "user-yousif": "123456",        // YOUSIF ALI IBRAHIM
-      "user-ops2": "123456"           // OPERATIONS USER 2
+      "user-ops2": "123456",          // OPERATIONS USER 2
+      "user-paolo-fernando": "123456" // PAOLO FERNANDO
     };
     
     // Ensure passwords are accessible immediately
