@@ -17,7 +17,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isFirstLogin, setIsFirstLogin] = useState(false);
 
   // Get user operations
-  const { toggleUserStatus, toggleUserPermission, toggleFilePermission } = useUserOperations(users, setUsers);
+  const userOperations = useUserOperations(users, setUsers);
+  
+  // Wrap permission functions to pass current user admin status
+  const toggleUserPermission = (userId: string, permissionType: keyof User['permissions']) => {
+    userOperations.toggleUserPermission(userId, permissionType, currentUser);
+  };
+  
+  const toggleFilePermission = (userId: string, fileKey: keyof User['permissions']['files']) => {
+    userOperations.toggleFilePermission(userId, fileKey, currentUser);
+  };
   
   // Get auth operations
   const { login: baseLogin, logout, register, requestPasswordReset, resetPassword } = useAuthOperations(users, setUsers, setCurrentUser);
@@ -582,7 +591,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     requestPasswordReset,
     resetPassword,
     users,
-    toggleUserStatus,
+    toggleUserStatus: userOperations.toggleUserStatus,
     sendActivationEmail: async (user: User) => {
       const { sendActivationEmail } = await import('@/utils/auth-utils');
       return sendActivationEmail(user);

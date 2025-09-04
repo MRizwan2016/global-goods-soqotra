@@ -29,8 +29,14 @@ export function useUserOperations(
     }
   };
 
-  const toggleUserPermission = (userId: string, permissionType: keyof User['permissions']) => {
+  const toggleUserPermission = (userId: string, permissionType: keyof User['permissions'], adminUser?: User | null) => {
     try {
+      // Check if the current user is admin
+      if (!adminUser?.isAdmin) {
+        toast.error("Only administrators can modify user permissions.");
+        return;
+      }
+
       const updatedUsers = users.map(user => {
         if (user.id === userId) {
           const currentPermission = user.permissions?.[permissionType] || false;
@@ -58,8 +64,14 @@ export function useUserOperations(
     }
   };
 
-  const toggleFilePermission = (userId: string, fileKey: keyof User['permissions']['files']) => {
+  const toggleFilePermission = (userId: string, fileKey: keyof User['permissions']['files'], adminUser?: User | null) => {
     try {
+      // Check if the current user is admin
+      if (!adminUser?.isAdmin) {
+        toast.error("Only administrators can modify file permissions.");
+        return;
+      }
+
       const updatedUsers = users.map(user => {
         if (user.id === userId) {
           const currentFilePermission = user.permissions?.files?.[fileKey] || false;
