@@ -52,14 +52,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Load data from localStorage on initial load
   useEffect(() => {
-    // Force clear localStorage to fix login issues
-    localStorage.removeItem("users");
-    localStorage.removeItem("userPasswords");
-    localStorage.removeItem("currentUser");
+    // Load users from localStorage or initialize with defaults
+    const storedUsers = localStorage.getItem("users");
+    if (storedUsers) {
+      try {
+        const parsedUsers = JSON.parse(storedUsers);
+        setUsers(parsedUsers.map(ensureUserPermissions));
+        console.log("Loaded users from localStorage:", parsedUsers.length);
+      } catch (error) {
+        console.error("Error parsing stored users:", error);
+        initializeDefaultUsersAndAdmin();
+      }
+    } else {
+      console.log("No stored users found, initializing defaults");
+      initializeDefaultUsersAndAdmin();
+    }
     
-    console.log("=== FORCED REINITIALIZATION ===");
-    initializeDefaultUsersAndAdmin();
+    // Ensure user passwords exist
+    ensureUserPasswordsExist();
     
+    // Load current user
     const storedUser = localStorage.getItem("currentUser");
     if (storedUser) {
       try {
