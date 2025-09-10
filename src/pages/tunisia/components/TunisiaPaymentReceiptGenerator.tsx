@@ -28,7 +28,7 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
     notes: ""
   });
 
-  const [receiptNumber] = useState(`RCT${invoice.invoiceNumber}`);
+  const [receiptNumber] = useState(`RCT${invoice.invoiceNumber}-${Date.now()}`);
 
   const [showReceipt, setShowReceipt] = useState(false);
 
@@ -197,19 +197,6 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
               </div>
             </div>
 
-            {invoice.personalEffects && invoice.personalEffects.length > 0 && (
-              <div className="mb-8">
-                <h3 className="font-semibold mb-3">Personal Effects</h3>
-                <div className="space-y-2 text-sm">
-                  {invoice.personalEffects.map((effect, index) => (
-                    <div key={index} className="flex justify-between">
-                      <span>{effect.description} ({effect.quantity} items, {effect.volume} CBM)</span>
-                      <span className="font-medium">QAR {effect.charges.toLocaleString()}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             {paymentDetails.notes && (
               <div className="mb-8">
@@ -279,24 +266,39 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
                 value={paymentDetails.amount}
                 onChange={(e) => setPaymentDetails(prev => ({ ...prev, amount: Number(e.target.value) }))}
               />
-              {paymentDetails.amount < invoice.totalAmount && (
-                <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                  <div className="text-sm">
-                    <div className="flex justify-between">
-                      <span>Total Amount:</span>
-                      <span className="font-medium">QAR {invoice.totalAmount.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Amount Paid:</span>
-                      <span className="font-medium">QAR {paymentDetails.amount.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between border-t pt-1 mt-1">
-                      <span className="font-semibold text-red-600">Balance Due:</span>
-                      <span className="font-bold text-red-600">QAR {(invoice.totalAmount - paymentDetails.amount).toLocaleString()}</span>
-                    </div>
+            </div>
+
+            {/* Part Payment Section */}
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+              <h4 className="font-semibold text-blue-800 mb-3">Payment Summary</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Total Invoice Amount:</span>
+                  <span className="font-medium">QAR {invoice.totalAmount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Amount Being Paid:</span>
+                  <span className="font-bold text-green-600">QAR {paymentDetails.amount.toLocaleString()}</span>
+                </div>
+                <div className="border-t pt-2">
+                  <div className="flex justify-between">
+                    <span className={`font-semibold ${paymentDetails.amount < invoice.totalAmount ? 'text-red-600' : 'text-green-600'}`}>
+                      {paymentDetails.amount < invoice.totalAmount ? 'Balance Due:' : 'Payment Status:'}
+                    </span>
+                    <span className={`font-bold ${paymentDetails.amount < invoice.totalAmount ? 'text-red-600' : 'text-green-600'}`}>
+                      {paymentDetails.amount < invoice.totalAmount 
+                        ? `QAR ${(invoice.totalAmount - paymentDetails.amount).toLocaleString()}`
+                        : 'FULLY PAID'
+                      }
+                    </span>
                   </div>
                 </div>
-              )}
+                {paymentDetails.amount < invoice.totalAmount && (
+                  <div className="mt-2 p-2 bg-yellow-100 border border-yellow-300 rounded text-xs">
+                    <strong>Partial Payment:</strong> This is a part payment. Customer needs to pay the remaining balance of QAR {(invoice.totalAmount - paymentDetails.amount).toLocaleString()}.
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>
@@ -342,12 +344,6 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
                 <span>Vehicle Freight:</span>
                 <span>QAR {invoice.vehicle.freightCharge.toLocaleString()}</span>
               </div>
-              {invoice.personalEffects && (
-                <div className="flex justify-between">
-                  <span>Personal Effects:</span>
-                  <span>QAR {invoice.personalEffects.reduce((sum, effect) => sum + effect.charges, 0).toLocaleString()}</span>
-                </div>
-              )}
               <div className="border-t pt-2">
                 <div className="flex justify-between font-bold text-lg">
                   <span>Total Amount:</span>

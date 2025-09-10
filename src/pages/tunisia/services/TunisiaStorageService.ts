@@ -179,9 +179,23 @@ export class TunisiaStorageService {
 
   static async getInvoiceByExportPlate(exportPlate: string): Promise<TunisiaInvoice | null> {
     try {
+      // First try from database
+      const { data: dbData, error: dbError } = await supabase
+        .from('tunisia_invoices')
+        .select('*')
+        .ilike('vehicle->>exportPlate', `%${exportPlate}%`)
+        .limit(1)
+        .single();
+
+      if (!dbError && dbData) {
+        console.log("Found invoice in database:", dbData.invoice_number);
+        return this.convertDbInvoiceToLocal(dbData);
+      }
+
+      // Fallback to local storage
       const invoices = await this.loadInvoices();
       console.log("Searching for export plate:", exportPlate);
-      console.log("Available invoices:", invoices.map(inv => ({ id: inv.id, exportPlate: inv.vehicle.exportPlate })));
+      console.log("Available export plates:", invoices.map(inv => inv.vehicle.exportPlate).filter(Boolean));
       
       const found = invoices.find(inv => {
         const invExportPlate = inv.vehicle.exportPlate?.toString().toLowerCase().trim();
@@ -190,12 +204,36 @@ export class TunisiaStorageService {
         return invExportPlate === searchPlate;
       });
       
-      console.log("Found invoice:", found ? found.id : "Not found");
+      console.log("Found invoice:", found ? found.invoiceNumber : "Not found");
       return found || null;
     } catch (error) {
       console.error("Error getting invoice by export plate:", error);
       return null;
     }
+  }
+
+  private static convertDbInvoiceToLocal(dbInvoice: any): TunisiaInvoice {
+    return {
+      id: dbInvoice.id,
+      invoiceNumber: dbInvoice.invoice_number,
+      customer: {
+        id: dbInvoice.customer_id,
+        name: dbInvoice.vehicle?.customerName || "Unknown Customer",
+        mobile: dbInvoice.vehicle?.customerMobile || "",
+        metrashMobile: dbInvoice.vehicle?.customerMetrashMobile || "",
+        prefix: dbInvoice.vehicle?.customerPrefix || "MR.",
+        address: dbInvoice.vehicle?.customerAddress || ""
+      },
+      vehicle: dbInvoice.vehicle,
+      personalEffects: dbInvoice.personal_effects || [],
+      totalAmount: Number(dbInvoice.total_amount),
+      date: dbInvoice.date,
+      status: "CONFIRMED",
+      hblNumber: dbInvoice.hbl_number,
+      paymentStatus: dbInvoice.payment_details ? "paid" : "unpaid",
+      paymentDetails: dbInvoice.payment_details,
+      supportingDocuments: dbInvoice.supporting_documents || []
+    };
   }
 
   // Container methods
