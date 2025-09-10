@@ -1,7 +1,8 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Package, Car, FileText } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Calendar, Package, Car, FileText, Edit, Receipt } from "lucide-react";
 import { TunisiaContainer } from "../types/tunisiaTypes";
 import { format } from "date-fns";
 
@@ -29,12 +30,16 @@ interface LoadingRecord {
 
 interface LoadingRecordsViewProps {
   containers: TunisiaContainer[];
+  invoices: any[];
   onBack: () => void;
+  onContainerEdit: (containerId: string) => void;
 }
 
 const LoadingRecordsView: React.FC<LoadingRecordsViewProps> = ({
   containers,
-  onBack
+  invoices,
+  onBack,
+  onContainerEdit
 }) => {
   // Generate loading records from containers
   const loadingRecords: LoadingRecord[] = containers
@@ -148,7 +153,10 @@ const LoadingRecordsView: React.FC<LoadingRecordsViewProps> = ({
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <div>
-                    <CardTitle className="text-lg">Container {record.containerNumber}</CardTitle>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      Container {record.containerNumber}
+                      <Badge variant="secondary" className="bg-blue-100 text-blue-800">SEALED</Badge>
+                    </CardTitle>
                     <p className="text-sm text-muted-foreground">
                       Loaded: {format(new Date(record.loadingDate), 'PPP')}
                     </p>
@@ -158,17 +166,60 @@ const LoadingRecordsView: React.FC<LoadingRecordsViewProps> = ({
                     <div className="text-sm text-muted-foreground">
                       {record.totalVehicles} vehicles • {record.totalPersonalEffects} effects
                     </div>
+                    <div className="flex gap-2 mt-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => onContainerEdit(record.id)}
+                        className="text-xs"
+                      >
+                        <Edit className="h-3 w-3 mr-1" />
+                        Edit/Reload
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Vehicles */}
+                <div className="space-y-6">
+                  {/* Loaded Invoices Section */}
                   <div>
                     <h4 className="font-medium mb-3 flex items-center gap-2">
-                      <Car className="h-4 w-4" />
-                      Vehicles ({record.totalVehicles})
+                      <Receipt className="h-4 w-4" />
+                      Loaded Invoices
                     </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {record.vehicles.map((vehicle, index) => {
+                        const relatedInvoice = invoices.find(inv => 
+                          inv.vehicle?.exportPlate === vehicle.exportPlate ||
+                          inv.vehicle?.chassisNumber === vehicle.exportPlate
+                        );
+                        return (
+                          <div key={index} className="border rounded p-3 bg-green-50 border-green-200">
+                            <div className="text-sm">
+                              <div className="font-medium text-green-800">
+                                {relatedInvoice?.invoiceNumber || `INV-${vehicle.exportPlate}`}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                Export: {vehicle.exportPlate}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {vehicle.make} - {vehicle.customerName}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Vehicles */}
+                    <div>
+                      <h4 className="font-medium mb-3 flex items-center gap-2">
+                        <Car className="h-4 w-4" />
+                        Vehicles ({record.totalVehicles})
+                      </h4>
                     {record.vehicles.length === 0 ? (
                       <p className="text-sm text-muted-foreground">No vehicles loaded</p>
                     ) : (
@@ -222,6 +273,7 @@ const LoadingRecordsView: React.FC<LoadingRecordsViewProps> = ({
                         ))}
                       </div>
                     )}
+                    </div>
                   </div>
                 </div>
               </CardContent>

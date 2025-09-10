@@ -24,7 +24,8 @@ const SealedContainersView: React.FC<SealedContainersViewProps> = ({
   onContainerDelete,
   isAdmin = false
 }) => {
-  const sealedContainers = containers.filter(container => container.status === 'SEALED');
+  // Only show permanently sealed containers (containers passed from parent are already filtered)
+  const sealedContainers = containers;
 
   return (
     <div className="space-y-6">
@@ -40,7 +41,7 @@ const SealedContainersView: React.FC<SealedContainersViewProps> = ({
               Sealed Container Management
             </h2>
             <p className="text-muted-foreground">
-              View and manage sealed containers with loading details
+              View and manage permanently sealed containers that have finished loading
             </p>
           </div>
         </div>

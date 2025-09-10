@@ -212,8 +212,12 @@ const TunisiaDashboard: React.FC = () => {
     TunisiaStorageService.updateContainer(updatedContainer);
     
     setContainers(prev => prev.map(c => c.id === containerId ? updatedContainer : c));
+    setSelectedContainer(updatedContainer);
     
     toast.success("Container reopened for additional loading!");
+    
+    // Navigate to container loading view for editing
+    setView('container-loading');
   };
 
   const handleContainerView = (container: TunisiaContainer) => {
@@ -372,7 +376,7 @@ const TunisiaDashboard: React.FC = () => {
           </div>
         </div>
         <SealedContainersView
-          containers={containers}
+          containers={containers.filter(c => c.status === 'SEALED')}
           onBack={() => setView('dashboard')}
           onContainerView={handleContainerView}
           onContainerReopen={handleContainerReopen}
@@ -433,7 +437,15 @@ const TunisiaDashboard: React.FC = () => {
         </div>
         <LoadingRecordsView
           containers={containers}
+          invoices={invoices}
           onBack={() => setView('dashboard')}
+          onContainerEdit={(containerId) => {
+            const container = containers.find(c => c.id === containerId);
+            if (container) {
+              setSelectedContainer(container);
+              setView('container-loading');
+            }
+          }}
         />
       </Layout>
     );
