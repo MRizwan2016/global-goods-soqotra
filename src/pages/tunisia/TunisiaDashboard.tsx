@@ -43,15 +43,22 @@ const TunisiaDashboard: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
+        console.log('Loading Tunisia data...');
+        
         const loadedInvoices = await TunisiaStorageService.loadInvoices();
         const loadedContainers = await TunisiaStorageService.loadContainers();
+        
+        console.log('Raw loaded data:', {
+          invoices: loadedInvoices,
+          containers: loadedContainers
+        });
         
         // Remove duplicates by containerNumber
         const uniqueContainers = loadedContainers.filter((container, index, self) => 
           index === self.findIndex(c => c.containerNumber === container.containerNumber)
         );
         
-        console.log('Loaded Tunisia data:', { 
+        console.log('Processed Tunisia data:', { 
           invoices: loadedInvoices.length, 
           containers: uniqueContainers.length,
           removedDuplicates: loadedContainers.length - uniqueContainers.length
@@ -73,6 +80,28 @@ const TunisiaDashboard: React.FC = () => {
     
     loadData();
   }, []);
+
+  // Refresh data function
+  const refreshData = async () => {
+    try {
+      console.log('Refreshing Tunisia data...');
+      const loadedInvoices = await TunisiaStorageService.loadInvoices();
+      const loadedContainers = await TunisiaStorageService.loadContainers();
+      
+      console.log('Refreshed data:', {
+        invoices: loadedInvoices.length,
+        containers: loadedContainers.length
+      });
+      
+      setInvoices(loadedInvoices);
+      setContainers(loadedContainers);
+      
+      toast.success("Data refreshed successfully!");
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+      toast.error("Failed to refresh data.");
+    }
+  };
 
   const handleContainerCreate = async (containerData: Omit<TunisiaContainer, 'id'>) => {
     // Check if container number already exists
@@ -492,10 +521,16 @@ const TunisiaDashboard: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-800 mb-2">Invoice Management</h1>
               <p className="text-gray-600">Manage customer invoices for vehicle and personal effects shipping</p>
+              <p className="text-sm text-blue-600">Data is stored in Supabase database (tunisia_invoices table)</p>
             </div>
-            <Button onClick={() => setView('invoice-form')}>
-              Create New Invoice
-            </Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={refreshData}>
+                Refresh Data
+              </Button>
+              <Button onClick={() => setView('invoice-form')}>
+                Create New Invoice
+              </Button>
+            </div>
           </div>
         </div>
 

@@ -6,19 +6,24 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { FileText, Download, ArrowLeft } from "lucide-react";
 import { TunisiaContainer } from "../types/tunisiaTypes";
-import { HouseBillOfLading } from "../types/tunisiaInvoiceTypes";
+import { HouseBillOfLading, TunisiaInvoice } from "../types/tunisiaInvoiceTypes";
 import HouseBillOfLadingDocument from "./HouseBillOfLadingDocument";
 import TunisiaPrintStyles from "./TunisiaPrintStyles";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface HouseBillOfLadingGeneratorProps {
   container: TunisiaContainer;
   onBack: () => void;
+  invoices?: TunisiaInvoice[];
 }
 
 const HouseBillOfLadingGenerator: React.FC<HouseBillOfLadingGeneratorProps> = ({
   container,
-  onBack
+  onBack,
+  invoices = []
 }) => {
+  const [selectedInvoiceForBL, setSelectedInvoiceForBL] = useState<TunisiaInvoice | null>(null);
+  
   const [hblData, setHblData] = useState<HouseBillOfLading>({
     id: `HBL-${container.id}-${Date.now()}`,
     blNumber: `2025/04726/${Date.now().toString().slice(-5)}`,
@@ -63,6 +68,28 @@ const HouseBillOfLadingGenerator: React.FC<HouseBillOfLadingGeneratorProps> = ({
     },
     specialInstructions: ""
   });
+
+  // Handle invoice selection for auto-filling HBL data
+  const handleInvoiceSelection = (invoiceId: string) => {
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (invoice) {
+      setSelectedInvoiceForBL(invoice);
+      
+      // Auto-fill HBL data from selected invoice
+      setHblData(prev => ({
+        ...prev,
+        consignee: {
+          name: `${invoice.customer.prefix} ${invoice.customer.name}`,
+          address: invoice.customer.address || "TUNIS, TUNISIA",
+          idNumber: invoice.customer.idNumber || ""
+        },
+        notifyParty: {
+          name: `${invoice.customer.prefix} ${invoice.customer.name}`,
+          address: invoice.customer.address || "TUNIS, TUNISIA"
+        }
+      }));
+    }
+  };
 
   const [showPreview, setShowPreview] = useState(false);
 
@@ -185,6 +212,35 @@ const HouseBillOfLadingGenerator: React.FC<HouseBillOfLadingGeneratorProps> = ({
                 value={hblData.shipper.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value, 'shipper')}
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Invoice Selection for Loading */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Select Invoice for Loading</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Available Invoices</Label>
+              <Select onValueChange={handleInvoiceSelection}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select an invoice to auto-fill consignee details" />
+                </SelectTrigger>
+                <SelectContent>
+                  {invoices.map((invoice) => (
+                    <SelectItem key={invoice.id} value={invoice.id}>
+                      {invoice.invoiceNumber} - {invoice.customer.prefix} {invoice.customer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {invoices.length === 0 && (
+                <p className="text-sm text-muted-foreground mt-2">
+                  No invoices available. Create invoices first to auto-fill consignee details.
+                </p>
+              )}
             </div>
           </CardContent>
         </Card>
