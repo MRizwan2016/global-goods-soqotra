@@ -42,39 +42,64 @@ const TunisiaDashboard: React.FC = () => {
   // Load data on component mount
   useEffect(() => {
     const loadData = async () => {
-      const loadedInvoices = await TunisiaStorageService.loadInvoices();
-      const loadedContainers = await TunisiaStorageService.loadContainers();
-      
-      console.log('Raw localStorage data:', {
-        invoicesData: localStorage.getItem('tunisia-invoices'),
-        containersData: localStorage.getItem('tunisia-containers')
-      });
-      
-      setInvoices(loadedInvoices);
-      setContainers(loadedContainers);
-      
-      console.log('Loaded Tunisia data:', { 
-        invoices: loadedInvoices.length, 
-        containers: loadedContainers.length,
-        invoiceDetails: loadedInvoices,
-        containerDetails: loadedContainers
-      });
+      try {
+        const loadedInvoices = await TunisiaStorageService.loadInvoices();
+        const loadedContainers = await TunisiaStorageService.loadContainers();
+        
+        // Remove duplicates by containerNumber
+        const uniqueContainers = loadedContainers.filter((container, index, self) => 
+          index === self.findIndex(c => c.containerNumber === container.containerNumber)
+        );
+        
+        console.log('Loaded Tunisia data:', { 
+          invoices: loadedInvoices.length, 
+          containers: uniqueContainers.length,
+          removedDuplicates: loadedContainers.length - uniqueContainers.length
+        });
+        
+        setInvoices(loadedInvoices);
+        setContainers(uniqueContainers);
+        
+        // If duplicates were found, clean up the database
+        if (loadedContainers.length > uniqueContainers.length) {
+          console.log("Cleaning up duplicate containers...");
+          await TunisiaStorageService.cleanupDuplicateContainers();
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+        toast.error("Failed to load data. Please refresh the page.");
+      }
     };
     
     loadData();
   }, []);
 
   const handleContainerCreate = async (containerData: Omit<TunisiaContainer, 'id'>) => {
+    // Check if container number already exists
+    const existingContainer = containers.find(c => c.containerNumber === containerData.containerNumber);
+    if (existingContainer) {
+      toast.error("Container number already exists!");
+      return;
+    }
+
+    // Generate unique ID using crypto.randomUUID() or fallback
+    const containerId = crypto.randomUUID ? crypto.randomUUID() : `container_${Date.now()}_${Math.random()}`;
+    
     const newContainer: TunisiaContainer = {
       ...containerData,
-      id: Date.now().toString()
+      id: containerId
     };
     
-    // Save to storage
-    await TunisiaStorageService.addContainer(newContainer);
-    setContainers(prev => [...prev, newContainer]);
-    
-    toast.success("Container created successfully!");
+    try {
+      // Save to storage
+      await TunisiaStorageService.addContainer(newContainer);
+      setContainers(prev => [...prev, newContainer]);
+      
+      toast.success("Container created successfully!");
+    } catch (error) {
+      console.error("Error creating container:", error);
+      toast.error("Failed to create container. Please try again.");
+    }
   };
 
   const handleContainerSelect = (container: TunisiaContainer) => {
@@ -85,9 +110,11 @@ const TunisiaDashboard: React.FC = () => {
   const handleVehicleAdd = (vehicleData: Omit<TunisiaVehicle, 'id'>) => {
     if (!selectedContainer) return;
 
+    const vehicleId = crypto.randomUUID ? crypto.randomUUID() : `vehicle_${Date.now()}_${Math.random()}`;
+    
     const newVehicle: TunisiaVehicle = {
       ...vehicleData,
-      id: Date.now().toString()
+      id: vehicleId
     };
 
     const updatedContainer: TunisiaContainer = {
@@ -111,9 +138,11 @@ const TunisiaDashboard: React.FC = () => {
   const handlePersonalEffectsAdd = (effectsData: Omit<PersonalEffects, 'id'>) => {
     if (!selectedContainer) return;
 
+    const effectId = crypto.randomUUID ? crypto.randomUUID() : `effect_${Date.now()}_${Math.random()}`;
+    
     const newEffects: PersonalEffects = {
       ...effectsData,
-      id: Date.now().toString()
+      id: effectId
     };
 
     const updatedContainer: TunisiaContainer = {

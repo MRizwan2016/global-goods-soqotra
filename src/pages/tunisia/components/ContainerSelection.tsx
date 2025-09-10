@@ -37,6 +37,22 @@ const ContainerSelection: React.FC<ContainerSelectionProps> = ({
   });
 
   const handleCreateContainer = () => {
+    // Validate container number is not empty
+    if (!newContainer.containerNumber.trim()) {
+      alert("Please enter a container number");
+      return;
+    }
+    
+    // Check for duplicate container number
+    const isDuplicate = containers.some(container => 
+      container.containerNumber.toLowerCase() === newContainer.containerNumber.toLowerCase()
+    );
+    
+    if (isDuplicate) {
+      alert("Container number already exists! Please use a different number.");
+      return;
+    }
+
     const container: Omit<TunisiaContainer, 'id'> = {
       ...newContainer,
       maxVehicles: newContainer.type === "40HC" ? 4 : 4,

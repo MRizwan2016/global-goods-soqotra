@@ -415,4 +415,51 @@ export class TunisiaStorageService {
       }
     }
   }
+
+  // Clean up duplicate containers
+  static async cleanupDuplicateContainers(): Promise<void> {
+    try {
+      const defaultUserId = 'tunisia-user-default';
+      
+      // Get all containers
+      const { data: containers, error } = await supabase
+        .from('tunisia_containers')
+        .select('*')
+        .eq('user_id', defaultUserId);
+
+      if (error) throw error;
+
+      if (!containers) return;
+
+      // Group by container number and keep only the latest one
+      const containerGroups: { [key: string]: any[] } = {};
+      containers.forEach(container => {
+        if (!containerGroups[container.container_number]) {
+          containerGroups[container.container_number] = [];
+        }
+        containerGroups[container.container_number].push(container);
+      });
+
+      // Delete duplicates
+      for (const containerNumber in containerGroups) {
+        const group = containerGroups[containerNumber];
+        if (group.length > 1) {
+          // Sort by created_at and keep the latest
+          group.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+          const toDelete = group.slice(1); // Remove the first (latest) item
+          
+          for (const container of toDelete) {
+            await supabase
+              .from('tunisia_containers')
+              .delete()
+              .eq('id', container.id);
+          }
+          
+          console.log(`Cleaned up ${toDelete.length} duplicate containers for ${containerNumber}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error cleaning up duplicate containers:", error);
+    }
+  }
 }
