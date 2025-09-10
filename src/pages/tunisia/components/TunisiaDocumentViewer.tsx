@@ -15,6 +15,9 @@ const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
   onBack,
   title
 }) => {
+  // Debug log to see what documents we're receiving
+  console.log('TunisiaDocumentViewer received documents:', documents);
+  console.log('Title:', title);
   const handlePrint = (docUrl: string) => {
     const printWindow = window.open('', '_blank');
     if (printWindow) {
@@ -105,12 +108,16 @@ const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
 
   // Helper function to create a proper data URL for base64 content
   const processDocumentUrl = (docUrl: string) => {
+    console.log('Processing document URL:', docUrl.substring(0, 100) + '...');
+    
     if (docUrl.startsWith('data:')) {
+      console.log('Already a data URL');
       return docUrl; // Already a proper data URL
     }
     
     // If it looks like base64 data, try to create a proper data URL
     if (isBase64Data(docUrl)) {
+      console.log('Detected base64 data, processing...');
       // Clean the base64 string - remove any whitespace or newlines
       const cleanBase64 = docUrl.replace(/\s/g, '');
       
@@ -118,14 +125,30 @@ const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
       try {
         const binaryString = atob(cleanBase64.substring(0, 100));
         const isPdf = binaryString.includes('%PDF') || docUrl.includes('PDF') || docUrl.includes('%PDF');
-        const mimeType = isPdf ? 'application/pdf' : 'image/jpeg';
-        return `data:${mimeType};base64,${cleanBase64}`;
+        
+        // Try to detect the file type from the binary data
+        let mimeType = 'application/pdf'; // Default to PDF
+        
+        if (binaryString.startsWith('\xFF\xD8\xFF')) {
+          mimeType = 'image/jpeg';
+        } else if (binaryString.startsWith('\x89PNG')) {
+          mimeType = 'image/png';
+        } else if (binaryString.startsWith('GIF87a') || binaryString.startsWith('GIF89a')) {
+          mimeType = 'image/gif';
+        } else if (binaryString.includes('%PDF')) {
+          mimeType = 'application/pdf';
+        }
+        
+        const result = `data:${mimeType};base64,${cleanBase64}`;
+        console.log('Created data URL with MIME type:', mimeType);
+        return result;
       } catch (e) {
-        // If decoding fails, assume it's a PDF
+        console.error('Failed to decode base64, assuming PDF:', e);
         return `data:application/pdf;base64,${cleanBase64}`;
       }
     }
     
+    console.log('Regular URL, returning as-is');
     return docUrl; // Regular URL
   };
 
@@ -154,18 +177,25 @@ const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
           <h1 className="text-2xl font-bold">{title} - Supporting Documents</h1>
         </div>
 
-        {documents.length === 0 ? (
+        {!documents || documents.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center">
               <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">No supporting documents uploaded.</p>
+              <p className="text-xs text-gray-500 mt-2">
+                Debug info: documents = {JSON.stringify(documents)}
+              </p>
             </CardContent>
           </Card>
         ) : (
           <div className="grid gap-6">
             {documents.map((docUrl, index) => {
+              console.log(`Processing document ${index + 1}:`, docUrl);
               const processedUrl = processDocumentUrl(docUrl);
               const isDisplayable = processedUrl.startsWith('data:') || processedUrl.startsWith('http') || processedUrl.startsWith('blob:');
+              
+              console.log(`Document ${index + 1} processed URL:`, processedUrl.substring(0, 100) + '...');
+              console.log(`Document ${index + 1} is displayable:`, isDisplayable);
               
               return (
                 <Card key={index} className="overflow-hidden">
@@ -212,41 +242,78 @@ const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
                   <CardContent>
                     <div className="document-preview bg-gray-50 p-4 rounded-lg">
                       {isDisplayable ? (
-                        isPdfDocument(docUrl) ? (
-                          <div className="text-center">
-                            <div className="relative">
-                              <iframe 
-                                src={`${processedUrl}#toolbar=1&navpanes=1&scrollbar=1`}
-                                className="w-full h-96 border rounded bg-white"
-                                title={`PDF Document ${index + 1}`}
-                                style={{ minHeight: '400px' }}
-                                onLoad={() => console.log('PDF loaded successfully')}
-                                onError={() => {
-                                  console.error('PDF failed to load');
-                                }}
-                              />
-                              {/* Fallback for when PDF fails to load */}
-                              <div className="absolute inset-0 hidden bg-gray-100 flex items-center justify-center rounded" id={`fallback-${index}`}>
-                                <div className="text-center">
-                                  <FileText className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                                  <p className="text-sm text-gray-600">PDF preview unavailable</p>
-                                  <p className="text-xs text-gray-500">Use View or Download buttons</p>
-                                </div>
-                              </div>
-                            </div>
-                            <p className="text-sm text-muted-foreground mt-2">PDF Document</p>
-                          </div>
-                        ) : (
-                          <div className="text-center">
-                            <img 
-                              src={processedUrl}
-                              alt={`Document ${index + 1}`}
-                              className="max-w-full h-auto max-h-96 mx-auto rounded border bg-white"
-                              style={{ maxHeight: '400px' }}
-                            />
-                            <p className="text-sm text-muted-foreground mt-2">Image Document</p>
-                          </div>
-                        )
+                         isPdfDocument(docUrl) ? (
+                           <div className="text-center">
+                             <div className="relative">
+                               <iframe 
+                                 src={processedUrl}
+                                 className="w-full h-96 border rounded bg-white"
+                                 title={`PDF Document ${index + 1}`}
+                                 style={{ minHeight: '400px' }}
+                                 onLoad={(e) => {
+                                   console.log('PDF loaded successfully', processedUrl);
+                                   const iframe = e.target as HTMLIFrameElement;
+                                   const fallback = document.getElementById(`fallback-${index}`);
+                                   if (fallback) fallback.style.display = 'none';
+                                 }}
+                                 onError={(e) => {
+                                   console.error('PDF failed to load', processedUrl);
+                                   const fallback = document.getElementById(`fallback-${index}`);
+                                   if (fallback) {
+                                     fallback.style.display = 'flex';
+                                     fallback.classList.remove('hidden');
+                                   }
+                                 }}
+                               />
+                               {/* Fallback for when PDF fails to load */}
+                               <div className="absolute inset-0 bg-gray-100 flex items-center justify-center rounded" id={`fallback-${index}`} style={{ display: 'none' }}>
+                                 <div className="text-center">
+                                   <FileText className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+                                   <p className="text-sm text-gray-600">PDF preview unavailable</p>
+                                   <p className="text-xs text-gray-500">Use View or Download buttons</p>
+                                   <Button 
+                                     size="sm" 
+                                     className="mt-2"
+                                     onClick={() => window.open(processedUrl, '_blank')}
+                                   >
+                                     Open in New Tab
+                                   </Button>
+                                 </div>
+                               </div>
+                             </div>
+                             <p className="text-sm text-muted-foreground mt-2">PDF Document</p>
+                           </div>
+                         ) : (
+                           <div className="text-center">
+                             <img 
+                               src={processedUrl}
+                               alt={`Document ${index + 1}`}
+                               className="max-w-full h-auto max-h-96 mx-auto rounded border bg-white shadow-sm"
+                               style={{ maxHeight: '400px' }}
+                               onLoad={() => console.log('Image loaded successfully', processedUrl)}
+                               onError={(e) => {
+                                 console.error('Image failed to load', processedUrl);
+                                 const target = e.target as HTMLImageElement;
+                                 target.style.display = 'none';
+                                 const parent = target.parentElement;
+                                 if (parent) {
+                                   parent.innerHTML = `
+                                     <div class="p-8">
+                                       <div class="h-16 w-16 mx-auto text-gray-400 mb-4 flex items-center justify-center">
+                                         <svg class="h-16 w-16" fill="currentColor" viewBox="0 0 20 20">
+                                           <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
+                                         </svg>
+                                       </div>
+                                       <p class="text-sm text-gray-600 mb-2">Unable to display image</p>
+                                       <p class="text-xs text-gray-500">Image format not supported</p>
+                                     </div>
+                                   `;
+                                 }
+                               }}
+                             />
+                             <p className="text-sm text-muted-foreground mt-2">Image Document</p>
+                           </div>
+                         )
                       ) : (
                         <div className="text-center p-8">
                           <div className="h-16 w-16 mx-auto text-gray-400 mb-4 flex items-center justify-content">
