@@ -180,9 +180,18 @@ export class TunisiaStorageService {
   static async getInvoiceByExportPlate(exportPlate: string): Promise<TunisiaInvoice | null> {
     try {
       const invoices = await this.loadInvoices();
-      return invoices.find(inv => 
-        inv.vehicle.exportPlate?.toLowerCase().trim() === exportPlate.toLowerCase().trim()
-      ) || null;
+      console.log("Searching for export plate:", exportPlate);
+      console.log("Available invoices:", invoices.map(inv => ({ id: inv.id, exportPlate: inv.vehicle.exportPlate })));
+      
+      const found = invoices.find(inv => {
+        const invExportPlate = inv.vehicle.exportPlate?.toString().toLowerCase().trim();
+        const searchPlate = exportPlate.toString().toLowerCase().trim();
+        console.log("Comparing:", invExportPlate, "vs", searchPlate);
+        return invExportPlate === searchPlate;
+      });
+      
+      console.log("Found invoice:", found ? found.id : "Not found");
+      return found || null;
     } catch (error) {
       console.error("Error getting invoice by export plate:", error);
       return null;

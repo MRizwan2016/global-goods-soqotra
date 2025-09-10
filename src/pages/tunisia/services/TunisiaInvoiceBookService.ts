@@ -29,8 +29,8 @@ export class TunisiaInvoiceBookService {
     if (existingBooks.length === 0) {
       const defaultBooks: TunisiaInvoiceBook[] = [];
       
-      // Create books from 013100 to 013150 (Book No. 1), 50 pages each
-      for (let bookNum = 1; bookNum <= 1; bookNum++) {
+      // Create books from 013100 to 013600 (Books 1-10), 50 pages each
+      for (let bookNum = 1; bookNum <= 10; bookNum++) {
         const startNum = 13100 + (bookNum - 1) * 50;
         const endNum = startNum + 49;
         

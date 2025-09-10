@@ -57,7 +57,7 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
         payment_method: paymentDetails.method,
         payment_date: paymentDetails.date,
         notes: paymentDetails.notes,
-        user_id: "current-user" // This should be replaced with actual user ID from auth
+        user_id: "tunisia-user-default" // Fixed user ID for Tunisia project
       };
 
       await TunisiaPaymentReceiptService.createPaymentReceipt(receiptData);
@@ -121,6 +121,12 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
                     <span className="font-semibold">Amount Paid:</span>
                     <span className="font-bold text-lg">QAR {paymentDetails.amount.toLocaleString()}</span>
                   </div>
+                  {paymentDetails.amount < invoice.totalAmount && (
+                    <div className="flex justify-between border-t pt-2 mt-2">
+                      <span className="font-semibold text-red-600">Balance Due:</span>
+                      <span className="font-bold text-lg text-red-600">QAR {(invoice.totalAmount - paymentDetails.amount).toLocaleString()}</span>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -273,6 +279,24 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
                 value={paymentDetails.amount}
                 onChange={(e) => setPaymentDetails(prev => ({ ...prev, amount: Number(e.target.value) }))}
               />
+              {paymentDetails.amount < invoice.totalAmount && (
+                <div className="mt-2 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <div className="text-sm">
+                    <div className="flex justify-between">
+                      <span>Total Amount:</span>
+                      <span className="font-medium">QAR {invoice.totalAmount.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Amount Paid:</span>
+                      <span className="font-medium">QAR {paymentDetails.amount.toLocaleString()}</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-1 mt-1">
+                      <span className="font-semibold text-red-600">Balance Due:</span>
+                      <span className="font-bold text-red-600">QAR {(invoice.totalAmount - paymentDetails.amount).toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>
