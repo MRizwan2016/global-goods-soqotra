@@ -521,7 +521,6 @@ const TunisiaDashboard: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold text-gray-800 mb-2">Invoice Management</h1>
               <p className="text-gray-600">Manage customer invoices for vehicle and personal effects shipping</p>
-              <p className="text-sm text-blue-600">Data is stored in Supabase database (tunisia_invoices table)</p>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={refreshData}>
