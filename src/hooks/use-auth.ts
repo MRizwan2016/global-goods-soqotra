@@ -45,9 +45,43 @@ export function useAuth(): LegacyAuthContextType {
     try {
       const storedUsers = localStorage.getItem('users');
       if (storedUsers) {
-        const parsedUsers = JSON.parse(storedUsers);
+        const parsedUsers: LegacyUser[] = JSON.parse(storedUsers);
         console.log("Loaded users from localStorage:", parsedUsers);
-        setUsers(parsedUsers);
+        if (Array.isArray(parsedUsers) && parsedUsers.length > 0) {
+          setUsers(parsedUsers);
+        } else {
+          console.log("Users array empty - seeding default ops user");
+          const seedUser: LegacyUser = {
+            id: 'user-ops',
+            fullName: 'Operations User',
+            email: 'ops@soqotra.qa',
+            mobileNumber: '',
+            country: 'QA',
+            isActive: true,
+            isAdmin: true,
+            createdAt: new Date().toISOString(),
+            permissions: {
+              masterData: true,
+              dataEntry: true,
+              reports: true,
+              downloads: true,
+              accounting: true,
+              controlPanel: true,
+              cargoDelivery: true,
+              accountFunctions: true,
+              accountRegistrations: true,
+              accountFinancialEntities: true,
+              accountCountryReconciliations: true,
+              files: { invoicing: true, paymentReceivable: true, sellingRates: true, container: true }
+            }
+          };
+          const initialUsers = [seedUser];
+          localStorage.setItem('users', JSON.stringify(initialUsers));
+          const passwords = JSON.parse(localStorage.getItem('userPasswords') || '{}');
+          passwords[seedUser.id] = '123456';
+          localStorage.setItem('userPasswords', JSON.stringify(passwords));
+          setUsers(initialUsers);
+        }
         const sid = localStorage.getItem('session_user_id');
         if (sid) {
           const existing = parsedUsers.find((u: LegacyUser) => u.id === sid) || null;
