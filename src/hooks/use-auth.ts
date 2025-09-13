@@ -38,6 +38,7 @@ function mapSupabaseUser(user: any): LegacyUser | null {
 export function useAuth(): LegacyAuthContextType {
   const ctx = useContext(AuthContext) as any;
   const [users, setUsers] = useState<LegacyUser[]>([]);
+  const [legacyUser, setLegacyUser] = useState<LegacyUser | null>(null);
 
   // Load users from localStorage on mount
   useEffect(() => {
@@ -47,8 +48,44 @@ export function useAuth(): LegacyAuthContextType {
         const parsedUsers = JSON.parse(storedUsers);
         console.log("Loaded users from localStorage:", parsedUsers);
         setUsers(parsedUsers);
+        const sid = localStorage.getItem('session_user_id');
+        if (sid) {
+          const existing = parsedUsers.find((u: LegacyUser) => u.id === sid) || null;
+          setLegacyUser(existing);
+        }
       } else {
-        console.log("No users found in localStorage");
+        console.log("No users found in localStorage - seeding default ops user");
+        const seedUser: LegacyUser = {
+          id: 'user-ops',
+          fullName: 'Operations User',
+          email: 'ops@soqotra.qa',
+          mobileNumber: '',
+          country: 'QA',
+          isActive: true,
+          isAdmin: true,
+          createdAt: new Date().toISOString(),
+          permissions: {
+            masterData: true,
+            dataEntry: true,
+            reports: true,
+            downloads: true,
+            accounting: true,
+            controlPanel: true,
+            cargoDelivery: true,
+            accountFunctions: true,
+            accountRegistrations: true,
+            accountFinancialEntities: true,
+            accountCountryReconciliations: true,
+            files: { invoicing: true, paymentReceivable: true, sellingRates: true, container: true }
+          }
+        };
+        const initialUsers = [seedUser];
+        localStorage.setItem('users', JSON.stringify(initialUsers));
+        // Seed password store
+        const passwords = JSON.parse(localStorage.getItem('userPasswords') || '{}');
+        passwords[seedUser.id] = '123456';
+        localStorage.setItem('userPasswords', JSON.stringify(passwords));
+        setUsers(initialUsers);
       }
     } catch (error) {
       console.error("Error loading users from localStorage:", error);
@@ -56,8 +93,11 @@ export function useAuth(): LegacyAuthContextType {
     }
   }, []);
 
-  const currentUser = useMemo(() => mapSupabaseUser(ctx?.user), [ctx?.user]);
-  const isAuthenticated = !!ctx?.user;
+  const currentUser = useMemo(() => {
+    const sbUser = mapSupabaseUser(ctx?.user);
+    return sbUser ?? legacyUser;
+  }, [ctx?.user, legacyUser]);
+  const isAuthenticated = !!ctx?.user || !!legacyUser;
   const isAdmin = currentUser?.isAdmin ?? false;
 
   const login = async (email: string, password: string) => {
@@ -83,8 +123,9 @@ export function useAuth(): LegacyAuthContextType {
     
     if (passwordMatch && user.isActive) {
       console.log("Login successful for user:", user.fullName);
-      // For legacy compatibility, we don't actually set the user in Supabase auth
-      // The legacy system handles this differently
+      // Persist legacy session
+      localStorage.setItem('session_user_id', user.id);
+      setLegacyUser(user);
       return true;
     }
     
@@ -92,7 +133,7 @@ export function useAuth(): LegacyAuthContextType {
     return false;
   };
 
-  const logout = () => ctx?.signOut?.();
+  const logout = () => { localStorage.removeItem('session_user_id'); setLegacyUser(null); ctx?.signOut?.(); };
 
   const register: LegacyAuthContextType["register"] = async ({ fullName, email, password, country, mobileNumber }) => {
     const { error } = await ctx?.signUp?.(email, password);
