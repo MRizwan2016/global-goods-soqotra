@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth as useSupabaseAuth } from '@/contexts/AuthContext';
+import { useAuth as useLegacyAuth } from '@/hooks/use-auth';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
@@ -12,7 +13,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children, 
   redirectTo = '/auth' 
 }) => {
-  const { user, loading } = useAuth();
+  const { user, loading } = useSupabaseAuth();
+  const { isAuthenticated } = useLegacyAuth();
 
   if (loading) {
     return (
@@ -22,7 +24,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  if (!user) {
+  if (!user && !isAuthenticated) {
     return <Navigate to={redirectTo} replace />;
   }
 
