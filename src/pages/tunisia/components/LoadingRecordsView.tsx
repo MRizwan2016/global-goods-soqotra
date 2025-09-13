@@ -41,6 +41,38 @@ const LoadingRecordsView: React.FC<LoadingRecordsViewProps> = ({
   onBack,
   onContainerEdit
 }) => {
+  // Calculate revenue from invoices for each container
+  const getContainerRevenue = (container: TunisiaContainer): number => {
+    let totalRevenue = 0;
+    
+    // Get revenue from vehicle invoices loaded in this container
+    container.loadedVehicles.forEach(vehicle => {
+      const relatedInvoice = invoices.find(inv => 
+        inv.vehicle?.exportPlate === vehicle.exportPlate ||
+        inv.vehicle?.chassisNumber === vehicle.exportPlate ||
+        inv.vehicle?.make === vehicle.make
+      );
+      if (relatedInvoice && relatedInvoice.totalAmount) {
+        totalRevenue += Number(relatedInvoice.totalAmount) || 0;
+      }
+    });
+    
+    // Add personal effects charges (if any have separate invoicing)
+    container.personalEffects.forEach(effect => {
+      const relatedInvoice = invoices.find(inv => 
+        inv.personalEffects?.some((pe: any) => pe.description === effect.description)
+      );
+      if (relatedInvoice && relatedInvoice.totalAmount) {
+        const personalEffectsAmount = relatedInvoice.personalEffects?.reduce((sum: number, pe: any) => {
+          return sum + (Number(pe.amount) || 0);
+        }, 0) || 0;
+        totalRevenue += personalEffectsAmount;
+      }
+    });
+    
+    return totalRevenue;
+  };
+
   // Generate loading records from containers
   const loadingRecords: LoadingRecord[] = containers
     .filter(container => container.status === 'SEALED' && 
@@ -64,7 +96,7 @@ const LoadingRecordsView: React.FC<LoadingRecordsViewProps> = ({
       })),
       totalVehicles: container.loadedVehicles.length,
       totalPersonalEffects: container.personalEffects.length,
-      totalRevenue: container.totalCharge
+      totalRevenue: getContainerRevenue(container)
     }));
 
   const totalStats = {
