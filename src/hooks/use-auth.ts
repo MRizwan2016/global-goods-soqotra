@@ -101,35 +101,83 @@ export function useAuth(): LegacyAuthContextType {
   const isAdmin = currentUser?.isAdmin ?? false;
 
   const login = async (email: string, password: string) => {
-    console.log("Login attempt with email:", email);
-    console.log("Available users:", users.length);
-    
-    // Check if user exists in localStorage
-    const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    console.log("Login attempt with email:", normalizedEmail);
+
+    // Load latest users from storage (in case another tab modified it)
+    try {
+      const storedUsers = localStorage.getItem('users');
+      if (storedUsers) setUsers(JSON.parse(storedUsers));
+    } catch {}
+
+    // Try to find user
+    let user = users.find(u => u.email.toLowerCase() === normalizedEmail);
+
+    // If not found, auto-seed the requested ops account for convenience
+    if (!user && normalizedEmail === 'ops@soqotra.qa') {
+      console.log('Seeding default ops user into localStorage');
+      user = {
+        id: 'user-ops',
+        fullName: 'Operations User',
+        email: 'ops@soqotra.qa',
+        mobileNumber: '',
+        country: 'QA',
+        isActive: true,
+        isAdmin: true,
+        createdAt: new Date().toISOString(),
+        permissions: {
+          masterData: true,
+          dataEntry: true,
+          reports: true,
+          downloads: true,
+          accounting: true,
+          controlPanel: true,
+          cargoDelivery: true,
+          accountFunctions: true,
+          accountRegistrations: true,
+          accountFinancialEntities: true,
+          accountCountryReconciliations: true,
+          files: { invoicing: true, paymentReceivable: true, sellingRates: true, container: true }
+        }
+      } as LegacyUser;
+      const updatedUsers = [...users, user];
+      setUsers(updatedUsers);
+      localStorage.setItem('users', JSON.stringify(updatedUsers));
+      const pw = JSON.parse(localStorage.getItem('userPasswords') || '{}');
+      pw[user.id] = '123456';
+      localStorage.setItem('userPasswords', JSON.stringify(pw));
+    }
+
     if (!user) {
-      console.log("User not found in localStorage");
+      console.log("User not found in localStorage after seeding check");
       return false;
     }
 
     // Check password from localStorage
     const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-    const storedPassword = userPasswords[user.id];
-    
-    console.log("User found:", user.fullName, "Password available:", !!storedPassword);
-    
-    // Common passwords to check
-    const validPasswords = [password, "123456", "password", "admin123", "soqotra123", "test123"];
-    const passwordMatch = validPasswords.includes(storedPassword) || validPasswords.includes(password);
-    
+    let storedPassword = userPasswords[user.id];
+
+    // Accept common fallback passwords and seed if missing
+    const commonPw = ["123456", "password", "admin123", "soqotra123", "test123"]; 
+    const providedIsCommon = commonPw.includes(password);
+
+    if (!storedPassword && providedIsCommon) {
+      console.log('No stored password. Accepting provided common password and saving it.');
+      storedPassword = password;
+      userPasswords[user.id] = password;
+      localStorage.setItem('userPasswords', JSON.stringify(userPasswords));
+    }
+
+    const passwordMatch = (storedPassword && password === storedPassword) || providedIsCommon;
+
     if (passwordMatch && user.isActive) {
       console.log("Login successful for user:", user.fullName);
-      // Persist legacy session
       localStorage.setItem('session_user_id', user.id);
       setLegacyUser(user);
       return true;
     }
-    
-    console.log("Login failed - password mismatch or user inactive");
+
+    console.log("Login failed - password mismatch or user inactive", { hasStored: !!storedPassword, isActive: user.isActive });
     return false;
   };
 
