@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      inquiries: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          details: string | null
+          email: string | null
+          id: string
+          name: string
+          phone: string | null
+          user_id: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          details?: string | null
+          email?: string | null
+          id?: string
+          name: string
+          phone?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          details?: string | null
+          email?: string | null
+          id?: string
+          name?: string
+          phone?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       schedule_jobs: {
         Row: {
           created_at: string

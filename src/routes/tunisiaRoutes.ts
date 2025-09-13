@@ -1,11 +1,16 @@
-
 import { RouteConfig } from "./types";
-import TunisiaDashboard from "@/pages/tunisia/TunisiaDashboard";
+import TunisiaProtectedDashboard from "@/pages/tunisia/TunisiaProtectedDashboard";
+import AuthPage from "@/pages/auth/AuthPage";
 
 export const tunisiaRoutes: RouteConfig[] = [
   {
     path: "/tunisia",
-    element: TunisiaDashboard,
-    private: true
+    element: TunisiaProtectedDashboard,
+    private: false // We handle auth internally
+  },
+  {
+    path: "/auth",
+    element: AuthPage,
+    private: false
   }
 ];

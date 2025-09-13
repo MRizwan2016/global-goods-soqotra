@@ -1,17 +1,12 @@
 
-import { useContext } from "react";
-import { AuthContext } from "@/contexts/AuthContext";
-import { User } from "@/types/auth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function usePermissions() {
-  const context = useContext(AuthContext);
+  const { user } = useAuth();
   
-  if (!context) {
-    throw new Error("usePermissions must be used within an AuthProvider");
-  }
-  
-  const hasFilePermission = (fileKey: keyof User['permissions']['files']) => {
-    return context.hasFilePermission(context.currentUser, fileKey);
+  // For Tunisia project, we'll assume all authenticated users have access
+  const hasFilePermission = (fileKey: string) => {
+    return !!user; // If user is authenticated, they have permission
   };
   
   return {

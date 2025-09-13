@@ -8,6 +8,7 @@ import { ArrowLeft, Printer } from "lucide-react";
 import { TunisiaInvoice, PaymentDetails } from "../types/tunisiaInvoiceTypes";
 import { TunisiaStorageService } from "../services/TunisiaStorageService";
 import { TunisiaPaymentReceiptService } from "../services/TunisiaPaymentReceiptService";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import TunisiaPrintStyles from "./TunisiaPrintStyles";
 
@@ -57,7 +58,7 @@ const TunisiaPaymentReceiptGenerator: React.FC<TunisiaPaymentReceiptGeneratorPro
         payment_method: paymentDetails.method,
         payment_date: paymentDetails.date,
         notes: paymentDetails.notes,
-        user_id: "tunisia-user-default" // Fixed user ID for Tunisia project
+        user_id: (await supabase.auth.getSession()).data.session?.user?.id || "" // Use authenticated user ID
       };
 
       await TunisiaPaymentReceiptService.createPaymentReceipt(receiptData);

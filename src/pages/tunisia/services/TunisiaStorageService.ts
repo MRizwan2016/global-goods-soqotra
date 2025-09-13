@@ -1,16 +1,24 @@
+import { supabase } from "@/integrations/supabase/client";
 import { TunisiaContainer } from "../types/tunisiaTypes";
 import { TunisiaInvoice } from "../types/tunisiaInvoiceTypes";
-import { supabase } from "@/integrations/supabase/client";
 
 export class TunisiaStorageService {
   private static readonly INVOICES_KEY = "tunisia-invoices";
   private static readonly CONTAINERS_KEY = "tunisia-containers";
 
+  // Get current user ID, throw error if not authenticated
+  private static async getCurrentUserId(): Promise<string> {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.user?.id) {
+      throw new Error('User must be authenticated to access Tunisia data');
+    }
+    return session.user.id;
+  }
+
   // Migration helper - move data from localStorage to Supabase
   private static async migrateDataToSupabase(): Promise<void> {
     try {
-      // Use a default user ID for Tunisia project (no authentication required)
-      const defaultUserId = 'tunisia-user-default';
+      const userId = await this.getCurrentUserId();
 
       // Migrate invoices
       const localInvoices = localStorage.getItem(this.INVOICES_KEY);
@@ -45,13 +53,12 @@ export class TunisiaStorageService {
 
   static async loadInvoices(): Promise<TunisiaInvoice[]> {
     try {
-      // Use a default user ID for Tunisia project (no authentication required)
-      const defaultUserId = 'tunisia-user-default';
+      const userId = await this.getCurrentUserId();
 
       const { data, error } = await supabase
         .from('tunisia_invoices')
         .select('*')
-        .eq('user_id', defaultUserId);
+        .eq('user_id', userId);
 
       if (error) throw error;
       
@@ -88,13 +95,12 @@ export class TunisiaStorageService {
   }
 
   private static async saveInvoiceToSupabase(invoice: TunisiaInvoice): Promise<void> {
-    // Use a default user ID for Tunisia project (no authentication required)
-    const defaultUserId = 'tunisia-user-default';
+    const userId = await this.getCurrentUserId();
 
     // Prepare the data to save with proper customer information
     const dataToSave = {
       id: invoice.id, // Include ID for proper upsert
-      user_id: defaultUserId,
+      user_id: userId,
       invoice_number: invoice.invoiceNumber,
       customer_id: typeof invoice.customer === 'object' ? JSON.stringify(invoice.customer) : invoice.customer,
       vehicle: invoice.vehicle as any,
@@ -245,13 +251,12 @@ export class TunisiaStorageService {
 
   static async loadContainers(): Promise<TunisiaContainer[]> {
     try {
-      // Use a default user ID for Tunisia project (no authentication required)
-      const defaultUserId = 'tunisia-user-default';
+      const userId = await this.getCurrentUserId();
 
       const { data, error } = await supabase
         .from('tunisia_containers')
         .select('*')
-        .eq('user_id', defaultUserId);
+        .eq('user_id', userId);
 
       if (error) throw error;
       
@@ -277,13 +282,12 @@ export class TunisiaStorageService {
   }
 
   private static async saveContainerToSupabase(container: TunisiaContainer): Promise<void> {
-    // Use a default user ID for Tunisia project (no authentication required)
-    const defaultUserId = 'tunisia-user-default';
+    const userId = await this.getCurrentUserId();
 
     const { error } = await supabase
       .from('tunisia_containers')
       .upsert({
-        user_id: defaultUserId,
+        user_id: userId,
         container_number: container.containerNumber,
         status: container.status,
         seal_number: container.sealNumber,
@@ -384,11 +388,10 @@ export class TunisiaStorageService {
 
   // Clear all data
   static async clearAllData(): Promise<void> {
-    // Use a default user ID for Tunisia project (no authentication required)
-    const defaultUserId = 'tunisia-user-default';
+    const userId = await this.getCurrentUserId();
 
-    await supabase.from('tunisia_invoices').delete().eq('user_id', defaultUserId);
-    await supabase.from('tunisia_containers').delete().eq('user_id', defaultUserId);
+    await supabase.from('tunisia_invoices').delete().eq('user_id', userId);
+    await supabase.from('tunisia_containers').delete().eq('user_id', userId);
     
     localStorage.removeItem(this.INVOICES_KEY);
     localStorage.removeItem(this.CONTAINERS_KEY);
@@ -419,13 +422,13 @@ export class TunisiaStorageService {
   // Clean up duplicate containers
   static async cleanupDuplicateContainers(): Promise<void> {
     try {
-      const defaultUserId = 'tunisia-user-default';
+      const userId = await this.getCurrentUserId();
       
       // Get all containers
       const { data: containers, error } = await supabase
         .from('tunisia_containers')
         .select('*')
-        .eq('user_id', defaultUserId);
+        .eq('user_id', userId);
 
       if (error) throw error;
 
