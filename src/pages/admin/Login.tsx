@@ -38,7 +38,7 @@ const Login = () => {
     );
   }
   
-  const { login, isAuthenticated, users } = authContext;
+  const { login, isAuthenticated, users, loading } = authContext;
   const navigate = useNavigate();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
@@ -67,11 +67,11 @@ const Login = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!loading && isAuthenticated) {
       console.log("User is authenticated, navigating to:", from);
       navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate, from]);
+  }, [isAuthenticated, loading, navigate, from]);
 
   // Debug: Log available users when component mounts
   useEffect(() => {

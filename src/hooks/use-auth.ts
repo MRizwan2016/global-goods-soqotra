@@ -39,7 +39,7 @@ export function useAuth(): LegacyAuthContextType {
   const ctx = useContext(AuthContext) as any;
   const [users, setUsers] = useState<LegacyUser[]>([]);
   const [legacyUser, setLegacyUser] = useState<LegacyUser | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [legacyLoading, setLegacyLoading] = useState<boolean>(true);
 
   // Load users from localStorage on mount
   useEffect(() => {
@@ -126,7 +126,7 @@ export function useAuth(): LegacyAuthContextType {
       console.error("Error loading users from localStorage:", error);
       setUsers([]);
     } finally {
-      setLoading(false);
+      setLegacyLoading(false);
     }
   }, []);
 
@@ -283,7 +283,7 @@ export function useAuth(): LegacyAuthContextType {
     currentUser,
     isAuthenticated,
     isAdmin,
-    loading,
+    loading: (ctx?.loading ?? false) || legacyLoading,
     login,
     logout,
     register,

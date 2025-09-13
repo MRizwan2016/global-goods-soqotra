@@ -14,9 +14,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   redirectTo = '/auth' 
 }) => {
   const { user, loading } = useSupabaseAuth();
-  const { isAuthenticated } = useLegacyAuth();
+  const { isAuthenticated, loading: legacyLoading } = useLegacyAuth();
 
-  if (loading) {
+  if (loading || legacyLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
