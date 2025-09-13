@@ -56,6 +56,7 @@ export interface AuthContextType {
   currentUser: User | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  loading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (userData: Omit<User, "id" | "isActive" | "isAdmin" | "createdAt" | "permissions"> & { password: string }) => Promise<boolean>;

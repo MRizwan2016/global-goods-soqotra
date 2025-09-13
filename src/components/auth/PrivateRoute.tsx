@@ -5,6 +5,7 @@ import { ReactNode, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
 import { usePermissions } from "@/hooks/use-permissions";
 import { User } from "@/types/auth";
+import { Loader2 } from "lucide-react";
 
 interface PrivateRouteProps {
   children?: ReactNode;
@@ -28,7 +29,7 @@ const PrivateRoute = ({
     return <Navigate to="/admin/login" replace />;
   }
   
-  const { isAuthenticated, isAdmin, currentUser } = authContext;
+  const { isAuthenticated, isAdmin, currentUser, loading } = authContext;
   
   // Add error boundary for permissions context
   let permissionsContext;
@@ -52,6 +53,15 @@ const PrivateRoute = ({
       path: location.pathname
     });
   }, [isAuthenticated, isAdmin, currentUser, requiredFile, requiredPermission, location.pathname]);
+
+  // Handle loading state to prevent flicker redirects
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    );
+  }
 
   // Check if user is authenticated
   if (!isAuthenticated) {
