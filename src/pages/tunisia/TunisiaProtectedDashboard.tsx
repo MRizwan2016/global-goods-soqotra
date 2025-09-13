@@ -1,6 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { User } from '@supabase/supabase-js';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,48 +6,39 @@ import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Lock } from 'lucide-react';
 import TunisiaDashboard from './TunisiaDashboard';
+import { useAuth } from '@/hooks/use-auth';
 
 const TunisiaProtectedDashboard: React.FC = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { isAuthenticated, loading, login, register } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setSubmitting(true);
     setError(null);
 
-    const { error } = isSignUp 
-      ? await supabase.auth.signUp({ 
-          email, 
-          password,
-          options: { emailRedirectTo: `${window.location.origin}/tunisia` }
-        })
-      : await supabase.auth.signInWithPassword({ email, password });
-    
-    if (error) {
-      setError(error.message);
+    let ok = false;
+    if (isSignUp) {
+      ok = await register({
+        fullName: email.split('@')[0] || 'Tunisia User',
+        email,
+        password,
+        country: 'TN',
+        mobileNumber: '',
+      });
+    } else {
+      ok = await login(email, password);
     }
-    setLoading(false);
+
+    if (!ok) {
+      setError('Invalid login credentials');
+    }
+
+    setSubmitting(false);
   };
 
   if (loading) {
@@ -60,7 +49,7 @@ const TunisiaProtectedDashboard: React.FC = () => {
     );
   }
 
-  if (!user) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
         <Card className="w-full max-w-md">
@@ -95,8 +84,8 @@ const TunisiaProtectedDashboard: React.FC = () => {
                   required
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                 {isSignUp ? 'Sign Up' : 'Sign In'}
               </Button>
               <Button 
