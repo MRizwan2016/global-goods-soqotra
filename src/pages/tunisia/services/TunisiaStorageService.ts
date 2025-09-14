@@ -6,13 +6,10 @@ export class TunisiaStorageService {
   private static readonly INVOICES_KEY = "tunisia-invoices";
   private static readonly CONTAINERS_KEY = "tunisia-containers";
 
-  // Get current user ID, throw error if not authenticated
-  private static async getCurrentUserId(): Promise<string> {
+  // Get current user ID, return null if not authenticated
+  private static async getCurrentUserId(): Promise<string | null> {
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user?.id) {
-      throw new Error('User must be authenticated to access Tunisia data');
-    }
-    return session.user.id;
+    return session?.user?.id || null;
   }
 
   // Migration helper - move data from localStorage to Supabase
@@ -55,6 +52,12 @@ export class TunisiaStorageService {
     try {
       const userId = await this.getCurrentUserId();
 
+      // If not authenticated, fall back to localStorage
+      if (!userId) {
+        const localData = localStorage.getItem(this.INVOICES_KEY);
+        return localData ? JSON.parse(localData) : [];
+      }
+
       const { data, error } = await supabase
         .from('tunisia_invoices')
         .select('*')
@@ -96,6 +99,7 @@ export class TunisiaStorageService {
 
   private static async saveInvoiceToSupabase(invoice: TunisiaInvoice): Promise<void> {
     const userId = await this.getCurrentUserId();
+    if (!userId) throw new Error('User must be authenticated to save to Supabase');
 
     // Prepare the data to save with proper customer information
     const dataToSave = {
@@ -127,10 +131,32 @@ export class TunisiaStorageService {
   }
 
   static async addInvoice(invoice: TunisiaInvoice): Promise<void> {
+    const userId = await this.getCurrentUserId();
+    
+    // If not authenticated, save to localStorage
+    if (!userId) {
+      const existingInvoices = JSON.parse(localStorage.getItem(this.INVOICES_KEY) || '[]');
+      const updatedInvoices = [...existingInvoices.filter((inv: TunisiaInvoice) => inv.id !== invoice.id), invoice];
+      localStorage.setItem(this.INVOICES_KEY, JSON.stringify(updatedInvoices));
+      return;
+    }
+    
     await this.saveInvoiceToSupabase(invoice);
   }
 
   static async updateInvoice(invoice: TunisiaInvoice): Promise<void> {
+    const userId = await this.getCurrentUserId();
+    
+    // If not authenticated, save to localStorage
+    if (!userId) {
+      const existingInvoices = JSON.parse(localStorage.getItem(this.INVOICES_KEY) || '[]');
+      const updatedInvoices = existingInvoices.map((inv: TunisiaInvoice) => 
+        inv.id === invoice.id ? invoice : inv
+      );
+      localStorage.setItem(this.INVOICES_KEY, JSON.stringify(updatedInvoices));
+      return;
+    }
+    
     await this.saveInvoiceToSupabase(invoice);
   }
 
