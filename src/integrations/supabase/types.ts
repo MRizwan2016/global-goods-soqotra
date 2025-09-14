@@ -14,6 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
+      effects_items: {
+        Row: {
+          cbm: number | null
+          charge_qr: number | null
+          created_at: string
+          description: string
+          gross_weight_kg: number | null
+          hs_code: string | null
+          id: string
+          invoice_id: string
+          item_category: string | null
+          loading_location: string | null
+          owner_name: string | null
+          qty: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cbm?: number | null
+          charge_qr?: number | null
+          created_at?: string
+          description: string
+          gross_weight_kg?: number | null
+          hs_code?: string | null
+          id?: string
+          invoice_id: string
+          item_category?: string | null
+          loading_location?: string | null
+          owner_name?: string | null
+          qty?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cbm?: number | null
+          charge_qr?: number | null
+          created_at?: string
+          description?: string
+          gross_weight_kg?: number | null
+          hs_code?: string | null
+          id?: string
+          invoice_id?: string
+          item_category?: string | null
+          loading_location?: string | null
+          owner_name?: string | null
+          qty?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "effects_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      files: {
+        Row: {
+          created_at: string
+          file_path: string
+          id: string
+          mime_type: string | null
+          original_name: string
+          related_id: string
+          related_type: string
+          size_bytes: number | null
+          uploaded_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          file_path: string
+          id?: string
+          mime_type?: string | null
+          original_name: string
+          related_id: string
+          related_type: string
+          size_bytes?: number | null
+          uploaded_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          file_path?: string
+          id?: string
+          mime_type?: string | null
+          original_name?: string
+          related_id?: string
+          related_type?: string
+          size_bytes?: number | null
+          uploaded_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       inquiries: {
         Row: {
           city: string | null
@@ -49,6 +147,313 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      invoice_items: {
+        Row: {
+          cbm: number | null
+          created_at: string
+          description: string | null
+          gross_weight_kg: number | null
+          height_in: number | null
+          id: string
+          invoice_id: string
+          length_in: number | null
+          qty: number
+          updated_at: string
+          user_id: string
+          width_in: number | null
+        }
+        Insert: {
+          cbm?: number | null
+          created_at?: string
+          description?: string | null
+          gross_weight_kg?: number | null
+          height_in?: number | null
+          id?: string
+          invoice_id: string
+          length_in?: number | null
+          qty?: number
+          updated_at?: string
+          user_id: string
+          width_in?: number | null
+        }
+        Update: {
+          cbm?: number | null
+          created_at?: string
+          description?: string | null
+          gross_weight_kg?: number | null
+          height_in?: number | null
+          id?: string
+          invoice_id?: string
+          length_in?: number | null
+          qty?: number
+          updated_at?: string
+          user_id?: string
+          width_in?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_items_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoice_vehicle: {
+        Row: {
+          chassis_no: string | null
+          color: string | null
+          created_at: string
+          engine_no: string | null
+          export_plate: string | null
+          hs_code: string | null
+          id: string
+          invoice_id: string
+          made_in_country: string | null
+          make: string | null
+          model: string | null
+          plate_no: string | null
+          updated_at: string
+          user_id: string
+          vehicle_type: string | null
+          year: number | null
+        }
+        Insert: {
+          chassis_no?: string | null
+          color?: string | null
+          created_at?: string
+          engine_no?: string | null
+          export_plate?: string | null
+          hs_code?: string | null
+          id?: string
+          invoice_id: string
+          made_in_country?: string | null
+          make?: string | null
+          model?: string | null
+          plate_no?: string | null
+          updated_at?: string
+          user_id: string
+          vehicle_type?: string | null
+          year?: number | null
+        }
+        Update: {
+          chassis_no?: string | null
+          color?: string | null
+          created_at?: string
+          engine_no?: string | null
+          export_plate?: string | null
+          hs_code?: string | null
+          id?: string
+          invoice_id?: string
+          made_in_country?: string | null
+          make?: string | null
+          model?: string | null
+          plate_no?: string | null
+          updated_at?: string
+          user_id?: string
+          vehicle_type?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoice_vehicle_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          book_no: number | null
+          cargo_charges: number | null
+          consignee_address: string | null
+          consignee_city: string | null
+          consignee_country: string | null
+          consignee_idno: string | null
+          consignee_name: string
+          consignee_phone: string | null
+          created_at: string
+          discounts: number | null
+          doc_fee: number | null
+          effects_rate_qr_per_cbm: number | null
+          effects_total_qr: number | null
+          hbl_no: string | null
+          id: string
+          invoice_code: string | null
+          invoice_date: string
+          invoice_no: number
+          invoice_type: string
+          num_packages: number | null
+          packing_fees: number | null
+          page_no: number | null
+          service_type: string | null
+          shipper_address: string | null
+          shipper_city: string | null
+          shipper_country: string | null
+          shipper_email: string | null
+          shipper_idno: string | null
+          shipper_metrash_phone: string | null
+          shipper_name: string
+          shipper_phone: string | null
+          status: number
+          total_amount: number | null
+          total_cbm: number | null
+          total_gross_weight_kg: number | null
+          updated_at: string
+          user_id: string
+          vehicle_freight_qr: number | null
+        }
+        Insert: {
+          book_no?: number | null
+          cargo_charges?: number | null
+          consignee_address?: string | null
+          consignee_city?: string | null
+          consignee_country?: string | null
+          consignee_idno?: string | null
+          consignee_name: string
+          consignee_phone?: string | null
+          created_at?: string
+          discounts?: number | null
+          doc_fee?: number | null
+          effects_rate_qr_per_cbm?: number | null
+          effects_total_qr?: number | null
+          hbl_no?: string | null
+          id?: string
+          invoice_code?: string | null
+          invoice_date: string
+          invoice_no: number
+          invoice_type?: string
+          num_packages?: number | null
+          packing_fees?: number | null
+          page_no?: number | null
+          service_type?: string | null
+          shipper_address?: string | null
+          shipper_city?: string | null
+          shipper_country?: string | null
+          shipper_email?: string | null
+          shipper_idno?: string | null
+          shipper_metrash_phone?: string | null
+          shipper_name: string
+          shipper_phone?: string | null
+          status?: number
+          total_amount?: number | null
+          total_cbm?: number | null
+          total_gross_weight_kg?: number | null
+          updated_at?: string
+          user_id: string
+          vehicle_freight_qr?: number | null
+        }
+        Update: {
+          book_no?: number | null
+          cargo_charges?: number | null
+          consignee_address?: string | null
+          consignee_city?: string | null
+          consignee_country?: string | null
+          consignee_idno?: string | null
+          consignee_name?: string
+          consignee_phone?: string | null
+          created_at?: string
+          discounts?: number | null
+          doc_fee?: number | null
+          effects_rate_qr_per_cbm?: number | null
+          effects_total_qr?: number | null
+          hbl_no?: string | null
+          id?: string
+          invoice_code?: string | null
+          invoice_date?: string
+          invoice_no?: number
+          invoice_type?: string
+          num_packages?: number | null
+          packing_fees?: number | null
+          page_no?: number | null
+          service_type?: string | null
+          shipper_address?: string | null
+          shipper_city?: string | null
+          shipper_country?: string | null
+          shipper_email?: string | null
+          shipper_idno?: string | null
+          shipper_metrash_phone?: string | null
+          shipper_name?: string
+          shipper_phone?: string | null
+          status?: number
+          total_amount?: number | null
+          total_cbm?: number | null
+          total_gross_weight_kg?: number | null
+          updated_at?: string
+          user_id?: string
+          vehicle_freight_qr?: number | null
+        }
+        Relationships: []
+      }
+      packages: {
+        Row: {
+          cbm: number | null
+          created_at: string
+          description: string | null
+          height_in: number | null
+          id: string
+          invoice_id: string | null
+          length_in: number | null
+          package_no: string | null
+          qty: number | null
+          shipment_id: string
+          updated_at: string
+          user_id: string
+          weight_kg: number | null
+          width_in: number | null
+        }
+        Insert: {
+          cbm?: number | null
+          created_at?: string
+          description?: string | null
+          height_in?: number | null
+          id?: string
+          invoice_id?: string | null
+          length_in?: number | null
+          package_no?: string | null
+          qty?: number | null
+          shipment_id: string
+          updated_at?: string
+          user_id: string
+          weight_kg?: number | null
+          width_in?: number | null
+        }
+        Update: {
+          cbm?: number | null
+          created_at?: string
+          description?: string | null
+          height_in?: number | null
+          id?: string
+          invoice_id?: string | null
+          length_in?: number | null
+          package_no?: string | null
+          qty?: number | null
+          shipment_id?: string
+          updated_at?: string
+          user_id?: string
+          weight_kg?: number | null
+          width_in?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "packages_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "packages_shipment_id_fkey"
+            columns: ["shipment_id"]
+            isOneToOne: false
+            referencedRelation: "shipments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       schedule_jobs: {
         Row: {
@@ -126,6 +531,65 @@ export type Database = {
           vehicle?: string
         }
         Relationships: []
+      }
+      shipments: {
+        Row: {
+          container_no: string | null
+          created_at: string
+          destination_country: string | null
+          eta_date: string | null
+          id: string
+          invoice_id: string | null
+          loaded_date: string | null
+          mode: string | null
+          origin_country: string | null
+          shipment_no: string | null
+          status: string | null
+          tracking_no: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          container_no?: string | null
+          created_at?: string
+          destination_country?: string | null
+          eta_date?: string | null
+          id?: string
+          invoice_id?: string | null
+          loaded_date?: string | null
+          mode?: string | null
+          origin_country?: string | null
+          shipment_no?: string | null
+          status?: string | null
+          tracking_no?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          container_no?: string | null
+          created_at?: string
+          destination_country?: string | null
+          eta_date?: string | null
+          id?: string
+          invoice_id?: string | null
+          loaded_date?: string | null
+          mode?: string | null
+          origin_country?: string | null
+          shipment_no?: string | null
+          status?: string | null
+          tracking_no?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shipments_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tunisia_containers: {
         Row: {
