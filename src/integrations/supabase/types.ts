@@ -784,6 +784,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      import_mysql_sample_data: {
+        Args: { target_user_id: string }
+        Returns: {
+          effects_items_created: number
+          inquiries_created: number
+          invoices_created: number
+          shipments_created: number
+          tunisia_invoices_created: number
+        }[]
+      }
+      import_user_data: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          effects_items_created: number
+          inquiries_created: number
+          invoices_created: number
+          shipments_created: number
+          tunisia_invoices_created: number
+        }[]
+      }
       user_owns_schedule: {
         Args: { schedule_uuid: string }
         Returns: boolean
