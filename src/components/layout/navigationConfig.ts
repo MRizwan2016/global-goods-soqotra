@@ -6,8 +6,10 @@ export const navigationSections: NavigationSections = {
   upb: {
     title: "UPB",
     icon: Database,
-    color: "text-green-800",
-    iconColor: "text-green-700",
+    color: "text-white",
+    bgGradient: "from-green-300 to-emerald-400",
+    borderColor: "border-green-100",
+    iconColor: "text-white",
     submenu: [
       {
         title: "DATA ENTRY",
@@ -44,8 +46,10 @@ export const navigationSections: NavigationSections = {
   accounts: {
     title: "ACCOUNTS",
     icon: DollarSign,
-    color: "text-purple-800",
-    iconColor: "text-purple-700",
+    color: "text-white",
+    bgGradient: "from-purple-300 to-violet-400",
+    borderColor: "border-purple-100",
+    iconColor: "text-white",
     submenu: [
       {
         title: "FUNCTIONS",
@@ -97,8 +101,10 @@ export const navigationSections: NavigationSections = {
   admin: {
     title: "ADMIN",
     icon: Settings,
-    color: "text-rose-800",
-    iconColor: "text-rose-700",
+    color: "text-white",
+    bgGradient: "from-rose-300 to-pink-400",
+    borderColor: "border-rose-100",
+    iconColor: "text-white",
     submenu: [
       {
         title: "CONTROL PANEL",
@@ -112,8 +118,10 @@ export const navigationSections: NavigationSections = {
   cargo: {
     title: "CARGO COLLECTION & DELIVERY",
     icon: Truck,
-    color: "text-sky-800",
-    iconColor: "text-sky-700",
+    color: "text-white",
+    bgGradient: "from-sky-300 to-blue-400",
+    borderColor: "border-sky-100",
+    iconColor: "text-white",
     submenu: [
       {
         title: "KENYA",
