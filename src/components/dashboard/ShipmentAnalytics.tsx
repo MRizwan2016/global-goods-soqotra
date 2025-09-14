@@ -18,7 +18,7 @@ interface ShipmentChartProps {
 
 const ShipmentChart = ({ data, title, color }: ShipmentChartProps) => {
   return (
-    <div className="bg-white rounded-md p-4 shadow-lg transition-transform hover:shadow-xl duration-300">
+    <div className="bg-white rounded-3xl p-6 border-2 border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:rotate-1">
       <h3 className={`text-lg font-medium mb-4 text-${color}-600`}>{title}</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
@@ -50,8 +50,8 @@ const ShipmentAnalytics = ({
   philippinesData 
 }: ShipmentAnalyticsProps) => {
   return (
-    <div className="mb-8 animate-fade-in" style={{animationDelay: "0.6s"}}>
-      <h2 className="text-xl font-semibold text-gray-700 mb-4">Shipment Analytics</h2>
+    <div className="mb-8 animate-fade-in bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 border-2 border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105" style={{animationDelay: "0.6s"}}>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 uppercase tracking-wider font-mono">Shipment Analytics</h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ShipmentChart 
           data={kenyaData} 

@@ -7,8 +7,8 @@ const PrimaryDestinations = () => {
   const { t, language } = useLanguage();
   
   return (
-    <div className="mb-8 animate-fade-in bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border border-emerald-100">
-      <h2 className={`text-xl font-semibold text-gray-700 mb-4 uppercase ${language === 'ar' ? 'font-arabic' : ''}`}>
+    <div className="mb-8 animate-fade-in bg-gradient-to-br from-emerald-50 to-green-50 rounded-3xl p-8 border-2 border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105">
+      <h2 className={`text-2xl font-bold text-gray-800 mb-6 uppercase tracking-wider ${language === 'ar' ? 'font-arabic' : 'font-mono'}`}>
         {t("dashboard.primaryDestinations")}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
