@@ -7,8 +7,8 @@ const AdditionalDestinations = () => {
   const { t, language } = useLanguage();
   
   return (
-    <div className="mb-8 animate-fade-in bg-gray-100 rounded-3xl p-8 border-4 border-black shadow-lg">
-      <div className="inline-block border-4 border-red-500 rounded-full px-6 py-2 mb-6 bg-white">
+    <div className="mb-8 animate-fade-in bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-8 border border-black shadow-lg">
+      <div className="inline-block border-2 border-black rounded-full px-6 py-2 mb-6 bg-white">
         <h2 className={`text-xl font-bold text-black uppercase tracking-wider ${language === 'ar' ? 'font-arabic' : 'font-mono'}`}>
           {t("dashboard.additionalDestinations")}
         </h2>

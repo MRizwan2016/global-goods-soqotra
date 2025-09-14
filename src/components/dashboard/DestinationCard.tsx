@@ -25,7 +25,7 @@ const DestinationCard = ({ country, bgColor, borderColor = "", to }: Destination
       {/* Circular container with gradient background */}
       <div className={`
         rounded-3xl p-6 bg-gradient-to-br ${bgColor} 
-        border-4 border-black shadow-lg
+        border border-black shadow-lg
         transform transition-all duration-500 ease-out
         hover:scale-105 hover:shadow-2xl hover:rotate-1
         cursor-pointer group-hover:bg-opacity-90

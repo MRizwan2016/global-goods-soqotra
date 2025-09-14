@@ -18,7 +18,7 @@ interface ShipmentChartProps {
 
 const ShipmentChart = ({ data, title, color }: ShipmentChartProps) => {
   return (
-    <div className="bg-white rounded-3xl p-6 border-2 border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:rotate-1">
+    <div className="bg-white rounded-3xl p-6 border border-black shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105 hover:rotate-1">
       <h3 className={`text-lg font-medium mb-4 text-${color}-600`}>{title}</h3>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
@@ -50,8 +50,10 @@ const ShipmentAnalytics = ({
   philippinesData 
 }: ShipmentAnalyticsProps) => {
   return (
-    <div className="mb-8 animate-fade-in bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl p-8 border-2 border-gray-800 shadow-lg hover:shadow-2xl transition-all duration-500 hover:scale-105" style={{animationDelay: "0.6s"}}>
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 uppercase tracking-wider font-mono">Shipment Analytics</h2>
+    <div className="mb-8 animate-fade-in bg-gradient-to-br from-blue-100 to-indigo-100 rounded-3xl p-8 border border-black shadow-lg" style={{animationDelay: "0.6s"}}>
+      <div className="inline-block border-2 border-black rounded-full px-6 py-2 mb-6 bg-white">
+        <h2 className="text-xl font-bold text-black uppercase tracking-wider font-mono">Shipment Analytics</h2>
+      </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <ShipmentChart 
           data={kenyaData} 
