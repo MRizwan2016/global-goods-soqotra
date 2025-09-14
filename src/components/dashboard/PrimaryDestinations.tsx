@@ -7,7 +7,7 @@ const PrimaryDestinations = () => {
   const { t, language } = useLanguage();
   
   return (
-    <div className="mb-8 animate-fade-in">
+    <div className="mb-8 animate-fade-in bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border border-emerald-100">
       <h2 className={`text-xl font-semibold text-gray-700 mb-4 uppercase ${language === 'ar' ? 'font-arabic' : ''}`}>
         {t("dashboard.primaryDestinations")}
       </h2>
