@@ -76,8 +76,28 @@ const MenuItemList: React.FC<Props> = ({
     console.log(`- ${menu.title} items:`, menu.items.map(item => item.name));
   });
 
+  // Helper function to get item colors based on section
+  const getItemColors = (itemIndex: number) => {
+    const colors = [
+      'bg-cyan-100 text-cyan-700 border-cyan-200',
+      'bg-blue-100 text-blue-700 border-blue-200',
+      'bg-indigo-100 text-indigo-700 border-indigo-200',
+      'bg-purple-100 text-purple-700 border-purple-200',
+      'bg-pink-100 text-pink-700 border-pink-200',
+      'bg-rose-100 text-rose-700 border-rose-200',
+      'bg-orange-100 text-orange-700 border-orange-200',
+      'bg-amber-100 text-amber-700 border-amber-200',
+      'bg-yellow-100 text-yellow-700 border-yellow-200',
+      'bg-lime-100 text-lime-700 border-lime-200',
+      'bg-green-100 text-green-700 border-green-200',
+      'bg-emerald-100 text-emerald-700 border-emerald-200',
+      'bg-teal-100 text-teal-700 border-teal-200',
+    ];
+    return colors[itemIndex % colors.length];
+  };
+
   return (
-    <div className="space-y-1 pl-10 mt-2 animate-slide-in">
+    <div className="space-y-3 pl-6 mt-4 animate-slide-in">
       {submenu.map((submenu, idx) => {
         // Filter menu items based on permissions
         const filteredItems = submenu.items.filter(item => 
@@ -91,21 +111,42 @@ const MenuItemList: React.FC<Props> = ({
         if (filteredItems.length === 0) return null;
         
         return (
-          <div key={`${sectionKey}-submenu-${idx}`} className="mb-3">
-            <h3 className="text-xs font-semibold text-gray-700 mb-1">{submenu.title}</h3>
-            <div className="space-y-0.5">
-              {filteredItems.map((item, itemIdx) => (
-                <Link
-                  key={`${sectionKey}-item-${itemIdx}`}
-                  to={item.path}
-                  className={`flex items-center text-sm px-3 py-1.5 rounded-md text-gray-600 hover:bg-[#F0F8FF] hover:text-gray-900 transition-all duration-200 ${
-                    isPathActive(item.path) && "bg-[#F0F8FF] text-gray-900 font-medium"
-                  }`}
-                  onClick={() => onNavigate(item.path)}
-                >
-                  <span>{item.name}</span>
-                </Link>
-              ))}
+          <div key={`${sectionKey}-submenu-${idx}`} className="mb-4">
+            {/* Numbered subheading with circle */}
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-700">
+                {idx + 1}
+              </div>
+              <h3 className="text-xs font-bold text-gray-800 uppercase tracking-wide">{submenu.title}</h3>
+            </div>
+            
+            {/* Menu items with alphabetical ordering */}
+            <div className="space-y-1 ml-2">
+              {filteredItems.map((item, itemIdx) => {
+                const letter = String.fromCharCode(65 + itemIdx); // A, B, C, etc.
+                const colors = getItemColors(itemIdx);
+                
+                return (
+                  <Link
+                    key={`${sectionKey}-item-${itemIdx}`}
+                    to={item.path}
+                    className={`group flex items-center gap-2 px-2 py-1.5 rounded-lg border transition-all duration-300 hover:scale-105 hover:shadow-md hover:translate-x-1 ${colors} ${
+                      isPathActive(item.path) 
+                        ? "shadow-md scale-105 ring-1 ring-blue-300" 
+                        : "hover:ring-1 hover:ring-blue-200"
+                    }`}
+                    onClick={() => onNavigate(item.path)}
+                  >
+                    {/* Alphabetical letter circle */}
+                    <div className="w-4 h-4 rounded-full bg-white/70 flex items-center justify-center text-xs font-bold group-hover:bg-white transition-colors duration-200">
+                      {letter}
+                    </div>
+                    <span className="text-xs font-medium flex-1 group-hover:font-semibold transition-all duration-200">
+                      {item.name}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         );
