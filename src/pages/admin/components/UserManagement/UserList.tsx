@@ -48,7 +48,7 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
     const canViewPasswords = currentUser?.isAdmin;
 
     if (!canViewPasswords) {
-      return "••••••••";
+      return <span className="text-xs text-muted-foreground">Protected</span>;
     }
 
     return (

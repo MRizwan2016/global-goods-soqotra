@@ -1,4 +1,3 @@
-
 import { useContext, useMemo, useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthContext } from "@/contexts/AuthContext";
@@ -41,99 +40,71 @@ export function useAuth(): LegacyAuthContextType {
   const [legacyUser, setLegacyUser] = useState<LegacyUser | null>(null);
   const [legacyLoading, setLegacyLoading] = useState<boolean>(true);
 
-  // Load users from localStorage on mount
+  // Load users from Supabase instead of localStorage
   useEffect(() => {
+    loadUsersFromSupabase();
+  }, []);
+
+  const loadUsersFromSupabase = async () => {
     try {
-      const storedUsers = localStorage.getItem('users');
-      if (storedUsers) {
-        const parsedUsers: LegacyUser[] = JSON.parse(storedUsers);
-        console.log("Loaded users from localStorage:", parsedUsers);
-        if (Array.isArray(parsedUsers) && parsedUsers.length > 0) {
-          setUsers(parsedUsers);
-        } else {
-          console.log("Users array empty - seeding default ops user");
-          const seedUser: LegacyUser = {
-            id: 'user-ops',
-            fullName: 'Operations User',
-            email: 'ops@soqotra.qa',
-            mobileNumber: '',
-            country: 'QA',
-            isActive: true,
-            isAdmin: true,
-            createdAt: new Date().toISOString(),
-            permissions: {
-              masterData: true,
-              dataEntry: true,
-              reports: true,
-              downloads: true,
-              accounting: true,
-              controlPanel: true,
-              cargoDelivery: true,
-              accountFunctions: true,
-              accountRegistrations: true,
-              accountFinancialEntities: true,
-              accountCountryReconciliations: true,
-              files: { invoicing: true, paymentReceivable: true, sellingRates: true, container: true }
-            }
-          };
-          const initialUsers = [seedUser];
-          localStorage.setItem('users', JSON.stringify(initialUsers));
-          const passwords = JSON.parse(localStorage.getItem('userPasswords') || '{}');
-          passwords[seedUser.id] = '123456';
-          localStorage.setItem('userPasswords', JSON.stringify(passwords));
-          setUsers(initialUsers);
+      console.log("Loading users from Supabase...");
+      const { data: profiles, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at');
+
+      if (error) {
+        console.error("Error loading profiles from Supabase:", error);
+        return;
+      }
+
+      console.log("Loaded profiles from Supabase:", profiles);
+
+      const supabaseUsers: LegacyUser[] = profiles.map((profile: any) => ({
+        id: profile.id,
+        fullName: profile.full_name,
+        email: profile.email,
+        mobileNumber: profile.mobile_number || "",
+        country: profile.country || "",
+        isActive: profile.is_active,
+        isAdmin: profile.is_admin,
+        createdAt: profile.created_at,
+        permissions: profile.permissions as LegacyUser['permissions']
+      }));
+
+      setUsers(supabaseUsers);
+      console.log("Mapped users:", supabaseUsers);
+
+      // Check if current user is authenticated via Supabase
+      if (ctx?.user) {
+        const currentProfile = profiles.find((p: any) => p.id === ctx.user.id);
+        if (currentProfile) {
+          setLegacyUser({
+            id: currentProfile.id,
+            fullName: currentProfile.full_name,
+            email: currentProfile.email,
+            mobileNumber: currentProfile.mobile_number || "",
+            country: currentProfile.country || "",
+            isActive: currentProfile.is_active,
+            isAdmin: currentProfile.is_admin,
+            createdAt: currentProfile.created_at,
+            permissions: currentProfile.permissions as LegacyUser['permissions']
+          });
         }
-        const sid = localStorage.getItem('session_user_id');
-        if (sid) {
-          const existing = parsedUsers.find((u: LegacyUser) => u.id === sid) || null;
-          setLegacyUser(existing);
-        }
-      } else {
-        console.log("No users found in localStorage - seeding default ops user");
-        const seedUser: LegacyUser = {
-          id: 'user-ops',
-          fullName: 'Operations User',
-          email: 'ops@soqotra.qa',
-          mobileNumber: '',
-          country: 'QA',
-          isActive: true,
-          isAdmin: true,
-          createdAt: new Date().toISOString(),
-          permissions: {
-            masterData: true,
-            dataEntry: true,
-            reports: true,
-            downloads: true,
-            accounting: true,
-            controlPanel: true,
-            cargoDelivery: true,
-            accountFunctions: true,
-            accountRegistrations: true,
-            accountFinancialEntities: true,
-            accountCountryReconciliations: true,
-            files: { invoicing: true, paymentReceivable: true, sellingRates: true, container: true }
-          }
-        };
-        const initialUsers = [seedUser];
-        localStorage.setItem('users', JSON.stringify(initialUsers));
-        // Seed password store
-        const passwords = JSON.parse(localStorage.getItem('userPasswords') || '{}');
-        passwords[seedUser.id] = '123456';
-        localStorage.setItem('userPasswords', JSON.stringify(passwords));
-        setUsers(initialUsers);
       }
     } catch (error) {
-      console.error("Error loading users from localStorage:", error);
+      console.error("Error loading users from Supabase:", error);
       setUsers([]);
     } finally {
       setLegacyLoading(false);
     }
-  }, []);
+  };
 
   const currentUser = useMemo(() => {
     const sbUser = mapSupabaseUser(ctx?.user);
     return sbUser ?? legacyUser;
   }, [ctx?.user, legacyUser]);
+  
   const isAuthenticated = !!ctx?.user || !!legacyUser;
   const isAdmin = currentUser?.isAdmin ?? false;
 
@@ -141,88 +112,95 @@ export function useAuth(): LegacyAuthContextType {
     const normalizedEmail = (email || '').trim().toLowerCase();
     console.log("Login attempt with email:", normalizedEmail);
 
-    // Load latest users from storage (in case another tab modified it)
     try {
-      const storedUsers = localStorage.getItem('users');
-      if (storedUsers) setUsers(JSON.parse(storedUsers));
-    } catch {}
+      // Use Supabase authentication
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: normalizedEmail,
+        password: password
+      });
 
-    // Try to find user
-    let user = users.find(u => u.email.toLowerCase() === normalizedEmail);
+      if (error) {
+        console.error("Supabase auth error:", error);
+        return false;
+      }
 
-    // If not found, auto-seed the requested ops account for convenience
-    if (!user && normalizedEmail === 'ops@soqotra.qa') {
-      console.log('Seeding default ops user into localStorage');
-      user = {
-        id: 'user-ops',
-        fullName: 'Operations User',
-        email: 'ops@soqotra.qa',
-        mobileNumber: '',
-        country: 'QA',
-        isActive: true,
-        isAdmin: true,
-        createdAt: new Date().toISOString(),
-        permissions: {
-          masterData: true,
-          dataEntry: true,
-          reports: true,
-          downloads: true,
-          accounting: true,
-          controlPanel: true,
-          cargoDelivery: true,
-          accountFunctions: true,
-          accountRegistrations: true,
-          accountFinancialEntities: true,
-          accountCountryReconciliations: true,
-          files: { invoicing: true, paymentReceivable: true, sellingRates: true, container: true }
-        }
-      } as LegacyUser;
-      const updatedUsers = [...users, user];
-      setUsers(updatedUsers);
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-      const pw = JSON.parse(localStorage.getItem('userPasswords') || '{}');
-      pw[user.id] = '123456';
-      localStorage.setItem('userPasswords', JSON.stringify(pw));
-    }
+      if (data.user) {
+        console.log("Login successful for user:", data.user.email);
+        await loadUsersFromSupabase(); // Reload users after login
+        return true;
+      }
 
-    if (!user) {
-      console.log("User not found in localStorage after seeding check");
+      return false;
+    } catch (error) {
+      console.error("Login error:", error);
       return false;
     }
-
-    // Check password from localStorage
-    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-    let storedPassword = userPasswords[user.id];
-
-    // Accept common fallback passwords and seed if missing
-    const commonPw = ["123456", "password", "admin123", "soqotra123", "test123"]; 
-    const providedIsCommon = commonPw.includes(password);
-
-    if (!storedPassword && providedIsCommon) {
-      console.log('No stored password. Accepting provided common password and saving it.');
-      storedPassword = password;
-      userPasswords[user.id] = password;
-      localStorage.setItem('userPasswords', JSON.stringify(userPasswords));
-    }
-
-    const passwordMatch = (storedPassword && password === storedPassword) || providedIsCommon;
-
-    if (passwordMatch && user.isActive) {
-      console.log("Login successful for user:", user.fullName);
-      localStorage.setItem('session_user_id', user.id);
-      setLegacyUser(user);
-      return true;
-    }
-
-    console.log("Login failed - password mismatch or user inactive", { hasStored: !!storedPassword, isActive: user.isActive });
-    return false;
   };
 
-  const logout = () => { localStorage.removeItem('session_user_id'); setLegacyUser(null); ctx?.signOut?.(); };
+  const logout = async () => {
+    setLegacyUser(null);
+    await supabase.auth.signOut();
+  };
 
   const register: LegacyAuthContextType["register"] = async ({ fullName, email, password, country, mobileNumber }) => {
-    const { error } = await ctx?.signUp?.(email, password);
-    return !error;
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName
+          }
+        }
+      });
+
+      if (error) {
+        console.error("Registration error:", error);
+        return false;
+      }
+
+      if (data.user) {
+        // Create profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            {
+              id: data.user.id,
+              full_name: fullName,
+              email: email,
+              mobile_number: mobileNumber,
+              country: country,
+              is_admin: false,
+              permissions: {
+                masterData: false,
+                dataEntry: true,
+                reports: true,
+                downloads: true,
+                accounting: true,
+                controlPanel: false,
+                cargoDelivery: true,
+                accountFunctions: true,
+                accountRegistrations: true,
+                accountFinancialEntities: true,
+                accountCountryReconciliations: true,
+                files: {}
+              }
+            }
+          ]);
+
+        if (profileError) {
+          console.error("Profile creation error:", profileError);
+        }
+
+        await loadUsersFromSupabase();
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error("Registration error:", error);
+      return false;
+    }
   };
 
   const requestPasswordReset = async (email: string) => {
@@ -238,43 +216,84 @@ export function useAuth(): LegacyAuthContextType {
   };
 
   const toggleUserStatus = async (userId: string) => {
-    const updatedUsers = users.map(user => 
-      user.id === userId ? { ...user, isActive: !user.isActive } : user
-    );
-    setUsers(updatedUsers);
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
+    try {
+      // Find the user in current users array
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+
+      // Update in Supabase
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: !user.isActive })
+        .eq('id', userId);
+
+      if (error) {
+        console.error("Error updating user status:", error);
+        return;
+      }
+
+      // Reload users from Supabase
+      await loadUsersFromSupabase();
+    } catch (error) {
+      console.error("Error toggling user status:", error);
+    }
   };
   
   const sendActivationEmail = async (_user: LegacyUser) => true;
-  const toggleUserPermission = (userId: string, permissionType: keyof LegacyUser['permissions']) => {
-    const updatedUsers = users.map(user => {
-      if (user.id === userId) {
-        return { ...user, permissions: { ...user.permissions, [permissionType]: !user.permissions[permissionType] } };
+  
+  const toggleUserPermission = async (userId: string, permissionType: keyof LegacyUser['permissions']) => {
+    try {
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+
+      const updatedPermissions = {
+        ...user.permissions,
+        [permissionType]: !user.permissions[permissionType]
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ permissions: updatedPermissions })
+        .eq('id', userId);
+
+      if (error) {
+        console.error("Error updating user permission:", error);
+        return;
       }
-      return user;
-    });
-    setUsers(updatedUsers);
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
+
+      await loadUsersFromSupabase();
+    } catch (error) {
+      console.error("Error toggling user permission:", error);
+    }
   };
   
-  const toggleFilePermission = (userId: string, fileKey: keyof LegacyUser['permissions']['files']) => {
-    const updatedUsers = users.map(user => {
-      if (user.id === userId) {
-        return { 
-          ...user, 
-          permissions: { 
-            ...user.permissions, 
-            files: { 
-              ...user.permissions.files, 
-              [fileKey]: !user.permissions.files[fileKey] 
-            } 
-          } 
-        };
+  const toggleFilePermission = async (userId: string, fileKey: keyof LegacyUser['permissions']['files']) => {
+    try {
+      const user = users.find(u => u.id === userId);
+      if (!user) return;
+
+      const updatedPermissions = {
+        ...user.permissions,
+        files: {
+          ...user.permissions.files,
+          [fileKey]: !user.permissions.files[fileKey]
+        }
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ permissions: updatedPermissions })
+        .eq('id', userId);
+
+      if (error) {
+        console.error("Error updating file permission:", error);
+        return;
       }
-      return user;
-    });
-    setUsers(updatedUsers);
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
+
+      await loadUsersFromSupabase();
+    } catch (error) {
+      console.error("Error toggling file permission:", error);
+    }
   };
   
   const hasFilePermission = (_user: LegacyUser | null, _fileKey: keyof LegacyUser['permissions']['files']) => true;
