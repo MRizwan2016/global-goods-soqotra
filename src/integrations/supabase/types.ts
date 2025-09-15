@@ -455,6 +455,45 @@ export type Database = {
           },
         ]
       }
+      profiles: {
+        Row: {
+          country: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean
+          is_admin: boolean
+          mobile_number: string | null
+          permissions: Json
+          updated_at: string
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id: string
+          is_active?: boolean
+          is_admin?: boolean
+          mobile_number?: string | null
+          permissions?: Json
+          updated_at?: string
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          is_admin?: boolean
+          mobile_number?: string | null
+          permissions?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
       schedule_jobs: {
         Row: {
           created_at: string
