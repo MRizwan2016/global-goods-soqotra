@@ -279,6 +279,12 @@ export class TunisiaStorageService {
     try {
       const userId = await this.getCurrentUserId();
 
+      // If not authenticated, fall back to localStorage
+      if (!userId) {
+        const localData = localStorage.getItem(this.CONTAINERS_KEY);
+        return localData ? JSON.parse(localData) : [];
+      }
+
       const { data, error } = await supabase
         .from('tunisia_containers')
         .select('*')
@@ -309,6 +315,7 @@ export class TunisiaStorageService {
 
   private static async saveContainerToSupabase(container: TunisiaContainer): Promise<void> {
     const userId = await this.getCurrentUserId();
+    if (!userId) throw new Error('User must be authenticated to save to Supabase');
 
     const { error } = await supabase
       .from('tunisia_containers')
@@ -324,14 +331,49 @@ export class TunisiaStorageService {
   }
 
   static async addContainer(container: TunisiaContainer): Promise<void> {
+    const userId = await this.getCurrentUserId();
+    
+    // If not authenticated, save to localStorage
+    if (!userId) {
+      const existingContainers = JSON.parse(localStorage.getItem(this.CONTAINERS_KEY) || '[]');
+      const updatedContainers = [
+        ...existingContainers.filter((c: TunisiaContainer) => c.id !== container.id),
+        container
+      ];
+      localStorage.setItem(this.CONTAINERS_KEY, JSON.stringify(updatedContainers));
+      return;
+    }
+
     await this.saveContainerToSupabase(container);
   }
 
   static async updateContainer(container: TunisiaContainer): Promise<void> {
+    const userId = await this.getCurrentUserId();
+
+    // If not authenticated, update in localStorage
+    if (!userId) {
+      const existingContainers = JSON.parse(localStorage.getItem(this.CONTAINERS_KEY) || '[]');
+      const updatedContainers = existingContainers.map((c: TunisiaContainer) => 
+        c.id === container.id ? container : c
+      );
+      localStorage.setItem(this.CONTAINERS_KEY, JSON.stringify(updatedContainers));
+      return;
+    }
+
     await this.saveContainerToSupabase(container);
   }
 
   static async deleteContainer(containerId: string): Promise<void> {
+    const userId = await this.getCurrentUserId();
+
+    // If not authenticated, delete from localStorage
+    if (!userId) {
+      const existingContainers = JSON.parse(localStorage.getItem(this.CONTAINERS_KEY) || '[]');
+      const updatedContainers = existingContainers.filter((c: TunisiaContainer) => c.id !== containerId);
+      localStorage.setItem(this.CONTAINERS_KEY, JSON.stringify(updatedContainers));
+      return;
+    }
+
     const { error } = await supabase
       .from('tunisia_containers')
       .delete()
@@ -342,6 +384,14 @@ export class TunisiaStorageService {
 
   static async getContainerById(containerId: string): Promise<TunisiaContainer | null> {
     try {
+      const userId = await this.getCurrentUserId();
+
+      // If not authenticated, read from localStorage
+      if (!userId) {
+        const localData = JSON.parse(localStorage.getItem(this.CONTAINERS_KEY) || '[]');
+        return localData.find((c: TunisiaContainer) => c.id === containerId) || null;
+      }
+
       const { data, error } = await supabase
         .from('tunisia_containers')
         .select('*')
