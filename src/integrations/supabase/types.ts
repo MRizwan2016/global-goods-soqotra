@@ -843,6 +843,10 @@ export type Database = {
           tunisia_invoices_created: number
         }[]
       }
+      is_admin: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
       user_owns_schedule: {
         Args: { schedule_uuid: string }
         Returns: boolean
