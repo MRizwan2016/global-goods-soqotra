@@ -23,9 +23,6 @@ const ViewSchedules = lazy(() => import("../pages/schedules/ViewSchedules"));
 const DisplaySchedule = lazy(() => import("../pages/schedules/DisplaySchedule"));
 const PrintSchedule = lazy(() => import("../pages/schedules/PrintSchedule"));
 
-// Reports
-const SalesRepReport = lazy(() => import("../pages/reports/SalesRepReport"));
-
 // Define the routes for the Qatar section
 export const qatarRoutes: RouteConfig[] = [
   {
@@ -139,12 +136,6 @@ export const qatarRoutes: RouteConfig[] = [
   {
     path: "/schedules/print/:scheduleId",
     element: PrintSchedule,
-    private: true
-  },
-  // Reports
-  {
-    path: "/reports/sales-rep",
-    element: SalesRepReport,
     private: true
   }
 ];
