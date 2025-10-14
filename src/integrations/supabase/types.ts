@@ -14,6 +14,106 @@ export type Database = {
   }
   public: {
     Tables: {
+      collection_performance: {
+        Row: {
+          city: string | null
+          collection_date: string
+          completed_on_time: boolean | null
+          created_at: string
+          customer_satisfaction_rating: number | null
+          id: string
+          invoice_id: string | null
+          job_count: number | null
+          job_id: string | null
+          job_status: string | null
+          job_type: string | null
+          location: string | null
+          notes: string | null
+          schedule_id: string | null
+          staff_id: string | null
+          staff_name: string
+          staff_type: string
+          total_cbm: number | null
+          total_packages: number | null
+          total_revenue_qr: number | null
+          total_weight_kg: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          city?: string | null
+          collection_date: string
+          completed_on_time?: boolean | null
+          created_at?: string
+          customer_satisfaction_rating?: number | null
+          id?: string
+          invoice_id?: string | null
+          job_count?: number | null
+          job_id?: string | null
+          job_status?: string | null
+          job_type?: string | null
+          location?: string | null
+          notes?: string | null
+          schedule_id?: string | null
+          staff_id?: string | null
+          staff_name: string
+          staff_type: string
+          total_cbm?: number | null
+          total_packages?: number | null
+          total_revenue_qr?: number | null
+          total_weight_kg?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          city?: string | null
+          collection_date?: string
+          completed_on_time?: boolean | null
+          created_at?: string
+          customer_satisfaction_rating?: number | null
+          id?: string
+          invoice_id?: string | null
+          job_count?: number | null
+          job_id?: string | null
+          job_status?: string | null
+          job_type?: string | null
+          location?: string | null
+          notes?: string | null
+          schedule_id?: string | null
+          staff_id?: string | null
+          staff_name?: string
+          staff_type?: string
+          total_cbm?: number | null
+          total_packages?: number | null
+          total_revenue_qr?: number | null
+          total_weight_kg?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_performance_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_performance_schedule_id_fkey"
+            columns: ["schedule_id"]
+            isOneToOne: false
+            referencedRelation: "schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_performance_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       effects_items: {
         Row: {
           cbm: number | null
@@ -630,6 +730,53 @@ export type Database = {
           },
         ]
       }
+      staff_members: {
+        Row: {
+          created_at: string
+          department: string | null
+          employee_id: string | null
+          hire_date: string | null
+          id: string
+          is_active: boolean | null
+          profile_id: string | null
+          staff_name: string
+          staff_type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          department?: string | null
+          employee_id?: string | null
+          hire_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          profile_id?: string | null
+          staff_name: string
+          staff_type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          department?: string | null
+          employee_id?: string | null
+          hire_date?: string | null
+          id?: string
+          is_active?: boolean | null
+          profile_id?: string | null
+          staff_name?: string
+          staff_type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_members_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tunisia_containers: {
         Row: {
           arrival_date: string | null
@@ -724,6 +871,7 @@ export type Database = {
           date: string
           hbl_number: string | null
           id: string
+          invoice_date: string | null
           invoice_number: string
           payment_details: Json | null
           personal_effects: Json | null
@@ -740,6 +888,7 @@ export type Database = {
           date: string
           hbl_number?: string | null
           id?: string
+          invoice_date?: string | null
           invoice_number: string
           payment_details?: Json | null
           personal_effects?: Json | null
@@ -756,6 +905,7 @@ export type Database = {
           date?: string
           hbl_number?: string | null
           id?: string
+          invoice_date?: string | null
           invoice_number?: string
           payment_details?: Json | null
           personal_effects?: Json | null
@@ -820,7 +970,116 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      staff_annual_performance: {
+        Row: {
+          avg_satisfaction: number | null
+          collection_jobs: number | null
+          completed_jobs: number | null
+          delivery_jobs: number | null
+          on_time_completion_rate: number | null
+          staff_id: string | null
+          staff_name: string | null
+          staff_type: string | null
+          total_jobs: number | null
+          total_packages: number | null
+          total_revenue_qr: number | null
+          total_volume_cbm: number | null
+          total_weight_kg: number | null
+          year: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_performance_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_daily_performance: {
+        Row: {
+          avg_satisfaction: number | null
+          collection_date: string | null
+          collection_jobs: number | null
+          completed_jobs: number | null
+          delivery_jobs: number | null
+          on_time_completion_rate: number | null
+          staff_id: string | null
+          staff_name: string | null
+          staff_type: string | null
+          total_jobs: number | null
+          total_packages: number | null
+          total_revenue_qr: number | null
+          total_volume_cbm: number | null
+          total_weight_kg: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_performance_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_monthly_performance: {
+        Row: {
+          avg_satisfaction: number | null
+          collection_jobs: number | null
+          completed_jobs: number | null
+          delivery_jobs: number | null
+          month: number | null
+          month_start: string | null
+          on_time_completion_rate: number | null
+          staff_id: string | null
+          staff_name: string | null
+          staff_type: string | null
+          total_jobs: number | null
+          total_packages: number | null
+          total_revenue_qr: number | null
+          total_volume_cbm: number | null
+          total_weight_kg: number | null
+          year: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_performance_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_weekly_performance: {
+        Row: {
+          avg_satisfaction: number | null
+          collection_jobs: number | null
+          completed_jobs: number | null
+          delivery_jobs: number | null
+          on_time_completion_rate: number | null
+          staff_id: string | null
+          staff_name: string | null
+          staff_type: string | null
+          total_jobs: number | null
+          total_packages: number | null
+          total_revenue_qr: number | null
+          total_volume_cbm: number | null
+          total_weight_kg: number | null
+          week_start: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_performance_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       import_mysql_sample_data: {
