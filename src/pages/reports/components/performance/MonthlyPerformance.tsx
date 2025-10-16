@@ -97,6 +97,24 @@ const MonthlyPerformance: React.FC = () => {
     },
   ];
 
+  const dummyRow = {
+    month_start: new Date().toISOString().slice(0, 10),
+    staff_name: "SAMPLE STAFF",
+    staff_type: "driver",
+    staff_id: "sample-staff-id",
+    total_jobs: 1,
+    completed_jobs: 1,
+    delivery_jobs: 0,
+    collection_jobs: 1,
+    total_packages: 3,
+    total_volume_cbm: 1.35,
+    total_weight_kg: 120,
+    total_revenue_qr: 810,
+    on_time_completion_rate: 1,
+    avg_satisfaction: 5,
+  };
+  const tableData = (performanceData && performanceData.length > 0) ? performanceData : [dummyRow];
+
   if (selectedStaff) {
     return (
       <StaffDetailView
@@ -113,7 +131,7 @@ const MonthlyPerformance: React.FC = () => {
     <div>
       <DataTable
         columns={columns}
-        data={performanceData || []}
+        data={tableData}
         isLoading={isLoading}
         defaultSortField="month_start"
         defaultSortDirection="desc"

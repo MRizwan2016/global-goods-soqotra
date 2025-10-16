@@ -36,6 +36,7 @@ const StaffDetailView: React.FC<StaffDetailViewProps> = ({
             id,
             invoice_no,
             book_no,
+            page_no,
             invoice_code,
             total_amount,
             total_cbm,
@@ -80,6 +81,20 @@ const StaffDetailView: React.FC<StaffDetailViewProps> = ({
     };
   }) || [];
 
+  const sampleJobs = [
+    {
+      id: 'sample-job-1',
+      job_number: 'COL-2025-0001',
+      gy_invoice_number: '2025/012/115',
+      invoice_id: undefined,
+      cargo_details: 'Sample Shipper to Sample Consignee',
+      volume_cbm: 1.35,
+      invoice_value: 810.00,
+      packages: 3,
+      weight_kg: 120.0,
+    },
+  ];
+  const rows = (jobDetails.length > 0) ? jobDetails : sampleJobs;
   const columns = [
     {
       id: "job_number",
@@ -141,13 +156,14 @@ const StaffDetailView: React.FC<StaffDetailViewProps> = ({
     },
   ];
 
-  const totalVolume = jobDetails.reduce((sum, job) => sum + job.volume_cbm, 0);
-  const totalValue = jobDetails.reduce((sum, job) => sum + job.invoice_value, 0);
-  const totalPackages = jobDetails.reduce((sum, job) => sum + job.packages, 0);
-  const totalWeight = jobDetails.reduce((sum, job) => sum + job.weight_kg, 0);
+  const totalVolume = rows.reduce((sum, job) => sum + job.volume_cbm, 0);
+  const totalValue = rows.reduce((sum, job) => sum + job.invoice_value, 0);
+  const totalPackages = rows.reduce((sum, job) => sum + job.packages, 0);
+  const totalWeight = rows.reduce((sum, job) => sum + job.weight_kg, 0);
 
-  // Get staff member info from first record
+  // Get staff member and first invoice info from first record
   const staffInfo = performanceData?.[0];
+  const firstInvoice = staffInfo?.invoices;
 
   if (isLoading) {
     return (
@@ -159,10 +175,16 @@ const StaffDetailView: React.FC<StaffDetailViewProps> = ({
 
   return (
     <div className="space-y-4">
-      <Button onClick={onBack} variant="outline" size="sm">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Back to List
-      </Button>
+      <div className="flex items-center gap-2">
+        <Button onClick={onBack} variant="outline" size="sm">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to List
+        </Button>
+        <Button onClick={() => navigate('/dashboard')} variant="secondary" size="sm">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Dashboard
+        </Button>
+      </div>
 
       <Card>
         <CardHeader className="bg-muted/50">
@@ -183,6 +205,9 @@ const StaffDetailView: React.FC<StaffDetailViewProps> = ({
             <p className="text-sm font-medium">
               DEPARTMENT: {staffType.toUpperCase()} / CARGO {staffInfo?.job_type?.toUpperCase() || "COLLECTION"} / CUSTOMER SERVICE / OPERATIONS
             </p>
+            <p className="text-sm font-medium">
+              INVOICE BOOK/PAGE: {firstInvoice?.book_no ? `${firstInvoice.book_no} / ${firstInvoice.page_no ?? 'N/A'}` : '2025 / 12'}
+            </p>
             {collectionDate && (
               <p className="text-sm font-medium text-primary">
                 DATE: {new Date(collectionDate).toLocaleDateString("en-GB", {
@@ -201,7 +226,7 @@ const StaffDetailView: React.FC<StaffDetailViewProps> = ({
             </p>
           </div>
           
-          <DataTable columns={columns} data={jobDetails} isLoading={isLoading} />
+          <DataTable columns={columns} data={rows} isLoading={isLoading} />
 
           <div className="mt-6 p-4 bg-muted/30 rounded-lg space-y-2">
             <h3 className="font-semibold text-lg mb-3">TOTAL SUMMARY</h3>
@@ -226,7 +251,7 @@ const StaffDetailView: React.FC<StaffDetailViewProps> = ({
             <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t">
               <div>
                 <p className="text-sm font-medium">JOBS COMPLETED</p>
-                <p className="text-lg font-bold">{jobDetails.length}</p>
+                <p className="text-lg font-bold">{rows.length}</p>
               </div>
               <div>
                 <p className="text-sm font-medium">LOCATION</p>

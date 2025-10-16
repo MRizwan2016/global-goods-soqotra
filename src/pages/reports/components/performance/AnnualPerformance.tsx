@@ -94,6 +94,24 @@ const AnnualPerformance: React.FC = () => {
     },
   ];
 
+  const dummyRow = {
+    year: new Date().getFullYear(),
+    staff_name: "SAMPLE STAFF",
+    staff_type: "driver",
+    staff_id: "sample-staff-id",
+    total_jobs: 4,
+    completed_jobs: 4,
+    delivery_jobs: 2,
+    collection_jobs: 2,
+    total_packages: 12,
+    total_volume_cbm: 5.40,
+    total_weight_kg: 480,
+    total_revenue_qr: 3220,
+    on_time_completion_rate: 0.95,
+    avg_satisfaction: 4.8,
+  };
+  const tableData = (performanceData && performanceData.length > 0) ? performanceData : [dummyRow];
+
   if (selectedStaff) {
     return (
       <StaffDetailView
@@ -109,7 +127,7 @@ const AnnualPerformance: React.FC = () => {
     <div>
       <DataTable
         columns={columns}
-        data={performanceData || []}
+        data={tableData}
         isLoading={isLoading}
         defaultSortField="year"
         defaultSortDirection="desc"
