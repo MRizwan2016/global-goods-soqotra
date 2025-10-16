@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Calendar, CalendarDays, CalendarRange, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, Calendar, CalendarDays, CalendarRange, TrendingUp, ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import ReportHeader from "./components/ReportHeader";
 import DailyPerformance from "./components/performance/DailyPerformance";
 import WeeklyPerformance from "./components/performance/WeeklyPerformance";
@@ -9,6 +11,7 @@ import MonthlyPerformance from "./components/performance/MonthlyPerformance";
 import AnnualPerformance from "./components/performance/AnnualPerformance";
 
 const StaffPerformance: React.FC = () => {
+  const navigate = useNavigate();
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [activeTab, setActiveTab] = useState("daily");
 
@@ -18,9 +21,15 @@ const StaffPerformance: React.FC = () => {
 
   return (
     <div className={`p-4 ${isFullScreen ? 'fixed inset-0 z-50 bg-background overflow-auto' : ''}`}>
-      <div className="flex items-center gap-3 mb-4">
-        <Users className="h-8 w-8 text-primary" />
-        <h1 className="text-2xl font-bold">Staff Performance</h1>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <Users className="h-8 w-8 text-primary" />
+          <h1 className="text-2xl font-bold">Staff Performance</h1>
+        </div>
+        <Button onClick={() => navigate('/dashboard')} variant="outline" size="sm">
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Dashboard
+        </Button>
       </div>
 
       <Tabs defaultValue="daily" value={activeTab} onValueChange={setActiveTab}>

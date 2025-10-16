@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { DataTable } from "@/components/ui/data-table";
+import StaffDetailView from "./StaffDetailView";
 
 const AnnualPerformance: React.FC = () => {
+  const [selectedStaff, setSelectedStaff] = useState<{ name: string; type: string } | null>(null);
+  
   const { data: performanceData, isLoading } = useQuery({
     queryKey: ["staff-annual-performance"],
     queryFn: async () => {
@@ -91,6 +94,16 @@ const AnnualPerformance: React.FC = () => {
     },
   ];
 
+  if (selectedStaff) {
+    return (
+      <StaffDetailView
+        staffName={selectedStaff.name}
+        staffType={selectedStaff.type}
+        onBack={() => setSelectedStaff(null)}
+      />
+    );
+  }
+
   return (
     <div>
       <DataTable
@@ -99,6 +112,7 @@ const AnnualPerformance: React.FC = () => {
         isLoading={isLoading}
         defaultSortField="year"
         defaultSortDirection="desc"
+        onRowClick={(row) => setSelectedStaff({ name: row.staff_name, type: row.staff_type })}
       />
     </div>
   );
