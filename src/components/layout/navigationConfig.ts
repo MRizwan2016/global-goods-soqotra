@@ -28,6 +28,7 @@ export const navigationSections: NavigationSections = {
           { name: "FINANCIAL REPORTS", path: "/reports/financial" },
           { name: "CARGO REPORTS", path: "/reports/cargo" },
           { name: "SALES REP REPORT", path: "/reports/sales-rep" },
+          { name: "STAFF PERFORMANCE", path: "/reports/staff-performance" },
         ],
       },
       {
