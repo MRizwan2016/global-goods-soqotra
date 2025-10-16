@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import StaffDetailView from "./StaffDetailView";
 
 const WeeklyPerformance: React.FC = () => {
-  const [selectedStaff, setSelectedStaff] = useState<{ name: string; type: string } | null>(null);
+  const [selectedStaff, setSelectedStaff] = useState<{ name: string; type: string; id?: string; date?: string } | null>(null);
   
   const { data: performanceData, isLoading } = useQuery({
     queryKey: ["staff-weekly-performance"],
@@ -101,6 +101,8 @@ const WeeklyPerformance: React.FC = () => {
       <StaffDetailView
         staffName={selectedStaff.name}
         staffType={selectedStaff.type}
+        staffId={selectedStaff.id}
+        collectionDate={selectedStaff.date}
         onBack={() => setSelectedStaff(null)}
       />
     );
@@ -114,7 +116,12 @@ const WeeklyPerformance: React.FC = () => {
         isLoading={isLoading}
         defaultSortField="week_start"
         defaultSortDirection="desc"
-        onRowClick={(row) => setSelectedStaff({ name: row.staff_name, type: row.staff_type })}
+        onRowClick={(row) => setSelectedStaff({ 
+          name: row.staff_name, 
+          type: row.staff_type,
+          id: row.staff_id,
+          date: row.week_start
+        })}
       />
     </div>
   );
