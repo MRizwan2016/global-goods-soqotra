@@ -31,6 +31,7 @@ interface DataTableProps {
   isLoading?: boolean;
   defaultSortField?: string;
   defaultSortDirection?: 'asc' | 'desc';
+  onRowClick?: (row: any) => void;
 }
 
 export const DataTable: React.FC<DataTableProps> = ({
@@ -38,7 +39,8 @@ export const DataTable: React.FC<DataTableProps> = ({
   data = [],
   isLoading = false,
   defaultSortField,
-  defaultSortDirection = 'desc'
+  defaultSortDirection = 'desc',
+  onRowClick
 }) => {
   // Initialize sorting state
   const initialSorting: SortingState = defaultSortField 
@@ -104,7 +106,11 @@ export const DataTable: React.FC<DataTableProps> = ({
         </TableHeader>
         <TableBody>
           {table.getRowModel().rows.map((row, index) => (
-            <TableRow key={row.id} className="border-b hover:bg-slate-50/80">
+            <TableRow 
+              key={row.id} 
+              className={`border-b hover:bg-slate-50/80 ${onRowClick ? 'cursor-pointer' : ''}`}
+              onClick={() => onRowClick?.(row.original)}
+            >
               {row.getVisibleCells().map(cell => (
                 <TableCell key={cell.id}>
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
