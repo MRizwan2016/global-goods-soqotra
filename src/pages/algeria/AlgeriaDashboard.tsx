@@ -9,6 +9,7 @@ import { Ship, Package, FileText, MapPin, Truck } from "lucide-react";
 import { AlgeriaContainer } from "./types/algeriaTypes";
 import { AlgeriaInvoice } from "./types/algeriaInvoiceTypes";
 import ContainerSelection from "./components/ContainerSelection";
+import AlgeriaInvoiceForm from "./components/AlgeriaInvoiceForm";
 import { AlgeriaStorageService } from "./services/AlgeriaStorageService";
 import { AlgeriaInvoiceBookService } from "./services/AlgeriaInvoiceBookService";
 import { toast } from "sonner";
@@ -17,7 +18,8 @@ const AlgeriaDashboard: React.FC = () => {
   const { language } = useLanguage();
   const [containers, setContainers] = useState<AlgeriaContainer[]>([]);
   const [invoices, setInvoices] = useState<AlgeriaInvoice[]>([]);
-  const [view, setView] = useState<'dashboard' | 'container-select' | 'invoice-management'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'container-select' | 'invoice-management' | 'invoice-form'>('dashboard');
+  const [selectedInvoice, setSelectedInvoice] = useState<AlgeriaInvoice | null>(null);
 
   // Initialize invoice books on mount
   useEffect(() => {
@@ -71,6 +73,26 @@ const AlgeriaDashboard: React.FC = () => {
     // TODO: Navigate to container loading view
   };
 
+  const handleInvoiceSave = async (invoice: AlgeriaInvoice) => {
+    try {
+      if (selectedInvoice) {
+        // Update existing invoice
+        await AlgeriaStorageService.addInvoice(invoice);
+        setInvoices(prev => prev.map(inv => inv.id === invoice.id ? invoice : inv));
+      } else {
+        // Add new invoice
+        await AlgeriaStorageService.addInvoice(invoice);
+        setInvoices(prev => [...prev, invoice]);
+      }
+      setView('invoice-management');
+      setSelectedInvoice(null);
+      toast.success(`Invoice ${selectedInvoice ? 'updated' : 'created'} successfully!`);
+    } catch (error) {
+      console.error("Error saving invoice:", error);
+      toast.error("Failed to save invoice. Please try again.");
+    }
+  };
+
   if (view === 'container-select') {
     return (
       <Layout title="Algeria Container Management">
@@ -94,6 +116,27 @@ const AlgeriaDashboard: React.FC = () => {
     );
   }
 
+  if (view === 'invoice-form') {
+    return (
+      <Layout title="Algeria Invoice Management">
+        <div className="mb-8">
+          <div className="flex justify-between mb-4">
+            <CountryBackButton />
+            <LanguageSwitcher />
+          </div>
+        </div>
+        <AlgeriaInvoiceForm
+          onBack={() => {
+            setView('invoice-management');
+            setSelectedInvoice(null);
+          }}
+          onInvoiceSave={handleInvoiceSave}
+          existingInvoice={selectedInvoice || undefined}
+        />
+      </Layout>
+    );
+  }
+
   if (view === 'invoice-management') {
     return (
       <Layout title="Algeria Invoice Management">
@@ -107,7 +150,10 @@ const AlgeriaDashboard: React.FC = () => {
               <h1 className="text-3xl font-bold text-gray-800 mb-2">Invoice Management</h1>
               <p className="text-gray-600">Manage customer invoices for vehicle and personal effects shipping</p>
             </div>
-            <Button onClick={() => toast.info("Invoice creation coming soon!")}>
+            <Button onClick={() => {
+              setSelectedInvoice(null);
+              setView('invoice-form');
+            }}>
               Create New Invoice
             </Button>
           </div>
