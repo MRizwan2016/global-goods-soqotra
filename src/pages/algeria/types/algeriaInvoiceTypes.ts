@@ -46,11 +46,12 @@ export interface AlgeriaInvoice {
   totalAmount: number;
   date: string;
   status: "DRAFT" | "PENDING" | "PAID" | "CANCELLED";
+  paymentStatus?: "paid" | "unpaid";
   paymentDetails?: PaymentDetails;
 }
 
 export interface PaymentDetails {
-  method: "CASH" | "CARD" | "BANK_TRANSFER";
+  method: "CASH" | "CARD" | "BANK_TRANSFER" | "CHEQUE";
   transactionId?: string;
   amount: number;
   date: string;
