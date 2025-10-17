@@ -136,3 +136,35 @@
   background: white;
   clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%, 33% 90%, 33% 10%);
 }
+
+.flag-algeria {
+  background: linear-gradient(90deg, #006233 50%, white 50%);
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.flag-algeria::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid #D21034;
+}
+
+.flag-algeria::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-45%, -50%);
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-bottom: 5px solid #D21034;
+  transform-origin: center;
+}
