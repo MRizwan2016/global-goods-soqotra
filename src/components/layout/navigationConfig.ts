@@ -94,6 +94,7 @@ export const navigationSections: NavigationSections = {
           { name: "OMAN", path: "/accounts/reconciliation/country/om" },
           { name: "BURUNDI", path: "/accounts/reconciliation/country/bi" },
           { name: "ALGERIA", path: "/accounts/reconciliation/country/dz" },
+          { name: "ALGERIA PAYMENTS", path: "/algeria/accounts" },
           { name: "GHANA", path: "/accounts/reconciliation/country/gh" },
         ],
       },
@@ -184,7 +185,6 @@ export const navigationSections: NavigationSections = {
         title: "ALGERIA",
         items: [
           { name: "DASHBOARD", path: "/algeria" },
-          { name: "ACCOUNTS", path: "/algeria/accounts" },
         ],
       },
       {

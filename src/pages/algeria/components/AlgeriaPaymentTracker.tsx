@@ -4,12 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Eye, CreditCard, FileText } from "lucide-react";
+import { Search, Eye, CreditCard, FileText, ArrowLeft } from "lucide-react";
 import { AlgeriaStorageService } from "../services/AlgeriaStorageService";
 import { AlgeriaInvoice } from "../types/algeriaInvoiceTypes";
 import AlgeriaPaymentReceiptGenerator from "./AlgeriaPaymentReceiptGenerator";
+import { useNavigate } from "react-router-dom";
 
 const AlgeriaPaymentTracker = () => {
+  const navigate = useNavigate();
   const [invoices, setInvoices] = useState<AlgeriaInvoice[]>([]);
   const [filteredInvoices, setFilteredInvoices] = useState<AlgeriaInvoice[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -80,6 +82,18 @@ const AlgeriaPaymentTracker = () => {
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-4 mb-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => navigate("/algeria")}
+          className="gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Dashboard
+        </Button>
+      </div>
+      
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
