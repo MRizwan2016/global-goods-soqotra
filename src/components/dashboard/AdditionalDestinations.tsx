@@ -48,6 +48,13 @@ const AdditionalDestinations = () => {
           borderColor="border-purple-100"
           to="/eritrea"
         />
+        
+        <DestinationCard
+          country={t("country.algeria")}
+          bgColor="from-teal-300 to-cyan-400"
+          borderColor="border-teal-100"
+          to="/algeria"
+        />
       </div>
     </div>
   );

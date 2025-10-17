@@ -30,6 +30,7 @@ const translations: Record<Language, Record<string, string>> = {
     "country.ethiopia": "Ethiopia",
     "country.sudan": "Sudan",
     "country.eritrea": "Eritrea",
+    "country.algeria": "Algeria",
     
     // Back button
     "navigation.back": "Back",
@@ -69,6 +70,7 @@ const translations: Record<Language, Record<string, string>> = {
     "country.ethiopia": "إثيوبيا",
     "country.sudan": "السودان",
     "country.eritrea": "إريتريا",
+    "country.algeria": "الجزائر",
     
     // Back button
     "navigation.back": "رجوع",
@@ -107,6 +109,7 @@ const translations: Record<Language, Record<string, string>> = {
     "country.ethiopia": "ኢትዮጵያ",
     "country.sudan": "ሱዳን",
     "country.eritrea": "ኤርትራ",
+    "country.algeria": "አልጄሪያ",
     
     "navigation.back": "ተመለስ",
     "language.switch": "English",
@@ -141,6 +144,7 @@ const translations: Record<Language, Record<string, string>> = {
     "country.ethiopia": "Uhabeshi",
     "country.sudan": "Sudan",
     "country.eritrea": "Eritrea",
+    "country.algeria": "Algeria",
     
     "navigation.back": "Rudi",
     "language.switch": "English",
@@ -175,6 +179,7 @@ const translations: Record<Language, Record<string, string>> = {
     "country.ethiopia": "ඉතියෝපියාව",
     "country.sudan": "සුඩානය",
     "country.eritrea": "එරිත්‍රියාව",
+    "country.algeria": "ඇල්ජීරියාව",
     
     "navigation.back": "ආපසු",
     "language.switch": "English",
@@ -209,6 +214,7 @@ const translations: Record<Language, Record<string, string>> = {
     "country.ethiopia": "எத்தியோப்பியா",
     "country.sudan": "சூடான்",
     "country.eritrea": "எரித்திரியா",
+    "country.algeria": "அல்ஜீரியா",
     
     "navigation.back": "திரும்பு",
     "language.switch": "English",

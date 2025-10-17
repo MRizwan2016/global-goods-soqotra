@@ -9,6 +9,7 @@ import { ugandaRoutes } from "./ugandaRoutes";
 import { sriLankaRoutes } from "./sriLankaRoutes";
 import { philippinesRoutes } from "./philippinesRoutes";
 import { tunisiaRoutes } from "./tunisiaRoutes";
+import { algeriaRoutes } from "./algeriaRoutes";
 import { somaliaRoutes } from "./somaliaRoutes";
 import { reportsRoutes } from "./reportsRoutes";
 import { printDocumentsRoutes } from "./printDocumentsRoutes";
@@ -80,6 +81,7 @@ export const routes: RouteConfig[] = [
   ...philippinesRoutes,
   ...somaliaRoutes,
   ...tunisiaRoutes,
+  ...algeriaRoutes,
   ...syriaRoutes,
   ...saudiArabiaRoutes,
   ...ethiopiaRoutes,
