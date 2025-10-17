@@ -185,6 +185,7 @@ export const navigationSections: NavigationSections = {
         title: "ALGERIA",
         items: [
           { name: "DASHBOARD", path: "/algeria" },
+          { name: "VEHICLE REGISTRY", path: "/algeria/vehicles" },
         ],
       },
       {

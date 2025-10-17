@@ -1,8 +1,9 @@
-import { AlgeriaContainer } from "../types/algeriaTypes";
+import { AlgeriaContainer, AlgeriaVehicle } from "../types/algeriaTypes";
 import { AlgeriaInvoice } from "../types/algeriaInvoiceTypes";
 
 const CONTAINERS_KEY = 'algeria_containers';
 const INVOICES_KEY = 'algeria_invoices';
+const VEHICLES_KEY = 'algeria_vehicles';
 
 export class AlgeriaStorageService {
   // Container operations
@@ -82,6 +83,63 @@ export class AlgeriaStorageService {
     } catch (error) {
       console.error("Error deleting invoice:", error);
       throw error;
+    }
+  }
+
+  // Vehicle operations
+  static async loadVehicles(): Promise<AlgeriaVehicle[]> {
+    try {
+      const stored = localStorage.getItem(VEHICLES_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+      console.error("Error loading Algeria vehicles:", error);
+      return [];
+    }
+  }
+
+  static async addVehicle(vehicle: AlgeriaVehicle): Promise<void> {
+    try {
+      const vehicles = await this.loadVehicles();
+      vehicles.push(vehicle);
+      localStorage.setItem(VEHICLES_KEY, JSON.stringify(vehicles));
+    } catch (error) {
+      console.error("Error adding vehicle:", error);
+      throw error;
+    }
+  }
+
+  static async updateVehicle(vehicle: AlgeriaVehicle): Promise<void> {
+    try {
+      const vehicles = await this.loadVehicles();
+      const index = vehicles.findIndex(v => v.id === vehicle.id);
+      if (index !== -1) {
+        vehicles[index] = vehicle;
+        localStorage.setItem(VEHICLES_KEY, JSON.stringify(vehicles));
+      }
+    } catch (error) {
+      console.error("Error updating vehicle:", error);
+      throw error;
+    }
+  }
+
+  static async deleteVehicle(vehicleId: string): Promise<void> {
+    try {
+      const vehicles = await this.loadVehicles();
+      const filtered = vehicles.filter(v => v.id !== vehicleId);
+      localStorage.setItem(VEHICLES_KEY, JSON.stringify(filtered));
+    } catch (error) {
+      console.error("Error deleting vehicle:", error);
+      throw error;
+    }
+  }
+
+  static async getVehicleByExportPlate(exportPlate: string): Promise<AlgeriaVehicle | null> {
+    try {
+      const vehicles = await this.loadVehicles();
+      return vehicles.find(v => v.exportPlate === exportPlate) || null;
+    } catch (error) {
+      console.error("Error finding vehicle:", error);
+      return null;
     }
   }
 }
