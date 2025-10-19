@@ -10,6 +10,7 @@ import { AlgeriaContainer } from "./types/algeriaTypes";
 import { AlgeriaInvoice } from "./types/algeriaInvoiceTypes";
 import ContainerSelection from "./components/ContainerSelection";
 import AlgeriaInvoiceForm from "./components/AlgeriaInvoiceForm";
+import AlgeriaInvoiceList from "./components/AlgeriaInvoiceList";
 import { AlgeriaStorageService } from "./services/AlgeriaStorageService";
 import { AlgeriaInvoiceBookService } from "./services/AlgeriaInvoiceBookService";
 import { toast } from "sonner";
@@ -157,16 +158,18 @@ const AlgeriaDashboard: React.FC = () => {
           </div>
         </div>
 
-        <Card>
-          <CardContent className="p-8 text-center">
-            <p className="text-muted-foreground mb-4">
-              {invoices.length === 0 ? "No invoices created yet." : `${invoices.length} invoice(s) found`}
-            </p>
-            <Button onClick={() => setView('dashboard')}>
-              Back to Dashboard
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <AlgeriaInvoiceList
+            invoices={invoices}
+            onEdit={(inv) => {
+              setSelectedInvoice(inv);
+              setView('invoice-form');
+            }}
+          />
+          <div className="flex justify-end">
+            <Button variant="outline" onClick={() => setView('dashboard')}>Back to Dashboard</Button>
+          </div>
+        </div>
       </Layout>
     );
   }
