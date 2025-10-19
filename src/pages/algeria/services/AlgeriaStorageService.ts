@@ -67,10 +67,33 @@ export class AlgeriaStorageService {
   static async addInvoice(invoice: AlgeriaInvoice): Promise<void> {
     try {
       const invoices = await this.loadInvoices();
-      invoices.push(invoice);
+      const existingIndex = invoices.findIndex(i => i.id === invoice.id);
+      
+      if (existingIndex !== -1) {
+        // Update existing invoice
+        invoices[existingIndex] = invoice;
+      } else {
+        // Add new invoice
+        invoices.push(invoice);
+      }
+      
       localStorage.setItem(INVOICES_KEY, JSON.stringify(invoices));
     } catch (error) {
-      console.error("Error adding invoice:", error);
+      console.error("Error adding/updating invoice:", error);
+      throw error;
+    }
+  }
+
+  static async updateInvoice(invoice: AlgeriaInvoice): Promise<void> {
+    try {
+      const invoices = await this.loadInvoices();
+      const index = invoices.findIndex(i => i.id === invoice.id);
+      if (index !== -1) {
+        invoices[index] = invoice;
+        localStorage.setItem(INVOICES_KEY, JSON.stringify(invoices));
+      }
+    } catch (error) {
+      console.error("Error updating invoice:", error);
       throw error;
     }
   }

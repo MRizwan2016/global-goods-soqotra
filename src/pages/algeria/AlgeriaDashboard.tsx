@@ -75,15 +75,13 @@ const AlgeriaDashboard: React.FC = () => {
 
   const handleInvoiceSave = async (invoice: AlgeriaInvoice) => {
     try {
-      if (selectedInvoice) {
-        // Update existing invoice
-        await AlgeriaStorageService.addInvoice(invoice);
-        setInvoices(prev => prev.map(inv => inv.id === invoice.id ? invoice : inv));
-      } else {
-        // Add new invoice
-        await AlgeriaStorageService.addInvoice(invoice);
-        setInvoices(prev => [...prev, invoice]);
-      }
+      // Save invoice (handles both add and update)
+      await AlgeriaStorageService.addInvoice(invoice);
+      
+      // Reload all invoices from storage to ensure UI is in sync
+      const updatedInvoices = await AlgeriaStorageService.loadInvoices();
+      setInvoices(updatedInvoices);
+      
       setView('invoice-management');
       setSelectedInvoice(null);
       toast.success(`Invoice ${selectedInvoice ? 'updated' : 'created'} successfully!`);
