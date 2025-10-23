@@ -75,7 +75,7 @@ const AlgeriaInvoiceForm: React.FC<AlgeriaInvoiceFormProps> = ({
   );
 
   const [hblNumber, setHblNumber] = useState(
-    existingInvoice?.hblNumber || `2025/`
+    existingInvoice?.hblNumber || AlgeriaInvoiceBookService.getNextHBLNumber()
   );
 
   // Invoice book state

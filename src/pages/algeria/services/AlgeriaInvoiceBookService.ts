@@ -19,9 +19,9 @@ export class AlgeriaInvoiceBookService {
     if (existingBooks.length === 0) {
       const defaultBooks: AlgeriaInvoiceBook[] = [];
       
-      // Create books from 020100 to 020600 (Books 1-10), 50 pages each
+      // Create books starting from #1, pages 013400-013450 (50 pages each)
       for (let bookNum = 1; bookNum <= 10; bookNum++) {
-        const startNum = 20100 + (bookNum - 1) * 50;
+        const startNum = 13400 + (bookNum - 1) * 50;
         const endNum = startNum + 49;
         
         const available: string[] = [];
@@ -31,7 +31,7 @@ export class AlgeriaInvoiceBookService {
 
         const book: AlgeriaInvoiceBook = {
           id: `algeria-book-${bookNum}`,
-          bookNumber: `Book ${bookNum}`,
+          bookNumber: `#${bookNum}`,
           startPage: startNum.toString().padStart(6, '0'),
           endPage: endNum.toString().padStart(6, '0'),
           available,
@@ -45,6 +45,22 @@ export class AlgeriaInvoiceBookService {
 
       this.saveBooks(defaultBooks);
     }
+  }
+
+  static getNextHBLNumber(): string {
+    const books = this.loadBooks();
+    let maxHBLNumber = 15150; // Starting HBL number
+    
+    // Find the highest HBL number used
+    books.forEach(book => {
+      const usedPages = 50 - book.available.length;
+      const bookHBLNumber = 15150 + (parseInt(book.bookNumber.replace('#', '')) - 1) * 50 + usedPages;
+      if (bookHBLNumber > maxHBLNumber) {
+        maxHBLNumber = bookHBLNumber;
+      }
+    });
+    
+    return `2025/04700/${maxHBLNumber}`;
   }
 
   static loadBooks(): AlgeriaInvoiceBook[] {
