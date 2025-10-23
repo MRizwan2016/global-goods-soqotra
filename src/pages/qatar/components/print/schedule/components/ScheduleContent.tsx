@@ -26,7 +26,9 @@ const ScheduleContent: React.FC<ScheduleContentProps> = ({
     totalCollectionAmount,
     totalDeliveryAmount,
     totalAmount,
-    itemCounts
+    itemCounts,
+    totalDeliveryPackages,
+    totalCollectionPackages
   } = useJobSummaryCalculations(jobs);
   
   const { userName, formattedDate, formattedTime } = useUserInfo();
@@ -65,6 +67,8 @@ const ScheduleContent: React.FC<ScheduleContentProps> = ({
           totalCollectionAmount={totalCollectionAmount}
           totalAmount={totalAmount}
           itemCounts={itemCounts}
+          totalDeliveryPackages={totalDeliveryPackages}
+          totalCollectionPackages={totalCollectionPackages}
         />
         
         <div className="text-right text-xs mt-4">Page 1/1</div>

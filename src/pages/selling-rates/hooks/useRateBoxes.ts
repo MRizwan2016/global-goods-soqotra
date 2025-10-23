@@ -13,7 +13,7 @@ export const useRateBoxes = () => {
 
   const addCustomPackage = (packageName: string) => {
     const id = `CUSTOM_${Date.now()}`;
-    setRateBoxes(prev => [...prev, { id, name: packageName.toUpperCase() }]);
+    setRateBoxes(prev => [...prev, { id, name: (packageName || "").toUpperCase() }]);
   };
 
   return {

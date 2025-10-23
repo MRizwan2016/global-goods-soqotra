@@ -9,6 +9,10 @@ export interface Book {
   startPage: string;
   endPage: string;
   available: string[];
-  assignedTo: string;
+  assignedTo?: string;
   status?: string;
+  isAssigned?: boolean;
+  assignedDate?: string;
+  id?: string;
+  country?: string;
 }

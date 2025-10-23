@@ -14,14 +14,16 @@ interface InvoiceTableProps {
   currentEntries: any[];
   indexOfFirstEntry: number;
   handlePrintInvoice: (id: string) => void;
-  handleViewInvoice: (id: string) => void; // Added the handleViewInvoice prop
+  handleViewInvoice: (id: string) => void;
+  handleInactivateInvoice?: (id: string, invoiceNumber: string) => void;
 }
 
 const InvoiceTable: React.FC<InvoiceTableProps> = ({
   currentEntries,
   indexOfFirstEntry,
   handlePrintInvoice,
-  handleViewInvoice // Added this prop in the destructuring
+  handleViewInvoice,
+  handleInactivateInvoice
 }) => {
   return (
     <div className="overflow-x-auto border border-gray-200">
@@ -57,14 +59,15 @@ const InvoiceTable: React.FC<InvoiceTableProps> = ({
         <TableBody>
           {currentEntries.length > 0 ? (
             currentEntries.map((item, index) => (
-              <InvoiceTableRow 
-                key={item.id}
-                item={item} 
-                index={index} 
-                indexOffset={indexOfFirstEntry}
-                onPrint={handlePrintInvoice}
-                onView={handleViewInvoice} // Pass the handleViewInvoice to the row component
-              />
+               <InvoiceTableRow 
+                 key={item.id}
+                 item={item} 
+                 index={index} 
+                 indexOffset={indexOfFirstEntry}
+                 onPrint={handlePrintInvoice}
+                 onView={handleViewInvoice}
+                 onInactivate={handleInactivateInvoice}
+               />
             ))
           ) : (
             <TableRow>

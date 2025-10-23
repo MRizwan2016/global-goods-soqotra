@@ -6,6 +6,7 @@ import CompletedJobsTable from "../../components/completed-jobs/CompletedJobsTab
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import BackButton from "@/components/ui/back-button";
 
 const CompletedJobsPage = () => {
   const navigate = useNavigate();
@@ -38,7 +39,10 @@ const CompletedJobsPage = () => {
   return (
     <div className="container mx-auto py-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">COMPLETED JOBS</h1>
+        <div className="flex items-center gap-4">
+          <BackButton to="/qatar" />
+          <h1 className="text-2xl font-bold">COMPLETED JOBS</h1>
+        </div>
         <Button 
           onClick={handleCreateNewJob}
           className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"

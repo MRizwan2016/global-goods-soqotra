@@ -24,7 +24,7 @@ export const useBarcodeScanner = ({
     // Most barcode scanners send an Enter key after scanning
     if (event.key === "Enter" && lastBarcode) {
       // Process the barcode (make it uppercase)
-      const processedBarcode = lastBarcode.toUpperCase();
+      const processedBarcode = (lastBarcode || "").toUpperCase();
       
       // Check if this is an invoice barcode (e.g., starts with GY or has specific format)
       const isInvoiceBarcode = /^(GY|gy|Gy|gY)?[0-9]{7,8}$/.test(processedBarcode);

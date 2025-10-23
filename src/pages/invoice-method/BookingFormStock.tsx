@@ -1,5 +1,4 @@
-
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -7,6 +6,25 @@ import { useBookStock } from "./hooks/useBookStock";
 import BookStockHeader from "./components/book-stock/BookStockHeader";
 import BookStockTabs from "./components/book-stock/BookStockTabs";
 import BookStockDialogs from "./booking-form-stock/BookStockDialogs";
+import { CancelledBooksHistory } from "./components/book-stock/CancelledBooksHistory";
+import { PageSelectionDialog } from "./components/book-stock/PageSelectionDialog";
+import { ReturnedStockDialog } from "./components/book-stock/ReturnedStockDialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Book } from "./booking-form-stock/types";
+
+interface CancelledBook extends Book {
+  cancelledDate?: string;
+  deletedDate?: string;
+  reason?: string;
+  cancelledPages?: string[];
+}
 
 const BookingFormStock = () => {
   const navigate = useNavigate();
@@ -27,6 +45,24 @@ const BookingFormStock = () => {
     mockUsers,
     loadBooks
   } = useBookStock();
+
+  // State for cancel/delete dialogs
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [pageSelectionOpen, setPageSelectionOpen] = useState(false);
+  const [returnedStockOpen, setReturnedStockOpen] = useState(false);
+  const [currentAction, setCurrentAction] = useState<"cancel" | "delete">("cancel");
+  const [bookToAction, setBookToAction] = useState<Book | null>(null);
+  const [cancelledBooks, setCancelledBooks] = useState<CancelledBook[]>([]);
+
+  // Load cancelled books from localStorage
+  useEffect(() => {
+    const loadCancelledBooks = () => {
+      const cancelled = JSON.parse(localStorage.getItem('cancelledBooks') || '[]');
+      setCancelledBooks(cancelled);
+    };
+    
+    loadCancelledBooks();
+  }, []);
 
   // Force refresh books when component mounts
   useEffect(() => {
@@ -71,12 +107,173 @@ const BookingFormStock = () => {
     }, 1500);
   };
 
+  // Updated handlers to use page selection
+  const handleCancelBook = (book: Book) => {
+    setBookToAction(book);
+    setCurrentAction("cancel");
+    setPageSelectionOpen(true);
+  };
+
+  const handleDeleteBook = (book: Book) => {
+    setBookToAction(book);
+    setCurrentAction("delete");
+    setPageSelectionOpen(true);
+  };
+
+  // Updated confirmation handler for page-level operations
+  const confirmPageAction = (pageNumbers: string[], reason: string) => {
+    if (!bookToAction || pageNumbers.length === 0) return;
+
+    const currentTime = new Date().toISOString();
+    const isCancel = currentAction === "cancel";
+    const totalPages = bookToAction.available.length;
+    const isEntireBook = pageNumbers.length === totalPages;
+    
+    // Create cancelled book entry
+    const cancelledBook: CancelledBook = {
+      ...bookToAction,
+      cancelledPages: isEntireBook ? undefined : pageNumbers, // Don't store pages if entire book
+      status: isCancel ? 'CANCELLED' : 'DELETED',
+      reason,
+      [isCancel ? 'cancelledDate' : 'deletedDate']: currentTime
+    };
+
+    // Update cancelled books history
+    const existingCancelled = JSON.parse(localStorage.getItem('cancelledBooks') || '[]');
+    const updatedCancelled = [...existingCancelled, cancelledBook];
+    localStorage.setItem('cancelledBooks', JSON.stringify(updatedCancelled));
+    setCancelledBooks(updatedCancelled);
+
+    // Get existing books
+    const existingBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+    
+    if (isEntireBook) {
+      // Remove entire book from active books (return to original stock)
+      const updatedBooks = existingBooks.filter((book: Book) => 
+        book.bookNumber !== bookToAction.bookNumber
+      );
+      localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+      
+      // Create a "returned to stock" entry for potential reassignment
+      const stockBooks = JSON.parse(localStorage.getItem('returnedStockBooks') || '[]');
+      const returnedBook = {
+        ...bookToAction,
+        status: 'RETURNED_TO_STOCK',
+        returnedDate: currentTime,
+        returnedReason: reason,
+        previousCountry: bookToAction.country,
+        previousAssignee: bookToAction.assignedTo,
+        available: Array.from({length: parseInt(bookToAction.endPage) - parseInt(bookToAction.startPage) + 1}, 
+          (_, i) => `GY${parseInt(bookToAction.startPage) + i}`) // Reset all pages as available
+      };
+      stockBooks.push(returnedBook);
+      localStorage.setItem('returnedStockBooks', JSON.stringify(stockBooks));
+      
+      toast.success(`Book ${isCancel ? 'Cancelled' : 'Deleted'}`, {
+        description: `Book #${bookToAction.bookNumber} has been completely ${isCancel ? 'cancelled' : 'deleted'} and returned to stock for reassignment.`
+      });
+    } else {
+      // Update the original book by removing only the selected pages
+      const updatedBooks = existingBooks.map((book: Book) => {
+        if (book.bookNumber === bookToAction.bookNumber) {
+          const remainingPages = book.available.filter(page => !pageNumbers.includes(page));
+          
+          // If no pages remain, remove the book entirely
+          if (remainingPages.length === 0) {
+            return null;
+          }
+          
+          return {
+            ...book,
+            available: remainingPages
+          };
+        }
+        return book;
+      }).filter(Boolean); // Remove null entries
+
+      localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+      
+      toast.success(`Pages ${isCancel ? 'Cancelled' : 'Deleted'}`, {
+        description: `${pageNumbers.length} page(s) have been ${isCancel ? 'cancelled' : 'deleted'} from Book #${bookToAction.bookNumber}`
+      });
+    }
+
+    loadBooks();
+
+    // Reset states
+    setPageSelectionOpen(false);
+    setBookToAction(null);
+  };
+
+  // Restore book handler
+  const handleRestoreBook = (book: CancelledBook) => {
+    if (!book.cancelledPages) {
+      // Original full book restore logic
+      const restoredBook: Book = {
+        bookNumber: book.bookNumber,
+        startPage: book.startPage,
+        endPage: book.endPage,
+        available: book.available,
+        assignedTo: book.assignedTo,
+        status: "ACTIVE"
+      };
+
+      // Add back to active books
+      const existingBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+      const updatedBooks = [...existingBooks, restoredBook];
+      localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+
+      // Remove from cancelled books
+      const existingCancelled = JSON.parse(localStorage.getItem('cancelledBooks') || '[]');
+      const updatedCancelled = existingCancelled.filter((cb: CancelledBook) => 
+        !(cb.bookNumber === book.bookNumber && cb.cancelledDate === book.cancelledDate && cb.deletedDate === book.deletedDate)
+      );
+      localStorage.setItem('cancelledBooks', JSON.stringify(updatedCancelled));
+      setCancelledBooks(updatedCancelled);
+    } else {
+      // Restore specific pages back to the original book
+      const existingBooks = JSON.parse(localStorage.getItem('invoiceBooks') || '[]');
+      const updatedBooks = existingBooks.map((existingBook: Book) => {
+        if (existingBook.bookNumber === book.bookNumber) {
+          // Add the cancelled pages back to available pages
+          const restoredPages = [...existingBook.available, ...book.cancelledPages];
+          return {
+            ...existingBook,
+            available: restoredPages.sort()
+          };
+        }
+        return existingBook;
+      });
+
+      localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
+
+      // Remove from cancelled books
+      const existingCancelled = JSON.parse(localStorage.getItem('cancelledBooks') || '[]');
+      const updatedCancelled = existingCancelled.filter((cb: CancelledBook) => 
+        !(cb.bookNumber === book.bookNumber && cb.cancelledPages === book.cancelledPages && 
+          cb.cancelledDate === book.cancelledDate && cb.deletedDate === book.deletedDate)
+      );
+      localStorage.setItem('cancelledBooks', JSON.stringify(updatedCancelled));
+      setCancelledBooks(updatedCancelled);
+    }
+
+    loadBooks();
+
+    toast.success("Pages Restored", {
+      description: book.cancelledPages 
+        ? `${book.cancelledPages.length} page(s) restored to Book #${book.bookNumber}`
+        : `Book #${book.bookNumber} has been restored successfully.`
+    });
+  };
+
   return (
     <Layout title="Booking Form Stock">
       <div className="space-y-6">
         <BookStockHeader 
           onGenerateReport={handleGenerateReport}
           onAddNewBook={handleAddNewBook}
+          onViewHistory={() => setHistoryDialogOpen(true)}
+          onViewReturnedStock={() => setReturnedStockOpen(true)}
         />
         
         <BookStockTabs
@@ -86,6 +283,8 @@ const BookingFormStock = () => {
           onAssignUser={handleAssignUser}
           onViewDetails={handleViewDetails}
           onAddNewBook={handleAddNewBook}
+          onCancelBook={handleCancelBook}
+          onDeleteBook={handleDeleteBook}
         />
       </div>
 
@@ -100,6 +299,42 @@ const BookingFormStock = () => {
         onConfirmAssignment={confirmAssignment}
         onAssignUser={handleAssignUser}
         users={mockUsers}
+      />
+
+      {/* Page Selection Dialog */}
+      <PageSelectionDialog
+        open={pageSelectionOpen}
+        onOpenChange={setPageSelectionOpen}
+        book={bookToAction}
+        action={currentAction}
+        onConfirm={confirmPageAction}
+      />
+
+      {/* History Dialog */}
+      <Dialog open={historyDialogOpen} onOpenChange={setHistoryDialogOpen}>
+        <DialogContent className="max-w-6xl max-h-[80vh]">
+          <DialogHeader>
+            <DialogTitle>Cancelled/Deleted Books History</DialogTitle>
+          </DialogHeader>
+          <div className="py-4 overflow-y-auto">
+            <CancelledBooksHistory
+              cancelledBooks={cancelledBooks}
+              onRestoreBook={handleRestoreBook}
+            />
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setHistoryDialogOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Returned Stock Dialog */}
+      <ReturnedStockDialog
+        open={returnedStockOpen}
+        onOpenChange={setReturnedStockOpen}
+        onReassign={loadBooks}
       />
     </Layout>
   );

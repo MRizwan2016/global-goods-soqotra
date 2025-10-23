@@ -13,16 +13,20 @@ interface JobSummaryProps {
   totalCollectionAmount: number;
   totalAmount: number;
   itemCounts: Record<string, number>;
+  totalDeliveryPackages?: number;
+  totalCollectionPackages?: number;
 }
 
-const JobSummary: React.FC<JobSummaryProps> = ({ 
+const JobSummary: React.FC<JobSummaryProps> = ({
   jobs,
-  deliveryCount, 
-  collectionCount, 
-  totalDeliveryAmount, 
-  totalCollectionAmount, 
-  totalAmount, 
-  itemCounts 
+  deliveryCount,
+  collectionCount,
+  totalDeliveryAmount,
+  totalCollectionAmount,
+  totalAmount,
+  itemCounts,
+  totalDeliveryPackages = 0,
+  totalCollectionPackages = 0
 }) => {
   return (
     <div className="grid grid-cols-2 gap-4 mt-6">
@@ -30,7 +34,9 @@ const JobSummary: React.FC<JobSummaryProps> = ({
         {/* Job Counts */}
         <JobCountSummary 
           deliveryCount={deliveryCount} 
-          collectionCount={collectionCount} 
+          collectionCount={collectionCount}
+          totalDeliveryPackages={totalDeliveryPackages}
+          totalCollectionPackages={totalCollectionPackages}
         />
         
         {/* Financial Summary */}

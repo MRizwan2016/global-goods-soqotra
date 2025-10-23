@@ -3,11 +3,9 @@ import React from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import PrivateRoute from "@/components/auth/PrivateRoute";
 import { routes } from "@/routes";
-import { useAuth } from "@/hooks/use-auth";
+
 
 const AppRoutes = () => {
-  // Use auth context directly instead of usePermissions
-  const { currentUser, isAdmin } = useAuth();
   
   return (
     <Routes>

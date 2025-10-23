@@ -12,6 +12,8 @@ interface BookStockTabsProps {
   onAssignUser: (book: Book) => void;
   onViewDetails: (book: Book) => void;
   onAddNewBook: () => void;
+  onCancelBook?: (book: any) => void;
+  onDeleteBook?: (book: any) => void;
 }
 
 const BookStockTabs: React.FC<BookStockTabsProps> = ({
@@ -20,7 +22,9 @@ const BookStockTabs: React.FC<BookStockTabsProps> = ({
   books,
   onAssignUser,
   onViewDetails,
-  onAddNewBook
+  onAddNewBook,
+  onCancelBook,
+  onDeleteBook
 }) => {
   return (
     <Tabs
@@ -41,6 +45,8 @@ const BookStockTabs: React.FC<BookStockTabsProps> = ({
             tab="active"
             onAssignUser={onAssignUser}
             onViewDetails={onViewDetails}
+            onCancelBook={onCancelBook}
+            onDeleteBook={onDeleteBook}
           />
         ) : (
           <EmptyStateMessage onAddNewBook={onAddNewBook} />
@@ -54,6 +60,8 @@ const BookStockTabs: React.FC<BookStockTabsProps> = ({
             tab="assigned"
             onAssignUser={onAssignUser}
             onViewDetails={onViewDetails}
+            onCancelBook={onCancelBook}
+            onDeleteBook={onDeleteBook}
           />
         ) : (
           <div className="flex flex-col items-center justify-center py-12 bg-gray-50 border border-gray-200 rounded-lg">
@@ -68,6 +76,8 @@ const BookStockTabs: React.FC<BookStockTabsProps> = ({
           tab="completed"
           onAssignUser={onAssignUser}
           onViewDetails={onViewDetails}
+          onCancelBook={onCancelBook}
+          onDeleteBook={onDeleteBook}
         />
       </TabsContent>
     </Tabs>

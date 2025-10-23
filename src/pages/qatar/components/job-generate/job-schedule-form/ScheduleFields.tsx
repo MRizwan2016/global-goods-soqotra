@@ -40,7 +40,7 @@ const ScheduleFields: React.FC<ScheduleFieldsProps> = ({
     if (selectedJobs.length > 0 && !formData.vehicle) {
       // If all selected jobs have the same vehicle type, use its corresponding number
       if (selectedVehicleTypes.length === 1 && selectedVehicleTypes[0]) {
-        const vehicleType = selectedVehicleTypes[0].toUpperCase();
+        const vehicleType = (selectedVehicleTypes[0] || "").toUpperCase();
         const recommendedVehicleNumber = vehicleNumberMap[vehicleType];
         if (recommendedVehicleNumber) {
           handleSelectChange("vehicle", recommendedVehicleNumber);

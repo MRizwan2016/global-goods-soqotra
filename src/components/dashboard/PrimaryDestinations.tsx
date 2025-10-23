@@ -1,66 +1,60 @@
 
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import React from "react";
+import DestinationCard from "./DestinationCard";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const PrimaryDestinations = () => {
+  const { t, language } = useLanguage();
+  
   return (
-    <div className="mb-8 animate-fade-in">
-      <h2 className="text-xl font-semibold text-gray-700 mb-4 uppercase">PRIMARY DESTINATIONS</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {/* Kenya Card */}
-        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-green-600 transition-all duration-300 hover:shadow-lg">
-          <h2 className="flex items-center gap-2 font-semibold text-lg mb-3 uppercase">
-            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm" style={{ background: "linear-gradient(to bottom, #000000 33%, #FFFFFF 33%, #FFFFFF 66%, #009A49 66%)" }}>
-            </div>
-            <span className="text-green-700">KENYA</span>
-          </h2>
-          <Link 
-            to="/kenya" 
-            className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
-          >
-            VIEW DETAILS 
-            <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
+    <div className="mb-8 animate-fade-in bg-gradient-to-br from-emerald-100 to-green-100 rounded-3xl p-8 border border-black shadow-lg">
+      <div className="inline-block border-2 border-black rounded-full px-6 py-2 mb-6 bg-white">
+        <h2 className={`text-xl font-bold text-black uppercase tracking-wider ${language === 'ar' ? 'font-arabic' : 'font-mono'}`}>
+          {t("dashboard.primaryDestinations")}
+        </h2>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <DestinationCard
+          country={t("country.kenya")}
+          bgColor="from-emerald-300 to-green-400"
+          borderColor="border-emerald-100"
+          to="/kenya"
+        />
         
-        {/* Sri Lanka Card */}
-        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-yellow-600 transition-all duration-300 hover:shadow-lg">
-          <h2 className="flex items-center gap-2 font-semibold text-lg mb-3 uppercase">
-            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm">
-              <img 
-                src="/lovable-uploads/ed0f9d99-06bf-411d-b01d-77800d19a00f.png" 
-                alt="Sri Lanka Flag" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span className="text-amber-700">SRI LANKA</span>
-          </h2>
-          <Link 
-            to="/destinations/sri-lanka" 
-            className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
-          >
-            VIEW DETAILS 
-            <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
+        <DestinationCard
+          country={t("country.tunisia")}
+          bgColor="from-red-300 to-rose-400"
+          borderColor="border-red-100"
+          to="/tunisia"
+        />
         
-        {/* Uganda Card (replacing Somalia) */}
-        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-red-600 transition-all duration-300 hover:shadow-lg">
-          <h2 className="flex items-center gap-2 font-semibold text-lg mb-3 uppercase">
-            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm" style={{ 
-              background: "linear-gradient(to bottom, #000000 33%, #FFFF00 33%, #FFFF00 66%, #DE0000 66%)"
-            }}>
-            </div>
-            <span className="text-red-700">UGANDA</span>
-          </h2>
-          <Link 
-            to="/destinations/uganda" 
-            className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
-          >
-            VIEW DETAILS 
-            <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
+        <DestinationCard
+          country={t("country.uganda")}
+          bgColor="from-yellow-300 to-amber-400"
+          borderColor="border-yellow-100"
+          to="/uganda"
+        />
+        
+        <DestinationCard
+          country={t("country.philippines")}
+          bgColor="from-blue-300 to-indigo-400"
+          borderColor="border-blue-100"
+          to="/philippines"
+        />
+        
+        <DestinationCard
+          country={t("country.sriLanka")}
+          bgColor="from-purple-300 to-violet-400"
+          borderColor="border-purple-100"
+          to="/sri-lanka"
+        />
+        
+        <DestinationCard
+          country={t("country.somalia")}
+          bgColor="from-cyan-300 to-teal-400"
+          borderColor="border-cyan-100"
+          to="/somalia"
+        />
       </div>
     </div>
   );

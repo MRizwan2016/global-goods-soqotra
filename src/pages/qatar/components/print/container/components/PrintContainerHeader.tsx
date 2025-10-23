@@ -29,9 +29,9 @@ const PrintContainerHeader: React.FC<PrintContainerHeaderProps> = ({
       <div className="print-header">
         <div className="logo-container flex justify-center mb-4">
           <img 
-            src="/soqotra-logo.png" 
+            src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
             alt="SOQOTRA LOGO" 
-            className="h-16 w-auto"
+            className="h-20 w-auto object-contain"
             style={{ maxWidth: '200px' }}
             onError={(e) => {
               const target = e.target as HTMLImageElement;

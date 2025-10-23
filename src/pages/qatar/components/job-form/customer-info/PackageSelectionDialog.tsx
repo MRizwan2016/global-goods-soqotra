@@ -33,7 +33,7 @@ const PackageSelectionDialog: React.FC<PackageSelectionDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
         <DialogHeader>
           <DialogTitle>Select Package</DialogTitle>
         </DialogHeader>
@@ -50,7 +50,9 @@ const PackageSelectionDialog: React.FC<PackageSelectionDialogProps> = ({
             />
           </div>
 
-          <PackageTable onSelectPackage={handleSelectPackage} searchTerm={searchTerm} />
+          <div className="max-h-[60vh] overflow-y-auto">
+            <PackageTable onSelectPackage={handleSelectPackage} searchTerm={searchTerm} />
+          </div>
         </div>
 
         <DialogFooter>

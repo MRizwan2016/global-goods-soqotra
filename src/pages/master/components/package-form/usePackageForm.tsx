@@ -34,6 +34,15 @@ export const usePackageForm = ({ existingPackage, onSave }: UsePackageFormProps)
     // Sudan (weight-based)
     sudanPortSudanPrice: existingPackage?.pricing?.sudan?.portSudan?.price.toString() || "",
     sudanPortSudanDocFee: existingPackage?.pricing?.sudan?.portSudan?.documentsFee.toString() || "45",
+    // Burundi (weight-based)
+    burundiBujumburaPrice: existingPackage?.pricing?.burundi?.bujumbura?.price.toString() || "",
+    burundiBujumburaDocFee: existingPackage?.pricing?.burundi?.bujumbura?.documentsFee.toString() || "50",
+    // Algeria (weight-based)
+    algeriaAlgiersPrice: existingPackage?.pricing?.algeria?.algiers?.price.toString() || "",
+    algeriaAlgiersDocFee: existingPackage?.pricing?.algeria?.algiers?.documentsFee.toString() || "45",
+    // Ghana (weight-based)
+    ghanaAccraPrice: existingPackage?.pricing?.ghana?.accra?.price.toString() || "",
+    ghanaAccraDocFee: existingPackage?.pricing?.ghana?.accra?.documentsFee.toString() || "40",
     // Legacy fields
     price: existingPackage?.price.toString() || "",
     documentsFee: existingPackage?.documentsFee.toString() || "0",
@@ -48,6 +57,9 @@ export const usePackageForm = ({ existingPackage, onSave }: UsePackageFormProps)
     eritreaAsmara: "0",
     eritreaHargeisa: "0",
     sudanPortSudan: "0",
+    burundiBujumbura: "0",
+    algeriaAlgiers: "0",
+    ghanaAccra: "0",
     legacy: existingPackage?.total.toString() || "0"
   });
 
@@ -72,6 +84,9 @@ export const usePackageForm = ({ existingPackage, onSave }: UsePackageFormProps)
       eritreaAsmara: (parseFloat(formState.eritreaAsmaraPrice) + parseFloat(formState.eritreaAsmaraDocFee)).toFixed(2),
       eritreaHargeisa: (parseFloat(formState.eritreaHargeisaPrice) + parseFloat(formState.eritreaHargeisaDocFee)).toFixed(2),
       sudanPortSudan: (parseFloat(formState.sudanPortSudanPrice) + parseFloat(formState.sudanPortSudanDocFee)).toFixed(2),
+      burundiBujumbura: (parseFloat(formState.burundiBujumburaPrice) + parseFloat(formState.burundiBujumburaDocFee)).toFixed(2),
+      algeriaAlgiers: (parseFloat(formState.algeriaAlgiersPrice) + parseFloat(formState.algeriaAlgiersDocFee)).toFixed(2),
+      ghanaAccra: (parseFloat(formState.ghanaAccraPrice) + parseFloat(formState.ghanaAccraDocFee)).toFixed(2),
       legacy: (parseFloat(formState.price) + parseFloat(formState.documentsFee)).toFixed(2)
     };
     
@@ -103,6 +118,18 @@ export const usePackageForm = ({ existingPackage, onSave }: UsePackageFormProps)
         if (!formState.sudanPortSudanPrice) {
           const price = (weight * 10.2).toFixed(2);
           setFormState(prev => ({...prev, sudanPortSudanPrice: price}));
+        }
+        if (!formState.burundiBujumburaPrice) {
+          const price = (weight * 11.5).toFixed(2);
+          setFormState(prev => ({...prev, burundiBujumburaPrice: price}));
+        }
+        if (!formState.algeriaAlgiersPrice) {
+          const price = (weight * 10.8).toFixed(2);
+          setFormState(prev => ({...prev, algeriaAlgiersPrice: price}));
+        }
+        if (!formState.ghanaAccraPrice) {
+          const price = (weight * 9.2).toFixed(2);
+          setFormState(prev => ({...prev, ghanaAccraPrice: price}));
         }
       }
     }
@@ -219,6 +246,27 @@ export const usePackageForm = ({ existingPackage, onSave }: UsePackageFormProps)
           portSudan: {
             price: parseFloat(formState.sudanPortSudanPrice) || 0,
             documentsFee: parseFloat(formState.sudanPortSudanDocFee) || 0,
+            isVolumeBasedPricing: false as const
+          }
+        },
+        burundi: {
+          bujumbura: {
+            price: parseFloat(formState.burundiBujumburaPrice) || 0,
+            documentsFee: parseFloat(formState.burundiBujumburaDocFee) || 0,
+            isVolumeBasedPricing: false as const
+          }
+        },
+        algeria: {
+          algiers: {
+            price: parseFloat(formState.algeriaAlgiersPrice) || 0,
+            documentsFee: parseFloat(formState.algeriaAlgiersDocFee) || 0,
+            isVolumeBasedPricing: false as const
+          }
+        },
+        ghana: {
+          accra: {
+            price: parseFloat(formState.ghanaAccraPrice) || 0,
+            documentsFee: parseFloat(formState.ghanaAccraDocFee) || 0,
             isVolumeBasedPricing: false as const
           }
         }

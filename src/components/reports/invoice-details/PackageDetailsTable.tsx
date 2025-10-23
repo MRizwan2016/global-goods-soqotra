@@ -25,6 +25,7 @@ const PackageDetailsTable: React.FC<PackageDetailsTableProps> = ({
               <th className="border border-gray-300 p-2 text-center">LENGTH</th>
               <th className="border border-gray-300 p-2 text-center">WIDTH</th>
               <th className="border border-gray-300 p-2 text-center">HEIGHT</th>
+              <th className="border border-gray-300 p-2 text-center">DIMENSION</th>
               <th className="border border-gray-300 p-2 text-center">VOLUME</th>
               <th className="border border-gray-300 p-2 text-center">WEIGHT</th>
               <th className="border border-gray-300 p-2 text-center">BARCODE</th>
@@ -48,6 +49,12 @@ const PackageDetailsTable: React.FC<PackageDetailsTableProps> = ({
                   <td className="border border-gray-300 p-2 text-center">{pkg.length}</td>
                   <td className="border border-gray-300 p-2 text-center">{pkg.width}</td>
                   <td className="border border-gray-300 p-2 text-center">{pkg.height}</td>
+                  <td className="border border-gray-300 p-2 text-center">
+                    {pkg.length && pkg.width && pkg.height 
+                      ? `${(pkg.length / 2.54).toFixed(1)}" × ${(pkg.width / 2.54).toFixed(1)}" × ${(pkg.height / 2.54).toFixed(1)}"`
+                      : "-"
+                    }
+                  </td>
                   <td className="border border-gray-300 p-2 text-center">{pkg.volume}</td>
                   <td className="border border-gray-300 p-2 text-center">{pkg.weight || "22.5"}</td>
                   <td className="border border-gray-300 p-2 text-center"></td>
@@ -69,6 +76,7 @@ const PackageDetailsTable: React.FC<PackageDetailsTableProps> = ({
                 <td className="border border-gray-300 p-2 text-center">41</td>
                 <td className="border border-gray-300 p-2 text-center">7</td>
                 <td className="border border-gray-300 p-2 text-center">26</td>
+                <td className="border border-gray-300 p-2 text-center">16.1" × 2.8" × 10.2"</td>
                 <td className="border border-gray-300 p-2 text-center">0.125</td>
                 <td className="border border-gray-300 p-2 text-center">22.5</td>
                 <td className="border border-gray-300 p-2 text-center"></td>

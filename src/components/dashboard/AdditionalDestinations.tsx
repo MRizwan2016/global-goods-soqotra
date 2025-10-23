@@ -1,96 +1,60 @@
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+
+import React from "react";
+import DestinationCard from "./DestinationCard";
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const AdditionalDestinations = () => {
+  const { t, language } = useLanguage();
+  
   return (
-    <div className="mb-8 animate-fade-in">
-      <h2 className="text-xl font-semibold text-gray-700 mb-4 uppercase">ADDITIONAL DESTINATIONS</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-blue-600 transition-all duration-300 hover:shadow-lg">
-          <h2 className="flex items-center gap-2 font-semibold text-lg mb-3 uppercase">
-            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm" style={{ background: "linear-gradient(to right, #0038A8 33%, #FFFFFF 33%, #FFFFFF 66%, #CE1126 66%)" }}>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-yellow-500 text-xs">★</div>
-              </div>
-            </div>
-            PHILIPPINES
-          </h2>
-          <Link 
-            to="/destinations/philippines" 
-            className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
-          >
-            VIEW DETAILS 
-            <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
+    <div className="mb-8 animate-fade-in bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-8 border border-black shadow-lg">
+      <div className="inline-block border-2 border-black rounded-full px-6 py-2 mb-6 bg-white">
+        <h2 className={`text-xl font-bold text-black uppercase tracking-wider ${language === 'ar' ? 'font-arabic' : 'font-mono'}`}>
+          {t("dashboard.additionalDestinations")}
+        </h2>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <DestinationCard
+          country={t("country.syria")}
+          bgColor="from-red-300 to-pink-400"
+          borderColor="border-red-100"
+          to="/syria"
+        />
         
-        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-red-600 transition-all duration-300 hover:shadow-lg">
-          <h2 className="flex items-center gap-2 font-semibold text-lg mb-3 uppercase">
-            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm" style={{ 
-              background: "#E70013",
-              position: "relative"
-            }}>
-              <div style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: "60%",
-                height: "60%",
-                borderRadius: "50%",
-                background: "white"
-              }}></div>
-              <div style={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                width: "45%",
-                height: "45%",
-                borderRadius: "50%",
-                background: "#E70013"
-              }}></div>
-              <div style={{
-                position: "absolute",
-                top: "35%",
-                left: "55%",
-                transform: "translate(-50%, -50%) rotate(45deg)",
-                width: "25%",
-                height: "25%",
-                background: "white",
-                clipPath: "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)"
-              }}></div>
-            </div>
-            <span className="text-red-700">TUNISIA</span>
-          </h2>
-          <Link 
-            to="/destinations/tunisia" 
-            className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
-          >
-            VIEW DETAILS 
-            <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
+        <DestinationCard
+          country={t("country.saudiArabia")}
+          bgColor="from-green-300 to-emerald-400"
+          borderColor="border-green-100"
+          to="/saudi-arabia"
+        />
         
-        <div className="destination-card hover-scale bg-white shadow-md rounded-lg p-5 border-l-4 border-blue-500 transition-all duration-300 hover:shadow-lg">
-          <h2 className="flex items-center gap-2 font-semibold text-lg mb-3 uppercase">
-            <div className="w-8 h-5 flex-shrink-0 rounded overflow-hidden shadow-sm">
-              <img 
-                src="/lovable-uploads/21983d88-cc3a-4e15-9432-668dc66e43c3.png" 
-                alt="Somalia Flag" 
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span className="text-blue-700">SOMALIA</span>
-          </h2>
-          <Link 
-            to="/destinations/somalia" 
-            className="destination-card-link flex items-center justify-end text-blue-600 hover:text-blue-800 transition-colors font-medium uppercase"
-          >
-            VIEW DETAILS 
-            <ArrowRight size={16} className="ml-1 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
+        <DestinationCard
+          country={t("country.ethiopia")}
+          bgColor="from-yellow-300 to-orange-400"
+          borderColor="border-yellow-100"
+          to="/ethiopia"
+        />
+        
+        <DestinationCard
+          country={t("country.sudan")}
+          bgColor="from-blue-300 to-sky-400"
+          borderColor="border-blue-100"
+          to="/sudan"
+        />
+        
+        <DestinationCard
+          country={t("country.eritrea")}
+          bgColor="from-purple-300 to-pink-400"
+          borderColor="border-purple-100"
+          to="/eritrea"
+        />
+        
+        <DestinationCard
+          country={t("country.algeria")}
+          bgColor="from-teal-300 to-cyan-400"
+          borderColor="border-teal-100"
+          to="/algeria"
+        />
       </div>
     </div>
   );

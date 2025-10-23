@@ -15,7 +15,7 @@ const ItemForm = ({ onSubmit, isJobNumberGenerated, initialState, isEditing, onC
   const [quantity, setQuantity] = useState(initialState?.quantity ? initialState.quantity.toString() : "1");
 
   const handleItemNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setItemName(e.target.value.toUpperCase());
+    setItemName((e.target.value || "").toUpperCase());
   };
 
   const handleSellPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,8 +46,8 @@ const ItemForm = ({ onSubmit, isJobNumberGenerated, initialState, isEditing, onC
 
     onSubmit({
       id: initialState?.id || uuidv4(),
-      name: itemName.toUpperCase(),
-      itemName: itemName.toUpperCase(),
+      name: (itemName || "").toUpperCase(),
+      itemName: (itemName || "").toUpperCase(),
       jobId: initialState?.jobId || 'temp',
       sellPrice: parseFloat(sellPrice),
       quantity: parseInt(quantity || "1"),

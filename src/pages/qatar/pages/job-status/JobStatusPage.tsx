@@ -17,8 +17,10 @@ import JobStatusSummaryView from "../../components/job-list/JobStatusSummaryView
 
 const JobStatusPage = () => {
   const navigate = useNavigate();
-  const [jobs] = useState(() => {
-    return JobStorageService.getAllJobs();
+  const [jobs, setJobs] = useState(() => {
+    const initialJobs = JobStorageService.getAllJobs();
+    console.log("JobStatusPage: Initial jobs loaded:", initialJobs.length);
+    return initialJobs;
   });
 
   const sectors = ["ALL SECTORS", "MANILA", "COLOMBO", "DOHA", "DUBAI"];
@@ -30,11 +32,37 @@ const JobStatusPage = () => {
   const [vehicleFilter, setVehicleFilter] = useState("ALL VEHICLES");
   const [jobTypeFilter, setJobTypeFilter] = useState("ALL JOBS");
   
-  // Define a function to refresh jobs if needed
+  // Function to refresh jobs from localStorage
   const refreshJobs = useCallback(() => {
-    console.log("Refreshing jobs...");
-    // Re-fetch or update jobs if needed
+    console.log("Refreshing jobs from localStorage...");
+    const updatedJobs = JobStorageService.getAllJobs();
+    console.log("JobStatusPage: Refreshed jobs count:", updatedJobs.length);
+    setJobs(updatedJobs);
   }, []);
+
+  // Listen for storage changes to automatically refresh jobs
+  React.useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'jobs') {
+        console.log("Jobs storage changed, refreshing...");
+        refreshJobs();
+      }
+    };
+
+    // Also listen for custom events for localStorage changes within the same tab
+    const handleJobsUpdated = () => {
+      console.log("Jobs updated event received, refreshing...");
+      refreshJobs();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('jobsUpdated', handleJobsUpdated);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('jobsUpdated', handleJobsUpdated);
+    };
+  }, [refreshJobs]);
   
   const additionalFilters = (
     <>

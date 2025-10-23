@@ -44,6 +44,29 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
       handleInputChange(e);
     }
   };
+
+  // Handle shipper name change with consignee auto-population
+  const handleShipperNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    // Update shipper name first
+    handleInputChange(e);
+    
+    // Auto-populate consignee name unless gift cargo is "yes"
+    if (name === "shipper1" && formState.giftCargo !== "yes") {
+      const consigneeEvent = {
+        target: {
+          name: "consignee1",
+          value: value
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      
+      // Use setTimeout to ensure the shipper name is updated first
+      setTimeout(() => {
+        handleInputChange(consigneeEvent);
+      }, 0);
+    }
+  };
   
   // If country changes, update the phone number prefixes
   useEffect(() => {
@@ -76,7 +99,7 @@ const ShipperDetails: React.FC<ShipperDetailsProps> = ({
           label="Shipper Name"
           name="shipper1"
           value={formState.shipper1}
-          onChange={handleInputChange}
+          onChange={handleShipperNameChange}
           placeholder="Primary shipper name"
         />
         

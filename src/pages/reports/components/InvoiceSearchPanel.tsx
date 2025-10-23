@@ -52,6 +52,45 @@ const InvoiceSearchPanel: React.FC = () => {
       }
     }
     
+    // Load invoices from all countries
+    const countryInvoices = [
+      { key: 'eritreaInvoices', country: 'ERITREA' },
+      { key: 'sudanInvoices', country: 'SUDAN' },
+      { key: 'sriLankaInvoices', country: 'SRI LANKA' },
+      { key: 'saudiArabiaInvoices', country: 'SAUDI ARABIA' },
+      { key: 'uaeInvoices', country: 'UAE' },
+      { key: 'philippinesInvoices', country: 'PHILIPPINES' }
+    ];
+
+    countryInvoices.forEach(({ key, country }) => {
+      const invoicesData = localStorage.getItem(key);
+      if (invoicesData) {
+        try {
+          const parsedInvoices = JSON.parse(invoicesData);
+          console.log(`Loading ${country} invoices for search:`, parsedInvoices);
+          
+          // Convert invoice format to standard format and avoid duplicates
+          const existingIds = new Set(allInvoices.map(inv => inv.id));
+          const convertedInvoices = parsedInvoices
+            .filter((invoice: any) => !existingIds.has(invoice.id || invoice.invoiceNumber))
+            .map((invoice: any) => ({
+              id: invoice.id || invoice.invoiceNumber,
+              invoiceNumber: invoice.invoiceNumber || invoice.formData?.invoiceNumber,
+              date: invoice.formData?.invoiceDate || invoice.formData?.date || invoice.date || new Date().toISOString().split('T')[0],
+              shipper1: invoice.shippingDetails?.shipper1 || invoice.formData?.shipper1 || invoice.shipper1 || '',
+              consignee1: invoice.shippingDetails?.consignee1 || invoice.formData?.consignee1 || invoice.consignee1 || '',
+              net: invoice.costDetails?.net || invoice.formData?.netAmount || invoice.net || invoice.formData?.totalCharges || 0,
+              paid: invoice.paid || false,
+              country: country
+            }));
+          
+          allInvoices = [...allInvoices, ...convertedInvoices];
+        } catch (error) {
+          console.error(`Error parsing ${country} invoices:`, error);
+        }
+      }
+    });
+    
     const results = allInvoices.filter(invoice => 
       invoice.invoiceNumber.toLowerCase().includes(query) ||
       invoice.consignee1?.toLowerCase().includes(query) ||

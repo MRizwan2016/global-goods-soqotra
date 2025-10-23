@@ -1,180 +1,108 @@
 
-import { useState } from "react";
 import { User } from "@/types/auth";
-import { toast } from "@/hooks/use-toast";
-import { sendActivationEmail } from "@/utils/auth-utils";
+import { toast } from "sonner";
+import { ensureUserPermissions } from "@/utils/auth-utils";
 
 export function useUserOperations(
   users: User[], 
   setUsers: React.Dispatch<React.SetStateAction<User[]>>
 ) {
-  const [loading, setLoading] = useState<Record<string, boolean>>({});
-
-  const toggleUserStatus = async (userId: string) => {
-    // Find the user first so we can get their current status
-    const userToUpdate = users.find(u => u.id === userId);
-    if (!userToUpdate) {
-      console.error("User not found:", userId);
-      toast({
-        title: "Error",
-        description: "User not found",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Set loading state
-    setLoading(prev => ({ ...prev, [userId]: true }));
-
+  const toggleUserStatus = async (userId: string): Promise<void> => {
     try {
-      // New status will be the opposite of current status
-      const newStatus = !userToUpdate.isActive;
-      
-      // Update the users array
-      setUsers(prevUsers => 
-        prevUsers.map(user => 
-          user.id === userId 
-            ? { ...user, isActive: newStatus } 
-            : user
-        )
-      );
-
-      // Show toast notification
-      toast({
-        title: `User ${newStatus ? "Activated" : "Deactivated"}`,
-        description: `${userToUpdate.fullName}'s account has been ${newStatus ? "activated" : "deactivated"}.`,
-      });
-      
-      // If the user is being activated, send an email
-      if (newStatus) {
-        const emailSent = await sendActivationEmail({...userToUpdate, isActive: newStatus});
-        
-        if (emailSent) {
-          toast({
-            title: "Email Notification Sent",
-            description: `An email has been sent to ${userToUpdate.email} regarding their account activation.`,
-          });
-        } else {
-          toast({
-            title: "Email Notification Failed",
-            description: "Could not send email notification. Please try again later.",
-            variant: "destructive"
-          });
-        }
-      }
-    } finally {
-      // Reset loading state
-      setLoading(prev => ({ ...prev, [userId]: false }));
-    }
-  };
-
-  const toggleUserPermission = (userId: string, permissionType: keyof User['permissions']) => {
-    // Find the user
-    const userToUpdate = users.find(u => u.id === userId);
-    if (!userToUpdate) {
-      console.error("User not found for permission toggle:", userId);
-      return;
-    }
-
-    console.log(`Toggling permission ${permissionType} for user`, userToUpdate);
-
-    // Update the user's permissions
-    setUsers(prevUsers => 
-      prevUsers.map(user => {
+      const updatedUsers = users.map(user => {
         if (user.id === userId) {
-          // Ensure permissions object exists
-          const currentPermissions = user.permissions || {
-            masterData: false,
-            dataEntry: false,
-            reports: false,
-            downloads: false,
-            accounting: false,
-            controlPanel: false,
-            files: {}
-          };
-          
-          const updatedPermissions = {
-            ...currentPermissions,
-            [permissionType]: !currentPermissions[permissionType]
-          };
-          
-          console.log("Updated permissions:", updatedPermissions);
-          
-          return {
-            ...user,
-            permissions: updatedPermissions
-          };
+          const updatedUser = { ...user, isActive: !user.isActive };
+          console.log(`Toggling user ${user.fullName} active status to: ${updatedUser.isActive}`);
+          return updatedUser;
         }
         return user;
-      })
-    );
+      });
 
-    // Show toast notification
-    toast({
-      title: `Permission Updated`,
-      description: `${userToUpdate.fullName}'s access to ${permissionType} has been ${
-        !userToUpdate.permissions?.[permissionType] ? 'granted' : 'revoked'
-      }.`,
-    });
+      setUsers(updatedUsers);
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+
+      const user = updatedUsers.find(u => u.id === userId);
+      toast.success(`${user?.fullName} has been ${user?.isActive ? 'activated' : 'deactivated'}.`);
+    } catch (error) {
+      console.error("Error toggling user status:", error);
+      toast.error("Failed to update user status.");
+    }
   };
 
-  const toggleFilePermission = (userId: string, fileKey: keyof User['permissions']['files']) => {
-    // Find the user
-    const userToUpdate = users.find(u => u.id === userId);
-    if (!userToUpdate) {
-      console.error("User not found for file permission toggle:", userId);
-      return;
-    }
+  const toggleUserPermission = (userId: string, permissionType: keyof User['permissions'], adminUser?: User | null) => {
+    try {
+      // Check if the current user is admin
+      if (!adminUser?.isAdmin) {
+        toast.error("Only administrators can modify user permissions.");
+        return;
+      }
 
-    console.log(`Toggling file permission ${fileKey} for user`, userToUpdate);
-
-    // Update the user's file permissions
-    setUsers(prevUsers => 
-      prevUsers.map(user => {
+      const updatedUsers = users.map(user => {
         if (user.id === userId) {
-          // Ensure permissions and files objects exist
-          const currentPermissions = user.permissions || {
-            masterData: false,
-            dataEntry: false,
-            reports: false,
-            downloads: false,
-            accounting: false,
-            controlPanel: false,
-            files: {}
-          };
-          
-          const currentFiles = currentPermissions.files || {};
-          
-          const updatedFiles = {
-            ...currentFiles,
-            [fileKey]: !currentFiles[fileKey]
-          };
-          
-          console.log("Updated file permissions:", updatedFiles);
-          
-          return {
+          const currentPermission = user.permissions?.[permissionType] || false;
+          const updatedUser = {
             ...user,
             permissions: {
-              ...currentPermissions,
-              files: updatedFiles
+              ...user.permissions,
+              [permissionType]: !currentPermission
             }
           };
+          console.log(`Toggling ${permissionType} permission for ${user.fullName} to: ${!currentPermission}`);
+          return ensureUserPermissions(updatedUser);
         }
         return user;
-      })
-    );
+      });
 
-    // Show toast notification
-    toast({
-      title: `File Permission Updated`,
-      description: `${userToUpdate.fullName}'s access to ${fileKey} has been ${
-        !userToUpdate.permissions?.files?.[fileKey] ? 'granted' : 'revoked'
-      }.`,
-    });
+      setUsers(updatedUsers);
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+
+      const user = updatedUsers.find(u => u.id === userId);
+      toast.success(`${permissionType} permission updated for ${user?.fullName}.`);
+    } catch (error) {
+      console.error("Error toggling user permission:", error);
+      toast.error("Failed to update user permission.");
+    }
+  };
+
+  const toggleFilePermission = (userId: string, fileKey: keyof User['permissions']['files'], adminUser?: User | null) => {
+    try {
+      // Check if the current user is admin
+      if (!adminUser?.isAdmin) {
+        toast.error("Only administrators can modify file permissions.");
+        return;
+      }
+
+      const updatedUsers = users.map(user => {
+        if (user.id === userId) {
+          const currentFilePermission = user.permissions?.files?.[fileKey] || false;
+          const updatedUser = {
+            ...user,
+            permissions: {
+              ...user.permissions,
+              files: {
+                ...user.permissions?.files,
+                [fileKey]: !currentFilePermission
+              }
+            }
+          };
+          console.log(`Toggling ${fileKey} file permission for ${user.fullName} to: ${!currentFilePermission}`);
+          return ensureUserPermissions(updatedUser);
+        }
+        return user;
+      });
+
+      setUsers(updatedUsers);
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+
+      const user = updatedUsers.find(u => u.id === userId);
+      toast.success(`${fileKey} access updated for ${user?.fullName}.`);
+    } catch (error) {
+      console.error("Error toggling file permission:", error);
+      toast.error("Failed to update file permission.");
+    }
   };
 
   return {
-    loading,
     toggleUserStatus,
     toggleUserPermission,
     toggleFilePermission

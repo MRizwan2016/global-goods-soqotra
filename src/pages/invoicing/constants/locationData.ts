@@ -15,7 +15,10 @@ export const warehouseOptions: Record<string, string[]> = {
   "Tanzania": ["Dar es Salaam Warehouse"],
   "Mozambique": ["Maputo Warehouse"],
   "Somalia": ["Mogadishu Warehouse"],
-  "Ethiopia": ["Addis Ababa Warehouse"]
+  "Ethiopia": ["Addis Ababa Warehouse"],
+  "Burundi": ["Bujumbura Warehouse"],
+  "Algeria": ["Algiers Warehouse", "Oran Warehouse"],
+  "Ghana": ["Accra Warehouse", "Tema Warehouse"]
 };
 
 // City options by country
@@ -51,7 +54,10 @@ export const cityOptions: Record<string, string[]> = {
   "Tanzania": ["Dar es Salaam", "Arusha", "Dodoma", "Mwanza"],
   "Mozambique": ["Maputo", "Beira", "Nampula"],
   "Somalia": ["Mogadishu", "Hargeisa", "Kismayo"],
-  "Ethiopia": ["Addis Ababa", "Dire Dawa", "Mekelle"]
+  "Ethiopia": ["Addis Ababa", "Dire Dawa", "Mekelle"],
+  "Burundi": ["Bujumbura", "Gitega", "Muyinga"],
+  "Algeria": ["Algiers", "Oran", "Constantine", "Annaba"],
+  "Ghana": ["Accra", "Kumasi", "Tamale", "Tema"]
 };
 
 // Country codes for phone numbers
@@ -74,7 +80,10 @@ export const COUNTRY_CODES: Record<string, string> = {
   "Tanzania": "+255 ",
   "Mozambique": "+258 ",
   "Somalia": "+252 ",
-  "Ethiopia": "+251 "
+  "Ethiopia": "+251 ",
+  "Burundi": "+257 ",
+  "Algeria": "+213 ",
+  "Ghana": "+233 "
 };
 
 // Default country and city

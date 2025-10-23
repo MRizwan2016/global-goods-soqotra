@@ -65,6 +65,21 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
         handleInputChange(mobileEvent);
       }
       
+      // Update secondary mobile number if it exists
+      if (formState.consigneeMobile2 && !formState.consigneeMobile2.startsWith(countryCode)) {
+        const numericMobile2 = formState.consigneeMobile2.replace(/\D+/g, '');
+        const newMobile2Value = countryCode + numericMobile2;
+        
+        const mobile2Event = {
+          target: {
+            name: "consigneeMobile2",
+            value: newMobile2Value
+          }
+        } as React.ChangeEvent<HTMLInputElement>;
+        
+        handleInputChange(mobile2Event);
+      }
+      
       // Update landline number if it exists
       if (formState.consigneeLandline && !formState.consigneeLandline.startsWith(countryCode)) {
         const numericLandline = formState.consigneeLandline.replace(/\D+/g, '');
@@ -82,13 +97,27 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
     }
   }, [formState.destination]);
 
+  // Clear consignee name when gift cargo is set to "yes"
+  useEffect(() => {
+    if (formState.giftCargo === "yes" && formState.consignee1) {
+      const clearEvent = {
+        target: {
+          name: "consignee1",
+          value: ""
+        }
+      } as React.ChangeEvent<HTMLInputElement>;
+      
+      handleInputChange(clearEvent);
+    }
+  }, [formState.giftCargo]);
+
   return (
     <div>
       <h4 className="font-medium text-sm mb-3 text-gray-600">Consignee Information</h4>
       
       <div className="space-y-3">
         <InputFieldWithIcon 
-          label="Consignee Name"
+          label="Primary Consignee Name"
           name="consignee1"
           value={formState.consignee1}
           onChange={handleInputChange}
@@ -96,7 +125,7 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
         />
         
         <InputFieldWithIcon 
-          label="Additional Consignee"
+          label="Secondary Consignee Name"
           name="consignee2"
           value={formState.consignee2}
           onChange={handleInputChange}
@@ -130,12 +159,21 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
         </div>
         
         <InputFieldWithIcon 
-          label="Mobile Number"
+          label="Primary Mobile Number"
           name="consigneeMobile"
           value={formState.consigneeMobile}
           onChange={handlePhoneChange}
           icon={Phone}
-          placeholder={`${COUNTRY_CODES[formState.destination] || "+xxx "} mobile number`}
+          placeholder={`${COUNTRY_CODES[formState.destination] || "+xxx "} primary mobile number`}
+        />
+        
+        <InputFieldWithIcon 
+          label="Secondary Mobile Number"
+          name="consigneeMobile2"
+          value={formState.consigneeMobile2}
+          onChange={handlePhoneChange}
+          icon={Phone}
+          placeholder={`${COUNTRY_CODES[formState.destination] || "+xxx "} secondary mobile number`}
         />
         
         <InputFieldWithIcon 

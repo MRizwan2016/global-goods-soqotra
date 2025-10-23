@@ -34,6 +34,11 @@ export function useRegistration(
         downloads: false,
         accounting: false,
         controlPanel: false,
+        cargoDelivery: true, // Default enabled for all users
+        accountFunctions: false,
+        accountRegistrations: false,
+        accountFinancialEntities: false,
+        accountCountryReconciliations: false,
         files: {
           salesRep: false,
           town: false,
@@ -45,7 +50,12 @@ export function useRegistration(
           invoiceBook: false,
           driverHelper: false,
           invoicing: false,
-          paymentReceivable: false
+          paymentReceivable: false,
+          // Account section files
+          accountFunctionFiles: false,
+          accountRegistrationFiles: false,
+          accountFinancialFiles: false,
+          accountCountryFiles: false
         }
       }
     };

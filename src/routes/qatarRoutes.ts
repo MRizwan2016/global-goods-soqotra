@@ -18,6 +18,11 @@ import JobStatusList from "@/pages/qatar/JobStatusList";
 import IncompleteJobs from "@/pages/qatar/IncompleteJobs";
 import { RouteConfig } from "./types";
 
+// Schedule Pages
+const ViewSchedules = lazy(() => import("../pages/schedules/ViewSchedules"));
+const DisplaySchedule = lazy(() => import("../pages/schedules/DisplaySchedule"));
+const PrintSchedule = lazy(() => import("../pages/schedules/PrintSchedule"));
+
 // Define the routes for the Qatar section
 export const qatarRoutes: RouteConfig[] = [
   {
@@ -99,6 +104,38 @@ export const qatarRoutes: RouteConfig[] = [
   {
     path: "/qatar/job-status",
     element: JobStatusList,
+    private: true
+  },
+  // Schedule routes
+  {
+    path: "/qatar/schedules",
+    element: ViewSchedules,
+    private: true
+  },
+  {
+    path: "/qatar/schedules/display/:scheduleId",
+    element: DisplaySchedule,
+    private: true
+  },
+  {
+    path: "/qatar/schedules/print/:scheduleId",
+    element: PrintSchedule,
+    private: true
+  },
+  // Global schedule routes
+  {
+    path: "/schedules",
+    element: ViewSchedules,
+    private: true
+  },
+  {
+    path: "/schedules/display/:scheduleId",
+    element: DisplaySchedule,
+    private: true
+  },
+  {
+    path: "/schedules/print/:scheduleId",
+    element: PrintSchedule,
     private: true
   }
 ];

@@ -59,7 +59,7 @@ const TownForm = () => {
   // Generate town code when name or country changes
   useEffect(() => {
     if (!id && formData.name && formData.country) {
-      const prefix = COUNTRY_PREFIXES[formData.country] || formData.country.substring(0, 3).toUpperCase();
+      const prefix = COUNTRY_PREFIXES[formData.country] || (formData.country || "").substring(0, 3).toUpperCase();
       
       // Get existing towns to determine the next number
       const towns = JSON.parse(localStorage.getItem('towns') || '[]');

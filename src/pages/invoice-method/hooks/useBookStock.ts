@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Book, User } from "../booking-form-stock/types";
+import { useAuth } from "@/hooks/use-auth";
 
 export const mockUsers: User[] = [
   { id: "1", name: "Mr. Lahiru Chathuranga" },
@@ -17,15 +18,46 @@ export const mockUsers: User[] = [
   { id: "11", name: "Mr. Evans" },
   { id: "12", name: "Mr. Paul Onchana" },
   { id: "13", name: "Mr. Edwin Mbuguo" },
+  { id: "14", name: "Mr. Yousuf" },
+  { id: "15", name: "Mr. Saleh" },
+  { id: "16", name: "Mr. Abdul Qader" },
 ];
 
 export function useBookStock() {
+  const { users: authUsers } = useAuth();
   const [books, setBooks] = useState<Book[]>([]);
   const [selectedTab, setSelectedTab] = useState("active");
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+
+  // Add localStorage monitoring to detect changes
+  const originalSetItem = localStorage.setItem.bind(localStorage);
+  const originalRemoveItem = localStorage.removeItem.bind(localStorage);
+  const originalClear = localStorage.clear.bind(localStorage);
+
+  // Override localStorage methods to log changes
+  localStorage.setItem = function(key, value) {
+    console.log("=== localStorage.setItem called ===");
+    console.log("Key:", key);
+    console.log("Value length:", value?.length);
+    console.log("Stack trace:", new Error().stack);
+    return originalSetItem(key, value);
+  };
+
+  localStorage.removeItem = function(key) {
+    console.log("=== localStorage.removeItem called ===");
+    console.log("Key:", key);
+    console.log("Stack trace:", new Error().stack);
+    return originalRemoveItem(key);
+  };
+
+  localStorage.clear = function() {
+    console.log("=== localStorage.clear called ===");
+    console.log("Stack trace:", new Error().stack);
+    return originalClear();
+  };
 
   // Load books from localStorage on component mount
   useEffect(() => {
@@ -34,11 +66,15 @@ export function useBookStock() {
     // Add event listener for storage changes
     window.addEventListener('storage', handleStorageChange);
     
+    // Add event listener for book updates
+    window.addEventListener('book-update', loadBooks);
+    
     // Reload when window gets focus
     window.addEventListener('focus', loadBooks);
     
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('book-update', loadBooks);
       window.removeEventListener('focus', loadBooks);
     };
   }, []);
@@ -51,11 +87,30 @@ export function useBookStock() {
   };
   
   const loadBooks = () => {
-    console.log("Loading books from localStorage...");
+    console.log("=== LOADING BOOKS FROM LOCALSTORAGE ===");
+    console.log("Timestamp:", new Date().toISOString());
+    console.log("All localStorage keys:", Object.keys(localStorage));
+    console.log("localStorage 'invoiceBooks':", localStorage.getItem('invoiceBooks'));
+    console.log("localStorage 'activeInvoiceBooks':", localStorage.getItem('activeInvoiceBooks'));
+    
+    // Check if localStorage is working at all
+    try {
+      localStorage.setItem('test-key', 'test-value');
+      const testValue = localStorage.getItem('test-key');
+      console.log("localStorage test - set 'test-value', got:", testValue);
+      localStorage.removeItem('test-key');
+    } catch (error) {
+      console.error("localStorage not working:", error);
+    }
+    
     const savedBooks = localStorage.getItem('invoiceBooks');
+    console.log("Raw localStorage data:", savedBooks);
+    
     if (savedBooks) {
       try {
         const parsedBooks = JSON.parse(savedBooks);
+        console.log("Parsed books from localStorage:", parsedBooks);
+        
         // Transform the format if needed
         const transformedBooks = parsedBooks.map((book: any) => ({
           ...book,
@@ -64,17 +119,57 @@ export function useBookStock() {
           startPage: book.startPage || book.startNumber,
           endPage: book.endPage || book.endNumber,
           status: book.isActivated ? "ACTIVE" : "INACTIVE",
-          available: book.availablePages || []
+          available: book.availablePages || book.available || [],
+          assignedTo: book.assignedTo || book.salesRepresentative || undefined,
+          country: book.country || "Qatar" // Default to Qatar if no country specified
         }));
-        console.log("Loaded books:", transformedBooks);
+        console.log("Transformed books:", transformedBooks);
         setBooks(transformedBooks);
       } catch (error) {
         console.error("Error loading books from localStorage:", error);
         setBooks([]);
       }
     } else {
-      console.log("No books found in localStorage");
-      setBooks([]);
+      console.log("No books found in localStorage - creating sample books with countries");
+      // Create sample books with country assignments and available pages
+      const sampleBooks = [
+        {
+          id: "BOOK001",
+          bookNumber: "BOOK001",
+          startPage: "1001",
+          endPage: "1100", 
+          status: "ACTIVE",
+          country: "Qatar",
+          available: Array.from({length: 100}, (_, i) => `GY${1001 + i}`),
+          isActivated: true
+        },
+        {
+          id: "BOOK002",
+          bookNumber: "BOOK002", 
+          startPage: "2001",
+          endPage: "2100",
+          status: "ACTIVE",
+          country: "Sudan",
+          available: Array.from({length: 100}, (_, i) => `GY${2001 + i}`),
+          isActivated: true
+        },
+        {
+          id: "BOOK003",
+          bookNumber: "BOOK003",
+          startPage: "3001",
+          endPage: "3100", 
+          status: "ACTIVE",
+          country: "Eritrea",
+          available: Array.from({length: 50}, (_, i) => `GY${3051 + i}`), // Only 50 pages available 
+          assignedTo: "John Doe",
+          assignedDate: new Date().toISOString(),
+          isActivated: true
+        }
+      ];
+      
+      // Save sample books to localStorage
+      localStorage.setItem('invoiceBooks', JSON.stringify(sampleBooks));
+      setBooks(sampleBooks);
     }
   };
 
@@ -95,7 +190,7 @@ export function useBookStock() {
       return;
     }
 
-    const selectedUser = mockUsers.find(user => user.id === selectedUserId);
+    const selectedUser = availableUsers.find(user => user.id === selectedUserId);
     if (!selectedUser) {
       toast.error("Invalid user selection");
       return;
@@ -111,10 +206,15 @@ export function useBookStock() {
     try {
       const originalBooks = JSON.parse(storedBooks);
       
-      // Update the specific book with the assigned user
+      // Update the specific book with the assigned user and mark it as assigned
       const updatedOriginalBooks = originalBooks.map((book: any) => 
         book.bookNumber === selectedBook.bookNumber 
-          ? { ...book, assignedTo: selectedUser.name }
+          ? { 
+              ...book, 
+              assignedTo: selectedUser.name,
+              isAssigned: true, // Mark as assigned to prevent reuse
+              assignedDate: new Date().toISOString()
+            }
           : book
       );
       
@@ -125,7 +225,12 @@ export function useBookStock() {
       const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
       const updatedActiveBooks = activeBooks.map((book: any) => 
         book.bookNumber === selectedBook.bookNumber 
-          ? { ...book, assignedTo: selectedUser.name }
+          ? { 
+              ...book, 
+              assignedTo: selectedUser.name,
+              isAssigned: true,
+              assignedDate: new Date().toISOString()
+            }
           : book
       );
       localStorage.setItem('activeInvoiceBooks', JSON.stringify(updatedActiveBooks));
@@ -133,9 +238,17 @@ export function useBookStock() {
       // Update the state
       const updatedBooks = books.map(book => 
         book.bookNumber === selectedBook.bookNumber 
-          ? { ...book, assignedTo: selectedUser.name }
+          ? { 
+              ...book, 
+              assignedTo: selectedUser.name,
+              isAssigned: true,
+              assignedDate: new Date().toISOString()
+            }
           : book
       );
+      
+      console.log("=== USER ASSIGNMENT SUCCESS ===");
+      console.log("Updated books with user assignment:", updatedBooks);
       
       setBooks(updatedBooks);
       
@@ -154,6 +267,18 @@ export function useBookStock() {
     }
   };
 
+  // Combine auth users with mock users for book assignment
+  const availableUsers = [
+    ...mockUsers,
+    // Convert auth users to the local User format and filter out admin
+    ...authUsers
+      .filter(authUser => !authUser.isAdmin && authUser.isActive)
+      .map(authUser => ({
+        id: authUser.id,
+        name: authUser.fullName
+      }))
+  ];
+
   return {
     books,
     selectedTab,
@@ -168,7 +293,7 @@ export function useBookStock() {
     handleAssignUser,
     handleViewDetails,
     confirmAssignment,
-    mockUsers,
+    mockUsers: availableUsers, // Now includes both mock and real users
     loadBooks
   };
 }

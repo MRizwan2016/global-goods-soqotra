@@ -1,7 +1,7 @@
 
 import { User } from "@/types/auth";
 import { toast } from "@/hooks/use-toast";
-
+import { sendPasswordResetEmail } from "@/utils/email-service";
 export function usePasswordReset(users: User[]) {
   const requestPasswordReset = async (email: string): Promise<boolean> => {
     // Find user by email (case-insensitive)
@@ -16,8 +16,18 @@ export function usePasswordReset(users: User[]) {
       return false;
     }
     
+    // Check if user is active
+    if (!user.isActive) {
+      toast({
+        title: "Account Inactive",
+        description: "Your account is not active. Please contact an administrator.",
+        variant: "destructive"
+      });
+      return false;
+    }
+    
     // Generate a reset token
-    const resetToken = Math.random().toString(36).substring(2, 15);
+    const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const resetExpiry = Date.now() + 3600000; // 1 hour from now
     
     // Store token in localStorage
@@ -28,15 +38,38 @@ export function usePasswordReset(users: User[]) {
     };
     localStorage.setItem("resetTokens", JSON.stringify(resetTokens));
     
-    // In a real app, send an email with a link containing the token
-    console.log(`Reset token for ${user.email}: ${resetToken}`);
+    // Create reset URL
+    const resetUrl = `${window.location.origin}/admin/reset-password?userId=${user.id}&token=${resetToken}`;
     
-    toast({
-      title: "Password Reset Requested",
-      description: "If this email is registered, you will receive reset instructions. (For demo purposes, check console for reset token)",
-    });
+    // Attempt to send email using our email service utility
+    const emailSent = await sendPasswordResetEmail(user.email, resetUrl, user.fullName);
     
-    return true;
+    // Fallback to simulated email sending in case the primary method fails
+    // const emailSent = await simulateEmailSending(user.email, resetUrl);
+    if (emailSent) {
+      toast({
+        title: "Password Reset Email Sent",
+        description: `A password reset link has been sent to ${user.email}. Please check your inbox and spam folder.`,
+      });
+      
+      // For demo purposes, also show the reset link in console and toast
+      setTimeout(() => {
+        toast({
+          title: "Demo: Reset Link",
+          description: `For testing, the reset link is: ${resetUrl}`,
+          duration: 15000,
+        });
+      }, 2000);
+      
+      return true;
+    } else {
+      toast({
+        title: "Email Send Failed",
+        description: "There was an error sending the reset email. Please try again later.",
+        variant: "destructive"
+      });
+      return false;
+    }
   };
 
   const resetPassword = async (userId: string, token: string, newPassword: string): Promise<boolean> => {
@@ -71,4 +104,25 @@ export function usePasswordReset(users: User[]) {
   };
 
   return { requestPasswordReset, resetPassword };
+}
+
+// Simulate email sending function
+async function simulateEmailSending(email: string, resetUrl: string): Promise<boolean> {
+  return new Promise((resolve) => {
+    // Simulate API call delay
+    setTimeout(() => {
+      // For demo purposes, we'll always return true
+      // In a real application, this would integrate with an email service like:
+      // - EmailJS
+      // - SendGrid
+      // - AWS SES
+      // - Nodemailer (if you have a backend)
+      
+      console.log(`Simulated email sent to: ${email}`);
+      console.log(`Email content would include: ${resetUrl}`);
+      
+      // Simulate successful email sending
+      resolve(true);
+    }, 1500);
+  });
 }

@@ -3,7 +3,7 @@ import React from "react";
 import { User } from "lucide-react";
 import { cityOptions } from "../constants/locationData";
 import { countrySectorMap } from "../constants/countrySectorMap";
-import ShipperDetails from "./shipper-consignee/ShipperDetails";
+import ShipperDetailsWithAutoFill from "./shipper-consignee/ShipperDetailsWithAutoFill";
 import ConsigneeDetails from "./shipper-consignee/ConsigneeDetails";
 import HandoverSelection from "./shipper-consignee/HandoverSelection";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -95,7 +95,7 @@ const ShipperConsigneeDetails: React.FC<ShipperConsigneeDetailsProps> = ({
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-        <ShipperDetails 
+        <ShipperDetailsWithAutoFill 
           formState={formState}
           handleInputChange={handleInputChange}
           handleSelectChange={onSelectChange}

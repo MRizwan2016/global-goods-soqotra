@@ -13,7 +13,16 @@ export const COUNTRY_CURRENCY_MAP: Record<string, string[]> = {
   "Kenya": ["KES"],
   "India": ["INR"],
   "Sri Lanka": ["LKR"],
-  "European Union": ["EUR"]
+  "European Union": ["EUR"],
+  "Burundi": ["BIF"],
+  "Algeria": ["DZD"],
+  "Ghana": ["GHS"],
+  "Saudi Arabia": ["SAR"],
+  "Egypt": ["EGP"],
+  "Oman": ["OMR"],
+  "Kuwait": ["KWD"],
+  "Bahrain": ["BHD"],
+  "Lebanon": ["LBP"]
 };
 
 /**
@@ -26,7 +35,16 @@ export const CURRENCY_SYMBOLS: Record<string, string> = {
   "EUR": "€",
   "KES": "KSh",
   "INR": "₹",
-  "LKR": "Rs"
+  "LKR": "Rs",
+  "BIF": "FBu",
+  "DZD": "د.ج",
+  "GHS": "₵",
+  "SAR": "SR",
+  "EGP": "E£",
+  "OMR": "ر.ع.",
+  "KWD": "د.ك",
+  "BHD": "ب.د",
+  "LBP": "ل.ل"
 };
 
 /**

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { Invoice } from "../types";
 import { toast } from "sonner";
+import { ExternalInvoiceService } from "@/services/ExternalInvoiceService";
 
 export const useInvoiceSearch = () => {
   const [invoicePrefix, setInvoicePrefix] = useState<string>("");
@@ -48,7 +49,7 @@ export const useInvoiceSearch = () => {
   }, [invoicePrefix]);
 
   // Handle invoice search
-  const handleInvoiceSearch = () => {
+  const handleInvoiceSearch = async () => {
     // Don't show dropdown for empty input
     if (invoicePrefix.trim() === "") {
       setMatchingInvoices([]);
@@ -56,19 +57,11 @@ export const useInvoiceSearch = () => {
       return;
     }
 
-    // First get all invoices from localStorage
-    let allInvoices: Invoice[] = [];
-    
-    // Get stored invoices from localStorage
-    const storedInvoicesStr = localStorage.getItem('invoices');
-    if (storedInvoicesStr) {
-      try {
-        const storedInvoices = JSON.parse(storedInvoicesStr);
-        allInvoices = storedInvoices;
-      } catch (error) {
-        console.error("Error parsing stored invoices:", error);
-      }
-    }
+    // Auto-sync external invoices if needed
+    await ExternalInvoiceService.autoSync();
+
+    // Get all invoices including external ones
+    let allInvoices: Invoice[] = ExternalInvoiceService.getAllInvoices();
     
     // If we don't have any invoices yet, add our mock data
     if (allInvoices.length === 0) {
@@ -128,23 +121,8 @@ export const useInvoiceSearch = () => {
       inv.invoiceNumber?.toLowerCase().includes(invoicePrefix.toLowerCase())
     );
 
-    // Also get stored invoices from generatedInvoices in local storage (if any)
-    const generatedInvoicesStr = localStorage.getItem('generatedInvoices');
-    let filteredGeneratedInvoices: Invoice[] = [];
-    
-    if (generatedInvoicesStr) {
-      try {
-        const generatedInvoices = JSON.parse(generatedInvoicesStr);
-        filteredGeneratedInvoices = generatedInvoices.filter((inv: any) => 
-          inv.invoiceNumber && inv.invoiceNumber.toLowerCase().includes(invoicePrefix.toLowerCase())
-        );
-      } catch (error) {
-        console.error("Error parsing generated invoices:", error);
-      }
-    }
-
-    // Combine all matched invoices
-    const allMatchedInvoices = [...filteredInvoices, ...filteredGeneratedInvoices];
+    // All invoices are already combined, just filter them
+    const allMatchedInvoices = filteredInvoices;
     
     // Set the matching invoices and show selector if there are matches
     setMatchingInvoices(allMatchedInvoices);

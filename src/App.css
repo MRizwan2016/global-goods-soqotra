@@ -81,61 +81,6 @@ body {
   transform: translateX(2px);
 }
 
-/* Country-specific flag colors with improved design */
-.flag-kenya {
-  background: linear-gradient(135deg, #000000, #006600, #FF0000);
-  border: 1px solid rgba(255,255,255,0.3);
-}
-
-.flag-tunisia {
-  background-color: #E70013;
-  border: 1px solid rgba(255,255,255,0.3);
-}
-
-.flag-uganda {
-  background: linear-gradient(180deg, #000000 33%, #FFFF00 33%, #FFFF00 66%, #FF0000 66%);
-  border: 1px solid rgba(255,255,255,0.3);
-}
-
-.flag-philippines {
-  background: linear-gradient(135deg, #0038A8 50%, #CE1126 50%);
-  border: 1px solid rgba(255,255,255,0.3);
-}
-
-.flag-srilanka {
-  background-color: #8D153A;
-  border: 2px solid #FFC100;
-  position: relative;
-}
-
-.flag-srilanka::before {
-  content: '';
-  position: absolute;
-  width: 12px;
-  height: 12px;
-  background-color: #FF9B00;
-  right: 5px;
-  border-radius: 50%;
-}
-
-.flag-somalia {
-  background-color: #4189DD;
-  border: 1px solid rgba(255,255,255,0.3);
-  position: relative;
-}
-
-.flag-somalia::before {
-  content: '';
-  position: absolute;
-  width: 14px;
-  height: 14px;
-  background-color: white;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-}
-
 /* Animation classes */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }

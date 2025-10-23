@@ -29,8 +29,29 @@ const InvoiceFilters: React.FC<InvoiceFiltersProps> = ({
   invoiceNumber,
   setInvoiceNumber,
 }) => {
-  // Get unique invoice numbers
-  const uniqueInvoiceNumbers = [...new Set(mockInvoiceData.map(i => i.invoiceNumber))];
+  // Get unique invoice numbers from all sources
+  const getUniqueInvoiceNumbers = () => {
+    let allInvoices = [...mockInvoiceData];
+    
+    // Load from localStorage sources
+    const storageKeys = ['invoices', 'eritreaInvoices', 'generatedInvoices', 'philippinesInvoices'];
+    storageKeys.forEach(key => {
+      try {
+        const stored = localStorage.getItem(key);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          allInvoices = [...allInvoices, ...parsed];
+        }
+      } catch (error) {
+        console.error(`Error loading ${key}:`, error);
+      }
+    });
+    
+    // Remove duplicates and get unique invoice numbers
+    return [...new Set(allInvoices.map(i => i.invoiceNumber))].filter(Boolean);
+  };
+  
+  const uniqueInvoiceNumbers = getUniqueInvoiceNumbers();
 
   return (
     <div className="flex flex-wrap gap-2 w-full">

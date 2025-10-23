@@ -82,6 +82,16 @@ export const mockSalesReps = [
     id: "sr16",
     name: "Mr. Paolo Fernando",
     code: "PF016"
+  },
+  {
+    id: "sr17",
+    name: "Mr. Ranatunghe",
+    code: "RN017"
+  },
+  {
+    id: "sr18",
+    name: "Mr. Daminda",
+    code: "DM018"
   }
 ];
 
@@ -135,5 +145,15 @@ export const mockDrivers = [
     id: "d9",
     name: "Mr. Idries Karar",
     license: "QT-90123"
+  },
+  {
+    id: "d10",
+    name: "Mr. Ranatunghe",
+    license: "QT-01234"
+  },
+  {
+    id: "d11",
+    name: "Mr. Daminda",
+    license: "QT-01235"
   }
 ];

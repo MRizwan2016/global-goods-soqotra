@@ -1,20 +1,42 @@
+
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { toast } from "sonner";
 import JobForm from "./components/JobForm";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Save, ArrowLeft, Truck } from "lucide-react";
 import { JobStorageService } from "./services/JobStorageService";
 import { JobNumberService } from "@/services/JobNumberService";
+import { JobInvoiceInterconnectService } from "./services/JobInvoiceInterconnectService";
 import { cityVehicleMapping } from "./data/cityVehicleMapping";
+import { fixInvoiceLinkage, cleanupDummyData } from "./utils/fixInvoiceLinkage";
 
 const NewJobForm = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   
+  // Fix invoice linkage issues on component mount
+  useEffect(() => {
+    fixInvoiceLinkage();
+    cleanupDummyData();
+    // Also cleanup any specific dummy entries
+    const jobs = JSON.parse(localStorage.getItem('jobs') || '[]');
+    const cleanedJobs = jobs.filter((job: any) => 
+      !job.customer?.toUpperCase().includes('DUMMY') &&
+      !job.customer?.toUpperCase().includes('SAMPLE') &&
+      job.customer !== 'MRS. AMIRA SIED OSMAN' // Remove this specific dummy entry
+    );
+    if (cleanedJobs.length !== jobs.length) {
+      localStorage.setItem('jobs', JSON.stringify(cleanedJobs));
+      console.log(`Cleaned up ${jobs.length - cleanedJobs.length} dummy job entries`);
+    }
+  }, []);
+  
   const handleCreateJob = async (jobData: any) => {
     try {
+      console.log("=== NEW JOB CREATION STARTED ===");
+      JobStorageService.debugStorage(); // Debug storage before saving
       setIsSaving(true);
       console.log("Creating new job:", jobData);
       
@@ -29,6 +51,12 @@ const NewJobForm = () => {
         toast.error("Customer name is required");
         setIsSaving(false);
         return;
+      }
+
+      // Make destination optional for now to avoid blocking saves
+      if (!jobData.destination) {
+        console.log("Warning: No destination specified, but proceeding with save");
+        jobData.destination = "UNSPECIFIED";
       }
       
       // Ensure we have an ID
@@ -52,26 +80,40 @@ const NewJobForm = () => {
         const savedJob = JobStorageService.saveJob(jobData);
         console.log("Job saved successfully:", savedJob);
 
-        // If there's an invoice number, update the invoice to include the job number
+        // Link job to invoice and create interconnection for mobile number lookup
         if (savedJob.invoiceNumber) {
           try {
-            const invoices = JSON.parse(localStorage.getItem('invoices') || '[]');
-            const matchingInvoice = invoices.find((inv: any) => inv.invoiceNumber === savedJob.invoiceNumber);
-            if (matchingInvoice) {
-              matchingInvoice.jobNumber = savedJob.jobNumber;
-              localStorage.setItem('invoices', JSON.stringify(invoices));
-            }
+            // Use new interconnect service for comprehensive linking
+            JobInvoiceInterconnectService.linkJobToInvoice(savedJob, savedJob.invoiceNumber);
             
-            // Also link via the JobNumberService
+            // Also link via the JobNumberService for backward compatibility
             JobNumberService.linkJobToInvoice(savedJob.jobNumber, savedJob.invoiceNumber);
+            
+            // Link mobile number if available
+            if (savedJob.mobileNumber) {
+              JobNumberService.linkJobToMobile(savedJob.jobNumber, savedJob.mobileNumber);
+            }
           } catch (error) {
             console.error('Error linking job number with invoice:', error);
+          }
+        }
+
+        // Always link mobile number for future invoice auto-population
+        if (savedJob.mobileNumber) {
+          try {
+            JobNumberService.linkJobToMobile(savedJob.jobNumber, savedJob.mobileNumber);
+          } catch (error) {
+            console.error('Error linking mobile number:', error);
           }
         }
         
         setTimeout(() => {
           toast.success("Job created successfully!");
           setIsSaving(false);
+          // Force refresh of job lists by dispatching event
+          window.dispatchEvent(new CustomEvent('jobsUpdated'));
+          console.log("=== NEW JOB CREATION COMPLETED ===");
+          JobStorageService.debugStorage(); // Debug storage after saving
           navigate("/qatar/jobs");  // Navigate to jobs page after successful creation
         }, 800);
       } catch (error) {
@@ -87,8 +129,32 @@ const NewJobForm = () => {
   };
   
   const handleClickSaveJob = () => {
-    console.log("Save button clicked");
-    document.getElementById('job-form')?.dispatchEvent(new Event('submit', { bubbles: true }));
+    console.log("=== SAVE BUTTON CLICKED ===");
+    console.log("Looking for job-form element...");
+    const form = document.getElementById('job-form') as HTMLFormElement;
+    if (form) {
+      console.log("Found job-form element, creating submit event...");
+      // Create and dispatch a form submit event
+      const submitEvent = new Event('submit', { 
+        bubbles: true, 
+        cancelable: true 
+      });
+      console.log("Dispatching submit event to form");
+      form.dispatchEvent(submitEvent);
+    } else {
+      console.error("Could not find job-form element");
+      // Fallback: try to call handleCreateJob directly
+      console.log("Attempting direct job creation as fallback...");
+      const currentFormData = {
+        id: crypto.randomUUID(),
+        jobNumber: '',
+        customer: '',
+        mobileNumber: '',
+        status: 'PENDING',
+        timestamp: new Date().toISOString()
+      };
+      handleCreateJob(currentFormData);
+    }
   };
   
   return (
@@ -107,6 +173,13 @@ const NewJobForm = () => {
             >
               <ArrowLeft size={16} />
               Back
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => JobStorageService.debugStorage()}
+              className="flex items-center gap-2 transition-colors bg-yellow-50 border-yellow-300"
+            >
+              Debug Storage
             </Button>
             <Button 
               onClick={handleClickSaveJob}

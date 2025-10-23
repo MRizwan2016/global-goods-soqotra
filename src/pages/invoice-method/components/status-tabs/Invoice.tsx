@@ -17,7 +17,11 @@ export const InvoiceRow: React.FC<InvoiceRowProps> = ({
   handleViewPaymentDetails 
 }) => {
   // Determine the customer name from various possible fields
-  const customerName = invoice.consignee1 || invoice.consignee || invoice.customer || 'Unknown';
+  const customerName = invoice.consignee1 || invoice.consignee || invoice.customer || 
+    invoice.customerName || invoice.consigneeName || 
+    (invoice.consigneePrefix && invoice.consigneeName ? 
+      `${invoice.consigneePrefix} ${invoice.consigneeName}`.trim() : null) ||
+    'UNKNOWN';
   
   // Special handling for invoice 13136051
   if (invoice.invoiceNumber === "13136051") {

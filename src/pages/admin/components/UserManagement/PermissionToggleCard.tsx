@@ -10,6 +10,7 @@ interface PermissionToggleCardProps {
   isEnabled: boolean;
   onToggle: () => void;
   id: string;
+  disabled?: boolean;
 }
 
 const PermissionToggleCard = ({ 
@@ -17,7 +18,8 @@ const PermissionToggleCard = ({
   icon, 
   isEnabled, 
   onToggle, 
-  id 
+  id,
+  disabled = false
 }: PermissionToggleCardProps) => {
   return (
     <Card>
@@ -31,11 +33,12 @@ const PermissionToggleCard = ({
         <div className="flex items-center mb-2">
           <Switch 
             checked={isEnabled}
-            onCheckedChange={onToggle}
+            onCheckedChange={disabled ? () => {} : onToggle}
             id={id}
+            disabled={disabled}
           />
-          <label htmlFor={id} className="ml-2 text-sm font-medium">
-            {isEnabled ? "Enabled" : "Disabled"}
+          <label htmlFor={id} className={`ml-2 text-sm font-medium ${disabled ? 'text-muted-foreground' : isEnabled ? 'text-green-600' : 'text-muted-foreground'}`}>
+            {disabled ? "Admin Only" : isEnabled ? "Enabled" : "Disabled"}
           </label>
         </div>
       </CardContent>

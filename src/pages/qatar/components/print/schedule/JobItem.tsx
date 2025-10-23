@@ -19,7 +19,9 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
     advanceAmount, 
     status,
     invoiceNumber,
-    items = []
+    items = [],
+    packageDetails,
+    remarks
   } = job;
 
   const displayJobNumber = jobNumber || id || "N/A";
@@ -59,6 +61,16 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
           <div className="text-sm">
             <span>Phone: {mobileNumber || "No Contact"}</span>
           </div>
+          
+          {/* Package Details Section */}
+          {packageDetails && (
+            <div className="text-sm mt-1">
+              <span className="font-medium">Package: </span>
+              <span>{packageDetails}</span>
+            </div>
+          )}
+          
+          {/* Items Section */}
           {items && items.length > 0 && (
             <div className="text-sm mt-1">
               <span className="font-medium">Items: </span>
@@ -68,6 +80,14 @@ const JobItem: React.FC<JobItemProps> = ({ job }) => {
                   {index < items.length - 1 ? ", " : ""}
                 </span>
               ))}
+            </div>
+          )}
+          
+          {/* Remarks Section */}
+          {remarks && (
+            <div className="text-sm mt-1">
+              <span className="font-medium">Remarks: </span>
+              <span>{remarks}</span>
             </div>
           )}
         </div>

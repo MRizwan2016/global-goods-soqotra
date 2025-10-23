@@ -44,7 +44,8 @@ export const transformBLRecord = (blRecord: any): BillOfLadingData => {
     chassisNumber: blRecord.chassisNumber || vehicleDetails.chassis,
     containerNo: blRecord.containerNo || "N/A",
     sealNo: blRecord.sealNo || "N/A",
-    specialInstructions: blRecord.specialInstructions || ""
+    specialInstructions: blRecord.specialInstructions || "",
+    agentName: blRecord.agentName || "N/A"
   };
 };
 
@@ -91,6 +92,7 @@ export const transformInvoiceToHBL = (invoiceData: any, id: string): BillOfLadin
     chassisNumber: vehicleDetails.chassis,
     containerNo: invoiceData.containerNo || "N/A",
     sealNo: invoiceData.sealNo || "N/A",
-    specialInstructions: invoiceData.specialInstructions || ""
+    specialInstructions: invoiceData.specialInstructions || "",
+    agentName: invoiceData.agentName || "N/A"
   };
 };

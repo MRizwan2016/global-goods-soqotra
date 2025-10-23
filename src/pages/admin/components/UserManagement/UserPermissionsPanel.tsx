@@ -13,11 +13,16 @@ interface UserPermissionsPanelProps {
 }
 
 const UserPermissionsPanel = ({ user }: UserPermissionsPanelProps) => {
-  const { toggleUserPermission, toggleFilePermission } = useAuth();
+  const { toggleUserPermission, toggleFilePermission, isAdmin } = useAuth();
   const [saving, setSaving] = useState(false);
   
   // Save user permissions
   const handleSavePermissions = () => {
+    if (!isAdmin) {
+      toast.error("Only administrators can save user permissions");
+      return;
+    }
+    
     setSaving(true);
     
     // Simulate API call with a timeout
@@ -35,22 +40,24 @@ const UserPermissionsPanel = ({ user }: UserPermissionsPanelProps) => {
       
       <CategoryPermissions 
         user={user} 
-        toggleUserPermission={toggleUserPermission} 
+        toggleUserPermission={toggleUserPermission}
+        isAdminOnly={!isAdmin}
       />
       
       <FilePermissionSection 
         user={user} 
-        toggleFilePermission={toggleFilePermission} 
+        toggleFilePermission={toggleFilePermission}
+        isAdminOnly={!isAdmin}
       />
       
       <div className="flex justify-end mt-6">
         <Button 
           onClick={handleSavePermissions} 
-          disabled={saving}
-          className="bg-green-600 hover:bg-green-700"
+          disabled={saving || !isAdmin}
+          className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
         >
           <Save className="mr-2 h-4 w-4" />
-          {saving ? "Saving..." : "Save Permissions"}
+          {saving ? "Saving..." : isAdmin ? "Save Permissions" : "Admin Only"}
         </Button>
       </div>
     </div>

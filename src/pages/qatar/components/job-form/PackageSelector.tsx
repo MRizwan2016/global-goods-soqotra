@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 
 interface PackageSelectorProps {
-  onAddItem: (item: JobItem) => void;
+  onAddItem: (action: any) => void;
 }
 
 const packageOptions = [
@@ -43,32 +43,52 @@ const packageOptions = [
   "MICROWAVE OVEN",
   "OVEN",
   "4 BURNER",
-  "DUVET"
+  "DUVET",
+  // Additional packages from the highlighted section
+  "1 METER WOODEN BOX",
+  "1.5 METER WOODEN BOX", 
+  "2 METER WOODEN BOX",
+  "2.5 METER WOODEN BOX",
+  "3 METER WOODEN BOX",
+  "4 METER WOODEN BOX",
+  "1.314 METER WOODEN BOX"
 ];
 
 const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
   const [selectedItem, setSelectedItem] = useState("");
   const [sellPrice, setSellPrice] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
-  
+  const [pendingAddition, setPendingAddition] = useState(false);
+
   const handleAddItem = () => {
-    if (selectedItem) {
-      const newItem: JobItem = {
+    if (selectedItem && quantity > 0 && !pendingAddition) {
+      setPendingAddition(true);
+      
+      // Create a more detailed description with package information
+      const packageDescription = `${selectedItem} - Qty: ${quantity}, Price: QAR ${sellPrice}`;
+      
+      const itemAction = {
         id: uuidv4(),
+        type: 'add' as const,
         name: selectedItem,
         itemName: selectedItem,
-        sellPrice,
-        quantity
+        sellPrice: sellPrice || 0,
+        quantity: quantity || 1,
+        jobId: 'temp'
       };
       
-      onAddItem(newItem);
+      onAddItem(itemAction);
       
-      // Reset fields after adding
-      setSelectedItem("");
+      // Don't reset selectedItem so user can add the same package multiple times
+      // Reset price and quantity
       setSellPrice(0);
       setQuantity(1);
+      
+      // Reset pending state after a short delay
+      setTimeout(() => setPendingAddition(false), 300);
     }
   };
+
   
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
@@ -81,9 +101,13 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
           <SelectTrigger id="packageOption" className="bg-white">
             <SelectValue placeholder="SELECT PACKAGE" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="bg-white max-h-48 overflow-y-scroll z-[1000] shadow-lg border border-gray-200" position="popper" side="bottom" align="start" sideOffset={4}>
             {packageOptions.map((option, index) => (
-              <SelectItem key={index} value={option}>
+              <SelectItem 
+                key={index} 
+                value={option}
+                className="hover:bg-gray-100 focus:bg-gray-100 cursor-pointer py-2 px-3"
+              >
                 {option}
               </SelectItem>
             ))}
@@ -117,10 +141,10 @@ const PackageSelector = ({ onAddItem }: PackageSelectorProps) => {
       <div className="flex items-end">
         <Button 
           onClick={handleAddItem} 
-          disabled={!selectedItem || sellPrice <= 0}
-          className="bg-blue-600 hover:bg-blue-700 w-full"
+          disabled={!selectedItem || quantity <= 0 || pendingAddition}
+          className="bg-blue-600 hover:bg-blue-700 w-full disabled:bg-gray-300"
         >
-          INSERT
+          {pendingAddition ? "ADDING..." : "INSERT"}
         </Button>
       </div>
     </div>

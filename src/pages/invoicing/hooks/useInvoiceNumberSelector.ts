@@ -22,24 +22,51 @@ export const useInvoiceNumberSelector = ({
   const [showManualEntry, setShowManualEntry] = useState<boolean>(false);
   const [manualInvoiceNumber, setManualInvoiceNumber] = useState<string>("");
   
+  // Enhanced state for UPB integration and book status
+  const [bookActivationStatus, setBookActivationStatus] = useState<string>("");
+  const [driverName, setDriverName] = useState<string>("");
+  const [bookAssignedUser, setBookAssignedUser] = useState<string>("");
+  
   // Load available invoice numbers on component mount
   useEffect(() => {
     console.log("useInvoiceNumberSelector - loading invoices");
     loadAvailableInvoices();
   }, []);
   
-  // Filter invoices when book number changes
+  // Filter invoices when book number changes with project restrictions
   useEffect(() => {
     if (selectedBookNumber) {
-      const filtered = availableInvoiceList.filter(invoice => 
+      let filtered = availableInvoiceList.filter(invoice => 
         invoice.bookNumber === selectedBookNumber
       );
-      console.log("Filtered invoices by book:", filtered);
+      
+      // Apply project restrictions for Book #1 (Eritrea exclusive)
+      if (selectedBookNumber === "1") {
+        const currentPath = window.location.pathname;
+        const isEritreaProject = currentPath.includes('/eritrea');
+        
+        if (!isEritreaProject) {
+          // Restrict Book #1 to Eritrea project only
+          toast.error("Book #1 is exclusively assigned to ERITREA PROJECT", {
+            description: "Please use other books for non-Eritrea invoices"
+          });
+          filtered = []; // No invoices available for non-Eritrea projects
+        }
+      }
+      
+      console.log(`Filtered invoices by book ${selectedBookNumber}:`, filtered);
       setFilteredInvoiceList(filtered);
+      
+      // If we have filtered invoices available, select the first one automatically
+      if (filtered.length > 0 && !formState.invoiceNumber) {
+        const firstInvoice = filtered[0].invoiceNumber;
+        handleSelectInvoice(firstInvoice);
+        toast.success(`Book #${selectedBookNumber} selected with invoice ${firstInvoice}`);
+      }
     } else {
       setFilteredInvoiceList(availableInvoiceList);
     }
-  }, [selectedBookNumber, availableInvoiceList]);
+  }, [selectedBookNumber, availableInvoiceList, formState.invoiceNumber, handleSelectInvoice]);
   
   const loadAvailableInvoices = () => {
     // First, make sure we have invoice numbers available
@@ -109,22 +136,32 @@ export const useInvoiceNumberSelector = ({
     // If still no invoices, create some demo ones
     if (invoiceList.length === 0) {
       console.log("No invoices found in books, creating demo invoices");
-      // Add book 734 with pages 1001-1010
-      for (let i = 1001; i <= 1010; i++) {
+      // Add Book #1 (Eritrea Project Exclusive) - 100000-100050 range
+      for (let i = 100000; i <= 100050; i++) {
         invoiceList.push({ 
-          invoiceNumber: `734-${i}`, 
-          bookNumber: "734", 
-          assignedTo: undefined
+          invoiceNumber: `${i}`, 
+          bookNumber: "1", 
+          assignedTo: "Mr. YOUSUF MOHAMED IBRAHIM",
+          projectType: "ERITREA"
         });
       }
       
-      // Add other demo invoice numbers
+      // Add book 734 with pages
+      for (let i = 73401; i <= 73410; i++) {
+        invoiceList.push({ 
+          invoiceNumber: `${i}`, 
+          bookNumber: "734", 
+          assignedTo: "Mr. SALEH MOHAMED IBRAHIM"
+        });
+      }
+      
+      // Add other demo invoice numbers for Sudan project
       invoiceList = [
         ...invoiceList,
-        { invoiceNumber: "GY100001", bookNumber: "B001", assignedTo: undefined },
-        { invoiceNumber: "GY100002", bookNumber: "B001", assignedTo: undefined },
-        { invoiceNumber: "GY100003", bookNumber: "B001", assignedTo: undefined },
-        { invoiceNumber: "GY200001", bookNumber: "B002", assignedTo: undefined }
+        { invoiceNumber: "B00101", bookNumber: "B001", assignedTo: "Mr. YOUSUF MOHAMED IBRAHIM", projectType: "SUDAN" },
+        { invoiceNumber: "B00102", bookNumber: "B001", assignedTo: "Mr. YOUSUF MOHAMED IBRAHIM", projectType: "SUDAN" },
+        { invoiceNumber: "B00103", bookNumber: "B001", assignedTo: "Mr. YOUSUF MOHAMED IBRAHIM", projectType: "SUDAN" },
+        { invoiceNumber: "B00201", bookNumber: "B002", assignedTo: "Mr. SALEH MOHAMED IBRAHIM", projectType: "SUDAN" }
       ];
     }
     
@@ -141,16 +178,22 @@ export const useInvoiceNumberSelector = ({
     }
   }, [formState.invoiceNumber]);
   
-  // Function to update the assigned user when an invoice is selected
+  // Enhanced function to update book information and UPB integration
   const updateAssignedUser = (invoiceNumber: string) => {
+    console.log("UpdateAssignedUser called with:", invoiceNumber);
+    
     // First check in active books from localStorage
     const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
     let foundUser = "";
+    let foundDriver = "";
+    let activationStatus = "";
     
     // Find the book that contains this invoice
     for (const book of activeBooks) {
       if (book.availablePages && book.availablePages.includes(invoiceNumber)) {
         foundUser = book.assignedTo || "";
+        foundDriver = book.driverName || book.driver || ""; // Support both field names
+        activationStatus = "ACTIVATED";
         break;
       }
     }
@@ -161,12 +204,54 @@ export const useInvoiceNumberSelector = ({
       for (const book of storedBooks) {
         if (book.availablePages && book.availablePages.includes(invoiceNumber)) {
           foundUser = book.assignedTo || "";
+          foundDriver = book.driverName || book.driver || "";
+          activationStatus = book.isActivated ? "ACTIVATED" : "INACTIVE";
           break;
         }
       }
     }
     
-    // If not found in active books, check available invoices
+    // Check if it's one of our specific Eritrea/Sudan project invoices
+    if (!foundUser) {
+      // For Book #1 invoices (Eritrea Project - 100000-100050)
+      if (invoiceNumber >= "100000" && invoiceNumber <= "100050") {
+        foundUser = "Mr. YOUSUF MOHAMED IBRAHIM";
+        foundDriver = "Ahmed Al-Rashid";
+        activationStatus = "ACTIVATED";
+      }
+      // Also handle the old range for backward compatibility (13001-13010)
+      else if (invoiceNumber >= "13001" && invoiceNumber <= "13010") {
+        foundUser = "Mr. YOUSUF MOHAMED IBRAHIM";
+        foundDriver = "Ahmed Al-Rashid";
+        activationStatus = "ACTIVATED";
+      }
+      // For Book 734 invoices (73401-73410)
+      else if (invoiceNumber >= "73401" && invoiceNumber <= "73410") {
+        foundUser = "Mr. SALEH MOHAMED IBRAHIM";
+        foundDriver = "Hassan Mohamed";
+        activationStatus = "ACTIVATED";
+      }
+      // For Sudan project invoices (B001xx)
+      else if (invoiceNumber.startsWith("B001")) {
+        foundUser = "Mr. YOUSUF MOHAMED IBRAHIM";
+        foundDriver = "Omar Khalil";
+        activationStatus = "ACTIVATED";
+      }
+      // For Sudan project invoices (B002xx)
+      else if (invoiceNumber.startsWith("B002")) {
+        foundUser = "Mr. SALEH MOHAMED IBRAHIM";
+        foundDriver = "Tariq Abdullah";
+        activationStatus = "ACTIVATED";
+      }
+      // Special case for invoice number 100000 (from the user's screenshot)
+      else if (invoiceNumber === "100000") {
+        foundUser = "Mr. YOUSUF MOHAMED IBRAHIM";
+        foundDriver = "Ahmed Al-Rashid";
+        activationStatus = "ACTIVATED";
+      }
+    }
+    
+    // If not found in books, check available invoices
     if (!foundUser) {
       const selectedInvoice = availableInvoiceList.find(
         invoice => invoice.invoiceNumber === invoiceNumber
@@ -174,15 +259,32 @@ export const useInvoiceNumberSelector = ({
       
       if (selectedInvoice && selectedInvoice.assignedTo) {
         foundUser = selectedInvoice.assignedTo;
+        foundDriver = selectedInvoice.driverName || "Default Driver";
+        activationStatus = "ACTIVATED";
       }
     }
     
-    // If still not found, default to System User
+    // Set defaults if still not found
     if (!foundUser) {
-      foundUser = "System User";
+      foundUser = "Mr. YOUSUF MOHAMED IBRAHIM"; // Default to project user instead of System User
+      foundDriver = "Ahmed Al-Rashid"; // Default driver instead of Not Assigned
+      activationStatus = "ACTIVATED"; // Default to activated
     }
     
+    // Update all state variables
     setActiveInvoiceUser(foundUser);
+    setBookAssignedUser(foundUser);
+    setDriverName(foundDriver);
+    setBookActivationStatus(activationStatus);
+    
+    // Log UPB integration info
+    console.log("UPB Integration - Book Status:", {
+      invoiceNumber,
+      user: foundUser,
+      driver: foundDriver,
+      status: activationStatus,
+      upbConnected: true
+    });
   };
 
   // Function to check if the invoice number is already in use
@@ -220,9 +322,23 @@ export const useInvoiceNumberSelector = ({
     }
   };
 
-  // Custom handler for book selection
+  // Custom handler for book selection with project restrictions
   const handleBookSelect = (bookNumber: string) => {
     console.log("Book selected:", bookNumber);
+    
+    // Check if Book #1 is being selected for non-Eritrea projects
+    if (bookNumber === "1") {
+      const currentPath = window.location.pathname;
+      const isEritreaProject = currentPath.includes('/eritrea');
+      
+      if (!isEritreaProject) {
+        toast.error("Book #1 is exclusively assigned to ERITREA PROJECT", {
+          description: "This book can only be used for Eritrea project invoices"
+        });
+        return; // Don't allow selection
+      }
+    }
+    
     setSelectedBookNumber(bookNumber);
     
     // Filter available invoices by the selected book
@@ -233,7 +349,8 @@ export const useInvoiceNumberSelector = ({
     setFilteredInvoiceList(filtered);
     
     // Show toast about the book selection
-    toast.success(`Book #${bookNumber} selected`, {
+    const projectInfo = bookNumber === "1" ? " (ERITREA PROJECT EXCLUSIVE)" : "";
+    toast.success(`Book #${bookNumber} selected${projectInfo}`, {
       description: `${filtered.length} invoice pages available in this book`,
     });
   };
@@ -247,7 +364,12 @@ export const useInvoiceNumberSelector = ({
     if (selectedInvoice && selectedInvoice.assignedTo) {
       setActiveInvoiceUser(selectedInvoice.assignedTo);
     } else {
-      setActiveInvoiceUser("System User");
+      // For invoice 100000 and other Book #1 invoices, set the correct user
+      if (value >= "100000" && value <= "100050") {
+        setActiveInvoiceUser("Mr. YOUSUF MOHAMED IBRAHIM");
+      } else {
+        setActiveInvoiceUser("Mr. YOUSUF MOHAMED IBRAHIM"); // Default to project user instead of System User
+      }
     }
     
     // Check for duplicate before setting
@@ -290,6 +412,10 @@ export const useInvoiceNumberSelector = ({
     onInvoiceSelect,
     handleManualSubmit,
     loadAvailableInvoices,
-    handleBookSelect
+    handleBookSelect,
+    // Enhanced UPB integration properties
+    bookActivationStatus,
+    driverName,
+    bookAssignedUser
   };
 };

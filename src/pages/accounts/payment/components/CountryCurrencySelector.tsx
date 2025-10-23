@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FormState } from "../types";
 import { fadeInVariants } from "../utils/animationVariants";
+import { COUNTRY_CURRENCY_MAP } from "../constants/paymentConstants";
 
 interface CountryCurrencySelectorProps {
   formState: FormState;
@@ -36,6 +37,9 @@ const CountryCurrencySelector: React.FC<CountryCurrencySelectorProps> = ({
           onValueChange={(value) => {
             handleCountryChange(value); // Call handleCountryChange when country changes
             handleSelectChange("country", value);
+            // Automatically set the currency when country changes
+            const currencies = COUNTRY_CURRENCY_MAP[value] || ["QAR"];
+            handleSelectChange("currency", currencies[0]);
           }}
         >
           <SelectTrigger className="w-full">

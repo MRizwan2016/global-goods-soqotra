@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { QatarJob } from "../types/jobTypes";
 import { cityVehicleMapping } from "../data/cityVehicleMapping";
+import { VehicleJobStorageService } from "../services/VehicleJobStorageService";
 
 export const useJobGrouping = (selectedJobs: QatarJob[]) => {
   const [showVehicleView, setShowVehicleView] = useState(false);
@@ -34,6 +35,16 @@ export const useJobGrouping = (selectedJobs: QatarJob[]) => {
   // Check if form should be disabled
   const isFormDisabled = selectedJobs.length === 0 || 
                         (jobsForSchedule.length === 0);
+
+  // Handle job assignment to vehicle
+  const assignJobsToVehicle = (jobIds: string[], vehicleId: string) => {
+    jobIds.forEach(jobId => {
+      VehicleJobStorageService.assignJobToVehicle(jobId, vehicleId);
+    });
+    
+    // Update vehicle statistics
+    VehicleJobStorageService.updateVehicleStatistics();
+  };
   
   return {
     showVehicleView,
@@ -45,6 +56,7 @@ export const useJobGrouping = (selectedJobs: QatarJob[]) => {
     selectedCity,
     setSelectedCity,
     jobsForSchedule,
-    isFormDisabled
+    isFormDisabled,
+    assignJobsToVehicle
   };
 };

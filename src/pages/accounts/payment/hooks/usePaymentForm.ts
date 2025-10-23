@@ -67,45 +67,53 @@ export const usePaymentForm = (
     if (selectedInvoice && formState) {
       console.log("Selected invoice in usePaymentForm:", selectedInvoice);
       
-      // Get relevant fields from invoice
-      const grossAmount = selectedInvoice.gross || selectedInvoice.grossAmount || 0;
+      // Get relevant fields from invoice with more robust handling
+      const grossAmount = selectedInvoice.gross || selectedInvoice.grossAmount || selectedInvoice.amount || 0;
       const discount = selectedInvoice.discount || 0;
-      const netAmount = selectedInvoice.net || selectedInvoice.amount || selectedInvoice.netAmount || 0;
+      const netAmount = selectedInvoice.net || selectedInvoice.amount || selectedInvoice.netAmount || (grossAmount - discount) || 0;
       const totalPaid = selectedInvoice.totalPaid || 0;
       const balanceToPay = netAmount - totalPaid;
+      
+      console.log("Payment form amount calculations:", {
+        grossAmount,
+        discount,
+        netAmount,
+        totalPaid,
+        balanceToPay,
+        invoiceNumber: selectedInvoice.invoiceNumber
+      });
       
       // Set the invoice date to the payment date if available
       if (selectedInvoice.date) {
         try {
           const selectedDate = new Date(selectedInvoice.date);
           setDate(selectedDate);
-          // Only pass one argument to handleDateSelect
           handleDateSelect(selectedDate);
         } catch (error) {
           console.error("Error parsing invoice date:", error);
         }
       }
       
-      // Update form state with invoice data
+      // Update form state with invoice data - handle different property name variations
       setFormState(prev => ({
         ...prev,
         invoiceNumber: selectedInvoice.invoiceNumber || "",
-        customerName: selectedInvoice.consignee1 || selectedInvoice.consignee || "",
-        bookingForm: selectedInvoice.bookingForm || selectedInvoice.bookNumber || "",
+        customerName: selectedInvoice.consignee1 || selectedInvoice.consignee || selectedInvoice.customerName || "",
+        bookingForm: selectedInvoice.bookingForm || selectedInvoice.bookNumber || selectedInvoice.awbNumber || "",
         shipper: selectedInvoice.shipper1 || selectedInvoice.shipper || "",
         consignee: selectedInvoice.consignee1 || selectedInvoice.consignee || "",
-        warehouse: selectedInvoice.warehouse || "",
-        shipmentType: selectedInvoice.freightType || selectedInvoice.shipmentType || "",
+        warehouse: selectedInvoice.warehouse || selectedInvoice.destination || "",
+        shipmentType: selectedInvoice.freightType || selectedInvoice.shipmentType || selectedInvoice.serviceType || "",
         grossAmount: grossAmount,
         discount: discount,
         netAmount: netAmount,
         totalPaid: totalPaid,
         balanceToPay: balanceToPay,
-        amountPaid: balanceToPay,
+        amountPaid: balanceToPay > 0 ? balanceToPay : netAmount,
         currency: selectedInvoice.currency || prev.currency
       }));
     }
-  }, [selectedInvoice]);
+  }, [selectedInvoice, setFormState, handleDateSelect]);
   
   // Effect for calculating amounts when relevant values change
   useEffect(() => {

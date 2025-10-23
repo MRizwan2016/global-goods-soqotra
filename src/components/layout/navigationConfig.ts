@@ -6,8 +6,10 @@ export const navigationSections: NavigationSections = {
   upb: {
     title: "UPB",
     icon: Database,
-    color: "text-green-800",
-    iconColor: "text-green-700",
+    color: "text-white",
+    bgGradient: "from-green-300 to-emerald-400",
+    borderColor: "border-green-100",
+    iconColor: "text-white",
     submenu: [
       {
         title: "DATA ENTRY",
@@ -25,6 +27,8 @@ export const navigationSections: NavigationSections = {
         items: [
           { name: "FINANCIAL REPORTS", path: "/reports/financial" },
           { name: "CARGO REPORTS", path: "/reports/cargo" },
+          { name: "SALES REP REPORT", path: "/reports/sales-rep" },
+          { name: "STAFF PERFORMANCE", path: "/reports/staff-performance" },
         ],
       },
       {
@@ -43,8 +47,10 @@ export const navigationSections: NavigationSections = {
   accounts: {
     title: "ACCOUNTS",
     icon: DollarSign,
-    color: "text-purple-800",
-    iconColor: "text-purple-700",
+    color: "text-white",
+    bgGradient: "from-purple-300 to-violet-400",
+    borderColor: "border-purple-100",
+    iconColor: "text-white",
     submenu: [
       {
         title: "FUNCTIONS",
@@ -86,6 +92,10 @@ export const navigationSections: NavigationSections = {
           { name: "SAUDI ARABIA", path: "/accounts/reconciliation/country/sa" },
           { name: "UAE", path: "/accounts/reconciliation/country/ae" },
           { name: "OMAN", path: "/accounts/reconciliation/country/om" },
+          { name: "BURUNDI", path: "/accounts/reconciliation/country/bi" },
+          { name: "ALGERIA", path: "/accounts/reconciliation/country/dz" },
+          { name: "ALGERIA PAYMENTS", path: "/algeria/accounts" },
+          { name: "GHANA", path: "/accounts/reconciliation/country/gh" },
         ],
       },
     ],
@@ -93,8 +103,10 @@ export const navigationSections: NavigationSections = {
   admin: {
     title: "ADMIN",
     icon: Settings,
-    color: "text-rose-800",
-    iconColor: "text-rose-700",
+    color: "text-white",
+    bgGradient: "from-rose-300 to-pink-400",
+    borderColor: "border-rose-100",
+    iconColor: "text-white",
     submenu: [
       {
         title: "CONTROL PANEL",
@@ -108,8 +120,10 @@ export const navigationSections: NavigationSections = {
   cargo: {
     title: "CARGO COLLECTION & DELIVERY",
     icon: Truck,
-    color: "text-sky-800",
-    iconColor: "text-sky-700",
+    color: "text-white",
+    bgGradient: "from-sky-300 to-blue-400",
+    borderColor: "border-sky-100",
+    iconColor: "text-white",
     submenu: [
       {
         title: "KENYA",
@@ -117,6 +131,7 @@ export const navigationSections: NavigationSections = {
           { name: "DASHBOARD", path: "/kenya" },
           { name: "NEW DELIVERY", path: "/kenya/delivery/new" },
           { name: "DELIVERY TRACKING", path: "/kenya/deliveries" },
+          { name: "VIEW SCHEDULES", path: "/kenya/schedules" },
         ],
       },
       {
@@ -126,11 +141,57 @@ export const navigationSections: NavigationSections = {
           { name: "ADD NEW JOB", path: "/qatar/job/new" },
           { name: "JOB TRACKING", path: "/qatar/jobs" },
           { name: "JOB SCHEDULE", path: "/qatar/jobs/generate" },
+          { name: "VIEW SCHEDULES", path: "/schedules" },
           { name: "PRINT SCHEDULES", path: "/qatar/jobs/print" },
           { name: "VEHICLES", path: "/qatar/vehicles" },
           { name: "DRIVERS", path: "/qatar/drivers" },
           { name: "FIND CUSTOMER", path: "/qatar/find-customer" },
           { name: "CONTAINERS", path: "/qatar/containers" },
+        ],
+      },
+      {
+        title: "PHILIPPINES",
+        items: [
+          { name: "DASHBOARD", path: "/philippines" },
+          { name: "VIEW SCHEDULES", path: "/philippines/schedules" },
+        ],
+      },
+      {
+        title: "SRI LANKA",
+        items: [
+          { name: "DASHBOARD", path: "/sri-lanka" },
+          { name: "VIEW SCHEDULES", path: "/sri-lanka/schedules" },
+        ],
+      },
+      {
+        title: "SOMALIA",
+        items: [
+          { name: "DASHBOARD", path: "/somalia" },
+        ],
+      },
+      {
+        title: "TUNISIA",
+        items: [
+          { name: "DASHBOARD", path: "/tunisia" },
+        ],
+      },
+      {
+        title: "BURUNDI",
+        items: [
+          { name: "DASHBOARD", path: "/burundi" },
+        ],
+      },
+      {
+        title: "ALGERIA",
+        items: [
+          { name: "DASHBOARD", path: "/algeria" },
+          { name: "VEHICLE REGISTRY", path: "/algeria/vehicles" },
+        ],
+      },
+      {
+        title: "GHANA",
+        items: [
+          { name: "DASHBOARD", path: "/ghana" },
         ],
       },
       {

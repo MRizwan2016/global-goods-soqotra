@@ -42,18 +42,12 @@ const LocationSelector = ({
     .filter(name => name && name.trim() !== "" && !name.includes("STREET NO.") && !["DOH", "RAK", "WAK", "UMS", "KHO", "DAY", "SHA", "WSB"].includes(name))
     .sort();
 
-  // Get all industrial area street numbers
-  const industrialAreaStreets = Object.keys(cityVehicleMapping)
-    .filter(name => name && name.trim() !== "" && name.includes("STREET NO."))
-    .sort((a, b) => {
-      const numA = parseInt(a.replace("STREET NO. ", ""));
-      const numB = parseInt(b.replace("STREET NO. ", ""));
-      return numA - numB;
-    });
+  // Generate all industrial area street numbers (1-52)
+  const industrialAreaStreets = Array.from({ length: 52 }, (_, i) => `STREET NO. ${i + 1}`);
 
   useEffect(() => {
-    // Check if selected town is an industrial area
-    setIsIndustrialArea(town === "INDUSTRIAL AREA");
+    // Check if selected town is an industrial area (check both cases)
+    setIsIndustrialArea(town === "INDUSTRIAL AREA" || town === "Industrial Area");
   }, [town]);
 
   const handleAddNewTown = () => {
@@ -158,7 +152,7 @@ const LocationSelector = ({
             <SelectTrigger id="location" className="bg-blue-600 text-white">
               <SelectValue placeholder="SELECT STREET NUMBER" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-80 bg-white border border-gray-200 shadow-lg z-50">
               {industrialAreaStreets.length > 0 ? (
                 industrialAreaStreets.map((street) => (
                   <SelectItem key={street} value={street || `unknown-street-${Date.now()}`}>

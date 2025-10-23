@@ -11,6 +11,8 @@ const DestinationWrapper = () => {
     const countryRouteMap: Record<string, string> = {
       kenya: '/kenya',
       qatar: '/qatar',
+      sudan: '/sudan',
+      eritrea: '/eritrea',
       // Add future countries as they become available
     };
 

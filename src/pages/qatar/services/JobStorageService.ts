@@ -1,4 +1,3 @@
-
 /**
  * Service to handle job storage operations
  */
@@ -10,12 +9,41 @@ export class JobStorageService {
   private static STORAGE_KEY = 'jobs';
 
   /**
+   * Debug localStorage contents
+   */
+  static debugStorage() {
+    console.log("=== DEBUGGING LOCALSTORAGE ===");
+    const allKeys = Object.keys(localStorage);
+    console.log("All localStorage keys:", allKeys);
+    const jobsData = localStorage.getItem(this.STORAGE_KEY);
+    console.log("Raw jobs data from localStorage:", jobsData);
+    if (jobsData) {
+      try {
+        const parsed = JSON.parse(jobsData);
+        console.log("Parsed jobs data:", parsed);
+        console.log("Jobs count:", Array.isArray(parsed) ? parsed.length : "Not an array");
+      } catch (e) {
+        console.error("Error parsing jobs data:", e);
+      }
+    }
+    console.log("=== END DEBUG ===");
+  }
+
+  /**
    * Get all jobs from storage
    */
   static getAllJobs() {
     try {
       const jobs = localStorage.getItem(this.STORAGE_KEY);
-      return jobs ? JSON.parse(jobs) : [];
+      const parsedJobs = jobs ? JSON.parse(jobs) : [];
+      
+      // TEMPORARILY DISABLED - Auto-cleanup dummy data on first access
+      // if (parsedJobs.length > 0) {
+      //   this.cleanupDummyData();
+      //   return JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
+      // }
+      
+      return parsedJobs;
     } catch (error) {
       console.error('Error retrieving jobs:', error);
       return [];
@@ -48,7 +76,15 @@ export class JobStorageService {
         throw new Error('No job data provided');
       }
 
-      console.log("Starting to save job with data:", jobData);
+      console.log("🔍 STEP 1: Starting saveJob with data:", JSON.stringify(jobData, null, 2));
+      
+      // Check what mobile number format we have
+      if (jobData.mobileNumber) {
+        console.log("🔍 Mobile number format:", jobData.mobileNumber);
+        if (jobData.mobileNumber.includes('555-')) {
+          console.warn("⚠️ Job has 555- mobile number, will be filtered as dummy!");
+        }
+      }
       
       const jobs = this.getAllJobs();
       
@@ -112,12 +148,53 @@ export class JobStorageService {
       }
       
       console.log("Saving jobs to localStorage, count:", jobs.length);
+      console.log("Jobs array before save:", jobs.map(j => ({ id: j.id, jobNumber: j.jobNumber, customer: j.customer })));
+      
       // Save to localStorage
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(jobs));
+      
+      // Dispatch custom event to notify other parts of the app
+      window.dispatchEvent(new CustomEvent('jobsUpdated'));
+      
+      // Verify the save by reading back from localStorage
+      const savedJobs = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '[]');
+      console.log("Verification: Jobs count after save:", savedJobs.length);
+      console.log("Verification: Saved job exists:", savedJobs.some((j: any) => j.id === jobToSave.id));
       
       // Update invoices with the job number if there's an invoice number
       if (jobToSave.invoiceNumber) {
         this.updateInvoiceWithJobNumber(jobToSave.invoiceNumber, jobToSave.jobNumber);
+      }
+      
+      console.log("✅ STEP 6: Job saved successfully with ID:", jobToSave.id);
+      console.log("✅ SAVED JOB DETAILS:", {
+        id: jobToSave.id,
+        jobNumber: jobToSave.jobNumber,
+        customer: jobToSave.customer,
+        mobileNumber: jobToSave.mobileNumber,
+        status: jobToSave.status
+      });
+      
+      // Check if this job will be filtered as dummy
+      const willBeFiltered = jobToSave.jobNumber.includes('TEST') ||
+                            jobToSave.jobNumber.includes('DUMMY') ||
+                            jobToSave.customer.includes('TEST') ||
+                            jobToSave.customer.includes('DUMMY') ||
+                            jobToSave.customer.includes('Mock') ||
+                            jobToSave.mobileNumber.includes('555-');
+      
+      if (willBeFiltered) {
+        console.warn("⚠️ WARNING: This job will be filtered out as dummy data!");
+        console.warn("⚠️ Filter reasons:", {
+          hasTestJobNumber: jobToSave.jobNumber.includes('TEST'),
+          hasDummyJobNumber: jobToSave.jobNumber.includes('DUMMY'),
+          hasTestCustomer: jobToSave.customer.includes('TEST'),
+          hasDummyCustomer: jobToSave.customer.includes('DUMMY'),
+          hasMockCustomer: jobToSave.customer.includes('Mock'),
+          has555Mobile: jobToSave.mobileNumber.includes('555-')
+        });
+      } else {
+        console.log("✅ Job passed real job filter - will appear in dashboard");
       }
       
       return jobToSave;
@@ -238,108 +315,30 @@ export class JobStorageService {
   }
 
   /**
-   * Clear all jobs and initialize with today's jobs
+   * Clear all jobs and sample data
    */
-  static resetAndInitializeJobs() {
+  static clearAllJobs() {
     try {
-      // Format today's date
-      const today = format(new Date(), 'yyyy-MM-dd');
-      
-      // Create four jobs with the specified job numbers
-      const newJobs = [
-        {
-          id: 'job-1',
-          jobNumber: 'QJB-778321-6039',
-          customer: 'QATAR NATIONAL BANK',
-          date: today,
-          time: '10:00',
-          amPm: 'AM' as 'AM', // TypeScript cast to ensure it's the correct type
-          location: 'QNB TOWER',
-          city: 'DOHA',
-          town: 'WEST BAY',
-          sector: 'BANKING',
-          branch: 'DOHA MAIN BRANCH',
-          mobileNumber: '555-1234',
-          jobType: 'DELIVERY',
-          status: 'COMPLETED',
-          isAssigned: true,
-          vehicle: 'CAR',
-          completionDate: today,
-          completionNotes: 'Delivered all items successfully',
-          invoiceNumber: 'INV-2025-001'
-        },
-        {
-          id: 'job-2',
-          jobNumber: '933642-6093',
-          customer: 'DOHA MUNICIPALITY',
-          date: today,
-          time: '11:30',
-          amPm: 'AM' as 'AM', // TypeScript cast
-          location: 'MUNICIPALITY OFFICE',
-          city: 'DOHA',
-          town: 'CENTRAL DOHA',
-          sector: 'GOVERNMENT',
-          branch: 'MAIN BRANCH',
-          mobileNumber: '555-2345',
-          jobType: 'COLLECTION',
-          status: 'COMPLETED',
-          isAssigned: true,
-          vehicle: 'VAN',
-          completionDate: today,
-          completionNotes: 'Collected all items as scheduled',
-          invoiceNumber: 'INV-2025-002'
-        },
-        {
-          id: 'job-3',
-          jobNumber: '044344-5405',
-          customer: 'HAMAD INTERNATIONAL AIRPORT',
-          date: today,
-          time: '14:00',
-          amPm: 'PM' as 'PM', // TypeScript cast
-          location: 'HIA CARGO TERMINAL',
-          city: 'DOHA',
-          town: 'AIRPORT AREA',
-          sector: 'AVIATION',
-          branch: 'CARGO DIVISION',
-          mobileNumber: '555-3456',
-          jobType: 'DELIVERY',
-          status: 'COMPLETED',
-          isAssigned: true,
-          vehicle: 'TRUCK',
-          completionDate: today,
-          completionNotes: 'Delivery completed on time',
-          invoiceNumber: 'INV-2025-003'
-        },
-        {
-          id: 'job-4',
-          jobNumber: '192033-5923',
-          customer: 'SIDRA MEDICAL CENTER',
-          date: today,
-          time: '16:30',
-          amPm: 'PM' as 'PM', // TypeScript cast
-          location: 'SIDRA HOSPITAL',
-          city: 'DOHA',
-          town: 'EDUCATION CITY',
-          sector: 'HEALTHCARE',
-          branch: 'MAIN FACILITY',
-          mobileNumber: '555-4567',
-          jobType: 'COLLECTION',
-          status: 'COMPLETED',
-          isAssigned: true,
-          vehicle: 'CAR',
-          completionDate: today,
-          completionNotes: 'Items collected and properly documented',
-          invoiceNumber: 'INV-2025-004'
-        }
-      ];
-
-      // Save the new jobs to localStorage
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(newJobs));
-      
-      return newJobs;
+      // Clear all jobs - start with empty array
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify([]));
+      console.log("All jobs cleared from localStorage");
+      return [];
     } catch (error) {
-      console.error('Error resetting jobs:', error);
-      throw new Error('Failed to reset and initialize jobs');
+      console.error('Error clearing jobs:', error);
+      throw new Error('Failed to clear jobs');
+    }
+  }
+
+  /**
+   * Clean up dummy data automatically
+   */
+  private static cleanupDummyData() {
+    try {
+      // Always return empty array to prevent dummy data loading
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify([]));
+      console.log('Dummy data cleanup completed - storage cleared');
+    } catch (error) {
+      console.error('Error cleaning up dummy data:', error);
     }
   }
 

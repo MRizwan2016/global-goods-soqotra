@@ -15,9 +15,13 @@ export const useCurrencyCountry = () => {
   const countryOptions = Object.keys(COUNTRY_CURRENCY_MAP);
   
   useEffect(() => {
-    // Get currencies for the selected country
+    // Get currencies for the selected country and automatically set the first one
     if (selectedCountry) {
-      setFilteredCurrencies(COUNTRY_CURRENCY_MAP[selectedCountry] || ["QAR"]);
+      const currencies = COUNTRY_CURRENCY_MAP[selectedCountry] || ["QAR"];
+      setFilteredCurrencies(currencies);
+      // Automatically set the currency symbol for the first (and usually only) currency
+      const firstCurrency = currencies[0];
+      setCurrencySymbol(CURRENCY_SYMBOLS[firstCurrency] || firstCurrency);
     }
   }, [selectedCountry]);
   

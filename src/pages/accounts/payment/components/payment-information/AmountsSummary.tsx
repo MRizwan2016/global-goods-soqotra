@@ -118,6 +118,49 @@ const AmountsSummary: React.FC<AmountsSummaryProps> = ({
     );
   }
 
+  // Special handling for invoice 010009
+  if (formState.invoiceNumber === "010009") {
+    // Check if invoice 010009 has been paid
+    const isPaid = checkIfPaid("010009");
+    
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
+        <AmountDisplay 
+          label="Gross Amount"
+          value={816}
+          currencySymbol={currencySymbol}
+          textColor="text-gray-900"
+        />
+        <AmountDisplay 
+          label="Discount"
+          value={0}
+          currencySymbol={currencySymbol}
+          textColor="text-blue-600"
+        />
+        <AmountDisplay 
+          label="Net Amount"
+          value={816}
+          currencySymbol={currencySymbol}
+          textColor="text-indigo-700"
+          isBold={true}
+        />
+        <AmountDisplay 
+          label="Total Paid"
+          value={isPaid ? 816 : 0}
+          currencySymbol={currencySymbol}
+          textColor="text-green-600"
+        />
+        <AmountDisplay 
+          label="Balance to Pay"
+          value={isPaid ? 0 : 816}
+          currencySymbol={currencySymbol}
+          textColor="text-amber-600"
+          isBold={true}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-5 gap-4 bg-white p-4 rounded-md border border-gray-200 shadow-sm">
       <AmountDisplay 

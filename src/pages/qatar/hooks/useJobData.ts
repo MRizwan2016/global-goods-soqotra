@@ -9,21 +9,28 @@ export const useJobData = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Reset and initialize jobs with today's data
-    const initializeJobs = () => {
+    // Load jobs from storage or use mock data as fallback
+    const loadJobs = () => {
       try {
-        // First clear all existing jobs and initialize with today's jobs
-        const initializedJobs = JobStorageService.resetAndInitializeJobs();
-        setJobs(initializedJobs as QatarJob[]); // Using type assertion to fix the type error
-        console.log('Jobs initialized with today\'s data', initializedJobs.length);
+        const storedJobs = JobStorageService.getAllJobs();
+        if (storedJobs.length === 0) {
+          // Use mock data as initial data if no jobs exist
+          setJobs(mockJobs);
+          console.log('Loaded mock jobs for initial data');
+        } else {
+          setJobs(storedJobs as QatarJob[]);
+          console.log('Loaded jobs from storage', storedJobs.length);
+        }
       } catch (error) {
-        console.error('Error initializing jobs:', error);
+        console.error('Error loading jobs:', error);
+        // Fallback to mock data
+        setJobs(mockJobs);
       } finally {
         setIsLoading(false);
       }
     };
 
-    initializeJobs();
+    loadJobs();
   }, []);
 
   const refreshJobs = () => {

@@ -4,9 +4,13 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PackageInfo } from "../details/packages/types";
 
+interface SelectedPackageWithId extends PackageInfo {
+  selectionId: string;
+}
+
 interface SelectedPackagesListProps {
-  selectedPackages: PackageInfo[];
-  onRemovePackage: (pkg: PackageInfo) => void;
+  selectedPackages: SelectedPackageWithId[];
+  onRemovePackage: (pkg: SelectedPackageWithId) => void;
 }
 
 const SelectedPackagesList = ({ selectedPackages, onRemovePackage }: SelectedPackagesListProps) => {
@@ -14,13 +18,13 @@ const SelectedPackagesList = ({ selectedPackages, onRemovePackage }: SelectedPac
   
   return (
     <div className="space-y-2">
-      {selectedPackages.map((pkg) => (
+      {selectedPackages.map((pkg, index) => (
         <div 
-          key={`${pkg.sr_no}-${pkg.description}`} 
+          key={pkg.selectionId} 
           className="flex items-center justify-between p-3 bg-blue-50 rounded-md border border-blue-100"
         >
           <div className="text-sm text-blue-700">
-            <p><strong>Box {pkg.boxNumber || pkg.sr_no}: {pkg.description}</strong></p>
+            <p><strong>Box {index + 1}: {pkg.description}</strong></p>
             <p>Dimensions: {pkg.dimensions} - Volume: {pkg.volume_in_meters} m³</p>
             <p>Price: {pkg.price} - Total: {pkg.total}</p>
           </div>

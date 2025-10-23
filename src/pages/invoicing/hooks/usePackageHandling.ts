@@ -95,6 +95,18 @@ export const usePackageHandling = ({
       price = selectedPackage.pricing.sudan.portSudan.price.toString();
       documentsFee = selectedPackage.pricing.sudan.portSudan.documentsFee.toString();
     }
+    else if (country === "Burundi") {
+      price = selectedPackage.pricing.burundi.bujumbura.price.toString();
+      documentsFee = selectedPackage.pricing.burundi.bujumbura.documentsFee.toString();
+    }
+    else if (country === "Algeria") {
+      price = selectedPackage.pricing.algeria.algiers.price.toString();
+      documentsFee = selectedPackage.pricing.algeria.algiers.documentsFee.toString();
+    }
+    else if (country === "Ghana") {
+      price = selectedPackage.pricing.ghana.accra.price.toString();
+      documentsFee = selectedPackage.pricing.ghana.accra.documentsFee.toString();
+    }
     // If no country-specific pricing or fallbacks match, use legacy pricing
     else {
       price = selectedPackage.price.toString();

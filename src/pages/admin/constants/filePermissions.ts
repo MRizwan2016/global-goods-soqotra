@@ -1,52 +1,68 @@
+
 export const filePermissions = {
   masterData: {
-    label: "Master Data",
-    icon: "Database",
+    title: "Master Data Files",
     files: {
-      salesRep: { label: "Sales Rep", path: "/master/sales-rep" },
-      town: { label: "Town", path: "/master/town" },
-      item: { label: "Item", path: "/master/item" },
+      salesRep: { label: "Sales Representative", path: "/master/sales-rep" },
+      town: { label: "Town Management", path: "/master/town" },
+      item: { label: "Item Management", path: "/master/item" },
       packageOptions: { label: "Package Options", path: "/master/package-options" },
-      sellingRates: { label: "Selling Rates", path: "/selling-rates" },
-      container: { label: "Container", path: "/qatar/containers" },
-      vessel: { label: "Vessel", path: "/qatar/vessels" },
+      sellingRates: { label: "Selling Rates", path: "/master/selling-rates" },
+      container: { label: "Container Management", path: "/master/container" },
+      vessel: { label: "Vessel Management", path: "/master/vessel" },
       invoiceBook: { label: "Invoice Book", path: "/master/invoice-book" },
-      driverHelper: { label: "Driver/Helper", path: "/master/driver-helper" },
+      driverHelper: { label: "Driver/Helper Management", path: "/master/driver-helper" }
     }
   },
   dataEntry: {
-    label: "Data Entry",
-    icon: "FileInput",
+    title: "Data Entry Files",
     files: {
       invoicing: { label: "Invoicing", path: "/data-entry/invoicing" },
-      paymentReceivable: { label: "Payment Receivable", path: "/data-entry/payment" },
-      loadContainer: { label: "Load Container", path: "/data-entry/container" },
-      loadVessel: { label: "Load Vessel", path: "/qatar/vessels" },
-      loadAirCargo: { label: "Load Air Cargo", path: "/data-entry/air-cargo" },
-      packingList: { label: "Packing List", path: "/data-entry/packing-list" },
-      sellingRates: { label: "Selling Rates", path: "/data-entry/selling-rates" }
+      paymentReceivable: { label: "Payment Receivable", path: "/data-entry/payment-receivable" },
+      loadContainer: { label: "Load Container", path: "/data-entry/load-container" },
+      loadVessel: { label: "Load Vessel", path: "/data-entry/load-vessel" },
+      loadAirCargo: { label: "Load Air Cargo", path: "/data-entry/load-air-cargo" },
+      packingList: { label: "Packing List", path: "/data-entry/packing-list" }
     }
   },
   reports: {
-    label: "Reports",
-    icon: "BarChart4",
+    title: "Reports Files",
     files: {
       cargoReports: { label: "Cargo Reports", path: "/reports/cargo" },
       financialReports: { label: "Financial Reports", path: "/reports/financial" },
-      shippingReports: { label: "Shipping Reports", path: "/reports/shipping" },
+      shippingReports: { label: "Shipping Reports", path: "/reports/shipping" }
     }
   },
   accounting: {
-    label: "Accounts",
-    icon: "DollarSign",
+    title: "Accounting Files",
     files: {
-      paymentMethods: { label: "Payment Methods", path: "/accounts/payment-methods" },
-      reconciliation: { label: "Reconciliation", path: "/accounts/reconciliation" },
-      profitLoss: { label: "Profit & Loss", path: "/accounts/profit-loss" },
-      financialReports: { label: "Financial Reports", path: "/accounts/financial-reports" },
-      payments: { label: "Payments", path: "/accounts/payments" },
-      addPayment: { label: "Add Payment", path: "/accounts/payment/add" },
-      paidInvoices: { label: "Paid Invoices", path: "/accounts/payments/paid" }
+      paymentMethods: { label: "Payment Methods", path: "/accounting/payment-methods" },
+      reconciliation: { label: "Reconciliation", path: "/accounting/reconciliation" },
+      profitLoss: { label: "Profit & Loss", path: "/accounts/profit-loss" }
+    }
+  },
+  accountFunctions: {
+    title: "Account Functions",
+    files: {
+      accountFunctionFiles: { label: "Function Management", path: "/accounts/functions" }
+    }
+  },
+  accountRegistrations: {
+    title: "Account Registrations", 
+    files: {
+      accountRegistrationFiles: { label: "Registration Management", path: "/accounts/registrations" }
+    }
+  },
+  accountFinancialEntities: {
+    title: "Account Financial Entities",
+    files: {
+      accountFinancialFiles: { label: "Financial Entity Management", path: "/accounts/financial-entities" }
+    }
+  },
+  accountCountryReconciliations: {
+    title: "Account Country Reconciliations",
+    files: {
+      accountCountryFiles: { label: "Country Reconciliation Reports", path: "/accounts/country-reconciliations" }
     }
   }
 };

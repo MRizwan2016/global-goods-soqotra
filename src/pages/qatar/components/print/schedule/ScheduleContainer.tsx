@@ -38,9 +38,16 @@ const ScheduleContainer: React.FC<ScheduleContainerProps> = ({
     if (printRef.current) {
       printRef.current.style.display = "block";
       printRef.current.style.visibility = "visible";
+      
+      // Ensure QR code and all content is visible
+      const qrElements = printRef.current.querySelectorAll('svg, canvas, .qrcode');
+      qrElements.forEach(element => {
+        (element as HTMLElement).style.display = 'block';
+        (element as HTMLElement).style.visibility = 'visible';
+      });
     }
     
-    // Add a slight delay to ensure styles are applied
+    // Add a longer delay to ensure QR codes and all content are rendered
     setTimeout(() => {
       // Always allow printing even if data validation fails
       try {
@@ -50,7 +57,7 @@ const ScheduleContainer: React.FC<ScheduleContainerProps> = ({
         console.warn("Print proceeded with validation warnings:", error);
         window.print();
       }
-    }, 300);
+    }, 500);
   };
   
   return (

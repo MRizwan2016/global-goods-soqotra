@@ -4,11 +4,15 @@ import React from "react";
 interface JobCountSummaryProps {
   deliveryCount: number;
   collectionCount: number;
+  totalDeliveryPackages?: number;
+  totalCollectionPackages?: number;
 }
 
 const JobCountSummary: React.FC<JobCountSummaryProps> = ({ 
   deliveryCount, 
-  collectionCount 
+  collectionCount,
+  totalDeliveryPackages = 0,
+  totalCollectionPackages = 0
 }) => {
   return (
     <div className="border p-3 rounded-md mb-2">
@@ -17,15 +21,15 @@ const JobCountSummary: React.FC<JobCountSummaryProps> = ({
         <tbody>
           <tr>
             <td className="py-1">Number of Deliveries</td>
-            <td className="text-right py-1">{deliveryCount}</td>
+            <td className="text-right py-1">{deliveryCount} ({totalDeliveryPackages} pkgs)</td>
           </tr>
           <tr>
             <td className="py-1">Number of Collections</td>
-            <td className="text-right py-1">{collectionCount}</td>
+            <td className="text-right py-1">{collectionCount} ({totalCollectionPackages} pkgs)</td>
           </tr>
           <tr>
             <td className="py-1 font-semibold">Total Jobs</td>
-            <td className="text-right py-1 font-semibold">{deliveryCount + collectionCount}</td>
+            <td className="text-right py-1 font-semibold">{deliveryCount + collectionCount} ({totalDeliveryPackages + totalCollectionPackages} pkgs)</td>
           </tr>
         </tbody>
       </table>

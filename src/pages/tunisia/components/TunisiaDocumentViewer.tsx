@@ -1,0 +1,340 @@
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Download, Eye, FileText } from "lucide-react";
+import TunisiaPrintStyles from "./TunisiaPrintStyles";
+
+interface TunisiaDocumentViewerProps {
+  documents: string[];
+  onBack: () => void;
+  title: string;
+}
+
+const TunisiaDocumentViewer: React.FC<TunisiaDocumentViewerProps> = ({
+  documents,
+  onBack,
+  title
+}) => {
+  // Debug log to see what documents we're receiving
+  console.log('TunisiaDocumentViewer received documents:', documents);
+  console.log('Title:', title);
+  const handlePrint = (docUrl: string) => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Document - ${title}</title>
+            <style>
+              @media print {
+                @page {
+                  size: A4;
+                  margin: 15mm;
+                }
+                body {
+                  margin: 0;
+                  padding: 0;
+                  background: white;
+                }
+                img {
+                  max-width: 100%;
+                  height: auto;
+                  display: block;
+                  margin: 0 auto;
+                }
+                .document-container {
+                  width: 100%;
+                  height: 100vh;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                }
+              }
+              body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                background: #f5f5f5;
+              }
+              .document-container {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                text-align: center;
+              }
+              img {
+                max-width: 100%;
+                height: auto;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+              }
+              iframe {
+                width: 100%;
+                height: 600px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+              }
+            </style>
+          </head>
+          <body>
+            <div class="document-container">
+              ${docUrl.toLowerCase().includes('.pdf') 
+                ? `<iframe src="${docUrl}" type="application/pdf"></iframe>`
+                : `<img src="${docUrl}" alt="Document" />`
+              }
+            </div>
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const handleDownload = (docUrl: string, index: number) => {
+    const link = document.createElement('a');
+    link.href = docUrl;
+    link.download = `${title}_document_${index + 1}.${docUrl.split('.').pop() || 'file'}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Helper function to determine if the data is base64 encoded
+  const isBase64Data = (str: string) => {
+    return str.startsWith('data:') || str.match(/^[A-Za-z0-9+/]*={0,2}$/);
+  };
+
+  // Helper function to create a proper data URL for base64 content
+  const processDocumentUrl = (docUrl: string) => {
+    console.log('Processing document URL:', docUrl.substring(0, 100) + '...');
+    
+    if (docUrl.startsWith('data:')) {
+      console.log('Already a data URL');
+      return docUrl; // Already a proper data URL
+    }
+    
+    // If it looks like base64 data, try to create a proper data URL
+    if (isBase64Data(docUrl)) {
+      console.log('Detected base64 data, processing...');
+      // Clean the base64 string - remove any whitespace or newlines
+      const cleanBase64 = docUrl.replace(/\s/g, '');
+      
+      // Check if it's a PDF by looking at the first few bytes when decoded
+      try {
+        const binaryString = atob(cleanBase64.substring(0, 100));
+        const isPdf = binaryString.includes('%PDF') || docUrl.includes('PDF') || docUrl.includes('%PDF');
+        
+        // Try to detect the file type from the binary data
+        let mimeType = 'application/pdf'; // Default to PDF
+        
+        if (binaryString.startsWith('\xFF\xD8\xFF')) {
+          mimeType = 'image/jpeg';
+        } else if (binaryString.startsWith('\x89PNG')) {
+          mimeType = 'image/png';
+        } else if (binaryString.startsWith('GIF87a') || binaryString.startsWith('GIF89a')) {
+          mimeType = 'image/gif';
+        } else if (binaryString.includes('%PDF')) {
+          mimeType = 'application/pdf';
+        }
+        
+        const result = `data:${mimeType};base64,${cleanBase64}`;
+        console.log('Created data URL with MIME type:', mimeType);
+        return result;
+      } catch (e) {
+        console.error('Failed to decode base64, assuming PDF:', e);
+        return `data:application/pdf;base64,${cleanBase64}`;
+      }
+    }
+    
+    console.log('Regular URL, returning as-is');
+    return docUrl; // Regular URL
+  };
+
+  // Helper function to check if document is PDF
+  const isPdfDocument = (docUrl: string) => {
+    const processedUrl = processDocumentUrl(docUrl);
+    return processedUrl.includes('application/pdf') || 
+           processedUrl.toLowerCase().includes('.pdf') ||
+           processedUrl.includes('PDF') ||
+           processedUrl.includes('%PDF');
+  };
+
+  return (
+    <>
+      <TunisiaPrintStyles />
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="flex items-center gap-4 mb-6">
+          <Button 
+            variant="outline" 
+            onClick={onBack}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <h1 className="text-2xl font-bold">{title} - Supporting Documents</h1>
+        </div>
+
+        {!documents || documents.length === 0 ? (
+          <Card>
+            <CardContent className="py-8 text-center">
+              <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No supporting documents uploaded.</p>
+              <p className="text-xs text-gray-500 mt-2">
+                Debug info: documents = {JSON.stringify(documents)}
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="grid gap-6">
+            {documents.map((docUrl, index) => {
+              console.log(`Processing document ${index + 1}:`, docUrl);
+              const processedUrl = processDocumentUrl(docUrl);
+              const isDisplayable = processedUrl.startsWith('data:') || processedUrl.startsWith('http') || processedUrl.startsWith('blob:');
+              
+              console.log(`Document ${index + 1} processed URL:`, processedUrl.substring(0, 100) + '...');
+              console.log(`Document ${index + 1} is displayable:`, isDisplayable);
+              
+              return (
+                <Card key={index} className="overflow-hidden">
+                  <CardHeader>
+                    <CardTitle className="flex items-center justify-between">
+                      <span>Document {index + 1}</span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            if (isDisplayable) {
+                              window.open(processedUrl, '_blank');
+                            } else {
+                              alert('Document preview not available');
+                            }
+                          }}
+                          className="flex items-center gap-2"
+                        >
+                          <Eye className="h-4 w-4" />
+                          View
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDownload(processedUrl, index)}
+                          className="flex items-center gap-2"
+                        >
+                          <Download className="h-4 w-4" />
+                          Download
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePrint(processedUrl)}
+                          className="flex items-center gap-2 print:hidden"
+                        >
+                          <FileText className="h-4 w-4" />
+                          Print
+                        </Button>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="document-preview bg-gray-50 p-4 rounded-lg">
+                      {isDisplayable ? (
+                         isPdfDocument(docUrl) ? (
+                           <div className="text-center">
+                             <div className="relative">
+                               <iframe 
+                                 src={processedUrl}
+                                 className="w-full h-96 border rounded bg-white"
+                                 title={`PDF Document ${index + 1}`}
+                                 style={{ minHeight: '400px' }}
+                                 onLoad={(e) => {
+                                   console.log('PDF loaded successfully', processedUrl);
+                                   const iframe = e.target as HTMLIFrameElement;
+                                   const fallback = document.getElementById(`fallback-${index}`);
+                                   if (fallback) fallback.style.display = 'none';
+                                 }}
+                                 onError={(e) => {
+                                   console.error('PDF failed to load', processedUrl);
+                                   const fallback = document.getElementById(`fallback-${index}`);
+                                   if (fallback) {
+                                     fallback.style.display = 'flex';
+                                     fallback.classList.remove('hidden');
+                                   }
+                                 }}
+                               />
+                               {/* Fallback for when PDF fails to load */}
+                               <div className="absolute inset-0 bg-gray-100 flex items-center justify-center rounded" id={`fallback-${index}`} style={{ display: 'none' }}>
+                                 <div className="text-center">
+                                   <FileText className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+                                   <p className="text-sm text-gray-600">PDF preview unavailable</p>
+                                   <p className="text-xs text-gray-500">Use View or Download buttons</p>
+                                   <Button 
+                                     size="sm" 
+                                     className="mt-2"
+                                     onClick={() => window.open(processedUrl, '_blank')}
+                                   >
+                                     Open in New Tab
+                                   </Button>
+                                 </div>
+                               </div>
+                             </div>
+                             <p className="text-sm text-muted-foreground mt-2">PDF Document</p>
+                           </div>
+                         ) : (
+                           <div className="text-center">
+                             <img 
+                               src={processedUrl}
+                               alt={`Document ${index + 1}`}
+                               className="max-w-full h-auto max-h-96 mx-auto rounded border bg-white shadow-sm"
+                               style={{ maxHeight: '400px' }}
+                               onLoad={() => console.log('Image loaded successfully', processedUrl)}
+                               onError={(e) => {
+                                 console.error('Image failed to load', processedUrl);
+                                 const target = e.target as HTMLImageElement;
+                                 target.style.display = 'none';
+                                 const parent = target.parentElement;
+                                 if (parent) {
+                                   parent.innerHTML = `
+                                     <div class="p-8">
+                                       <div class="h-16 w-16 mx-auto text-gray-400 mb-4 flex items-center justify-center">
+                                         <svg class="h-16 w-16" fill="currentColor" viewBox="0 0 20 20">
+                                           <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd"></path>
+                                         </svg>
+                                       </div>
+                                       <p class="text-sm text-gray-600 mb-2">Unable to display image</p>
+                                       <p class="text-xs text-gray-500">Image format not supported</p>
+                                     </div>
+                                   `;
+                                 }
+                               }}
+                             />
+                             <p className="text-sm text-muted-foreground mt-2">Image Document</p>
+                           </div>
+                         )
+                      ) : (
+                        <div className="text-center p-8">
+                          <div className="h-16 w-16 mx-auto text-gray-400 mb-4 flex items-center justify-content">
+                            <svg className="h-16 w-16" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd"></path>
+                            </svg>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">Unable to preview document</p>
+                          <p className="text-xs text-gray-500">Document format not supported for preview</p>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </>
+  );
+};
+
+export default TunisiaDocumentViewer;

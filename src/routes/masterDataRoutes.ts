@@ -1,7 +1,7 @@
 
 import { RouteConfig } from "./types";
 import InvoiceBookForm from "@/pages/master/InvoiceBookForm";
-import InvoiceBookStock from "@/pages/master/InvoiceBookStock";
+import BookingFormStock from "@/pages/invoice-method/BookingFormStock";
 import PackageOptionForm from "@/pages/master/PackageOptionForm";
 import PackageOptionsList from "@/pages/master/PackageOptionsList";
 import PackageOptionsImport from "@/pages/master/PackageOptionsImport";
@@ -23,7 +23,7 @@ export const masterDataRoutes: RouteConfig[] = [
   },
   {
     path: "/master/book/stock",
-    element: InvoiceBookStock,
+    element: BookingFormStock,
     private: true
   },
   {

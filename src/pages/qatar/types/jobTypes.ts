@@ -3,6 +3,7 @@ export interface QatarJob {
   id: string;
   jobNumber: string;
   customer: string;
+  customerPrefix?: string;
   date: string;
   time: string;
   amPm: 'AM' | 'PM';
@@ -11,6 +12,7 @@ export interface QatarJob {
   town?: string;
   sector?: string;
   branch?: string; // Added the branch property
+  destination?: string; // Added destination for international shipping
   mobileNumber: string;
   jobType: 'COLLECTION' | 'DELIVERY';
   status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED' | 'SCHEDULED';
@@ -34,6 +36,7 @@ export interface QatarJob {
   items?: JobItem[];
   collectDate?: string; // Added this as it's used in mockJobs.ts
   entryDate?: string; // Added this as it's used in mockJobs.ts
+  packageDetails?: string; // Added to store package details for printing
 }
 
 export interface JobItem {

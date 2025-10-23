@@ -12,5 +12,8 @@ export const countrySectorMap = {
   "Uganda": "KAMPALA : K",
   "Kuwait": "KUWAIT : K",
   "Oman": "MUSCAT : M",
-  "Qatar": "DOHA : D"
+  "Qatar": "DOHA : D",
+  "Burundi": "BUJUMBURA : B",
+  "Algeria": "ALGIERS : A",
+  "Ghana": "ACCRA : G"
 };

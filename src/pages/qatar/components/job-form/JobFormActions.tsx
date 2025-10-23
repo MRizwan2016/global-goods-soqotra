@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { useJobForm } from "./context/JobFormContext";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
+import InvoicePrintButton from "./InvoicePrintButton";
+import { QatarJob } from "../../types/jobTypes";
 
 interface JobFormActionsProps {
   isNewJob: boolean;
@@ -31,22 +33,34 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("=== JOB FORM SUBMISSION STARTED ===");
+    console.log("Form disabled:", disabled);
+    console.log("Read only:", readOnly);
+    console.log("Is saving:", isSaving);
+    console.log("Job number generated:", isJobNumberGenerated);
+    console.log("Is new job:", isNewJob);
+    console.log("Current job data:", jobData);
     
     if (disabled || readOnly) {
+      console.log("BLOCKED: Form is disabled or read-only");
       toast.error("This job cannot be modified");
       return;
     }
     
     // Validate required fields
     if (!isJobNumberGenerated && isNewJob) {
+      console.log("BLOCKED: Job number not generated");
       toast.error("Please generate a Job Number first");
       return;
     }
     
-    if (!jobData.customer) {
+    if (!jobData.customer?.trim()) {
+      console.log("BLOCKED: Customer name missing");
       toast.error("Please enter customer name");
       return;
     }
+
+    console.log("All validations passed, proceeding with job submission...");
     
     // Ensure job has an ID
     const jobDataWithId = {
@@ -61,18 +75,64 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
     };
     
     // Submit the form with complete data
-    console.log("Submitting job form data:", jobDataWithId);
+    console.log("Calling onSubmit with job data:", jobDataWithId);
     try {
       onSubmit(jobDataWithId);
+      console.log("onSubmit called successfully");
+      // Dispatch event to notify all job lists to refresh
+      setTimeout(() => {
+        console.log("Dispatching jobsUpdated event");
+        window.dispatchEvent(new CustomEvent('jobsUpdated'));
+      }, 100);
     } catch (error) {
       console.error("Error submitting job:", error);
       toast.error(`Error submitting job: ${error instanceof Error ? error.message : "Unknown error"}`);
     }
+    console.log("=== JOB FORM SUBMISSION COMPLETED ===");
   };
 
   const handleCancel = () => {
     navigate("/qatar");
   };
+
+  // Create a complete job object for printing
+  const jobForPrint: QatarJob = {
+    ...jobData,
+    id: jobData.id || uuidv4(), // Ensure id is always present
+    items: jobItems,
+    advanceAmount: parseFloat(String(jobData.advanceAmount)) || 0,
+    jobType: (jobData.jobType === 'COLLECTION' || jobData.jobType === 'DELIVERY') 
+      ? jobData.jobType 
+      : 'COLLECTION' as const,
+    status: (jobData.status as QatarJob['status']) || 'PENDING',
+    date: jobData.date || new Date().toISOString().split('T')[0],
+    time: jobData.time || '12:00',
+    amPm: (jobData.amPm === 'AM' || jobData.amPm === 'PM') ? jobData.amPm : 'AM',
+    location: jobData.location || '',
+    city: jobData.city || '',
+    mobileNumber: jobData.mobileNumber || '',
+  };
+
+  // Listen for form submission events
+  React.useEffect(() => {
+    const form = document.getElementById('job-form');
+    const handleFormSubmit = (e: Event) => {
+      e.preventDefault();
+      console.log("JobFormActions: Form submit event received");
+      // Create a synthetic React FormEvent
+      const syntheticEvent = {
+        preventDefault: () => {},
+        currentTarget: e.currentTarget,
+        target: e.target
+      } as React.FormEvent;
+      handleSubmit(syntheticEvent);
+    };
+
+    if (form) {
+      form.addEventListener('submit', handleFormSubmit);
+      return () => form.removeEventListener('submit', handleFormSubmit);
+    }
+  }, [handleSubmit]);
 
   return (
     <div className="flex justify-end gap-2 mt-6">
@@ -85,9 +145,18 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
         <ArrowLeft size={16} />
         BACK
       </Button>
+      
+      {/* Print Invoice Button - show for existing jobs */}
+      {!isNewJob && jobData.jobNumber && (
+        <InvoicePrintButton 
+          job={jobForPrint} 
+          disabled={!jobData.customer || !jobData.jobNumber}
+        />
+      )}
+      
       {!disabled && !readOnly && (
         <Button 
-          type="submit" 
+          type="button"
           className="bg-green-600 hover:bg-green-700 flex items-center gap-2 transition-colors"
           disabled={isFormDisabled}
           onClick={handleSubmit}

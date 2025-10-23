@@ -15,6 +15,12 @@ export interface User {
     downloads: boolean;
     accounting: boolean;
     controlPanel: boolean;
+    cargoDelivery: boolean; // Default enabled for all users
+    // Account section permissions
+    accountFunctions: boolean;
+    accountRegistrations: boolean;
+    accountFinancialEntities: boolean;
+    accountCountryReconciliations: boolean;
     files: {
       salesRep?: boolean;
       town?: boolean;
@@ -37,6 +43,11 @@ export interface User {
       paymentMethods?: boolean;
       reconciliation?: boolean;
       profitLoss?: boolean;
+      // Account section files
+      accountFunctionFiles?: boolean;
+      accountRegistrationFiles?: boolean;
+      accountFinancialFiles?: boolean;
+      accountCountryFiles?: boolean;
     };
   };
 }
@@ -45,6 +56,7 @@ export interface AuthContextType {
   currentUser: User | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  loading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
   register: (userData: Omit<User, "id" | "isActive" | "isAdmin" | "createdAt" | "permissions"> & { password: string }) => Promise<boolean>;

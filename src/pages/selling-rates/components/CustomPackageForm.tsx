@@ -16,7 +16,7 @@ const CustomPackageForm: React.FC<CustomPackageFormProps> = ({ onAddPackage }) =
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (packageName.trim()) {
-      onAddPackage(packageName.trim().toUpperCase());
+      onAddPackage((packageName || "").trim().toUpperCase());
       setPackageName('');
       setIsOpen(false);
     }

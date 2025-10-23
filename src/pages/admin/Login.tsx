@@ -19,7 +19,26 @@ const loginSchema = z.object({
 type LoginValues = z.infer<typeof loginSchema>;
 
 const Login = () => {
-  const { login, isAuthenticated, users } = useAuth();
+  // Add error boundary for auth context
+  let authContext;
+  try {
+    authContext = useAuth();
+  } catch (error) {
+    console.error("AuthProvider context error in Login:", error);
+    // Return a basic login form without auth functionality as fallback
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 p-4">
+        <div className="w-full max-w-md bg-white/10 rounded-2xl shadow-xl border border-white/20 p-8">
+          <div className="text-center text-white">
+            <h1 className="text-2xl font-bold mb-4">Loading...</h1>
+            <p>Please wait while the application initializes.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  const { login, isAuthenticated, users, loading } = authContext;
   const navigate = useNavigate();
   const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
@@ -48,11 +67,11 @@ const Login = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
+    if (!loading && isAuthenticated) {
       console.log("User is authenticated, navigating to:", from);
       navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate, from]);
+  }, [isAuthenticated, loading, navigate, from]);
 
   // Debug: Log available users when component mounts
   useEffect(() => {
@@ -75,6 +94,14 @@ const Login = () => {
     },
   });
 
+  // Clear error message when user edits fields
+  useEffect(() => {
+    const subscription = form.watch(() => {
+      if (error) setError(null);
+    });
+    return () => subscription.unsubscribe?.();
+  }, [form, error]);
+
   const onSubmit = async (values: LoginValues) => {
     setError(null);
     setIsLoading(true);
@@ -82,11 +109,19 @@ const Login = () => {
       console.log(`Login attempt: ${values.email} with browser info: ${browserInfo}`);
       
       // Check if user exists
-      const user = users.find(u => u.email.toLowerCase() === values.email.toLowerCase() && u.isActive);
+      const user = users.find(u => u.email.toLowerCase() === values.email.toLowerCase());
       if (user) {
-        console.log(`Found user: ${user.fullName} (${user.id})`);
+        console.log(`Found user: ${user.fullName} (${user.id}), Active: ${user.isActive}`);
+        
+        // Debug: Check what passwords are available
+        const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
+        console.log(`Password available for user ${user.id}:`, userPasswords[user.id] ? 'YES' : 'NO');
+        
+        // For testing: Log suggested passwords
+        console.log("Suggested test passwords: 123456, password, admin123, soqotra123, test123");
       } else {
         console.log(`No user found with email: ${values.email}`);
+        console.log("Available user emails:", users.map(u => u.email));
       }
       
       const success = await login(values.email, values.password);
@@ -96,7 +131,7 @@ const Login = () => {
         navigate(from, { replace: true });
       } else {
         console.log("Login failed");
-        setError("Invalid email or password. Please try again.");
+        setError("Invalid email or password. Please try again with: 123456, password, admin123, soqotra123, or test123");
       }
     } catch (err) {
       console.error("Login error:", err);

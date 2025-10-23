@@ -28,12 +28,8 @@ const PackageDetailsSection: React.FC<PackageDetailsSectionProps> = ({
 }) => {
   return (
     <div className="mt-8">
-      <div className="bg-soqotra-blue text-white py-2 px-4 font-medium flex justify-between items-center">
-        <span>PACKAGES DETAILS</span>
-        <div className="text-xs">
-          Standard dimensions: Small(19×19×19), Medium(19×19×29), Large(23×23×23), 
-          Extra Large(23×23×28), Jumbo(24×24×26), Super Jumbo(30×30×30), Bulilit(14×14×12)
-        </div>
+      <div className="bg-gradient-to-r from-cyan-400 to-blue-400 text-white py-2 px-4 font-medium flex justify-between items-center">
+        <span className="uppercase">PACKAGES DETAILS</span>
       </div>
       
       <PackageSelector 
