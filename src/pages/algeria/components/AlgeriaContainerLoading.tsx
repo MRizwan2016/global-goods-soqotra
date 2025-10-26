@@ -33,11 +33,11 @@ const AlgeriaContainerLoading: React.FC<AlgeriaContainerLoadingProps> = ({
 
   const loadData = async () => {
     const invoices = await AlgeriaStorageService.loadInvoices();
-    const paidInvoices = invoices.filter(inv => 
-      inv.paymentStatus === 'paid' && 
+    // Allow loading any invoice with export plate (payment not required)
+    const availableInvoices = invoices.filter(inv => 
       inv.vehicle?.exportPlate
     );
-    setAvailableInvoices(paidInvoices);
+    setAvailableInvoices(availableInvoices);
 
     // Load already loaded vehicles for this container
     const loaded = container.loadedVehicles || [];
@@ -68,7 +68,7 @@ const AlgeriaContainerLoading: React.FC<AlgeriaContainerLoadingProps> = ({
     );
 
     if (!invoice || !invoice.vehicle) {
-      toast.error("No paid invoice found with this export plate");
+      toast.error("No invoice found with this export plate");
       return;
     }
 
