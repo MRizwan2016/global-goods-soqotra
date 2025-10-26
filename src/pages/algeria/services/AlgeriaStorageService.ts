@@ -21,7 +21,7 @@ export class AlgeriaStorageService {
     try {
       const containers = await this.loadContainers();
       containers.push(container);
-      localStorage.setItem(CONTAINERS_KEY, JSON.stringify(containers));
+      this.saveContainers(containers);
     } catch (error) {
       console.error("Error adding container:", error);
       throw error;
@@ -34,7 +34,7 @@ export class AlgeriaStorageService {
       const index = containers.findIndex(c => c.id === container.id);
       if (index !== -1) {
         containers[index] = container;
-        localStorage.setItem(CONTAINERS_KEY, JSON.stringify(containers));
+        this.saveContainers(containers);
       }
     } catch (error) {
       console.error("Error updating container:", error);
@@ -46,9 +46,36 @@ export class AlgeriaStorageService {
     try {
       const containers = await this.loadContainers();
       const filtered = containers.filter(c => c.id !== containerId);
-      localStorage.setItem(CONTAINERS_KEY, JSON.stringify(filtered));
+      this.saveContainers(filtered);
     } catch (error) {
       console.error("Error deleting container:", error);
+      throw error;
+    }
+  }
+
+  // Internal helpers to keep storage size small
+  private static stripHeavyFieldsFromContainer(container: AlgeriaContainer): AlgeriaContainer {
+    const sanitizedLoaded = (container.loadedVehicles || []).map((v: any) => ({
+      ...v,
+      photos: [],
+    }));
+    const sanitizedEffects = (container.personalEffects || []).map((p: any) => ({
+      ...p,
+      photos: [],
+    }));
+    return {
+      ...container,
+      loadedVehicles: sanitizedLoaded,
+      personalEffects: sanitizedEffects,
+    };
+  }
+
+  private static saveContainers(containers: AlgeriaContainer[]) {
+    try {
+      const sanitized = containers.map(c => this.stripHeavyFieldsFromContainer(c));
+      localStorage.setItem(CONTAINERS_KEY, JSON.stringify(sanitized));
+    } catch (error) {
+      console.error("Error saving containers:", error);
       throw error;
     }
   }

@@ -72,10 +72,11 @@ const AlgeriaContainerLoading: React.FC<AlgeriaContainerLoadingProps> = ({
       return;
     }
 
-    // Convert invoice vehicle to AlgeriaVehicle format
+    // Convert invoice vehicle to AlgeriaVehicle format (strip heavy fields)
     const vehicleToLoad: any = {
       id: invoice.id,
       ...invoice.vehicle,
+      photos: [],
       customerInfo: {
         name: invoice.customer.name,
         mobile: invoice.customer.mobile,
@@ -89,10 +90,18 @@ const AlgeriaContainerLoading: React.FC<AlgeriaContainerLoadingProps> = ({
       loadedVehicles: [...(container.loadedVehicles || []), vehicleToLoad]
     };
 
-    await AlgeriaStorageService.updateContainer(updatedContainer);
-    setLoadedVehicles(prev => [...prev, { exportPlate: plate, invoice }]);
-    setExportPlateSearch("");
-    toast.success(`Vehicle ${plate} loaded into container`);
+    try {
+      await AlgeriaStorageService.updateContainer(updatedContainer);
+      setLoadedVehicles(prev => [...prev, { exportPlate: plate, invoice }]);
+      setExportPlateSearch("");
+      toast.success(`Vehicle ${plate} loaded into container`);
+    } catch (err: any) {
+      const isQuota = err && (err.name === 'QuotaExceededError' || String(err).includes('QuotaExceededError'));
+      toast.error(isQuota
+        ? 'Browser storage is full. Please remove old containers/vehicles or clear site data, then try again.'
+        : 'Failed to save container update. Please try again.');
+      console.error('Load vehicle failed:', err);
+    }
   };
 
   const handleUnloadVehicle = async (exportPlate: string) => {
