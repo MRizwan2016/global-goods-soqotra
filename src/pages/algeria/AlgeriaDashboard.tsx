@@ -11,6 +11,7 @@ import { AlgeriaInvoice } from "./types/algeriaInvoiceTypes";
 import ContainerSelection from "./components/ContainerSelection";
 import AlgeriaInvoiceForm from "./components/AlgeriaInvoiceForm";
 import AlgeriaInvoiceList from "./components/AlgeriaInvoiceList";
+import AlgeriaContainerLoading from "./components/AlgeriaContainerLoading";
 import { AlgeriaStorageService } from "./services/AlgeriaStorageService";
 import { AlgeriaInvoiceBookService } from "./services/AlgeriaInvoiceBookService";
 import { toast } from "sonner";
@@ -19,8 +20,9 @@ const AlgeriaDashboard: React.FC = () => {
   const { language } = useLanguage();
   const [containers, setContainers] = useState<AlgeriaContainer[]>([]);
   const [invoices, setInvoices] = useState<AlgeriaInvoice[]>([]);
-  const [view, setView] = useState<'dashboard' | 'container-select' | 'invoice-management' | 'invoice-form'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'container-select' | 'container-loading' | 'invoice-management' | 'invoice-form'>('dashboard');
   const [selectedInvoice, setSelectedInvoice] = useState<AlgeriaInvoice | null>(null);
+  const [selectedContainer, setSelectedContainer] = useState<AlgeriaContainer | null>(null);
 
   // Initialize invoice books on mount
   useEffect(() => {
@@ -70,8 +72,8 @@ const AlgeriaDashboard: React.FC = () => {
   };
 
   const handleContainerSelect = (container: AlgeriaContainer) => {
-    toast.info(`Container ${container.containerNumber} selected`);
-    // TODO: Navigate to container loading view
+    setSelectedContainer(container);
+    setView('container-loading');
   };
 
   const handleInvoiceSave = async (invoice: AlgeriaInvoice) => {
@@ -91,6 +93,26 @@ const AlgeriaDashboard: React.FC = () => {
       toast.error("Failed to save invoice. Please try again.");
     }
   };
+
+  if (view === 'container-loading' && selectedContainer) {
+    return (
+      <Layout title="Algeria Container Loading">
+        <div className="mb-8">
+          <div className="flex justify-between mb-4">
+            <CountryBackButton />
+            <LanguageSwitcher />
+          </div>
+        </div>
+        <AlgeriaContainerLoading
+          container={selectedContainer}
+          onBack={() => {
+            setView('container-select');
+            setSelectedContainer(null);
+          }}
+        />
+      </Layout>
+    );
+  }
 
   if (view === 'container-select') {
     return (

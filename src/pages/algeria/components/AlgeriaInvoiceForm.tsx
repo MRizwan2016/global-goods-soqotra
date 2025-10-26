@@ -75,8 +75,16 @@ const AlgeriaInvoiceForm: React.FC<AlgeriaInvoiceFormProps> = ({
   );
 
   const [hblNumber, setHblNumber] = useState(
-    existingInvoice?.hblNumber || AlgeriaInvoiceBookService.getNextHBLNumber()
+    existingInvoice?.hblNumber || ""
   );
+
+  // Generate HBL number on mount for new invoices
+  useEffect(() => {
+    if (!existingInvoice && !hblNumber) {
+      const nextHBL = AlgeriaInvoiceBookService.getNextHBLNumber();
+      setHblNumber(nextHBL);
+    }
+  }, []);
 
   // Invoice book state
   const [availableBooks, setAvailableBooks] = useState<AlgeriaInvoiceBook[]>([]);
@@ -252,6 +260,11 @@ const AlgeriaInvoiceForm: React.FC<AlgeriaInvoiceFormProps> = ({
         date: new Date().toISOString().split('T')[0],
         status: "DRAFT"
       };
+
+      // Allocate HBL number if new invoice
+      if (!existingInvoice && hblNumber) {
+        AlgeriaInvoiceBookService.allocateHBLNumber(hblNumber);
+      }
 
       onInvoiceSave(invoice);
       toast.success(`Invoice ${existingInvoice ? 'updated' : 'created'} successfully!`);

@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { AlgeriaInvoice, PaymentDetails } from "../types/algeriaInvoiceTypes";
 import { AlgeriaStorageService } from "../services/AlgeriaStorageService";
+import { AlgeriaPaymentReceiptService } from "../services/AlgeriaPaymentReceiptService";
+import ReceiptView from "@/components/payment/ReceiptView";
 import { toast } from "sonner";
 
 interface AlgeriaPaymentReceiptGeneratorProps {
@@ -26,12 +28,8 @@ const AlgeriaPaymentReceiptGenerator: React.FC<AlgeriaPaymentReceiptGeneratorPro
     notes: ""
   });
 
-  const [receiptNumber] = useState(`RCT-ALG-${invoice.invoiceNumber}-${Date.now()}`);
+  const [receiptNumber] = useState(`ALG-${invoice.invoiceNumber.replace(/\//g, '-')}-${Date.now()}`);
   const [showReceipt, setShowReceipt] = useState(false);
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   const handleGenerateReceipt = async () => {
     try {
@@ -42,6 +40,19 @@ const AlgeriaPaymentReceiptGenerator: React.FC<AlgeriaPaymentReceiptGeneratorPro
       };
       
       await AlgeriaStorageService.addInvoice(updatedInvoice);
+
+      // Save receipt record
+      await AlgeriaPaymentReceiptService.saveReceipt({
+        id: crypto.randomUUID(),
+        receiptNumber,
+        invoiceNumber: invoice.invoiceNumber,
+        date: paymentDetails.date,
+        customer: `${invoice.customer.prefix} ${invoice.customer.name}`,
+        amount: paymentDetails.amount,
+        paymentMethod: paymentDetails.method,
+        currency: "QAR",
+        remarks: paymentDetails.notes
+      });
       
       setShowReceipt(true);
       toast.success(`Payment receipt ${receiptNumber} generated successfully!`);
@@ -53,150 +64,23 @@ const AlgeriaPaymentReceiptGenerator: React.FC<AlgeriaPaymentReceiptGeneratorPro
 
   if (showReceipt) {
     return (
-      <>
-        <style>{`
-          @media print {
-            body * { visibility: hidden; }
-            #algeria-payment-receipt-print, #algeria-payment-receipt-print * { visibility: visible; }
-            #algeria-payment-receipt-print { position: absolute; left: 0; top: 0; width: 100%; }
-            .print\\:hidden { display: none !important; }
-          }
-        `}</style>
-        <div className="max-w-4xl mx-auto space-y-4">
-          <div className="flex gap-4 print:hidden">
-            <Button variant="outline" onClick={() => setShowReceipt(false)}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Edit Payment
-            </Button>
-            <Button onClick={handlePrint}>
-              <Printer className="h-4 w-4 mr-2" />
-              Print Receipt
-            </Button>
-          </div>
-
-          <div id="algeria-payment-receipt-print" className="bg-white p-8 border rounded-lg shadow-sm">
-            <div className="text-center mb-8">
-              <h1 className="text-2xl font-bold mb-2">SOQOTRA LOGISTICS SERVICES,</h1>
-              <h2 className="text-lg font-semibold">TRANSPORTATION & TRADING WLL</h2>
-              <p className="text-sm">Vehicle & Personal Effects Shipping to Algeria</p>
-              <div className="mt-4 text-lg font-semibold">PAYMENT RECEIPT</div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-8 mb-8">
-              <div>
-                <h3 className="font-semibold mb-3">Payment Details</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Receipt No:</span>
-                    <span className="font-medium">{receiptNumber}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Payment Date:</span>
-                    <span className="font-medium">{new Date(paymentDetails.date).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Payment Method:</span>
-                    <span className="font-medium">{paymentDetails.method}</span>
-                  </div>
-                  {paymentDetails.transactionId && (
-                    <div className="flex justify-between">
-                      <span>Transaction ID:</span>
-                      <span className="font-medium">{paymentDetails.transactionId}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between border-t pt-2">
-                    <span className="font-semibold">Amount Paid:</span>
-                    <span className="font-bold text-lg">QAR {paymentDetails.amount.toLocaleString()}</span>
-                  </div>
-                  {paymentDetails.amount < invoice.totalAmount && (
-                    <div className="flex justify-between border-t pt-2 mt-2">
-                      <span className="font-semibold text-red-600">Balance Due:</span>
-                      <span className="font-bold text-lg text-red-600">QAR {(invoice.totalAmount - paymentDetails.amount).toLocaleString()}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="font-semibold mb-3">Customer Information</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Name:</span>
-                    <span className="font-medium">{invoice.customer.prefix} {invoice.customer.name}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Mobile:</span>
-                    <span className="font-medium">{invoice.customer.mobile}</span>
-                  </div>
-                  {invoice.customer.metrashMobile && (
-                    <div className="flex justify-between">
-                      <span>Metrash Mobile:</span>
-                      <span className="font-medium">{invoice.customer.metrashMobile}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between">
-                    <span>Invoice No:</span>
-                    <span className="font-medium">{invoice.invoiceNumber}</span>
-                  </div>
-                  {invoice.hblNumber && (
-                    <div className="flex justify-between">
-                      <span>HBL No:</span>
-                      <span className="font-medium">{invoice.hblNumber}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <h3 className="font-semibold mb-3">Vehicle Details</h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Make/Model:</span>
-                    <span className="font-medium">{invoice.vehicle.make} {invoice.vehicle.model}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Year/Color:</span>
-                    <span className="font-medium">{invoice.vehicle.year} • {invoice.vehicle.color}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Type:</span>
-                    <span className="font-medium">{invoice.vehicle.type}</span>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span>Chassis No:</span>
-                    <span className="font-medium">{invoice.vehicle.chassisNumber}</span>
-                  </div>
-                  <div className="flex justify-between bg-blue-50 p-2 rounded border-2 border-blue-500">
-                    <span className="font-semibold text-blue-900">Export Plate:</span>
-                    <span className="font-bold text-blue-900">{invoice.vehicle.exportPlate}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Freight Charge:</span>
-                    <span className="font-medium">QAR {invoice.vehicle.freightCharge.toLocaleString()}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {paymentDetails.notes && (
-              <div className="mb-8">
-                <h3 className="font-semibold mb-3">Notes</h3>
-                <p className="text-sm">{paymentDetails.notes}</p>
-              </div>
-            )}
-
-            <div className="border-t pt-4 text-center">
-              <p className="text-xs mt-2">
-                For queries, contact: +974-44412770 & +974-44412773 | Email: accounts@soqotralogistics.com
-              </p>
-            </div>
-          </div>
-        </div>
-      </>
+      <ReceiptView
+        isOpen={showReceipt}
+        onClose={() => {
+          setShowReceipt(false);
+          onBack();
+        }}
+        receiptData={{
+          receiptNumber,
+          invoiceNumber: invoice.invoiceNumber,
+          date: paymentDetails.date,
+          customer: `${invoice.customer.prefix} ${invoice.customer.name}`,
+          amount: paymentDetails.amount,
+          paymentMethod: paymentDetails.method,
+          currency: "QAR",
+          remarks: paymentDetails.notes
+        }}
+      />
     );
   }
 

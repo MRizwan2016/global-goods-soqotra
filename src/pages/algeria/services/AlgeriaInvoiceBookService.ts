@@ -49,18 +49,48 @@ export class AlgeriaInvoiceBookService {
 
   static getNextHBLNumber(): string {
     const books = this.loadBooks();
-    let maxHBLNumber = 15150; // Starting HBL number
     
-    // Find the highest HBL number used
-    books.forEach(book => {
-      const usedPages = 50 - book.available.length;
-      const bookHBLNumber = 15150 + (parseInt(book.bookNumber.replace('#', '')) - 1) * 50 + usedPages;
-      if (bookHBLNumber > maxHBLNumber) {
-        maxHBLNumber = bookHBLNumber;
+    // Find the first available book
+    for (const book of books) {
+      if (book.available.length > 0 && book.status !== 'completed') {
+        // Calculate the next HBL number based on book position and pages used
+        const bookIndex = parseInt(book.bookNumber.replace('#', '')) - 1;
+        const usedPagesInBook = 50 - book.available.length;
+        const hblSequence = 15150 + (bookIndex * 50) + usedPagesInBook;
+        
+        return `2025/04700/${hblSequence}`;
       }
-    });
+    }
     
-    return `2025/04700/${maxHBLNumber}`;
+    // If no available books, return the next number after all books
+    return `2025/04700/${15150 + books.length * 50}`;
+  }
+
+  static allocateHBLNumber(hblNumber: string): boolean {
+    const books = this.loadBooks();
+    const hblSequence = parseInt(hblNumber.split('/')[2]);
+    
+    // Find which book this HBL belongs to
+    const bookIndex = Math.floor((hblSequence - 15150) / 50);
+    const pageInBook = (hblSequence - 15150) % 50;
+    const pageNumber = (13400 + bookIndex * 50 + pageInBook).toString().padStart(6, '0');
+    
+    const book = books.find(b => parseInt(b.bookNumber.replace('#', '')) === bookIndex + 1);
+    
+    if (!book || !book.available.includes(pageNumber)) {
+      return false;
+    }
+    
+    // Remove the page from available
+    book.available = book.available.filter(p => p !== pageNumber);
+    
+    // Update book status if all pages used
+    if (book.available.length === 0) {
+      book.status = 'completed';
+    }
+    
+    this.saveBooks(books);
+    return true;
   }
 
   static loadBooks(): AlgeriaInvoiceBook[] {
