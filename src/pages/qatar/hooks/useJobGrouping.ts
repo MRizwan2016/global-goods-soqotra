@@ -32,9 +32,8 @@ export const useJobGrouping = (selectedJobs: QatarJob[]) => {
     }
   }, [selectedCity]);
   
-  // Check if form should be disabled
-  const isFormDisabled = selectedJobs.length === 0 || 
-                        (jobsForSchedule.length === 0);
+  // Form is always enabled - validation happens on submit
+  const isFormDisabled = false;
 
   // Handle job assignment to vehicle
   const assignJobsToVehicle = (jobIds: string[], vehicleId: string) => {
