@@ -220,7 +220,7 @@ const SaudiArabiaDashboard = () => {
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-blue-500 hover:bg-blue-500">
+                  <TableRow className="bg-[#3b5998] hover:bg-[#3b5998]">
                     <TableHead className="text-white font-medium">Num</TableHead>
                     <TableHead className="text-white font-medium">MODIFY</TableHead>
                     <TableHead className="text-white font-medium">INV. DATE</TableHead>

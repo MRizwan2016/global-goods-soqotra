@@ -12,55 +12,28 @@ interface StatCardsProps {
 }
 
 const StatCards = ({ stats }: StatCardsProps) => {
+  const cards = [
+    { label: "Total Deliveries", value: stats.total, icon: Package },
+    { label: "Delivered", value: stats.delivered, icon: CheckCircle },
+    { label: "In Transit", value: stats.inTransit, icon: Truck },
+    { label: "Pending", value: stats.pending, icon: CircleAlert },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card className="shadow-sm hover:shadow transition-shadow">
-        <CardContent className="flex items-center p-6">
-          <div className="bg-blue-100 p-3 rounded-full">
-            <Package size={24} className="text-blue-700" />
-          </div>
-          <div className="ml-4">
-            <p className="text-sm font-medium text-gray-500">Total Deliveries</p>
-            <h3 className="text-2xl font-bold">{stats.total}</h3>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="shadow-sm hover:shadow transition-shadow">
-        <CardContent className="flex items-center p-6">
-          <div className="bg-green-100 p-3 rounded-full">
-            <CheckCircle size={24} className="text-green-700" />
-          </div>
-          <div className="ml-4">
-            <p className="text-sm font-medium text-gray-500">Delivered</p>
-            <h3 className="text-2xl font-bold">{stats.delivered}</h3>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="shadow-sm hover:shadow transition-shadow">
-        <CardContent className="flex items-center p-6">
-          <div className="bg-orange-100 p-3 rounded-full">
-            <Truck size={24} className="text-orange-700" />
-          </div>
-          <div className="ml-4">
-            <p className="text-sm font-medium text-gray-500">In Transit</p>
-            <h3 className="text-2xl font-bold">{stats.inTransit}</h3>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="shadow-sm hover:shadow transition-shadow">
-        <CardContent className="flex items-center p-6">
-          <div className="bg-yellow-100 p-3 rounded-full">
-            <CircleAlert size={24} className="text-yellow-700" />
-          </div>
-          <div className="ml-4">
-            <p className="text-sm font-medium text-gray-500">Pending</p>
-            <h3 className="text-2xl font-bold">{stats.pending}</h3>
-          </div>
-        </CardContent>
-      </Card>
+      {cards.map((card, i) => (
+        <Card key={i} className="shadow-sm hover:shadow transition-shadow border border-gray-200">
+          <CardContent className="flex items-center p-6">
+            <div className="bg-[#3b5998]/10 p-3 rounded-full">
+              <card.icon size={24} className="text-[#3b5998]" />
+            </div>
+            <div className="ml-4">
+              <p className="text-sm font-medium text-gray-500">{card.label}</p>
+              <h3 className="text-2xl font-bold text-[#1e2a3a]">{card.value}</h3>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };

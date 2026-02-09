@@ -16,7 +16,7 @@ const SomaliaDashboard: React.FC = () => {
   return (
     <Layout title="Somalia Operations">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Somalia Logistics Operations</h1>
+        <h1 className="text-3xl font-bold text-[#1e2a3a] mb-2">Somalia Logistics Operations</h1>
         <p className="text-gray-600">Specialized logistics services to Somalia ports and regions</p>
       </div>
 
@@ -29,16 +29,16 @@ const SomaliaDashboard: React.FC = () => {
         <SomaliaMapInfo />
       </div>
       
-      <Card className="mb-6">
+      <Card className="mb-6 border border-gray-200">
         <CardHeader>
-          <CardTitle>Somalia Operations Gallery</CardTitle>
+          <CardTitle className="text-[#1e2a3a]">Somalia Operations Gallery</CardTitle>
         </CardHeader>
         <CardContent>
           <SomaliaGallery />
         </CardContent>
       </Card>
       
-      <Card>
+      <Card className="border border-gray-200">
         <CardContent className="p-6">
           <Tabs defaultValue="deliveries">
             <TabsList className="grid w-full grid-cols-4">

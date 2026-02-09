@@ -10,34 +10,26 @@ import { mockDeliveries } from "./data/mockDeliveryData";
 import DashboardHeader from "./components/dashboard/DashboardHeader";
 
 const KenyaDashboard = () => {
-  // Get stats from the utility function
   const stats = getDeliveryStats();
 
   return (
     <Layout title="Kenya Dashboard">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-[#f8f9fb] rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="mb-6 flex justify-between items-center">
           <div>
             <BackButton to="/" />
-            <h1 className="text-2xl font-bold mt-2">Kenya Operations Dashboard</h1>
+            <h1 className="text-2xl font-bold mt-2 text-[#1e2a3a]">Kenya Operations Dashboard</h1>
             <p className="text-gray-600">Overview of delivery operations in Kenya</p>
           </div>
         </div>
         
-        {/* Dashboard header with action buttons */}
         <DashboardHeader />
-        
-        {/* Stats summary cards */}
         <StatCards stats={stats} />
-        
-        {/* Charts */}
         <DeliveryCharts 
           monthlyShipments={monthlyShipments}
           cargoByCounty={cargoByCounty}
           chartColors={CHART_COLORS}
         />
-        
-        {/* Recent deliveries table */}
         <RecentDeliveries deliveries={mockDeliveries} />
       </div>
     </Layout>

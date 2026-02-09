@@ -12,55 +12,28 @@ interface StatCardsProps {
 }
 
 const StatCards = ({ stats }: StatCardsProps) => {
+  const cards = [
+    { label: "TOTAL JOBS", value: stats.total, icon: Truck },
+    { label: "COMPLETED", value: stats.completed, icon: CheckCircle2 },
+    { label: "IN PROGRESS", value: stats.inProgress, icon: Clock },
+    { label: "PENDING", value: stats.pending, icon: AlertTriangle },
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <Card className="border-l-4 border-l-blue-500 hover:shadow-md transition-shadow animate-fade-in">
-        <CardContent className="p-4 flex justify-between items-center">
-          <div>
-            <p className="text-sm text-gray-500 uppercase">TOTAL JOBS</p>
-            <p className="text-2xl font-bold">{stats.total}</p>
-          </div>
-          <div className="bg-blue-100 p-3 rounded-full">
-            <Truck className="h-6 w-6 text-blue-500" />
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="border-l-4 border-l-green-500 hover:shadow-md transition-shadow animate-fade-in" style={{ animationDelay: "0.1s" }}>
-        <CardContent className="p-4 flex justify-between items-center">
-          <div>
-            <p className="text-sm text-gray-500 uppercase">COMPLETED</p>
-            <p className="text-2xl font-bold">{stats.completed}</p>
-          </div>
-          <div className="bg-green-100 p-3 rounded-full">
-            <CheckCircle2 className="h-6 w-6 text-green-500" />
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="border-l-4 border-l-orange-500 hover:shadow-md transition-shadow animate-fade-in" style={{ animationDelay: "0.2s" }}>
-        <CardContent className="p-4 flex justify-between items-center">
-          <div>
-            <p className="text-sm text-gray-500 uppercase">IN PROGRESS</p>
-            <p className="text-2xl font-bold">{stats.inProgress}</p>
-          </div>
-          <div className="bg-orange-100 p-3 rounded-full">
-            <Clock className="h-6 w-6 text-orange-500" />
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card className="border-l-4 border-l-yellow-500 hover:shadow-md transition-shadow animate-fade-in" style={{ animationDelay: "0.3s" }}>
-        <CardContent className="p-4 flex justify-between items-center">
-          <div>
-            <p className="text-sm text-gray-500 uppercase">PENDING</p>
-            <p className="text-2xl font-bold">{stats.pending}</p>
-          </div>
-          <div className="bg-yellow-100 p-3 rounded-full">
-            <AlertTriangle className="h-6 w-6 text-yellow-500" />
-          </div>
-        </CardContent>
-      </Card>
+      {cards.map((card, i) => (
+        <Card key={i} className="border-l-4 border-l-[#3b5998] hover:shadow-md transition-shadow animate-fade-in border border-gray-200" style={{ animationDelay: `${i * 0.1}s` }}>
+          <CardContent className="p-4 flex justify-between items-center">
+            <div>
+              <p className="text-sm text-gray-500 uppercase">{card.label}</p>
+              <p className="text-2xl font-bold text-[#1e2a3a]">{card.value}</p>
+            </div>
+            <div className="bg-[#3b5998]/10 p-3 rounded-full">
+              <card.icon className="h-6 w-6 text-[#3b5998]" />
+            </div>
+          </CardContent>
+        </Card>
+      ))}
     </div>
   );
 };

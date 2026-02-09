@@ -14,20 +14,14 @@ const JobListing = ({ jobs }: JobListingProps) => {
   const navigate = useNavigate();
   
   const getStatusBadge = (status: string) => {
-    switch(status) {
-      case 'PENDING':
-        return <Badge className="bg-yellow-500">PENDING</Badge>;
-      case 'IN_PROGRESS':
-        return <Badge className="bg-orange-500">IN PROGRESS</Badge>;
-      case 'SCHEDULED':
-        return <Badge className="bg-blue-500">SCHEDULED</Badge>;
-      case 'COMPLETED':
-        return <Badge className="bg-green-500">COMPLETED</Badge>;
-      case 'CANCELLED':
-        return <Badge className="bg-red-500">CANCELLED</Badge>;
-      default:
-        return <Badge className="bg-gray-500">{status}</Badge>;
-    }
+    const styles: Record<string, string> = {
+      'PENDING': 'bg-amber-100 text-amber-800 hover:bg-amber-100',
+      'IN_PROGRESS': 'bg-[#3b5998]/10 text-[#3b5998] hover:bg-[#3b5998]/10',
+      'SCHEDULED': 'bg-[#3b5998]/20 text-[#1e2a3a] hover:bg-[#3b5998]/20',
+      'COMPLETED': 'bg-green-100 text-green-800 hover:bg-green-100',
+      'CANCELLED': 'bg-red-100 text-red-800 hover:bg-red-100',
+    };
+    return <Badge className={styles[status] || 'bg-gray-100 text-gray-700'}>{status.replace('_', ' ')}</Badge>;
   };
   
   const handleViewJob = (jobId: string) => {
@@ -35,14 +29,14 @@ const JobListing = ({ jobs }: JobListingProps) => {
   };
   
   return (
-    <Card className="shadow-sm hover:shadow transition-shadow mb-6">
+    <Card className="shadow-sm hover:shadow transition-shadow mb-6 border border-gray-200">
       <CardHeader>
         <div className="flex justify-between">
           <div>
-            <CardTitle>RECENT JOBS</CardTitle>
+            <CardTitle className="text-[#1e2a3a]">RECENT JOBS</CardTitle>
             <CardDescription>VIEW AND MANAGE RECENT COLLECTION & DELIVERY JOBS</CardDescription>
           </div>
-          <Button variant="outline" onClick={() => navigate('/qatar/jobs')}>
+          <Button variant="outline" onClick={() => navigate('/qatar/jobs')} className="border-[#3b5998]/30 text-[#3b5998] hover:bg-[#3b5998]/5">
             VIEW ALL JOBS
           </Button>
         </div>
@@ -51,7 +45,7 @@ const JobListing = ({ jobs }: JobListingProps) => {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b">
+              <tr className="bg-[#3b5998] text-white">
                 <th className="text-left p-2">JOB #</th>
                 <th className="text-left p-2">TYPE</th>
                 <th className="text-left p-2">SECTOR</th>
@@ -97,7 +91,7 @@ const JobListing = ({ jobs }: JobListingProps) => {
                     <Button 
                       size="sm" 
                       variant="outline" 
-                      className="h-7 px-2 text-xs"
+                      className="h-7 px-2 text-xs border-[#3b5998]/30 text-[#3b5998] hover:bg-[#3b5998]/5"
                       onClick={() => handleViewJob(job.id)}
                     >
                       <Edit size={12} className="mr-1" />

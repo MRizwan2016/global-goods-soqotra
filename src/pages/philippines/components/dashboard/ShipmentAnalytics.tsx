@@ -3,7 +3,6 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
-// Mock data for the Philippines shipment data
 const philippinesMonthlyData = [
   { name: "Jan", shipments: 352 },
   { name: "Feb", shipments: 389 },
@@ -13,7 +12,6 @@ const philippinesMonthlyData = [
   { name: "Jun", shipments: 425 }
 ];
 
-// Mock data for shipment types
 const shipmentTypeData = [
   { name: "Manila", value: 485 },
   { name: "Cebu", value: 310 },
@@ -22,47 +20,37 @@ const shipmentTypeData = [
   { name: "Other", value: 196 }
 ];
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
+const NAVY_PALETTE = ['#1e2a3a', '#3b5998', '#5a7ab5', '#8ba3cc', '#b8cce2'];
 
 const ShipmentAnalytics: React.FC = () => {
   return (
-    <Card>
+    <Card className="border border-gray-200">
       <CardHeader>
-        <CardTitle>Philippines Shipment Analytics</CardTitle>
+        <CardTitle className="text-[#1e2a3a]">Philippines Shipment Analytics</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
           <div>
-            <h4 className="font-medium text-gray-700 mb-3">Monthly Shipments</h4>
+            <h4 className="font-medium text-[#1e2a3a] mb-3">Monthly Shipments</h4>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  width={500}
-                  height={300}
-                  data={philippinesMonthlyData}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
+                <BarChart data={philippinesMonthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="name" />
                   <YAxis />
                   <Tooltip />
                   <Legend />
-                  <Bar dataKey="shipments" fill="#0088FE" name="Shipments" />
+                  <Bar dataKey="shipments" fill="#3b5998" name="Shipments" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
           
           <div>
-            <h4 className="font-medium text-gray-700 mb-3">Port Distribution</h4>
+            <h4 className="font-medium text-[#1e2a3a] mb-3">Port Distribution</h4>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <PieChart width={400} height={400}>
+                <PieChart>
                   <Pie
                     data={shipmentTypeData}
                     cx="50%"
@@ -70,11 +58,11 @@ const ShipmentAnalytics: React.FC = () => {
                     labelLine={false}
                     label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
                     outerRadius={80}
-                    fill="#8884d8"
+                    fill="#3b5998"
                     dataKey="value"
                   >
                     {shipmentTypeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell key={`cell-${index}`} fill={NAVY_PALETTE[index % NAVY_PALETTE.length]} />
                     ))}
                   </Pie>
                   <Tooltip />
