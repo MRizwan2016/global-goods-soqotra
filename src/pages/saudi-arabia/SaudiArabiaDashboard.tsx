@@ -156,7 +156,7 @@ const SaudiArabiaDashboard = () => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                <div className="text-2xl font-bold text-[#1e2a3a]">{stat.value}</div>
               </CardContent>
             </Card>
           ))}
