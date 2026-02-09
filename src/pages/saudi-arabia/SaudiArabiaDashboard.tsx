@@ -124,8 +124,8 @@ const SaudiArabiaDashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-8 bg-gradient-to-r from-green-600 to-black rounded"></div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard - Saudi Arabia</h1>
+            <div className="w-12 h-8 bg-gradient-to-r from-green-600 to-green-800 rounded"></div>
+            <h1 className="text-3xl font-bold text-[#1e2a3a]">Dashboard - Saudi Arabia</h1>
           </div>
           <div className="flex gap-2">
             <Button 
