@@ -151,7 +151,7 @@ const SaudiArabiaDashboard = () => {
                 <CardTitle className="text-sm font-medium text-gray-600">
                   {stat.title}
                 </CardTitle>
-                <div className={`p-2 rounded-lg ${stat.color}`}>
+                <div className="p-2 rounded-lg bg-[#3b5998]">
                   <stat.icon className="h-4 w-4 text-white" />
                 </div>
               </CardHeader>
