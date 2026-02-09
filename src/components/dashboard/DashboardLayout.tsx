@@ -11,7 +11,7 @@ interface DashboardLayoutProps {
 
 const DashboardLayout = ({ children, isLoaded }: DashboardLayoutProps) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F0F8FF] to-white relative overflow-hidden">
+    <div className="min-h-screen bg-[#f8f9fb] relative overflow-hidden">
       <BackgroundOverlay />
       <WaveBackground />
       <DashboardContent isLoaded={isLoaded}>

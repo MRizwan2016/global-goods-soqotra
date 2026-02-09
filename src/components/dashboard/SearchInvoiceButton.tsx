@@ -14,7 +14,7 @@ const SearchInvoiceButton = () => {
   return (
     <Button
       onClick={handleSearchInvoices}
-      className="bg-green-600 hover:bg-green-700 text-white"
+      className="bg-[#1e2a3a] hover:bg-[#253549] text-white"
     >
       <Search className="h-4 w-4 mr-2" />
       Search Invoices

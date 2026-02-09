@@ -7,52 +7,40 @@ const AdditionalDestinations = () => {
   const { t, language } = useLanguage();
   
   return (
-    <div className="mb-8 animate-fade-in bg-gradient-to-br from-purple-100 to-pink-100 rounded-3xl p-8 border border-black shadow-lg">
-      <div className="inline-block border-2 border-black rounded-full px-6 py-2 mb-6 bg-white">
-        <h2 className={`text-xl font-bold text-black uppercase tracking-wider ${language === 'ar' ? 'font-arabic' : 'font-mono'}`}>
-          {t("dashboard.additionalDestinations")}
-        </h2>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="animate-fade-in">
+      <h2 className={`text-lg font-semibold text-[#1e2a3a] mb-4 flex items-center gap-2 ${language === 'ar' ? 'font-arabic flex-row-reverse' : ''}`}>
+        <span className="w-1 h-5 bg-[#3b5998] rounded-full inline-block"></span>
+        {t("dashboard.additionalDestinations")}
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <DestinationCard
           country={t("country.syria")}
-          bgColor="from-red-300 to-pink-400"
-          borderColor="border-red-100"
+          bgColor=""
           to="/syria"
         />
-        
         <DestinationCard
           country={t("country.saudiArabia")}
-          bgColor="from-green-300 to-emerald-400"
-          borderColor="border-green-100"
+          bgColor=""
           to="/saudi-arabia"
         />
-        
         <DestinationCard
           country={t("country.ethiopia")}
-          bgColor="from-yellow-300 to-orange-400"
-          borderColor="border-yellow-100"
+          bgColor=""
           to="/ethiopia"
         />
-        
         <DestinationCard
           country={t("country.sudan")}
-          bgColor="from-blue-300 to-sky-400"
-          borderColor="border-blue-100"
+          bgColor=""
           to="/sudan"
         />
-        
         <DestinationCard
           country={t("country.eritrea")}
-          bgColor="from-purple-300 to-pink-400"
-          borderColor="border-purple-100"
+          bgColor=""
           to="/eritrea"
         />
-        
         <DestinationCard
           country={t("country.algeria")}
-          bgColor="from-teal-300 to-cyan-400"
-          borderColor="border-teal-100"
+          bgColor=""
           to="/algeria"
         />
       </div>
