@@ -124,12 +124,12 @@ const SaudiArabiaDashboard = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-8 bg-gradient-to-r from-green-600 to-black rounded"></div>
-            <h1 className="text-3xl font-bold text-gray-900">Dashboard - Saudi Arabia</h1>
+            <div className="w-12 h-8 bg-gradient-to-r from-green-600 to-green-800 rounded"></div>
+            <h1 className="text-3xl font-bold text-[#1e2a3a]">Dashboard - Saudi Arabia</h1>
           </div>
           <div className="flex gap-2">
-            <Button 
-              className="gap-2"
+             <Button 
+              className="gap-2 bg-[#3b5998] hover:bg-[#2d4373]"
               onClick={() => navigate("/saudi-arabia/invoice/add")}
             >
               <Plus className="h-4 w-4" />
@@ -151,12 +151,12 @@ const SaudiArabiaDashboard = () => {
                 <CardTitle className="text-sm font-medium text-gray-600">
                   {stat.title}
                 </CardTitle>
-                <div className={`p-2 rounded-lg ${stat.color}`}>
+                <div className="p-2 rounded-lg bg-[#3b5998]">
                   <stat.icon className="h-4 w-4 text-white" />
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
+                <div className="text-2xl font-bold text-[#1e2a3a]">{stat.value}</div>
               </CardContent>
             </Card>
           ))}
@@ -220,7 +220,7 @@ const SaudiArabiaDashboard = () => {
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-blue-500 hover:bg-blue-500">
+                  <TableRow className="bg-[#3b5998] hover:bg-[#3b5998]">
                     <TableHead className="text-white font-medium">Num</TableHead>
                     <TableHead className="text-white font-medium">MODIFY</TableHead>
                     <TableHead className="text-white font-medium">INV. DATE</TableHead>

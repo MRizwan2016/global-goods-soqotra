@@ -13,16 +13,16 @@ interface VehicleStatisticsProps {
 
 const VehicleStatistics = ({ vehicleStats, totals }: VehicleStatisticsProps) => {
   return (
-    <Card className="shadow-sm hover:shadow transition-shadow mb-6">
+    <Card className="shadow-sm hover:shadow transition-shadow mb-6 border border-gray-200">
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg uppercase">VEHICLE STATISTICS</CardTitle>
+        <CardTitle className="text-lg uppercase text-[#1e2a3a]">VEHICLE STATISTICS</CardTitle>
         <CardDescription>VEHICLE ALLOCATION AND JOB DISTRIBUTION</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-blue-50 text-blue-800">
+              <tr className="bg-[#3b5998]/10 text-[#1e2a3a]">
                 <th className="border p-2 text-center">NUM</th>
                 <th className="border p-2 text-center">VEHICLE</th>
                 <th className="border p-2 text-center">TOTAL JOBS</th>
@@ -40,7 +40,7 @@ const VehicleStatistics = ({ vehicleStats, totals }: VehicleStatisticsProps) => 
                   <td className="border p-2 text-center">{stat.collections}</td>
                 </tr>
               ))}
-              <tr className="bg-blue-600 text-white font-bold">
+              <tr className="bg-[#3b5998] text-white font-bold">
                 <td className="border p-2 text-right" colSpan={2}>TOTAL JOBS:</td>
                 <td className="border p-2 text-center">{totals.totalJobs}</td>
                 <td className="border p-2 text-center">{totals.totalDeliveries}</td>

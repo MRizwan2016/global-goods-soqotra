@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DailyJobForecast } from "../../types/jobTypes";
 
 interface PendingJobsProps {
@@ -8,15 +8,15 @@ interface PendingJobsProps {
 
 const PendingJobs = ({ jobForecasts }: PendingJobsProps) => {
   return (
-    <Card className="shadow-sm hover:shadow transition-shadow mb-6">
-      <CardHeader className="bg-blue-600 text-white py-2 px-4 rounded-t-md">
+    <Card className="shadow-sm hover:shadow transition-shadow mb-6 border border-gray-200">
+      <CardHeader className="bg-[#3b5998] text-white py-2 px-4 rounded-t-md">
         <CardTitle className="text-lg uppercase">PENDING JOBS</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-blue-50 text-blue-800">
+              <tr className="bg-[#3b5998]/10 text-[#1e2a3a]">
                 <th className="border p-2 text-center">NUM</th>
                 <th className="border p-2 text-center">JOB DATE</th>
                 <th className="border p-2 text-center">DAY</th>

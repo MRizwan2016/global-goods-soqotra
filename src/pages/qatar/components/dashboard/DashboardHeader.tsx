@@ -11,18 +11,18 @@ const DashboardHeader = () => {
   };
   
   return (
-    <div className="p-4 bg-blue-50 border-b border-blue-100 flex flex-col gap-3">
-      <h3 className="text-lg font-medium text-blue-800">QATAR CARGO COLLECTION & DELIVERY MANAGEMENT</h3>
+    <div className="p-4 bg-[#f8f9fb] border-b border-gray-200 flex flex-col gap-3 mb-6">
+      <h3 className="text-lg font-medium text-[#1e2a3a]">QATAR CARGO COLLECTION & DELIVERY MANAGEMENT</h3>
       <div className="flex flex-wrap gap-2">
-        <Button onClick={() => navigate("/qatar/jobs")} variant="outline" className="bg-white hover:bg-gray-50">
+        <Button onClick={() => navigate("/qatar/jobs")} variant="outline" className="bg-white hover:bg-gray-50 border-[#3b5998]/30 text-[#3b5998]">
           VIEW ALL JOBS
         </Button>
-        <Button onClick={() => navigate("/qatar/jobs/generate")} variant="outline" className="bg-white hover:bg-gray-50">
+        <Button onClick={() => navigate("/qatar/jobs/generate")} variant="outline" className="bg-white hover:bg-gray-50 border-[#3b5998]/30 text-[#3b5998]">
           <Printer className="h-4 w-4 mr-1" />
           JOB SCHEDULE
         </Button>
         <Button 
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          className="bg-[#3b5998] hover:bg-[#2d4373] text-white"
           onClick={handleNewJob}
         >
           <Plus className="h-4 w-4 mr-1" />
@@ -30,11 +30,11 @@ const DashboardHeader = () => {
         </Button>
       </div>
       
-      {/* Report buttons section */}
       <div className="flex flex-wrap gap-2">
         <Button 
           onClick={() => navigate("/qatar/completed-jobs")}
-          className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1 transition-all hover:scale-105"
+          variant="outline"
+          className="border-[#3b5998]/30 text-[#3b5998] hover:bg-[#3b5998]/5 flex items-center gap-1"
         >
           <CheckCircle size={16} />
           COMPLETED JOBS
@@ -42,7 +42,8 @@ const DashboardHeader = () => {
         
         <Button 
           onClick={() => navigate("/qatar/cancelled-jobs")}
-          className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-1 transition-all hover:scale-105"
+          variant="outline"
+          className="border-red-300 text-red-600 hover:bg-red-50 flex items-center gap-1"
         >
           <XCircle size={16} />
           CANCELLED JOBS
@@ -50,7 +51,8 @@ const DashboardHeader = () => {
         
         <Button 
           onClick={() => navigate("/qatar/job-status")}
-          className="bg-amber-600 hover:bg-amber-700 text-white flex items-center gap-1 transition-all hover:scale-105"
+          variant="outline"
+          className="border-[#3b5998]/30 text-[#3b5998] hover:bg-[#3b5998]/5 flex items-center gap-1"
         >
           <Activity size={16} />
           JOB STATUS

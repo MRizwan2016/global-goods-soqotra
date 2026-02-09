@@ -10,16 +10,16 @@ interface RecentDeliveriesProps {
 
 const RecentDeliveries = ({ deliveries }: RecentDeliveriesProps) => {
   return (
-    <Card className="shadow-sm hover:shadow transition-shadow mb-6">
+    <Card className="shadow-sm hover:shadow transition-shadow mb-6 border border-gray-200">
       <CardHeader>
-        <CardTitle>Recent Deliveries</CardTitle>
+        <CardTitle className="text-[#1e2a3a]">Recent Deliveries</CardTitle>
         <CardDescription>Latest cargo deliveries in process</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b">
+              <tr className="bg-[#3b5998] text-white">
                 <th className="text-left p-2">Invoice #</th>
                 <th className="text-left p-2">Receiver</th>
                 <th className="text-left p-2">Destination</th>
@@ -39,9 +39,9 @@ const RecentDeliveries = ({ deliveries }: RecentDeliveriesProps) => {
                     <td className="p-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium
                         ${latestStatus.status === 'delivered' ? 'bg-green-100 text-green-800' : 
-                          latestStatus.status === 'in-transit' ? 'bg-orange-100 text-orange-800' : 
-                          latestStatus.status === 'processing' ? 'bg-blue-100 text-blue-800' : 
-                          'bg-yellow-100 text-yellow-800'}`}>
+                          latestStatus.status === 'in-transit' ? 'bg-amber-100 text-amber-800' : 
+                          latestStatus.status === 'processing' ? 'bg-[#3b5998]/10 text-[#3b5998]' : 
+                          'bg-gray-100 text-gray-700'}`}>
                         {latestStatus.status.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                       </span>
                     </td>
@@ -55,7 +55,7 @@ const RecentDeliveries = ({ deliveries }: RecentDeliveriesProps) => {
                     </td>
                     <td className="p-2 text-right">
                       <Link to={`/kenya/delivery/${delivery.id}`}>
-                        <Button variant="ghost" size="sm" className="h-8">
+                        <Button variant="ghost" size="sm" className="h-8 text-[#3b5998] hover:bg-[#3b5998]/5">
                           View
                         </Button>
                       </Link>
@@ -68,7 +68,7 @@ const RecentDeliveries = ({ deliveries }: RecentDeliveriesProps) => {
         </div>
         <div className="mt-4 text-center">
           <Link to="/kenya/deliveries">
-            <Button variant="outline">View All Deliveries</Button>
+            <Button variant="outline" className="border-[#3b5998]/30 text-[#3b5998] hover:bg-[#3b5998]/5">View All Deliveries</Button>
           </Link>
         </div>
       </CardContent>
