@@ -128,8 +128,8 @@ const SaudiArabiaDashboard = () => {
             <h1 className="text-3xl font-bold text-[#1e2a3a]">Dashboard - Saudi Arabia</h1>
           </div>
           <div className="flex gap-2">
-            <Button 
-              className="gap-2"
+             <Button 
+              className="gap-2 bg-[#3b5998] hover:bg-[#2d4373]"
               onClick={() => navigate("/saudi-arabia/invoice/add")}
             >
               <Plus className="h-4 w-4" />
