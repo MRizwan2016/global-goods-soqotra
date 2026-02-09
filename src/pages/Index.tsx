@@ -15,8 +15,8 @@ const Index = () => {
       console.log("User is authenticated, redirecting to dashboard");
       navigate("/dashboard", { replace: true });
     } else {
-      console.log("User is not authenticated, redirecting to registration page (main entry point)");
-      navigate("/admin/register", { replace: true });
+      console.log("User is not authenticated, redirecting to login page");
+      navigate("/admin/login", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
