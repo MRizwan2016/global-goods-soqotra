@@ -20,7 +20,7 @@ const DashboardContent = ({ children, isLoaded }: DashboardContentProps) => {
     >
       <div className="space-y-6 animate-fade-in dashboard-content">
         <div className={`flex justify-between items-center mb-6 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-          <h1 className={`text-2xl font-semibold text-gray-800 ${language === 'ar' ? 'font-arabic' : ''}`}>
+          <h1 className={`text-2xl font-semibold text-[#1e2a3a] ${language === 'ar' ? 'font-arabic' : ''}`}>
             {t("dashboard.title")}
           </h1>
           <div className={`flex items-center gap-2 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
