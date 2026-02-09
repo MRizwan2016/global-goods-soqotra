@@ -23,23 +23,16 @@ const Header = ({ title }: { title: string }) => {
   };
 
   return (
-    <header className="relative bg-gradient-to-r from-white to-gray-50 border-b border-b-[#e6e6e6] py-6 px-4">
-      {/* Background Image */}
-      <div 
-        className="absolute inset-0 opacity-10 bg-[url('/lovable-uploads/42243779-6510-4c41-bac1-c181e6b6a4f8.png')] 
-        bg-center bg-cover mix-blend-overlay pointer-events-none"
-        aria-hidden="true"
-      />
-      
-      <div className="relative flex items-center justify-between max-w-7xl mx-auto">
-        <div className="flex items-center gap-8 flex-1">
+    <header className="bg-white border-b border-slate-200 py-4 px-6">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-6 flex-1">
           <img 
             src="/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png" 
             alt="SOQOTRA LOGO" 
-            className="h-16 w-auto cursor-pointer transition-transform hover:scale-105"
+            className="h-12 w-auto cursor-pointer transition-opacity hover:opacity-80"
             onClick={handleLogoClick}
           />
-          <h1 className="text-2xl font-semibold text-gray-900 tracking-wide text-center flex-1">
+          <h1 className="text-lg font-semibold text-[#1e2a3a] tracking-wide">
             {title}
           </h1>
         </div>
@@ -47,8 +40,9 @@ const Header = ({ title }: { title: string }) => {
         <div className="flex items-center gap-2">
           {isAuthenticated ? (
             <Button 
-              variant="outline" 
-              className="flex items-center gap-2 border-red-200 hover:bg-red-50 hover:text-red-600 hover:border-red-300"
+              variant="ghost" 
+              size="sm"
+              className="flex items-center gap-2 text-slate-500 hover:text-red-600 hover:bg-red-50"
               onClick={handleLogout}
             >
               <LogOut className="h-4 w-4" />
@@ -56,8 +50,9 @@ const Header = ({ title }: { title: string }) => {
             </Button>
           ) : (
             <Button 
-              variant="outline" 
-              className="flex items-center gap-2 border-blue-200 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300"
+              variant="ghost" 
+              size="sm"
+              className="flex items-center gap-2 text-slate-500 hover:text-[#1e2a3a] hover:bg-slate-100"
               onClick={handleLogin}
             >
               <LogIn className="h-4 w-4" />

@@ -20,23 +20,23 @@ const UserProfileSection = () => {
   };
 
   return (
-    <div className="p-4 border-t border-sky-200 bg-gradient-to-r from-sky-50 to-green-50">
+    <div className="p-4 border-t border-[#2a3a4e] bg-[#182232]">
       {currentUser ? (
-        <div className="flex flex-col space-y-3 animate-fade-in">
+        <div className="flex flex-col space-y-3">
           <div className="flex items-center">
-            <div className="h-8 w-8 rounded-full bg-soqotra-green flex items-center justify-center text-white font-medium mr-3 hover-scale shadow-sm">
+            <div className="h-8 w-8 rounded-full bg-[#3b5998] flex items-center justify-center text-white text-sm font-medium mr-3">
               {currentUser.fullName ? currentUser.fullName.charAt(0) : 'U'}
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-medium">{currentUser.fullName || 'User'}</span>
-              <span className="text-xs text-gray-500">{currentUser.isAdmin ? 'Administrator' : 'User'}</span>
+              <span className="text-sm font-medium text-slate-200">{currentUser.fullName || 'User'}</span>
+              <span className="text-xs text-slate-500">{currentUser.isAdmin ? 'Administrator' : 'User'}</span>
             </div>
           </div>
-          <Separator />
+          <Separator className="bg-[#2a3a4e]" />
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="flex items-center justify-start text-sm text-gray-600 hover:text-rose-600 transition-colors duration-300 p-0 m-0 h-auto"
+            className="flex items-center justify-start text-sm text-slate-400 hover:text-red-400 hover:bg-[#253549] transition-colors duration-200 p-0 m-0 h-auto"
           >
             <LogOut className="mr-2 h-4 w-4" />
             Log out
@@ -46,7 +46,7 @@ const UserProfileSection = () => {
         <Button
           variant="ghost"
           onClick={handleLogin}
-          className="flex items-center justify-start text-sm text-gray-600 hover:text-green-600 transition-colors duration-300 p-0 m-0 h-auto w-full"
+          className="flex items-center justify-start text-sm text-slate-400 hover:text-white hover:bg-[#253549] transition-colors duration-200 p-0 m-0 h-auto w-full"
         >
           <LogIn className="mr-2 h-4 w-4" />
           Log in
