@@ -14,7 +14,7 @@ const CustomsTab: React.FC = () => {
         <h4 className="font-medium text-[#1e2a3a] mb-3">Customs Clearance Services</h4>
         <ul className="space-y-2">
           <li className="flex items-start">
-            <span className="inline-flex items-center justify-center bg-purple-100 text-purple-800 rounded-full h-5 w-5 mr-2 flex-shrink-0 text-xs font-medium">•</span>
+             <span className="inline-flex items-center justify-center bg-[#d6dce8] text-[#3b5998] rounded-full h-5 w-5 mr-2 flex-shrink-0 text-xs font-medium">•</span>
             <span className="text-gray-700">Region-specific customs documentation preparation</span>
           </li>
           <li className="flex items-start">
