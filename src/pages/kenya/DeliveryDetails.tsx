@@ -13,6 +13,7 @@ import CargoTab from "./components/delivery-details/CargoTab";
 import TransportTab from "./components/delivery-details/TransportTab";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const DeliveryDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -72,6 +73,7 @@ const DeliveryDetails = () => {
 
   return (
     <Layout title={`Delivery ${delivery.invoiceNumber} Details`}>
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <HeaderSection 
           invoiceNumber={delivery.invoiceNumber} 

@@ -10,6 +10,7 @@ import { CargoDelivery } from "./types/deliveryTracking";
 import DeliveryFilterBar from "./components/DeliveryFilterBar";
 import DeliveryTable from "./components/DeliveryTable";
 import DeliveryPaginationFooter from "./components/DeliveryPaginationFooter";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const KenyaDeliveryTracking = () => {
   const navigate = useNavigate();
@@ -51,6 +52,7 @@ const KenyaDeliveryTracking = () => {
 
   return (
     <Layout title="Kenya Cargo Delivery Tracking">
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-4 bg-[#f0f3f8] border-b border-[#d6dce8] flex justify-between items-center">
           <div className="flex items-center gap-4">

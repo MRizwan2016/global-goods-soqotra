@@ -7,6 +7,7 @@ import { FileText, Filter, Printer, Ship } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 import mockContainers from "./data/mockContainers";
 import { mockVesselData } from "./components/vessel-management/mockVesselData";
 
@@ -65,6 +66,7 @@ const CargoManifest: React.FC = () => {
 
   return (
     <Layout title="CARGO MANIFEST">
+      <PageBreadcrumb className="mb-4" />
       <div className="container mx-auto py-6 animate-fade-in">
         <Card className="shadow-md">
           <CardContent className="p-6">

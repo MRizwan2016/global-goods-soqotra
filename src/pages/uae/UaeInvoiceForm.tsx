@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Save, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const UaeInvoiceForm = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const UaeInvoiceForm = () => {
 
   return (
      <div className="min-h-screen bg-[#f8f9fb] p-6">
+      <PageBreadcrumb className="mb-4 max-w-4xl mx-auto" />
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">

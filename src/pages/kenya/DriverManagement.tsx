@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Driver } from "./types/deliveryTracking";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 import { 
   Dialog,
   DialogContent,
@@ -119,6 +120,7 @@ const DriverManagement = () => {
 
   return (
     <Layout title="Driver Management">
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-4 bg-green-50 border-b border-green-100 flex justify-between items-center">
           <div className="flex items-center gap-4">

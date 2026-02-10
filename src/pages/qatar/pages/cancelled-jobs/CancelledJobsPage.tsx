@@ -4,6 +4,7 @@ import { JobStorageService } from "../../services/JobStorageService";
 import JobListPage from "../../components/job-list/JobListPage";
 import CancelledJobsTable from "../../components/cancelled-jobs/CancelledJobsTable";
 import BackButton from "@/components/ui/back-button";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const CancelledJobsPage = () => {
   const [jobs] = useState(() => {
@@ -15,6 +16,7 @@ const CancelledJobsPage = () => {
 
   return (
     <div className="container mx-auto py-6">
+      <PageBreadcrumb className="mb-4" />
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <BackButton to="/qatar" />

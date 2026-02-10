@@ -10,6 +10,7 @@ import VehicleFilterBar from "./components/Vehicle/VehicleFilterBar";
 import VehicleTable from "./components/Vehicle/VehicleTable";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const VehicleManagement = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
@@ -63,6 +64,7 @@ const VehicleManagement = () => {
 
   return (
     <Layout title="Vehicle Management">
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-4 bg-green-50 border-b border-green-100 flex justify-between items-center">
           <div className="flex items-center gap-4">

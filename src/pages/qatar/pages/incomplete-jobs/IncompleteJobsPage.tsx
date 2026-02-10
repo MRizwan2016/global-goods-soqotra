@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, QrCode } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { QRScannerDialog } from "../../components/qr-scanner";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const IncompleteJobsPage = () => {
   const navigate = useNavigate();
@@ -50,6 +51,7 @@ const IncompleteJobsPage = () => {
 
   return (
     <div className="container mx-auto py-6">
+      <PageBreadcrumb className="mb-4" />
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">INCOMPLETE JOBS</h1>
         <div className="flex gap-2">

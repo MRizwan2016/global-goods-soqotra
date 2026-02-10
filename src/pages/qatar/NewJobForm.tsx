@@ -11,6 +11,7 @@ import { JobNumberService } from "@/services/JobNumberService";
 import { JobInvoiceInterconnectService } from "./services/JobInvoiceInterconnectService";
 import { cityVehicleMapping } from "./data/cityVehicleMapping";
 import { fixInvoiceLinkage, cleanupDummyData } from "./utils/fixInvoiceLinkage";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const NewJobForm = () => {
   const navigate = useNavigate();
@@ -159,6 +160,7 @@ const NewJobForm = () => {
   
   return (
     <Layout title="Create New Qatar Job">
+      <PageBreadcrumb className="mb-4" />
       <div className="space-y-6 bg-white p-8 rounded-lg shadow-sm animate-fade-in">
         <div className="flex justify-between items-center">
           <div>

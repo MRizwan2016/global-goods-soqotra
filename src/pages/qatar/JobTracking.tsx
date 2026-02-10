@@ -5,6 +5,7 @@ import JobTrackingHeader from "./components/job-tracking/JobTrackingHeader";
 import JobFilters from "./components/job-tracking/JobFilters";
 import JobTable from "./components/job-tracking/JobTable";
 import TablePagination from "./components/job-tracking/TablePagination";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const JobTracking = () => {
   const {
@@ -26,6 +27,7 @@ const JobTracking = () => {
 
   return (
     <Layout title="Qatar Job Tracking">
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <JobTrackingHeader />
         

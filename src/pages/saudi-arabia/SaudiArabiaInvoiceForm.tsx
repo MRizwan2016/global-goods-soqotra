@@ -25,6 +25,7 @@ import {
   doorToDoorPricing 
 } from "./data/saudiArabiaData";
 import { toast } from "sonner";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const SaudiArabiaInvoiceForm = () => {
   const navigate = useNavigate();
@@ -121,6 +122,7 @@ const SaudiArabiaInvoiceForm = () => {
 
   return (
     <Layout title={`${id ? 'Edit' : 'Add New'} Invoice - Saudi Arabia`}>
+      <PageBreadcrumb className="mb-4" />
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

@@ -9,6 +9,7 @@ import VehicleList from "./components/vehicle-management/VehicleList";
 import VehicleStats from "./components/vehicle-management/VehicleStats";
 import VehicleForm from "./components/vehicle-management/VehicleForm";
 import { mockVehicles } from "./data/mockVehicles";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const VehicleManagement = () => {
   const [showAddVehicle, setShowAddVehicle] = useState(false);
@@ -16,6 +17,7 @@ const VehicleManagement = () => {
 
   return (
     <Layout title="Vehicle Management">
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">

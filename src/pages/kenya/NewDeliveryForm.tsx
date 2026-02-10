@@ -11,6 +11,7 @@ import DeliveryInvoiceSelector from "./components/delivery-form/DeliveryInvoiceS
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const NewDeliveryForm = () => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const NewDeliveryForm = () => {
   
   return (
     <Layout title="New Delivery">
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
         <div className="mb-4 flex justify-between items-center">
           <BackButton to="/kenya/deliveries" />
