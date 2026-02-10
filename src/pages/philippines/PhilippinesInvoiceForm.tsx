@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Save, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const PhilippinesInvoiceForm = () => {
   const navigate = useNavigate();
