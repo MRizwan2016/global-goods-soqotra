@@ -11,6 +11,7 @@ import { JobNumberService } from "@/services/JobNumberService";
 import { JobInvoiceInterconnectService } from "./services/JobInvoiceInterconnectService";
 import { cityVehicleMapping } from "./data/cityVehicleMapping";
 import { fixInvoiceLinkage, cleanupDummyData } from "./utils/fixInvoiceLinkage";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const NewJobForm = () => {
   const navigate = useNavigate();
