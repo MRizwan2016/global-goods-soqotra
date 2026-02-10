@@ -10,6 +10,7 @@ import VehicleFilterBar from "./components/Vehicle/VehicleFilterBar";
 import VehicleTable from "./components/Vehicle/VehicleTable";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const VehicleManagement = () => {
   const [vehicles, setVehicles] = useState<Vehicle[]>(mockVehicles);
