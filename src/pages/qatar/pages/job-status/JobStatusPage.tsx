@@ -128,6 +128,7 @@ const JobStatusPage = () => {
 
   return (
     <>
+      <PageBreadcrumb className="mb-4" />
       <div className="mb-6 flex items-center">
         <Button 
           variant="outline" 

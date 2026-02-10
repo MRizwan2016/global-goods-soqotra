@@ -39,6 +39,7 @@ const CompletedJobsPage = () => {
 
   return (
     <div className="container mx-auto py-6">
+      <PageBreadcrumb className="mb-4" />
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
           <BackButton to="/qatar" />
