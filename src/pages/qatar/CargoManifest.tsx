@@ -7,6 +7,7 @@ import { FileText, Filter, Printer, Ship } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 import mockContainers from "./data/mockContainers";
 import { mockVesselData } from "./components/vessel-management/mockVesselData";
 
