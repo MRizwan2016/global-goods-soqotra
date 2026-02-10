@@ -456,7 +456,7 @@ const SaudiArabiaInvoiceForm = () => {
                   <div className="text-sm text-gray-600">Total Weight</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">{formData.totalVolume.toFixed(3)} m³</div>
+                  <div className="text-2xl font-bold text-[#7b9acc]">{formData.totalVolume.toFixed(3)} m³</div>
                   <div className="text-sm text-gray-600">Total Volume</div>
                 </div>
               </div>
