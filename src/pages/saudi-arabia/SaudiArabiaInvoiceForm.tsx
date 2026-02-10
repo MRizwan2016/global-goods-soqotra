@@ -466,7 +466,7 @@ const SaudiArabiaInvoiceForm = () => {
 
         {/* Costs Details */}
         <Card>
-          <CardHeader className="bg-green-600 text-white">
+          <CardHeader className="bg-[#3b5998] text-white">
             <CardTitle>COSTS & PRICING</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
