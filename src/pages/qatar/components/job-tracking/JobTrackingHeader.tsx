@@ -31,8 +31,8 @@ const JobTrackingHeader = () => {
   };
   
   return (
-    <div className="p-4 bg-blue-50 border-b border-blue-100 flex flex-col gap-3">
-      <h3 className="text-lg font-medium text-blue-800">QATAR CARGO COLLECTION & DELIVERY MANAGEMENT</h3>
+     <div className="p-4 bg-[#f0f3f8] border-b border-[#d6dce8] flex flex-col gap-3">
+      <h3 className="text-lg font-medium text-[#1e2a3a]">QATAR CARGO COLLECTION & DELIVERY MANAGEMENT</h3>
       <div className="flex flex-wrap gap-2">
         <Button 
           variant="outline" 
