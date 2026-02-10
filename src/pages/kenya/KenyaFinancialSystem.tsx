@@ -15,6 +15,7 @@ import {
   FileCheck
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const KenyaFinancialSystem = () => {
   const [activeTab, setActiveTab] = useState("invoice-approval");
