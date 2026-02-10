@@ -22,7 +22,7 @@ const DeliveriesTab: React.FC = () => {
             <span className="text-gray-700">Same-day delivery within major metropolitan areas</span>
           </li>
           <li className="flex items-start">
-            <span className="inline-flex items-center justify-center bg-blue-100 text-blue-800 rounded-full h-5 w-5 mr-2 flex-shrink-0 text-xs font-medium">•</span>
+             <span className="inline-flex items-center justify-center bg-[#d6dce8] text-[#3b5998] rounded-full h-5 w-5 mr-2 flex-shrink-0 text-xs font-medium">•</span>
             <span className="text-gray-700">Inter-island delivery services via ferry, RORO, and air freight</span>
           </li>
           <li className="flex items-start">
