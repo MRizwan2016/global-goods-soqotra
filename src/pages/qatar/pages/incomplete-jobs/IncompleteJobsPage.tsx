@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, QrCode } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { QRScannerDialog } from "../../components/qr-scanner";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const IncompleteJobsPage = () => {
   const navigate = useNavigate();
