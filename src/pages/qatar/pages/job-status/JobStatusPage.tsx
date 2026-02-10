@@ -14,6 +14,7 @@ import { JobStorageService } from "../../services/JobStorageService";
 import JobListPage from "../../components/job-list/JobListPage";
 import JobStatusTable from "../../components/job-status/JobStatusTable";
 import JobStatusSummaryView from "../../components/job-list/JobStatusSummaryView";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const JobStatusPage = () => {
   const navigate = useNavigate();
