@@ -12,6 +12,7 @@ import GroupControlPanel from "./components/job-generate/page-sections/GroupCont
 import JobGenerateLayout from "./components/job-generate/page-sections/JobGenerateLayout";
 import ScheduleDetailsEditor from "./components/job-generate/schedule-details/ScheduleDetailsEditor";
 import { toast } from "sonner";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const JobGeneratePage: React.FC = () => {
   const { jobsData, isLoading, pendingJobs } = useJobGenerate();
