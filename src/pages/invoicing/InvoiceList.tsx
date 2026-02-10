@@ -48,8 +48,8 @@ const InvoiceList = () => {
   return (
     <Layout title="Invoice Management">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-4 bg-green-50 border-b border-green-100">
-          <h3 className="text-lg font-medium text-green-800">View Invoice Record Listed</h3>
+         <div className="p-4 bg-[#f0f3f8] border-b border-[#d6dce8]">
+          <h3 className="text-lg font-medium text-[#1e2a3a]">View Invoice Record Listed</h3>
         </div>
         
         <div className="p-4 flex flex-col gap-4">

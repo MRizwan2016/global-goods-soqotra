@@ -32,7 +32,7 @@ const PaymentDetails: React.FC<PaymentDetailsProps> = ({
 
   return (
     <div className="mt-8">
-      <div className="bg-soqotra-blue text-white py-2 px-4 font-medium">
+       <div className="bg-[#1e2a3a] text-white py-2 px-4 font-medium">
         PAYMENT DETAILS
       </div>
       

@@ -30,7 +30,7 @@ const CustomsTab: React.FC = () => {
             <span className="text-gray-700">Special permits and licenses procurement</span>
           </li>
           <li className="flex items-start">
-            <span className="inline-flex items-center justify-center bg-purple-100 text-purple-800 rounded-full h-5 w-5 mr-2 flex-shrink-0 text-xs font-medium">•</span>
+            <span className="inline-flex items-center justify-center bg-[#d6dce8] text-[#3b5998] rounded-full h-5 w-5 mr-2 flex-shrink-0 text-xs font-medium">•</span>
             <span className="text-gray-700">Customs compliance consulting</span>
           </li>
         </ul>

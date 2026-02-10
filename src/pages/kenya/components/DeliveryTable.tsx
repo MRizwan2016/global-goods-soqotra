@@ -65,7 +65,7 @@ const DeliveryTable: React.FC<DeliveryTableProps> = ({ entries, onViewDelivery }
                   <Button 
                     size="sm" 
                     variant="outline" 
-                    className="h-7 px-2 text-xs"
+                    className="h-7 px-2 text-xs border-[#3b5998] text-[#3b5998] hover:bg-[#3b5998] hover:text-white"
                     onClick={() => onViewDelivery(delivery.id)}
                   >
                     View Details

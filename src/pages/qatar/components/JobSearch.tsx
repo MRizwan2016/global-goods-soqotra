@@ -73,7 +73,7 @@ const JobSearch = ({ onSearch }: JobSearchProps) => {
         </div>
         
         <div className="flex items-end">
-          <Button onClick={handleSearch} className="bg-blue-600 hover:bg-blue-700 w-full">
+          <Button onClick={handleSearch} className="bg-[#3b5998] hover:bg-[#1e2a3a] w-full">
             <Search size={16} className="mr-2" />
             FIND
           </Button>

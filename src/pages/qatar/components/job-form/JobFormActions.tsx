@@ -157,7 +157,7 @@ const JobFormActions: React.FC<JobFormActionsProps> = ({
       {!disabled && !readOnly && (
         <Button 
           type="button"
-          className="bg-green-600 hover:bg-green-700 flex items-center gap-2 transition-colors"
+          className="bg-[#3b5998] hover:bg-[#1e2a3a] flex items-center gap-2 transition-colors"
           disabled={isFormDisabled}
           onClick={handleSubmit}
         >

@@ -529,7 +529,7 @@ const SaudiArabiaInvoiceForm = () => {
                 <div className="text-sm text-gray-600">Discount</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{formData.net.toFixed(2)} QAR</div>
+                <div className="text-2xl font-bold text-[#1e2a3a]">{formData.net.toFixed(2)} QAR</div>
                 <div className="text-sm text-gray-600">Net Total</div>
               </div>
             </div>
