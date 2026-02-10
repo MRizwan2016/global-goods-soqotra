@@ -73,6 +73,7 @@ const DeliveryDetails = () => {
 
   return (
     <Layout title={`Delivery ${delivery.invoiceNumber} Details`}>
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <HeaderSection 
           invoiceNumber={delivery.invoiceNumber} 

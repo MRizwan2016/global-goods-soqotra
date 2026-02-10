@@ -19,6 +19,7 @@ const NewDeliveryForm = () => {
   
   return (
     <Layout title="New Delivery">
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
         <div className="mb-4 flex justify-between items-center">
           <BackButton to="/kenya/deliveries" />

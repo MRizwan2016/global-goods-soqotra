@@ -2,10 +2,12 @@ import React from "react";
 import Layout from "@/components/layout/Layout";
 import BackButton from "@/components/ui/back-button";
 import CustomerTrackingPortal from "./components/tracking/CustomerTrackingPortal";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const KenyaCustomerPortal = () => {
   return (
     <Layout title="Kenya Customer Portal">
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="mb-6">
           <BackButton to="/kenya" />
