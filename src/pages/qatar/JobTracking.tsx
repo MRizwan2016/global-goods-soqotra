@@ -5,6 +5,7 @@ import JobTrackingHeader from "./components/job-tracking/JobTrackingHeader";
 import JobFilters from "./components/job-tracking/JobFilters";
 import JobTable from "./components/job-tracking/JobTable";
 import TablePagination from "./components/job-tracking/TablePagination";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const JobTracking = () => {
   const {
