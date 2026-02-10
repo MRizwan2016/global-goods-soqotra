@@ -26,7 +26,7 @@ const WarehousesTab: React.FC = () => {
             <span className="text-gray-700">Davao: 6,200 sq m facility for Mindanao operations</span>
           </li>
           <li className="flex items-start">
-            <span className="inline-flex items-center justify-center bg-green-100 text-green-800 rounded-full h-5 w-5 mr-2 flex-shrink-0 text-xs font-medium">•</span>
+             <span className="inline-flex items-center justify-center bg-[#d6dce8] text-[#3b5998] rounded-full h-5 w-5 mr-2 flex-shrink-0 text-xs font-medium">•</span>
             <span className="text-gray-700">Clark: 4,500 sq m bonded warehouse facility</span>
           </li>
           <li className="flex items-start">
