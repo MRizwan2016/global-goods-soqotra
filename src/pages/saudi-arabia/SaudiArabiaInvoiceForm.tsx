@@ -122,6 +122,7 @@ const SaudiArabiaInvoiceForm = () => {
 
   return (
     <Layout title={`${id ? 'Edit' : 'Add New'} Invoice - Saudi Arabia`}>
+      <PageBreadcrumb className="mb-4" />
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
