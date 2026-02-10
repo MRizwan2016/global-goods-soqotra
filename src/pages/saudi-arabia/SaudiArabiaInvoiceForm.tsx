@@ -400,7 +400,7 @@ const SaudiArabiaInvoiceForm = () => {
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-blue-500 hover:bg-blue-500">
+                  <TableRow className="bg-[#1e2a3a] hover:bg-[#1e2a3a]">
                     <TableHead className="text-white">No.</TableHead>
                     <TableHead className="text-white">PACKAGE</TableHead>
                     <TableHead className="text-white">DIMENSIONS</TableHead>
