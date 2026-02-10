@@ -13,6 +13,7 @@ import CargoTab from "./components/delivery-details/CargoTab";
 import TransportTab from "./components/delivery-details/TransportTab";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const DeliveryDetails = () => {
   const { id } = useParams<{ id: string }>();
