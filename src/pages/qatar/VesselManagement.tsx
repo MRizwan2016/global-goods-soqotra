@@ -8,6 +8,7 @@ import VesselManagementHeader from "./components/vessel-management/VesselManagem
 import VesselTabs from "./components/vessel-management/VesselTabs";
 import LoadingState from "./components/shared/LoadingState";
 import { motion } from "framer-motion";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const VesselManagement: React.FC = () => {
   const {
