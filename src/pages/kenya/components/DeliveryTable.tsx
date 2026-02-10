@@ -16,7 +16,7 @@ const DeliveryTable: React.FC<DeliveryTableProps> = ({ entries, onViewDelivery }
   return (
     <Table>
       <TableHeader>
-        <TableRow className="bg-gray-100 hover:bg-gray-100">
+        <TableRow className="bg-[#1e2a3a] hover:bg-[#1e2a3a]">
           <TableHead className="w-24">Invoice #</TableHead>
           <TableHead>Receiver</TableHead>
           <TableHead>Contact</TableHead>
