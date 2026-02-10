@@ -66,6 +66,7 @@ const CargoManifest: React.FC = () => {
 
   return (
     <Layout title="CARGO MANIFEST">
+      <PageBreadcrumb className="mb-4" />
       <div className="container mx-auto py-6 animate-fade-in">
         <Card className="shadow-md">
           <CardContent className="p-6">

@@ -120,6 +120,7 @@ const JobGeneratePage: React.FC = () => {
   
   return (
     <Layout title="Job Schedule Generation">
+      <PageBreadcrumb className="mb-4" />
       <div className="w-full">
         <div className="max-w-full mx-auto">
           <JobPageHeader />

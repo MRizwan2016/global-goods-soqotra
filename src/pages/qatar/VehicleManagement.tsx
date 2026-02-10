@@ -17,6 +17,7 @@ const VehicleManagement = () => {
 
   return (
     <Layout title="Vehicle Management">
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-2">

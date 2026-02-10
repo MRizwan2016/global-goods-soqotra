@@ -109,6 +109,7 @@ const ContainerManagement: React.FC = () => {
 
   return (
     <Layout title="CONTAINER MANAGEMENT">
+      <PageBreadcrumb className="mb-4" />
       {/* Add global styles for printing */}
       <PrintStyles />
       

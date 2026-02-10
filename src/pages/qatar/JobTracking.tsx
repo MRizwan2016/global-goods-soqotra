@@ -27,6 +27,7 @@ const JobTracking = () => {
 
   return (
     <Layout title="Qatar Job Tracking">
+      <PageBreadcrumb className="mb-4" />
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <JobTrackingHeader />
         

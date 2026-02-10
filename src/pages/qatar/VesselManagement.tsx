@@ -30,6 +30,7 @@ const VesselManagement: React.FC = () => {
 
   return (
     <Layout title="VESSEL MANAGEMENT">
+      <PageBreadcrumb className="mb-4" />
       <motion.div 
         className="container py-6 mx-auto"
         initial={{ opacity: 0 }}

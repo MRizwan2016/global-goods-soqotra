@@ -160,6 +160,7 @@ const NewJobForm = () => {
   
   return (
     <Layout title="Create New Qatar Job">
+      <PageBreadcrumb className="mb-4" />
       <div className="space-y-6 bg-white p-8 rounded-lg shadow-sm animate-fade-in">
         <div className="flex justify-between items-center">
           <div>

@@ -124,6 +124,7 @@ const JobDetails = () => {
   
   return (
     <Layout title={`Job ${job.jobNumber} - ${job.jobType}`}>
+      <PageBreadcrumb className="mb-4" />
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
