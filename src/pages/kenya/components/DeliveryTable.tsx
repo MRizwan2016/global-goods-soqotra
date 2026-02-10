@@ -17,17 +17,17 @@ const DeliveryTable: React.FC<DeliveryTableProps> = ({ entries, onViewDelivery }
     <Table>
       <TableHeader>
         <TableRow className="bg-[#1e2a3a] hover:bg-[#1e2a3a]">
-          <TableHead className="w-24">Invoice #</TableHead>
-          <TableHead>Receiver</TableHead>
-          <TableHead>Contact</TableHead>
-          <TableHead>Location</TableHead>
-          <TableHead className="w-28">Collection Date</TableHead>
-          <TableHead className="w-28">Delivery Date</TableHead>
-          <TableHead className="w-28">Status</TableHead>
-          <TableHead className="w-24">Payment</TableHead>
-          <TableHead className="w-24">D2D</TableHead>
-          <TableHead className="w-24">Packages</TableHead>
-          <TableHead className="w-20 text-right">Actions</TableHead>
+          <TableHead className="w-24 text-white">Invoice #</TableHead>
+          <TableHead className="text-white">Receiver</TableHead>
+          <TableHead className="text-white">Contact</TableHead>
+          <TableHead className="text-white">Location</TableHead>
+          <TableHead className="w-28 text-white">Collection Date</TableHead>
+          <TableHead className="w-28 text-white">Delivery Date</TableHead>
+          <TableHead className="w-28 text-white">Status</TableHead>
+          <TableHead className="w-24 text-white">Payment</TableHead>
+          <TableHead className="w-24 text-white">D2D</TableHead>
+          <TableHead className="w-24 text-white">Packages</TableHead>
+          <TableHead className="w-20 text-right text-white">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
