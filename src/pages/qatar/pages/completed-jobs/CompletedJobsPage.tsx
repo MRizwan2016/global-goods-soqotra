@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import BackButton from "@/components/ui/back-button";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const CompletedJobsPage = () => {
   const navigate = useNavigate();
