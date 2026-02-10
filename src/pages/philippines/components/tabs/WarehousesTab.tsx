@@ -14,7 +14,7 @@ const WarehousesTab: React.FC = () => {
         <h4 className="font-medium text-[#1e2a3a] mb-3">Warehouse Facilities</h4>
         <ul className="space-y-2">
           <li className="flex items-start">
-            <span className="inline-flex items-center justify-center bg-green-100 text-green-800 rounded-full h-5 w-5 mr-2 flex-shrink-0 text-xs font-medium">•</span>
+             <span className="inline-flex items-center justify-center bg-[#d6dce8] text-[#3b5998] rounded-full h-5 w-5 mr-2 flex-shrink-0 text-xs font-medium">•</span>
             <span className="text-gray-700">Manila: 12,000 sq m primary distribution center</span>
           </li>
           <li className="flex items-start">
