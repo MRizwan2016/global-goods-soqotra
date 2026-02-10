@@ -83,7 +83,7 @@ const JobTable = ({ currentEntries, refreshJobs }: JobTableProps) => {
       <div className="overflow-x-auto border border-gray-200 rounded-md">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-100 hover:bg-gray-100">
+            <TableRow className="bg-[#1e2a3a] hover:bg-[#1e2a3a]">
               <TableHead className="w-24">JOB #</TableHead>
               <TableHead>TYPE</TableHead>
               <TableHead>CUSTOMER</TableHead>
