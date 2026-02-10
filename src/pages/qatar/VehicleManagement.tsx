@@ -9,6 +9,7 @@ import VehicleList from "./components/vehicle-management/VehicleList";
 import VehicleStats from "./components/vehicle-management/VehicleStats";
 import VehicleForm from "./components/vehicle-management/VehicleForm";
 import { mockVehicles } from "./data/mockVehicles";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const VehicleManagement = () => {
   const [showAddVehicle, setShowAddVehicle] = useState(false);
