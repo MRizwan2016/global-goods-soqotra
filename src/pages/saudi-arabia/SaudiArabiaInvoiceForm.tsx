@@ -311,7 +311,7 @@ const SaudiArabiaInvoiceForm = () => {
 
         {/* Package Details */}
         <Card>
-          <CardHeader className="bg-blue-500 text-white">
+          <CardHeader className="bg-[#1e2a3a] text-white">
             <CardTitle>PACKAGE DETAILS</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
