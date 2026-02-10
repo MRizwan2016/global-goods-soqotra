@@ -12,7 +12,7 @@ const FormActions = ({ onSubmit }: FormActionsProps) => {
       <Link to="/kenya/deliveries">
         <Button variant="outline" type="button">Cancel</Button>
       </Link>
-      <Button type="submit" onClick={onSubmit}>Create Delivery</Button>
+      <Button type="submit" onClick={onSubmit} className="bg-[#3b5998] hover:bg-[#1e2a3a]">Create Delivery</Button>
     </div>
   );
 };

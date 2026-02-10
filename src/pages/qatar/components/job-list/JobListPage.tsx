@@ -94,8 +94,8 @@ const JobListPage: React.FC<JobListPageProps> = ({
 
       <div className="flex justify-end mt-4">
         <Button 
-          onClick={handlePrintButtonClick} 
-          className="bg-gray-700 hover:bg-gray-800 text-white"
+           onClick={handlePrintButtonClick} 
+          className="bg-[#3b5998] hover:bg-[#1e2a3a] text-white"
         >
           <Printer className="h-4 w-4 mr-2" />
           Print Job List

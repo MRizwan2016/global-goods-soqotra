@@ -130,8 +130,8 @@ const SaudiArabiaInvoiceForm = () => {
               Go Back
             </Button>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-8 bg-gradient-to-r from-green-600 to-black rounded"></div>
-              <h1 className="text-3xl font-bold text-gray-900">
+               <div className="w-12 h-8 bg-gradient-to-r from-[#3b5998] to-[#1e2a3a] rounded"></div>
+              <h1 className="text-3xl font-bold text-[#1e2a3a]">
                 {id ? 'Edit' : 'Add New'} Invoice - Saudi Arabia
               </h1>
             </div>
@@ -311,7 +311,7 @@ const SaudiArabiaInvoiceForm = () => {
 
         {/* Package Details */}
         <Card>
-          <CardHeader className="bg-blue-500 text-white">
+          <CardHeader className="bg-[#1e2a3a] text-white">
             <CardTitle>PACKAGE DETAILS</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
@@ -400,7 +400,7 @@ const SaudiArabiaInvoiceForm = () => {
             <div className="rounded-md border">
               <Table>
                 <TableHeader>
-                  <TableRow className="bg-blue-500 hover:bg-blue-500">
+                  <TableRow className="bg-[#1e2a3a] hover:bg-[#1e2a3a]">
                     <TableHead className="text-white">No.</TableHead>
                     <TableHead className="text-white">PACKAGE</TableHead>
                     <TableHead className="text-white">DIMENSIONS</TableHead>
@@ -448,15 +448,15 @@ const SaudiArabiaInvoiceForm = () => {
             {packageItems.length > 0 && (
               <div className="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-lg">
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">{formData.totalPackages}</div>
+                  <div className="text-2xl font-bold text-[#3b5998]">{formData.totalPackages}</div>
                   <div className="text-sm text-gray-600">Total Packages</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{formData.totalWeight.toFixed(2)} kg</div>
+                  <div className="text-2xl font-bold text-[#5a7ab5]">{formData.totalWeight.toFixed(2)} kg</div>
                   <div className="text-sm text-gray-600">Total Weight</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-purple-600">{formData.totalVolume.toFixed(3)} m³</div>
+                  <div className="text-2xl font-bold text-[#7b9acc]">{formData.totalVolume.toFixed(3)} m³</div>
                   <div className="text-sm text-gray-600">Total Volume</div>
                 </div>
               </div>
@@ -466,7 +466,7 @@ const SaudiArabiaInvoiceForm = () => {
 
         {/* Costs Details */}
         <Card>
-          <CardHeader className="bg-green-600 text-white">
+          <CardHeader className="bg-[#3b5998] text-white">
             <CardTitle>COSTS & PRICING</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
@@ -521,7 +521,7 @@ const SaudiArabiaInvoiceForm = () => {
             {/* Totals Display */}
             <div className="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-lg">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{formData.gross.toFixed(2)} QAR</div>
+                <div className="text-2xl font-bold text-[#3b5998]">{formData.gross.toFixed(2)} QAR</div>
                 <div className="text-sm text-gray-600">Gross Total</div>
               </div>
               <div className="text-center">
@@ -529,7 +529,7 @@ const SaudiArabiaInvoiceForm = () => {
                 <div className="text-sm text-gray-600">Discount</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{formData.net.toFixed(2)} QAR</div>
+                <div className="text-2xl font-bold text-[#1e2a3a]">{formData.net.toFixed(2)} QAR</div>
                 <div className="text-sm text-gray-600">Net Total</div>
               </div>
             </div>

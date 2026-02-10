@@ -17,7 +17,7 @@ const UaeInvoiceForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+     <div className="min-h-screen bg-[#f8f9fb] p-6">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
@@ -25,28 +25,29 @@ const UaeInvoiceForm = () => {
               onClick={() => navigate('/uae')}
               variant="outline"
               size="sm"
+              className="border-[#3b5998] text-[#3b5998] hover:bg-[#3b5998] hover:text-white"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">UAE Invoice</h1>
+              <h1 className="text-2xl font-bold text-[#1e2a3a]">UAE Invoice</h1>
               <p className="text-gray-600">Create or edit invoice for UAE destination</p>
             </div>
           </div>
           <div className="flex gap-2">
-            <Button onClick={handlePreview} variant="outline">
+            <Button onClick={handlePreview} variant="outline" className="border-[#3b5998] text-[#3b5998] hover:bg-[#3b5998] hover:text-white">
               <Eye className="h-4 w-4 mr-2" />
               Preview
             </Button>
-            <Button onClick={handleSave}>
+            <Button onClick={handleSave} className="bg-[#3b5998] hover:bg-[#1e2a3a]">
               <Save className="h-4 w-4 mr-2" />
               Save
             </Button>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="text-center py-12">
             <p className="text-gray-500 mb-4">Invoice form coming soon...</p>
             <p className="text-sm text-gray-400">

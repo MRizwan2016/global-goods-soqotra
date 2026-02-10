@@ -83,16 +83,16 @@ const JobTable = ({ currentEntries, refreshJobs }: JobTableProps) => {
       <div className="overflow-x-auto border border-gray-200 rounded-md">
         <Table>
           <TableHeader>
-            <TableRow className="bg-gray-100 hover:bg-gray-100">
-              <TableHead className="w-24">JOB #</TableHead>
-              <TableHead>TYPE</TableHead>
-              <TableHead>CUSTOMER</TableHead>
-              <TableHead>CONTACT</TableHead>
-              <TableHead>LOCATION</TableHead>
-              <TableHead className="w-28">DATE</TableHead>
-              <TableHead className="w-24">VEHICLE</TableHead>
-              <TableHead className="w-28">STATUS</TableHead>
-              <TableHead className="w-48 text-right">ACTIONS</TableHead>
+            <TableRow className="bg-[#1e2a3a] hover:bg-[#1e2a3a]">
+               <TableHead className="w-24 text-white">JOB #</TableHead>
+              <TableHead className="text-white">TYPE</TableHead>
+              <TableHead className="text-white">CUSTOMER</TableHead>
+              <TableHead className="text-white">CONTACT</TableHead>
+              <TableHead className="text-white">LOCATION</TableHead>
+              <TableHead className="w-28 text-white">DATE</TableHead>
+              <TableHead className="w-24 text-white">VEHICLE</TableHead>
+              <TableHead className="w-28 text-white">STATUS</TableHead>
+              <TableHead className="w-48 text-right text-white">ACTIONS</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

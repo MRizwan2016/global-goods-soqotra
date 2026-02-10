@@ -32,7 +32,7 @@ const JobSearch = ({ onSearch }: JobSearchProps) => {
   
   return (
     <Card className="mb-6">
-      <CardHeader className="bg-blue-600 text-white py-2 px-4 rounded-t-md">
+       <CardHeader className="bg-[#1e2a3a] text-white py-2 px-4 rounded-t-md">
         <CardTitle className="text-lg uppercase">FIND CUSTOMER</CardTitle>
       </CardHeader>
       <CardContent className="p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -73,7 +73,7 @@ const JobSearch = ({ onSearch }: JobSearchProps) => {
         </div>
         
         <div className="flex items-end">
-          <Button onClick={handleSearch} className="bg-blue-600 hover:bg-blue-700 w-full">
+          <Button onClick={handleSearch} className="bg-[#3b5998] hover:bg-[#1e2a3a] w-full">
             <Search size={16} className="mr-2" />
             FIND
           </Button>

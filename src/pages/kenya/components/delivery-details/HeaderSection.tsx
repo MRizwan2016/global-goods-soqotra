@@ -30,7 +30,7 @@ const HeaderSection = ({
               Back
             </Button>
           </Link>
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="text-2xl font-bold text-[#1e2a3a]">
             Delivery {invoiceNumber}
           </h1>
           {getStatusBadge(latestStatus || 'pending')}

@@ -31,12 +31,12 @@ const JobTrackingHeader = () => {
   };
   
   return (
-    <div className="p-4 bg-blue-50 border-b border-blue-100 flex flex-col gap-3">
-      <h3 className="text-lg font-medium text-blue-800">QATAR CARGO COLLECTION & DELIVERY MANAGEMENT</h3>
+     <div className="p-4 bg-[#f0f3f8] border-b border-[#d6dce8] flex flex-col gap-3">
+      <h3 className="text-lg font-medium text-[#1e2a3a]">QATAR CARGO COLLECTION & DELIVERY MANAGEMENT</h3>
       <div className="flex flex-wrap gap-2">
         <Button 
           variant="outline" 
-          className="flex items-center gap-1"
+          className="flex items-center gap-1 border-[#3b5998] text-[#3b5998] hover:bg-[#3b5998] hover:text-white"
           onClick={handleJobGenerate}
         >
           <Printer size={14} />
@@ -44,18 +44,18 @@ const JobTrackingHeader = () => {
         </Button>
         <Button 
           variant="outline" 
-          className="flex items-center gap-1"
+          className="flex items-center gap-1 border-[#3b5998] text-[#3b5998] hover:bg-[#3b5998] hover:text-white"
           onClick={handleManageVehicles}
         >
           <Truck size={14} />
           MANAGE VEHICLES
         </Button>
-        <Button variant="outline" className="flex items-center gap-1" onClick={() => navigate("/qatar/drivers")}>
+        <Button variant="outline" className="flex items-center gap-1 border-[#3b5998] text-[#3b5998] hover:bg-[#3b5998] hover:text-white" onClick={() => navigate("/qatar/drivers")}>
           <User size={14} />
           MANAGE DRIVERS
         </Button>
         <Button 
-          className="bg-blue-600 hover:bg-blue-700 flex items-center gap-1"
+          className="bg-[#3b5998] hover:bg-[#1e2a3a] flex items-center gap-1"
           onClick={handleNewJob}
         >
           <Plus size={14} />

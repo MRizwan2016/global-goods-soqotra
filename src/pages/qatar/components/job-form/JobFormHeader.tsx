@@ -44,10 +44,10 @@ const JobFormHeader: React.FC<JobFormHeaderProps> = ({ isNewJob }) => {
           </div>
           {isNewJob && !isJobNumberGenerated && (
             <div className="mt-6">
-              <Button
+               <Button
                 type="button"
                 onClick={handleGenerateJobNumber}
-                className="bg-blue-600 hover:bg-blue-700 transition-colors"
+                className="bg-[#3b5998] hover:bg-[#1e2a3a] transition-colors"
               >
                 <Hash className="mr-1 h-4 w-4" /> Generate Job No
               </Button>

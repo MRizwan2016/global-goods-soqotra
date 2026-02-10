@@ -52,26 +52,26 @@ const KenyaDeliveryTracking = () => {
   return (
     <Layout title="Kenya Cargo Delivery Tracking">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-4 bg-green-50 border-b border-green-100 flex justify-between items-center">
+        <div className="p-4 bg-[#f0f3f8] border-b border-[#d6dce8] flex justify-between items-center">
           <div className="flex items-center gap-4">
             <BackButton to="/kenya" />
-            <h3 className="text-lg font-medium text-green-800">Kenya Cargo Collection & Delivery Management</h3>
+            <h3 className="text-lg font-medium text-[#1e2a3a]">Kenya Cargo Collection & Delivery Management</h3>
           </div>
           <div className="flex gap-2">
             <Link to="/kenya/vehicles">
-              <Button variant="outline" className="flex items-center gap-1">
+              <Button variant="outline" className="flex items-center gap-1 border-[#3b5998] text-[#3b5998] hover:bg-[#3b5998] hover:text-white">
                 <CarFront size={14} />
                 Manage Vehicles
               </Button>
             </Link>
             <Link to="/kenya/drivers">
-              <Button variant="outline" className="flex items-center gap-1">
+              <Button variant="outline" className="flex items-center gap-1 border-[#3b5998] text-[#3b5998] hover:bg-[#3b5998] hover:text-white">
                 <UserRoundCog size={14} />
                 Manage Drivers
               </Button>
             </Link>
             <Link to="/kenya/delivery/new">
-              <Button className="bg-green-600 hover:bg-green-700">Add New Delivery</Button>
+              <Button className="bg-[#3b5998] hover:bg-[#1e2a3a]">Add New Delivery</Button>
             </Link>
           </div>
         </div>
