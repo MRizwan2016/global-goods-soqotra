@@ -4,6 +4,7 @@ import { JobStorageService } from "../../services/JobStorageService";
 import JobListPage from "../../components/job-list/JobListPage";
 import CancelledJobsTable from "../../components/cancelled-jobs/CancelledJobsTable";
 import BackButton from "@/components/ui/back-button";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const CancelledJobsPage = () => {
   const [jobs] = useState(() => {
