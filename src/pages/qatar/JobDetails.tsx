@@ -9,6 +9,7 @@ import { JobStorageService } from "./services/JobStorageService";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle } from "lucide-react";
 import JobCloseDialog from "./components/job-tracking/JobCloseDialog";
+import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const JobDetails = () => {
   const { id } = useParams<{ id: string }>();
