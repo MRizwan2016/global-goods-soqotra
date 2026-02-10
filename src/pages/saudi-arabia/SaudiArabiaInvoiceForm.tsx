@@ -130,8 +130,8 @@ const SaudiArabiaInvoiceForm = () => {
               Go Back
             </Button>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-8 bg-gradient-to-r from-green-600 to-black rounded"></div>
-              <h1 className="text-3xl font-bold text-gray-900">
+               <div className="w-12 h-8 bg-gradient-to-r from-[#3b5998] to-[#1e2a3a] rounded"></div>
+              <h1 className="text-3xl font-bold text-[#1e2a3a]">
                 {id ? 'Edit' : 'Add New'} Invoice - Saudi Arabia
               </h1>
             </div>
