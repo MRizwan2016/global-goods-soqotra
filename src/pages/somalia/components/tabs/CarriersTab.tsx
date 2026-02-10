@@ -10,8 +10,8 @@ const CarriersTab: React.FC = () => {
         We've developed reliable routes that prioritize security while maintaining efficient delivery schedules.
       </p>
       
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
-        <h4 className="font-medium text-amber-800 mb-3">Carrier Partnerships</h4>
+       <div className="bg-[#f0f3f8] border border-[#d6dce8] rounded-lg p-6">
+        <h4 className="font-medium text-[#1e2a3a] mb-3">Carrier Partnerships</h4>
         <ul className="space-y-2">
           <li className="flex items-start">
             <span className="inline-flex items-center justify-center bg-amber-100 text-amber-800 rounded-full h-5 w-5 mr-2 flex-shrink-0 text-xs font-medium">•</span>
