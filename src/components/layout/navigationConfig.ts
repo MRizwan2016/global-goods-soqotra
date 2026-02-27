@@ -126,6 +126,14 @@ export const navigationSections: NavigationSections = {
     iconColor: "text-white",
     submenu: [
       {
+        title: "TRACK & TRACE",
+        items: [
+          { name: "CUSTOMER PORTAL", path: "/customer-portal" },
+          { name: "ADMIN - CARGO TRACKING", path: "/admin/control-panel" },
+          { name: "CUSTOMER MANAGEMENT", path: "/customer-portal/admin" },
+        ],
+      },
+      {
         title: "KENYA",
         items: [
           { name: "DASHBOARD", path: "/kenya" },
