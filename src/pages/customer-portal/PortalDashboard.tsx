@@ -180,6 +180,14 @@ const PortalDashboard: React.FC = () => {
         onToggleLang={() => setLang(l => l === 'en' ? 'ar' : 'en')}
         rightContent={
           <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Link to="/dashboard">
+                <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-white/10 gap-1.5">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Dashboard
+                </Button>
+              </Link>
+            )}
             {/* Change Password Dialog */}
             <Dialog>
               <DialogTrigger asChild>
