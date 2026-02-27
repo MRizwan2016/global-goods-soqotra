@@ -14,16 +14,156 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cargo_tracking: {
+        Row: {
+          arrival_date: string | null
+          cargo_description: string | null
+          clearance_date: string | null
+          collection_date: string | null
+          created_at: string
+          created_by: string | null
+          current_status: string
+          customer_account_id: string
+          customer_name: string
+          delivery_date: string | null
+          destination: string | null
+          id: string
+          in_transit_date: string | null
+          invoice_number: string
+          loaded_date: string | null
+          notes: string | null
+          origin: string | null
+          processing_date: string | null
+          updated_at: string
+        }
+        Insert: {
+          arrival_date?: string | null
+          cargo_description?: string | null
+          clearance_date?: string | null
+          collection_date?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_status?: string
+          customer_account_id: string
+          customer_name: string
+          delivery_date?: string | null
+          destination?: string | null
+          id?: string
+          in_transit_date?: string | null
+          invoice_number: string
+          loaded_date?: string | null
+          notes?: string | null
+          origin?: string | null
+          processing_date?: string | null
+          updated_at?: string
+        }
+        Update: {
+          arrival_date?: string | null
+          cargo_description?: string | null
+          clearance_date?: string | null
+          collection_date?: string | null
+          created_at?: string
+          created_by?: string | null
+          current_status?: string
+          customer_account_id?: string
+          customer_name?: string
+          delivery_date?: string | null
+          destination?: string | null
+          id?: string
+          in_transit_date?: string | null
+          invoice_number?: string
+          loaded_date?: string | null
+          notes?: string | null
+          origin?: string | null
+          processing_date?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cargo_tracking_customer_account_id_fkey"
+            columns: ["customer_account_id"]
+            isOneToOne: false
+            referencedRelation: "customer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customer_accounts: {
+        Row: {
+          activated_at: string | null
+          activated_by: string | null
+          country: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          is_active: boolean
+          mobile_number: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          activated_at?: string | null
+          activated_by?: string | null
+          country?: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          is_active?: boolean
+          mobile_number: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          activated_at?: string | null
+          activated_by?: string | null
+          country?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          mobile_number?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_customer_active: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "staff" | "customer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +290,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "staff", "customer"],
+    },
   },
 } as const
