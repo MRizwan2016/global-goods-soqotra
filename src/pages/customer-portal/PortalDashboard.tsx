@@ -79,7 +79,7 @@ const PortalDashboard: React.FC = () => {
   }, [searchTerm, shipments]);
 
   const fetchShipments = async () => {
-    setLoading(true);
+    setShipmentsLoading(true);
     const { data, error } = await supabase
       .from('cargo_tracking')
       .select('*')
