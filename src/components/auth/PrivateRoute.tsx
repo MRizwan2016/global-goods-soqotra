@@ -97,7 +97,7 @@ const PrivateRoute = ({
     // Convert the string to a valid key for file permissions
     const fileKey = requiredFile as keyof User['permissions']['files'];
     const hasAccess = hasFilePermission(fileKey);
-    console.log(`File permission ${requiredFile} required, user has access: ${hasAccess}`);
+    
     
     if (!hasAccess) {
       toast({
