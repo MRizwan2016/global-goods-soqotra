@@ -80,7 +80,7 @@ const PrivateRoute = ({
   if (requiredPermission && !isAdmin && currentUser) {
     const permissionKey = requiredPermission as keyof typeof currentUser.permissions;
     const hasPermission = currentUser.permissions[permissionKey];
-    console.log(`Permission ${requiredPermission} required, user has access: ${hasPermission}`);
+    
     
     if (!hasPermission) {
       toast({
