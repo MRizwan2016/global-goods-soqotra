@@ -73,18 +73,6 @@ const Login = () => {
     }
   }, [isAuthenticated, loading, navigate, from]);
 
-  // Debug: Log available users when component mounts
-  useEffect(() => {
-    console.log("Available users for login:", users.map(u => ({
-      id: u.id,
-      email: u.email,
-      isActive: u.isActive
-    })));
-    
-    // Debug: Check password store
-    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-    console.log("User passwords available for IDs:", Object.keys(userPasswords));
-  }, [users]);
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -106,32 +94,11 @@ const Login = () => {
     setError(null);
     setIsLoading(true);
     try {
-      console.log(`Login attempt: ${values.email} with browser info: ${browserInfo}`);
-      
-      // Check if user exists
-      const user = users.find(u => u.email.toLowerCase() === values.email.toLowerCase());
-      if (user) {
-        console.log(`Found user: ${user.fullName} (${user.id}), Active: ${user.isActive}`);
-        
-        // Debug: Check what passwords are available
-        const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-        console.log(`Password available for user ${user.id}:`, userPasswords[user.id] ? 'YES' : 'NO');
-        
-        // For testing: Log suggested passwords
-        console.log("Suggested test passwords: 123456, password, admin123, soqotra123, test123");
-      } else {
-        console.log(`No user found with email: ${values.email}`);
-        console.log("Available user emails:", users.map(u => u.email));
-      }
-      
       const success = await login(values.email, values.password);
       if (success) {
-        console.log("Login successful, navigating to:", from);
-        // Navigate to the redirect path or default
         navigate(from, { replace: true });
       } else {
-        console.log("Login failed");
-        setError("Invalid email or password. Please try again with: 123456, password, admin123, soqotra123, or test123");
+        setError("Invalid email or password. Please try again.");
       }
     } catch (err) {
       console.error("Login error:", err);
