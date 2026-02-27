@@ -88,6 +88,77 @@ export type Database = {
           },
         ]
       }
+      collection_performance: {
+        Row: {
+          city: string | null
+          collection_date: string
+          created_at: string
+          id: string
+          invoice_id: string | null
+          job_id: string | null
+          job_status: string | null
+          job_type: string | null
+          location: string | null
+          on_time: boolean | null
+          satisfaction_rating: number | null
+          staff_id: string | null
+          staff_name: string
+          staff_type: string
+          total_cbm: number | null
+          total_packages: number | null
+          total_revenue_qr: number | null
+          total_weight_kg: number | null
+        }
+        Insert: {
+          city?: string | null
+          collection_date?: string
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          job_id?: string | null
+          job_status?: string | null
+          job_type?: string | null
+          location?: string | null
+          on_time?: boolean | null
+          satisfaction_rating?: number | null
+          staff_id?: string | null
+          staff_name: string
+          staff_type?: string
+          total_cbm?: number | null
+          total_packages?: number | null
+          total_revenue_qr?: number | null
+          total_weight_kg?: number | null
+        }
+        Update: {
+          city?: string | null
+          collection_date?: string
+          created_at?: string
+          id?: string
+          invoice_id?: string | null
+          job_id?: string | null
+          job_status?: string | null
+          job_type?: string | null
+          location?: string | null
+          on_time?: boolean | null
+          satisfaction_rating?: number | null
+          staff_id?: string | null
+          staff_name?: string
+          staff_type?: string
+          total_cbm?: number | null
+          total_packages?: number | null
+          total_revenue_qr?: number | null
+          total_weight_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_performance_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customer_accounts: {
         Row: {
           activated_at: string | null
@@ -130,6 +201,54 @@ export type Database = {
         }
         Relationships: []
       }
+      invoices: {
+        Row: {
+          book_no: string | null
+          consignee_name: string | null
+          created_at: string
+          id: string
+          invoice_code: string | null
+          invoice_no: string | null
+          num_packages: number | null
+          page_no: string | null
+          shipper_name: string | null
+          total_amount: number | null
+          total_cbm: number | null
+          total_gross_weight_kg: number | null
+          updated_at: string
+        }
+        Insert: {
+          book_no?: string | null
+          consignee_name?: string | null
+          created_at?: string
+          id?: string
+          invoice_code?: string | null
+          invoice_no?: string | null
+          num_packages?: number | null
+          page_no?: string | null
+          shipper_name?: string | null
+          total_amount?: number | null
+          total_cbm?: number | null
+          total_gross_weight_kg?: number | null
+          updated_at?: string
+        }
+        Update: {
+          book_no?: string | null
+          consignee_name?: string | null
+          created_at?: string
+          id?: string
+          invoice_code?: string | null
+          invoice_no?: string | null
+          num_packages?: number | null
+          page_no?: string | null
+          shipper_name?: string | null
+          total_amount?: number | null
+          total_cbm?: number | null
+          total_gross_weight_kg?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -166,6 +285,132 @@ export type Database = {
         }
         Relationships: []
       }
+      tunisia_containers: {
+        Row: {
+          container_number: string
+          created_at: string
+          id: string
+          loaded_vehicles: Json | null
+          seal_number: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          container_number: string
+          created_at?: string
+          id?: string
+          loaded_vehicles?: Json | null
+          seal_number?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          container_number?: string
+          created_at?: string
+          id?: string
+          loaded_vehicles?: Json | null
+          seal_number?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tunisia_invoices: {
+        Row: {
+          created_at: string
+          customer_id: string | null
+          date: string | null
+          hbl_number: string | null
+          id: string
+          invoice_number: string
+          payment_details: Json | null
+          personal_effects: Json | null
+          status: string | null
+          supporting_documents: Json | null
+          total_amount: number | null
+          updated_at: string
+          user_id: string
+          vehicle: Json | null
+        }
+        Insert: {
+          created_at?: string
+          customer_id?: string | null
+          date?: string | null
+          hbl_number?: string | null
+          id?: string
+          invoice_number: string
+          payment_details?: Json | null
+          personal_effects?: Json | null
+          status?: string | null
+          supporting_documents?: Json | null
+          total_amount?: number | null
+          updated_at?: string
+          user_id: string
+          vehicle?: Json | null
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string | null
+          date?: string | null
+          hbl_number?: string | null
+          id?: string
+          invoice_number?: string
+          payment_details?: Json | null
+          personal_effects?: Json | null
+          status?: string | null
+          supporting_documents?: Json | null
+          total_amount?: number | null
+          updated_at?: string
+          user_id?: string
+          vehicle?: Json | null
+        }
+        Relationships: []
+      }
+      tunisia_payment_receipts: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          invoice_id: string
+          invoice_number: string
+          notes: string | null
+          payment_date: string
+          payment_method: string
+          receipt_number: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          invoice_id: string
+          invoice_number: string
+          notes?: string | null
+          payment_date: string
+          payment_method?: string
+          receipt_number: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          invoice_id?: string
+          invoice_number?: string
+          notes?: string | null
+          payment_date?: string
+          payment_method?: string
+          receipt_number?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -186,7 +431,84 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      staff_annual_performance: {
+        Row: {
+          avg_satisfaction: number | null
+          collection_jobs: number | null
+          completed_jobs: number | null
+          delivery_jobs: number | null
+          on_time_completion_rate: number | null
+          staff_id: string | null
+          staff_name: string | null
+          staff_type: string | null
+          total_jobs: number | null
+          total_packages: number | null
+          total_revenue_qr: number | null
+          total_volume_cbm: number | null
+          total_weight_kg: number | null
+          year: number | null
+        }
+        Relationships: []
+      }
+      staff_daily_performance: {
+        Row: {
+          avg_satisfaction: number | null
+          collection_date: string | null
+          collection_jobs: number | null
+          completed_jobs: number | null
+          delivery_jobs: number | null
+          on_time_completion_rate: number | null
+          staff_id: string | null
+          staff_name: string | null
+          staff_type: string | null
+          total_jobs: number | null
+          total_packages: number | null
+          total_revenue_qr: number | null
+          total_volume_cbm: number | null
+          total_weight_kg: number | null
+        }
+        Relationships: []
+      }
+      staff_monthly_performance: {
+        Row: {
+          avg_satisfaction: number | null
+          collection_jobs: number | null
+          completed_jobs: number | null
+          delivery_jobs: number | null
+          month: number | null
+          month_start: string | null
+          on_time_completion_rate: number | null
+          staff_id: string | null
+          staff_name: string | null
+          staff_type: string | null
+          total_jobs: number | null
+          total_packages: number | null
+          total_revenue_qr: number | null
+          total_volume_cbm: number | null
+          total_weight_kg: number | null
+          year: number | null
+        }
+        Relationships: []
+      }
+      staff_weekly_performance: {
+        Row: {
+          avg_satisfaction: number | null
+          collection_jobs: number | null
+          completed_jobs: number | null
+          delivery_jobs: number | null
+          on_time_completion_rate: number | null
+          staff_id: string | null
+          staff_name: string | null
+          staff_type: string | null
+          total_jobs: number | null
+          total_packages: number | null
+          total_revenue_qr: number | null
+          total_volume_cbm: number | null
+          total_weight_kg: number | null
+          week_start: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
