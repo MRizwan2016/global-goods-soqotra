@@ -25,6 +25,7 @@ import { sudanRoutes } from "./sudanRoutes";
 import { eritreaRoutes } from "./eritreaRoutes";
 import { upbRoutes } from "./upbRoutes";
 import { scheduleRoutes } from "./scheduleRoutes";
+import { customerPortalRoutes } from "./customerPortalRoutes";
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
