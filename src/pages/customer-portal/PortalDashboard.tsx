@@ -59,12 +59,12 @@ const PortalDashboard: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       navigate('/customer-portal');
       return;
     }
-    fetchShipments();
-  }, [user]);
+    if (user) fetchShipments();
+  }, [user, loading]);
 
   useEffect(() => {
     if (!searchTerm.trim()) {
