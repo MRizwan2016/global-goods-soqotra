@@ -4,11 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Lock, Mail, Package } from 'lucide-react';
+import { Loader2, Lock, Mail, Package, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { usePortalAuth } from './hooks/usePortalAuth';
 import { useTranslation, Language } from './i18n/translations';
 import PortalHeader from './components/PortalHeader';
+import { useAuth } from '@/hooks/use-auth';
 
 const PortalLogin: React.FC = () => {
   const [email, setEmail] = useState('');
