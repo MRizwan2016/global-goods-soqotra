@@ -32,8 +32,6 @@ class DataBackupService {
       'payments', 
       'jobs',
       'users',
-      'userPasswords',
-      'admin-password',
       'vessels',
       'containers',
       'manifests',

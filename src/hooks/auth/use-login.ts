@@ -10,20 +10,8 @@ export function useLogin(
   setShowPasswordChange?: React.Dispatch<React.SetStateAction<boolean>>,
   setIsFirstLogin?: React.Dispatch<React.SetStateAction<boolean>>
 ) {
-  const login = async (email: string, password: string): Promise<boolean> => {
-    const normalizedEmail = email.toLowerCase();
-    
-    // Handle admin login
-    if (normalizedEmail === ADMIN_EMAIL.toLowerCase()) {
-      const adminPassword = localStorage.getItem("admin-password");
-      if (adminPassword) {
-        const success = handleAdminLogin(users, password, adminPassword, setCurrentUser);
-        if (success) return true;
-      }
-    }
-
-    // localStorage auth removed - all authentication goes through Supabase Auth
-    
+  const login = async (email: string, _password: string): Promise<boolean> => {
+    // All authentication goes through Supabase Auth - no localStorage fallback
     handleLoginFailure();
     return false;
   };
