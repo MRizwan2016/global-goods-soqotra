@@ -55,6 +55,7 @@ const PortalDashboard: React.FC = () => {
   const t = useTranslation(lang);
   
   const { user, customerAccount, isActive, signOut, changePassword } = usePortalAuth();
+  const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
