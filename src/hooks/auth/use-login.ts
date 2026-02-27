@@ -2,7 +2,6 @@
 import { User } from "@/types/auth";
 import { handleLoginFailure } from "./utils/login-utils";
 import { toast } from "@/hooks/use-toast";
-import { toast } from "@/hooks/use-toast";
 
 export function useLogin(
   users: User[], 
