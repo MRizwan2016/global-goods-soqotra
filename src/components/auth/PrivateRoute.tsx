@@ -67,7 +67,7 @@ const PrivateRoute = ({
 
   // Check if admin is required for the route
   if (requireAdmin && !isAdmin) {
-    console.log("Admin access required but user is not admin, redirecting to home");
+    
     toast({
       title: "Access Denied",
       description: "You do not have permission to access this page.",
