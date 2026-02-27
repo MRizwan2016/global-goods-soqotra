@@ -89,7 +89,7 @@ const PortalDashboard: React.FC = () => {
       setShipments(data as CargoItem[]);
       setFilteredShipments(data as CargoItem[]);
     }
-    setLoading(false);
+    setShipmentsLoading(false);
   };
 
   const handleChangePassword = async () => {
