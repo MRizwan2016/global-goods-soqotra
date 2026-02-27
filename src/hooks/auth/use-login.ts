@@ -22,23 +22,7 @@ export function useLogin(
       }
     }
 
-    // Get stored passwords
-    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-    
-    // Find the user by email (case-insensitive) - must be active
-    const user = users.find(u => u.email.toLowerCase() === normalizedEmail && u.isActive);
-    
-    if (user) {
-      // Check if it's first login (password is still the initial password)
-      const storedPassword = userPasswords[user.id];
-      if (password === storedPassword && password === "123456" && setShowPasswordChange && setIsFirstLogin) {
-        setIsFirstLogin(true);
-        setShowPasswordChange(true);
-      }
-      
-      const success = handleUserLogin(users, normalizedEmail, password, userPasswords, setCurrentUser);
-      return success;
-    }
+    // localStorage auth removed - all authentication goes through Supabase Auth
     
     handleLoginFailure();
     return false;

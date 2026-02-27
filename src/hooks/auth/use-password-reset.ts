@@ -86,10 +86,7 @@ export function usePasswordReset(users: User[]) {
       return false;
     }
     
-    // Update password
-    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-    userPasswords[userId] = newPassword;
-    localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
+    // Password stored via Supabase Auth - no localStorage storage
     
     // Remove used token
     delete resetTokens[userId];

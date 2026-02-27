@@ -147,34 +147,8 @@ export function useAuth(): LegacyAuthContextType {
       // Supabase auth failed, try localStorage fallback
     }
 
-    // Fallback to localStorage authentication
-    try {
-      const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
-
-      if (!user) {
-        return false;
-      }
-
-      // User must be active
-      if (!user.isActive) {
-        return false;
-      }
-
-      // Check password from localStorage - strict match only
-      const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-      const storedPassword = userPasswords[user.id];
-
-      if (!storedPassword || password !== storedPassword) {
-        return false;
-      }
-
-      localStorage.setItem('session_user_id', user.id);
-      setLegacyUser(user);
-      return true;
-    } catch (error) {
-      console.error("Login error");
-      return false;
-    }
+    // localStorage fallback removed for security
+    return false;
   };
 
   const logout = async () => {

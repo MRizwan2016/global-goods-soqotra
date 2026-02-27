@@ -60,10 +60,7 @@ export function useRegistration(
       }
     };
 
-    // Store user password separately (in real app, would be hashed)
-    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-    userPasswords[newUser.id] = userData.password;
-    localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
+    // Password storage in localStorage removed for security - use Supabase Auth instead
 
     // Add to users list and update localStorage
     const updatedUsers = [...users, newUser];

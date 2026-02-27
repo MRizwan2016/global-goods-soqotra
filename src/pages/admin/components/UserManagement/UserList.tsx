@@ -103,10 +103,6 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
                       <p><span className="font-medium">Email:</span> {user.email}</p>
                       <p><span className="font-medium">Mobile:</span> {user.mobileNumber}</p>
                       <p><span className="font-medium">Country:</span> {user.country}</p>
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">Password:</span>
-                        {renderPassword(user.id)}
-                      </div>
                     </div>
                   </div>
                   
