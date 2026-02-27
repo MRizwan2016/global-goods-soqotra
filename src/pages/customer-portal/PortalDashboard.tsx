@@ -48,7 +48,7 @@ const PortalDashboard: React.FC = () => {
   const [shipments, setShipments] = useState<CargoItem[]>([]);
   const [filteredShipments, setFilteredShipments] = useState<CargoItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [shipmentsLoading, setShipmentsLoading] = useState(true);
   const [lang, setLang] = useState<Language>('en');
   const [newPassword, setNewPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
