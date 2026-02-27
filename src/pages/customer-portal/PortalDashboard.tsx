@@ -11,6 +11,7 @@ import { usePortalAuth } from './hooks/usePortalAuth';
 import { useTranslation, Language } from './i18n/translations';
 import PortalHeader from './components/PortalHeader';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
