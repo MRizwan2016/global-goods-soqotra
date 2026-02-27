@@ -73,18 +73,6 @@ const Login = () => {
     }
   }, [isAuthenticated, loading, navigate, from]);
 
-  // Debug: Log available users when component mounts
-  useEffect(() => {
-    console.log("Available users for login:", users.map(u => ({
-      id: u.id,
-      email: u.email,
-      isActive: u.isActive
-    })));
-    
-    // Debug: Check password store
-    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-    console.log("User passwords available for IDs:", Object.keys(userPasswords));
-  }, [users]);
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
