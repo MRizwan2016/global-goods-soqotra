@@ -56,7 +56,7 @@ export function useAuth(): LegacyAuthContextType {
 
         if (!error && profiles) {
           supabaseUsers = profiles.map((profile: any) => ({
-            id: profile.id,
+            id: profile.user_id,
             fullName: profile.full_name,
             email: profile.email,
             mobileNumber: profile.mobile_number || "",
