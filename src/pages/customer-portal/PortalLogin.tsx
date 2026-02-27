@@ -20,6 +20,7 @@ const PortalLogin: React.FC = () => {
   const t = useTranslation(lang);
   
   const { signIn, user } = usePortalAuth();
+  const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
