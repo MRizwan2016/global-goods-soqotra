@@ -54,7 +54,7 @@ const PortalDashboard: React.FC = () => {
   const [changingPassword, setChangingPassword] = useState(false);
   const t = useTranslation(lang);
   
-  const { user, customerAccount, isActive, signOut, changePassword } = usePortalAuth();
+  const { user, customerAccount, loading, isActive, signOut, changePassword } = usePortalAuth();
   const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
