@@ -43,16 +43,7 @@ const PrivateRoute = ({
   const { hasFilePermission } = permissionsContext;
   const location = useLocation();
 
-  useEffect(() => {
-    console.log("PrivateRoute: Authentication status", { 
-      isAuthenticated, 
-      isAdmin, 
-      currentUser: currentUser ? `${currentUser.fullName} (${currentUser.email})` : 'none',
-      requiredFile,
-      requiredPermission,
-      path: location.pathname
-    });
-  }, [isAuthenticated, isAdmin, currentUser, requiredFile, requiredPermission, location.pathname]);
+  // Auth state monitoring (no sensitive data logged)
 
   // Handle loading state to prevent flicker redirects
   if (loading) {
