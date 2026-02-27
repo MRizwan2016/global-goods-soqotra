@@ -19,58 +19,6 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
   const { currentUser, isAdmin } = useAuth();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
-  const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
-
-  const handleToggleStatus = async (userId: string) => {
-    await toggleUserStatus(userId);
-  };
-
-  const openPermissionsDialog = (user: User) => {
-    setSelectedUser(user);
-    setPermissionsDialogOpen(true);
-  };
-
-  const getUserPassword = (userId: string): string => {
-    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-    return userPasswords[userId] || "Not set";
-  };
-
-  const togglePasswordVisibility = (userId: string) => {
-    setShowPasswords(prev => ({
-      ...prev,
-      [userId]: !prev[userId]
-    }));
-  };
-
-  const renderPassword = (userId: string) => {
-    const password = getUserPassword(userId);
-    const isVisible = showPasswords[userId];
-    const canViewPasswords = currentUser?.isAdmin;
-
-    if (!canViewPasswords) {
-      return <span className="text-xs text-muted-foreground">Protected</span>;
-    }
-
-    return (
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-mono">
-          {isVisible ? password : "••••••••"}
-        </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => togglePasswordVisibility(userId)}
-          className="h-6 w-6 p-0"
-        >
-          {isVisible ? (
-            <EyeOff className="h-3 w-3" />
-          ) : (
-            <Eye className="h-3 w-3" />
-          )}
-        </Button>
-      </div>
-    );
-  };
 
   // Helper function to get user colors based on index
   const getUserColors = (userIndex: number) => {
