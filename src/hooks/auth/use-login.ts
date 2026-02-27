@@ -1,7 +1,7 @@
 
 import { User } from "@/types/auth";
-import { ADMIN_EMAIL } from "@/constants/auth";
-import { handleAdminLogin, handleUserLogin, handleLoginFailure } from "./utils/login-utils";
+import { handleLoginFailure } from "./utils/login-utils";
+import { toast } from "@/hooks/use-toast";
 import { toast } from "@/hooks/use-toast";
 
 export function useLogin(

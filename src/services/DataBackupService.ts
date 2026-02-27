@@ -8,8 +8,6 @@ export interface BackupData {
     payments: any[];
     jobs: any[];
     users: any[];
-    userPasswords: Record<string, string>;
-    adminPassword: string;
     vessels: any[];
     containers: any[];
     manifests: any[];
