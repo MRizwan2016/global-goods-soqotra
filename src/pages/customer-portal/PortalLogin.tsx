@@ -43,7 +43,20 @@ const PortalLogin: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-muted/30" dir={lang === 'ar' ? 'rtl' : 'ltr'}>
-      <PortalHeader lang={lang} onToggleLang={() => setLang(l => l === 'en' ? 'ar' : 'en')} />
+      <PortalHeader 
+        lang={lang} 
+        onToggleLang={() => setLang(l => l === 'en' ? 'ar' : 'en')}
+        rightContent={
+          isAdmin ? (
+            <Link to="/dashboard">
+              <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-white/10 gap-1.5">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Dashboard
+              </Button>
+            </Link>
+          ) : undefined
+        }
+      />
       
       <div className="flex items-center justify-center px-4 py-12">
         <Card className="w-full max-w-md shadow-xl border-0">
