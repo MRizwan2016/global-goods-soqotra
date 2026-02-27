@@ -257,7 +257,7 @@ const PortalDashboard: React.FC = () => {
         </div>
 
         {/* Shipments */}
-        {loading ? (
+        {shipmentsLoading ? (
           <Card><CardContent className="py-12 text-center text-muted-foreground">{t.loading}</CardContent></Card>
         ) : filteredShipments.length === 0 ? (
           <Card className="border-0 shadow-md">
