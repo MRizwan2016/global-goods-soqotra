@@ -1,5 +1,5 @@
 
-import { Database, DollarSign, Settings, Truck } from "lucide-react";
+import { Database, DollarSign, Settings, Truck, Package } from "lucide-react";
 import { NavigationSections } from "./types";
 
 export const navigationSections: NavigationSections = {
