@@ -127,7 +127,7 @@ const PrivateRoute = ({
     const requiredPermission = routePermissionMap[pathRequiresPermission];
     const hasAccess = currentUser.permissions?.[requiredPermission] || false;
     
-    console.log(`Path ${location.pathname} requires permission ${requiredPermission}, user has access: ${hasAccess}`);
+    
     
     if (!hasAccess) {
       toast({
