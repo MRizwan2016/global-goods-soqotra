@@ -56,7 +56,7 @@ const PrivateRoute = ({
 
   // Check if user is authenticated
   if (!isAuthenticated) {
-    console.log("User not authenticated, redirecting to login");
+    
     toast({
       title: "Authentication Required",
       description: "Please log in to access this page.",
