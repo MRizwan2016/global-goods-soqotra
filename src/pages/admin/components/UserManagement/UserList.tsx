@@ -20,6 +20,15 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
 
+  const handleToggleStatus = async (userId: string) => {
+    await toggleUserStatus(userId);
+  };
+
+  const openPermissionsDialog = (user: User) => {
+    setSelectedUser(user);
+    setPermissionsDialogOpen(true);
+  };
+
   // Helper function to get user colors based on index
   const getUserColors = (userIndex: number) => {
     const colors = [
