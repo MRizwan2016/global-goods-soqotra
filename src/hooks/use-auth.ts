@@ -40,15 +40,12 @@ export function useAuth(): LegacyAuthContextType {
   const [legacyUser, setLegacyUser] = useState<LegacyUser | null>(null);
   const [legacyLoading, setLegacyLoading] = useState<boolean>(true);
 
-  // Load users from both Supabase and localStorage
   useEffect(() => {
     loadUsersFromBothSources();
   }, []);
 
   const loadUsersFromBothSources = async () => {
     try {
-      console.log("Loading users from both Supabase and localStorage...");
-      
       // Load from Supabase
       let supabaseUsers: LegacyUser[] = [];
       try {
@@ -58,7 +55,6 @@ export function useAuth(): LegacyAuthContextType {
           .order('created_at');
 
         if (!error && profiles) {
-          console.log("Loaded profiles from Supabase:", profiles);
           supabaseUsers = profiles.map((profile: any) => ({
             id: profile.id,
             fullName: profile.full_name,
@@ -72,110 +68,24 @@ export function useAuth(): LegacyAuthContextType {
           }));
         }
       } catch (error) {
-        console.error("Error loading from Supabase:", error);
+        console.error("Error loading profiles");
       }
 
-      // Load from localStorage as fallback
+      // Load from localStorage as fallback (for legacy users only)
       let localStorageUsers: LegacyUser[] = [];
       try {
         const storedUsers = localStorage.getItem('users');
         if (storedUsers) {
           const parsedUsers: LegacyUser[] = JSON.parse(storedUsers);
-          console.log("Loaded users from localStorage:", parsedUsers);
           if (Array.isArray(parsedUsers) && parsedUsers.length > 0) {
             localStorageUsers = parsedUsers;
           }
         }
-        
-        // Seed default users if none exist
-        if (localStorageUsers.length === 0) {
-          console.log("Seeding default users");
-          localStorageUsers = [
-            {
-              id: 'admin-1',
-              fullName: 'System Administrator',
-              email: 'admin@soqotra.com',
-              mobileNumber: '+974 5555 5555',
-              country: 'Qatar',
-              isActive: true,
-              isAdmin: true,
-              createdAt: new Date().toISOString(),
-              permissions: {
-                masterData: true,
-                dataEntry: true,
-                reports: true,
-                downloads: true,
-                accounting: true,
-                controlPanel: true,
-                cargoDelivery: true,
-                accountFunctions: true,
-                accountRegistrations: true,
-                accountFinancialEntities: true,
-                accountCountryReconciliations: true,
-                files: {
-                  salesRep: true,
-                  town: true,
-                  item: true,
-                  packageOptions: true,
-                  sellingRates: true,
-                  container: true,
-                  vessel: true,
-                  invoiceBook: true,
-                  driverHelper: true,
-                  invoicing: true,
-                  paymentReceivable: true,
-                  loadContainer: true,
-                  loadVessel: true,
-                  loadAirCargo: true,
-                  packingList: true,
-                  cargoReports: true,
-                  financialReports: true,
-                  shippingReports: true,
-                  paymentMethods: true,
-                  reconciliation: true,
-                  profitLoss: true
-                }
-              }
-            },
-            {
-              id: 'user-ops',
-              fullName: 'Operations User',
-              email: 'ops@soqotra.qa',
-              mobileNumber: '',
-              country: 'QA',
-              isActive: true,
-              isAdmin: true,
-              createdAt: new Date().toISOString(),
-              permissions: {
-                masterData: true,
-                dataEntry: true,
-                reports: true,
-                downloads: true,
-                accounting: true,
-                controlPanel: true,
-                cargoDelivery: true,
-                accountFunctions: true,
-                accountRegistrations: true,
-                accountFinancialEntities: true,
-                accountCountryReconciliations: true,
-                files: { invoicing: true, paymentReceivable: true, sellingRates: true, container: true }
-              }
-            }
-          ];
-          localStorage.setItem('users', JSON.stringify(localStorageUsers));
-          
-          // Set default passwords
-          const passwords = {
-            'admin-1': 'admin123',
-            'user-ops': '123456'
-          };
-          localStorage.setItem('userPasswords', JSON.stringify(passwords));
-        }
       } catch (error) {
-        console.error("Error loading from localStorage:", error);
+        console.error("Error loading from localStorage");
       }
 
-      // Combine users (Supabase takes priority over localStorage for same emails)
+      // Combine users (Supabase takes priority)
       const allUsers = [...supabaseUsers];
       localStorageUsers.forEach(localUser => {
         const existsInSupabase = supabaseUsers.find(su => su.email === localUser.email);
@@ -185,7 +95,6 @@ export function useAuth(): LegacyAuthContextType {
       });
 
       setUsers(allUsers);
-      console.log("Combined users:", allUsers);
 
       // Check current session
       const sid = localStorage.getItem('session_user_id');
@@ -202,7 +111,7 @@ export function useAuth(): LegacyAuthContextType {
         }
       }
     } catch (error) {
-      console.error("Error loading users:", error);
+      console.error("Error loading users");
       setUsers([]);
     } finally {
       setLegacyLoading(false);
@@ -211,7 +120,6 @@ export function useAuth(): LegacyAuthContextType {
 
   const currentUser = useMemo(() => {
     if (ctx?.user) {
-      // If authenticated via Supabase, find their profile
       const profile = users.find(u => u.id === ctx.user.id);
       return profile || mapSupabaseUser(ctx.user);
     }
@@ -223,9 +131,8 @@ export function useAuth(): LegacyAuthContextType {
 
   const login = async (email: string, password: string) => {
     const normalizedEmail = (email || '').trim().toLowerCase();
-    console.log("Login attempt with email:", normalizedEmail);
 
-    // First try Supabase authentication for users that exist there
+    // First try Supabase authentication
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
@@ -233,52 +140,39 @@ export function useAuth(): LegacyAuthContextType {
       });
 
       if (!error && data.user) {
-        console.log("Login successful via Supabase for user:", data.user.email);
-        await loadUsersFromBothSources(); // Reload users after login
+        await loadUsersFromBothSources();
         return true;
       }
     } catch (error) {
-      console.log("Supabase auth failed, trying localStorage fallback");
+      // Supabase auth failed, try localStorage fallback
     }
 
     // Fallback to localStorage authentication
     try {
-      // Find user in localStorage
       const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
 
       if (!user) {
-        console.log("User not found in either Supabase or localStorage");
         return false;
       }
 
-      // Check password from localStorage
+      // User must be active
+      if (!user.isActive) {
+        return false;
+      }
+
+      // Check password from localStorage - strict match only
       const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-      let storedPassword = userPasswords[user.id];
+      const storedPassword = userPasswords[user.id];
 
-      // Accept common fallback passwords and seed if missing
-      const commonPw = ["123456", "password", "admin123", "soqotra123", "test123"]; 
-      const providedIsCommon = commonPw.includes(password);
-
-      if (!storedPassword && providedIsCommon) {
-        console.log('No stored password. Accepting provided common password and saving it.');
-        storedPassword = password;
-        userPasswords[user.id] = password;
-        localStorage.setItem('userPasswords', JSON.stringify(userPasswords));
+      if (!storedPassword || password !== storedPassword) {
+        return false;
       }
 
-      const passwordMatch = (storedPassword && password === storedPassword) || providedIsCommon;
-
-      if (passwordMatch && user.isActive) {
-        console.log("Login successful via localStorage for user:", user.fullName);
-        localStorage.setItem('session_user_id', user.id);
-        setLegacyUser(user);
-        return true;
-      }
-
-      console.log("Login failed - password mismatch or user inactive");
-      return false;
+      localStorage.setItem('session_user_id', user.id);
+      setLegacyUser(user);
+      return true;
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login error");
       return false;
     }
   };
@@ -302,19 +196,18 @@ export function useAuth(): LegacyAuthContextType {
       });
 
       if (error) {
-        console.error("Registration error:", error);
+        console.error("Registration error");
         return false;
       }
 
       if (data.user) {
-        // Profile will be created automatically by the trigger
         await loadUsersFromBothSources();
         return true;
       }
 
       return false;
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error("Registration error");
       return false;
     }
   };
@@ -336,22 +229,19 @@ export function useAuth(): LegacyAuthContextType {
       const user = users.find(u => u.id === userId);
       if (!user) return;
 
-      // Check if this is a Supabase user or localStorage user
-      const isSupabaseUser = user.id.includes('-') && user.id.length > 20; // UUID format
+      const isSupabaseUser = user.id.includes('-') && user.id.length > 20;
 
       if (isSupabaseUser) {
-        // Update in Supabase
         const { error } = await supabase
           .from('profiles')
           .update({ is_active: !user.isActive })
           .eq('id', userId);
 
         if (error) {
-          console.error("Error updating user status in Supabase:", error);
+          console.error("Error updating user status");
           return;
         }
       } else {
-        // Update in localStorage
         const updatedUsers = users.map(u => 
           u.id === userId ? { ...u, isActive: !u.isActive } : u
         );
@@ -361,7 +251,7 @@ export function useAuth(): LegacyAuthContextType {
 
       await loadUsersFromBothSources();
     } catch (error) {
-      console.error("Error toggling user status:", error);
+      console.error("Error toggling user status");
     }
   };
   
@@ -386,7 +276,7 @@ export function useAuth(): LegacyAuthContextType {
           .eq('id', userId);
 
         if (error) {
-          console.error("Error updating user permission in Supabase:", error);
+          console.error("Error updating user permission");
           return;
         }
       } else {
@@ -399,7 +289,7 @@ export function useAuth(): LegacyAuthContextType {
 
       await loadUsersFromBothSources();
     } catch (error) {
-      console.error("Error toggling user permission:", error);
+      console.error("Error toggling user permission");
     }
   };
   
@@ -425,7 +315,7 @@ export function useAuth(): LegacyAuthContextType {
           .eq('id', userId);
 
         if (error) {
-          console.error("Error updating file permission in Supabase:", error);
+          console.error("Error updating file permission");
           return;
         }
       } else {
@@ -438,7 +328,7 @@ export function useAuth(): LegacyAuthContextType {
 
       await loadUsersFromBothSources();
     } catch (error) {
-      console.error("Error toggling file permission:", error);
+      console.error("Error toggling file permission");
     }
   };
   

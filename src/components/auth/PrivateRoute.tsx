@@ -43,16 +43,7 @@ const PrivateRoute = ({
   const { hasFilePermission } = permissionsContext;
   const location = useLocation();
 
-  useEffect(() => {
-    console.log("PrivateRoute: Authentication status", { 
-      isAuthenticated, 
-      isAdmin, 
-      currentUser: currentUser ? `${currentUser.fullName} (${currentUser.email})` : 'none',
-      requiredFile,
-      requiredPermission,
-      path: location.pathname
-    });
-  }, [isAuthenticated, isAdmin, currentUser, requiredFile, requiredPermission, location.pathname]);
+  // Auth state monitoring (no sensitive data logged)
 
   // Handle loading state to prevent flicker redirects
   if (loading) {
@@ -65,7 +56,7 @@ const PrivateRoute = ({
 
   // Check if user is authenticated
   if (!isAuthenticated) {
-    console.log("User not authenticated, redirecting to login");
+    
     toast({
       title: "Authentication Required",
       description: "Please log in to access this page.",
@@ -76,7 +67,7 @@ const PrivateRoute = ({
 
   // Check if admin is required for the route
   if (requireAdmin && !isAdmin) {
-    console.log("Admin access required but user is not admin, redirecting to home");
+    
     toast({
       title: "Access Denied",
       description: "You do not have permission to access this page.",
@@ -89,7 +80,7 @@ const PrivateRoute = ({
   if (requiredPermission && !isAdmin && currentUser) {
     const permissionKey = requiredPermission as keyof typeof currentUser.permissions;
     const hasPermission = currentUser.permissions[permissionKey];
-    console.log(`Permission ${requiredPermission} required, user has access: ${hasPermission}`);
+    
     
     if (!hasPermission) {
       toast({
@@ -106,7 +97,7 @@ const PrivateRoute = ({
     // Convert the string to a valid key for file permissions
     const fileKey = requiredFile as keyof User['permissions']['files'];
     const hasAccess = hasFilePermission(fileKey);
-    console.log(`File permission ${requiredFile} required, user has access: ${hasAccess}`);
+    
     
     if (!hasAccess) {
       toast({
@@ -136,7 +127,7 @@ const PrivateRoute = ({
     const requiredPermission = routePermissionMap[pathRequiresPermission];
     const hasAccess = currentUser.permissions?.[requiredPermission] || false;
     
-    console.log(`Path ${location.pathname} requires permission ${requiredPermission}, user has access: ${hasAccess}`);
+    
     
     if (!hasAccess) {
       toast({

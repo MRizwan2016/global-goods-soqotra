@@ -1,7 +1,6 @@
 
-// Default admin user
+// Admin email identifier (not a security credential - used for routing only)
 export const ADMIN_EMAIL = "admin@soqotra.com";
-export const ADMIN_PASSWORD = "admin123";
 
 // Email service configuration - using EmailJS
 export const EMAIL_SERVICE_URL = "https://api.emailjs.com/api/v1.0/email/send";
