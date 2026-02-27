@@ -95,5 +95,6 @@ export const routes: RouteConfig[] = [
   ...masterRoutes,
   ...sellingRatesRoutes,
   ...invoiceRoutes,
-  ...scheduleRoutes
+  ...scheduleRoutes,
+  ...customerPortalRoutes
 ];
