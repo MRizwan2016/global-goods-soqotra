@@ -21,7 +21,7 @@ export const customerPortalRoutes: RouteConfig[] = [
     private: false // Auth handled internally by the component
   },
   {
-    path: "/admin/customer-management",
+    path: "/customer-portal/admin",
     element: AdminCustomerManagement,
     private: true,
     requiredPermission: 'controlPanel'
