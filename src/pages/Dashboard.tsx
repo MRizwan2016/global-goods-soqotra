@@ -9,7 +9,7 @@ import DashboardCard from "@/components/dashboard/DashboardCard";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { HardDrive } from "lucide-react";
+import { HardDrive, Package, Users, Search } from "lucide-react";
 
 const Dashboard = () => {
   const { isLoaded, shipmentData } = useDashboardData();
