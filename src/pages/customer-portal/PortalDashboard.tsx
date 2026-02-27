@@ -5,12 +5,13 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Package, Clock, LogOut, User, Lock, AlertTriangle, CheckCircle2, Truck, Ship, FileCheck, Box, Calendar } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Search, Package, Clock, LogOut, User, Lock, AlertTriangle, CheckCircle2, Truck, Ship, FileCheck, Box, Calendar, ArrowLeft } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import { usePortalAuth } from './hooks/usePortalAuth';
 import { useTranslation, Language } from './i18n/translations';
 import PortalHeader from './components/PortalHeader';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
@@ -47,22 +48,23 @@ const PortalDashboard: React.FC = () => {
   const [shipments, setShipments] = useState<CargoItem[]>([]);
   const [filteredShipments, setFilteredShipments] = useState<CargoItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [shipmentsLoading, setShipmentsLoading] = useState(true);
   const [lang, setLang] = useState<Language>('en');
   const [newPassword, setNewPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const t = useTranslation(lang);
   
-  const { user, customerAccount, isActive, signOut, changePassword } = usePortalAuth();
+  const { user, customerAccount, loading, isActive, signOut, changePassword } = usePortalAuth();
+  const { isAdmin } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user) {
+    if (!loading && !user) {
       navigate('/customer-portal');
       return;
     }
-    fetchShipments();
-  }, [user]);
+    if (user) fetchShipments();
+  }, [user, loading]);
 
   useEffect(() => {
     if (!searchTerm.trim()) {
@@ -77,7 +79,7 @@ const PortalDashboard: React.FC = () => {
   }, [searchTerm, shipments]);
 
   const fetchShipments = async () => {
-    setLoading(true);
+    setShipmentsLoading(true);
     const { data, error } = await supabase
       .from('cargo_tracking')
       .select('*')
@@ -87,7 +89,7 @@ const PortalDashboard: React.FC = () => {
       setShipments(data as CargoItem[]);
       setFilteredShipments(data as CargoItem[]);
     }
-    setLoading(false);
+    setShipmentsLoading(false);
   };
 
   const handleChangePassword = async () => {
@@ -178,6 +180,14 @@ const PortalDashboard: React.FC = () => {
         onToggleLang={() => setLang(l => l === 'en' ? 'ar' : 'en')}
         rightContent={
           <div className="flex items-center gap-2">
+            {isAdmin && (
+              <Link to="/dashboard">
+                <Button variant="ghost" size="sm" className="text-primary-foreground hover:bg-white/10 gap-1.5">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Dashboard
+                </Button>
+              </Link>
+            )}
             {/* Change Password Dialog */}
             <Dialog>
               <DialogTrigger asChild>
@@ -255,7 +265,7 @@ const PortalDashboard: React.FC = () => {
         </div>
 
         {/* Shipments */}
-        {loading ? (
+        {shipmentsLoading ? (
           <Card><CardContent className="py-12 text-center text-muted-foreground">{t.loading}</CardContent></Card>
         ) : filteredShipments.length === 0 ? (
           <Card className="border-0 shadow-md">
