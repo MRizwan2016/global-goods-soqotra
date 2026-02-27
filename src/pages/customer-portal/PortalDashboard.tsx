@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Search, Package, Clock, LogOut, User, Lock, AlertTriangle, CheckCircle2, Truck, Ship, FileCheck, Box, Calendar } from 'lucide-react';
+import { Search, Package, Clock, LogOut, User, Lock, AlertTriangle, CheckCircle2, Truck, Ship, FileCheck, Box, Calendar, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { usePortalAuth } from './hooks/usePortalAuth';
 import { useTranslation, Language } from './i18n/translations';
