@@ -284,12 +284,12 @@ export function useAuth(): LegacyAuthContextType {
         return;
       }
 
-      const currentPerms = (freshProfile.permissions as LegacyUser['permissions']) || {};
+      const currentPerms = (freshProfile.permissions || {}) as any;
       const updatedPermissions = {
         ...currentPerms,
         files: {
-          ...currentPerms.files,
-          [fileKey]: !currentPerms.files?.[fileKey]
+          ...(currentPerms.files || {}),
+          [fileKey]: !(currentPerms.files?.[fileKey])
         }
       };
 
@@ -305,7 +305,7 @@ export function useAuth(): LegacyAuthContextType {
 
       // Update local state immediately
       setUsers(prev => prev.map(u => 
-        u.id === userId ? { ...u, permissions: updatedPermissions } : u
+        u.id === userId ? { ...u, permissions: updatedPermissions as LegacyUser['permissions'] } : u
       ));
     } catch (error) {
       console.error("Error toggling file permission");
