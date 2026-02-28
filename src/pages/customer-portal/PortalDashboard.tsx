@@ -55,7 +55,13 @@ const PortalDashboard: React.FC = () => {
   const t = useTranslation(lang);
   
   const { user, customerAccount, loading, isActive, signOut, changePassword } = usePortalAuth();
-  const { isAdmin } = useAuth();
+  let isAdmin = false;
+  try {
+    const authHook = useAuth();
+    isAdmin = authHook.isAdmin;
+  } catch (e) {
+    // useAuth may fail if profiles query fails
+  }
   const navigate = useNavigate();
 
   useEffect(() => {
