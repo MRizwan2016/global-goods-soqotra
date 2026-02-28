@@ -18,49 +18,81 @@ export const usePortalAuth = () => {
   const [loading, setLoading] = useState(true);
   const [isActive, setIsActive] = useState(false);
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        // Fetch customer account
-        const { data } = await supabase
-          .from('customer_accounts')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-        
-        if (data) {
-          setCustomerAccount(data as CustomerAccount);
-          setIsActive(data.is_active);
-        }
+  const fetchCustomerAccount = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('customer_accounts')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      if (data) {
+        setCustomerAccount(data as CustomerAccount);
+        setIsActive(data.is_active);
       } else {
         setCustomerAccount(null);
         setIsActive(false);
       }
-      setLoading(false);
-    });
+    } catch (err) {
+      console.error('Error fetching customer account:', err);
+      setCustomerAccount(null);
+      setIsActive(false);
+    }
+  };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        supabase
-          .from('customer_accounts')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .maybeSingle()
-          .then(({ data }) => {
-            if (data) {
-              setCustomerAccount(data as CustomerAccount);
-              setIsActive(data.is_active);
-            }
-            setLoading(false);
+  useEffect(() => {
+    let mounted = true;
+
+    // Safety timeout - ensure loading resolves within 5 seconds
+    const timeout = setTimeout(() => {
+      if (mounted && loading) {
+        console.warn('Portal auth timeout - forcing loading complete');
+        setLoading(false);
+      }
+    }, 5000);
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!mounted) return;
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        
+        if (currentUser) {
+          fetchCustomerAccount(currentUser.id).finally(() => {
+            if (mounted) setLoading(false);
           });
+        } else {
+          setCustomerAccount(null);
+          setIsActive(false);
+          setLoading(false);
+        }
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      
+      if (currentUser) {
+        fetchCustomerAccount(currentUser.id).finally(() => {
+          if (mounted) setLoading(false);
+        });
       } else {
         setLoading(false);
       }
+    }).catch(() => {
+      if (mounted) setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      clearTimeout(timeout);
+      subscription.unsubscribe();
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -79,7 +111,6 @@ export const usePortalAuth = () => {
     
     if (error) return { data, error };
 
-    // Create customer account record
     if (data.user) {
       const { error: profileError } = await supabase
         .from('customer_accounts')
