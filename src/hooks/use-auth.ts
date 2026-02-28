@@ -245,7 +245,7 @@ export function useAuth(): LegacyAuthContextType {
         return;
       }
 
-      const currentPerms = (freshProfile.permissions as LegacyUser['permissions']) || {};
+      const currentPerms = (freshProfile.permissions || {}) as any;
       const updatedPermissions = {
         ...currentPerms,
         [permissionType]: !currentPerms[permissionType]
