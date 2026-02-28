@@ -233,35 +233,38 @@ export function useAuth(): LegacyAuthContextType {
   
   const toggleUserPermission = async (userId: string, permissionType: keyof LegacyUser['permissions']) => {
     try {
-      const user = users.find(u => u.id === userId);
-      if (!user) return;
+      // Fetch fresh permissions from DB to avoid race conditions
+      const { data: freshProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('permissions')
+        .eq('user_id', userId)
+        .single();
 
-      const updatedPermissions = {
-        ...user.permissions,
-        [permissionType]: !user.permissions[permissionType]
-      };
-
-      const isSupabaseUser = user.id.includes('-') && user.id.length > 20;
-
-      if (isSupabaseUser) {
-        const { error } = await supabase
-          .from('profiles')
-          .update({ permissions: updatedPermissions })
-          .eq('user_id', userId);
-
-        if (error) {
-          console.error("Error updating user permission");
-          return;
-        }
-      } else {
-        const updatedUsers = users.map(u => 
-          u.id === userId ? { ...u, permissions: updatedPermissions } : u
-        );
-        const localUsers = updatedUsers.filter(u => !u.id.includes('-') || u.id.length < 20);
-        localStorage.setItem("users", JSON.stringify(localUsers));
+      if (fetchError || !freshProfile) {
+        console.error("Error fetching fresh permissions");
+        return;
       }
 
-      await loadUsersFromBothSources();
+      const currentPerms = (freshProfile.permissions as LegacyUser['permissions']) || {};
+      const updatedPermissions = {
+        ...currentPerms,
+        [permissionType]: !currentPerms[permissionType]
+      };
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({ permissions: updatedPermissions })
+        .eq('user_id', userId);
+
+      if (error) {
+        console.error("Error updating user permission");
+        return;
+      }
+
+      // Update local state immediately
+      setUsers(prev => prev.map(u => 
+        u.id === userId ? { ...u, permissions: updatedPermissions } : u
+      ));
     } catch (error) {
       console.error("Error toggling user permission");
     }
@@ -269,38 +272,41 @@ export function useAuth(): LegacyAuthContextType {
   
   const toggleFilePermission = async (userId: string, fileKey: keyof LegacyUser['permissions']['files']) => {
     try {
-      const user = users.find(u => u.id === userId);
-      if (!user) return;
+      // Fetch fresh permissions from DB to avoid race conditions
+      const { data: freshProfile, error: fetchError } = await supabase
+        .from('profiles')
+        .select('permissions')
+        .eq('user_id', userId)
+        .single();
 
+      if (fetchError || !freshProfile) {
+        console.error("Error fetching fresh permissions");
+        return;
+      }
+
+      const currentPerms = (freshProfile.permissions as LegacyUser['permissions']) || {};
       const updatedPermissions = {
-        ...user.permissions,
+        ...currentPerms,
         files: {
-          ...user.permissions.files,
-          [fileKey]: !user.permissions.files[fileKey]
+          ...currentPerms.files,
+          [fileKey]: !currentPerms.files?.[fileKey]
         }
       };
 
-      const isSupabaseUser = user.id.includes('-') && user.id.length > 20;
+      const { error } = await supabase
+        .from('profiles')
+        .update({ permissions: updatedPermissions })
+        .eq('user_id', userId);
 
-      if (isSupabaseUser) {
-        const { error } = await supabase
-          .from('profiles')
-          .update({ permissions: updatedPermissions })
-          .eq('user_id', userId);
-
-        if (error) {
-          console.error("Error updating file permission");
-          return;
-        }
-      } else {
-        const updatedUsers = users.map(u => 
-          u.id === userId ? { ...u, permissions: updatedPermissions } : u
-        );
-        const localUsers = updatedUsers.filter(u => !u.id.includes('-') || u.id.length < 20);
-        localStorage.setItem("users", JSON.stringify(localUsers));
+      if (error) {
+        console.error("Error updating file permission");
+        return;
       }
 
-      await loadUsersFromBothSources();
+      // Update local state immediately
+      setUsers(prev => prev.map(u => 
+        u.id === userId ? { ...u, permissions: updatedPermissions } : u
+      ));
     } catch (error) {
       console.error("Error toggling file permission");
     }
