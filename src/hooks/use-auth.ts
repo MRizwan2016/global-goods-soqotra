@@ -209,7 +209,7 @@ export function useAuth(): LegacyAuthContextType {
         const { error } = await supabase
           .from('profiles')
           .update({ is_active: !user.isActive })
-          .eq('id', userId);
+          .eq('user_id', userId);
 
         if (error) {
           console.error("Error updating user status");
