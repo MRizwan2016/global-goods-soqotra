@@ -43,6 +43,14 @@ export const usePortalAuth = () => {
   useEffect(() => {
     let mounted = true;
 
+    // Safety timeout - ensure loading resolves within 5 seconds
+    const timeout = setTimeout(() => {
+      if (mounted && loading) {
+        console.warn('Portal auth timeout - forcing loading complete');
+        setLoading(false);
+      }
+    }, 5000);
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -51,7 +59,6 @@ export const usePortalAuth = () => {
         setUser(currentUser);
         
         if (currentUser) {
-          // Don't await - fire and forget to avoid blocking
           fetchCustomerAccount(currentUser.id).finally(() => {
             if (mounted) setLoading(false);
           });
@@ -82,6 +89,8 @@ export const usePortalAuth = () => {
 
     return () => {
       mounted = false;
+      clearTimeout(timeout);
+      subscription.unsubscribe();
       subscription.unsubscribe();
     };
   }, []);
