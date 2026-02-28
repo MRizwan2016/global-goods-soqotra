@@ -247,7 +247,7 @@ export function useAuth(): LegacyAuthContextType {
         const { error } = await supabase
           .from('profiles')
           .update({ permissions: updatedPermissions })
-          .eq('id', userId);
+          .eq('user_id', userId);
 
         if (error) {
           console.error("Error updating user permission");
