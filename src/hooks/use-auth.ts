@@ -263,6 +263,8 @@ export function useAuth(): LegacyAuthContextType {
 
       // Update local state immediately
       setUsers(prev => prev.map(u => 
+        u.id === userId ? { ...u, permissions: updatedPermissions as LegacyUser['permissions'] } : u
+      ));
         u.id === userId ? { ...u, permissions: updatedPermissions } : u
       ));
     } catch (error) {
