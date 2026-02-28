@@ -41,28 +41,49 @@ export const usePortalAuth = () => {
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchCustomerAccount(session.user.id);
+    let mounted = true;
+
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        if (!mounted) return;
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        
+        if (currentUser) {
+          // Don't await - fire and forget to avoid blocking
+          fetchCustomerAccount(currentUser.id).finally(() => {
+            if (mounted) setLoading(false);
+          });
+        } else {
+          setCustomerAccount(null);
+          setIsActive(false);
+          setLoading(false);
+        }
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+      
+      if (currentUser) {
+        fetchCustomerAccount(currentUser.id).finally(() => {
+          if (mounted) setLoading(false);
+        });
       } else {
-        setCustomerAccount(null);
-        setIsActive(false);
+        setLoading(false);
       }
-      setLoading(false);
-    });
-
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchCustomerAccount(session.user.id);
-      }
-      setLoading(false);
     }).catch(() => {
-      setLoading(false);
+      if (mounted) setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -81,7 +102,6 @@ export const usePortalAuth = () => {
     
     if (error) return { data, error };
 
-    // Create customer account record
     if (data.user) {
       const { error: profileError } = await supabase
         .from('customer_accounts')
