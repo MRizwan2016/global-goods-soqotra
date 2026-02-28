@@ -80,14 +80,20 @@ const PortalDashboard: React.FC = () => {
 
   const fetchShipments = async () => {
     setShipmentsLoading(true);
-    const { data, error } = await supabase
-      .from('cargo_tracking')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('cargo_tracking')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (!error && data) {
-      setShipments(data as CargoItem[]);
-      setFilteredShipments(data as CargoItem[]);
+      if (!error && data) {
+        setShipments(data as CargoItem[]);
+        setFilteredShipments(data as CargoItem[]);
+      } else {
+        console.log('Cargo fetch error or no data:', error?.message);
+      }
+    } catch (err) {
+      console.error('Failed to fetch shipments:', err);
     }
     setShipmentsLoading(false);
   };
