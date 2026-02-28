@@ -1,1 +1,4 @@
 project_id = "qucxwhcnugpoqmvjqoqn"
+
+[functions.cargo-status-notification]
+verify_jwt = false

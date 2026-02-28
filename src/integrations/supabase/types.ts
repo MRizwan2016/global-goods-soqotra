@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      cargo_status_notifications: {
+        Row: {
+          cargo_tracking_id: string
+          customer_account_id: string
+          email_sent_to: string
+          error: string | null
+          id: string
+          new_status: string
+          old_status: string | null
+          resend_message_id: string | null
+          sent_at: string
+        }
+        Insert: {
+          cargo_tracking_id: string
+          customer_account_id: string
+          email_sent_to: string
+          error?: string | null
+          id?: string
+          new_status: string
+          old_status?: string | null
+          resend_message_id?: string | null
+          sent_at?: string
+        }
+        Update: {
+          cargo_tracking_id?: string
+          customer_account_id?: string
+          email_sent_to?: string
+          error?: string | null
+          id?: string
+          new_status?: string
+          old_status?: string | null
+          resend_message_id?: string | null
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cargo_status_notifications_cargo_tracking_id_fkey"
+            columns: ["cargo_tracking_id"]
+            isOneToOne: false
+            referencedRelation: "cargo_tracking"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cargo_status_notifications_customer_account_id_fkey"
+            columns: ["customer_account_id"]
+            isOneToOne: false
+            referencedRelation: "customer_accounts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cargo_tracking: {
         Row: {
           arrival_date: string | null
