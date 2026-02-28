@@ -266,7 +266,6 @@ export function useAuth(): LegacyAuthContextType {
         u.id === userId ? { ...u, permissions: updatedPermissions as LegacyUser['permissions'] } : u
       ));
     } catch (error) {
-    } catch (error) {
       console.error("Error toggling user permission");
     }
   };
