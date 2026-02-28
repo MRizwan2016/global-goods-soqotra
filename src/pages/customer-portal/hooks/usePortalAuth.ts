@@ -18,21 +18,33 @@ export const usePortalAuth = () => {
   const [loading, setLoading] = useState(true);
   const [isActive, setIsActive] = useState(false);
 
+  const fetchCustomerAccount = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('customer_accounts')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      
+      if (data) {
+        setCustomerAccount(data as CustomerAccount);
+        setIsActive(data.is_active);
+      } else {
+        setCustomerAccount(null);
+        setIsActive(false);
+      }
+    } catch (err) {
+      console.error('Error fetching customer account:', err);
+      setCustomerAccount(null);
+      setIsActive(false);
+    }
+  };
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        // Fetch customer account
-        const { data } = await supabase
-          .from('customer_accounts')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-        
-        if (data) {
-          setCustomerAccount(data as CustomerAccount);
-          setIsActive(data.is_active);
-        }
+        await fetchCustomerAccount(session.user.id);
       } else {
         setCustomerAccount(null);
         setIsActive(false);
@@ -40,24 +52,14 @@ export const usePortalAuth = () => {
       setLoading(false);
     });
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        supabase
-          .from('customer_accounts')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .maybeSingle()
-          .then(({ data }) => {
-            if (data) {
-              setCustomerAccount(data as CustomerAccount);
-              setIsActive(data.is_active);
-            }
-            setLoading(false);
-          });
-      } else {
-        setLoading(false);
+        await fetchCustomerAccount(session.user.id);
       }
+      setLoading(false);
+    }).catch(() => {
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
