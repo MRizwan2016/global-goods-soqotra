@@ -149,7 +149,8 @@ const PortalDashboard: React.FC = () => {
 
   const statusOrder = ['collected', 'loaded', 'in_transit', 'arrived', 'clearance', 'processing', 'delivered'];
 
-  if (loading || !user) return null;
+  if (loading) return <div className="flex items-center justify-center min-h-screen"><p>Loading portal...</p></div>;
+  if (!user) return null;
 
   // Account pending activation
   if (!isActive && customerAccount) {
