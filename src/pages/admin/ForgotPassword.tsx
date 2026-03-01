@@ -84,7 +84,7 @@ const ForgotPassword = () => {
                 asChild
                 className="mt-4 bg-[#1976d2] hover:bg-blue-600"
               >
-                <Link to="/admin/login">Return to Login</Link>
+                <Link to="/login">Return to Login</Link>
               </Button>
             </div>
           ) : (
