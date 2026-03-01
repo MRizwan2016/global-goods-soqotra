@@ -26,7 +26,7 @@ const PrivateRoute = ({
     authContext = useAuth();
   } catch (error) {
     console.error("AuthProvider context error:", error);
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace />;
   }
   
   const { isAuthenticated, isAdmin, currentUser, loading } = authContext;
@@ -37,7 +37,7 @@ const PrivateRoute = ({
     permissionsContext = usePermissions();
   } catch (error) {
     console.error("Permissions context error:", error);
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace />;
   }
   
   const { hasFilePermission } = permissionsContext;
@@ -62,7 +62,7 @@ const PrivateRoute = ({
       description: "Please log in to access this page.",
       variant: "destructive",
     });
-    return <Navigate to="/admin/login" replace state={{ from: location }} />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   // Check if admin is required for the route

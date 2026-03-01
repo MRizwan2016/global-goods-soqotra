@@ -85,7 +85,7 @@ export const useInvoicePrintData = () => {
     
     // If not authenticated, redirect to login
     if (!isAuthenticated) {
-      navigate("/admin/login", { replace: true });
+      navigate("/login", { replace: true });
     }
   }, [isAuthenticated, navigate, location]);
   

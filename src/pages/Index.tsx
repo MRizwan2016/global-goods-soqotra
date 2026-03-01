@@ -16,7 +16,7 @@ const Index = () => {
       navigate("/dashboard", { replace: true });
     } else {
       console.log("User is not authenticated, redirecting to login page");
-      navigate("/admin/login", { replace: true });
+      navigate("/login", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
