@@ -37,7 +37,7 @@ const PrivateRoute = ({
     permissionsContext = usePermissions();
   } catch (error) {
     console.error("Permissions context error:", error);
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace />;
   }
   
   const { hasFilePermission } = permissionsContext;
