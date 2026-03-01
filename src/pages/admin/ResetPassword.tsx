@@ -70,7 +70,7 @@ const ResetPassword = () => {
     try {
       const success = await resetPassword(userId, token, values.password);
       if (success) {
-        navigate("/admin/login", { 
+        navigate("/login", { 
           state: { 
             message: "Password reset successful! You can now log in with your new password." 
           }

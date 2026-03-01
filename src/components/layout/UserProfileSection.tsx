@@ -16,7 +16,7 @@ const UserProfileSection = () => {
   };
 
   const handleLogin = () => {
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   return (

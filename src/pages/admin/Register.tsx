@@ -58,7 +58,7 @@ const Register = () => {
       });
       
       if (success) {
-        navigate("/admin/login", { 
+        navigate("/login", { 
           state: { 
             message: "Registration successful! Please wait for admin approval to access your account." 
           }

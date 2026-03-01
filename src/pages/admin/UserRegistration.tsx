@@ -71,7 +71,7 @@ const UserRegistration = () => {
       });
 
       if (success) {
-        navigate("/admin/login");
+        navigate("/login");
       }
     } finally {
       setIsLoading(false);
