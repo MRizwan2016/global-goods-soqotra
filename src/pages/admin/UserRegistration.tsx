@@ -214,7 +214,7 @@ const UserRegistration = () => {
         </CardContent>
         <CardFooter className="flex justify-center gap-1 text-sm">
           <span>Already have an account?</span>
-          <Link to="/admin/login" className="text-blue-600 hover:underline">
+          <Link to="/login" className="text-blue-600 hover:underline">
             Sign in
           </Link>
         </CardFooter>

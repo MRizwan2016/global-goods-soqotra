@@ -224,7 +224,7 @@ const Register = () => {
               </Button>
               
               <div className="text-center pt-2">
-                <Link to="/admin/login" className="text-blue-500 hover:underline">
+                <Link to="/login" className="text-blue-500 hover:underline">
                   Already have an account? Login here
                 </Link>
               </div>
