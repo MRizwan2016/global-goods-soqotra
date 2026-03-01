@@ -62,7 +62,7 @@ const PrivateRoute = ({
       description: "Please log in to access this page.",
       variant: "destructive",
     });
-    return <Navigate to="/admin/login" replace state={{ from: location }} />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   // Check if admin is required for the route

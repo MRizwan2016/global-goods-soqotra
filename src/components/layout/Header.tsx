@@ -15,7 +15,7 @@ const Header = ({ title }: { title: string }) => {
   };
 
   const handleLogin = () => {
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   const handleLogoClick = () => {

@@ -33,7 +33,7 @@ const AppRoutes = () => {
               path={route.path}
               element={
                 <PrivateRouteWrapper
-                  requireAdmin={route.path.includes('/admin') && !route.path.includes('/admin/login')} 
+                  requireAdmin={route.path.includes('/admin') && !route.path.includes('/login')} 
                   requiredFile={route.requiredFile}
                   requiredPermission={route.requiredPermission || requiredPermission}
                 >
