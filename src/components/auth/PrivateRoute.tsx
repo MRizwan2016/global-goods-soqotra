@@ -26,7 +26,7 @@ const PrivateRoute = ({
     authContext = useAuth();
   } catch (error) {
     console.error("AuthProvider context error:", error);
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to="/login" replace />;
   }
   
   const { isAuthenticated, isAdmin, currentUser, loading } = authContext;
