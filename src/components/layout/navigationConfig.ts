@@ -112,7 +112,7 @@ export const navigationSections: NavigationSections = {
         title: "CONTROL PANEL",
         items: [
           { name: "CONTROL PANEL", path: "/admin/control-panel" },
-          { name: "REGISTER USER", path: "/admin/register" },
+          { name: "REGISTER USER", path: "/register" },
         ],
       },
     ],

@@ -115,7 +115,7 @@ const ResetPassword = () => {
           {!isValidToken ? (
             <div className="text-center">
               <Button asChild className="mt-4 bg-[#1976d2] hover:bg-blue-600">
-                <Link to="/admin/forgot-password">Request New Reset Link</Link>
+                <Link to="/forgot-password">Request New Reset Link</Link>
               </Button>
             </div>
           ) : (

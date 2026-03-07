@@ -15,7 +15,7 @@ export const adminRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/admin/register",
+    path: "/register",
     element: UserRegistration,
     private: true
   }
