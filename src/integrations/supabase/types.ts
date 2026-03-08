@@ -252,6 +252,93 @@ export type Database = {
         }
         Relationships: []
       }
+      drivers: {
+        Row: {
+          country: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
+      invoice_books: {
+        Row: {
+          assigned_date: string | null
+          assigned_to_driver: string | null
+          assigned_to_sales_rep: string | null
+          available_pages: Json
+          book_number: string
+          country: string
+          country_id_number: string | null
+          created_at: string
+          end_page: string
+          id: string
+          job_data: Json | null
+          job_number: string | null
+          pages_used: number
+          start_page: string
+          status: string
+          total_pages: number
+          updated_at: string
+          whatsapp_number: string | null
+        }
+        Insert: {
+          assigned_date?: string | null
+          assigned_to_driver?: string | null
+          assigned_to_sales_rep?: string | null
+          available_pages?: Json
+          book_number: string
+          country: string
+          country_id_number?: string | null
+          created_at?: string
+          end_page: string
+          id?: string
+          job_data?: Json | null
+          job_number?: string | null
+          pages_used?: number
+          start_page: string
+          status?: string
+          total_pages?: number
+          updated_at?: string
+          whatsapp_number?: string | null
+        }
+        Update: {
+          assigned_date?: string | null
+          assigned_to_driver?: string | null
+          assigned_to_sales_rep?: string | null
+          available_pages?: Json
+          book_number?: string
+          country?: string
+          country_id_number?: string | null
+          created_at?: string
+          end_page?: string
+          id?: string
+          job_data?: Json | null
+          job_number?: string | null
+          pages_used?: number
+          start_page?: string
+          status?: string
+          total_pages?: number
+          updated_at?: string
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           book_no: string | null
@@ -333,6 +420,30 @@ export type Database = {
           permissions?: Json | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      sales_representatives: {
+        Row: {
+          country: string
+          created_at: string
+          id: string
+          is_active: boolean
+          name: string
+        }
+        Insert: {
+          country: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name?: string
         }
         Relationships: []
       }
