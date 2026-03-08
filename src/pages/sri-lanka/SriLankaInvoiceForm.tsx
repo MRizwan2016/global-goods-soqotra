@@ -759,6 +759,71 @@ const SriLankaInvoiceForm = () => {
                 </Select>
               </div>
             </div>
+            
+            {/* Book Assignment & WhatsApp Details */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-4 pt-4 border-t border-blue-200">
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">BOOK NUMBER</label>
+                <Input
+                  name="bookNumber"
+                  value={formData.bookNumber}
+                  onChange={handleInputChange}
+                  placeholder="E.G. 800"
+                  className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PAGE NUMBER</label>
+                <Input
+                  name="pageNumber"
+                  value={formData.pageNumber}
+                  onChange={handleInputChange}
+                  placeholder="AUTO FROM BOOK"
+                  className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
+                  readOnly
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SALES REP</label>
+                <Select value={formData.salesRepresentative} onValueChange={(value) => handleSelectChange('salesRepresentative', value)}>
+                  <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                    <SelectValue placeholder="SELECT REP" className="uppercase" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white/95 backdrop-blur-sm">
+                    <SelectItem value="Mr. Lahiru Chathuranga">Mr. Lahiru Chathuranga</SelectItem>
+                    <SelectItem value="Mr. Sajjad">Mr. Sajjad</SelectItem>
+                    <SelectItem value="Mr. Imam Ubaidulla">Mr. Imam Ubaidulla</SelectItem>
+                    <SelectItem value="Mr. Ranatunghe">Mr. Ranatunghe</SelectItem>
+                    <SelectItem value="Mr. Mohamed Rizwan">Mr. Mohamed Rizwan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DRIVER</label>
+                <Select value={formData.driverName} onValueChange={(value) => handleSelectChange('driverName', value)}>
+                  <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                    <SelectValue placeholder="SELECT DRIVER" className="uppercase" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white/95 backdrop-blur-sm">
+                    <SelectItem value="Ashoka Udesh">Ashoka Udesh</SelectItem>
+                    <SelectItem value="Johnny Venakady">Johnny Venakady</SelectItem>
+                    <SelectItem value="Kanaya">Kanaya</SelectItem>
+                    <SelectItem value="Bakeeth Idris">Bakeeth Idris</SelectItem>
+                    <SelectItem value="Idries Karar">Idries Karar</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">WHATSAPP NUMBER</label>
+                <Input
+                  name="whatsappNumber"
+                  value={formData.whatsappNumber}
+                  onChange={handleInputChange}
+                  placeholder="+94 XXX XXX XXXX"
+                  className="bg-white/80 border-blue-200 focus:border-blue-400"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Destination Details */}
