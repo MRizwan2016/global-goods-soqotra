@@ -71,6 +71,8 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
           // Map destination to country name used in DB
           const destinationCountryMap: Record<string, string> = {
             'SRI LANKA': 'Sri Lanka',
+            'COLOMBO': 'Sri Lanka',
+            'COLOMBO, SRI LANKA': 'Sri Lanka',
             'SUDAN': 'Sudan',
             'ERITREA': 'Eritrea',
             'SOMALIA': 'Somalia',
