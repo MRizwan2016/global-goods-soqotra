@@ -96,36 +96,46 @@ const InvoiceBookForm = () => {
         let firstPage: number;
         let lastPage: number;
         
-        // Fixed page numbering system for all countries:
-        // Book 1: 100000-100050 (51 pages)
-        // Book 2: 100051-100100 (50 pages)  
-        // Book 3: 100101-100151 (51 pages)
-        // Pattern: alternates between 51 and 50 pages
-        
-        if (bookNumber === 1) {
-          firstPage = 100000;
-          lastPage = 100050;
-        } else {
-          // Calculate starting page based on previous books
-          let totalPages = 51; // Book 1 has 51 pages
+        // Sri Lanka specific page numbering
+        if (formData.country === "SRI_LANKA") {
+          // Country ID: 13, Book 800: pages 13140800-13140850
+          const sriLankaBaseBook = 800;
+          const sriLankaBasePage = 140800;
+          const countryPrefix = 13;
+          const bookOffset = bookNumber - sriLankaBaseBook;
+          const pagesPerBook = 50;
           
-          for (let i = 2; i < bookNumber; i++) {
-            // Alternating pattern: odd books have 51 pages, even books have 50 pages
-            totalPages += (i % 2 === 1) ? 51 : 50;
+          firstPage = countryPrefix * 1000000 + sriLankaBasePage + (bookOffset * pagesPerBook);
+          lastPage = firstPage + pagesPerBook - 1;
+          
+          updatedFormData = {
+            ...updatedFormData,
+            startPage: firstPage.toString(),
+            endPage: lastPage.toString(),
+            pagesInBook: pagesPerBook.toString()
+          };
+        } else {
+          // Default page numbering for other countries
+          if (bookNumber === 1) {
+            firstPage = 100000;
+            lastPage = 100050;
+          } else {
+            let totalPages = 51;
+            for (let i = 2; i < bookNumber; i++) {
+              totalPages += (i % 2 === 1) ? 51 : 50;
+            }
+            firstPage = 100000 + totalPages;
+            const currentBookPages = (bookNumber % 2 === 1) ? 51 : 50;
+            lastPage = firstPage + currentBookPages - 1;
           }
           
-          firstPage = 100000 + totalPages;
-          // Current book pages: odd book numbers get 51 pages, even get 50 pages
-          const currentBookPages = (bookNumber % 2 === 1) ? 51 : 50;
-          lastPage = firstPage + currentBookPages - 1;
+          updatedFormData = {
+            ...updatedFormData,
+            startPage: firstPage.toString(),
+            endPage: lastPage.toString(),
+            pagesInBook: (lastPage - firstPage + 1).toString()
+          };
         }
-        
-        updatedFormData = {
-          ...updatedFormData,
-          startPage: firstPage.toString(),
-          endPage: lastPage.toString(),
-          pagesInBook: (lastPage - firstPage + 1).toString()
-        };
       }
       
       setFormData(updatedFormData);
