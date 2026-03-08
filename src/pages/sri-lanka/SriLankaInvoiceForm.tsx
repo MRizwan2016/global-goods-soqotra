@@ -33,6 +33,11 @@ const SriLankaInvoiceForm = () => {
     date: new Date().toISOString().split('T')[0],
     cargoType: '',
     jobNumber: '',
+    bookNumber: '',
+    pageNumber: '',
+    salesRepresentative: '',
+    driverName: '',
+    whatsappNumber: '',
     shipperPrefix: '',
     shipperName: '',
     shipperCountry: '',
@@ -42,7 +47,7 @@ const SriLankaInvoiceForm = () => {
     shipperMobile: '',
     consigneePrefix: '',
     consigneeName: '',
-    consigneeCountry: 'SRI LANKA', // Default to Sri Lanka
+    consigneeCountry: 'SRI LANKA',
     consigneeDistrict: '',
     consigneeProvince: '',
     consigneeAddress: '',
@@ -67,7 +72,6 @@ const SriLankaInvoiceForm = () => {
     packingCharges: '0',
     transportationFee: '0',
     remarks: '',
-    // Package details fields
     packagesName: '',
     length: '',
     width: '',
