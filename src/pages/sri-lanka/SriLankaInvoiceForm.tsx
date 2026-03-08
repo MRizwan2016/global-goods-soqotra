@@ -709,10 +709,36 @@ const SriLankaInvoiceForm = () => {
                  <Input
                    name="jobNumber"
                    value={formData.jobNumber}
-                   onChange={handleInputChange}
-                   placeholder="AUTO-GENERATED"
+                   onChange={(e) => {
+                     const value = e.target.value;
+                     handleInputChange(e);
+                     // Auto-fill from Qatar collection/delivery jobs
+                     if (value.length >= 3) {
+                       try {
+                         const scheduleJobs = JSON.parse(localStorage.getItem('qatarJobs') || '[]');
+                         const matchedJob = scheduleJobs.find((j: any) => 
+                           j.jobNumber?.includes(value) || j.id?.includes(value)
+                         );
+                         if (matchedJob) {
+                           setFormData(prev => ({
+                             ...prev,
+                             jobNumber: value,
+                             shipperName: matchedJob.shipperName || matchedJob.customerName || prev.shipperName,
+                             shipperMobile: matchedJob.shipperMobile || matchedJob.mobile || prev.shipperMobile,
+                             consigneeName: matchedJob.consigneeName || prev.consigneeName,
+                             consigneeMobile: matchedJob.consigneeMobile || prev.consigneeMobile,
+                             weight: matchedJob.weight || prev.weight,
+                             description: matchedJob.description || prev.description,
+                           }));
+                           toast.success('Job details auto-filled');
+                         }
+                       } catch (err) {
+                         console.log('No Qatar job data found');
+                       }
+                     }
+                   }}
+                   placeholder="ENTER JOB NUMBER"
                    className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
-                   readOnly
                  />
               </div>
               <div>
