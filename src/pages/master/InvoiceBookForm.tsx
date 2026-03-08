@@ -22,6 +22,14 @@ const InvoiceBookForm = () => {
   // Country-specific data
   const getSalesRepresentatives = (country: string) => {
     switch (country) {
+      case "SRI_LANKA":
+        return [
+          { value: "MR_LAHIRU_CHATHURANGA", label: "Mr. Lahiru Chathuranga" },
+          { value: "MR_SAJJAD", label: "Mr. Sajjad" },
+          { value: "MR_IMAM_UBAIDULLA", label: "Mr. Imam Ubaidulla" },
+          { value: "MR_RANATUNGHE", label: "Mr. Ranatunghe" },
+          { value: "MR_MOHAMED_RIZWAN", label: "Mr. Mohamed Rizwan" }
+        ];
       case "ERITREA":
         return [
           { value: "MR_YOUSUF", label: "Mr. Yousuf" },
@@ -44,6 +52,14 @@ const InvoiceBookForm = () => {
 
   const getDrivers = (country: string) => {
     switch (country) {
+      case "SRI_LANKA":
+        return [
+          { value: "ASHOKA_UDESH", label: "Ashoka Udesh" },
+          { value: "JOHNNY_VENAKADY", label: "Johnny Venakady" },
+          { value: "KANAYA", label: "Kanaya" },
+          { value: "BAKEETH_IDRIS", label: "Bakeeth Idris" },
+          { value: "IDRIES_KARAR", label: "Idries Karar" }
+        ];
       case "ERITREA":
         return [
           { value: "MR_JOHNY_VENAKADY", label: "Mr. Johny Venakady" },
