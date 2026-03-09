@@ -37,14 +37,17 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
           
           /* Hide non-printable elements */
           .print\\:hidden,
-          .no-print,
+          .no-print {
+            display: none !important;
+            visibility: hidden !important;
+          }
+          
           button,
           .button,
           [role="button"],
           input,
           select {
             display: none !important;
-            visibility: hidden !important;
           }
           
           /* Make sure the print container is visible */
