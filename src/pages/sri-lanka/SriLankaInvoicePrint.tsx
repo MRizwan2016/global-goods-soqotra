@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer } from 'lucide-react';
+import { ArrowLeft, Printer, Download } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import SriLankaHAWB from './documents/SriLankaHAWB';
 import SriLankaAirManifest from './documents/SriLankaAirManifest';
+import { toast } from 'sonner';
 
 const SriLankaInvoicePrint = () => {
   const { id } = useParams();
@@ -119,70 +122,43 @@ const SriLankaInvoicePrint = () => {
   };
 
   const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow && printRef.current) {
-      const printContent = printRef.current.innerHTML;
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Print Invoice</title>
-            <style>
-              body { 
-                margin: 0; 
-                padding: 20px; 
-                font-family: Arial, sans-serif; 
-                font-size: 12px;
-                line-height: 1.4;
-              }
-              .print-container { 
-                max-width: 800px; 
-                margin: 0 auto; 
-                background: white;
-              }
-              table { 
-                width: 100%; 
-                border-collapse: collapse; 
-              }
-              th, td { 
-                border: 1px solid #000; 
-                padding: 8px; 
-                text-align: left; 
-              }
-              .font-bold { font-weight: bold; }
-              .text-center { text-align: center; }
-              .text-right { text-align: right; }
-              .border-t { border-top: 1px solid #000; }
-              .border-r { border-right: 1px solid #000; }
-              .border-b { border-bottom: 1px solid #000; }
-              .underline { text-decoration: underline; }
-              .flex { display: flex; }
-              .w-1\\/2 { width: 50%; }
-              .w-1\\/4 { width: 25%; }
-              .w-2\\/4 { width: 50%; }
-              .p-2 { padding: 8px; }
-              .mt-1 { margin-top: 4px; }
-              .mb-1 { margin-bottom: 4px; }
-              .text-lg { font-size: 16px; }
-              .text-base { font-size: 14px; }
-              .text-sm { font-size: 12px; }
-              .text-xs { font-size: 10px; }
-              img { max-width: 100%; height: auto; }
-              @media print {
-                body { margin: 0; padding: 0; }
-                .no-print { display: none; }
-              }
-            </style>
-          </head>
-          <body>
-            <div class="print-container">
-              ${printContent}
-            </div>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
+    window.print();
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!printRef.current) return;
+    toast.info('Generating PDF...');
+    try {
+      const canvas = await html2canvas(printRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+      });
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = 210;
+      const pdfHeight = 297;
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pdfHeight;
+
+      while (heightLeft > 0) {
+        position -= pdfHeight;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight;
+      }
+
+      pdf.save(`Invoice-${invoiceData?.invoiceNumber || 'document'}.pdf`);
+      toast.success('PDF downloaded successfully');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to generate PDF');
     }
   };
 
@@ -198,6 +174,18 @@ const SriLankaInvoicePrint = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!invoiceData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <p className="text-destructive font-medium">Invoice not found. Please save the invoice first.</p>
+        <Button variant="outline" onClick={() => navigate(-1)} className="flex items-center gap-2">
+          <ArrowLeft className="h-4 w-4" />
+          Go Back
+        </Button>
       </div>
     );
   }
@@ -256,9 +244,13 @@ const SriLankaInvoicePrint = () => {
                 </>
               )}
             </div>
+            <Button onClick={handleDownloadPDF} variant="outline" className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Download PDF
+            </Button>
             <Button onClick={handlePrint} className="flex items-center gap-2">
               <Printer className="h-4 w-4" />
-              Print Document
+              Print
             </Button>
           </div>
         </div>

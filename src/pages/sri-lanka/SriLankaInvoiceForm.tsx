@@ -432,16 +432,24 @@ const SriLankaInvoiceForm = () => {
       // Get existing invoices from localStorage
       const existingInvoices = JSON.parse(localStorage.getItem('sriLankaInvoices') || '[]');
       
+      // Check if we're editing an existing invoice
+      const currentPath = window.location.pathname;
+      const isEditing = currentPath.includes('/edit/');
+      const existingId = isEditing ? currentPath.split('/edit/')[1] : null;
+      
       // Auto-generate job number if not present
       const jobNumber = formData.jobNumber || `SL-JOB-${Date.now()}`;
       
+      // Use existing ID if editing, otherwise generate new one
+      const invoiceId = existingId || `sri-lanka-${Date.now()}`;
+      
       // Create proper invoice structure for printing
       const invoiceData = {
-        id: `sri-lanka-${Date.now()}`,
+        id: invoiceId,
         ...formData,
         jobNumber,
         packageItems: packageItems,
-        createdAt: new Date().toISOString(),
+        createdAt: isEditing ? (existingInvoices.find((inv: any) => inv.id === existingId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         country: 'SRI LANKA',
         // Map to print structure
@@ -478,8 +486,17 @@ const SriLankaInvoiceForm = () => {
         transportationFee: parseFloat(formData.transportationFee || '0')
       };
       
-      // Add to existing invoices
-      const updatedInvoices = [...existingInvoices, invoiceData];
+      // Update existing or add new
+      let updatedInvoices;
+      if (isEditing) {
+        updatedInvoices = existingInvoices.map((inv: any) => inv.id === existingId ? invoiceData : inv);
+        // If not found (first save after creation), add it
+        if (!existingInvoices.some((inv: any) => inv.id === existingId)) {
+          updatedInvoices = [...existingInvoices, invoiceData];
+        }
+      } else {
+        updatedInvoices = [...existingInvoices, invoiceData];
+      }
       
       // Save back to localStorage
       localStorage.setItem('sriLankaInvoices', JSON.stringify(updatedInvoices));
@@ -488,7 +505,9 @@ const SriLankaInvoiceForm = () => {
       console.log('Invoice saved:', invoiceData);
       
       // Navigate to edit page with the saved invoice ID
-      navigate(`/sri-lanka/invoice/edit/${invoiceData.id}`);
+      if (!isEditing) {
+        navigate(`/sri-lanka/invoice/edit/${invoiceData.id}`);
+      }
       
     } catch (error) {
       console.error('Error saving invoice:', error);
