@@ -26,7 +26,7 @@ const ScheduleQRCode: React.FC<ScheduleQRCodeProps> = ({ scheduleNumber }) => {
   const qrValue = JSON.stringify(scheduleInfo);
   
   return (
-    <div className="print:block" style={{ width: "80px", height: "80px" }}>
+    <div style={{ width: "80px", height: "80px", display: "block" }}>
       <QRCodeSVG 
         value={qrValue}
         size={80}
