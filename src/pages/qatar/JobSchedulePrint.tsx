@@ -71,7 +71,7 @@ const JobSchedulePrint: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white w-full print-container">
-      <div className="p-4 print:hidden">
+      <div className="p-4 no-print">
         <h2 className="text-xl font-bold mb-4">Job Schedule Print</h2>
         
         {/* View toggle */}
