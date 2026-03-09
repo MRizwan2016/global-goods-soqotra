@@ -244,9 +244,13 @@ const SriLankaInvoicePrint = () => {
                 </>
               )}
             </div>
+            <Button onClick={handleDownloadPDF} variant="outline" className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Download PDF
+            </Button>
             <Button onClick={handlePrint} className="flex items-center gap-2">
               <Printer className="h-4 w-4" />
-              Print Document
+              Print
             </Button>
           </div>
         </div>
