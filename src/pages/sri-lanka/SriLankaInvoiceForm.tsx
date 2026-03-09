@@ -222,7 +222,6 @@ const SriLankaInvoiceForm = () => {
 
   // Manual entry state  
   const [showManualEntry, setShowManualEntry] = useState(true); // Always show direct input
-  const [showManualEntry, setShowManualEntry] = useState(false);
   const [manualInvoiceNumber, setManualInvoiceNumber] = useState('');
 
   // Sri Lanka Districts and Provinces
