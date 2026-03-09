@@ -85,7 +85,85 @@ const SriLankaInvoiceForm = () => {
   
   // Receipt modal state
   const [showReceipt, setShowReceipt] = useState(false);
-  
+
+  // Database-driven book data
+  const [dbBooks, setDbBooks] = useState<any[]>([]);
+  const [availablePages, setAvailablePages] = useState<string[]>([]);
+
+  // Load Sri Lanka invoice books from database
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('invoice_books')
+          .select('*')
+          .eq('country', 'Sri Lanka')
+          .in('status', ['available', 'assigned']);
+        
+        if (error) {
+          console.error('Error fetching Sri Lanka books:', error);
+          return;
+        }
+        if (data) {
+          console.log('Loaded Sri Lanka invoice books:', data);
+          setDbBooks(data);
+        }
+      } catch (err) {
+        console.error('Error loading books:', err);
+      }
+    };
+    fetchBooks();
+  }, []);
+
+  // Auto-fill when book number changes - lookup from DB
+  const handleBookNumberChange = useCallback((bookNum: string) => {
+    setFormData(prev => ({ ...prev, bookNumber: bookNum }));
+    
+    if (!bookNum) {
+      setAvailablePages([]);
+      return;
+    }
+
+    // Find matching book in DB (book_number field stores like "#800")
+    const matchedBook = dbBooks.find(b => 
+      b.book_number === `#${bookNum}` || 
+      b.book_number === bookNum ||
+      b.book_number?.replace('#', '') === bookNum
+    );
+
+    if (matchedBook) {
+      console.log('Matched book from DB:', matchedBook);
+      
+      // Parse available pages
+      const pages = Array.isArray(matchedBook.available_pages) 
+        ? matchedBook.available_pages as string[]
+        : [];
+      setAvailablePages(pages);
+      
+      // Auto-fill sales rep from book assignment
+      const salesRep = matchedBook.assigned_to_sales_rep || '';
+      const nextPage = pages.length > 0 ? pages[0] : '';
+      
+      setFormData(prev => ({
+        ...prev,
+        bookNumber: bookNum,
+        salesRepresentative: salesRep || prev.salesRepresentative,
+        pageNumber: nextPage || prev.pageNumber,
+        // Auto-set invoice number from page number
+        invoiceNumber: nextPage || prev.invoiceNumber,
+        whatsappNumber: matchedBook.whatsapp_number || prev.whatsappNumber,
+        driverName: matchedBook.assigned_to_driver || prev.driverName,
+      }));
+      
+      if (salesRep) {
+        toast.success(`Book #${bookNum} assigned to ${salesRep}`);
+      }
+    } else {
+      console.log('No matching book found for:', bookNum);
+      setAvailablePages([]);
+    }
+  }, [dbBooks]);
+
   // Load existing invoice if editing
   useEffect(() => {
     const currentPath = window.location.pathname;
