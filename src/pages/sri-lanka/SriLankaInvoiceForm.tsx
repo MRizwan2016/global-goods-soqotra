@@ -381,14 +381,15 @@ const SriLankaInvoiceForm = () => {
     console.log('Form data before validation:', formData);
     
     // Check all required fields with more precise validation
+    const safeStr = (val: any) => String(val || '').trim();
     const requiredFields = {
-      'Invoice Number': formData.invoiceNumber?.trim(),
-      'Cargo Type': formData.cargoType?.trim(),
-      'Service Type': formData.serviceType?.trim(),
-      'Shipper Name': formData.shipperName?.trim(),
-      'Consignee Name': formData.consigneeName?.trim(),
-      'Total Weight': formData.weight?.trim(),
-      'Description': formData.description?.trim()
+      'Invoice Number': safeStr(formData.invoiceNumber),
+      'Cargo Type': safeStr(formData.cargoType),
+      'Service Type': safeStr(formData.serviceType),
+      'Shipper Name': safeStr(formData.shipperName),
+      'Consignee Name': safeStr(formData.consigneeName),
+      'Total Weight': safeStr(formData.weight),
+      'Description': safeStr(formData.description)
     };
 
     console.log('Required fields check:', requiredFields);
