@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Save, Eye, User, MapPin, Phone, Mail, Printer } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PackageItem } from '@/pages/invoicing/types/invoiceForm';
@@ -84,7 +85,85 @@ const SriLankaInvoiceForm = () => {
   
   // Receipt modal state
   const [showReceipt, setShowReceipt] = useState(false);
-  
+
+  // Database-driven book data
+  const [dbBooks, setDbBooks] = useState<any[]>([]);
+  const [availablePages, setAvailablePages] = useState<string[]>([]);
+
+  // Load Sri Lanka invoice books from database
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('invoice_books')
+          .select('*')
+          .eq('country', 'Sri Lanka')
+          .in('status', ['available', 'assigned']);
+        
+        if (error) {
+          console.error('Error fetching Sri Lanka books:', error);
+          return;
+        }
+        if (data) {
+          console.log('Loaded Sri Lanka invoice books:', data);
+          setDbBooks(data);
+        }
+      } catch (err) {
+        console.error('Error loading books:', err);
+      }
+    };
+    fetchBooks();
+  }, []);
+
+  // Auto-fill when book number changes - lookup from DB
+  const handleBookNumberChange = useCallback((bookNum: string) => {
+    setFormData(prev => ({ ...prev, bookNumber: bookNum }));
+    
+    if (!bookNum) {
+      setAvailablePages([]);
+      return;
+    }
+
+    // Find matching book in DB (book_number field stores like "#800")
+    const matchedBook = dbBooks.find(b => 
+      b.book_number === `#${bookNum}` || 
+      b.book_number === bookNum ||
+      b.book_number?.replace('#', '') === bookNum
+    );
+
+    if (matchedBook) {
+      console.log('Matched book from DB:', matchedBook);
+      
+      // Parse available pages
+      const pages = Array.isArray(matchedBook.available_pages) 
+        ? matchedBook.available_pages as string[]
+        : [];
+      setAvailablePages(pages);
+      
+      // Auto-fill sales rep from book assignment
+      const salesRep = matchedBook.assigned_to_sales_rep || '';
+      const nextPage = pages.length > 0 ? pages[0] : '';
+      
+      setFormData(prev => ({
+        ...prev,
+        bookNumber: bookNum,
+        salesRepresentative: salesRep || prev.salesRepresentative,
+        pageNumber: nextPage || prev.pageNumber,
+        // Auto-set invoice number from page number
+        invoiceNumber: nextPage || prev.invoiceNumber,
+        whatsappNumber: matchedBook.whatsapp_number || prev.whatsappNumber,
+        driverName: matchedBook.assigned_to_driver || prev.driverName,
+      }));
+      
+      if (salesRep) {
+        toast.success(`Book #${bookNum} assigned to ${salesRep}`);
+      }
+    } else {
+      console.log('No matching book found for:', bookNum);
+      setAvailablePages([]);
+    }
+  }, [dbBooks]);
+
   // Load existing invoice if editing
   useEffect(() => {
     const currentPath = window.location.pathname;
@@ -138,14 +217,11 @@ const SriLankaInvoiceForm = () => {
     return [];
   };
 
-  // Mock invoice numbers (normally from Invoice Book Stock Management)
-  const AVAILABLE_INVOICES = [
-    'GY-13138406', 'GY-13136939', 'GY-13138380', 'GY-13138520', 'GY-13138523',
-    'SL-006', 'SL-007', 'SL-008', 'SL-009', 'SL-010'
-  ];
+  // Mock invoice numbers - DEPRECATED, now using DB-driven invoice books
+  const AVAILABLE_INVOICES: string[] = [];
 
-  // Manual entry state
-  const [showManualEntry, setShowManualEntry] = useState(false);
+  // Manual entry state  
+  const [showManualEntry, setShowManualEntry] = useState(true); // Always show direct input
   const [manualInvoiceNumber, setManualInvoiceNumber] = useState('');
 
   // Sri Lanka Districts and Provinces
@@ -283,15 +359,15 @@ const SriLankaInvoiceForm = () => {
       return;
     }
     
-    // Validate GY format
-    const gyPattern = /^GY\d{6}$/;
-    if (!gyPattern.test(manualInvoiceNumber)) {
-      toast.error('Invoice number must be in GY format (e.g., GY-000123)');
+    // Accept numeric invoice numbers (e.g., 13140835) or GY format
+    const numericPattern = /^\d{6,10}$/;
+    const gyPattern = /^GY-?\d{6,8}$/;
+    if (!numericPattern.test(manualInvoiceNumber) && !gyPattern.test(manualInvoiceNumber)) {
+      toast.error('Invoice number must be numeric (e.g., 13140835) or GY format (e.g., GY-000123)');
       return;
     }
     
     setFormData(prev => ({ ...prev, invoiceNumber: manualInvoiceNumber }));
-    setShowManualEntry(false);
     setManualInvoiceNumber('');
     toast.success('Invoice number set successfully');
   };
@@ -649,54 +725,42 @@ const SriLankaInvoiceForm = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">INVOICE NUMBER *</label>
-                {!showManualEntry ? (
-                  <div className="space-y-2">
-                    <Select value={formData.invoiceNumber} onValueChange={(value) => handleSelectChange('invoiceNumber', value)}>
-                      <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
-                        <SelectValue placeholder="SELECT INVOICE NUMBER" className="uppercase" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white/95 backdrop-blur-sm">
-                        {AVAILABLE_INVOICES.map(invoice => (
-                          <SelectItem key={invoice} value={invoice} className="uppercase">{invoice}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button 
-                      type="button" 
-                      variant="link" 
-                      className="p-0 h-auto text-xs text-blue-600"
-                      onClick={() => setShowManualEntry(true)}
-                    >
-                      Enter GY invoice number manually
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <Input 
-                      placeholder="Enter GY invoice number (e.g., GY000123)"
-                      value={manualInvoiceNumber}
-                      onChange={(e) => setManualInvoiceNumber(e.target.value.toUpperCase())}
-                      className="flex-1 bg-white/80 border-blue-200 focus:border-blue-400 w-full min-w-[250px] font-mono text-lg tracking-wider px-4 py-2"
-                      maxLength={8}
-                      style={{ minWidth: '250px', fontSize: '18px', letterSpacing: '0.1em' }}
-                    />
-                    <Button 
-                      type="button" 
-                      onClick={handleManualInvoiceSubmit}
-                      className="whitespace-nowrap bg-green-500 hover:bg-green-600"
-                    >
-                      Submit
-                    </Button>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={handleManualInvoiceCancel}
-                      className="whitespace-nowrap"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                )}
+                <div className="flex gap-2">
+                  {formData.invoiceNumber ? (
+                    <div className="flex items-center gap-2 w-full">
+                      <Input 
+                        value={formData.invoiceNumber}
+                        readOnly
+                        className="flex-1 bg-green-50 border-green-300 font-mono text-lg font-bold tracking-wider"
+                      />
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setFormData(prev => ({ ...prev, invoiceNumber: '' }))}
+                      >
+                        Change
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <Input 
+                        placeholder="Enter invoice number (e.g., 13140835)"
+                        value={manualInvoiceNumber}
+                        onChange={(e) => setManualInvoiceNumber(e.target.value.toUpperCase())}
+                        className="flex-1 bg-white/80 border-blue-200 focus:border-blue-400 font-mono text-lg tracking-wider"
+                        maxLength={12}
+                      />
+                      <Button 
+                        type="button" 
+                        onClick={handleManualInvoiceSubmit}
+                        className="whitespace-nowrap bg-green-500 hover:bg-green-600"
+                      >
+                        Set
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DATE *</label>
@@ -716,10 +780,10 @@ const SriLankaInvoiceForm = () => {
                    onChange={(e) => {
                      const value = e.target.value;
                      handleInputChange(e);
-                      // Auto-fill from Qatar collection/delivery jobs
+                      // Auto-fill from Qatar collection/delivery jobs - check both localStorage AND database
                       if (value.length >= 3) {
                         try {
-                          // Check all possible storage keys for jobs
+                          // Check localStorage first
                           const jobs1 = JSON.parse(localStorage.getItem('jobs') || '[]');
                           const jobs2 = JSON.parse(localStorage.getItem('qatarJobs') || '[]');
                           const allJobs = [...jobs1, ...jobs2];
@@ -730,7 +794,7 @@ const SriLankaInvoiceForm = () => {
                             j.id?.includes(value)
                           );
                           if (matchedJob) {
-                            console.log('Matched Qatar job:', matchedJob);
+                            console.log('Matched job from localStorage:', matchedJob);
                             setFormData(prev => ({
                               ...prev,
                               jobNumber: value,
@@ -744,10 +808,48 @@ const SriLankaInvoiceForm = () => {
                               packages: matchedJob.packages || matchedJob.totalPackages || prev.packages,
                             }));
                             toast.success('Job details auto-filled from completed job');
+                            return;
                           }
                         } catch (err) {
-                          console.log('No Qatar job data found:', err);
+                          console.log('localStorage lookup failed:', err);
                         }
+
+                        // Also check database schedule_jobs
+                        const fetchJobFromDB = async () => {
+                          try {
+                            const { data: scheduleJobs, error } = await supabase
+                              .from('schedule_jobs')
+                              .select('job_data');
+                            
+                            if (error || !scheduleJobs) return;
+                            
+                            for (const sj of scheduleJobs) {
+                              const jobData = sj.job_data as any;
+                              if (jobData && (jobData.jobNumber === value || jobData.jobNumber?.includes(value))) {
+                                console.log('Matched job from DB schedule_jobs:', jobData);
+                                setFormData(prev => ({
+                                  ...prev,
+                                  jobNumber: value,
+                                  shipperName: jobData.shipperName || jobData.customerName || jobData.shipper1 || prev.shipperName,
+                                  shipperMobile: jobData.shipperMobile || jobData.mobile || jobData.shipperPhone || prev.shipperMobile,
+                                  shipperCity: jobData.shipperCity || jobData.city || prev.shipperCity,
+                                  shipperAddress: jobData.shipperAddress || jobData.address || prev.shipperAddress,
+                                  consigneeName: jobData.consigneeName || jobData.consignee1 || prev.consigneeName,
+                                  consigneeMobile: jobData.consigneeMobile || jobData.consigneePhone || prev.consigneeMobile,
+                                  weight: jobData.weight || jobData.totalWeight || prev.weight,
+                                  description: jobData.description || jobData.remarks || prev.description,
+                                  volume: jobData.volume || jobData.totalVolume || prev.volume,
+                                  packages: jobData.packages || jobData.totalPackages || prev.packages,
+                                }));
+                                toast.success('Job details auto-filled from database');
+                                return;
+                              }
+                            }
+                          } catch (err) {
+                            console.log('DB job lookup failed:', err);
+                          }
+                        };
+                        fetchJobFromDB();
                       }
                    }}
                    placeholder="ENTER JOB NUMBER"
@@ -776,21 +878,35 @@ const SriLankaInvoiceForm = () => {
                 <Input
                   name="bookNumber"
                   value={formData.bookNumber}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleBookNumberChange(e.target.value)}
                   placeholder="E.G. 800"
                   className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PAGE NUMBER</label>
-                <Input
-                  name="pageNumber"
-                  value={formData.pageNumber}
-                  onChange={handleInputChange}
-                  placeholder="AUTO FROM BOOK"
-                  className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
-                  readOnly
-                />
+                {availablePages.length > 0 ? (
+                  <Select value={formData.pageNumber} onValueChange={(value) => {
+                    setFormData(prev => ({ ...prev, pageNumber: value, invoiceNumber: value }));
+                  }}>
+                    <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                      <SelectValue placeholder="SELECT PAGE" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60">
+                      {availablePages.map((page: string) => (
+                        <SelectItem key={page} value={page}>{page}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    name="pageNumber"
+                    value={formData.pageNumber}
+                    onChange={handleInputChange}
+                    placeholder="ENTER PAGE NUMBER"
+                    className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
+                  />
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SALES REP</label>
