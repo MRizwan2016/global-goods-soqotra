@@ -529,8 +529,14 @@ const SriLankaInvoiceForm = () => {
     setShowReceipt(true);
   };
 
+  const storeAndOpenPrint = (invoiceId: string) => {
+    // Store current form data so print page can find it even in new tabs
+    const printData = { ...formData, id: invoiceId, packageItems };
+    sessionStorage.setItem('printInvoiceData', JSON.stringify(printData));
+    window.open(`/sri-lanka/invoice/print/${invoiceId}`, '_blank');
+  };
+
   const handlePreview = () => {
-    // For existing invoices, use saved ID, otherwise require save first
     const currentInvoiceId = window.location.pathname.includes('/edit/') 
       ? window.location.pathname.split('/edit/')[1] 
       : null;
@@ -540,15 +546,10 @@ const SriLankaInvoiceForm = () => {
       return;
     }
     
-    if (currentInvoiceId) {
-      window.open(`/sri-lanka/invoice/print/${currentInvoiceId}`, '_blank');
-    } else {
-      window.open(`/sri-lanka/invoice/print/preview_${formData.invoiceNumber}`, '_blank');
-    }
+    storeAndOpenPrint(currentInvoiceId || `preview_${formData.invoiceNumber}`);
   };
 
   const handlePrint = () => {
-    // For existing invoices, use saved ID, otherwise require save first
     const currentInvoiceId = window.location.pathname.includes('/edit/') 
       ? window.location.pathname.split('/edit/')[1] 
       : null;
@@ -558,11 +559,7 @@ const SriLankaInvoiceForm = () => {
       return;
     }
     
-    if (currentInvoiceId) {
-      window.open(`/sri-lanka/invoice/print/${currentInvoiceId}`, '_blank');
-    } else {
-      window.open(`/sri-lanka/invoice/print/preview_${formData.invoiceNumber}`, '_blank');
-    }
+    storeAndOpenPrint(currentInvoiceId || `preview_${formData.invoiceNumber}`);
   };
 
   // Package handlers
