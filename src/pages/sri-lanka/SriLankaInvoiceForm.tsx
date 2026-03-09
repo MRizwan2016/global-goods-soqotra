@@ -780,10 +780,10 @@ const SriLankaInvoiceForm = () => {
                    onChange={(e) => {
                      const value = e.target.value;
                      handleInputChange(e);
-                      // Auto-fill from Qatar collection/delivery jobs
+                      // Auto-fill from Qatar collection/delivery jobs - check both localStorage AND database
                       if (value.length >= 3) {
                         try {
-                          // Check all possible storage keys for jobs
+                          // Check localStorage first
                           const jobs1 = JSON.parse(localStorage.getItem('jobs') || '[]');
                           const jobs2 = JSON.parse(localStorage.getItem('qatarJobs') || '[]');
                           const allJobs = [...jobs1, ...jobs2];
@@ -794,7 +794,7 @@ const SriLankaInvoiceForm = () => {
                             j.id?.includes(value)
                           );
                           if (matchedJob) {
-                            console.log('Matched Qatar job:', matchedJob);
+                            console.log('Matched job from localStorage:', matchedJob);
                             setFormData(prev => ({
                               ...prev,
                               jobNumber: value,
@@ -808,10 +808,48 @@ const SriLankaInvoiceForm = () => {
                               packages: matchedJob.packages || matchedJob.totalPackages || prev.packages,
                             }));
                             toast.success('Job details auto-filled from completed job');
+                            return;
                           }
                         } catch (err) {
-                          console.log('No Qatar job data found:', err);
+                          console.log('localStorage lookup failed:', err);
                         }
+
+                        // Also check database schedule_jobs
+                        const fetchJobFromDB = async () => {
+                          try {
+                            const { data: scheduleJobs, error } = await supabase
+                              .from('schedule_jobs')
+                              .select('job_data');
+                            
+                            if (error || !scheduleJobs) return;
+                            
+                            for (const sj of scheduleJobs) {
+                              const jobData = sj.job_data as any;
+                              if (jobData && (jobData.jobNumber === value || jobData.jobNumber?.includes(value))) {
+                                console.log('Matched job from DB schedule_jobs:', jobData);
+                                setFormData(prev => ({
+                                  ...prev,
+                                  jobNumber: value,
+                                  shipperName: jobData.shipperName || jobData.customerName || jobData.shipper1 || prev.shipperName,
+                                  shipperMobile: jobData.shipperMobile || jobData.mobile || jobData.shipperPhone || prev.shipperMobile,
+                                  shipperCity: jobData.shipperCity || jobData.city || prev.shipperCity,
+                                  shipperAddress: jobData.shipperAddress || jobData.address || prev.shipperAddress,
+                                  consigneeName: jobData.consigneeName || jobData.consignee1 || prev.consigneeName,
+                                  consigneeMobile: jobData.consigneeMobile || jobData.consigneePhone || prev.consigneeMobile,
+                                  weight: jobData.weight || jobData.totalWeight || prev.weight,
+                                  description: jobData.description || jobData.remarks || prev.description,
+                                  volume: jobData.volume || jobData.totalVolume || prev.volume,
+                                  packages: jobData.packages || jobData.totalPackages || prev.packages,
+                                }));
+                                toast.success('Job details auto-filled from database');
+                                return;
+                              }
+                            }
+                          } catch (err) {
+                            console.log('DB job lookup failed:', err);
+                          }
+                        };
+                        fetchJobFromDB();
                       }
                    }}
                    placeholder="ENTER JOB NUMBER"
@@ -840,21 +878,35 @@ const SriLankaInvoiceForm = () => {
                 <Input
                   name="bookNumber"
                   value={formData.bookNumber}
-                  onChange={handleInputChange}
+                  onChange={(e) => handleBookNumberChange(e.target.value)}
                   placeholder="E.G. 800"
                   className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PAGE NUMBER</label>
-                <Input
-                  name="pageNumber"
-                  value={formData.pageNumber}
-                  onChange={handleInputChange}
-                  placeholder="AUTO FROM BOOK"
-                  className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
-                  readOnly
-                />
+                {availablePages.length > 0 ? (
+                  <Select value={formData.pageNumber} onValueChange={(value) => {
+                    setFormData(prev => ({ ...prev, pageNumber: value, invoiceNumber: value }));
+                  }}>
+                    <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                      <SelectValue placeholder="SELECT PAGE" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60">
+                      {availablePages.map((page: string) => (
+                        <SelectItem key={page} value={page}>{page}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    name="pageNumber"
+                    value={formData.pageNumber}
+                    onChange={handleInputChange}
+                    placeholder="ENTER PAGE NUMBER"
+                    className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
+                  />
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SALES REP</label>
