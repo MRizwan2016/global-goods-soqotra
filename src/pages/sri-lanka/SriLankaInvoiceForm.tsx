@@ -716,30 +716,39 @@ const SriLankaInvoiceForm = () => {
                    onChange={(e) => {
                      const value = e.target.value;
                      handleInputChange(e);
-                     // Auto-fill from Qatar collection/delivery jobs
-                     if (value.length >= 3) {
-                       try {
-                         const scheduleJobs = JSON.parse(localStorage.getItem('qatarJobs') || '[]');
-                         const matchedJob = scheduleJobs.find((j: any) => 
-                           j.jobNumber?.includes(value) || j.id?.includes(value)
-                         );
-                         if (matchedJob) {
-                           setFormData(prev => ({
-                             ...prev,
-                             jobNumber: value,
-                             shipperName: matchedJob.shipperName || matchedJob.customerName || prev.shipperName,
-                             shipperMobile: matchedJob.shipperMobile || matchedJob.mobile || prev.shipperMobile,
-                             consigneeName: matchedJob.consigneeName || prev.consigneeName,
-                             consigneeMobile: matchedJob.consigneeMobile || prev.consigneeMobile,
-                             weight: matchedJob.weight || prev.weight,
-                             description: matchedJob.description || prev.description,
-                           }));
-                           toast.success('Job details auto-filled');
-                         }
-                       } catch (err) {
-                         console.log('No Qatar job data found');
-                       }
-                     }
+                      // Auto-fill from Qatar collection/delivery jobs
+                      if (value.length >= 3) {
+                        try {
+                          // Check all possible storage keys for jobs
+                          const jobs1 = JSON.parse(localStorage.getItem('jobs') || '[]');
+                          const jobs2 = JSON.parse(localStorage.getItem('qatarJobs') || '[]');
+                          const allJobs = [...jobs1, ...jobs2];
+                          
+                          const matchedJob = allJobs.find((j: any) => 
+                            j.jobNumber === value || 
+                            j.jobNumber?.includes(value) || 
+                            j.id?.includes(value)
+                          );
+                          if (matchedJob) {
+                            console.log('Matched Qatar job:', matchedJob);
+                            setFormData(prev => ({
+                              ...prev,
+                              jobNumber: value,
+                              shipperName: matchedJob.shipperName || matchedJob.customerName || matchedJob.shipper1 || prev.shipperName,
+                              shipperMobile: matchedJob.shipperMobile || matchedJob.mobile || matchedJob.shipperPhone || prev.shipperMobile,
+                              consigneeName: matchedJob.consigneeName || matchedJob.consignee1 || prev.consigneeName,
+                              consigneeMobile: matchedJob.consigneeMobile || matchedJob.consigneePhone || prev.consigneeMobile,
+                              weight: matchedJob.weight || matchedJob.totalWeight || prev.weight,
+                              description: matchedJob.description || matchedJob.remarks || prev.description,
+                              volume: matchedJob.volume || matchedJob.totalVolume || prev.volume,
+                              packages: matchedJob.packages || matchedJob.totalPackages || prev.packages,
+                            }));
+                            toast.success('Job details auto-filled from completed job');
+                          }
+                        } catch (err) {
+                          console.log('No Qatar job data found:', err);
+                        }
+                      }
                    }}
                    placeholder="ENTER JOB NUMBER"
                    className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
