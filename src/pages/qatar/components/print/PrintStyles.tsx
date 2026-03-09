@@ -11,7 +11,7 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
       {`
         @media print {
           @page {
-            size: ${orientation === "landscape" ? "landscape" : "portrait"};
+            size: A4 ${orientation === "landscape" ? "landscape" : "portrait"};
             margin: 10mm;
           }
           
