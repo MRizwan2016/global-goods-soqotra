@@ -46,7 +46,6 @@ const SriLankaInvoicePrint = () => {
       console.log('Found invoice:', invoice);
       
       if (invoice) {
-          // Ensure proper data structure for printing
           const processedInvoice = {
             ...invoice,
             packages: invoice.packageItems?.map((pkg: any) => ({
@@ -78,46 +77,14 @@ const SriLankaInvoicePrint = () => {
           
           setInvoiceData(processedInvoice);
           
-          // Check payment status
           const payments = localStorage.getItem('payments');
           if (payments) {
             const paymentData = JSON.parse(payments);
             const payment = paymentData.find((p: any) => p.invoiceNumber === processedInvoice.invoiceNumber);
             setIsPaid(!!payment);
           }
-        } else {
-          console.log('Invoice not found, using fallback data');
-          // Fallback data
-          setInvoiceData({
-            id: id,
-            invoiceNumber: `SL${Date.now()}`,
-            date: new Date().toLocaleDateString('en-GB'),
-            serviceType: 'SEA FREIGHT',
-            shipper: {
-              name: "SAMPLE SHIPPER",
-              address: "DOHA, QATAR",
-              mobile: "+974 1234 5678"
-            },
-            consignee: {
-              name: "SAMPLE CONSIGNEE",
-              address: "COLOMBO, SRI LANKA", 
-              mobile: "+94 77 123 4567",
-              idNumber: "123456789V"
-            },
-            packages: [
-              { id: 1, name: "SAMPLE PACKAGE", length: 50, width: 40, height: 30, volume: 0.06 }
-            ],
-            totalWeight: 25,
-            pricing: {
-              gross: 500,
-              discount: 50,
-              net: 450
-            }
-          });
-        }
       } else {
-        console.log('No stored invoices found');
-        setInvoiceData(null);
+          setInvoiceData(null);
       }
     }
     setLoading(false);
