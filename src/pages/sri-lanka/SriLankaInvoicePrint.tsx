@@ -1,10 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer } from 'lucide-react';
+import { ArrowLeft, Printer, Download } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import SriLankaHAWB from './documents/SriLankaHAWB';
 import SriLankaAirManifest from './documents/SriLankaAirManifest';
+import { toast } from 'sonner';
 
 const SriLankaInvoicePrint = () => {
   const { id } = useParams();
