@@ -359,15 +359,15 @@ const SriLankaInvoiceForm = () => {
       return;
     }
     
-    // Validate GY format
-    const gyPattern = /^GY\d{6}$/;
-    if (!gyPattern.test(manualInvoiceNumber)) {
-      toast.error('Invoice number must be in GY format (e.g., GY-000123)');
+    // Accept numeric invoice numbers (e.g., 13140835) or GY format
+    const numericPattern = /^\d{6,10}$/;
+    const gyPattern = /^GY-?\d{6,8}$/;
+    if (!numericPattern.test(manualInvoiceNumber) && !gyPattern.test(manualInvoiceNumber)) {
+      toast.error('Invoice number must be numeric (e.g., 13140835) or GY format (e.g., GY-000123)');
       return;
     }
     
     setFormData(prev => ({ ...prev, invoiceNumber: manualInvoiceNumber }));
-    setShowManualEntry(false);
     setManualInvoiceNumber('');
     toast.success('Invoice number set successfully');
   };
