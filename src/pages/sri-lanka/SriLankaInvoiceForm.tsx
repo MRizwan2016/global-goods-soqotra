@@ -217,13 +217,11 @@ const SriLankaInvoiceForm = () => {
     return [];
   };
 
-  // Mock invoice numbers (normally from Invoice Book Stock Management)
-  const AVAILABLE_INVOICES = [
-    'GY-13138406', 'GY-13136939', 'GY-13138380', 'GY-13138520', 'GY-13138523',
-    'SL-006', 'SL-007', 'SL-008', 'SL-009', 'SL-010'
-  ];
+  // Mock invoice numbers - DEPRECATED, now using DB-driven invoice books
+  const AVAILABLE_INVOICES: string[] = [];
 
-  // Manual entry state
+  // Manual entry state  
+  const [showManualEntry, setShowManualEntry] = useState(true); // Always show direct input
   const [showManualEntry, setShowManualEntry] = useState(false);
   const [manualInvoiceNumber, setManualInvoiceNumber] = useState('');
 
