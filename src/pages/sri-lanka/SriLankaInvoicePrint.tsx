@@ -22,15 +22,30 @@ const SriLankaInvoicePrint = () => {
   useEffect(() => {
     if (id) {
       console.log('Loading invoice with ID:', id);
+      
+      // Try localStorage first
       const storedInvoices = localStorage.getItem('sriLankaInvoices');
-      console.log('Stored invoices:', storedInvoices);
+      let invoice: any = null;
       
       if (storedInvoices) {
         const invoices = JSON.parse(storedInvoices);
-        const invoice = invoices.find((inv: any) => inv.id === id);
-        console.log('Found invoice:', invoice);
-        
-        if (invoice) {
+        invoice = invoices.find((inv: any) => inv.id === id);
+      }
+      
+      // Fallback: check sessionStorage (set by form before opening print)
+      if (!invoice) {
+        const printData = sessionStorage.getItem('printInvoiceData');
+        if (printData) {
+          const parsed = JSON.parse(printData);
+          if (parsed.id === id) {
+            invoice = parsed;
+          }
+        }
+      }
+      
+      console.log('Found invoice:', invoice);
+      
+      if (invoice) {
           // Ensure proper data structure for printing
           const processedInvoice = {
             ...invoice,
