@@ -34,7 +34,7 @@ const ScheduleContent: React.FC<ScheduleContentProps> = ({
   const { userName, formattedDate, formattedTime } = useUserInfo();
   
   return (
-    <div className="p-4 w-full max-w-[1200px] mx-auto" ref={printRef}>
+    <div className="p-4 w-full max-w-[1200px] mx-auto print-content" ref={printRef}>
       <div className="bg-white p-6 shadow-md">
         {/* Header */}
         <PrintHeader 
