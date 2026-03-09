@@ -725,54 +725,42 @@ const SriLankaInvoiceForm = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">INVOICE NUMBER *</label>
-                {!showManualEntry ? (
-                  <div className="space-y-2">
-                    <Select value={formData.invoiceNumber} onValueChange={(value) => handleSelectChange('invoiceNumber', value)}>
-                      <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
-                        <SelectValue placeholder="SELECT INVOICE NUMBER" className="uppercase" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white/95 backdrop-blur-sm">
-                        {AVAILABLE_INVOICES.map(invoice => (
-                          <SelectItem key={invoice} value={invoice} className="uppercase">{invoice}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button 
-                      type="button" 
-                      variant="link" 
-                      className="p-0 h-auto text-xs text-blue-600"
-                      onClick={() => setShowManualEntry(true)}
-                    >
-                      Enter GY invoice number manually
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <Input 
-                      placeholder="Enter GY invoice number (e.g., GY000123)"
-                      value={manualInvoiceNumber}
-                      onChange={(e) => setManualInvoiceNumber(e.target.value.toUpperCase())}
-                      className="flex-1 bg-white/80 border-blue-200 focus:border-blue-400 w-full min-w-[250px] font-mono text-lg tracking-wider px-4 py-2"
-                      maxLength={8}
-                      style={{ minWidth: '250px', fontSize: '18px', letterSpacing: '0.1em' }}
-                    />
-                    <Button 
-                      type="button" 
-                      onClick={handleManualInvoiceSubmit}
-                      className="whitespace-nowrap bg-green-500 hover:bg-green-600"
-                    >
-                      Submit
-                    </Button>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={handleManualInvoiceCancel}
-                      className="whitespace-nowrap"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                )}
+                <div className="flex gap-2">
+                  {formData.invoiceNumber ? (
+                    <div className="flex items-center gap-2 w-full">
+                      <Input 
+                        value={formData.invoiceNumber}
+                        readOnly
+                        className="flex-1 bg-green-50 border-green-300 font-mono text-lg font-bold tracking-wider"
+                      />
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setFormData(prev => ({ ...prev, invoiceNumber: '' }))}
+                      >
+                        Change
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <Input 
+                        placeholder="Enter invoice number (e.g., 13140835)"
+                        value={manualInvoiceNumber}
+                        onChange={(e) => setManualInvoiceNumber(e.target.value.toUpperCase())}
+                        className="flex-1 bg-white/80 border-blue-200 focus:border-blue-400 font-mono text-lg tracking-wider"
+                        maxLength={12}
+                      />
+                      <Button 
+                        type="button" 
+                        onClick={handleManualInvoiceSubmit}
+                        className="whitespace-nowrap bg-green-500 hover:bg-green-600"
+                      >
+                        Set
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DATE *</label>
