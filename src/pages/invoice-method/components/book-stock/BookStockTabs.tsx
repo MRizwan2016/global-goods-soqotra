@@ -64,6 +64,7 @@ const BookStockTabs: React.FC<BookStockTabsProps> = ({
             onViewDetails={onViewDetails}
             onCancelBook={onCancelBook}
             onDeleteBook={onDeleteBook}
+            onReassignBook={onReassignBook}
           />
         ) : (
           <div className="flex flex-col items-center justify-center py-12 bg-gray-50 border border-gray-200 rounded-lg">
