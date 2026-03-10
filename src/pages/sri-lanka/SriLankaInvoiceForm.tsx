@@ -404,14 +404,10 @@ const SriLankaInvoiceForm = () => {
       return;
     }
     
-    // Auto-fill pricing defaults if not set
-    if (!formData.rate && !formData.total) {
-      setFormData(prev => ({
-        ...prev,
-        rate: '0',
-        total: '0'
-      }));
-    }
+    // Default pricing to 0 if not set
+    const saveRate = formData.rate || '0';
+    const saveTotal = formData.total || '0';
+
     
     // Validate total calculation
     const rate = parseFloat(formData.rate) || 0;
