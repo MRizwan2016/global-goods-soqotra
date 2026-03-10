@@ -45,9 +45,9 @@ const SriLankaDashboard = () => {
   };
 
   const filteredInvoices = invoices.filter(invoice =>
-    invoice.invoiceNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.shipperName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.consigneeName?.toLowerCase().includes(searchTerm.toLowerCase())
+    String(invoice.invoiceNumber || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    String(invoice.shipperName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    String(invoice.consigneeName || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleNewInvoice = () => navigate('/sri-lanka/invoice/add');
