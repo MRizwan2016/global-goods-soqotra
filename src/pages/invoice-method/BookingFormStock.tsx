@@ -9,6 +9,7 @@ import BookStockDialogs from "./booking-form-stock/BookStockDialogs";
 import { CancelledBooksHistory } from "./components/book-stock/CancelledBooksHistory";
 import { PageSelectionDialog } from "./components/book-stock/PageSelectionDialog";
 import { ReturnedStockDialog } from "./components/book-stock/ReturnedStockDialog";
+import ReassignBookDialog from "./components/book-stock/ReassignBookDialog";
 import {
   Dialog,
   DialogContent,
