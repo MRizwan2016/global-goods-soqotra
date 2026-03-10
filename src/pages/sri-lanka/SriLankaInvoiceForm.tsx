@@ -58,6 +58,7 @@ const SriLankaInvoiceForm = () => {
     serviceType: '',
     destination: '',
     terminal: '',
+    warehouse: '',
     packages: '',
     weight: '',
     volume: '',
