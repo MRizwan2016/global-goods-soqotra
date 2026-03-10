@@ -300,7 +300,7 @@ const SriLankaInvoicePrint = () => {
                         <td className="p-2 w-24 align-middle border-r border-black">
                           <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Soqotra Logo" className="h-14 w-auto object-contain" />
                         </td>
-                        <td className="p-2 align-middle text-xs leading-tight">
+                        <td className="p-2 align-middle text-xs leading-tight text-center">
                           <div className="font-bold text-sm">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</div>
                           <div>NO. 3, 1ST FLOOR, BUILDING NO. 53, ZONE 55, 76 SAED AL BASHER</div>
                           <div>AZIZIA COMMERCIAL STREET, DOHA - QATAR</div>
