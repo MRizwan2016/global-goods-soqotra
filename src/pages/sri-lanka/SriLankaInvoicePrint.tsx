@@ -32,13 +32,15 @@ const SriLankaInvoicePrint = () => {
         invoice = invoices.find((inv: any) => inv.id === id);
       }
       
-      // Fallback: check sessionStorage (set by form before opening print)
+      // Fallback: check localStorage printInvoiceData (set by form before opening print)
       if (!invoice) {
-        const printData = sessionStorage.getItem('printInvoiceData');
+        const printData = localStorage.getItem('printInvoiceData');
         if (printData) {
           const parsed = JSON.parse(printData);
           if (parsed.id === id) {
             invoice = parsed;
+            // Clean up after reading
+            localStorage.removeItem('printInvoiceData');
           }
         }
       }
