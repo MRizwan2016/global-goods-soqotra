@@ -262,11 +262,16 @@ const SriLankaInvoiceForm = () => {
       
       if (totalCBM > 0) {
         const pricing = calculateSeaFreightPricing(totalCBM, formData.warehouse);
+        const discount = parseFloat(formData.discount?.toString() || '0') || 0;
+        const packing = parseFloat(formData.packingCharges?.toString() || '0') || 0;
+        const transport = parseFloat(formData.transportationFee?.toString() || '0') || 0;
+        const calculatedTotal = pricing.rate + pricing.documentsFee - discount + packing + transport;
         
         setFormData(prev => ({
           ...prev,
           rate: pricing.rate.toString(),
           documentsFee: pricing.documentsFee.toString(),
+          total: calculatedTotal.toFixed(2)
         }));
       }
     }
