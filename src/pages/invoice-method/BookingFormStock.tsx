@@ -345,6 +345,14 @@ const BookingFormStock = () => {
         onOpenChange={setReturnedStockOpen}
         onReassign={loadBooks}
       />
+
+      {/* Reassign Book Dialog */}
+      <ReassignBookDialog
+        open={reassignDialogOpen}
+        onOpenChange={setReassignDialogOpen}
+        book={bookToReassign}
+        onReassigned={loadBooks}
+      />
     </Layout>
   );
 };
