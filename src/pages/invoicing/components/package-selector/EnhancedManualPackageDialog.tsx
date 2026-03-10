@@ -43,7 +43,7 @@ const EnhancedManualPackageDialog: React.FC<EnhancedManualPackageDialogProps> = 
     const length = parseFloat(formData.length) || 0;
     const width = parseFloat(formData.width) || 0;
     const height = parseFloat(formData.height) || 0;
-    const volume = (length * width * height) / 1000000; // Convert cubic inches to cubic meters
+    const volume = (length * width * height) * 0.0000163871; // Convert cubic inches to cubic meters
 
     const weight = parseFloat(formData.weight) || 0;
     const rate = parseFloat(formData.ratePerUnit) || 0;

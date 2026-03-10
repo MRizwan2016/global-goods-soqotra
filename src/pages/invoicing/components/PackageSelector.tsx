@@ -62,7 +62,7 @@ const PackageSelector: React.FC<PackageSelectorProps> = ({
         onOpenChange={setShowManualDialog}
         onSubmit={(name, price, dimensions, volume, pricingType, docsFee) => {
           if (handleManualPackage) {
-            handleManualPackage(name, price);
+            handleManualPackage(name, price, dimensions, volume, pricingType, docsFee);
           }
         }}
       />
