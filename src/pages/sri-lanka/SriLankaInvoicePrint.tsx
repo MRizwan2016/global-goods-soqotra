@@ -316,9 +316,16 @@ const SriLankaInvoicePrint = () => {
                       </tr>
                     </tbody>
                   </table>
-                  <div className="border-t border-black px-3 py-1.5 text-right">
-                    <div className="text-sm"><span className="font-bold">INVOICE: </span><span className="font-bold text-lg">{invoiceData.invoiceNumber}</span></div>
-                    <div className="text-sm"><span className="font-bold">DATE: </span>{invoiceData.date}</div>
+                  <div className="border-t border-black flex">
+                    <div className="flex-1 border-r border-black p-1.5">
+                      <div className="border-2 border-black px-3 py-1 inline-block font-bold text-sm">
+                        {(invoiceData.warehouse || 'Colombo Warehouse').toUpperCase()}
+                      </div>
+                    </div>
+                    <div className="p-1.5 text-right">
+                      <div className="text-sm"><span className="font-bold">INVOICE: </span><span className="font-bold text-lg">{invoiceData.invoiceNumber}</span></div>
+                      <div className="text-sm"><span className="font-bold">DATE: </span>{invoiceData.date}</div>
+                    </div>
                   </div>
                 </div>
 
