@@ -594,12 +594,59 @@ const SriLankaInvoiceForm = () => {
     }
   };
 
-  const handleManualPackage = (packageName: string, price: string) => {
+  const handleManualPackage = (packageName: string, price: string, dimensions?: string, volume?: string, pricingType?: string, docsFee?: string) => {
+    const parsedPrice = parseFloat(price) || 0;
+    const parsedDocFee = parseFloat(docsFee || '0') || 0;
+    const total = parsedPrice + parsedDocFee;
+    
+    // Parse dimensions if provided
+    let length = '', width = '', height = '';
+    if (dimensions) {
+      const parts = dimensions.split(/\s*[xX×]\s*/);
+      if (parts.length === 3) {
+        length = parts[0].trim();
+        width = parts[1].trim();
+        height = parts[2].trim();
+      }
+    }
+
+    const newPackage: PackageItem = {
+      id: Date.now().toString(),
+      name: packageName,
+      description: formData.description || 'PERSONAL EFFECTS',
+      price: parsedPrice,
+      quantity: 1,
+      total: total,
+      length,
+      width,
+      height,
+      volume: volume || '',
+      weight: '',
+      documentsFee: parsedDocFee.toString(),
+      volumeWeight: volume || ''
+    };
+
+    setPackageItems(prev => [...prev, newPackage]);
+    
+    const updatedPackages = [...packageItems, newPackage];
+    const totalVolume = updatedPackages.reduce((sum, pkg) => sum + (parseFloat(pkg.volume || '0') || 0), 0);
+    const totalWeight = updatedPackages.reduce((sum, pkg) => sum + (parseFloat(pkg.weight || '0') || 0), 0);
+    const totalPrice = updatedPackages.reduce((sum, pkg) => sum + (pkg.total || 0), 0);
+    
     setFormData(prev => ({
       ...prev,
-      packagesName: packageName,
-      price: price
+      packagesName: '',
+      length: '',
+      width: '',
+      height: '',
+      price: '',
+      volume: totalVolume.toFixed(4),
+      weight: totalWeight.toString(),
+      total: totalPrice.toFixed(2),
+      packages: updatedPackages.length.toString()
     }));
+
+    toast.success('Manual package added successfully');
   };
 
   const handleAddPackage = () => {
