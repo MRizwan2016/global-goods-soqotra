@@ -293,6 +293,7 @@ const BookingFormStock = () => {
           onAddNewBook={handleAddNewBook}
           onCancelBook={handleCancelBook}
           onDeleteBook={handleDeleteBook}
+          onReassignBook={handleReassignBook}
         />
       </div>
 
