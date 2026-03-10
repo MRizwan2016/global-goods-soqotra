@@ -188,6 +188,7 @@ const SriLankaInvoiceForm = () => {
   const CARGO_TYPES = ['GIFT CARGO', 'UPB CARGO'];
   const SERVICE_TYPES = ['SEA FREIGHT', 'AIR FREIGHT'];
   const SEA_TERMINALS = ['JCT TERMINAL', 'ICIC TERMINAL', 'P&O TERMINAL', 'HAMBANTHOTA TERMINAL'];
+  const SEA_WAREHOUSES = ['Colombo Warehouse', 'Kurunegala UPB Warehouse', 'Galle UPB Warehouse'];
   const AIR_DESTINATIONS = ['BANDARANAYAKE INTERNATIONAL AIRPORT'];
 
   // Prefix options
