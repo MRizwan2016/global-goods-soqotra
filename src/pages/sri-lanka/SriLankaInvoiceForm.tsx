@@ -997,19 +997,34 @@ const SriLankaInvoiceForm = () => {
                 </Select>
               </div>
               {formData.serviceType === 'SEA FREIGHT' && (
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">TERMINAL</label>
-                  <Select value={formData.terminal} onValueChange={(value) => handleSelectChange('terminal', value)}>
-                    <SelectTrigger className="bg-white/80 border-green-200 focus:border-green-400">
-                      <SelectValue placeholder="SELECT TERMINAL" className="uppercase" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white/95 backdrop-blur-sm">
-                      {SEA_TERMINALS.map(terminal => (
-                        <SelectItem key={terminal} value={terminal} className="uppercase">{terminal}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">TERMINAL</label>
+                    <Select value={formData.terminal} onValueChange={(value) => handleSelectChange('terminal', value)}>
+                      <SelectTrigger className="bg-white/80 border-green-200 focus:border-green-400">
+                        <SelectValue placeholder="SELECT TERMINAL" className="uppercase" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white/95 backdrop-blur-sm">
+                        {SEA_TERMINALS.map(terminal => (
+                          <SelectItem key={terminal} value={terminal} className="uppercase">{terminal}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DESTINATION WAREHOUSE *</label>
+                    <Select value={formData.warehouse} onValueChange={(value) => handleSelectChange('warehouse', value)}>
+                      <SelectTrigger className="bg-white/80 border-green-200 focus:border-green-400">
+                        <SelectValue placeholder="SELECT WAREHOUSE" className="uppercase" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white/95 backdrop-blur-sm">
+                        {SEA_WAREHOUSES.map(wh => (
+                          <SelectItem key={wh} value={wh} className="uppercase">{wh}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
               )}
             </div>
           </div>
