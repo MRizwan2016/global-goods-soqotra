@@ -404,10 +404,13 @@ const SriLankaInvoiceForm = () => {
       return;
     }
     
-    // Additional validation for pricing
-    if (!formData.rate || !formData.total) {
-      toast.error('Please ensure pricing is calculated correctly');
-      return;
+    // Auto-fill pricing defaults if not set
+    if (!formData.rate && !formData.total) {
+      setFormData(prev => ({
+        ...prev,
+        rate: '0',
+        total: '0'
+      }));
     }
     
     // Validate total calculation
