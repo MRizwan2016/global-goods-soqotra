@@ -529,9 +529,9 @@ const SriLankaInvoiceForm = () => {
   };
 
   const storeAndOpenPrint = (invoiceId: string) => {
-    // Store current form data so print page can find it even in new tabs
+    // Use localStorage (shared across tabs) instead of sessionStorage (per-tab only)
     const printData = { ...formData, id: invoiceId, packageItems };
-    sessionStorage.setItem('printInvoiceData', JSON.stringify(printData));
+    localStorage.setItem('printInvoiceData', JSON.stringify(printData));
     window.open(`/sri-lanka/invoice/print/${invoiceId}`, '_blank');
   };
 
