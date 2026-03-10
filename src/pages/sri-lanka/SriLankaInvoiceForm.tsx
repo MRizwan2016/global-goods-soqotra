@@ -58,6 +58,7 @@ const SriLankaInvoiceForm = () => {
     serviceType: '',
     destination: '',
     terminal: '',
+    warehouse: '',
     packages: '',
     weight: '',
     volume: '',
@@ -187,6 +188,7 @@ const SriLankaInvoiceForm = () => {
   const CARGO_TYPES = ['GIFT CARGO', 'UPB CARGO'];
   const SERVICE_TYPES = ['SEA FREIGHT', 'AIR FREIGHT'];
   const SEA_TERMINALS = ['JCT TERMINAL', 'ICIC TERMINAL', 'P&O TERMINAL', 'HAMBANTHOTA TERMINAL'];
+  const SEA_WAREHOUSES = ['Colombo Warehouse', 'Kurunegala UPB Warehouse', 'Galle UPB Warehouse'];
   const AIR_DESTINATIONS = ['BANDARANAYAKE INTERNATIONAL AIRPORT'];
 
   // Prefix options
@@ -252,19 +254,23 @@ const SriLankaInvoiceForm = () => {
         documentsFee: pricing.documentsFee.toString(),
         total: pricing.total.toString()
       }));
-    } else if (formData.serviceType === 'SEA FREIGHT' && formData.volume && formData.terminal) {
-      const volume = parseFloat(formData.volume) || 0;
-      const warehouseDestination = getWarehouseDestination(formData.terminal);
-      const pricing = calculateSeaFreightPricing(volume, warehouseDestination);
+    } else if (formData.serviceType === 'SEA FREIGHT' && formData.warehouse) {
+      // Calculate total CBM from all package items
+      const totalCBM = packageItems.length > 0
+        ? packageItems.reduce((sum, pkg) => sum + (parseFloat(pkg.volume || '0') || 0), 0)
+        : parseFloat(formData.volume || '0') || 0;
       
-      setFormData(prev => ({
-        ...prev,
-        rate: pricing.rate.toString(),
-        documentsFee: pricing.documentsFee.toString(),
-        total: pricing.total.toString()
-      }));
+      if (totalCBM > 0) {
+        const pricing = calculateSeaFreightPricing(totalCBM, formData.warehouse);
+        
+        setFormData(prev => ({
+          ...prev,
+          rate: pricing.rate.toString(),
+          documentsFee: pricing.documentsFee.toString(),
+        }));
+      }
     }
-  }, [formData.serviceType, formData.weight, formData.volume, formData.terminal]);
+  }, [formData.serviceType, formData.weight, formData.volume, formData.warehouse, packageItems]);
 
   // Auto-calculate total when rate, documentsFee, discount, packing, or transport changes
   useEffect(() => {
@@ -991,19 +997,34 @@ const SriLankaInvoiceForm = () => {
                 </Select>
               </div>
               {formData.serviceType === 'SEA FREIGHT' && (
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">TERMINAL</label>
-                  <Select value={formData.terminal} onValueChange={(value) => handleSelectChange('terminal', value)}>
-                    <SelectTrigger className="bg-white/80 border-green-200 focus:border-green-400">
-                      <SelectValue placeholder="SELECT TERMINAL" className="uppercase" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white/95 backdrop-blur-sm">
-                      {SEA_TERMINALS.map(terminal => (
-                        <SelectItem key={terminal} value={terminal} className="uppercase">{terminal}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">TERMINAL</label>
+                    <Select value={formData.terminal} onValueChange={(value) => handleSelectChange('terminal', value)}>
+                      <SelectTrigger className="bg-white/80 border-green-200 focus:border-green-400">
+                        <SelectValue placeholder="SELECT TERMINAL" className="uppercase" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white/95 backdrop-blur-sm">
+                        {SEA_TERMINALS.map(terminal => (
+                          <SelectItem key={terminal} value={terminal} className="uppercase">{terminal}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DESTINATION WAREHOUSE *</label>
+                    <Select value={formData.warehouse} onValueChange={(value) => handleSelectChange('warehouse', value)}>
+                      <SelectTrigger className="bg-white/80 border-green-200 focus:border-green-400">
+                        <SelectValue placeholder="SELECT WAREHOUSE" className="uppercase" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white/95 backdrop-blur-sm">
+                        {SEA_WAREHOUSES.map(wh => (
+                          <SelectItem key={wh} value={wh} className="uppercase">{wh}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
               )}
             </div>
           </div>
