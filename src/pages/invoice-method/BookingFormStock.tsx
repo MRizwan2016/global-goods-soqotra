@@ -123,6 +123,11 @@ const BookingFormStock = () => {
     setPageSelectionOpen(true);
   };
 
+  const handleReassignBook = (book: Book) => {
+    setBookToReassign(book);
+    setReassignDialogOpen(true);
+  };
+
   // Updated confirmation handler for page-level operations
   const confirmPageAction = (pageNumbers: string[], reason: string) => {
     if (!bookToAction || pageNumbers.length === 0) return;
