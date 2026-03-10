@@ -39,6 +39,7 @@ const ViewSchedules: React.FC = () => {
   // Get country from current path
   const getCountryFromPath = (): string => {
     const path = window.location.pathname;
+    if (path.includes('/sri-lanka')) return 'Sri Lanka';
     if (path.includes('/qatar')) return 'Qatar';
     if (path.includes('/kenya')) return 'Kenya';
     if (path.includes('/uganda')) return 'Uganda';
