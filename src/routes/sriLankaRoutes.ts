@@ -4,11 +4,17 @@ import SriLankaInvoiceForm from "@/pages/sri-lanka/SriLankaInvoiceForm";
 import SriLankaInvoicePrint from "@/pages/sri-lanka/SriLankaInvoicePrint";
 import SriLankaAirManifestPage from "@/pages/sri-lanka/manifest/SriLankaAirManifestPage";
 import SriLankaSeaManifestPage from "@/pages/sri-lanka/manifest/SriLankaSeaManifestPage";
+import ViewSchedules from "@/pages/schedules/ViewSchedules";
 
 export const sriLankaRoutes: RouteConfig[] = [
   {
     path: "/sri-lanka",
     element: SriLankaDashboard,
+    private: true
+  },
+  {
+    path: "/sri-lanka/schedules",
+    element: ViewSchedules,
     private: true
   },
   {
