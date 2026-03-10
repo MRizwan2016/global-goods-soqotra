@@ -406,13 +406,14 @@ const SriLankaInvoicePrint = () => {
                 {/* Footer */}
                 <div className="flex border-t border-black">
                   <div className="w-1/2 border-r border-black p-2">
-                    <div className="font-bold mb-1 text-sm">CONDITIONS:</div>
-                    <div className="text-xs space-y-0.5">
-                      <div>1. ANY DISPUTES MUST BE REPORTED WITHIN 24 HOURS OF DELIVERY.</div>
-                      <div>2. PAYMENT TERMS: NET 30 DAYS FROM INVOICE DATE.</div>
-                      <div>3. LATE PAYMENT CHARGES APPLY AFTER DUE DATE.</div>
-                      <div>4. COMPANY NOT LIABLE FOR DAMAGES BEYOND SERVICE CHARGES.</div>
-                      <div>5. ALL PACKAGES SUBJECT TO CUSTOMS INSPECTION.</div>
+                    <div className="text-[7px] leading-tight space-y-1">
+                      <div className="font-bold text-[8px]">CARGO TRACKING - PLEASE VISIT: HTTPS://WWW.TRICOGLOBAL.COM/TRACK</div>
+                      <div className="font-bold text-[8px]">GLOBAL WHATSUP NUMBER: +94765002222 - SEND A MESSAGE TO OBTAIN AN APPOINTMENT FOR THE CUSTOMS CLEARANCE.</div>
+                      <div className="font-bold mt-1 text-[8px]">SHIPPER DECLARATION:-</div>
+                      <div>1/WE HEREBY DECLARE THAT THE CONTENTS OF THIS CONSIGNMENT ARE FULLY AND ACCURATELY DESCRIBED, AND THE PARCEL DOESN'T CONTAIN ILLEGAL ITEMS, CASH, JEWELRY OR DANGEROUS GOODS.</div>
+                      <div>PERISHABLE & BREAKABLE ITEMS SHIPPED AT MY OWN RISK. SOQOTRA LOGISTICS ISN'T LIABLE FOR ANY LOSE FROM BREAKABLE OR UNDECLARED ITEMS.</div>
+                      <div>SHIPPER / CONSIGNEE RESPONSIBLE FOR DESTINATION CHARGES. I UNDERSTAND THAT THE DELIVERY TIME IS JUST AN INDICATOR IT MAY CHANGE.</div>
+                      <div>STORAGE CHARGES APPLICABLE AFTER 10 DAYS. I UNDERSTAND TO COMPLY WITH THE ABOVE-MENTIONED TERMS & CONDITIONS.</div>
                     </div>
                     <div className="mt-6 text-center">
                       <div className="font-bold text-sm">CUSTOMER SIGNATURE</div>
