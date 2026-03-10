@@ -50,6 +50,7 @@ const BookingTabTable: React.FC<BookingTabTableProps> = ({ books, tab, onAssignU
       onViewDetails={onViewDetails}
       onCancelBook={onCancelBook}
       onDeleteBook={onDeleteBook}
+      onReassignBook={onReassignBook}
     />
   );
 };
