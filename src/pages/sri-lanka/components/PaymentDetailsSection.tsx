@@ -174,7 +174,16 @@ const PaymentDetailsSection: React.FC<PaymentDetailsSectionProps> = ({
           </div>
           <div className="border-l pl-4">
             <span className="text-gray-600">Total Amount:</span>
-            <div className="font-bold text-lg text-green-600">QAR {formData.total || '0'}</div>
+            <div className="font-bold text-lg text-green-600">QAR {(() => {
+              const rate = parseFloat(formData.rate || '0');
+              const volume = parseFloat(formData.volume || '0');
+              const freightCharge = volume * rate;
+              const docFee = parseFloat(formData.documentsFee || '0');
+              const discount = parseFloat(formData.discount || '0');
+              const packing = parseFloat(formData.packingCharges || '0');
+              const transport = parseFloat(formData.transportationFee || '0');
+              return (freightCharge + docFee - discount + packing + transport).toFixed(2);
+            })()}</div>
           </div>
         </div>
       </div>
