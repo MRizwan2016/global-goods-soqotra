@@ -13,6 +13,7 @@ interface BookingTabTableProps {
   onViewDetails: (book: Book) => void;
   onCancelBook?: (book: Book) => void;
   onDeleteBook?: (book: Book) => void;
+  onReassignBook?: (book: Book) => void;
 }
 
 const BookingTabTable: React.FC<BookingTabTableProps> = ({ books, tab, onAssignUser, onViewDetails, onCancelBook, onDeleteBook }) => {
