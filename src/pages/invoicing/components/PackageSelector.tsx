@@ -13,7 +13,7 @@ interface PackageSelectorProps {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   packageOptions: PackageOption[];
   handlePackageSelect: (description: string) => void;
-  handleManualPackage?: (packageName: string, price: string) => void;
+  handleManualPackage?: (packageName: string, price: string, dimensions?: string, volume?: string, pricingType?: string, docsFee?: string) => void;
   handleAddPackage: () => void;
   packageItems: PackageItem[];
 }
