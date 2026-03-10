@@ -265,11 +265,12 @@ const SriLankaInvoiceForm = () => {
         const discount = parseFloat(formData.discount?.toString() || '0') || 0;
         const packing = parseFloat(formData.packingCharges?.toString() || '0') || 0;
         const transport = parseFloat(formData.transportationFee?.toString() || '0') || 0;
-        const calculatedTotal = pricing.rate + pricing.documentsFee - discount + packing + transport;
+        // RATE = per-CBM rate, TOTAL = (CBM × rate) + docFee - discount + packing + transport
+        const calculatedTotal = pricing.freightCharge + pricing.documentsFee - discount + packing + transport;
         
         setFormData(prev => ({
           ...prev,
-          rate: pricing.rate.toString(),
+          rate: pricing.ratePerCBM.toString(),
           documentsFee: pricing.documentsFee.toString(),
           total: calculatedTotal.toFixed(2)
         }));
