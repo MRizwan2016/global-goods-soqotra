@@ -285,11 +285,22 @@ const SriLankaInvoiceForm = () => {
     const discount = parseFloat(formData.discount?.toString() || '0') || 0;
     const packing = parseFloat(formData.packingCharges?.toString() || '0') || 0;
     const transport = parseFloat(formData.transportationFee?.toString() || '0') || 0;
-    const calculatedTotal = rate + docFee - discount + packing + transport;
+    
+    // For sea freight: total = (CBM × rate) + docFee - discount + packing + transport
+    // For air freight: rate is already weight × per-kg rate
+    let calculatedTotal: number;
+    if (formData.serviceType === 'SEA FREIGHT') {
+      const totalCBM = packageItems.length > 0
+        ? packageItems.reduce((sum, pkg) => sum + (parseFloat(pkg.volume || '0') || 0), 0)
+        : parseFloat(formData.volume || '0') || 0;
+      const freightCharge = totalCBM * rate;
+      calculatedTotal = freightCharge + docFee - discount + packing + transport;
+    } else {
+      calculatedTotal = rate + docFee - discount + packing + transport;
+    }
     
     console.log('Auto-calculation:', { rate, docFee, discount, packing, transport, calculatedTotal });
     
-    // Always update the total when any pricing field changes
     if (calculatedTotal >= 0) {
       setFormData(prev => ({
         ...prev,
