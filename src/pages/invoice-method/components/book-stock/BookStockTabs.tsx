@@ -25,7 +25,8 @@ const BookStockTabs: React.FC<BookStockTabsProps> = ({
   onViewDetails,
   onAddNewBook,
   onCancelBook,
-  onDeleteBook
+  onDeleteBook,
+  onReassignBook
 }) => {
   return (
     <Tabs
