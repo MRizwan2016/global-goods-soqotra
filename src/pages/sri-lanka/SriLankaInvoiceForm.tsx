@@ -276,38 +276,7 @@ const SriLankaInvoiceForm = () => {
         }));
       }
     }
-  }, [formData.serviceType, formData.weight, formData.volume, formData.warehouse, packageItems]);
-
-  // Auto-calculate total when rate, documentsFee, discount, packing, or transport changes
-  useEffect(() => {
-    const rate = parseFloat(formData.rate?.toString() || '0') || 0;
-    const docFee = parseFloat(formData.documentsFee?.toString() || '0') || 0;
-    const discount = parseFloat(formData.discount?.toString() || '0') || 0;
-    const packing = parseFloat(formData.packingCharges?.toString() || '0') || 0;
-    const transport = parseFloat(formData.transportationFee?.toString() || '0') || 0;
-    
-    // For sea freight: total = (CBM × rate) + docFee - discount + packing + transport
-    // For air freight: rate is already weight × per-kg rate
-    let calculatedTotal: number;
-    if (formData.serviceType === 'SEA FREIGHT') {
-      const totalCBM = packageItems.length > 0
-        ? packageItems.reduce((sum, pkg) => sum + (parseFloat(pkg.volume || '0') || 0), 0)
-        : parseFloat(formData.volume || '0') || 0;
-      const freightCharge = totalCBM * rate;
-      calculatedTotal = freightCharge + docFee - discount + packing + transport;
-    } else {
-      calculatedTotal = rate + docFee - discount + packing + transport;
-    }
-    
-    console.log('Auto-calculation:', { rate, docFee, discount, packing, transport, calculatedTotal });
-    
-    if (calculatedTotal >= 0) {
-      setFormData(prev => ({
-        ...prev,
-        total: calculatedTotal.toFixed(2)
-      }));
-    }
-  }, [formData.rate, formData.documentsFee, formData.discount, formData.packingCharges, formData.transportationFee]);
+  }, [formData.serviceType, formData.weight, formData.volume, formData.warehouse, formData.discount, formData.packingCharges, formData.transportationFee, packageItems]);
 
   // Auto-calculate volume from package dimensions
   useEffect(() => {
