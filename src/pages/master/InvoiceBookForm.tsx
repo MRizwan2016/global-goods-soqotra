@@ -5,13 +5,17 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 
 const InvoiceBookForm = () => {
   const navigate = useNavigate();
+  const [isRangeMode, setIsRangeMode] = useState(false);
   const [formData, setFormData] = useState({
     pagesInBook: "50",
     country: "",
     bookNumber: "",
+    bookNumberEnd: "", // For range mode
     startPage: "",
     endPage: "",
     bookType: "NORMAL",
@@ -82,73 +86,65 @@ const InvoiceBookForm = () => {
         ];
     }
   };
+
+  const calculatePageNumbers = (country: string, bookNumber: number) => {
+    if (country === "SRI_LANKA") {
+      const sriLankaBaseBook = 800;
+      const sriLankaBasePage = 140800;
+      const countryPrefix = 13;
+      const bookOffset = bookNumber - sriLankaBaseBook;
+      const pagesPerBook = 50;
+      
+      const firstPage = countryPrefix * 1000000 + sriLankaBasePage + (bookOffset * pagesPerBook);
+      const lastPage = firstPage + pagesPerBook - 1;
+      return { firstPage, lastPage, pagesPerBook };
+    } else {
+      let firstPage: number;
+      let lastPage: number;
+      if (bookNumber === 1) {
+        firstPage = 100000;
+        lastPage = 100050;
+      } else {
+        let totalPages = 51;
+        for (let i = 2; i < bookNumber; i++) {
+          totalPages += (i % 2 === 1) ? 51 : 50;
+        }
+        firstPage = 100000 + totalPages;
+        const currentBookPages = (bookNumber % 2 === 1) ? 51 : 50;
+        lastPage = firstPage + currentBookPages - 1;
+      }
+      return { firstPage, lastPage, pagesPerBook: lastPage - firstPage + 1 };
+    }
+  };
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     
-    // Handle page number calculation based on book number (same for all countries)
     if (name === "bookNumber" && value) {
-      let updatedFormData = { ...formData, [name]: value };
-      
       const bookNumber = parseInt(value);
-      
-      if (!isNaN(bookNumber) && bookNumber > 0) {
-        let firstPage: number;
-        let lastPage: number;
-        
-        // Sri Lanka specific page numbering
-        if (formData.country === "SRI_LANKA") {
-          // Country ID: 13, Book 800: pages 13140800-13140850
-          const sriLankaBaseBook = 800;
-          const sriLankaBasePage = 140800;
-          const countryPrefix = 13;
-          const bookOffset = bookNumber - sriLankaBaseBook;
-          const pagesPerBook = 50;
-          
-          firstPage = countryPrefix * 1000000 + sriLankaBasePage + (bookOffset * pagesPerBook);
-          lastPage = firstPage + pagesPerBook - 1;
-          
-          updatedFormData = {
-            ...updatedFormData,
-            startPage: firstPage.toString(),
-            endPage: lastPage.toString(),
-            pagesInBook: pagesPerBook.toString()
-          };
-        } else {
-          // Default page numbering for other countries
-          if (bookNumber === 1) {
-            firstPage = 100000;
-            lastPage = 100050;
-          } else {
-            let totalPages = 51;
-            for (let i = 2; i < bookNumber; i++) {
-              totalPages += (i % 2 === 1) ? 51 : 50;
-            }
-            firstPage = 100000 + totalPages;
-            const currentBookPages = (bookNumber % 2 === 1) ? 51 : 50;
-            lastPage = firstPage + currentBookPages - 1;
-          }
-          
-          updatedFormData = {
-            ...updatedFormData,
-            startPage: firstPage.toString(),
-            endPage: lastPage.toString(),
-            pagesInBook: (lastPage - firstPage + 1).toString()
-          };
-        }
+      if (!isNaN(bookNumber) && bookNumber > 0 && formData.country) {
+        const { firstPage, lastPage, pagesPerBook } = calculatePageNumbers(formData.country, bookNumber);
+        setFormData({
+          ...formData,
+          [name]: value,
+          startPage: firstPage.toString(),
+          endPage: lastPage.toString(),
+          pagesInBook: pagesPerBook.toString()
+        });
+        return;
       }
-      
-      setFormData(updatedFormData);
-      return;
     }
     
-    // Handle country changes - reset sales rep and driver
     if (name === "country") {
       setFormData({
         ...formData,
         [name]: value,
         salesRepresentative: "",
-        driverName: ""
+        driverName: "",
+        bookNumber: "",
+        bookNumberEnd: "",
+        startPage: "",
+        endPage: ""
       });
       return;
     }
@@ -160,153 +156,137 @@ const InvoiceBookForm = () => {
   };
   
   const handleSave = () => {
-    console.log("=== SAVE BUTTON CLICKED ===");
-    console.log("Form data:", formData);
-    console.log("Browser localStorage support:", typeof(Storage) !== "undefined");
-    console.log("Current localStorage state:", localStorage);
-    
     if (!formData.country) {
-      console.log("ERROR: No country selected");
       toast.error("Please select a country");
       return;
     }
     
     if (!formData.bookNumber) {
-      console.log("ERROR: No book number provided");
       toast.error("Please enter a book number");
       return;
     }
     
     if (!formData.salesRepresentative) {
-      console.log("ERROR: No sales representative provided");
       toast.error("Please enter a sales representative name");
       return;
     }
     
     if (!formData.driverName) {
-      console.log("ERROR: No driver name provided");
       toast.error("Please enter a driver name");
+      return;
+    }
+
+    // Determine the range of books to create
+    const startBookNum = parseInt(formData.bookNumber);
+    const endBookNum = isRangeMode && formData.bookNumberEnd 
+      ? parseInt(formData.bookNumberEnd) 
+      : startBookNum;
+
+    if (isNaN(startBookNum) || (isRangeMode && isNaN(endBookNum))) {
+      toast.error("Please enter valid book numbers");
+      return;
+    }
+
+    if (endBookNum < startBookNum) {
+      toast.error("End book number must be greater than or equal to start book number");
+      return;
+    }
+
+    if (endBookNum - startBookNum > 50) {
+      toast.error("Maximum 50 books can be added at once");
       return;
     }
     
     try {
-      // Create the new book object
-      const newBook = {
-        id: Date.now().toString(),
-        country: formData.country,
-        bookNumber: formData.bookNumber,
-        startPage: formData.startPage,
-        endPage: formData.endPage,
-        isIssued: false,
-        isActivated: true, // Set to active by default so it shows in the active tab
-        bookType: formData.bookType,
-        pagesUsed: 0,
-        salesRepresentative: formData.salesRepresentative,
-        driverName: formData.driverName,
-        availablePages: Array.from(
-          { length: parseInt(formData.endPage) - parseInt(formData.startPage) + 1 }, 
-          (_, i) => (parseInt(formData.startPage) + i).toString()
-        )
-      };
-      
-      console.log("Creating new book:", newBook);
-      
-      // Get existing books from localStorage
-      console.log("=== BEFORE SAVE ===");
-      console.log("All localStorage keys BEFORE save:", Object.keys(localStorage));
-      console.log("localStorage 'invoiceBooks' BEFORE save:", localStorage.getItem('invoiceBooks'));
-      
       const existingBooksJson = localStorage.getItem('invoiceBooks');
       const existingBooks = existingBooksJson ? JSON.parse(existingBooksJson) : [];
-      console.log("Existing books from localStorage:", existingBooks);
       
-      // Check if a book with the same number already exists across ALL countries
-      const bookExists = existingBooks.some((book: any) => book.bookNumber === formData.bookNumber);
-      console.log("Checking for existing book across all countries:", formData.bookNumber, "Found:", bookExists);
-      
-      if (bookExists) {
-        const existingBook = existingBooks.find((book: any) => book.bookNumber === formData.bookNumber);
-        console.log("ERROR: Book already exists in country:", existingBook?.country);
-        
-        // Enhanced error message with country-specific guidance
-        const nextBookNumber = parseInt(formData.bookNumber) + 1;
-        toast.error(`Book #${formData.bookNumber} is already assigned to ${existingBook?.country || 'another country'}. Choose the next book number (${nextBookNumber}) for assignment.`);
+      // Check for duplicates in the range
+      const duplicates: string[] = [];
+      for (let bn = startBookNum; bn <= endBookNum; bn++) {
+        const bnStr = bn.toString();
+        if (existingBooks.some((book: any) => book.bookNumber === bnStr)) {
+          duplicates.push(bnStr);
+        }
+      }
+
+      if (duplicates.length > 0) {
+        toast.error(`Book number(s) ${duplicates.join(', ')} already exist. Please choose different numbers.`);
         return;
       }
-      
-      // Add the new book and save back to localStorage
-      const updatedBooks = [...existingBooks, newBook];
-      console.log("Saving to localStorage - invoiceBooks:", updatedBooks.length, "books");
-      console.log("About to save this data:", JSON.stringify(updatedBooks));
-      
-      // Force a localStorage clear and re-save to ensure it works
-      console.log("=== ATTEMPTING LOCALSTORAGE SAVE ===");
-      console.log("Data being saved:", JSON.stringify(updatedBooks, null, 2));
-      console.log("Number of books to save:", updatedBooks.length);
-      console.log("Current localStorage size:", JSON.stringify(localStorage).length);
-      
-      try {
-        // Check localStorage quota before saving
-        const testData = JSON.stringify(updatedBooks);
-        console.log("Size of data to save:", testData.length, "characters");
+
+      // Create all books in the range
+      const newBooks: any[] = [];
+      for (let bn = startBookNum; bn <= endBookNum; bn++) {
+        const { firstPage, lastPage, pagesPerBook } = calculatePageNumbers(formData.country, bn);
         
-        localStorage.setItem('invoiceBooks', testData);
-        console.log("localStorage save successful");
-        
-        // Immediately verify the save
-        const immediateVerify = localStorage.getItem('invoiceBooks');
-        console.log("Immediate verification - Data exists:", !!immediateVerify);
-        console.log("Immediate verification - Length:", immediateVerify?.length);
-        
-      } catch (storageError) {
-        console.error("localStorage save failed:", storageError);
-        if (storageError.name === 'QuotaExceededError') {
-          console.error("localStorage quota exceeded");
-          toast.error("Storage quota exceeded. Please clear some data.");
-        }
-        throw storageError;
+        const newBook = {
+          id: `${Date.now()}-${bn}`,
+          country: formData.country,
+          bookNumber: bn.toString(),
+          startPage: firstPage.toString(),
+          endPage: lastPage.toString(),
+          isIssued: false,
+          isActivated: true,
+          bookType: formData.bookType,
+          pagesUsed: 0,
+          salesRepresentative: formData.salesRepresentative,
+          driverName: formData.driverName,
+          availablePages: Array.from(
+            { length: pagesPerBook }, 
+            (_, i) => (firstPage + i).toString()
+          )
+        };
+        newBooks.push(newBook);
       }
       
-      // Verify the save worked
-      console.log("=== AFTER SAVE VERIFICATION ===");
-      const verifyBooks = localStorage.getItem('invoiceBooks');
-      console.log("localStorage 'invoiceBooks' AFTER save:", verifyBooks);
-      console.log("All localStorage keys AFTER save:", Object.keys(localStorage));
+      console.log(`Creating ${newBooks.length} new book(s):`, newBooks);
+      
+      const updatedBooks = [...existingBooks, ...newBooks];
+      localStorage.setItem('invoiceBooks', JSON.stringify(updatedBooks));
       
       // Also update activeInvoiceBooks
       const activeBooks = JSON.parse(localStorage.getItem('activeInvoiceBooks') || '[]');
-      const updatedActiveBooks = [
-        ...activeBooks, 
-        {
-          bookNumber: newBook.bookNumber,
-          availablePages: newBook.availablePages,
-          pagesUsed: 0,
-          isActivated: true
-        }
-      ];
-      console.log("Saving to localStorage - activeInvoiceBooks:", updatedActiveBooks.length, "books");
+      const newActiveEntries = newBooks.map(book => ({
+        bookNumber: book.bookNumber,
+        availablePages: book.availablePages,
+        pagesUsed: 0,
+        isActivated: true
+      }));
+      const updatedActiveBooks = [...activeBooks, ...newActiveEntries];
       localStorage.setItem('activeInvoiceBooks', JSON.stringify(updatedActiveBooks));
       
-      console.log("=== SAVE SUCCESS ===");
-      toast.success("Invoice book added successfully");
-      console.log("Updated books in localStorage:", updatedBooks);
+      const count = newBooks.length;
+      toast.success(
+        count === 1 
+          ? "Invoice book added successfully" 
+          : `${count} invoice books added successfully (Book #${startBookNum} to #${endBookNum})`
+      );
       
       // Trigger storage event so other components know to refresh
-      console.log("Dispatching storage event...");
       window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new Event('book-update'));
       
-      // Also dispatch a custom event specific for book updates
-      console.log("Dispatching book-update event...");
-      const bookUpdateEvent = new Event('book-update');
-      window.dispatchEvent(bookUpdateEvent);
-      
-      console.log("Navigating back to stock list...");
       navigate("/master/book/stock");
     } catch (error) {
-      console.error("=== SAVE ERROR ===", error);
+      console.error("Save error:", error);
       toast.error("Failed to save book. Please try again.");
     }
   };
+
+  // Preview for range mode
+  const getRangePreview = () => {
+    if (!isRangeMode || !formData.bookNumber || !formData.bookNumberEnd || !formData.country) return null;
+    const start = parseInt(formData.bookNumber);
+    const end = parseInt(formData.bookNumberEnd);
+    if (isNaN(start) || isNaN(end) || end < start) return null;
+    const count = end - start + 1;
+    const firstPages = calculatePageNumbers(formData.country, start);
+    const lastPages = calculatePageNumbers(formData.country, end);
+    return { count, firstStart: firstPages.firstPage, lastEnd: lastPages.lastPage };
+  };
+
+  const rangePreview = getRangePreview();
   
   return (
     <Layout title="Add Invoice Book">
@@ -318,6 +298,22 @@ const InvoiceBookForm = () => {
         </div>
         
         <div className="p-6">
+          {/* Range mode toggle */}
+          <div className="flex items-center gap-3 mb-6 p-3 bg-blue-50 rounded-lg border border-blue-100">
+            <Switch
+              checked={isRangeMode}
+              onCheckedChange={setIsRangeMode}
+            />
+            <Label className="text-sm font-medium text-blue-800 cursor-pointer" onClick={() => setIsRangeMode(!isRangeMode)}>
+              Add Multiple Books (Range Mode)
+            </Label>
+            {isRangeMode && (
+              <span className="text-xs text-blue-600 ml-2">
+                Enter start and end book numbers to create multiple books at once
+              </span>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl">
             <div className="flex flex-col">
               <label className="text-sm font-medium mb-1">COUNTRY:</label>
@@ -340,16 +336,32 @@ const InvoiceBookForm = () => {
             </div>
             
             <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">BOOK NUMBER:</label>
+              <label className="text-sm font-medium mb-1">
+                {isRangeMode ? "FROM BOOK NUMBER:" : "BOOK NUMBER:"}
+              </label>
               <Input 
                 name="bookNumber"
                 value={formData.bookNumber}
                 onChange={handleInputChange}
                 className="border border-gray-300 transition-colors focus:border-blue-400"
-                placeholder="Enter book number"
+                placeholder={isRangeMode ? "Start book number (e.g. 800)" : "Enter book number"}
                 disabled={!formData.country}
               />
             </div>
+
+            {isRangeMode && (
+              <div className="flex flex-col">
+                <label className="text-sm font-medium mb-1">TO BOOK NUMBER:</label>
+                <Input 
+                  name="bookNumberEnd"
+                  value={formData.bookNumberEnd}
+                  onChange={handleInputChange}
+                  className="border border-gray-300 transition-colors focus:border-blue-400"
+                  placeholder="End book number (e.g. 810)"
+                  disabled={!formData.country}
+                />
+              </div>
+            )}
             
             <div className="flex flex-col">
               <label className="text-sm font-medium mb-1">PAGES IN BOOK:</label>
@@ -376,25 +388,29 @@ const InvoiceBookForm = () => {
               </select>
             </div>
             
-            <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">FIRST PAGE NUMBER:</label>
-              <Input 
-                name="startPage"
-                value={formData.startPage}
-                className="border border-gray-300"
-                readOnly
-              />
-            </div>
-            
-            <div className="flex flex-col">
-              <label className="text-sm font-medium mb-1">LAST PAGE NUMBER:</label>
-              <Input 
-                name="endPage"
-                value={formData.endPage}
-                className="border border-gray-300"
-                readOnly
-              />
-            </div>
+            {!isRangeMode && (
+              <>
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium mb-1">FIRST PAGE NUMBER:</label>
+                  <Input 
+                    name="startPage"
+                    value={formData.startPage}
+                    className="border border-gray-300"
+                    readOnly
+                  />
+                </div>
+                
+                <div className="flex flex-col">
+                  <label className="text-sm font-medium mb-1">LAST PAGE NUMBER:</label>
+                  <Input 
+                    name="endPage"
+                    value={formData.endPage}
+                    className="border border-gray-300"
+                    readOnly
+                  />
+                </div>
+              </>
+            )}
             
             <div className="flex flex-col">
               <label className="text-sm font-medium mb-1">SALES REPRESENTATIVE:</label>
@@ -432,13 +448,35 @@ const InvoiceBookForm = () => {
               </select>
             </div>
           </div>
+
+          {/* Range preview */}
+          {isRangeMode && rangePreview && (
+            <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg max-w-4xl">
+              <h4 className="text-sm font-semibold text-green-800 mb-2">Range Preview</h4>
+              <div className="grid grid-cols-3 gap-4 text-sm text-green-700">
+                <div>
+                  <span className="font-medium">Total Books:</span> {rangePreview.count}
+                </div>
+                <div>
+                  <span className="font-medium">First Page (Book #{formData.bookNumber}):</span> {rangePreview.firstStart}
+                </div>
+                <div>
+                  <span className="font-medium">Last Page (Book #{formData.bookNumberEnd}):</span> {rangePreview.lastEnd}
+                </div>
+              </div>
+              <p className="text-xs text-green-600 mt-2">
+                All {rangePreview.count} books will be assigned to {formData.salesRepresentative || "selected sales representative"} 
+                {formData.driverName ? ` with driver ${formData.driverName}` : ""}
+              </p>
+            </div>
+          )}
           
           <div className="mt-8 flex gap-3">
             <Button 
               onClick={handleSave}
               className="bg-blue-500 hover:bg-blue-600 transition-colors hover:scale-105 transform duration-200"
             >
-              Save
+              {isRangeMode ? `Save ${rangePreview ? rangePreview.count : ''} Book(s)` : 'Save'}
             </Button>
             <Button 
               onClick={() => navigate("/master/book/stock")}
