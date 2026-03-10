@@ -16,7 +16,7 @@ interface BookingTabTableProps {
   onReassignBook?: (book: Book) => void;
 }
 
-const BookingTabTable: React.FC<BookingTabTableProps> = ({ books, tab, onAssignUser, onViewDetails, onCancelBook, onDeleteBook }) => {
+const BookingTabTable: React.FC<BookingTabTableProps> = ({ books, tab, onAssignUser, onViewDetails, onCancelBook, onDeleteBook, onReassignBook }) => {
   // For completed tab, we use a specific table with hardcoded values
   if (tab === "completed") {
     return <CompletedBooksTable />;
