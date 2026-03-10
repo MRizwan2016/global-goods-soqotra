@@ -54,6 +54,8 @@ const BookingFormStock = () => {
   const [currentAction, setCurrentAction] = useState<"cancel" | "delete">("cancel");
   const [bookToAction, setBookToAction] = useState<Book | null>(null);
   const [cancelledBooks, setCancelledBooks] = useState<CancelledBook[]>([]);
+  const [reassignDialogOpen, setReassignDialogOpen] = useState(false);
+  const [bookToReassign, setBookToReassign] = useState<Book | null>(null);
 
   // Load cancelled books from localStorage
   useEffect(() => {
