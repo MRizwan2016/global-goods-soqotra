@@ -464,7 +464,7 @@ const SriLankaInvoiceForm = () => {
         })),
         totalWeight: parseFloat(formData.weight || '0'),
         pricing: {
-          gross: parseFloat(formData.rate || '0') + parseFloat(formData.documentsFee || '0'),
+          gross: parseFloat(formData.total || '0') + parseFloat(formData.discount || '0'),
           discount: parseFloat(formData.discount || '0'),
           net: parseFloat(formData.total || '0')
         },
