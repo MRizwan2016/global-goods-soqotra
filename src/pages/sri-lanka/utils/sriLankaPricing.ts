@@ -41,17 +41,19 @@ export const calculateSeaFreightPricing = (
   volumeCBM: number,
   destination: string
 ): {
-  rate: number;
+  ratePerCBM: number;
+  freightCharge: number;
   documentsFee: number;
   total: number;
 } => {
   const ratePerCBM = SEA_FREIGHT_RATES[destination as keyof typeof SEA_FREIGHT_RATES] || SEA_FREIGHT_RATES['Colombo Warehouse'];
-  const rate = volumeCBM * ratePerCBM;
+  const freightCharge = volumeCBM * ratePerCBM;
   const documentsFee = SEA_FREIGHT_DOCUMENTATION_FEE;
-  const total = rate + documentsFee;
+  const total = freightCharge + documentsFee;
 
   return {
-    rate,
+    ratePerCBM,
+    freightCharge,
     documentsFee,
     total
   };
