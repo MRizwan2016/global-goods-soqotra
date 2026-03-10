@@ -410,13 +410,13 @@ const SriLankaInvoiceForm = () => {
 
     
     // Validate total calculation
-    const rate = parseFloat(formData.rate) || 0;
+    const rate = parseFloat(saveRate) || 0;
     const docFee = parseFloat(formData.documentsFee) || 0;
     const discount = parseFloat(formData.discount) || 0;
     const packing = parseFloat(formData.packingCharges) || 0;
     const transport = parseFloat(formData.transportationFee) || 0;
     const expectedTotal = rate + docFee - discount + packing + transport;
-    const actualTotal = parseFloat(formData.total) || 0;
+    const actualTotal = parseFloat(saveTotal) || 0;
     
     if (Math.abs(expectedTotal - actualTotal) > 0.01) {
       console.log('Price mismatch:', { rate, docFee, discount, packing, transport, expectedTotal, actualTotal });
