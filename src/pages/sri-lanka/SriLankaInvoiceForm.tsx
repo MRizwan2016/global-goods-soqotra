@@ -254,19 +254,23 @@ const SriLankaInvoiceForm = () => {
         documentsFee: pricing.documentsFee.toString(),
         total: pricing.total.toString()
       }));
-    } else if (formData.serviceType === 'SEA FREIGHT' && formData.volume && formData.terminal) {
-      const volume = parseFloat(formData.volume) || 0;
-      const warehouseDestination = getWarehouseDestination(formData.terminal);
-      const pricing = calculateSeaFreightPricing(volume, warehouseDestination);
+    } else if (formData.serviceType === 'SEA FREIGHT' && formData.warehouse) {
+      // Calculate total CBM from all package items
+      const totalCBM = packageItems.length > 0
+        ? packageItems.reduce((sum, pkg) => sum + (parseFloat(pkg.volume || '0') || 0), 0)
+        : parseFloat(formData.volume || '0') || 0;
       
-      setFormData(prev => ({
-        ...prev,
-        rate: pricing.rate.toString(),
-        documentsFee: pricing.documentsFee.toString(),
-        total: pricing.total.toString()
-      }));
+      if (totalCBM > 0) {
+        const pricing = calculateSeaFreightPricing(totalCBM, formData.warehouse);
+        
+        setFormData(prev => ({
+          ...prev,
+          rate: pricing.rate.toString(),
+          documentsFee: pricing.documentsFee.toString(),
+        }));
+      }
     }
-  }, [formData.serviceType, formData.weight, formData.volume, formData.terminal]);
+  }, [formData.serviceType, formData.weight, formData.volume, formData.warehouse, packageItems]);
 
   // Auto-calculate total when rate, documentsFee, discount, packing, or transport changes
   useEffect(() => {
