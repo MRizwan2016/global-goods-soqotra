@@ -74,7 +74,18 @@ const JobSchedulePrint: React.FC = () => {
   return (
     <div className="min-h-screen bg-white w-full print-container">
       <div className="p-4 no-print">
-        <h2 className="text-xl font-bold mb-4">Job Schedule Print</h2>
+        <div className="flex items-center gap-4 mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/qatar/jobs")}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <h2 className="text-xl font-bold">Job Schedule Print</h2>
+        </div>
         
         {/* View toggle */}
         <ViewModeToggle 
