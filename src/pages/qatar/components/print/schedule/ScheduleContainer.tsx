@@ -1,5 +1,6 @@
 
 import React, { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { QatarJob } from "../../../types/jobTypes";
 import PrintStyles from "../PrintStyles";
 import { PrintScheduleControls, ScheduleContent, validateScheduleData } from "./components";
@@ -16,12 +17,13 @@ const ScheduleContainer: React.FC<ScheduleContainerProps> = ({
   onBack
 }) => {
   const printRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   
   const handleBack = () => {
     if (onBack) {
       onBack();
     } else {
-      window.location.href = "/qatar/jobs";
+      navigate("/qatar/jobs");
     }
   };
   
