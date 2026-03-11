@@ -81,7 +81,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
           const { data: dbBooks, error } = await supabase
             .from('invoice_books')
             .select('*')
-            .in('status', ['available', 'assigned']);
+            .eq('status', 'assigned');
           
           if (!error && dbBooks && dbBooks.length > 0) {
             dbBooks.forEach((book) => {
