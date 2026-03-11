@@ -48,52 +48,50 @@ interface InvoiceDetails {
 const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobCloseDialogProps) => {
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [availableInvoices, setAvailableInvoices] = useState<InvoiceDetails[]>([]);
+  const [allInvoices, setAllInvoices] = useState<InvoiceDetails[]>([]);
+  const [selectedBook, setSelectedBook] = useState<string>("all");
+  const [availableBooks, setAvailableBooks] = useState<{bookNumber: string; assignedTo?: string; country?: string}[]>([]);
   const [invoiceAmount, setInvoiceAmount] = useState("");
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [reason, setReason] = useState("");
   const [action, setAction] = useState<"COMPLETE" | "CANCEL">("COMPLETE");
   const [loading, setLoading] = useState(false);
 
-  // Load available invoices from both localStorage AND database
+  // Filter invoices when book selection changes
+  useEffect(() => {
+    if (selectedBook === "all") {
+      setAvailableInvoices(allInvoices);
+    } else {
+      setAvailableInvoices(allInvoices.filter(inv => inv.bookNumber === selectedBook));
+    }
+    setInvoiceNumber("");
+  }, [selectedBook, allInvoices]);
+
+  // Load available invoices from ALL assigned books
   useEffect(() => {
     const loadInvoices = async () => {
       try {
-        // Get the job to determine its destination
-        const job = JobStorageService.getJobById(jobId);
-        const jobDestination = job?.destination || '';
-        
         const usedInvoices = JSON.parse(localStorage.getItem('used-invoices') || '[]');
         
         let invoiceList: InvoiceDetails[] = [];
+        const booksMap = new Map<string, {bookNumber: string; assignedTo?: string; country?: string}>();
         
-        // ---- 1. Fetch from Supabase invoice_books table ----
+        // ---- 1. Fetch ALL assigned/available books from Supabase ----
         try {
-          // Map destination to country name used in DB
-          const destinationCountryMap: Record<string, string> = {
-            'SRI LANKA': 'Sri Lanka',
-            'COLOMBO': 'Sri Lanka',
-            'COLOMBO, SRI LANKA': 'Sri Lanka',
-            'SUDAN': 'Sudan',
-            'ERITREA': 'Eritrea',
-            'SOMALIA': 'Somalia',
-            'ETHIOPIA': 'Ethiopia',
-            'PHILIPPINES': 'Philippines',
-            'TUNISIA': 'Tunisia',
-            'KENYA': 'Kenya',
-            'UGANDA': 'Uganda',
-            'QATAR': 'Qatar',
-          };
-          
-          const dbCountry = destinationCountryMap[jobDestination.toUpperCase()] || jobDestination;
-          
           const { data: dbBooks, error } = await supabase
             .from('invoice_books')
             .select('*')
-            .eq('country', dbCountry)
             .in('status', ['available', 'assigned']);
           
           if (!error && dbBooks && dbBooks.length > 0) {
             dbBooks.forEach((book) => {
+              const bookLabel = `#${book.book_number}`;
+              booksMap.set(bookLabel, {
+                bookNumber: bookLabel,
+                assignedTo: book.assigned_to_sales_rep || undefined,
+                country: book.country
+              });
+              
               const pages = Array.isArray(book.available_pages) 
                 ? book.available_pages as (string | number)[]
                 : [];
@@ -103,7 +101,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
                 if (!usedInvoices.includes(pageStr)) {
                   invoiceList.push({
                     invoiceNumber: pageStr,
-                    bookNumber: `#${book.book_number}`,
+                    bookNumber: bookLabel,
                     assignedTo: book.assigned_to_sales_rep || undefined,
                     driverName: book.assigned_to_driver || undefined,
                     amount: undefined,
@@ -122,18 +120,24 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
         }
         
         // ---- 2. Also load from localStorage (existing logic) ----
+        const job = JobStorageService.getJobById(jobId);
+        const jobDestination = job?.destination || '';
+        
         const activeBooks = JSON.parse(localStorage.getItem('active-books') || '[]');
         const storedBooks = JSON.parse(localStorage.getItem('books') || '[]');
         
-        const isBookAssignedToDestination = (book: any, destination: string) => {
-          if (book.destination) return book.destination.toUpperCase() === destination.toUpperCase();
-          if (book.country) return book.country.toUpperCase() === destination.toUpperCase();
-          return false;
-        };
-        
         const processLocalBooks = (books: any[]) => {
           books.forEach((book: any) => {
-            if (book.isActivated && isBookAssignedToDestination(book, jobDestination)) {
+            if (book.isActivated) {
+              const bookLabel = `#${book.bookId || book.id}`;
+              if (!booksMap.has(bookLabel)) {
+                booksMap.set(bookLabel, {
+                  bookNumber: bookLabel,
+                  assignedTo: book.assignedTo,
+                  country: book.destination || book.country
+                });
+              }
+              
               if (book.pageRangeStart && book.pageRangeEnd) {
                 const startPage = parseInt(book.pageRangeStart);
                 const endPage = parseInt(book.pageRangeEnd);
@@ -142,11 +146,11 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
                   if (!usedInvoices.includes(inv)) {
                     invoiceList.push({
                       invoiceNumber: inv,
-                      bookNumber: `#${book.bookId || book.id}`,
-                      assignedTo: book.assignedTo || `${jobDestination} Sales Rep`,
-                      driverName: book.driverName || `${jobDestination} Driver`,
-                      amount: book.defaultAmount || 500,
-                      date: book.activationDate || new Date().toISOString().split('T')[0]
+                      bookNumber: bookLabel,
+                      assignedTo: book.assignedTo || undefined,
+                      driverName: book.driverName || undefined,
+                      amount: book.defaultAmount || undefined,
+                      date: book.activationDate || undefined
                     });
                   }
                 }
@@ -156,11 +160,11 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
                   .forEach((invoiceNo: string) => {
                     invoiceList.push({
                       invoiceNumber: invoiceNo,
-                      bookNumber: `#${book.bookId || book.id}`,
-                      assignedTo: book.assignedTo || `${jobDestination} Sales Rep`,
-                      driverName: book.driverName || `${jobDestination} Driver`,
-                      amount: book.defaultAmount || 500,
-                      date: book.activationDate || new Date().toISOString().split('T')[0]
+                      bookNumber: bookLabel,
+                      assignedTo: book.assignedTo || undefined,
+                      driverName: book.driverName || undefined,
+                      amount: book.defaultAmount || undefined,
+                      date: book.activationDate || undefined
                     });
                   });
               }
@@ -169,60 +173,33 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
         };
         
         processLocalBooks(activeBooks);
-        if (invoiceList.length === 0) {
-          processLocalBooks(storedBooks);
-        }
+        processLocalBooks(storedBooks);
         
-        // ---- 3. Fallback demo invoices if nothing found ----
-        if (invoiceList.length === 0) {
-          const getDestinationBookPrefix = (destination: string) => {
-            const prefixMap: { [key: string]: string } = {
-              'SUDAN': '00BOOK-SD',
-              'ERITREA': '00BOOK-ER', 
-              'SOMALIA': '00BOOK-SO',
-              'ETHIOPIA': '00BOOK-ET',
-              'SRI LANKA': '00BOOK-LK',
-              'PHILIPPINES': '00BOOK-PH',
-              'TUNISIA': '00BOOK-TN',
-              'SAUDI ARABIA': '00BOOK-SA',
-              'SYRIA': '00BOOK-SY',
-              'KENYA': '00BOOK-KE',
-              'UGANDA': '00BOOK-UG',
-              'MOZAMBIQUE': '00BOOK-MZ'
-            };
-            return prefixMap[destination.toUpperCase()] || '00BOOK-GEN';
-          };
-
-          const bookPrefix = getDestinationBookPrefix(jobDestination);
-          
-          for (let i = 100000; i <= 100050; i++) {
-            const inv = i.toString();
-            const bk = `${bookPrefix}-${Math.floor((i - 100000) / 10) + 1}`;
-            if (!usedInvoices.includes(inv)) {
-              invoiceList.push({
-                invoiceNumber: inv,
-                bookNumber: bk,
-                assignedTo: `${jobDestination} Sales Rep`,
-                driverName: `${jobDestination} Driver`,
-                amount: 500,
-                date: new Date().toISOString().split('T')[0]
-              });
-            }
+        // Remove duplicates by invoiceNumber
+        const uniqueMap = new Map<string, InvoiceDetails>();
+        invoiceList.forEach(inv => {
+          if (!uniqueMap.has(inv.invoiceNumber)) {
+            uniqueMap.set(inv.invoiceNumber, inv);
           }
-        }
+        });
+        invoiceList = Array.from(uniqueMap.values());
         
         console.log("Available invoices for job completion:", invoiceList);
+        console.log("Available books:", Array.from(booksMap.values()));
+        
+        setAllInvoices(invoiceList);
         setAvailableInvoices(invoiceList);
+        setAvailableBooks(Array.from(booksMap.values()));
       } catch (error) {
         console.error("Error loading available invoices:", error);
-        setAvailableInvoices([
-          { invoiceNumber: "010001", bookNumber: "B001", assignedTo: "Sales Rep", driverName: "Driver", amount: 500, date: new Date().toISOString().split('T')[0] }
-        ]);
+        setAllInvoices([]);
+        setAvailableInvoices([]);
       }
     };
 
     if (isOpen) {
       loadInvoices();
+      setSelectedBook("all");
     }
   }, [isOpen, jobId]);
 
@@ -363,19 +340,36 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
           
           {action === "COMPLETE" ? (
             <>
+              {/* Book filter */}
+              <div className="space-y-2">
+                <Label>Select Book</Label>
+                <Select value={selectedBook} onValueChange={setSelectedBook}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All Books" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]">
+                    <SelectItem value="all">All Books ({allInvoices.length} pages)</SelectItem>
+                    {availableBooks.map((book) => (
+                      <SelectItem key={book.bookNumber} value={book.bookNumber}>
+                        {book.bookNumber} - {book.country || ''} {book.assignedTo ? `(${book.assignedTo})` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="invoiceNumber">Invoice Number</Label>
                   <Select value={invoiceNumber} onValueChange={(value) => {
                     setInvoiceNumber(value);
-                    // Auto-fill amount when invoice is selected
                     const selectedInvoice = availableInvoices.find(inv => inv.invoiceNumber === value);
                     if (selectedInvoice && selectedInvoice.amount) {
                       setInvoiceAmount(selectedInvoice.amount.toString());
                     }
                   }}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Invoice Number" />
+                      <SelectValue placeholder="Select Invoice..." />
                     </SelectTrigger>
                     <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]">
                       {availableInvoices.length > 0 ? (
@@ -386,12 +380,12 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
                             className="flex flex-col items-start space-y-1 p-3"
                           >
                             <div className="flex items-center gap-2 w-full">
-                              <FileText className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                              <FileText className="h-4 w-4 text-primary flex-shrink-0" />
                               <div className="flex flex-col flex-1 min-w-0">
                                 <div className="font-medium text-sm">
                                   {invoice.invoiceNumber}
                                 </div>
-                                <div className="text-xs text-gray-500 space-y-0.5">
+                                <div className="text-xs text-muted-foreground space-y-0.5">
                                   <div>Book: {invoice.bookNumber}</div>
                                   {invoice.assignedTo && (
                                     <div>Rep: {invoice.assignedTo}</div>
@@ -399,19 +393,13 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
                                   {invoice.driverName && (
                                     <div>Driver: {invoice.driverName}</div>
                                   )}
-                                  {invoice.amount && (
-                                    <div>Amount: QAR {invoice.amount}</div>
-                                  )}
-                                  {invoice.date && (
-                                    <div>Date: {invoice.date}</div>
-                                  )}
                                 </div>
                               </div>
                             </div>
                           </SelectItem>
                         ))
                       ) : (
-                        <div className="p-3 text-gray-500 text-center text-sm">
+                        <div className="p-3 text-muted-foreground text-center text-sm">
                           No invoices available
                         </div>
                       )}
