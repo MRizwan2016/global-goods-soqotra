@@ -12,6 +12,7 @@ import ScheduleForm from "./components/schedule-print/ScheduleForm";
 import { JobStorageService } from "./services/JobStorageService";
 
 const JobSchedulePrint: React.FC = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [allJobs, setAllJobs] = useState<QatarJob[]>([]);
   
