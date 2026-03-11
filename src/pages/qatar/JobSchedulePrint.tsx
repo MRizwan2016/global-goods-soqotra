@@ -1,5 +1,8 @@
 
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import PrintJobSchedule from "./components/print/PrintJobSchedule";
 import { groupBy } from "lodash";
 import { QatarJob } from "./types/jobTypes";
@@ -11,6 +14,7 @@ import ScheduleForm from "./components/schedule-print/ScheduleForm";
 import { JobStorageService } from "./services/JobStorageService";
 
 const JobSchedulePrint: React.FC = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [allJobs, setAllJobs] = useState<QatarJob[]>([]);
   
@@ -72,7 +76,18 @@ const JobSchedulePrint: React.FC = () => {
   return (
     <div className="min-h-screen bg-white w-full print-container">
       <div className="p-4 no-print">
-        <h2 className="text-xl font-bold mb-4">Job Schedule Print</h2>
+        <div className="flex items-center gap-4 mb-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => navigate("/qatar/jobs")}
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <h2 className="text-xl font-bold">Job Schedule Print</h2>
+        </div>
         
         {/* View toggle */}
         <ViewModeToggle 
