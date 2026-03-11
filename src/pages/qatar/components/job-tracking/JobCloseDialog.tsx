@@ -340,19 +340,36 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
           
           {action === "COMPLETE" ? (
             <>
+              {/* Book filter */}
+              <div className="space-y-2">
+                <Label>Select Book</Label>
+                <Select value={selectedBook} onValueChange={setSelectedBook}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All Books" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]">
+                    <SelectItem value="all">All Books ({allInvoices.length} pages)</SelectItem>
+                    {availableBooks.map((book) => (
+                      <SelectItem key={book.bookNumber} value={book.bookNumber}>
+                        {book.bookNumber} - {book.country || ''} {book.assignedTo ? `(${book.assignedTo})` : ''}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="invoiceNumber">Invoice Number</Label>
                   <Select value={invoiceNumber} onValueChange={(value) => {
                     setInvoiceNumber(value);
-                    // Auto-fill amount when invoice is selected
                     const selectedInvoice = availableInvoices.find(inv => inv.invoiceNumber === value);
                     if (selectedInvoice && selectedInvoice.amount) {
                       setInvoiceAmount(selectedInvoice.amount.toString());
                     }
                   }}>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Invoice Number" />
+                      <SelectValue placeholder="Select Invoice..." />
                     </SelectTrigger>
                     <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]">
                       {availableInvoices.length > 0 ? (
@@ -363,12 +380,12 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
                             className="flex flex-col items-start space-y-1 p-3"
                           >
                             <div className="flex items-center gap-2 w-full">
-                              <FileText className="h-4 w-4 text-blue-500 flex-shrink-0" />
+                              <FileText className="h-4 w-4 text-primary flex-shrink-0" />
                               <div className="flex flex-col flex-1 min-w-0">
                                 <div className="font-medium text-sm">
                                   {invoice.invoiceNumber}
                                 </div>
-                                <div className="text-xs text-gray-500 space-y-0.5">
+                                <div className="text-xs text-muted-foreground space-y-0.5">
                                   <div>Book: {invoice.bookNumber}</div>
                                   {invoice.assignedTo && (
                                     <div>Rep: {invoice.assignedTo}</div>
@@ -376,19 +393,13 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
                                   {invoice.driverName && (
                                     <div>Driver: {invoice.driverName}</div>
                                   )}
-                                  {invoice.amount && (
-                                    <div>Amount: QAR {invoice.amount}</div>
-                                  )}
-                                  {invoice.date && (
-                                    <div>Date: {invoice.date}</div>
-                                  )}
                                 </div>
                               </div>
                             </div>
                           </SelectItem>
                         ))
                       ) : (
-                        <div className="p-3 text-gray-500 text-center text-sm">
+                        <div className="p-3 text-muted-foreground text-center text-sm">
                           No invoices available
                         </div>
                       )}
