@@ -10,7 +10,7 @@ import { useInvoiceHandler } from "./useInvoiceHandler";
 import { FormState } from "../types";
 
 export const useInvoicePayment = () => {
-  const navigate = useNavigate();
+  
   
   const { date, handleDateSelect } = useDateHandling();
   
