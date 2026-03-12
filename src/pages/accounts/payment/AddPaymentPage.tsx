@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useInvoicePayment } from "./hooks/useInvoicePayment";
