@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Box, BarChart3, FileText } from "lucide-react";
 import ReportHeader from "./components/ReportHeader";
 import InvoiceSearchPanel from "./components/InvoiceSearchPanel";
+import BackButton from "@/components/ui/back-button";
 
 const CargoReportsPage: React.FC = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
@@ -16,7 +17,10 @@ const CargoReportsPage: React.FC = () => {
 
   return (
     <div className={`p-4 ${isFullScreen ? 'fixed inset-0 z-50 bg-white overflow-auto' : ''}`}>
-      <h1 className="text-2xl font-bold mb-4">Cargo Reports</h1>
+      <div className="flex items-center gap-4 mb-4">
+        <BackButton to="/dashboard" />
+        <h1 className="text-2xl font-bold">Cargo Reports</h1>
+      </div>
 
       <Tabs defaultValue="invoices" value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="mb-4">
