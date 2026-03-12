@@ -1,117 +1,107 @@
 
 import { toast } from "sonner";
-import { getBalanceForPayment } from "../utils/amountCalculations";
+
+// Helper to extract string name from possibly nested object
+const extractName = (val: any): string => {
+  if (!val) return '';
+  if (typeof val === 'string') return val;
+  if (typeof val === 'object' && val.name) return String(val.name);
+  return String(val) === '[object Object]' ? '' : String(val);
+};
+
+// Extract pricing from nested or flat invoice data
+const extractPricing = (inv: any): { gross: number; discount: number; net: number } => {
+  if (inv.pricing && typeof inv.pricing === 'object') {
+    return {
+      gross: parseFloat(inv.pricing.gross) || 0,
+      discount: parseFloat(inv.pricing.discount) || 0,
+      net: parseFloat(inv.pricing.net) || 0,
+    };
+  }
+  if (inv.formData) {
+    const netAmount = parseFloat(inv.formData.netAmount) || parseFloat(inv.formData.totalPrice) || 0;
+    const discount = parseFloat(inv.formData.discount) || 0;
+    return { gross: netAmount + discount, discount, net: netAmount };
+  }
+  const gross = parseFloat(inv.gross) || parseFloat(inv.grossAmount) || parseFloat(inv.amount) || 0;
+  const discount = parseFloat(inv.discount) || 0;
+  const net = parseFloat(inv.net) || parseFloat(inv.netAmount) || parseFloat(inv.amount) || gross - discount || 0;
+  return { gross: gross || net + discount, discount, net: net || gross - discount };
+};
 
 /**
  * Hook for invoice selection logic
  */
 export const useInvoiceHandler = () => {
-  // Handle selecting an invoice
   const handleSelectInvoice = (
     invoice: any, 
     setSelectedInvoice: React.Dispatch<React.SetStateAction<any>>,
     setFormState: React.Dispatch<React.SetStateAction<any>>,
     setShowInvoiceSelector: React.Dispatch<React.SetStateAction<boolean>>
   ) => {
-    // First set the selected invoice
     setSelectedInvoice(invoice);
     setShowInvoiceSelector(false);
     
-    // Check if the invoice has already been loaded from sessionStorage
-    const isFromSessionStorage = !!sessionStorage.getItem('selectedInvoice');
-    if (isFromSessionStorage) {
-      // Clear the session storage to prevent reuse
-      sessionStorage.removeItem('selectedInvoice');
+    // Check existing payments for this invoice
+    let existingPaidAmount = 0;
+    try {
+      const storedPayments = localStorage.getItem('payments');
+      if (storedPayments) {
+        const payments = JSON.parse(storedPayments);
+        const invoicePayments = payments.filter((p: any) => String(p.invoiceNumber) === String(invoice.invoiceNumber));
+        existingPaidAmount = invoicePayments.reduce((sum: number, p: any) => sum + (parseFloat(p.amount) || 0), 0);
+      }
+    } catch (e) {
+      console.error("Error checking payments:", e);
     }
+
+    // Extract pricing - handles nested pricing objects (Sri Lanka) and flat formats
+    const pricing = extractPricing(invoice);
+    const grossAmount = pricing.gross;
+    const discount = pricing.discount;
+    const netAmount = pricing.net;
+    const totalPaid = existingPaidAmount || parseFloat(invoice.totalPaid) || parseFloat(invoice.paidAmount) || 0;
+    const balanceToPay = Math.max(0, netAmount - totalPaid);
+    const isPaid = invoice.paid || totalPaid >= netAmount;
     
-    // If invoice is already paid, show a warning
-    if (invoice.paid) {
+    // Extract names - handles both string and object formats
+    const shipperName = extractName(invoice.shipper1) || extractName(invoice.shipper) || extractName(invoice.formData?.shipper1) || extractName(invoice.shipperName) || '';
+    const consigneeName = extractName(invoice.consignee1) || extractName(invoice.consignee) || extractName(invoice.formData?.consignee1) || extractName(invoice.consigneeName) || '';
+    const bookingForm = invoice.bookingForm || invoice.bookNumber || invoice.formData?.bookNumber || invoice.jobNumber || invoice.book_no || '';
+    const warehouse = invoice.warehouse || invoice.formData?.warehouse || invoice.destination || '';
+    const shipmentType = invoice.freightType || invoice.shipmentType || invoice.formData?.serviceType || invoice.serviceType || '';
+    
+    console.log("Invoice selection - pricing:", { grossAmount, discount, netAmount, totalPaid, balanceToPay, isPaid });
+    
+    if (isPaid) {
       toast.warning("Invoice Already Paid", {
         description: `Invoice ${invoice.invoiceNumber} has already been paid.`
       });
     }
     
-    // Special handling for invoice 010000
-    if (invoice.invoiceNumber === "010000") {
-      // Check if this invoice is already marked as paid
-      let isPaid = invoice.paid || false;
-      
-      // If not set as paid, check if there are payments for it in localStorage
-      if (!isPaid) {
-        const storedPayments = localStorage.getItem('payments');
-        if (storedPayments) {
-          const payments = JSON.parse(storedPayments);
-          const invoice010000Payments = payments.filter((p: any) => p.invoiceNumber === "010000");
-          isPaid = invoice010000Payments.length > 0;
-        }
-      }
-      
-      setFormState(prev => ({
-        ...prev,
-        invoiceNumber: "010000",
-        customerName: "PASTOR ZACH RICH",
-        bookingForm: "BF-10000",
-        shipper: "Global Exports Ltd.",
-        consignee: "PASTOR ZACH RICH",
-        warehouse: "Main Warehouse",
-        shipmentType: "Air Freight",
-        grossAmount: 1500,
-        discount: 0,
-        netAmount: 1500,
-        totalPaid: isPaid ? 1500 : 0,
-        balanceToPay: isPaid ? 0 : 1500,
-        amountPaid: isPaid ? 0 : 1500,
-        currency: "QAR",
-        country: "Qatar",
-      }));
-      
-      toast.success("Invoice Selected", {
-        description: `Invoice 010000 loaded for payment${isPaid ? ' (already paid)' : ''}`
-      });
-      return;
-    }
-    
-    // Get the balance to pay (either from invoice.balanceToPay or calculate it)
-    const balanceToPay = invoice.paid ? 0 : getBalanceForPayment(invoice);
-    
-    // Get customer name from various possible properties
-    const customerName = invoice.consignee1 || invoice.consignee || invoice.customer || "";
-    
-    // Set form state with invoice details
-    setFormState(prev => ({
+    setFormState((prev: any) => ({
       ...prev,
-      invoiceNumber: invoice.invoiceNumber,
-      customerName: customerName,
-      bookingForm: invoice.bookingForm || invoice.bookNumber || "",
-      shipper: invoice.shipper1 || invoice.shipper || "",
-      consignee: invoice.consignee1 || invoice.consignee || "",
-      warehouse: invoice.warehouse || "",
-      shipmentType: invoice.freightType || invoice.shipmentType || "",
-      grossAmount: invoice.gross || invoice.grossAmount || 0,
-      discount: invoice.discount || 0,
-      netAmount: invoice.net || invoice.amount || invoice.netAmount || 0,
-      totalPaid: invoice.totalPaid || (invoice.paid ? (invoice.net || invoice.amount || 0) : 0),
-      balanceToPay: balanceToPay,
-      amountPaid: invoice.paid ? 0 : balanceToPay, // Default to zero if already paid
-      currency: invoice.currency || prev.currency, // Use currency from invoice if available
+      invoiceNumber: String(invoice.invoiceNumber || ''),
+      customerName: consigneeName,
+      bookingForm: String(bookingForm),
+      shipper: shipperName,
+      consignee: consigneeName,
+      warehouse: String(warehouse),
+      shipmentType: String(shipmentType),
+      grossAmount,
+      discount,
+      netAmount,
+      totalPaid,
+      balanceToPay,
+      amountPaid: isPaid ? 0 : balanceToPay,
+      currency: invoice.currency || invoice.formData?.currency || prev.currency,
+      country: invoice.country || prev.country || 'Qatar',
     }));
     
-    // If invoice has currency, try to set the matching country
-    if (invoice.currency) {
-      setFormState(prev => ({
-        ...prev,
-        currency: invoice.currency,
-        country: prev.country || "Qatar" // Default to Qatar if no country set yet
-      }));
-    }
-    
-    // Show toast notification
     toast.success("Invoice Selected", {
-      description: `Invoice ${invoice.invoiceNumber} loaded for payment${invoice.paid ? ' (already paid)' : ''}`
+      description: `Invoice ${invoice.invoiceNumber} loaded for payment${isPaid ? ' (already paid)' : ''}`
     });
   };
   
-  return {
-    handleSelectInvoice
-  };
+  return { handleSelectInvoice };
 };
