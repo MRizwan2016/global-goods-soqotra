@@ -17,7 +17,7 @@ const ReceiptActions: React.FC<ReceiptActionsProps> = ({ onPrint, onDownload, on
       <div className="flex flex-wrap gap-2 w-full">
         <Button 
           onClick={onPrint}
-          className="flex-1 min-w-[110px] bg-blue-600 hover:bg-blue-700"
+          className="flex-1 min-w-[110px]"
         >
           <Printer className="mr-2" size={16} />
           Print
@@ -33,7 +33,8 @@ const ReceiptActions: React.FC<ReceiptActionsProps> = ({ onPrint, onDownload, on
         {onWhatsAppShare && (
           <Button 
             onClick={onWhatsAppShare}
-            className="flex-1 min-w-[130px] bg-green-600 hover:bg-green-700 text-white"
+            variant="secondary"
+            className="flex-1 min-w-[130px]"
           >
             <MessageCircle className="mr-2" size={16} />
             WhatsApp
