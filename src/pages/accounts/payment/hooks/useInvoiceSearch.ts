@@ -51,7 +51,8 @@ export const useInvoiceSearch = () => {
   // Handle invoice search
   const handleInvoiceSearch = async () => {
     // Don't show dropdown for empty input
-    if (invoicePrefix.trim() === "") {
+    const prefix = String(invoicePrefix || '').trim();
+    if (prefix === "") {
       setMatchingInvoices([]);
       setShowInvoiceSelector(false);
       return;
