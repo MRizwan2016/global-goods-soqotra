@@ -83,7 +83,7 @@ const SriLankaDashboard = () => {
       `📅 Date: ${invoice.date}\n` +
       `👤 Shipper: ${invoice.shipperName}\n` +
       `📍 Consignee: ${invoice.consigneeName}\n` +
-      `💰 Total: QAR ${parseFloat(invoice.total || '0').toFixed(2)}\n` +
+      `💰 Total: QAR ${parseFloat((invoice as any).pricing?.net || invoice.total || '0').toFixed(2)}\n` +
       `📋 Book: ${invoice.bookNumber || 'N/A'} | Page: ${invoice.pageNumber || 'N/A'}\n` +
       `🚚 Driver: ${invoice.driverName || 'N/A'}\n` +
       `📞 Sales Rep: ${invoice.salesRepresentative || 'N/A'}`
