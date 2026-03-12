@@ -52,6 +52,7 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
           onPrint={handlePrint}
           onDownload={handleDownloadPDF}
           onShare={handleShare}
+          onWhatsAppShare={handleWhatsAppShare}
         />
       </DialogContent>
     </Dialog>
