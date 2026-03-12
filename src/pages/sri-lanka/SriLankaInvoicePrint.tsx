@@ -99,6 +99,11 @@ const SriLankaInvoicePrint = () => {
             const payment = paymentData.find((p: any) => p.invoiceNumber === processedInvoice.invoiceNumber);
             setIsPaid(!!payment);
           }
+          
+          // Check if invoice itself is marked as paid
+          if (invoice.paid || invoice.paidAmount > 0 || invoice.totalPaid > 0) {
+            setIsPaid(true);
+          }
       } else {
           setInvoiceData(null);
       }
