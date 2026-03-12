@@ -27,7 +27,11 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
   receiptData,
 }) => {
   const receiptRef = useRef<HTMLDivElement>(null);
-  const { handlePrint, handleDownloadPDF, handleShare } = useReceiptActions(receiptRef, receiptData.receiptNumber);
+  const { handlePrint, handleDownloadPDF, handleShare, handleWhatsAppShare } = useReceiptActions(
+    receiptRef, 
+    receiptData.receiptNumber,
+    receiptData
+  );
 
   const currencySymbol = receiptData.currency === "USD" ? "$" : 
                         receiptData.currency === "EUR" ? "€" : 
