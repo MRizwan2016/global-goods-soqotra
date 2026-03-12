@@ -13,11 +13,11 @@ interface ReceiptActionsProps {
 
 const ReceiptActions: React.FC<ReceiptActionsProps> = ({ onPrint, onDownload, onShare, onWhatsAppShare }) => {
   return (
-    <DialogFooter className="p-4 bg-gray-50 print:hidden">
-      <div className="flex gap-2 w-full">
+    <DialogFooter className="p-4 bg-muted print:hidden">
+      <div className="flex flex-wrap gap-2 w-full">
         <Button 
           onClick={onPrint}
-          className="flex-1 bg-blue-600 hover:bg-blue-700"
+          className="flex-1 min-w-[110px]"
         >
           <Printer className="mr-2" size={16} />
           Print
@@ -25,7 +25,7 @@ const ReceiptActions: React.FC<ReceiptActionsProps> = ({ onPrint, onDownload, on
         <Button 
           onClick={onDownload} 
           variant="outline" 
-          className="flex-1"
+          className="flex-1 min-w-[110px]"
         >
           <Download className="mr-2" size={16} />
           PDF
@@ -33,7 +33,8 @@ const ReceiptActions: React.FC<ReceiptActionsProps> = ({ onPrint, onDownload, on
         {onWhatsAppShare && (
           <Button 
             onClick={onWhatsAppShare}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+            variant="secondary"
+            className="flex-1 min-w-[130px]"
           >
             <MessageCircle className="mr-2" size={16} />
             WhatsApp
@@ -42,9 +43,10 @@ const ReceiptActions: React.FC<ReceiptActionsProps> = ({ onPrint, onDownload, on
         <Button 
           onClick={onShare}
           variant="outline" 
-          className="w-10 p-0"
+          className="flex-1 min-w-[100px]"
         >
-          <Share2 size={16} />
+          <Share2 className="mr-2" size={16} />
+          Share
         </Button>
       </div>
     </DialogFooter>

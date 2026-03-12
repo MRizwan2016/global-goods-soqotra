@@ -1,6 +1,5 @@
 
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useInvoiceSearch } from "./useInvoiceSearch";
 import { usePaymentSave } from "./usePaymentSave";
 import { useCurrencyCountry } from "./useCurrencyCountry";
@@ -11,7 +10,7 @@ import { useInvoiceHandler } from "./useInvoiceHandler";
 import { FormState } from "../types";
 
 export const useInvoicePayment = () => {
-  const navigate = useNavigate();
+  
   
   const { date, handleDateSelect } = useDateHandling();
   
@@ -69,19 +68,24 @@ export const useInvoicePayment = () => {
     invoiceSelectHandler(invoice, setSelectedInvoice, setFormState, setShowInvoiceSelector);
   };
   
-  // Payment amount change that also updates totalPaid and balanceToPay dynamically
+  // Payment amount change updates only current payment + live remaining balance
   const handlePaymentAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const amount = paymentAmountHandler(e, formState);
+
     setFormState(prev => {
-      const netAmount = prev.netAmount || 0;
-      const existingPaid = prev.totalPaid || 0;
-      // Balance is net minus what's already paid (not counting current input)
-      const balance = Math.max(0, netAmount - existingPaid);
+      const netAmount = Number(prev.netAmount) || 0;
+      const totalPaid = Number(prev.totalPaid) || 0;
+      const baseBalance =
+        prev.originalBalanceToPay !== undefined
+          ? Number(prev.originalBalanceToPay) || 0
+          : Math.max(0, netAmount - totalPaid);
+
+      const normalizedAmount = Math.max(0, Math.min(amount, baseBalance));
+
       return {
         ...prev,
-        amountPaid: amount,
-        // Show how balance would look after this payment
-        balanceToPay: Math.max(0, balance - amount),
+        amountPaid: normalizedAmount,
+        balanceToPay: Math.max(0, baseBalance - normalizedAmount),
       };
     });
   };
