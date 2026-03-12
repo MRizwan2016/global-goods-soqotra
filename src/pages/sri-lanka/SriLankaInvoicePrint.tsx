@@ -99,6 +99,11 @@ const SriLankaInvoicePrint = () => {
             const payment = paymentData.find((p: any) => p.invoiceNumber === processedInvoice.invoiceNumber);
             setIsPaid(!!payment);
           }
+          
+          // Check if invoice itself is marked as paid
+          if (invoice.paid || invoice.paidAmount > 0 || invoice.totalPaid > 0) {
+            setIsPaid(true);
+          }
       } else {
           setInvoiceData(null);
       }
@@ -316,7 +321,13 @@ const SriLankaInvoicePrint = () => {
                         </td>
                         <td className="p-2 w-20 align-middle border-l border-black text-center">
                           <QRCodeSVG 
-                            value={`https://global-goods-soqotra.lovable.app/receipt?inv=${encodeURIComponent(invoiceData.invoiceNumber || '')}&date=${encodeURIComponent(invoiceData.date || '')}&customer=${encodeURIComponent(invoiceData.consignee?.name || '')}&amount=${invoiceData.pricing?.net || 0}&currency=QAR&status=${isPaid ? 'PAID' : 'UNPAID'}`} 
+                            value={(() => {
+                              const baseUrl = 'https://global-goods-soqotra.lovable.app/receipt';
+                              const status = isPaid ? 'PAID' : 'UNPAID';
+                              // Generate SOQ- receipt number only for paid/part-paid invoices
+                              const receiptNo = isPaid ? `SOQ-${String(Math.abs(invoiceData.invoiceNumber?.replace(/\D/g, '') || Date.now()) % 1000000).padStart(6, '0')}` : '';
+                              return `${baseUrl}?receipt=${encodeURIComponent(receiptNo)}&inv=${encodeURIComponent(invoiceData.invoiceNumber || '')}&date=${encodeURIComponent(invoiceData.date || '')}&customer=${encodeURIComponent(invoiceData.consignee?.name || '')}&amount=${invoiceData.pricing?.net || 0}&currency=QAR&status=${status}`;
+                            })()} 
                             size={56} 
                             level="M"
                           />
