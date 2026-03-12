@@ -232,7 +232,7 @@ const SriLankaDashboard = () => {
                             {invoice.serviceType}
                           </span>
                         </td>
-                        <td className="py-3 px-2 font-medium">QAR {parseFloat(invoice.total || '0').toFixed(2)}</td>
+                        <td className="py-3 px-2 font-medium">QAR {parseFloat((invoice as any).pricing?.net || invoice.total || '0').toFixed(2)}</td>
                         <td className="py-3 px-2 text-center">
                           <Button variant="outline" size="sm" onClick={() => handleShareWhatsApp(invoice)} title="Share e-Invoice via WhatsApp" className="text-green-600 hover:bg-green-50">
                             <MessageCircle className="h-3 w-3" />
