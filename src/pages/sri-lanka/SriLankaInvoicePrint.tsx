@@ -77,7 +77,7 @@ const SriLankaInvoicePrint = () => {
             warehouse: invoice.warehouse || 'Colombo Warehouse',
             totalWeight: parseFloat(invoice.weight || '0'),
             pricing: {
-              gross: parseFloat(invoice.rate || '0') + parseFloat(invoice.documentsFee || '0'),
+              gross: parseFloat(invoice.total || '0') + parseFloat(invoice.discount || '0'),
               discount: parseFloat(invoice.discount || '0'),
               net: parseFloat(invoice.total || '0')
             }
