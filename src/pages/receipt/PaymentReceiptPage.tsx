@@ -33,6 +33,18 @@ const PaymentReceiptPage: React.FC = () => {
         {/* Title */}
         <h1 className="text-2xl font-bold text-center mb-10">PAYMENT RECEIPT</h1>
 
+        {/* Payment Status Badge */}
+        {status === 'PAID' && (
+          <div className="flex justify-center mb-6">
+            <span className="bg-green-100 text-green-700 font-bold px-4 py-1 rounded-full text-sm border border-green-300">✓ PAID</span>
+          </div>
+        )}
+        {status === 'UNPAID' && (
+          <div className="flex justify-center mb-6">
+            <span className="bg-red-100 text-red-700 font-bold px-4 py-1 rounded-full text-sm border border-red-300">✗ UNPAID</span>
+          </div>
+        )}
+
         {/* Receipt Fields */}
         <div className="space-y-6 mb-10">
           <div className="flex items-end">
