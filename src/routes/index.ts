@@ -63,6 +63,11 @@ const baseRoutes: RouteConfig[] = [
     requiredPermission: "controlPanel"
   },
   {
+    path: "/receipt",
+    element: PaymentReceiptPage,
+    private: false
+  },
+  {
     path: "*",
     element: NotFound,
     private: false
