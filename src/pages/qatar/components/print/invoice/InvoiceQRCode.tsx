@@ -13,11 +13,11 @@ const InvoiceQRCode: React.FC<InvoiceQRCodeProps> = ({
   invoiceNumber 
 }) => {
   // Create a comprehensive QR code value for invoice verification
-  const baseUrl = window.location.origin;
+  const publishedUrl = 'https://global-goods-soqotra.lovable.app';
   const currentDate = new Date().toISOString().split('T')[0];
   
   // Include job details in QR code for verification
-  const qrValue = `${baseUrl}/qatar/jobs/${jobNumber}?customer=${encodeURIComponent(customer)}&invoice=${invoiceNumber || ''}&date=${currentDate}&verified=true`;
+  const qrValue = `${publishedUrl}/receipt?inv=${encodeURIComponent(invoiceNumber || '')}&customer=${encodeURIComponent(customer)}&date=${currentDate}&status=UNPAID`;
   
   return (
     <div className="print:block" style={{ width: "120px", height: "120px" }}>

@@ -316,7 +316,7 @@ const SriLankaInvoicePrint = () => {
                         </td>
                         <td className="p-2 w-20 align-middle border-l border-black text-center">
                           <QRCodeSVG 
-                            value={`${window.location.origin}/receipt?inv=${encodeURIComponent(invoiceData.invoiceNumber || '')}&date=${encodeURIComponent(invoiceData.date || '')}&customer=${encodeURIComponent(invoiceData.consignee?.name || '')}&amount=${invoiceData.pricing?.net || 0}&currency=QAR&status=${isPaid ? 'PAID' : 'UNPAID'}`} 
+                            value={`https://global-goods-soqotra.lovable.app/receipt?inv=${encodeURIComponent(invoiceData.invoiceNumber || '')}&date=${encodeURIComponent(invoiceData.date || '')}&customer=${encodeURIComponent(invoiceData.consignee?.name || '')}&amount=${invoiceData.pricing?.net || 0}&currency=QAR&status=${isPaid ? 'PAID' : 'UNPAID'}`} 
                             size={56} 
                             level="M"
                           />
