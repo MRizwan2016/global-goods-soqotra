@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { FormState } from "../types";
+import { ExternalInvoiceService } from "@/services/ExternalInvoiceService";
 
 /**
  * Hook for handling payment saving
@@ -9,21 +10,15 @@ import { FormState } from "../types";
 export const usePaymentSave = (formState: FormState, currencySymbol: string) => {
   const navigate = useNavigate();
 
-  /**
-   * Save payment to localStorage
-   * @returns boolean indicating if save was successful
-   */
   const handleSave = (): boolean => {
     try {
       console.log("Saving payment:", formState);
       
-      // Validate required fields
       if (!formState.invoiceNumber) {
         toast.error("Invoice number is required");
         return false;
       }
       
-      // Allow zero payments to handle special cases
       const paymentAmount = formState.amountPaid || 0;
       
       // Create payment object
@@ -39,43 +34,37 @@ export const usePaymentSave = (formState: FormState, currencySymbol: string) => 
         timestamp: new Date().toISOString()
       };
       
-      // Load existing payments
-      const existingPaymentsJSON = localStorage.getItem('payments') || '[]';
-      const existingPayments = JSON.parse(existingPaymentsJSON);
+      // Save to payments list
+      const existingPayments = JSON.parse(localStorage.getItem('payments') || '[]');
+      localStorage.setItem('payments', JSON.stringify([...existingPayments, payment]));
       
-      // Add new payment
-      const updatedPayments = [...existingPayments, payment];
+      // Update invoice paid status across ALL country storage keys
+      ExternalInvoiceService.updateInvoicePaidStatus(formState.invoiceNumber, paymentAmount);
       
-      // Save to localStorage
-      localStorage.setItem('payments', JSON.stringify(updatedPayments));
+      // Also update the 'invoices' key specifically for legacy compatibility
+      try {
+        const existingInvoicesJSON = localStorage.getItem('invoices') || '[]';
+        const existingInvoices = JSON.parse(existingInvoicesJSON);
+        const updatedInvoices = existingInvoices.map((invoice: any) => {
+          if (String(invoice.invoiceNumber) === String(formState.invoiceNumber)) {
+            const previousPaid = invoice.totalPaid || 0;
+            const newTotalPaid = previousPaid + paymentAmount;
+            const invoiceAmount = invoice.net || invoice.amount || 0;
+            return {
+              ...invoice,
+              totalPaid: newTotalPaid,
+              paidAmount: newTotalPaid,
+              paid: newTotalPaid >= invoiceAmount
+            };
+          }
+          return invoice;
+        });
+        localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
+      } catch (e) {
+        console.error("Error updating invoices:", e);
+      }
       
-      // Update invoices in localStorage to reflect payment
-      const existingInvoicesJSON = localStorage.getItem('invoices') || '[]';
-      const existingInvoices = JSON.parse(existingInvoicesJSON);
-      
-      // Find the invoice to update
-      const updatedInvoices = existingInvoices.map((invoice: any) => {
-        if (invoice.invoiceNumber === formState.invoiceNumber) {
-          // Calculate total paid amount including this payment
-          const previousPaid = invoice.totalPaid || 0;
-          const newTotalPaid = previousPaid + paymentAmount;
-          const invoiceAmount = invoice.net || invoice.amount || 0;
-          
-          // Update invoice payment status
-          return {
-            ...invoice,
-            totalPaid: newTotalPaid,
-            paidAmount: newTotalPaid,
-            paid: newTotalPaid >= invoiceAmount
-          };
-        }
-        return invoice;
-      });
-      
-      // Save updated invoices
-      localStorage.setItem('invoices', JSON.stringify(updatedInvoices));
-      
-      // Trigger a storage event to notify other components about the update
+      // Trigger storage event for all listening components
       window.dispatchEvent(new Event('storage'));
       
       toast.success("Payment Saved", {
