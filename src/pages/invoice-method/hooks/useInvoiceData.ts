@@ -21,23 +21,46 @@ const extractName = (val: any): string => {
   return '';
 };
 
+// Extract pricing from nested or flat invoice data
+const extractPricing = (inv: any): { gross: number; discount: number; net: number } => {
+  if (inv.pricing && typeof inv.pricing === 'object') {
+    return {
+      gross: parseFloat(inv.pricing.gross) || 0,
+      discount: parseFloat(inv.pricing.discount) || 0,
+      net: parseFloat(inv.pricing.net) || 0,
+    };
+  }
+  if (inv.formData) {
+    const netAmount = parseFloat(inv.formData.netAmount) || parseFloat(inv.formData.totalPrice) || parseFloat(inv.formData.totalCharges) || 0;
+    const discount = parseFloat(inv.formData.discount) || 0;
+    return { gross: netAmount + discount, discount, net: netAmount };
+  }
+  const gross = parseFloat(inv.gross) || parseFloat(inv.grossAmount) || parseFloat(inv.total_amount) || parseFloat(inv.amount) || 0;
+  const discount = parseFloat(inv.discount) || 0;
+  const net = parseFloat(inv.net) || parseFloat(inv.netAmount) || parseFloat(inv.total_amount) || parseFloat(inv.amount) || gross - discount || 0;
+  return { gross: gross || net + discount, discount, net: net || gross - discount };
+};
+
 // Convert any country invoice format to standard Invoice
-const convertToStandardInvoice = (invoice: any, country: string): Invoice => ({
-  id: invoice.id || invoice.invoiceNumber || crypto.randomUUID(),
-  invoiceNumber: invoice.invoiceNumber || invoice.formData?.invoiceNumber || invoice.invoice_no || '',
-  date: invoice.formData?.date || invoice.date || invoice.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
-  shipper1: extractName(invoice.formData?.shipper1 || invoice.shipper1 || invoice.shipper_name || invoice.shipper),
-  consignee1: extractName(invoice.formData?.consignee1 || invoice.consignee1 || invoice.consignee_name || invoice.consignee),
-  net: invoice.formData?.netAmount || invoice.net || invoice.formData?.totalCharges || invoice.total_amount || invoice.totalAmount || invoice.amount || 0,
-  paid: invoice.paid || invoice.status === 'PAID' || invoice.paymentStatus === 'paid' || false,
-  balanceToPay: invoice.balanceToPay || invoice.formData?.netAmount || invoice.net || invoice.total_amount || invoice.amount || 0,
-  currency: invoice.formData?.currency || invoice.currency || 'QR',
-  bookingForm: invoice.formData?.bookNumber || invoice.bookingForm || invoice.book_no || '',
-  country: country,
-  amount: invoice.formData?.netAmount || invoice.net || invoice.total_amount || invoice.totalAmount || invoice.amount || 0,
-  totalPaid: invoice.totalPaid || invoice.paidAmount || 0,
-  paidAmount: invoice.paidAmount || invoice.totalPaid || 0,
-});
+const convertToStandardInvoice = (invoice: any, country: string): Invoice => {
+  const pricing = extractPricing(invoice);
+  return {
+    id: invoice.id || invoice.invoiceNumber || crypto.randomUUID(),
+    invoiceNumber: invoice.invoiceNumber || invoice.formData?.invoiceNumber || invoice.invoice_no || '',
+    date: invoice.formData?.date || invoice.date || invoice.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
+    shipper1: extractName(invoice.formData?.shipper1 || invoice.shipper1 || invoice.shipper_name || invoice.shipper || invoice.shipperName),
+    consignee1: extractName(invoice.formData?.consignee1 || invoice.consignee1 || invoice.consignee_name || invoice.consignee || invoice.consigneeName),
+    net: pricing.net,
+    paid: invoice.paid || invoice.status === 'PAID' || invoice.paymentStatus === 'paid' || false,
+    balanceToPay: pricing.net - (parseFloat(invoice.totalPaid) || parseFloat(invoice.paidAmount) || 0),
+    currency: invoice.formData?.currency || invoice.currency || 'QR',
+    bookingForm: invoice.formData?.bookNumber || invoice.bookingForm || invoice.book_no || invoice.jobNumber || '',
+    country: invoice.country || country,
+    amount: pricing.net,
+    totalPaid: parseFloat(invoice.totalPaid) || parseFloat(invoice.paidAmount) || 0,
+    paidAmount: parseFloat(invoice.paidAmount) || parseFloat(invoice.totalPaid) || 0,
+  };
+};
 
 export const useInvoiceData = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
