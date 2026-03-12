@@ -19,7 +19,7 @@ export const useInvoiceSearch = () => {
         const parsedInvoice = JSON.parse(storedInvoice);
         
         // Set the invoice prefix to help with debugging
-        setInvoicePrefix(parsedInvoice.invoiceNumber || "");
+        setInvoicePrefix(String(parsedInvoice.invoiceNumber || ""));
         
         // Set the selected invoice
         setSelectedInvoice(parsedInvoice);
@@ -51,7 +51,8 @@ export const useInvoiceSearch = () => {
   // Handle invoice search
   const handleInvoiceSearch = async () => {
     // Don't show dropdown for empty input
-    if (invoicePrefix.trim() === "") {
+    const prefix = String(invoicePrefix || '').trim();
+    if (prefix === "") {
       setMatchingInvoices([]);
       setShowInvoiceSelector(false);
       return;
@@ -118,7 +119,7 @@ export const useInvoiceSearch = () => {
 
     // Filter to match the invoicePrefix
     const filteredInvoices = allInvoices.filter(inv => 
-      inv.invoiceNumber?.toLowerCase().includes(invoicePrefix.toLowerCase())
+      String(inv.invoiceNumber || '').toLowerCase().includes(prefix.toLowerCase())
     );
 
     // All invoices are already combined, just filter them

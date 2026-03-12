@@ -62,7 +62,13 @@ const convertToStandardInvoice = (invoice: any, country: string): Invoice => {
     date: invoice.formData?.date || invoice.date || invoice.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
     shipper1: extractName(invoice.formData?.shipper1 || invoice.shipper1 || invoice.shipper_name || invoice.shipper || invoice.shipperName),
     consignee1: extractName(invoice.formData?.consignee1 || invoice.consignee1 || invoice.consignee_name || invoice.consignee || invoice.consigneeName),
+    shipper: extractName(invoice.formData?.shipper1 || invoice.shipper1 || invoice.shipper_name || invoice.shipper || invoice.shipperName),
+    consignee: extractName(invoice.formData?.consignee1 || invoice.consignee1 || invoice.consignee_name || invoice.consignee || invoice.consigneeName),
+    gross: pricing.gross,
+    grossAmount: pricing.gross,
+    discount: pricing.discount,
     net: pricing.net,
+    netAmount: pricing.net,
     paid: invoice.paid || invoice.status === 'PAID' || invoice.paymentStatus === 'paid' || false,
     balanceToPay: pricing.net - (parseFloat(invoice.totalPaid) || parseFloat(invoice.paidAmount) || 0),
     currency: invoice.formData?.currency || invoice.currency || 'QR',
@@ -71,6 +77,9 @@ const convertToStandardInvoice = (invoice: any, country: string): Invoice => {
     amount: pricing.net,
     totalPaid: parseFloat(invoice.totalPaid) || parseFloat(invoice.paidAmount) || 0,
     paidAmount: parseFloat(invoice.paidAmount) || parseFloat(invoice.totalPaid) || 0,
+    warehouse: invoice.formData?.warehouse || invoice.warehouse || invoice.destination || '',
+    freightType: invoice.formData?.serviceType || invoice.freightType || invoice.shipmentType || invoice.serviceType || '',
+    shipmentType: invoice.formData?.serviceType || invoice.shipmentType || invoice.freightType || invoice.serviceType || '',
   };
 };
 
