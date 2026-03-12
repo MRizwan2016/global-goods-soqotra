@@ -2,15 +2,16 @@
 import React from "react";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Printer, Download, Share2 } from "lucide-react";
+import { Printer, Download, Share2, MessageCircle } from "lucide-react";
 
 interface ReceiptActionsProps {
   onPrint: () => void;
   onDownload: () => void;
   onShare: () => void;
+  onWhatsAppShare?: () => void;
 }
 
-const ReceiptActions: React.FC<ReceiptActionsProps> = ({ onPrint, onDownload, onShare }) => {
+const ReceiptActions: React.FC<ReceiptActionsProps> = ({ onPrint, onDownload, onShare, onWhatsAppShare }) => {
   return (
     <DialogFooter className="p-4 bg-gray-50 print:hidden">
       <div className="flex gap-2 w-full">
@@ -19,7 +20,7 @@ const ReceiptActions: React.FC<ReceiptActionsProps> = ({ onPrint, onDownload, on
           className="flex-1 bg-blue-600 hover:bg-blue-700"
         >
           <Printer className="mr-2" size={16} />
-          Print Receipt
+          Print
         </Button>
         <Button 
           onClick={onDownload} 
@@ -27,8 +28,17 @@ const ReceiptActions: React.FC<ReceiptActionsProps> = ({ onPrint, onDownload, on
           className="flex-1"
         >
           <Download className="mr-2" size={16} />
-          Download PDF
+          PDF
         </Button>
+        {onWhatsAppShare && (
+          <Button 
+            onClick={onWhatsAppShare}
+            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+          >
+            <MessageCircle className="mr-2" size={16} />
+            WhatsApp
+          </Button>
+        )}
         <Button 
           onClick={onShare}
           variant="outline" 
