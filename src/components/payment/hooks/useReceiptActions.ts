@@ -5,7 +5,11 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { toast } from "sonner";
 
-export const useReceiptActions = (receiptRef: React.RefObject<HTMLDivElement>, receiptNumber: string) => {
+export const useReceiptActions = (
+  receiptRef: React.RefObject<HTMLDivElement>, 
+  receiptNumber: string,
+  receiptData?: { invoiceNumber: string; customer: string; amount: number; currency: string }
+) => {
   const handlePrint = useReactToPrint({
     documentTitle: `Receipt-${receiptNumber}`,
     onBeforePrint: async () => {
@@ -17,14 +21,12 @@ export const useReceiptActions = (receiptRef: React.RefObject<HTMLDivElement>, r
       console.error("Print error:", error);
       toast.error("Failed to print receipt");
     },
-    // The correct property name in react-to-print v3.0.6
     contentRef: receiptRef
   });
 
   const handleDownloadPDF = async () => {
     if (receiptRef.current) {
       try {
-        console.log("Generating PDF for element:", receiptRef.current);
         const canvas = await html2canvas(receiptRef.current, {
           scale: 2,
           logging: true,
@@ -56,61 +58,48 @@ export const useReceiptActions = (receiptRef: React.RefObject<HTMLDivElement>, r
 
   const handleShare = async () => {
     try {
-      // Check if Web Share API is supported
       if (navigator.share) {
-        const shareData = {
+        await navigator.share({
           title: 'Payment Receipt',
           text: `Receipt #${receiptNumber}`,
           url: window.location.href
-        };
-        
-        console.log("Attempting to share with data:", shareData);
-        
-        try {
-          await navigator.share(shareData);
-          toast.success("Receipt shared successfully");
-        } catch (error) {
-          console.error("Share error:", error);
-          if (error instanceof Error && error.name !== 'AbortError') {
-            toast.error("Failed to share receipt");
-          }
-        }
+        });
+        toast.success("Receipt shared successfully");
       } else {
-        // Fallback for browsers that don't support the Web Share API
-        console.log("Web Share API not supported");
-        
-        // Create a temporary input element to copy the URL
-        const textArea = document.createElement("textarea");
-        textArea.value = window.location.href;
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
-        try {
-          const successful = document.execCommand('copy');
-          document.body.removeChild(textArea);
-          
-          if (successful) {
-            toast.success("Receipt URL copied to clipboard", {
-              description: "You can now share it manually"
-            });
-          } else {
-            toast.error("Failed to copy receipt URL");
-          }
-        } catch (err) {
-          document.body.removeChild(textArea);
-          toast.error("Failed to copy receipt URL");
-        }
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Receipt URL copied to clipboard");
       }
     } catch (error) {
-      console.error("Share handling error:", error);
-      toast.error("Error sharing receipt");
+      if (error instanceof Error && error.name !== 'AbortError') {
+        toast.error("Failed to share receipt");
+      }
     }
+  };
+
+  const handleWhatsAppShare = () => {
+    const data = receiptData;
+    const currencyLabel = data?.currency === "QAR" ? "QR" : data?.currency || "";
+    const message = [
+      `📧 *PAYMENT RECEIPT*`,
+      `━━━━━━━━━━━━━━━`,
+      `Receipt #: ${receiptNumber}`,
+      data?.invoiceNumber ? `Invoice #: ${data.invoiceNumber}` : '',
+      data?.customer ? `Customer: ${data.customer}` : '',
+      data?.amount ? `Amount Paid: ${currencyLabel} ${data.amount.toFixed(2)}` : '',
+      `━━━━━━━━━━━━━━━`,
+      `Thank you for your payment!`,
+      `SOQOTRA LOGISTICS`,
+    ].filter(Boolean).join('\n');
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+    toast.success("Opening WhatsApp...");
   };
 
   return {
     handlePrint,
     handleDownloadPDF,
-    handleShare
+    handleShare,
+    handleWhatsAppShare
   };
 };
