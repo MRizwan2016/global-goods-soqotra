@@ -13,13 +13,21 @@ const safeParseJSON = (key: string): any[] => {
   }
 };
 
+// Safely extract a string name from a value that might be an object
+const extractName = (val: any): string => {
+  if (!val) return '';
+  if (typeof val === 'string') return val;
+  if (typeof val === 'object' && val.name) return String(val.name);
+  return '';
+};
+
 // Convert any country invoice format to standard Invoice
 const convertToStandardInvoice = (invoice: any, country: string): Invoice => ({
   id: invoice.id || invoice.invoiceNumber || crypto.randomUUID(),
   invoiceNumber: invoice.invoiceNumber || invoice.formData?.invoiceNumber || invoice.invoice_no || '',
   date: invoice.formData?.date || invoice.date || invoice.created_at?.split('T')[0] || new Date().toISOString().split('T')[0],
-  shipper1: invoice.formData?.shipper1 || invoice.shipper1 || invoice.shipper_name || invoice.shipper || '',
-  consignee1: invoice.formData?.consignee1 || invoice.consignee1 || invoice.consignee_name || invoice.consignee || '',
+  shipper1: extractName(invoice.formData?.shipper1 || invoice.shipper1 || invoice.shipper_name || invoice.shipper),
+  consignee1: extractName(invoice.formData?.consignee1 || invoice.consignee1 || invoice.consignee_name || invoice.consignee),
   net: invoice.formData?.netAmount || invoice.net || invoice.formData?.totalCharges || invoice.total_amount || invoice.totalAmount || invoice.amount || 0,
   paid: invoice.paid || invoice.status === 'PAID' || invoice.paymentStatus === 'paid' || false,
   balanceToPay: invoice.balanceToPay || invoice.formData?.netAmount || invoice.net || invoice.total_amount || invoice.amount || 0,
