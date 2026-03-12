@@ -19,7 +19,7 @@ export const useInvoiceSearch = () => {
         const parsedInvoice = JSON.parse(storedInvoice);
         
         // Set the invoice prefix to help with debugging
-        setInvoicePrefix(parsedInvoice.invoiceNumber || "");
+        setInvoicePrefix(String(parsedInvoice.invoiceNumber || ""));
         
         // Set the selected invoice
         setSelectedInvoice(parsedInvoice);
