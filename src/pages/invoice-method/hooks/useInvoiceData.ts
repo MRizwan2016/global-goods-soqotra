@@ -13,6 +13,14 @@ const safeParseJSON = (key: string): any[] => {
   }
 };
 
+// Safely extract a string name from a value that might be an object
+const extractName = (val: any): string => {
+  if (!val) return '';
+  if (typeof val === 'string') return val;
+  if (typeof val === 'object' && val.name) return String(val.name);
+  return '';
+};
+
 // Convert any country invoice format to standard Invoice
 const convertToStandardInvoice = (invoice: any, country: string): Invoice => ({
   id: invoice.id || invoice.invoiceNumber || crypto.randomUUID(),
