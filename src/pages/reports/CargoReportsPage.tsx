@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Box, BarChart3, FileText } from "lucide-react";
 import ReportHeader from "./components/ReportHeader";
 import InvoiceSearchPanel from "./components/InvoiceSearchPanel";
+import BackButton from "@/components/ui/back-button";
 
 const CargoReportsPage: React.FC = () => {
   const [isFullScreen, setIsFullScreen] = useState(false);
