@@ -403,11 +403,13 @@ const SriLankaInvoiceForm = () => {
     
     // Validate total calculation
     const rate = parseFloat(saveRate) || 0;
+    const volume = parseFloat(formData.volume || '0') || 0;
     const docFee = parseFloat(formData.documentsFee) || 0;
     const discount = parseFloat(formData.discount) || 0;
     const packing = parseFloat(formData.packingCharges) || 0;
     const transport = parseFloat(formData.transportationFee) || 0;
-    const expectedTotal = rate + docFee - discount + packing + transport;
+    const freightCharge = formData.serviceType === 'SEA FREIGHT' ? volume * rate : rate;
+    const expectedTotal = freightCharge + docFee - discount + packing + transport;
     const actualTotal = parseFloat(saveTotal) || 0;
     
     if (Math.abs(expectedTotal - actualTotal) > 0.01) {
