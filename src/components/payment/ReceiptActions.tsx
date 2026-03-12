@@ -13,7 +13,7 @@ interface ReceiptActionsProps {
 
 const ReceiptActions: React.FC<ReceiptActionsProps> = ({ onPrint, onDownload, onShare, onWhatsAppShare }) => {
   return (
-    <DialogFooter className="p-4 bg-gray-50 print:hidden">
+    <DialogFooter className="p-4 bg-muted print:hidden">
       <div className="flex flex-wrap gap-2 w-full">
         <Button 
           onClick={onPrint}
