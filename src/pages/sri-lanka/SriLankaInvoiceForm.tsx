@@ -403,11 +403,13 @@ const SriLankaInvoiceForm = () => {
     
     // Validate total calculation
     const rate = parseFloat(saveRate) || 0;
+    const volume = parseFloat(formData.volume || '0') || 0;
     const docFee = parseFloat(formData.documentsFee) || 0;
     const discount = parseFloat(formData.discount) || 0;
     const packing = parseFloat(formData.packingCharges) || 0;
     const transport = parseFloat(formData.transportationFee) || 0;
-    const expectedTotal = rate + docFee - discount + packing + transport;
+    const freightCharge = formData.serviceType === 'SEA FREIGHT' ? volume * rate : rate;
+    const expectedTotal = freightCharge + docFee - discount + packing + transport;
     const actualTotal = parseFloat(saveTotal) || 0;
     
     if (Math.abs(expectedTotal - actualTotal) > 0.01) {
@@ -463,11 +465,17 @@ const SriLankaInvoiceForm = () => {
           volume: (parseFloat(item.length || '0') * parseFloat(item.width || '0') * parseFloat(item.height || '0')) / 1000000
         })),
         totalWeight: parseFloat(formData.weight || '0'),
-        pricing: {
-          gross: parseFloat(formData.total || '0') + parseFloat(formData.discount || '0'),
-          discount: parseFloat(formData.discount || '0'),
-          net: parseFloat(formData.total || '0')
-        },
+        pricing: (() => {
+          const vol = parseFloat(formData.volume || '0') || 0;
+          const r = parseFloat(formData.rate || '0') || 0;
+          const df = parseFloat(formData.documentsFee || '0') || 0;
+          const disc = parseFloat(formData.discount || '0') || 0;
+          const pack = parseFloat(formData.packingCharges || '0') || 0;
+          const trans = parseFloat(formData.transportationFee || '0') || 0;
+          const fc = formData.serviceType === 'SEA FREIGHT' ? vol * r : r;
+          const net = fc + df - disc + pack + trans;
+          return { gross: net + disc, discount: disc, net };
+        })(),
         // Payment details
         paymentStatus: formData.paymentStatus,
         paymentMethod: formData.paymentMethod,

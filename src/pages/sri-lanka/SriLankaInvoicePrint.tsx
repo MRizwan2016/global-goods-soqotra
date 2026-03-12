@@ -76,11 +76,19 @@ const SriLankaInvoicePrint = () => {
             },
             warehouse: invoice.warehouse || 'Colombo Warehouse',
             totalWeight: parseFloat(invoice.weight || '0'),
-            pricing: {
-              gross: parseFloat(invoice.total || '0') + parseFloat(invoice.discount || '0'),
-              discount: parseFloat(invoice.discount || '0'),
-              net: parseFloat(invoice.total || '0')
-            }
+            pricing: (() => {
+              // Recalculate total from raw data to avoid stale stored values
+              const volume = parseFloat(invoice.volume || '0') || 0;
+              const rate = parseFloat(invoice.rate || '0') || 0;
+              const docFee = parseFloat(invoice.documentsFee || '0') || 0;
+              const discount = parseFloat(invoice.discount || '0') || 0;
+              const packing = parseFloat(invoice.packingCharges || '0') || 0;
+              const transport = parseFloat(invoice.transportationFee || '0') || 0;
+              const freightCharge = invoice.serviceType === 'SEA FREIGHT' ? volume * rate : rate;
+              const net = freightCharge + docFee - discount + packing + transport;
+              const gross = net + discount;
+              return { gross, discount, net };
+            })()
           };
           
           setInvoiceData(processedInvoice);
