@@ -83,7 +83,7 @@ const SriLankaDashboard = () => {
       `📅 Date: ${invoice.date}\n` +
       `👤 Shipper: ${invoice.shipperName}\n` +
       `📍 Consignee: ${invoice.consigneeName}\n` +
-      `💰 Total: QAR ${parseFloat(invoice.total || '0').toFixed(2)}\n` +
+      `💰 Total: QAR ${parseFloat((invoice as any).pricing?.net || invoice.total || '0').toFixed(2)}\n` +
       `📋 Book: ${invoice.bookNumber || 'N/A'} | Page: ${invoice.pageNumber || 'N/A'}\n` +
       `🚚 Driver: ${invoice.driverName || 'N/A'}\n` +
       `📞 Sales Rep: ${invoice.salesRepresentative || 'N/A'}`
@@ -232,7 +232,7 @@ const SriLankaDashboard = () => {
                             {invoice.serviceType}
                           </span>
                         </td>
-                        <td className="py-3 px-2 font-medium">QAR {parseFloat(invoice.total || '0').toFixed(2)}</td>
+                        <td className="py-3 px-2 font-medium">QAR {parseFloat((invoice as any).pricing?.net || invoice.total || '0').toFixed(2)}</td>
                         <td className="py-3 px-2 text-center">
                           <Button variant="outline" size="sm" onClick={() => handleShareWhatsApp(invoice)} title="Share e-Invoice via WhatsApp" className="text-green-600 hover:bg-green-50">
                             <MessageCircle className="h-3 w-3" />

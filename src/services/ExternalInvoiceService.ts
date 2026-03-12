@@ -48,18 +48,27 @@ const safeParseJSON = (key: string): any[] => {
 
 // Extract pricing from nested or flat invoice data
 const extractPricing = (inv: any): { gross: number; discount: number; net: number } => {
-  // Check for nested pricing object (Sri Lanka format)
+  // Check for nested pricing object (Sri Lanka format) - most reliable source
   if (inv.pricing && typeof inv.pricing === 'object') {
-    return {
-      gross: parseFloat(inv.pricing.gross) || 0,
-      discount: parseFloat(inv.pricing.discount) || 0,
-      net: parseFloat(inv.pricing.net) || 0,
-    };
+    const net = parseFloat(inv.pricing.net) || 0;
+    const discount = parseFloat(inv.pricing.discount) || 0;
+    const gross = parseFloat(inv.pricing.gross) || (net + discount);
+    if (net > 0 || gross > 0) {
+      return { gross, discount, net };
+    }
+  }
+  
+  // Check for total field (Sri Lanka stores calculated total here)
+  if (inv.total && parseFloat(inv.total) > 0) {
+    const net = parseFloat(inv.total) || 0;
+    const discount = parseFloat(inv.discount) || 0;
+    const gross = net + discount;
+    return { gross, discount, net };
   }
   
   // Check formData nested pricing
   if (inv.formData) {
-    const netAmount = parseFloat(inv.formData.netAmount) || parseFloat(inv.formData.totalPrice) || 0;
+    const netAmount = parseFloat(inv.formData.netAmount) || parseFloat(inv.formData.totalPrice) || parseFloat(inv.formData.total) || 0;
     const discount = parseFloat(inv.formData.discount) || 0;
     return {
       gross: netAmount + discount,
