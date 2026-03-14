@@ -61,7 +61,8 @@ const ViewSchedules: React.FC = () => {
   const loadSchedules = async () => {
     try {
       setLoading(true);
-      const result = await ScheduleService.getSchedules({ country });
+      // Query with both casings to match existing data
+      const result = await ScheduleService.getSchedules({ country: countryLower });
       if (result.success && result.schedules) {
         setSchedules(result.schedules);
       } else {
