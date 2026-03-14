@@ -51,7 +51,7 @@ const InvoiceFinancialDetails: React.FC<InvoiceFinancialDetailsProps> = ({
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">GROSS:</div>
-          <div className="p-2">{invoice.gross}</div>
+          <div className="p-2">{invoice.pricing?.gross || invoice.gross || 0}</div>
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">DISCOUNT:</div>
