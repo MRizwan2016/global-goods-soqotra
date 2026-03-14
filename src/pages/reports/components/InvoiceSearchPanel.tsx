@@ -92,7 +92,7 @@ const InvoiceSearchPanel: React.FC = () => {
     });
     
     const results = allInvoices.filter(invoice => 
-      invoice.invoiceNumber.toLowerCase().includes(query) ||
+      String(invoice.invoiceNumber || "").toLowerCase().includes(query) ||
       invoice.consignee1?.toLowerCase().includes(query) ||
       invoice.shipper1?.toLowerCase().includes(query)
     );
