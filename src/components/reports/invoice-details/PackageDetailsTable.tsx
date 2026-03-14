@@ -41,22 +41,21 @@ const PackageDetailsTable: React.FC<PackageDetailsTableProps> = ({
             </tr>
           </thead>
           <tbody>
-            {invoice.packageDetails ? (
-              invoice.packageDetails.map((pkg, index) => (
-                <tr key={pkg.id} className="hover:bg-gray-100">
+            {(invoice.packageDetails || invoice.packageItems || invoice.packages || []).map((pkg: any, index: number) => (
+                <tr key={pkg.id || index} className="hover:bg-gray-100">
                   <td className="border border-gray-300 p-2">{index + 1}</td>
-                  <td className="border border-gray-300 p-2">{pkg.name}</td>
-                  <td className="border border-gray-300 p-2 text-center">{pkg.length}</td>
-                  <td className="border border-gray-300 p-2 text-center">{pkg.width}</td>
-                  <td className="border border-gray-300 p-2 text-center">{pkg.height}</td>
+                  <td className="border border-gray-300 p-2">{pkg.name || pkg.description || "-"}</td>
+                  <td className="border border-gray-300 p-2 text-center">{pkg.length || "-"}</td>
+                  <td className="border border-gray-300 p-2 text-center">{pkg.width || "-"}</td>
+                  <td className="border border-gray-300 p-2 text-center">{pkg.height || "-"}</td>
                   <td className="border border-gray-300 p-2 text-center">
                     {pkg.length && pkg.width && pkg.height 
-                      ? `${(pkg.length / 2.54).toFixed(1)}" × ${(pkg.width / 2.54).toFixed(1)}" × ${(pkg.height / 2.54).toFixed(1)}"`
+                      ? `${(Number(pkg.length) / 2.54).toFixed(1)}" × ${(Number(pkg.width) / 2.54).toFixed(1)}" × ${(Number(pkg.height) / 2.54).toFixed(1)}"`
                       : "-"
                     }
                   </td>
-                  <td className="border border-gray-300 p-2 text-center">{pkg.volume}</td>
-                  <td className="border border-gray-300 p-2 text-center">{pkg.weight || "22.5"}</td>
+                  <td className="border border-gray-300 p-2 text-center">{typeof pkg.volume === 'number' ? pkg.volume.toFixed(4) : (pkg.volume || "-")}</td>
+                  <td className="border border-gray-300 p-2 text-center">{pkg.weight || "0"}</td>
                   <td className="border border-gray-300 p-2 text-center"></td>
                   <td className="border border-gray-300 p-2 text-center">0</td>
                   <td className="border border-gray-300 p-2 text-center">00/00/0000</td>
@@ -69,7 +68,12 @@ const PackageDetailsTable: React.FC<PackageDetailsTableProps> = ({
                   <td className="border border-gray-300 p-2 text-center">//</td>
                 </tr>
               ))
-            ) : (
+            }
+            {(invoice.packageDetails || invoice.packageItems || invoice.packages || []).length === 0 && (
+              <tr>
+                <td colSpan={18} className="border border-gray-300 p-4 text-center text-gray-500">No package details available</td>
+              </tr>
+            )}
               <tr>
                 <td className="border border-gray-300 p-2">1</td>
                 <td className="border border-gray-300 p-2">TELEVISION SET (P/E)</td>
