@@ -15,7 +15,7 @@ const InvoiceFinancialDetails: React.FC<InvoiceFinancialDetailsProps> = ({
       <div className="border rounded">
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">FREIGHT:</div>
-          <div className="p-2">{invoice.net / 3}</div>
+          <div className="p-2">{((invoice.pricing?.net || invoice.net || 0) / 3).toFixed(2)}</div>
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">DESTINATION TRANSPORT:</div>
@@ -51,19 +51,19 @@ const InvoiceFinancialDetails: React.FC<InvoiceFinancialDetailsProps> = ({
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">GROSS:</div>
-          <div className="p-2">{invoice.gross}</div>
+          <div className="p-2">{invoice.pricing?.gross || invoice.gross || 0}</div>
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">DISCOUNT:</div>
-          <div className="p-2">{invoice.discount}</div>
+          <div className="p-2">{invoice.pricing?.discount || invoice.discount || 0}</div>
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">NET:</div>
-          <div className="p-2">{invoice.net}</div>
+          <div className="p-2">{invoice.pricing?.net || invoice.net || 0}</div>
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">PAID:</div>
-          <div className="p-2">{invoice.paid ? invoice.net : 0}</div>
+          <div className="p-2">{invoice.paid ? (invoice.pricing?.net || invoice.net || 0) : 0}</div>
         </div>
         <div className="grid grid-cols-2">
           <div className="p-2 bg-gray-100 font-semibold">DUE:</div>
@@ -106,7 +106,7 @@ const InvoiceFinancialDetails: React.FC<InvoiceFinancialDetailsProps> = ({
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">PACKAGES:</div>
-          <div className="p-2">{invoice.packages}</div>
+          <div className="p-2">{Array.isArray(invoice.packages) ? invoice.packages.length : (invoice.packages || 0)}</div>
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">DOOR TO DOOR:</div>
