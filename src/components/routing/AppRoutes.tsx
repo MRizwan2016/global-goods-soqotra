@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { Suspense } from "react";
 import { Route, Routes, Navigate, useLocation } from "react-router-dom";
 import PrivateRoute from "@/components/auth/PrivateRoute";
 import { routes } from "@/routes";
@@ -8,6 +8,7 @@ import { routes } from "@/routes";
 const AppRoutes = () => {
   
   return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="text-lg">Loading...</div></div>}>
     <Routes>
       {routes.map((route, index) => {
         const RouteElement = route.element;
@@ -53,6 +54,7 @@ const AppRoutes = () => {
         }
       })}
     </Routes>
+    </Suspense>
   );
 };
 
