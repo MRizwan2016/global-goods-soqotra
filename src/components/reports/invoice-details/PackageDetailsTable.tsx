@@ -74,27 +74,6 @@ const PackageDetailsTable: React.FC<PackageDetailsTableProps> = ({
                 <td colSpan={18} className="border border-gray-300 p-4 text-center text-gray-500">No package details available</td>
               </tr>
             )}
-              <tr>
-                <td className="border border-gray-300 p-2">1</td>
-                <td className="border border-gray-300 p-2">TELEVISION SET (P/E)</td>
-                <td className="border border-gray-300 p-2 text-center">41</td>
-                <td className="border border-gray-300 p-2 text-center">7</td>
-                <td className="border border-gray-300 p-2 text-center">26</td>
-                <td className="border border-gray-300 p-2 text-center">16.1" × 2.8" × 10.2"</td>
-                <td className="border border-gray-300 p-2 text-center">0.125</td>
-                <td className="border border-gray-300 p-2 text-center">22.5</td>
-                <td className="border border-gray-300 p-2 text-center"></td>
-                <td className="border border-gray-300 p-2 text-center">0</td>
-                <td className="border border-gray-300 p-2 text-center">00/00/0000</td>
-                <td className="border border-gray-300 p-2 text-center">0</td>
-                <td className="border border-gray-300 p-2 text-center"></td>
-                <td className="border border-gray-300 p-2 text-center"></td>
-                <td className="border border-gray-300 p-2 text-center"></td>
-                <td className="border border-gray-300 p-2 text-center">//</td>
-                <td className="border border-gray-300 p-2 text-center">//</td>
-                <td className="border border-gray-300 p-2 text-center">//</td>
-              </tr>
-            )}
           </tbody>
         </table>
       </div>
