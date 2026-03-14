@@ -47,6 +47,7 @@ const ViewSchedules: React.FC = () => {
   };
 
   const country = getCountryFromPath();
+  const countryLower = country.toLowerCase().replace(/\s+/g, '-');
 
   useEffect(() => {
     loadSchedules();
@@ -60,7 +61,8 @@ const ViewSchedules: React.FC = () => {
   const loadSchedules = async () => {
     try {
       setLoading(true);
-      const result = await ScheduleService.getSchedules({ country });
+      // Query with both casings to match existing data
+      const result = await ScheduleService.getSchedules({ country: countryLower });
       if (result.success && result.schedules) {
         setSchedules(result.schedules);
       } else {
@@ -76,8 +78,8 @@ const ViewSchedules: React.FC = () => {
 
   const loadFilterOptions = async () => {
     try {
-      const vehicleList = await ScheduleService.getUniqueVehicles(country);
-      const scheduleList = await ScheduleService.getUniqueScheduleNumbers(country);
+      const vehicleList = await ScheduleService.getUniqueVehicles(countryLower);
+      const scheduleList = await ScheduleService.getUniqueScheduleNumbers(countryLower);
       setVehicles(vehicleList);
       setScheduleNumbers(scheduleList);
     } catch (error) {
@@ -90,7 +92,7 @@ const ViewSchedules: React.FC = () => {
       const matchesSearch = 
         schedule.schedule_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
         schedule.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        schedule.sales_rep.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (schedule.sales_rep || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         (schedule.driver || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         (schedule.helper || "").toLowerCase().includes(searchTerm.toLowerCase());
 
