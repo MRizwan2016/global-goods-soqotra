@@ -78,8 +78,8 @@ const ViewSchedules: React.FC = () => {
 
   const loadFilterOptions = async () => {
     try {
-      const vehicleList = await ScheduleService.getUniqueVehicles(country);
-      const scheduleList = await ScheduleService.getUniqueScheduleNumbers(country);
+      const vehicleList = await ScheduleService.getUniqueVehicles(countryLower);
+      const scheduleList = await ScheduleService.getUniqueScheduleNumbers(countryLower);
       setVehicles(vehicleList);
       setScheduleNumbers(scheduleList);
     } catch (error) {
