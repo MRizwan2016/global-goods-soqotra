@@ -54,7 +54,7 @@ export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
       receiptNumber: paymentData?.receiptNumber || invoice.receiptNumber || `RCP-${invoice.invoiceNumber}`,
       invoiceNumber: invoice.invoiceNumber,
       date: paymentData?.paymentDate || invoice.paymentDate || invoice.date || new Date().toISOString().split('T')[0],
-      customer: typeof invoice.consignee1 === 'object' ? invoice.consignee1?.name : (invoice.consignee1 || invoice.customer || invoice.customerName || invoice.consigneeName || 'N/A'),
+      customer: (invoice.consignee1 && typeof invoice.consignee1 === 'object') ? (invoice.consignee1 as any)?.name : (String(invoice.consignee1 || '') || invoice.customer || invoice.customerName || invoice.consigneeName || 'N/A'),
       amount: paymentData?.amount || invoice.totalPaid || invoice.paidAmount || invoice.net || invoice.amount || 0,
       paymentMethod: paymentData?.paymentMethod || invoice.paymentMethod || 'cash',
       currency: invoice.currency || 'QAR',
