@@ -47,6 +47,7 @@ const ViewSchedules: React.FC = () => {
   };
 
   const country = getCountryFromPath();
+  const countryLower = country.toLowerCase().replace(/\s+/g, '-');
 
   useEffect(() => {
     loadSchedules();
