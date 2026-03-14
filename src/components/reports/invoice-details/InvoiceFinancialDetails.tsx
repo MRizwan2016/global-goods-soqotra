@@ -63,7 +63,7 @@ const InvoiceFinancialDetails: React.FC<InvoiceFinancialDetailsProps> = ({
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">PAID:</div>
-          <div className="p-2">{invoice.paid ? invoice.net : 0}</div>
+          <div className="p-2">{invoice.paid ? (invoice.pricing?.net || invoice.net || 0) : 0}</div>
         </div>
         <div className="grid grid-cols-2">
           <div className="p-2 bg-gray-100 font-semibold">DUE:</div>
