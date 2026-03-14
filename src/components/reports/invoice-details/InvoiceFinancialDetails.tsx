@@ -106,7 +106,7 @@ const InvoiceFinancialDetails: React.FC<InvoiceFinancialDetailsProps> = ({
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">PACKAGES:</div>
-          <div className="p-2">{invoice.packages}</div>
+          <div className="p-2">{Array.isArray(invoice.packages) ? invoice.packages.length : (invoice.packages || 0)}</div>
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">DOOR TO DOOR:</div>
