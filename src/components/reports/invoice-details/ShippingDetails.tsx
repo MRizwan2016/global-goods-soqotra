@@ -6,6 +6,17 @@ interface ShippingDetailsProps {
   isFullScreen?: boolean;
 }
 
+// Safely extract a string from a value that might be an object
+const safeStr = (val: any, fallback = "-"): string => {
+  if (val == null || val === "") return fallback;
+  if (typeof val === "string") return val;
+  if (typeof val === "number") return String(val);
+  if (typeof val === "object") {
+    return val.name || val.label || val.value || JSON.stringify(val);
+  }
+  return String(val);
+};
+
 const ShippingDetails: React.FC<ShippingDetailsProps> = ({ 
   invoice, 
   isFullScreen = false 
