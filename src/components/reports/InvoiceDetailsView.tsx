@@ -24,13 +24,28 @@ export const InvoiceDetailsView: React.FC = () => {
   useEffect(() => {
     const fetchInvoiceData = async () => {
       try {
-        // First try to get from localStorage for real data
-        const storedInvoices = localStorage.getItem('invoices');
+        // Search across all localStorage invoice keys
         let foundInvoice = null;
+        const invoiceKeys = [
+          'invoices', 'sriLankaInvoices', 'eritreaInvoices', 'qatarInvoices',
+          'sudanInvoices', 'kenyaInvoices', 'algeriaInvoices', 'tunisiaInvoices',
+          'generatedInvoices'
+        ];
         
-        if (storedInvoices) {
-          const parsedInvoices = JSON.parse(storedInvoices);
-          foundInvoice = parsedInvoices.find((inv: any) => inv.id === id);
+        for (const key of invoiceKeys) {
+          try {
+            const stored = localStorage.getItem(key);
+            if (stored) {
+              const parsed = JSON.parse(stored);
+              const found = parsed.find((inv: any) => inv.id === id || inv.invoiceNumber === id);
+              if (found) {
+                foundInvoice = found;
+                break;
+              }
+            }
+          } catch (e) {
+            console.error(`Error reading ${key}:`, e);
+          }
         }
         
         // If not found in localStorage, check mock data
