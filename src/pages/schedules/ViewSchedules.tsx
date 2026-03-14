@@ -92,7 +92,7 @@ const ViewSchedules: React.FC = () => {
       const matchesSearch = 
         schedule.schedule_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
         schedule.vehicle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        schedule.sales_rep.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (schedule.sales_rep || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         (schedule.driver || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
         (schedule.helper || "").toLowerCase().includes(searchTerm.toLowerCase());
 
