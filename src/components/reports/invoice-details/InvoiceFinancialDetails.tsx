@@ -15,7 +15,7 @@ const InvoiceFinancialDetails: React.FC<InvoiceFinancialDetailsProps> = ({
       <div className="border rounded">
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">FREIGHT:</div>
-          <div className="p-2">{invoice.net / 3}</div>
+          <div className="p-2">{((invoice.pricing?.net || invoice.net || 0) / 3).toFixed(2)}</div>
         </div>
         <div className="grid grid-cols-2 border-b">
           <div className="p-2 bg-gray-100 font-semibold">DESTINATION TRANSPORT:</div>
