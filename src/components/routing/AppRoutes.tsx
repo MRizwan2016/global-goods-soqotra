@@ -8,6 +8,7 @@ import { routes } from "@/routes";
 const AppRoutes = () => {
   
   return (
+    <Suspense fallback={<div className="flex items-center justify-center h-screen"><div className="text-lg">Loading...</div></div>}>
     <Routes>
       {routes.map((route, index) => {
         const RouteElement = route.element;
