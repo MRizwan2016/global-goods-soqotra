@@ -33,6 +33,24 @@ const SaudiArabiaInvoiceForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [showPreview, setShowPreview] = useState(false);
+  const [dbBooks, setDbBooks] = useState<any[]>([]);
+
+  // Load Saudi Arabia invoice books from database
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('invoice_books')
+          .select('*')
+          .eq('country', 'Saudi Arabia')
+          .in('status', ['available', 'assigned']);
+        if (!error && data) setDbBooks(data);
+      } catch (err) {
+        console.error('Error loading SA books:', err);
+      }
+    };
+    fetchBooks();
+  }, []);
 
   // Use the enhanced Saudi Arabia invoice hook
   const {
@@ -48,6 +66,31 @@ const SaudiArabiaInvoiceForm = () => {
     saveInvoice,
     loadInvoice
   } = useSaudiArabiaInvoice(id);
+
+  // Job number auto-fill handler
+  const handleJobNumberChange = useCallback(async (value: string) => {
+    handleFormChange('jobNumber', value);
+    if (value.length >= 3) {
+      const result = await lookupJobData(value, dbBooks);
+      if (result) {
+        // Map to Saudi Arabia form fields
+        if (result.shipperName) handleFormChange('shipperName', result.shipperName);
+        if (result.shipperMobile) handleFormChange('shipperMobile', result.shipperMobile);
+        if (result.shipperCity) handleFormChange('shipperCity', result.shipperCity);
+        if (result.shipperAddress) handleFormChange('shipperAddress', result.shipperAddress);
+        if (result.consigneeName) handleFormChange('consigneeName', result.consigneeName);
+        if (result.consigneeMobile) handleFormChange('consigneeMobile', result.consigneeMobile);
+        if (result.driverName) handleFormChange('driver', result.driverName);
+        if (result.salesRepresentative) handleFormChange('salesRep', result.salesRepresentative);
+        if (result.invoiceNumber) handleFormChange('invoiceNumber', result.invoiceNumber);
+        if (result.bookNumber) handleFormChange('bookNumber', result.bookNumber);
+        if (result.description) handleFormChange('remarks', result.description);
+        
+        const { toast } = await import('sonner');
+        toast.success('Job details auto-filled');
+      }
+    }
+  }, [dbBooks, handleFormChange]);
 
   // Load invoice data if editing
   useEffect(() => {
