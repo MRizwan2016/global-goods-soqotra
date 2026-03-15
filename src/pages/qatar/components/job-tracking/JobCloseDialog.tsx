@@ -57,10 +57,11 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
   const [action, setAction] = useState<"COMPLETE" | "CANCEL">("COMPLETE");
   const [loading, setLoading] = useState(false);
 
-  // Filter invoices when book selection changes
+  // Filter invoices when book selection changes - only load pages for selected book
   useEffect(() => {
     if (selectedBook === "all") {
-      setAvailableInvoices(allInvoices);
+      // Don't show all invoices at once - require book selection first
+      setAvailableInvoices([]);
     } else {
       setAvailableInvoices(allInvoices.filter(inv => inv.bookNumber === selectedBook));
     }
