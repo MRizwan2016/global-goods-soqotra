@@ -841,82 +841,169 @@ const SriLankaInvoiceForm = () => {
                    name="jobNumber"
                    value={formData.jobNumber}
                    onChange={(e) => {
-                     const value = e.target.value;
-                     handleInputChange(e);
-                      // Auto-fill from Qatar collection/delivery jobs - check both localStorage AND database
-                      if (value.length >= 3) {
-                        try {
-                          // Check localStorage first
-                          const jobs1 = JSON.parse(localStorage.getItem('jobs') || '[]');
-                          const jobs2 = JSON.parse(localStorage.getItem('qatarJobs') || '[]');
-                          const allJobs = [...jobs1, ...jobs2];
-                          
-                          const matchedJob = allJobs.find((j: any) => 
-                            j.jobNumber === value || 
-                            j.jobNumber?.includes(value) || 
-                            j.id?.includes(value)
-                          );
-                          if (matchedJob) {
-                            console.log('Matched job from localStorage:', matchedJob);
-                            setFormData(prev => ({
-                              ...prev,
-                              jobNumber: value,
-                              shipperName: matchedJob.shipperName || matchedJob.customerName || matchedJob.shipper1 || prev.shipperName,
-                              shipperMobile: matchedJob.shipperMobile || matchedJob.mobile || matchedJob.shipperPhone || prev.shipperMobile,
-                              consigneeName: matchedJob.consigneeName || matchedJob.consignee1 || prev.consigneeName,
-                              consigneeMobile: matchedJob.consigneeMobile || matchedJob.consigneePhone || prev.consigneeMobile,
-                              weight: matchedJob.weight || matchedJob.totalWeight || prev.weight,
-                              description: matchedJob.description || matchedJob.remarks || prev.description,
-                              volume: matchedJob.volume || matchedJob.totalVolume || prev.volume,
-                              packages: matchedJob.packages || matchedJob.totalPackages || prev.packages,
-                            }));
-                            toast.success('Job details auto-filled from completed job');
-                            return;
-                          }
-                        } catch (err) {
-                          console.log('localStorage lookup failed:', err);
-                        }
+                      const value = e.target.value;
+                      handleInputChange(e);
+                       // Auto-fill from Qatar collection/delivery jobs - check both localStorage AND database
+                       if (value.length >= 3) {
+                         try {
+                           // Check localStorage first
+                           const jobs1 = JSON.parse(localStorage.getItem('jobs') || '[]');
+                           const jobs2 = JSON.parse(localStorage.getItem('qatarJobs') || '[]');
+                           const allJobs = [...jobs1, ...jobs2];
+                           
+                           const matchedJob = allJobs.find((j: any) => 
+                             j.jobNumber === value || 
+                             j.jobNumber?.includes(value) || 
+                             j.id?.includes(value)
+                           );
+                           if (matchedJob) {
+                             console.log('Matched job from localStorage:', matchedJob);
+                             
+                             // Auto-fill all available fields from the completed job
+                             const updatedFields: any = {
+                               jobNumber: value,
+                               shipperName: matchedJob.customer || matchedJob.shipperName || matchedJob.customerName || matchedJob.shipper1 || '',
+                               shipperMobile: matchedJob.mobileNumber || matchedJob.shipperMobile || matchedJob.mobile || matchedJob.shipperPhone || '',
+                               shipperCity: matchedJob.town || matchedJob.city || matchedJob.shipperCity || '',
+                               shipperAddress: matchedJob.location || matchedJob.shipperAddress || matchedJob.address || '',
+                               consigneeName: matchedJob.consigneeName || matchedJob.consignee1 || '',
+                               consigneeMobile: matchedJob.consigneeMobile || matchedJob.consigneePhone || '',
+                               weight: matchedJob.weight || matchedJob.totalWeight || '',
+                               description: matchedJob.description || matchedJob.remarks || matchedJob.packageDetails || '',
+                               volume: matchedJob.volume || matchedJob.totalVolume || '',
+                               packages: matchedJob.packages || matchedJob.totalPackages || '',
+                               driverName: matchedJob.driver || matchedJob.driverName || '',
+                             };
+                             
+                             // Auto-fill invoice number from completed job
+                             if (matchedJob.invoiceNumber) {
+                               updatedFields.invoiceNumber = matchedJob.invoiceNumber;
+                               updatedFields.pageNumber = matchedJob.invoiceNumber;
+                             }
+                             
+                             // Try to find matching book for this invoice to auto-fill book number, sales rep
+                             if (matchedJob.invoiceNumber && dbBooks.length > 0) {
+                               for (const book of dbBooks) {
+                                 const pages = Array.isArray(book.available_pages) ? book.available_pages as string[] : [];
+                                 if (pages.includes(matchedJob.invoiceNumber) || 
+                                     book.job_number === value ||
+                                     book.job_number === matchedJob.jobNumber) {
+                                   updatedFields.bookNumber = book.book_number?.replace('#', '') || book.book_number || '';
+                                   updatedFields.salesRepresentative = book.assigned_to_sales_rep || '';
+                                   updatedFields.driverName = book.assigned_to_driver || updatedFields.driverName;
+                                   
+                                   // Set available pages for the matched book
+                                   setAvailablePages(pages);
+                                   break;
+                                 }
+                               }
+                             }
+                             
+                             // Only set non-empty values to avoid overwriting existing data
+                             setFormData(prev => {
+                               const merged = { ...prev };
+                               for (const [key, val] of Object.entries(updatedFields)) {
+                                 if (val) (merged as any)[key] = val;
+                               }
+                               return merged;
+                             });
+                             
+                             toast.success('Job details auto-filled from completed job');
+                             return;
+                           }
+                         } catch (err) {
+                           console.log('localStorage lookup failed:', err);
+                         }
 
-                        // Also check database schedule_jobs
-                        const fetchJobFromDB = async () => {
-                          try {
-                            const { data: scheduleJobs, error } = await supabase
-                              .from('schedule_jobs')
-                              .select('job_data');
-                            
-                            if (error || !scheduleJobs) return;
-                            
-                            for (const sj of scheduleJobs) {
-                              const jobData = sj.job_data as any;
-                              if (jobData && (jobData.jobNumber === value || jobData.jobNumber?.includes(value))) {
-                                console.log('Matched job from DB schedule_jobs:', jobData);
-                                setFormData(prev => ({
-                                  ...prev,
-                                  jobNumber: value,
-                                  shipperName: jobData.shipperName || jobData.customerName || jobData.shipper1 || prev.shipperName,
-                                  shipperMobile: jobData.shipperMobile || jobData.mobile || jobData.shipperPhone || prev.shipperMobile,
-                                  shipperCity: jobData.shipperCity || jobData.city || prev.shipperCity,
-                                  shipperAddress: jobData.shipperAddress || jobData.address || prev.shipperAddress,
-                                  consigneeName: jobData.consigneeName || jobData.consignee1 || prev.consigneeName,
-                                  consigneeMobile: jobData.consigneeMobile || jobData.consigneePhone || prev.consigneeMobile,
-                                  weight: jobData.weight || jobData.totalWeight || prev.weight,
-                                  description: jobData.description || jobData.remarks || prev.description,
-                                  volume: jobData.volume || jobData.totalVolume || prev.volume,
-                                  packages: jobData.packages || jobData.totalPackages || prev.packages,
-                                }));
-                                toast.success('Job details auto-filled from database');
-                                return;
-                              }
-                            }
-                          } catch (err) {
-                            console.log('DB job lookup failed:', err);
-                          }
-                        };
-                        fetchJobFromDB();
-                      }
-                   }}
-                   placeholder="ENTER JOB NUMBER"
-                   className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
+                         // Also check database schedule_jobs
+                         const fetchJobFromDB = async () => {
+                           try {
+                             const { data: scheduleJobs, error } = await supabase
+                               .from('schedule_jobs')
+                               .select('job_data, schedule_id');
+                             
+                             if (error || !scheduleJobs) return;
+                             
+                             for (const sj of scheduleJobs) {
+                               const jobData = sj.job_data as any;
+                               if (jobData && (jobData.jobNumber === value || jobData.jobNumber?.includes(value))) {
+                                 console.log('Matched job from DB schedule_jobs:', jobData);
+                                 
+                                 // Fetch schedule details for driver/sales rep
+                                 let scheduleDriver = '';
+                                 let scheduleSalesRep = '';
+                                 let scheduleVehicle = '';
+                                 if (sj.schedule_id) {
+                                   const { data: schedule } = await supabase
+                                     .from('schedules')
+                                     .select('driver, sales_rep, vehicle')
+                                     .eq('id', sj.schedule_id)
+                                     .maybeSingle();
+                                   if (schedule) {
+                                     scheduleDriver = schedule.driver || '';
+                                     scheduleSalesRep = schedule.sales_rep || '';
+                                     scheduleVehicle = schedule.vehicle || '';
+                                   }
+                                 }
+                                 
+                                 const updatedFields: any = {
+                                   jobNumber: value,
+                                   shipperName: jobData.customer || jobData.shipperName || jobData.customerName || jobData.shipper1 || '',
+                                   shipperMobile: jobData.mobileNumber || jobData.shipperMobile || jobData.mobile || jobData.shipperPhone || '',
+                                   shipperCity: jobData.town || jobData.city || jobData.shipperCity || '',
+                                   shipperAddress: jobData.location || jobData.shipperAddress || jobData.address || '',
+                                   consigneeName: jobData.consigneeName || jobData.consignee1 || '',
+                                   consigneeMobile: jobData.consigneeMobile || jobData.consigneePhone || '',
+                                   weight: jobData.weight || jobData.totalWeight || '',
+                                   description: jobData.description || jobData.remarks || jobData.packageDetails || '',
+                                   volume: jobData.volume || jobData.totalVolume || '',
+                                   packages: jobData.packages || jobData.totalPackages || '',
+                                   driverName: scheduleDriver || jobData.driver || jobData.driverName || '',
+                                   salesRepresentative: scheduleSalesRep || jobData.salesRep || '',
+                                 };
+                                 
+                                 if (jobData.invoiceNumber) {
+                                   updatedFields.invoiceNumber = jobData.invoiceNumber;
+                                   updatedFields.pageNumber = jobData.invoiceNumber;
+                                 }
+                                 
+                                 // Find matching book
+                                 if (jobData.invoiceNumber && dbBooks.length > 0) {
+                                   for (const book of dbBooks) {
+                                     const pages = Array.isArray(book.available_pages) ? book.available_pages as string[] : [];
+                                     if (pages.includes(jobData.invoiceNumber) || 
+                                         book.job_number === value ||
+                                         book.job_number === jobData.jobNumber) {
+                                       updatedFields.bookNumber = book.book_number?.replace('#', '') || book.book_number || '';
+                                       updatedFields.salesRepresentative = book.assigned_to_sales_rep || updatedFields.salesRepresentative;
+                                       updatedFields.driverName = book.assigned_to_driver || updatedFields.driverName;
+                                       setAvailablePages(pages);
+                                       break;
+                                     }
+                                   }
+                                 }
+                                 
+                                 setFormData(prev => {
+                                   const merged = { ...prev };
+                                   for (const [key, val] of Object.entries(updatedFields)) {
+                                     if (val) (merged as any)[key] = val;
+                                   }
+                                   return merged;
+                                 });
+                                 
+                                 toast.success('Job details auto-filled from database');
+                                 return;
+                               }
+                             }
+                           } catch (err) {
+                             console.log('DB job lookup failed:', err);
+                           }
+                         };
+                         fetchJobFromDB();
+                       }
+                    }}
+                    placeholder="ENTER JOB NUMBER"
+                    className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
                  />
               </div>
               <div>
