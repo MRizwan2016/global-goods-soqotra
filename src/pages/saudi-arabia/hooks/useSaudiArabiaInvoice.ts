@@ -19,6 +19,7 @@ export interface SaudiArabiaFormData {
   // Basic Details
   invoiceNumber: string;
   invoiceDate: string;
+  jobNumber: string;
   port: string;
   sector: string;
   salesRep: string;
