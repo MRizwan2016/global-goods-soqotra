@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Package, CarFront, UserRoundCog, Search } from "lucide-react";
+import { ArrowRight, Package, CarFront, UserRoundCog, Search, FileText, Calendar } from "lucide-react";
 
 const DashboardHeader = () => {
   return (
