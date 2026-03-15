@@ -87,6 +87,7 @@ export const useSaudiArabiaInvoice = (invoiceId?: string) => {
   const [formData, setFormData] = useState<SaudiArabiaFormData>({
     invoiceNumber: "",
     invoiceDate: new Date().toISOString().split('T')[0],
+    jobNumber: "",
     port: "",
     sector: "",
     salesRep: "",
