@@ -61,16 +61,22 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
   const [loading, setLoading] = useState(false);
   const [loadingInvoices, setLoadingInvoices] = useState(false);
 
-  // Filter invoices when book selection changes - only load pages for selected book
   useEffect(() => {
     if (selectedBook === "all") {
-      // Don't show all invoices at once - require book selection first
       setAvailableInvoices([]);
-    } else {
-      setAvailableInvoices(allInvoices.filter(inv => inv.bookNumber === selectedBook));
     }
     setInvoiceNumber("");
-  }, [selectedBook, allInvoices]);
+    setInvoiceSearch("");
+  }, [selectedBook]);
+
+  const filteredInvoices = useMemo(() => {
+    const query = invoiceSearch.trim().toLowerCase();
+    const source = query
+      ? availableInvoices.filter((inv) => String(inv.invoiceNumber).toLowerCase().includes(query))
+      : availableInvoices;
+
+    return source.slice(0, INVOICE_RENDER_LIMIT);
+  }, [availableInvoices, invoiceSearch]);
 
   // Load available books (metadata only - no pages)
   useEffect(() => {
