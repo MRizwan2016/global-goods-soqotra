@@ -580,7 +580,7 @@ const SaudiArabiaInvoiceForm = () => {
             {/* Totals Display */}
             <div className="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-lg">
               <div className="text-center">
-                <div className="text-2xl font-bold text-[#3b5998]">{formData.gross.toFixed(2)} QAR</div>
+                <div className="text-2xl font-bold text-[#3b5998]">{formData.gross.toFixed(2)} SAR</div>
                 <div className="text-sm text-gray-600">Gross Total</div>
               </div>
               <div className="text-center">
