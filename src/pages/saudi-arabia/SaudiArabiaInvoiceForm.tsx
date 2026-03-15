@@ -540,7 +540,7 @@ const SaudiArabiaInvoiceForm = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">DOCUMENTS FEE (QAR):</label>
+                <label className="text-sm font-medium">DOCUMENTS FEE (SAR):</label>
                 <Input 
                   type="number"
                   value={formData.documentsFee}
