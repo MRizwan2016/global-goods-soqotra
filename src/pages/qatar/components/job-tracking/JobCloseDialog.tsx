@@ -57,33 +57,31 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
   const [action, setAction] = useState<"COMPLETE" | "CANCEL">("COMPLETE");
   const [loading, setLoading] = useState(false);
 
-  // Filter invoices when book selection changes
+  // Filter invoices when book selection changes - only load pages for selected book
   useEffect(() => {
     if (selectedBook === "all") {
-      setAvailableInvoices(allInvoices);
+      // Don't show all invoices at once - require book selection first
+      setAvailableInvoices([]);
     } else {
       setAvailableInvoices(allInvoices.filter(inv => inv.bookNumber === selectedBook));
     }
     setInvoiceNumber("");
   }, [selectedBook, allInvoices]);
 
-  // Load available invoices from ALL assigned books
+  // Load available books (metadata only - no pages)
   useEffect(() => {
-    const loadInvoices = async () => {
+    const loadBooks = async () => {
       try {
-        const usedInvoices = JSON.parse(localStorage.getItem('used-invoices') || '[]');
-        
-        let invoiceList: InvoiceDetails[] = [];
         const booksMap = new Map<string, {bookNumber: string; assignedTo?: string; country?: string}>();
         
-        // ---- 1. Fetch ALL assigned/available books from Supabase ----
+        // Fetch book metadata from Supabase (without processing all pages)
         try {
           const { data: dbBooks, error } = await supabase
             .from('invoice_books')
-            .select('*')
+            .select('book_number, assigned_to_sales_rep, assigned_to_driver, country, assigned_date, status')
             .in('status', ['assigned', 'available', 'active']);
           
-          if (!error && dbBooks && dbBooks.length > 0) {
+          if (!error && dbBooks) {
             dbBooks.forEach((book) => {
               const bookLabel = `#${book.book_number}`;
               booksMap.set(bookLabel, {
@@ -91,91 +89,126 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
                 assignedTo: book.assigned_to_sales_rep || undefined,
                 country: book.country
               });
-              
-              const pages = Array.isArray(book.available_pages) 
-                ? book.available_pages as (string | number)[]
-                : [];
-              
-              pages.forEach((page) => {
-                const pageStr = String(page);
-                if (!usedInvoices.includes(pageStr)) {
-                  invoiceList.push({
-                    invoiceNumber: pageStr,
-                    bookNumber: bookLabel,
-                    assignedTo: book.assigned_to_sales_rep || undefined,
-                    driverName: book.assigned_to_driver || undefined,
-                    amount: undefined,
-                    date: book.assigned_date ? new Date(book.assigned_date).toISOString().split('T')[0] : undefined
-                  });
-                }
-              });
             });
-          }
-          
-          if (error) {
-            console.error("Error fetching invoice books from DB:", error);
           }
         } catch (dbError) {
           console.error("Error querying invoice_books:", dbError);
         }
         
-        // ---- 2. Also load from localStorage (existing logic) ----
-        const job = JobStorageService.getJobById(jobId);
-        const jobDestination = job?.destination || '';
-        
+        // Also load from localStorage
         const activeBooks = JSON.parse(localStorage.getItem('active-books') || '[]');
         const storedBooks = JSON.parse(localStorage.getItem('books') || '[]');
         
-        const processLocalBooks = (books: any[]) => {
-          books.forEach((book: any) => {
-            if (book.isActivated) {
-              const bookLabel = `#${book.bookId || book.id}`;
-              if (!booksMap.has(bookLabel)) {
-                booksMap.set(bookLabel, {
-                  bookNumber: bookLabel,
-                  assignedTo: book.assignedTo,
-                  country: book.destination || book.country
+        [...activeBooks, ...storedBooks].forEach((book: any) => {
+          if (book.isActivated) {
+            const bookLabel = `#${book.bookId || book.id}`;
+            if (!booksMap.has(bookLabel)) {
+              booksMap.set(bookLabel, {
+                bookNumber: bookLabel,
+                assignedTo: book.assignedTo,
+                country: book.destination || book.country
+              });
+            }
+          }
+        });
+        
+        setAvailableBooks(Array.from(booksMap.values()));
+      } catch (error) {
+        console.error("Error loading books:", error);
+      }
+    };
+
+    if (isOpen) {
+      loadBooks();
+      setSelectedBook("all");
+      setAllInvoices([]);
+      setAvailableInvoices([]);
+    }
+  }, [isOpen]);
+
+  // Load pages only for the selected book
+  useEffect(() => {
+    if (!isOpen || selectedBook === "all") return;
+    
+    const loadPagesForBook = async () => {
+      try {
+        const usedInvoices = JSON.parse(localStorage.getItem('used-invoices') || '[]');
+        let invoiceList: InvoiceDetails[] = [];
+        const bookNum = selectedBook.replace('#', '');
+        
+        // Try Supabase first
+        try {
+          const { data: dbBook, error } = await supabase
+            .from('invoice_books')
+            .select('*')
+            .eq('book_number', bookNum)
+            .maybeSingle();
+          
+          if (!error && dbBook) {
+            const pages = Array.isArray(dbBook.available_pages) 
+              ? dbBook.available_pages as (string | number)[]
+              : [];
+            
+            pages.forEach((page) => {
+              const pageStr = String(page);
+              if (!usedInvoices.includes(pageStr)) {
+                invoiceList.push({
+                  invoiceNumber: pageStr,
+                  bookNumber: selectedBook,
+                  assignedTo: dbBook.assigned_to_sales_rep || undefined,
+                  driverName: dbBook.assigned_to_driver || undefined,
+                  amount: undefined,
+                  date: dbBook.assigned_date ? new Date(dbBook.assigned_date).toISOString().split('T')[0] : undefined
                 });
               }
-              
-              if (book.pageRangeStart && book.pageRangeEnd) {
-                const startPage = parseInt(book.pageRangeStart);
-                const endPage = parseInt(book.pageRangeEnd);
-                for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
-                  const inv = `GY ${pageNum}`;
-                  if (!usedInvoices.includes(inv)) {
-                    invoiceList.push({
-                      invoiceNumber: inv,
-                      bookNumber: bookLabel,
-                      assignedTo: book.assignedTo || undefined,
-                      driverName: book.driverName || undefined,
-                      amount: book.defaultAmount || undefined,
-                      date: book.activationDate || undefined
-                    });
-                  }
-                }
-              } else if (book.availablePages && Array.isArray(book.availablePages)) {
-                book.availablePages
-                  .filter((invoiceNo: string) => !usedInvoices.includes(invoiceNo))
-                  .forEach((invoiceNo: string) => {
-                    invoiceList.push({
-                      invoiceNumber: invoiceNo,
-                      bookNumber: bookLabel,
-                      assignedTo: book.assignedTo || undefined,
-                      driverName: book.driverName || undefined,
-                      amount: book.defaultAmount || undefined,
-                      date: book.activationDate || undefined
-                    });
-                  });
+            });
+          }
+        } catch (dbError) {
+          console.error("Error querying invoice_books pages:", dbError);
+        }
+        
+        // Also check localStorage
+        const activeBooks = JSON.parse(localStorage.getItem('active-books') || '[]');
+        const storedBooks = JSON.parse(localStorage.getItem('books') || '[]');
+        
+        [...activeBooks, ...storedBooks].forEach((book: any) => {
+          if (!book.isActivated) return;
+          const bookLabel = `#${book.bookId || book.id}`;
+          if (bookLabel !== selectedBook) return;
+          
+          if (book.pageRangeStart && book.pageRangeEnd) {
+            const startPage = parseInt(book.pageRangeStart);
+            const endPage = parseInt(book.pageRangeEnd);
+            for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
+              const inv = `GY ${pageNum}`;
+              if (!usedInvoices.includes(inv)) {
+                invoiceList.push({
+                  invoiceNumber: inv,
+                  bookNumber: bookLabel,
+                  assignedTo: book.assignedTo || undefined,
+                  driverName: book.driverName || undefined,
+                  amount: book.defaultAmount || undefined,
+                  date: book.activationDate || undefined
+                });
               }
             }
-          });
-        };
+          } else if (book.availablePages && Array.isArray(book.availablePages)) {
+            book.availablePages
+              .filter((invoiceNo: string) => !usedInvoices.includes(invoiceNo))
+              .forEach((invoiceNo: string) => {
+                invoiceList.push({
+                  invoiceNumber: invoiceNo,
+                  bookNumber: bookLabel,
+                  assignedTo: book.assignedTo || undefined,
+                  driverName: book.driverName || undefined,
+                  amount: book.defaultAmount || undefined,
+                  date: book.activationDate || undefined
+                });
+              });
+          }
+        });
         
-        processLocalBooks(activeBooks);
-        processLocalBooks(storedBooks);
-        
-        // Remove duplicates by invoiceNumber
+        // Remove duplicates
         const uniqueMap = new Map<string, InvoiceDetails>();
         invoiceList.forEach(inv => {
           if (!uniqueMap.has(inv.invoiceNumber)) {
@@ -184,24 +217,16 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
         });
         invoiceList = Array.from(uniqueMap.values());
         
-        console.log("Available invoices for job completion:", invoiceList);
-        console.log("Available books:", Array.from(booksMap.values()));
-        
+        console.log(`Loaded ${invoiceList.length} pages for book ${selectedBook}`);
         setAllInvoices(invoiceList);
         setAvailableInvoices(invoiceList);
-        setAvailableBooks(Array.from(booksMap.values()));
       } catch (error) {
-        console.error("Error loading available invoices:", error);
-        setAllInvoices([]);
-        setAvailableInvoices([]);
+        console.error("Error loading pages for book:", error);
       }
     };
-
-    if (isOpen) {
-      loadInvoices();
-      setSelectedBook("all");
-    }
-  }, [isOpen, jobId]);
+    
+    loadPagesForBook();
+  }, [isOpen, selectedBook, jobId]);
 
   const handleComplete = () => {
     setLoading(true);
@@ -348,7 +373,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
                     <SelectValue placeholder="All Books" />
                   </SelectTrigger>
                   <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]">
-                    <SelectItem value="all">All Books ({allInvoices.length} pages)</SelectItem>
+                    <SelectItem value="all">-- Select a Book --</SelectItem>
                     {availableBooks.map((book) => (
                       <SelectItem key={book.bookNumber} value={book.bookNumber}>
                         {book.bookNumber} - {book.country || ''} {book.assignedTo ? `(${book.assignedTo})` : ''}
