@@ -12,6 +12,20 @@ const DashboardHeader = () => {
       </div>
       
       <div className="flex flex-wrap gap-2 mt-3 md:mt-0">
+        <Link to="/kenya/invoices">
+          <Button variant="outline" className="flex items-center gap-1 border-[#3b5998]/30 text-[#3b5998] hover:bg-[#3b5998]/5">
+            <FileText size={16} />
+            Invoices
+          </Button>
+        </Link>
+        
+        <Link to="/kenya/schedules">
+          <Button variant="outline" className="flex items-center gap-1 border-[#3b5998]/30 text-[#3b5998] hover:bg-[#3b5998]/5">
+            <Calendar size={16} />
+            Schedules
+          </Button>
+        </Link>
+        
         <Link to="/kenya/customer-portal">
           <Button variant="outline" className="flex items-center gap-1 border-[#3b5998]/30 text-[#3b5998] hover:bg-[#3b5998]/5">
             <Search size={16} />
