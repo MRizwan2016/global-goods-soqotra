@@ -1,6 +1,6 @@
 
-import { useState, useEffect } from "react";
-import { 
+import { useState, useEffect, useMemo } from "react";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -45,28 +45,70 @@ interface InvoiceDetails {
   date?: string;
 }
 
+const MAX_INVOICES_PER_BOOK = 800;
+const INVOICE_RENDER_LIMIT = 250;
+
+const buildInvoiceRange = (startPage: string, endPage: string, limit: number): string[] => {
+  const start = String(startPage || "").trim();
+  const end = String(endPage || "").trim();
+
+  const startMatch = start.match(/^(.*?)(\d+)$/);
+  const endMatch = end.match(/^(.*?)(\d+)$/);
+
+  if (!startMatch || !endMatch) return [];
+
+  const [, startPrefix, startNumberRaw] = startMatch;
+  const [, endPrefix, endNumberRaw] = endMatch;
+  if (startPrefix !== endPrefix) return [];
+
+  const startNumber = Number(startNumberRaw);
+  const endNumber = Number(endNumberRaw);
+
+  if (!Number.isFinite(startNumber) || !Number.isFinite(endNumber) || endNumber < startNumber) {
+    return [];
+  }
+
+  const width = Math.max(startNumberRaw.length, endNumberRaw.length);
+  const maxInvoices = Math.min(limit, endNumber - startNumber + 1);
+  const generatedInvoices: string[] = [];
+
+  for (let index = 0; index < maxInvoices; index++) {
+    const currentNumber = startNumber + index;
+    generatedInvoices.push(`${startPrefix}${String(currentNumber).padStart(width, "0")}`);
+  }
+
+  return generatedInvoices;
+};
+
 const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobCloseDialogProps) => {
   const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [invoiceSearch, setInvoiceSearch] = useState("");
   const [availableInvoices, setAvailableInvoices] = useState<InvoiceDetails[]>([]);
-  const [allInvoices, setAllInvoices] = useState<InvoiceDetails[]>([]);
   const [selectedBook, setSelectedBook] = useState<string>("all");
-  const [availableBooks, setAvailableBooks] = useState<{bookNumber: string; assignedTo?: string; country?: string}[]>([]);
+  const [availableBooks, setAvailableBooks] = useState<{ bookNumber: string; assignedTo?: string; country?: string }[]>([]);
   const [invoiceAmount, setInvoiceAmount] = useState("");
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [reason, setReason] = useState("");
   const [action, setAction] = useState<"COMPLETE" | "CANCEL">("COMPLETE");
   const [loading, setLoading] = useState(false);
+  const [loadingInvoices, setLoadingInvoices] = useState(false);
 
-  // Filter invoices when book selection changes - only load pages for selected book
   useEffect(() => {
     if (selectedBook === "all") {
-      // Don't show all invoices at once - require book selection first
       setAvailableInvoices([]);
-    } else {
-      setAvailableInvoices(allInvoices.filter(inv => inv.bookNumber === selectedBook));
     }
     setInvoiceNumber("");
-  }, [selectedBook, allInvoices]);
+    setInvoiceSearch("");
+  }, [selectedBook]);
+
+  const filteredInvoices = useMemo(() => {
+    const query = invoiceSearch.trim().toLowerCase();
+    const source = query
+      ? availableInvoices.filter((inv) => String(inv.invoiceNumber).toLowerCase().includes(query))
+      : availableInvoices;
+
+    return source.slice(0, INVOICE_RENDER_LIMIT);
+  }, [availableInvoices, invoiceSearch]);
 
   // Load available books (metadata only - no pages)
   useEffect(() => {
@@ -95,23 +137,40 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
           console.error("Error querying invoice_books:", dbError);
         }
         
-        // Also load from localStorage
-        const activeBooks = JSON.parse(localStorage.getItem('active-books') || '[]');
-        const storedBooks = JSON.parse(localStorage.getItem('books') || '[]');
-        
-        [...activeBooks, ...storedBooks].forEach((book: any) => {
-          if (book.isActivated) {
-            const bookLabel = `#${book.bookId || book.id}`;
+        if (booksMap.size === 0) {
+          const parseLocalBooks = (key: string) => {
+            try {
+              const raw = localStorage.getItem(key);
+              const parsed = raw ? JSON.parse(raw) : [];
+              return Array.isArray(parsed) ? parsed : [];
+            } catch {
+              return [];
+            }
+          };
+
+          const localBooks = [
+            ...parseLocalBooks("active-books"),
+            ...parseLocalBooks("books"),
+            ...parseLocalBooks("activeInvoiceBooks"),
+            ...parseLocalBooks("invoiceBooks")
+          ];
+
+          localBooks.forEach((book: any) => {
+            if (!book?.isActivated && !book?.is_active) return;
+            const bookRef = String(book.bookId || book.book_number || book.bookNumber || book.id || "").trim();
+            if (!bookRef) return;
+
+            const bookLabel = `#${bookRef}`;
             if (!booksMap.has(bookLabel)) {
               booksMap.set(bookLabel, {
                 bookNumber: bookLabel,
-                assignedTo: book.assignedTo,
+                assignedTo: book.assignedTo || book.assigned_to_sales_rep,
                 country: book.destination || book.country
               });
             }
-          }
-        });
-        
+          });
+        }
+
         setAvailableBooks(Array.from(booksMap.values()));
       } catch (error) {
         console.error("Error loading books:", error);
@@ -121,112 +180,158 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
     if (isOpen) {
       loadBooks();
       setSelectedBook("all");
-      setAllInvoices([]);
       setAvailableInvoices([]);
+      setInvoiceNumber("");
+      setInvoiceSearch("");
     }
   }, [isOpen]);
 
   // Load pages only for the selected book
   useEffect(() => {
     if (!isOpen || selectedBook === "all") return;
-    
+
     const loadPagesForBook = async () => {
+      setLoadingInvoices(true);
+      setAvailableInvoices([]);
+
       try {
-        const usedInvoices = JSON.parse(localStorage.getItem('used-invoices') || '[]');
-        let invoiceList: InvoiceDetails[] = [];
-        const bookNum = selectedBook.replace('#', '');
-        
-        // Try Supabase first
+        const rawUsedInvoices = JSON.parse(localStorage.getItem("used-invoices") || "[]");
+        const usedInvoices = new Set(
+          Array.isArray(rawUsedInvoices)
+            ? rawUsedInvoices.map((invoice) => String(invoice).trim())
+            : []
+        );
+
+        const invoiceList: InvoiceDetails[] = [];
+        const seenInvoices = new Set<string>();
+        const bookNum = selectedBook.replace("#", "");
+
+        const appendInvoice = (invoice: InvoiceDetails): boolean => {
+          if (invoiceList.length >= MAX_INVOICES_PER_BOOK) return false;
+
+          const invoiceValue = String(invoice.invoiceNumber).trim();
+          if (!invoiceValue || usedInvoices.has(invoiceValue) || seenInvoices.has(invoiceValue)) {
+            return true;
+          }
+
+          seenInvoices.add(invoiceValue);
+          invoiceList.push({ ...invoice, invoiceNumber: invoiceValue });
+          return invoiceList.length < MAX_INVOICES_PER_BOOK;
+        };
+
+        let foundDbBook = false;
+
         try {
           const { data: dbBook, error } = await supabase
-            .from('invoice_books')
-            .select('*')
-            .eq('book_number', bookNum)
+            .from("invoice_books")
+            .select("book_number, assigned_to_sales_rep, assigned_to_driver, assigned_date, start_page, end_page")
+            .eq("book_number", bookNum)
             .maybeSingle();
-          
+
           if (!error && dbBook) {
-            const pages = Array.isArray(dbBook.available_pages) 
-              ? dbBook.available_pages as (string | number)[]
-              : [];
-            
-            pages.forEach((page) => {
-              const pageStr = String(page);
-              if (!usedInvoices.includes(pageStr)) {
-                invoiceList.push({
-                  invoiceNumber: pageStr,
-                  bookNumber: selectedBook,
-                  assignedTo: dbBook.assigned_to_sales_rep || undefined,
-                  driverName: dbBook.assigned_to_driver || undefined,
-                  amount: undefined,
-                  date: dbBook.assigned_date ? new Date(dbBook.assigned_date).toISOString().split('T')[0] : undefined
-                });
-              }
-            });
+            foundDbBook = true;
+
+            const generatedPages = buildInvoiceRange(
+              String(dbBook.start_page || ""),
+              String(dbBook.end_page || ""),
+              MAX_INVOICES_PER_BOOK
+            );
+
+            for (const page of generatedPages) {
+              const shouldContinue = appendInvoice({
+                invoiceNumber: page,
+                bookNumber: selectedBook,
+                assignedTo: dbBook.assigned_to_sales_rep || undefined,
+                driverName: dbBook.assigned_to_driver || undefined,
+                amount: undefined,
+                date: dbBook.assigned_date
+                  ? new Date(dbBook.assigned_date).toISOString().split("T")[0]
+                  : undefined
+              });
+              if (!shouldContinue) break;
+            }
           }
         } catch (dbError) {
-          console.error("Error querying invoice_books pages:", dbError);
+          console.error("Error querying invoice book pages:", dbError);
         }
-        
-        // Also check localStorage
-        const activeBooks = JSON.parse(localStorage.getItem('active-books') || '[]');
-        const storedBooks = JSON.parse(localStorage.getItem('books') || '[]');
-        
-        [...activeBooks, ...storedBooks].forEach((book: any) => {
-          if (!book.isActivated) return;
-          const bookLabel = `#${book.bookId || book.id}`;
-          if (bookLabel !== selectedBook) return;
-          
-          if (book.pageRangeStart && book.pageRangeEnd) {
-            const startPage = parseInt(book.pageRangeStart);
-            const endPage = parseInt(book.pageRangeEnd);
-            for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
-              const inv = `GY ${pageNum}`;
-              if (!usedInvoices.includes(inv)) {
-                invoiceList.push({
-                  invoiceNumber: inv,
-                  bookNumber: bookLabel,
-                  assignedTo: book.assignedTo || undefined,
-                  driverName: book.driverName || undefined,
+
+        if (!foundDbBook || invoiceList.length === 0) {
+          const parseLocalBooks = (key: string) => {
+            try {
+              const raw = localStorage.getItem(key);
+              const parsed = raw ? JSON.parse(raw) : [];
+              return Array.isArray(parsed) ? parsed : [];
+            } catch {
+              return [];
+            }
+          };
+
+          const localBooks = [
+            ...parseLocalBooks("active-books"),
+            ...parseLocalBooks("books"),
+            ...parseLocalBooks("activeInvoiceBooks"),
+            ...parseLocalBooks("invoiceBooks")
+          ];
+
+          for (const book of localBooks) {
+            const bookRef = String(book.bookId || book.book_number || book.bookNumber || book.id || "").trim();
+            if (`#${bookRef}` !== selectedBook) continue;
+
+            const assignedTo = book.assignedTo || book.assigned_to_sales_rep || undefined;
+            const driverName = book.driverName || book.assigned_to_driver || undefined;
+
+            if (book.pageRangeStart && book.pageRangeEnd) {
+              const generatedPages = buildInvoiceRange(
+                String(book.pageRangeStart),
+                String(book.pageRangeEnd),
+                MAX_INVOICES_PER_BOOK
+              );
+
+              for (const invoiceNo of generatedPages) {
+                const shouldContinue = appendInvoice({
+                  invoiceNumber: invoiceNo,
+                  bookNumber: selectedBook,
+                  assignedTo,
+                  driverName,
                   amount: book.defaultAmount || undefined,
                   date: book.activationDate || undefined
                 });
+                if (!shouldContinue) break;
               }
             }
-          } else if (book.availablePages && Array.isArray(book.availablePages)) {
-            book.availablePages
-              .filter((invoiceNo: string) => !usedInvoices.includes(invoiceNo))
-              .forEach((invoiceNo: string) => {
-                invoiceList.push({
-                  invoiceNumber: invoiceNo,
-                  bookNumber: bookLabel,
-                  assignedTo: book.assignedTo || undefined,
-                  driverName: book.driverName || undefined,
+
+            if (Array.isArray(book.availablePages) && invoiceList.length < MAX_INVOICES_PER_BOOK) {
+              for (const invoiceNo of book.availablePages) {
+                const shouldContinue = appendInvoice({
+                  invoiceNumber: String(invoiceNo),
+                  bookNumber: selectedBook,
+                  assignedTo,
+                  driverName,
                   amount: book.defaultAmount || undefined,
                   date: book.activationDate || undefined
                 });
-              });
+                if (!shouldContinue) break;
+              }
+            }
+
+            if (invoiceList.length >= MAX_INVOICES_PER_BOOK) break;
           }
-        });
-        
-        // Remove duplicates
-        const uniqueMap = new Map<string, InvoiceDetails>();
-        invoiceList.forEach(inv => {
-          if (!uniqueMap.has(inv.invoiceNumber)) {
-            uniqueMap.set(inv.invoiceNumber, inv);
-          }
-        });
-        invoiceList = Array.from(uniqueMap.values());
-        
-        console.log(`Loaded ${invoiceList.length} pages for book ${selectedBook}`);
-        setAllInvoices(invoiceList);
+        }
+
+        if (invoiceList.length === MAX_INVOICES_PER_BOOK) {
+          toast.info(`Showing first ${MAX_INVOICES_PER_BOOK} invoices for performance.`);
+        }
+
         setAvailableInvoices(invoiceList);
       } catch (error) {
         console.error("Error loading pages for book:", error);
+      } finally {
+        setLoadingInvoices(false);
       }
     };
-    
+
     loadPagesForBook();
-  }, [isOpen, selectedBook, jobId]);
+  }, [isOpen, selectedBook]);
 
   const handleComplete = () => {
     setLoading(true);
@@ -386,50 +491,59 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="invoiceNumber">Invoice Number</Label>
-                  <Select value={invoiceNumber} onValueChange={(value) => {
-                    setInvoiceNumber(value);
-                    const selectedInvoice = availableInvoices.find(inv => inv.invoiceNumber === value);
-                    if (selectedInvoice && selectedInvoice.amount) {
-                      setInvoiceAmount(selectedInvoice.amount.toString());
-                    }
-                  }}>
+                  <Input
+                    id="invoiceNumber"
+                    value={invoiceSearch}
+                    onChange={(e) => setInvoiceSearch(e.target.value)}
+                    placeholder="Filter invoice list"
+                  />
+                  <Select
+                    value={invoiceNumber}
+                    onValueChange={(value) => {
+                      setInvoiceNumber(value);
+                      const selectedInvoice = availableInvoices.find((inv) => inv.invoiceNumber === value);
+                      if (selectedInvoice?.amount) {
+                        setInvoiceAmount(selectedInvoice.amount.toString());
+                      }
+                    }}
+                    disabled={selectedBook === "all" || loadingInvoices}
+                  >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Invoice..." />
+                      <SelectValue placeholder={loadingInvoices ? "Loading invoices..." : "Select Invoice..."} />
                     </SelectTrigger>
                     <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]">
-                      {availableInvoices.length > 0 ? (
-                        availableInvoices.map((invoice) => (
-                          <SelectItem 
-                            key={invoice.invoiceNumber} 
+                      {loadingInvoices ? (
+                        <div className="p-3 text-muted-foreground text-center text-sm">Loading invoices...</div>
+                      ) : filteredInvoices.length > 0 ? (
+                        filteredInvoices.map((invoice) => (
+                          <SelectItem
+                            key={invoice.invoiceNumber}
                             value={invoice.invoiceNumber}
                             className="flex flex-col items-start space-y-1 p-3"
                           >
                             <div className="flex items-center gap-2 w-full">
                               <FileText className="h-4 w-4 text-primary flex-shrink-0" />
                               <div className="flex flex-col flex-1 min-w-0">
-                                <div className="font-medium text-sm">
-                                  {invoice.invoiceNumber}
-                                </div>
+                                <div className="font-medium text-sm">{invoice.invoiceNumber}</div>
                                 <div className="text-xs text-muted-foreground space-y-0.5">
                                   <div>Book: {invoice.bookNumber}</div>
-                                  {invoice.assignedTo && (
-                                    <div>Rep: {invoice.assignedTo}</div>
-                                  )}
-                                  {invoice.driverName && (
-                                    <div>Driver: {invoice.driverName}</div>
-                                  )}
+                                  {invoice.assignedTo && <div>Rep: {invoice.assignedTo}</div>}
+                                  {invoice.driverName && <div>Driver: {invoice.driverName}</div>}
                                 </div>
                               </div>
                             </div>
                           </SelectItem>
                         ))
                       ) : (
-                        <div className="p-3 text-muted-foreground text-center text-sm">
-                          No invoices available
-                        </div>
+                        <div className="p-3 text-muted-foreground text-center text-sm">No invoices available</div>
                       )}
                     </SelectContent>
                   </Select>
+                  {availableInvoices.length > INVOICE_RENDER_LIMIT && (
+                    <p className="text-xs text-muted-foreground">
+                      Showing first {INVOICE_RENDER_LIMIT} invoices. Use filter to narrow results.
+                    </p>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
