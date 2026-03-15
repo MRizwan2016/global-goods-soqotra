@@ -48,6 +48,38 @@ interface InvoiceDetails {
 const MAX_INVOICES_PER_BOOK = 800;
 const INVOICE_RENDER_LIMIT = 250;
 
+const buildInvoiceRange = (startPage: string, endPage: string, limit: number): string[] => {
+  const start = String(startPage || "").trim();
+  const end = String(endPage || "").trim();
+
+  const startMatch = start.match(/^(.*?)(\d+)$/);
+  const endMatch = end.match(/^(.*?)(\d+)$/);
+
+  if (!startMatch || !endMatch) return [];
+
+  const [, startPrefix, startNumberRaw] = startMatch;
+  const [, endPrefix, endNumberRaw] = endMatch;
+  if (startPrefix !== endPrefix) return [];
+
+  const startNumber = Number(startNumberRaw);
+  const endNumber = Number(endNumberRaw);
+
+  if (!Number.isFinite(startNumber) || !Number.isFinite(endNumber) || endNumber < startNumber) {
+    return [];
+  }
+
+  const width = Math.max(startNumberRaw.length, endNumberRaw.length);
+  const maxInvoices = Math.min(limit, endNumber - startNumber + 1);
+  const generatedInvoices: string[] = [];
+
+  for (let index = 0; index < maxInvoices; index++) {
+    const currentNumber = startNumber + index;
+    generatedInvoices.push(`${startPrefix}${String(currentNumber).padStart(width, "0")}`);
+  }
+
+  return generatedInvoices;
+};
+
 const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobCloseDialogProps) => {
   const [invoiceNumber, setInvoiceNumber] = useState("");
   const [invoiceSearch, setInvoiceSearch] = useState("");
