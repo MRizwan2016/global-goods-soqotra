@@ -531,7 +531,7 @@ const SaudiArabiaInvoiceForm = () => {
           <CardContent className="space-y-6 pt-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">FREIGHT (QAR):</label>
+                <label className="text-sm font-medium">FREIGHT (SAR):</label>
                 <Input 
                   type="number"
                   value={formData.freight}
