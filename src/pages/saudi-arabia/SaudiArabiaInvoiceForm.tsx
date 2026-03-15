@@ -531,7 +531,7 @@ const SaudiArabiaInvoiceForm = () => {
           <CardContent className="space-y-6 pt-6">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium">FREIGHT (QAR):</label>
+                <label className="text-sm font-medium">FREIGHT (SAR):</label>
                 <Input 
                   type="number"
                   value={formData.freight}
@@ -540,7 +540,7 @@ const SaudiArabiaInvoiceForm = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">DOCUMENTS FEE (QAR):</label>
+                <label className="text-sm font-medium">DOCUMENTS FEE (SAR):</label>
                 <Input 
                   type="number"
                   value={formData.documentsFee}
@@ -549,7 +549,7 @@ const SaudiArabiaInvoiceForm = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">PACKING (QAR):</label>
+                <label className="text-sm font-medium">PACKING (SAR):</label>
                 <Input 
                   type="number"
                   value={formData.packing}
@@ -558,7 +558,7 @@ const SaudiArabiaInvoiceForm = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">TRANSPORTATION (QAR):</label>
+                <label className="text-sm font-medium">TRANSPORTATION (SAR):</label>
                 <Input 
                   type="number"
                   value={formData.destinationTransport}
@@ -567,7 +567,7 @@ const SaudiArabiaInvoiceForm = () => {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium">DISCOUNT (QAR):</label>
+                <label className="text-sm font-medium">DISCOUNT (SAR):</label>
                 <Input 
                   type="number"
                   value={formData.discount}
@@ -580,15 +580,15 @@ const SaudiArabiaInvoiceForm = () => {
             {/* Totals Display */}
             <div className="grid grid-cols-3 gap-4 bg-gray-50 p-4 rounded-lg">
               <div className="text-center">
-                <div className="text-2xl font-bold text-[#3b5998]">{formData.gross.toFixed(2)} QAR</div>
+                <div className="text-2xl font-bold text-[#3b5998]">{formData.gross.toFixed(2)} SAR</div>
                 <div className="text-sm text-gray-600">Gross Total</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">-{formData.discount.toFixed(2)} QAR</div>
+                <div className="text-2xl font-bold text-red-600">-{formData.discount.toFixed(2)} SAR</div>
                 <div className="text-sm text-gray-600">Discount</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-[#1e2a3a]">{formData.net.toFixed(2)} QAR</div>
+                <div className="text-2xl font-bold text-[#1e2a3a]">{formData.net.toFixed(2)} SAR</div>
                 <div className="text-sm text-gray-600">Net Total</div>
               </div>
             </div>
