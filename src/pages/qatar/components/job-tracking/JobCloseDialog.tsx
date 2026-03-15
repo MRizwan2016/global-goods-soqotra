@@ -437,50 +437,59 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="invoiceNumber">Invoice Number</Label>
-                  <Select value={invoiceNumber} onValueChange={(value) => {
-                    setInvoiceNumber(value);
-                    const selectedInvoice = availableInvoices.find(inv => inv.invoiceNumber === value);
-                    if (selectedInvoice && selectedInvoice.amount) {
-                      setInvoiceAmount(selectedInvoice.amount.toString());
-                    }
-                  }}>
+                  <Input
+                    id="invoiceNumber"
+                    value={invoiceSearch}
+                    onChange={(e) => setInvoiceSearch(e.target.value)}
+                    placeholder="Filter invoice list"
+                  />
+                  <Select
+                    value={invoiceNumber}
+                    onValueChange={(value) => {
+                      setInvoiceNumber(value);
+                      const selectedInvoice = availableInvoices.find((inv) => inv.invoiceNumber === value);
+                      if (selectedInvoice?.amount) {
+                        setInvoiceAmount(selectedInvoice.amount.toString());
+                      }
+                    }}
+                    disabled={selectedBook === "all" || loadingInvoices}
+                  >
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select Invoice..." />
+                      <SelectValue placeholder={loadingInvoices ? "Loading invoices..." : "Select Invoice..."} />
                     </SelectTrigger>
                     <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]">
-                      {availableInvoices.length > 0 ? (
-                        availableInvoices.map((invoice) => (
-                          <SelectItem 
-                            key={invoice.invoiceNumber} 
+                      {loadingInvoices ? (
+                        <div className="p-3 text-muted-foreground text-center text-sm">Loading invoices...</div>
+                      ) : filteredInvoices.length > 0 ? (
+                        filteredInvoices.map((invoice) => (
+                          <SelectItem
+                            key={invoice.invoiceNumber}
                             value={invoice.invoiceNumber}
                             className="flex flex-col items-start space-y-1 p-3"
                           >
                             <div className="flex items-center gap-2 w-full">
                               <FileText className="h-4 w-4 text-primary flex-shrink-0" />
                               <div className="flex flex-col flex-1 min-w-0">
-                                <div className="font-medium text-sm">
-                                  {invoice.invoiceNumber}
-                                </div>
+                                <div className="font-medium text-sm">{invoice.invoiceNumber}</div>
                                 <div className="text-xs text-muted-foreground space-y-0.5">
                                   <div>Book: {invoice.bookNumber}</div>
-                                  {invoice.assignedTo && (
-                                    <div>Rep: {invoice.assignedTo}</div>
-                                  )}
-                                  {invoice.driverName && (
-                                    <div>Driver: {invoice.driverName}</div>
-                                  )}
+                                  {invoice.assignedTo && <div>Rep: {invoice.assignedTo}</div>}
+                                  {invoice.driverName && <div>Driver: {invoice.driverName}</div>}
                                 </div>
                               </div>
                             </div>
                           </SelectItem>
                         ))
                       ) : (
-                        <div className="p-3 text-muted-foreground text-center text-sm">
-                          No invoices available
-                        </div>
+                        <div className="p-3 text-muted-foreground text-center text-sm">No invoices available</div>
                       )}
                     </SelectContent>
                   </Select>
+                  {availableInvoices.length > INVOICE_RENDER_LIMIT && (
+                    <p className="text-xs text-muted-foreground">
+                      Showing first {INVOICE_RENDER_LIMIT} invoices. Use filter to narrow results.
+                    </p>
+                  )}
                 </div>
                 
                 <div className="space-y-2">
