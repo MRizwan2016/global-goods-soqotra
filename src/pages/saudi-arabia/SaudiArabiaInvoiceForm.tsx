@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,8 @@ import { useInvoiceNumberSelector } from "../invoicing/hooks/useInvoiceNumberSel
 import InvoiceNumberSelector from "../invoicing/components/basic-information/InvoiceNumberSelector";
 import UPBIntegrationCard from "@/components/invoice/UPBIntegrationCard";
 import { useSaudiArabiaInvoice } from "./hooks/useSaudiArabiaInvoice";
+import { lookupJobData } from "@/hooks/useJobAutoFill";
+import { supabase } from "@/integrations/supabase/client";
 import ShipperDetails from "./components/shipping/ShipperDetails";
 import ConsigneeDetails from "./components/shipping/ConsigneeDetails";
 import { 
@@ -31,6 +33,24 @@ const SaudiArabiaInvoiceForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [showPreview, setShowPreview] = useState(false);
+  const [dbBooks, setDbBooks] = useState<any[]>([]);
+
+  // Load Saudi Arabia invoice books from database
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('invoice_books')
+          .select('*')
+          .eq('country', 'Saudi Arabia')
+          .in('status', ['available', 'assigned']);
+        if (!error && data) setDbBooks(data);
+      } catch (err) {
+        console.error('Error loading SA books:', err);
+      }
+    };
+    fetchBooks();
+  }, []);
 
   // Use the enhanced Saudi Arabia invoice hook
   const {
@@ -46,6 +66,31 @@ const SaudiArabiaInvoiceForm = () => {
     saveInvoice,
     loadInvoice
   } = useSaudiArabiaInvoice(id);
+
+  // Job number auto-fill handler
+  const handleJobNumberChange = useCallback(async (value: string) => {
+    handleFormChange('jobNumber', value);
+    if (value.length >= 3) {
+      const result = await lookupJobData(value, dbBooks);
+      if (result) {
+        // Map to Saudi Arabia form fields
+        if (result.shipperName) handleFormChange('shipperName', result.shipperName);
+        if (result.shipperMobile) handleFormChange('shipperMobile', result.shipperMobile);
+        if (result.shipperCity) handleFormChange('shipperCity', result.shipperCity);
+        if (result.shipperAddress) handleFormChange('shipperAddress', result.shipperAddress);
+        if (result.consigneeName) handleFormChange('consigneeName', result.consigneeName);
+        if (result.consigneeMobile) handleFormChange('consigneeMobile', result.consigneeMobile);
+        if (result.driverName) handleFormChange('driver', result.driverName);
+        if (result.salesRepresentative) handleFormChange('salesRep', result.salesRepresentative);
+        if (result.invoiceNumber) handleFormChange('invoiceNumber', result.invoiceNumber);
+        if (result.bookNumber) handleFormChange('bookNumber', result.bookNumber);
+        if (result.description) handleFormChange('remarks', result.description);
+        
+        const { toast } = await import('sonner');
+        toast.success('Job details auto-filled');
+      }
+    }
+  }, [dbBooks, handleFormChange]);
 
   // Load invoice data if editing
   useEffect(() => {
@@ -280,6 +325,18 @@ const SaudiArabiaInvoiceForm = () => {
                   value={formData.invoiceDate}
                   onChange={(e) => handleFormChange('invoiceDate', e.target.value)}
                 />
+              </div>
+
+              {/* Job Number with Auto-fill */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">JOB NUMBER:</label>
+                <Input
+                  value={formData.jobNumber}
+                  onChange={(e) => handleJobNumberChange(e.target.value)}
+                  placeholder="Enter job number to auto-fill"
+                  className="border-orange-300 focus:border-orange-500"
+                />
+                <p className="text-xs text-muted-foreground">Type a job number to auto-fill shipper, driver, sales rep & more</p>
               </div>
             </div>
           </CardContent>

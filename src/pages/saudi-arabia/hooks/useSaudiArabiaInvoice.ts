@@ -19,6 +19,7 @@ export interface SaudiArabiaFormData {
   // Basic Details
   invoiceNumber: string;
   invoiceDate: string;
+  jobNumber: string;
   port: string;
   sector: string;
   salesRep: string;
@@ -86,6 +87,7 @@ export const useSaudiArabiaInvoice = (invoiceId?: string) => {
   const [formData, setFormData] = useState<SaudiArabiaFormData>({
     invoiceNumber: "",
     invoiceDate: new Date().toISOString().split('T')[0],
+    jobNumber: "",
     port: "",
     sector: "",
     salesRep: "",
