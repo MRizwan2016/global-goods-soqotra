@@ -280,10 +280,30 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
             const assignedTo = book.assignedTo || book.assigned_to_sales_rep || undefined;
             const driverName = book.driverName || book.assigned_to_driver || undefined;
 
-            if (Array.isArray(book.availablePages)) {
-              for (const invoiceNo of book.availablePages) {
+            if (book.pageRangeStart && book.pageRangeEnd) {
+              const generatedPages = buildInvoiceRange(
+                String(book.pageRangeStart),
+                String(book.pageRangeEnd),
+                MAX_INVOICES_PER_BOOK
+              );
+
+              for (const invoiceNo of generatedPages) {
                 const shouldContinue = appendInvoice({
                   invoiceNumber: invoiceNo,
+                  bookNumber: selectedBook,
+                  assignedTo,
+                  driverName,
+                  amount: book.defaultAmount || undefined,
+                  date: book.activationDate || undefined
+                });
+                if (!shouldContinue) break;
+              }
+            }
+
+            if (Array.isArray(book.availablePages) && invoiceList.length < MAX_INVOICES_PER_BOOK) {
+              for (const invoiceNo of book.availablePages) {
+                const shouldContinue = appendInvoice({
+                  invoiceNumber: String(invoiceNo),
                   bookNumber: selectedBook,
                   assignedTo,
                   driverName,
