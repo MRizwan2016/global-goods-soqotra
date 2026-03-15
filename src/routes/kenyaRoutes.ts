@@ -1,5 +1,5 @@
-
 import KenyaDashboard from "@/pages/kenya/KenyaDashboard";
+import KenyaInvoiceDashboard from "@/pages/kenya/KenyaInvoiceDashboard";
 import KenyaDeliveryTracking from "@/pages/kenya/KenyaDeliveryTracking";
 import DeliveryDetails from "@/pages/kenya/DeliveryDetails";
 import NewDeliveryForm from "@/pages/kenya/NewDeliveryForm";
@@ -8,12 +8,45 @@ import DriverManagement from "@/pages/kenya/DriverManagement";
 import KenyaFinancialSystem from "@/pages/kenya/KenyaFinancialSystem";
 import StaffTestingPage from "@/pages/kenya/StaffTestingPage";
 import KenyaCustomerPortal from "@/pages/kenya/KenyaCustomerPortal";
+import KenyaAirManifest from "@/pages/kenya/KenyaAirManifest";
+import KenyaSeaManifest from "@/pages/kenya/KenyaSeaManifest";
+import ViewSchedules from "@/pages/schedules/ViewSchedules";
 import { RouteConfig } from "./types";
 
 export const kenyaRoutes: RouteConfig[] = [
   {
     path: "/kenya",
     element: KenyaDashboard,
+    private: true
+  },
+  {
+    path: "/kenya/invoices",
+    element: KenyaInvoiceDashboard,
+    private: true
+  },
+  {
+    path: "/kenya/schedules",
+    element: ViewSchedules,
+    private: true
+  },
+  {
+    path: "/kenya/invoice/add",
+    element: KenyaInvoiceDashboard,
+    private: true
+  },
+  {
+    path: "/kenya/invoice/edit/:id",
+    element: KenyaInvoiceDashboard,
+    private: true
+  },
+  {
+    path: "/kenya/manifest/air/:manifestId",
+    element: KenyaAirManifest,
+    private: true
+  },
+  {
+    path: "/kenya/manifest/sea/:manifestId",
+    element: KenyaSeaManifest,
     private: true
   },
   {
