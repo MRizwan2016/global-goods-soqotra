@@ -584,7 +584,7 @@ const SaudiArabiaInvoiceForm = () => {
                 <div className="text-sm text-gray-600">Gross Total</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">-{formData.discount.toFixed(2)} QAR</div>
+                <div className="text-2xl font-bold text-red-600">-{formData.discount.toFixed(2)} SAR</div>
                 <div className="text-sm text-gray-600">Discount</div>
               </div>
               <div className="text-center">
