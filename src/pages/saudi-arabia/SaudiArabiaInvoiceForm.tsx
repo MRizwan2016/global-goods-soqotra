@@ -326,6 +326,18 @@ const SaudiArabiaInvoiceForm = () => {
                   onChange={(e) => handleFormChange('invoiceDate', e.target.value)}
                 />
               </div>
+
+              {/* Job Number with Auto-fill */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">JOB NUMBER:</label>
+                <Input
+                  value={formData.jobNumber}
+                  onChange={(e) => handleJobNumberChange(e.target.value)}
+                  placeholder="Enter job number to auto-fill"
+                  className="border-orange-300 focus:border-orange-500"
+                />
+                <p className="text-xs text-muted-foreground">Type a job number to auto-fill shipper, driver, sales rep & more</p>
+              </div>
             </div>
           </CardContent>
         </Card>
