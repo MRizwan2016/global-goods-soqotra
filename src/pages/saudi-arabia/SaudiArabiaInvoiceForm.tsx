@@ -13,6 +13,8 @@ import { useInvoiceNumberSelector } from "../invoicing/hooks/useInvoiceNumberSel
 import InvoiceNumberSelector from "../invoicing/components/basic-information/InvoiceNumberSelector";
 import UPBIntegrationCard from "@/components/invoice/UPBIntegrationCard";
 import { useSaudiArabiaInvoice } from "./hooks/useSaudiArabiaInvoice";
+import { lookupJobData } from "@/hooks/useJobAutoFill";
+import { supabase } from "@/integrations/supabase/client";
 import ShipperDetails from "./components/shipping/ShipperDetails";
 import ConsigneeDetails from "./components/shipping/ConsigneeDetails";
 import { 
