@@ -373,7 +373,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
                     <SelectValue placeholder="All Books" />
                   </SelectTrigger>
                   <SelectContent className="bg-white max-h-60 overflow-y-auto z-[100]">
-                    <SelectItem value="all">All Books ({allInvoices.length} pages)</SelectItem>
+                    <SelectItem value="all">-- Select a Book --</SelectItem>
                     {availableBooks.map((book) => (
                       <SelectItem key={book.bookNumber} value={book.bookNumber}>
                         {book.bookNumber} - {book.country || ''} {book.assignedTo ? `(${book.assignedTo})` : ''}
