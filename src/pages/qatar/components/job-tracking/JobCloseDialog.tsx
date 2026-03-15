@@ -205,7 +205,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
 
             for (const page of pages) {
               const shouldContinue = appendInvoice({
-                invoiceNumber: page,
+                invoiceNumber: String(page),
                 bookNumber: selectedBook,
                 assignedTo: dbBook.assigned_to_sales_rep || undefined,
                 driverName: dbBook.assigned_to_driver || undefined,
