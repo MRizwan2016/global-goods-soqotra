@@ -1,6 +1,6 @@
 
-import { useState, useEffect } from "react";
-import { 
+import { useState, useEffect, useMemo } from "react";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -45,17 +45,21 @@ interface InvoiceDetails {
   date?: string;
 }
 
+const MAX_INVOICES_PER_BOOK = 800;
+const INVOICE_RENDER_LIMIT = 250;
+
 const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobCloseDialogProps) => {
   const [invoiceNumber, setInvoiceNumber] = useState("");
+  const [invoiceSearch, setInvoiceSearch] = useState("");
   const [availableInvoices, setAvailableInvoices] = useState<InvoiceDetails[]>([]);
-  const [allInvoices, setAllInvoices] = useState<InvoiceDetails[]>([]);
   const [selectedBook, setSelectedBook] = useState<string>("all");
-  const [availableBooks, setAvailableBooks] = useState<{bookNumber: string; assignedTo?: string; country?: string}[]>([]);
+  const [availableBooks, setAvailableBooks] = useState<{ bookNumber: string; assignedTo?: string; country?: string }[]>([]);
   const [invoiceAmount, setInvoiceAmount] = useState("");
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [reason, setReason] = useState("");
   const [action, setAction] = useState<"COMPLETE" | "CANCEL">("COMPLETE");
   const [loading, setLoading] = useState(false);
+  const [loadingInvoices, setLoadingInvoices] = useState(false);
 
   // Filter invoices when book selection changes - only load pages for selected book
   useEffect(() => {
