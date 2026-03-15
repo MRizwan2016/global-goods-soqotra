@@ -97,17 +97,33 @@ const CitySelector = () => {
           <SelectValue placeholder="SELECT CITY" />
         </SelectTrigger>
         <SelectContent className="max-h-[300px]">
-          <SelectGroup>
-            <SelectLabel>Cities</SelectLabel>
-            {allCities.map((city, index) => (
-              <SelectItem key={index} value={city}>
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  <span>{city}</span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectGroup>
+          {isSaudiArabia ? (
+            Object.entries(saudiRegions).map(([region, cities]) => (
+              <SelectGroup key={region}>
+                <SelectLabel className="text-xs font-semibold bg-muted">{region}</SelectLabel>
+                {cities.map((city) => (
+                  <SelectItem key={city} value={city}>
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      <span>{city}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            ))
+          ) : (
+            <SelectGroup>
+              <SelectLabel>Cities</SelectLabel>
+              {allCities.map((city, index) => (
+                <SelectItem key={index} value={city}>
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    <span>{city}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          )}
         </SelectContent>
       </Select>
 
