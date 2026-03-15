@@ -224,20 +224,22 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
         try {
           const { data: dbBook, error } = await supabase
             .from("invoice_books")
-            .select("book_number, assigned_to_sales_rep, assigned_to_driver, assigned_date, available_pages")
+            .select("book_number, assigned_to_sales_rep, assigned_to_driver, assigned_date, start_page, end_page")
             .eq("book_number", bookNum)
             .maybeSingle();
 
           if (!error && dbBook) {
             foundDbBook = true;
 
-            const pages = Array.isArray(dbBook.available_pages)
-              ? (dbBook.available_pages as (string | number)[])
-              : [];
+            const generatedPages = buildInvoiceRange(
+              String(dbBook.start_page || ""),
+              String(dbBook.end_page || ""),
+              MAX_INVOICES_PER_BOOK
+            );
 
-            for (const page of pages) {
+            for (const page of generatedPages) {
               const shouldContinue = appendInvoice({
-                invoiceNumber: String(page),
+                invoiceNumber: page,
                 bookNumber: selectedBook,
                 assignedTo: dbBook.assigned_to_sales_rep || undefined,
                 driverName: dbBook.assigned_to_driver || undefined,
