@@ -140,25 +140,25 @@ export const countryCodes = {
 
 // Door-to-door pricing based on sectors
 export const doorToDoorPricing = {
-  // QAR 15.00 sectors
-  RIYADH: { price: 15.00, currency: "QAR" },
-  DAMMAM: { price: 15.00, currency: "QAR" },
-  KHOBAR: { price: 15.00, currency: "QAR" },
-  JUBAIL: { price: 15.00, currency: "QAR" },
+  // SAR 15.00 sectors
+  RIYADH: { price: 15.00, currency: "SAR" },
+  DAMMAM: { price: 15.00, currency: "SAR" },
+  KHOBAR: { price: 15.00, currency: "SAR" },
+  JUBAIL: { price: 15.00, currency: "SAR" },
   
-  // QAR 20.00 sectors
-  JEDDAH: { price: 20.00, currency: "QAR" },
-  MECCA: { price: 20.00, currency: "QAR" },
-  MEDINA: { price: 20.00, currency: "QAR" },
-  YANBU: { price: 20.00, currency: "QAR" },
+  // SAR 20.00 sectors
+  JEDDAH: { price: 20.00, currency: "SAR" },
+  MECCA: { price: 20.00, currency: "SAR" },
+  MEDINA: { price: 20.00, currency: "SAR" },
+  YANBU: { price: 20.00, currency: "SAR" },
   
-  // QAR 25.00 sectors  
-  TABUK: { price: 25.00, currency: "QAR" },
-  ABHA: { price: 25.00, currency: "QAR" },
-  JAZAN: { price: 25.00, currency: "QAR" },
-  NAJRAN: { price: 25.00, currency: "QAR" },
-  HAIL: { price: 25.00, currency: "QAR" },
-  QASSIM: { price: 25.00, currency: "QAR" }
+  // SAR 25.00 sectors  
+  TABUK: { price: 25.00, currency: "SAR" },
+  ABHA: { price: 25.00, currency: "SAR" },
+  JAZAN: { price: 25.00, currency: "SAR" },
+  NAJRAN: { price: 25.00, currency: "SAR" },
+  HAIL: { price: 25.00, currency: "SAR" },
+  QASSIM: { price: 25.00, currency: "SAR" }
 };
 
 // Package details

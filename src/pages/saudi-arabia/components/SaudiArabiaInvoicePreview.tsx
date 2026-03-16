@@ -27,7 +27,7 @@ const SaudiArabiaInvoicePreview: React.FC<SaudiArabiaInvoicePreviewProps> = ({
     return [
       `INVOICE:${formData.invoiceNumber || "SA12345"}`,
       `DATE:${formData.invoiceDate || new Date().toISOString().split('T')[0]}`,
-      `TOTAL:${formData.net || "0.00"} QAR`,
+      `TOTAL:${formData.net || "0.00"} SAR`,
       `SHIPPER:${formData.shipperName || "N/A"}`,
       `CONSIGNEE:${formData.consigneeName || "N/A"}`,
       `STATUS:${formData.paymentStatus || "UNPAID"}`,
@@ -310,32 +310,32 @@ const SaudiArabiaInvoicePreview: React.FC<SaudiArabiaInvoicePreviewProps> = ({
                   <tbody>
                     <tr>
                       <td className="border border-black px-2 py-1 font-bold">FREIGHT</td>
-                      <td className="border border-black px-2 py-1">QAR</td>
+                      <td className="border border-black px-2 py-1">SAR</td>
                       <td className="border border-black px-2 py-1 text-right">{formData.freight?.toFixed(2) || "750.00"}</td>
                     </tr>
                     <tr>
                       <td className="border border-black px-2 py-1 font-bold">DOCUMENTS FEE</td>
-                      <td className="border border-black px-2 py-1">QAR</td>
+                      <td className="border border-black px-2 py-1">SAR</td>
                       <td className="border border-black px-2 py-1 text-right">{formData.documentsFee?.toFixed(2) || "50.00"}</td>
                     </tr>
                     <tr>
                       <td className="border border-black px-2 py-1 font-bold">DISCOUNT</td>
-                      <td className="border border-black px-2 py-1">QAR</td>
+                      <td className="border border-black px-2 py-1">SAR</td>
                       <td className="border border-black px-2 py-1 text-right">{formData.discount?.toFixed(2) || "-"}</td>
                     </tr>
                     <tr>
                       <td className="border border-black px-2 py-1 font-bold">PACKING FEE</td>
-                      <td className="border border-black px-2 py-1">QAR</td>
+                      <td className="border border-black px-2 py-1">SAR</td>
                       <td className="border border-black px-2 py-1 text-right">{formData.packing?.toFixed(2) || "-"}</td>
                     </tr>
                     <tr>
                       <td className="border border-black px-2 py-1 font-bold">TRANSPORTATION</td>
-                      <td className="border border-black px-2 py-1">QAR</td>
+                      <td className="border border-black px-2 py-1">SAR</td>
                       <td className="border border-black px-2 py-1 text-right">{formData.destinationTransport?.toFixed(2) || "-"}</td>
                     </tr>
                     <tr className="bg-gray-100">
                       <td className="border border-black px-2 py-1 font-bold">TOTAL</td>
-                      <td className="border border-black px-2 py-1 font-bold">QAR</td>
+                      <td className="border border-black px-2 py-1 font-bold">SAR</td>
                       <td className="border border-black px-2 py-1 text-right font-bold">{formData.net?.toFixed(2) || "800.00"}</td>
                     </tr>
                   </tbody>
