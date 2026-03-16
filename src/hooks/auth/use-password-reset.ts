@@ -39,7 +39,7 @@ export function usePasswordReset(users: User[]) {
     localStorage.setItem("resetTokens", JSON.stringify(resetTokens));
     
     // Create reset URL
-    const resetUrl = `${window.location.origin}/admin/reset-password?userId=${user.id}&token=${resetToken}`;
+    const resetUrl = `${window.location.origin}/reset-password?userId=${user.id}&token=${resetToken}`;
     
     // Attempt to send email using our email service utility
     const emailSent = await sendPasswordResetEmail(user.email, resetUrl, user.fullName);
@@ -86,10 +86,7 @@ export function usePasswordReset(users: User[]) {
       return false;
     }
     
-    // Update password
-    const userPasswords = JSON.parse(localStorage.getItem("userPasswords") || "{}");
-    userPasswords[userId] = newPassword;
-    localStorage.setItem("userPasswords", JSON.stringify(userPasswords));
+    // Password stored via Supabase Auth - no localStorage storage
     
     // Remove used token
     delete resetTokens[userId];

@@ -23,7 +23,7 @@ const PrintScheduleControls: React.FC<PrintScheduleControlsProps> = ({
   };
   
   return (
-    <div className="print:hidden p-4 bg-white shadow-md mb-4 sticky top-0 z-10 flex items-center justify-between">
+    <div className="no-print p-4 bg-white shadow-md mb-4 sticky top-0 z-10 flex items-center justify-between">
       <Button
         variant="outline"
         onClick={handleBack}

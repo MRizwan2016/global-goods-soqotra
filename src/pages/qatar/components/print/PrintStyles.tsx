@@ -11,11 +11,10 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
       {`
         @media print {
           @page {
-            size: ${orientation === "landscape" ? "landscape" : "portrait"};
-            margin: 15mm;
+            size: A4 ${orientation === "landscape" ? "landscape" : "portrait"};
+            margin: 10mm;
           }
           
-          /* Reset all elements to ensure proper printing */
           * {
             box-sizing: border-box;
             -webkit-print-color-adjust: exact !important;
@@ -23,50 +22,48 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
             color-adjust: exact !important;
           }
           
-          /* Make sure everything is visible in print */
           body, html {
             visibility: visible !important;
             overflow: visible !important;
             background-color: white !important;
             height: auto !important;
+            width: auto !important;
             margin: 0 !important;
             padding: 0 !important;
             color: black !important;
             font-family: Arial, sans-serif !important;
           }
           
-          /* Hide non-printable elements */
-          .print\\:hidden,
+          /* Only hide elements explicitly marked as no-print */
           .no-print,
-          button,
-          .button,
-          [role="button"],
-          input,
-          select {
+          .print\\:hidden {
             display: none !important;
-            visibility: hidden !important;
           }
           
-          /* Make sure the print container is visible */
-          .print-container, 
+          /* Ensure all print containers and their children are visible */
+          .print-container,
+          .print-container *,
           .print-content,
-          #print-container-manifest {
-            display: block !important;
+          .print-content * {
             visibility: visible !important;
+          }
+          
+          .print-container,
+          .print-content {
+            display: block !important;
             position: relative !important;
             width: 100% !important;
             overflow: visible !important;
-            page-break-inside: avoid !important;
-            color: black !important;
             background-color: white !important;
+            color: black !important;
           }
-          
-          /* Make headings and text print with the right colors */
-          h1, h2, h3, h4, h5, h6, p, table, div {
+
+          /* Text colors for print */
+          h1, h2, h3, h4, h5, h6, p, span, div, td, th {
             color: black !important;
           }
           
-          /* Ensure tables print properly */
+          /* Table styles */
           table {
             border-collapse: collapse;
             width: 100%;
@@ -80,23 +77,20 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
           
           th {
             background-color: #f2f2f2 !important;
-            color: black !important;
           }
           
           tr {
             page-break-inside: avoid;
-            page-break-after: auto;
           }
           
-          /* Badge styles for print */
-          .badge, [class*="badge-"], .badge-outline, [class*="-badge"] {
+          /* Badge styles */
+          .badge, [class*="badge-"], .badge-outline {
             background-color: white !important;
             color: black !important;
             border: 1px solid #333 !important;
-            text-shadow: none !important;
           }
           
-          /* Special formatting for the container header */
+          /* Print header */
           .print-header {
             text-align: center;
             margin-bottom: 20px;
@@ -104,18 +98,11 @@ const PrintStyles: React.FC<PrintStylesProps> = ({ orientation = "portrait" }) =
             border-bottom: 2px solid #333 !important;
           }
           
-          .print-header h1 {
-            font-size: 24px !important;
-            font-weight: bold !important;
-          }
-          
-          /* Ensure images print */
           img {
             max-width: 100% !important;
             page-break-inside: avoid;
           }
           
-          /* QR code specific styles */
           svg, canvas, .qrcode {
             background-color: white !important;
             display: block !important;

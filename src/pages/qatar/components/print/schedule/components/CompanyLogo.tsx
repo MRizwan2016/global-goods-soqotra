@@ -9,7 +9,7 @@ const CompanyLogo: React.FC = () => {
         alt="Soqotra Logo" 
         className="h-20 object-contain"
       />
-      <div className="text-sm mt-1 font-medium text-blue-600">SOQOTRA</div>
+      
     </div>
   );
 };

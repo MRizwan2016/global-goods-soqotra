@@ -12,11 +12,11 @@ const UserProfileSection = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   const handleLogin = () => {
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   return (

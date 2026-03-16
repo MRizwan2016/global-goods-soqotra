@@ -1,5 +1,5 @@
 
-import { Database, DollarSign, Settings, Truck } from "lucide-react";
+import { Database, DollarSign, Settings, Truck, Package } from "lucide-react";
 import { NavigationSections } from "./types";
 
 export const navigationSections: NavigationSections = {
@@ -112,7 +112,7 @@ export const navigationSections: NavigationSections = {
         title: "CONTROL PANEL",
         items: [
           { name: "CONTROL PANEL", path: "/admin/control-panel" },
-          { name: "REGISTER USER", path: "/admin/register" },
+          { name: "REGISTER USER", path: "/register" },
         ],
       },
     ],
@@ -125,6 +125,14 @@ export const navigationSections: NavigationSections = {
     borderColor: "border-sky-100",
     iconColor: "text-white",
     submenu: [
+      {
+        title: "TRACK & TRACE",
+        items: [
+          { name: "CUSTOMER PORTAL", path: "/customer-portal" },
+          { name: "ADMIN - CARGO TRACKING", path: "/admin/control-panel" },
+          { name: "CUSTOMER MANAGEMENT", path: "/customer-portal/admin" },
+        ],
+      },
       {
         title: "KENYA",
         items: [

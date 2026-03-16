@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Save, Eye, User, MapPin, Phone, Mail, Printer } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { PackageItem } from '@/pages/invoicing/types/invoiceForm';
@@ -33,6 +34,11 @@ const SriLankaInvoiceForm = () => {
     date: new Date().toISOString().split('T')[0],
     cargoType: '',
     jobNumber: '',
+    bookNumber: '',
+    pageNumber: '',
+    salesRepresentative: '',
+    driverName: '',
+    whatsappNumber: '',
     shipperPrefix: '',
     shipperName: '',
     shipperCountry: '',
@@ -42,7 +48,7 @@ const SriLankaInvoiceForm = () => {
     shipperMobile: '',
     consigneePrefix: '',
     consigneeName: '',
-    consigneeCountry: 'SRI LANKA', // Default to Sri Lanka
+    consigneeCountry: 'SRI LANKA',
     consigneeDistrict: '',
     consigneeProvince: '',
     consigneeAddress: '',
@@ -52,6 +58,7 @@ const SriLankaInvoiceForm = () => {
     serviceType: '',
     destination: '',
     terminal: '',
+    warehouse: '',
     packages: '',
     weight: '',
     volume: '',
@@ -67,7 +74,6 @@ const SriLankaInvoiceForm = () => {
     packingCharges: '0',
     transportationFee: '0',
     remarks: '',
-    // Package details fields
     packagesName: '',
     length: '',
     width: '',
@@ -80,7 +86,85 @@ const SriLankaInvoiceForm = () => {
   
   // Receipt modal state
   const [showReceipt, setShowReceipt] = useState(false);
-  
+
+  // Database-driven book data
+  const [dbBooks, setDbBooks] = useState<any[]>([]);
+  const [availablePages, setAvailablePages] = useState<string[]>([]);
+
+  // Load Sri Lanka invoice books from database
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('invoice_books')
+          .select('*')
+          .eq('country', 'Sri Lanka')
+          .in('status', ['available', 'assigned']);
+        
+        if (error) {
+          console.error('Error fetching Sri Lanka books:', error);
+          return;
+        }
+        if (data) {
+          console.log('Loaded Sri Lanka invoice books:', data);
+          setDbBooks(data);
+        }
+      } catch (err) {
+        console.error('Error loading books:', err);
+      }
+    };
+    fetchBooks();
+  }, []);
+
+  // Auto-fill when book number changes - lookup from DB
+  const handleBookNumberChange = useCallback((bookNum: string) => {
+    setFormData(prev => ({ ...prev, bookNumber: bookNum }));
+    
+    if (!bookNum) {
+      setAvailablePages([]);
+      return;
+    }
+
+    // Find matching book in DB (book_number field stores like "#800")
+    const matchedBook = dbBooks.find(b => 
+      b.book_number === `#${bookNum}` || 
+      b.book_number === bookNum ||
+      b.book_number?.replace('#', '') === bookNum
+    );
+
+    if (matchedBook) {
+      console.log('Matched book from DB:', matchedBook);
+      
+      // Parse available pages
+      const pages = Array.isArray(matchedBook.available_pages) 
+        ? matchedBook.available_pages as string[]
+        : [];
+      setAvailablePages(pages);
+      
+      // Auto-fill sales rep from book assignment
+      const salesRep = matchedBook.assigned_to_sales_rep || '';
+      const nextPage = pages.length > 0 ? pages[0] : '';
+      
+      setFormData(prev => ({
+        ...prev,
+        bookNumber: bookNum,
+        salesRepresentative: salesRep || prev.salesRepresentative,
+        pageNumber: nextPage || prev.pageNumber,
+        // Auto-set invoice number from page number
+        invoiceNumber: nextPage || prev.invoiceNumber,
+        whatsappNumber: matchedBook.whatsapp_number || prev.whatsappNumber,
+        driverName: matchedBook.assigned_to_driver || prev.driverName,
+      }));
+      
+      if (salesRep) {
+        toast.success(`Book #${bookNum} assigned to ${salesRep}`);
+      }
+    } else {
+      console.log('No matching book found for:', bookNum);
+      setAvailablePages([]);
+    }
+  }, [dbBooks]);
+
   // Load existing invoice if editing
   useEffect(() => {
     const currentPath = window.location.pathname;
@@ -104,6 +188,7 @@ const SriLankaInvoiceForm = () => {
   const CARGO_TYPES = ['GIFT CARGO', 'UPB CARGO'];
   const SERVICE_TYPES = ['SEA FREIGHT', 'AIR FREIGHT'];
   const SEA_TERMINALS = ['JCT TERMINAL', 'ICIC TERMINAL', 'P&O TERMINAL', 'HAMBANTHOTA TERMINAL'];
+  const SEA_WAREHOUSES = ['Colombo Warehouse', 'Kurunegala UPB Warehouse', 'Galle UPB Warehouse'];
   const AIR_DESTINATIONS = ['BANDARANAYAKE INTERNATIONAL AIRPORT'];
 
   // Prefix options
@@ -134,14 +219,11 @@ const SriLankaInvoiceForm = () => {
     return [];
   };
 
-  // Mock invoice numbers (normally from Invoice Book Stock Management)
-  const AVAILABLE_INVOICES = [
-    'GY-13138406', 'GY-13136939', 'GY-13138380', 'GY-13138520', 'GY-13138523',
-    'SL-006', 'SL-007', 'SL-008', 'SL-009', 'SL-010'
-  ];
+  // Mock invoice numbers - DEPRECATED, now using DB-driven invoice books
+  const AVAILABLE_INVOICES: string[] = [];
 
-  // Manual entry state
-  const [showManualEntry, setShowManualEntry] = useState(false);
+  // Manual entry state  
+  const [showManualEntry, setShowManualEntry] = useState(true); // Always show direct input
   const [manualInvoiceNumber, setManualInvoiceNumber] = useState('');
 
   // Sri Lanka Districts and Provinces
@@ -172,39 +254,29 @@ const SriLankaInvoiceForm = () => {
         documentsFee: pricing.documentsFee.toString(),
         total: pricing.total.toString()
       }));
-    } else if (formData.serviceType === 'SEA FREIGHT' && formData.volume && formData.terminal) {
-      const volume = parseFloat(formData.volume) || 0;
-      const warehouseDestination = getWarehouseDestination(formData.terminal);
-      const pricing = calculateSeaFreightPricing(volume, warehouseDestination);
+    } else if (formData.serviceType === 'SEA FREIGHT' && formData.warehouse) {
+      // Calculate total CBM from all package items
+      const totalCBM = packageItems.length > 0
+        ? packageItems.reduce((sum, pkg) => sum + (parseFloat(pkg.volume || '0') || 0), 0)
+        : parseFloat(formData.volume || '0') || 0;
       
-      setFormData(prev => ({
-        ...prev,
-        rate: pricing.rate.toString(),
-        documentsFee: pricing.documentsFee.toString(),
-        total: pricing.total.toString()
-      }));
+      if (totalCBM > 0) {
+        const pricing = calculateSeaFreightPricing(totalCBM, formData.warehouse);
+        const discount = parseFloat(formData.discount?.toString() || '0') || 0;
+        const packing = parseFloat(formData.packingCharges?.toString() || '0') || 0;
+        const transport = parseFloat(formData.transportationFee?.toString() || '0') || 0;
+        // RATE = per-CBM rate, TOTAL = (CBM × rate) + docFee - discount + packing + transport
+        const calculatedTotal = pricing.freightCharge + pricing.documentsFee - discount + packing + transport;
+        
+        setFormData(prev => ({
+          ...prev,
+          rate: pricing.ratePerCBM.toString(),
+          documentsFee: pricing.documentsFee.toString(),
+          total: calculatedTotal.toFixed(2)
+        }));
+      }
     }
-  }, [formData.serviceType, formData.weight, formData.volume, formData.terminal]);
-
-  // Auto-calculate total when rate, documentsFee, discount, packing, or transport changes
-  useEffect(() => {
-    const rate = parseFloat(formData.rate?.toString() || '0') || 0;
-    const docFee = parseFloat(formData.documentsFee?.toString() || '0') || 0;
-    const discount = parseFloat(formData.discount?.toString() || '0') || 0;
-    const packing = parseFloat(formData.packingCharges?.toString() || '0') || 0;
-    const transport = parseFloat(formData.transportationFee?.toString() || '0') || 0;
-    const calculatedTotal = rate + docFee - discount + packing + transport;
-    
-    console.log('Auto-calculation:', { rate, docFee, discount, packing, transport, calculatedTotal });
-    
-    // Always update the total when any pricing field changes
-    if (calculatedTotal >= 0) {
-      setFormData(prev => ({
-        ...prev,
-        total: calculatedTotal.toFixed(2)
-      }));
-    }
-  }, [formData.rate, formData.documentsFee, formData.discount, formData.packingCharges, formData.transportationFee]);
+  }, [formData.serviceType, formData.weight, formData.volume, formData.warehouse, formData.discount, formData.packingCharges, formData.transportationFee, packageItems]);
 
   // Auto-calculate volume from package dimensions
   useEffect(() => {
@@ -279,15 +351,15 @@ const SriLankaInvoiceForm = () => {
       return;
     }
     
-    // Validate GY format
-    const gyPattern = /^GY\d{6}$/;
-    if (!gyPattern.test(manualInvoiceNumber)) {
-      toast.error('Invoice number must be in GY format (e.g., GY-000123)');
+    // Accept numeric invoice numbers (e.g., 13140835) or GY format
+    const numericPattern = /^\d{6,10}$/;
+    const gyPattern = /^GY-?\d{6,8}$/;
+    if (!numericPattern.test(manualInvoiceNumber) && !gyPattern.test(manualInvoiceNumber)) {
+      toast.error('Invoice number must be numeric (e.g., 13140835) or GY format (e.g., GY-000123)');
       return;
     }
     
     setFormData(prev => ({ ...prev, invoiceNumber: manualInvoiceNumber }));
-    setShowManualEntry(false);
     setManualInvoiceNumber('');
     toast.success('Invoice number set successfully');
   };
@@ -301,14 +373,15 @@ const SriLankaInvoiceForm = () => {
     console.log('Form data before validation:', formData);
     
     // Check all required fields with more precise validation
+    const safeStr = (val: any) => String(val || '').trim();
     const requiredFields = {
-      'Invoice Number': formData.invoiceNumber?.trim(),
-      'Cargo Type': formData.cargoType?.trim(),
-      'Service Type': formData.serviceType?.trim(),
-      'Shipper Name': formData.shipperName?.trim(),
-      'Consignee Name': formData.consigneeName?.trim(),
-      'Total Weight': formData.weight?.trim(),
-      'Description': formData.description?.trim()
+      'Invoice Number': safeStr(formData.invoiceNumber),
+      'Cargo Type': safeStr(formData.cargoType),
+      'Service Type': safeStr(formData.serviceType),
+      'Shipper Name': safeStr(formData.shipperName),
+      'Consignee Name': safeStr(formData.consigneeName),
+      'Total Weight': safeStr(formData.weight),
+      'Description': safeStr(formData.description)
     };
 
     console.log('Required fields check:', requiredFields);
@@ -323,20 +396,21 @@ const SriLankaInvoiceForm = () => {
       return;
     }
     
-    // Additional validation for pricing
-    if (!formData.rate || !formData.total) {
-      toast.error('Please ensure pricing is calculated correctly');
-      return;
-    }
+    // Default pricing to 0 if not set
+    const saveRate = formData.rate || '0';
+    const saveTotal = formData.total || '0';
+
     
     // Validate total calculation
-    const rate = parseFloat(formData.rate) || 0;
+    const rate = parseFloat(saveRate) || 0;
+    const volume = parseFloat(formData.volume || '0') || 0;
     const docFee = parseFloat(formData.documentsFee) || 0;
     const discount = parseFloat(formData.discount) || 0;
     const packing = parseFloat(formData.packingCharges) || 0;
     const transport = parseFloat(formData.transportationFee) || 0;
-    const expectedTotal = rate + docFee - discount + packing + transport;
-    const actualTotal = parseFloat(formData.total) || 0;
+    const freightCharge = formData.serviceType === 'SEA FREIGHT' ? volume * rate : rate;
+    const expectedTotal = freightCharge + docFee - discount + packing + transport;
+    const actualTotal = parseFloat(saveTotal) || 0;
     
     if (Math.abs(expectedTotal - actualTotal) > 0.01) {
       console.log('Price mismatch:', { rate, docFee, discount, packing, transport, expectedTotal, actualTotal });
@@ -351,16 +425,24 @@ const SriLankaInvoiceForm = () => {
       // Get existing invoices from localStorage
       const existingInvoices = JSON.parse(localStorage.getItem('sriLankaInvoices') || '[]');
       
+      // Check if we're editing an existing invoice
+      const currentPath = window.location.pathname;
+      const isEditing = currentPath.includes('/edit/');
+      const existingId = isEditing ? currentPath.split('/edit/')[1] : null;
+      
       // Auto-generate job number if not present
       const jobNumber = formData.jobNumber || `SL-JOB-${Date.now()}`;
       
+      // Use existing ID if editing, otherwise generate new one
+      const invoiceId = existingId || `sri-lanka-${Date.now()}`;
+      
       // Create proper invoice structure for printing
       const invoiceData = {
-        id: `sri-lanka-${Date.now()}`,
+        id: invoiceId,
         ...formData,
         jobNumber,
         packageItems: packageItems,
-        createdAt: new Date().toISOString(),
+        createdAt: isEditing ? (existingInvoices.find((inv: any) => inv.id === existingId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         country: 'SRI LANKA',
         // Map to print structure
@@ -383,11 +465,17 @@ const SriLankaInvoiceForm = () => {
           volume: (parseFloat(item.length || '0') * parseFloat(item.width || '0') * parseFloat(item.height || '0')) / 1000000
         })),
         totalWeight: parseFloat(formData.weight || '0'),
-        pricing: {
-          gross: parseFloat(formData.rate || '0') + parseFloat(formData.documentsFee || '0'),
-          discount: parseFloat(formData.discount || '0'),
-          net: parseFloat(formData.total || '0')
-        },
+        pricing: (() => {
+          const vol = parseFloat(formData.volume || '0') || 0;
+          const r = parseFloat(formData.rate || '0') || 0;
+          const df = parseFloat(formData.documentsFee || '0') || 0;
+          const disc = parseFloat(formData.discount || '0') || 0;
+          const pack = parseFloat(formData.packingCharges || '0') || 0;
+          const trans = parseFloat(formData.transportationFee || '0') || 0;
+          const fc = formData.serviceType === 'SEA FREIGHT' ? vol * r : r;
+          const net = fc + df - disc + pack + trans;
+          return { gross: net + disc, discount: disc, net };
+        })(),
         // Payment details
         paymentStatus: formData.paymentStatus,
         paymentMethod: formData.paymentMethod,
@@ -397,8 +485,17 @@ const SriLankaInvoiceForm = () => {
         transportationFee: parseFloat(formData.transportationFee || '0')
       };
       
-      // Add to existing invoices
-      const updatedInvoices = [...existingInvoices, invoiceData];
+      // Update existing or add new
+      let updatedInvoices;
+      if (isEditing) {
+        updatedInvoices = existingInvoices.map((inv: any) => inv.id === existingId ? invoiceData : inv);
+        // If not found (first save after creation), add it
+        if (!existingInvoices.some((inv: any) => inv.id === existingId)) {
+          updatedInvoices = [...existingInvoices, invoiceData];
+        }
+      } else {
+        updatedInvoices = [...existingInvoices, invoiceData];
+      }
       
       // Save back to localStorage
       localStorage.setItem('sriLankaInvoices', JSON.stringify(updatedInvoices));
@@ -407,7 +504,9 @@ const SriLankaInvoiceForm = () => {
       console.log('Invoice saved:', invoiceData);
       
       // Navigate to edit page with the saved invoice ID
-      navigate(`/sri-lanka/invoice/edit/${invoiceData.id}`);
+      if (!isEditing) {
+        navigate(`/sri-lanka/invoice/edit/${invoiceData.id}`);
+      }
       
     } catch (error) {
       console.error('Error saving invoice:', error);
@@ -429,8 +528,14 @@ const SriLankaInvoiceForm = () => {
     setShowReceipt(true);
   };
 
+  const storeAndOpenPrint = (invoiceId: string) => {
+    // Use localStorage (shared across tabs) instead of sessionStorage (per-tab only)
+    const printData = { ...formData, id: invoiceId, packageItems };
+    localStorage.setItem('printInvoiceData', JSON.stringify(printData));
+    window.open(`/sri-lanka/invoice/print/${invoiceId}`, '_blank');
+  };
+
   const handlePreview = () => {
-    // For existing invoices, use saved ID, otherwise require save first
     const currentInvoiceId = window.location.pathname.includes('/edit/') 
       ? window.location.pathname.split('/edit/')[1] 
       : null;
@@ -440,15 +545,10 @@ const SriLankaInvoiceForm = () => {
       return;
     }
     
-    if (currentInvoiceId) {
-      window.open(`/sri-lanka/invoice/print/${currentInvoiceId}`, '_blank');
-    } else {
-      window.open(`/sri-lanka/invoice/print/preview_${formData.invoiceNumber}`, '_blank');
-    }
+    storeAndOpenPrint(currentInvoiceId || `preview_${formData.invoiceNumber}`);
   };
 
   const handlePrint = () => {
-    // For existing invoices, use saved ID, otherwise require save first
     const currentInvoiceId = window.location.pathname.includes('/edit/') 
       ? window.location.pathname.split('/edit/')[1] 
       : null;
@@ -458,11 +558,7 @@ const SriLankaInvoiceForm = () => {
       return;
     }
     
-    if (currentInvoiceId) {
-      window.open(`/sri-lanka/invoice/print/${currentInvoiceId}`, '_blank');
-    } else {
-      window.open(`/sri-lanka/invoice/print/preview_${formData.invoiceNumber}`, '_blank');
-    }
+    storeAndOpenPrint(currentInvoiceId || `preview_${formData.invoiceNumber}`);
   };
 
   // Package handlers
@@ -506,12 +602,59 @@ const SriLankaInvoiceForm = () => {
     }
   };
 
-  const handleManualPackage = (packageName: string, price: string) => {
+  const handleManualPackage = (packageName: string, price: string, dimensions?: string, volume?: string, pricingType?: string, docsFee?: string) => {
+    const parsedPrice = parseFloat(price) || 0;
+    const parsedDocFee = parseFloat(docsFee || '0') || 0;
+    const total = parsedPrice + parsedDocFee;
+    
+    // Parse dimensions if provided
+    let length = '', width = '', height = '';
+    if (dimensions) {
+      const parts = dimensions.split(/\s*[xX×]\s*/);
+      if (parts.length === 3) {
+        length = parts[0].trim();
+        width = parts[1].trim();
+        height = parts[2].trim();
+      }
+    }
+
+    const newPackage: PackageItem = {
+      id: Date.now().toString(),
+      name: packageName,
+      description: formData.description || 'PERSONAL EFFECTS',
+      price: parsedPrice,
+      quantity: 1,
+      total: total,
+      length,
+      width,
+      height,
+      volume: volume || '',
+      weight: '',
+      documentsFee: parsedDocFee.toString(),
+      volumeWeight: volume || ''
+    };
+
+    setPackageItems(prev => [...prev, newPackage]);
+    
+    const updatedPackages = [...packageItems, newPackage];
+    const totalVolume = updatedPackages.reduce((sum, pkg) => sum + (parseFloat(pkg.volume || '0') || 0), 0);
+    const totalWeight = updatedPackages.reduce((sum, pkg) => sum + (parseFloat(pkg.weight || '0') || 0), 0);
+    const totalPrice = updatedPackages.reduce((sum, pkg) => sum + (pkg.total || 0), 0);
+    
     setFormData(prev => ({
       ...prev,
-      packagesName: packageName,
-      price: price
+      packagesName: '',
+      length: '',
+      width: '',
+      height: '',
+      price: '',
+      volume: totalVolume.toFixed(4),
+      weight: totalWeight.toString(),
+      total: totalPrice.toFixed(2),
+      packages: updatedPackages.length.toString()
     }));
+
+    toast.success('Manual package added successfully');
   };
 
   const handleAddPackage = () => {
@@ -645,54 +788,42 @@ const SriLankaInvoiceForm = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">INVOICE NUMBER *</label>
-                {!showManualEntry ? (
-                  <div className="space-y-2">
-                    <Select value={formData.invoiceNumber} onValueChange={(value) => handleSelectChange('invoiceNumber', value)}>
-                      <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
-                        <SelectValue placeholder="SELECT INVOICE NUMBER" className="uppercase" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-white/95 backdrop-blur-sm">
-                        {AVAILABLE_INVOICES.map(invoice => (
-                          <SelectItem key={invoice} value={invoice} className="uppercase">{invoice}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button 
-                      type="button" 
-                      variant="link" 
-                      className="p-0 h-auto text-xs text-blue-600"
-                      onClick={() => setShowManualEntry(true)}
-                    >
-                      Enter GY invoice number manually
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <Input 
-                      placeholder="Enter GY invoice number (e.g., GY000123)"
-                      value={manualInvoiceNumber}
-                      onChange={(e) => setManualInvoiceNumber(e.target.value.toUpperCase())}
-                      className="flex-1 bg-white/80 border-blue-200 focus:border-blue-400 w-full min-w-[250px] font-mono text-lg tracking-wider px-4 py-2"
-                      maxLength={8}
-                      style={{ minWidth: '250px', fontSize: '18px', letterSpacing: '0.1em' }}
-                    />
-                    <Button 
-                      type="button" 
-                      onClick={handleManualInvoiceSubmit}
-                      className="whitespace-nowrap bg-green-500 hover:bg-green-600"
-                    >
-                      Submit
-                    </Button>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={handleManualInvoiceCancel}
-                      className="whitespace-nowrap"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                )}
+                <div className="flex gap-2">
+                  {formData.invoiceNumber ? (
+                    <div className="flex items-center gap-2 w-full">
+                      <Input 
+                        value={formData.invoiceNumber}
+                        readOnly
+                        className="flex-1 bg-green-50 border-green-300 font-mono text-lg font-bold tracking-wider"
+                      />
+                      <Button 
+                        type="button" 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setFormData(prev => ({ ...prev, invoiceNumber: '' }))}
+                      >
+                        Change
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <Input 
+                        placeholder="Enter invoice number (e.g., 13140835)"
+                        value={manualInvoiceNumber}
+                        onChange={(e) => setManualInvoiceNumber(e.target.value.toUpperCase())}
+                        className="flex-1 bg-white/80 border-blue-200 focus:border-blue-400 font-mono text-lg tracking-wider"
+                        maxLength={12}
+                      />
+                      <Button 
+                        type="button" 
+                        onClick={handleManualInvoiceSubmit}
+                        className="whitespace-nowrap bg-green-500 hover:bg-green-600"
+                      >
+                        Set
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DATE *</label>
@@ -709,10 +840,170 @@ const SriLankaInvoiceForm = () => {
                  <Input
                    name="jobNumber"
                    value={formData.jobNumber}
-                   onChange={handleInputChange}
-                   placeholder="AUTO-GENERATED"
-                   className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
-                   readOnly
+                   onChange={(e) => {
+                      const value = e.target.value;
+                      handleInputChange(e);
+                       // Auto-fill from Qatar collection/delivery jobs - check both localStorage AND database
+                       if (value.length >= 3) {
+                         try {
+                           // Check localStorage first
+                           const jobs1 = JSON.parse(localStorage.getItem('jobs') || '[]');
+                           const jobs2 = JSON.parse(localStorage.getItem('qatarJobs') || '[]');
+                           const allJobs = [...jobs1, ...jobs2];
+                           
+                           const matchedJob = allJobs.find((j: any) => 
+                             j.jobNumber === value || 
+                             j.jobNumber?.includes(value) || 
+                             j.id?.includes(value)
+                           );
+                           if (matchedJob) {
+                             console.log('Matched job from localStorage:', matchedJob);
+                             
+                             // Auto-fill all available fields from the completed job
+                             const updatedFields: any = {
+                               jobNumber: value,
+                               shipperName: matchedJob.customer || matchedJob.shipperName || matchedJob.customerName || matchedJob.shipper1 || '',
+                               shipperMobile: matchedJob.mobileNumber || matchedJob.shipperMobile || matchedJob.mobile || matchedJob.shipperPhone || '',
+                               shipperCity: matchedJob.town || matchedJob.city || matchedJob.shipperCity || '',
+                               shipperAddress: matchedJob.location || matchedJob.shipperAddress || matchedJob.address || '',
+                               consigneeName: matchedJob.consigneeName || matchedJob.consignee1 || '',
+                               consigneeMobile: matchedJob.consigneeMobile || matchedJob.consigneePhone || '',
+                               weight: matchedJob.weight || matchedJob.totalWeight || '',
+                               description: matchedJob.description || matchedJob.remarks || matchedJob.packageDetails || '',
+                               volume: matchedJob.volume || matchedJob.totalVolume || '',
+                               packages: matchedJob.packages || matchedJob.totalPackages || '',
+                               driverName: matchedJob.driver || matchedJob.driverName || '',
+                             };
+                             
+                             // Auto-fill invoice number from completed job
+                             if (matchedJob.invoiceNumber) {
+                               updatedFields.invoiceNumber = matchedJob.invoiceNumber;
+                               updatedFields.pageNumber = matchedJob.invoiceNumber;
+                             }
+                             
+                             // Try to find matching book for this invoice to auto-fill book number, sales rep
+                             if (matchedJob.invoiceNumber && dbBooks.length > 0) {
+                               for (const book of dbBooks) {
+                                 const pages = Array.isArray(book.available_pages) ? book.available_pages as string[] : [];
+                                 if (pages.includes(matchedJob.invoiceNumber) || 
+                                     book.job_number === value ||
+                                     book.job_number === matchedJob.jobNumber) {
+                                   updatedFields.bookNumber = book.book_number?.replace('#', '') || book.book_number || '';
+                                   updatedFields.salesRepresentative = book.assigned_to_sales_rep || '';
+                                   updatedFields.driverName = book.assigned_to_driver || updatedFields.driverName;
+                                   
+                                   // Set available pages for the matched book
+                                   setAvailablePages(pages);
+                                   break;
+                                 }
+                               }
+                             }
+                             
+                             // Only set non-empty values to avoid overwriting existing data
+                             setFormData(prev => {
+                               const merged = { ...prev };
+                               for (const [key, val] of Object.entries(updatedFields)) {
+                                 if (val) (merged as any)[key] = val;
+                               }
+                               return merged;
+                             });
+                             
+                             toast.success('Job details auto-filled from completed job');
+                             return;
+                           }
+                         } catch (err) {
+                           console.log('localStorage lookup failed:', err);
+                         }
+
+                         // Also check database schedule_jobs
+                         const fetchJobFromDB = async () => {
+                           try {
+                             const { data: scheduleJobs, error } = await supabase
+                               .from('schedule_jobs')
+                               .select('job_data, schedule_id');
+                             
+                             if (error || !scheduleJobs) return;
+                             
+                             for (const sj of scheduleJobs) {
+                               const jobData = sj.job_data as any;
+                               if (jobData && (jobData.jobNumber === value || jobData.jobNumber?.includes(value))) {
+                                 console.log('Matched job from DB schedule_jobs:', jobData);
+                                 
+                                 // Fetch schedule details for driver/sales rep
+                                 let scheduleDriver = '';
+                                 let scheduleSalesRep = '';
+                                 let scheduleVehicle = '';
+                                 if (sj.schedule_id) {
+                                   const { data: schedule } = await supabase
+                                     .from('schedules')
+                                     .select('driver, sales_rep, vehicle')
+                                     .eq('id', sj.schedule_id)
+                                     .maybeSingle();
+                                   if (schedule) {
+                                     scheduleDriver = schedule.driver || '';
+                                     scheduleSalesRep = schedule.sales_rep || '';
+                                     scheduleVehicle = schedule.vehicle || '';
+                                   }
+                                 }
+                                 
+                                 const updatedFields: any = {
+                                   jobNumber: value,
+                                   shipperName: jobData.customer || jobData.shipperName || jobData.customerName || jobData.shipper1 || '',
+                                   shipperMobile: jobData.mobileNumber || jobData.shipperMobile || jobData.mobile || jobData.shipperPhone || '',
+                                   shipperCity: jobData.town || jobData.city || jobData.shipperCity || '',
+                                   shipperAddress: jobData.location || jobData.shipperAddress || jobData.address || '',
+                                   consigneeName: jobData.consigneeName || jobData.consignee1 || '',
+                                   consigneeMobile: jobData.consigneeMobile || jobData.consigneePhone || '',
+                                   weight: jobData.weight || jobData.totalWeight || '',
+                                   description: jobData.description || jobData.remarks || jobData.packageDetails || '',
+                                   volume: jobData.volume || jobData.totalVolume || '',
+                                   packages: jobData.packages || jobData.totalPackages || '',
+                                   driverName: scheduleDriver || jobData.driver || jobData.driverName || '',
+                                   salesRepresentative: scheduleSalesRep || jobData.salesRep || '',
+                                 };
+                                 
+                                 if (jobData.invoiceNumber) {
+                                   updatedFields.invoiceNumber = jobData.invoiceNumber;
+                                   updatedFields.pageNumber = jobData.invoiceNumber;
+                                 }
+                                 
+                                 // Find matching book
+                                 if (jobData.invoiceNumber && dbBooks.length > 0) {
+                                   for (const book of dbBooks) {
+                                     const pages = Array.isArray(book.available_pages) ? book.available_pages as string[] : [];
+                                     if (pages.includes(jobData.invoiceNumber) || 
+                                         book.job_number === value ||
+                                         book.job_number === jobData.jobNumber) {
+                                       updatedFields.bookNumber = book.book_number?.replace('#', '') || book.book_number || '';
+                                       updatedFields.salesRepresentative = book.assigned_to_sales_rep || updatedFields.salesRepresentative;
+                                       updatedFields.driverName = book.assigned_to_driver || updatedFields.driverName;
+                                       setAvailablePages(pages);
+                                       break;
+                                     }
+                                   }
+                                 }
+                                 
+                                 setFormData(prev => {
+                                   const merged = { ...prev };
+                                   for (const [key, val] of Object.entries(updatedFields)) {
+                                     if (val) (merged as any)[key] = val;
+                                   }
+                                   return merged;
+                                 });
+                                 
+                                 toast.success('Job details auto-filled from database');
+                                 return;
+                               }
+                             }
+                           } catch (err) {
+                             console.log('DB job lookup failed:', err);
+                           }
+                         };
+                         fetchJobFromDB();
+                       }
+                    }}
+                    placeholder="ENTER JOB NUMBER"
+                    className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
                  />
               </div>
               <div>
@@ -727,6 +1018,85 @@ const SriLankaInvoiceForm = () => {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+            
+            {/* Book Assignment & WhatsApp Details */}
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mt-4 pt-4 border-t border-blue-200">
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">BOOK NUMBER</label>
+                <Input
+                  name="bookNumber"
+                  value={formData.bookNumber}
+                  onChange={(e) => handleBookNumberChange(e.target.value)}
+                  placeholder="E.G. 800"
+                  className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PAGE NUMBER</label>
+                {availablePages.length > 0 ? (
+                  <Select value={formData.pageNumber} onValueChange={(value) => {
+                    setFormData(prev => ({ ...prev, pageNumber: value, invoiceNumber: value }));
+                  }}>
+                    <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                      <SelectValue placeholder="SELECT PAGE" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60">
+                      {availablePages.map((page: string) => (
+                        <SelectItem key={page} value={page}>{page}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    name="pageNumber"
+                    value={formData.pageNumber}
+                    onChange={handleInputChange}
+                    placeholder="ENTER PAGE NUMBER"
+                    className="bg-white/80 border-blue-200 focus:border-blue-400 placeholder:uppercase"
+                  />
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SALES REP</label>
+                <Select value={formData.salesRepresentative} onValueChange={(value) => handleSelectChange('salesRepresentative', value)}>
+                  <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                    <SelectValue placeholder="SELECT REP" className="uppercase" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white/95 backdrop-blur-sm">
+                    <SelectItem value="Mr. Lahiru Chathuranga">Mr. Lahiru Chathuranga</SelectItem>
+                    <SelectItem value="Mr. Sajjad">Mr. Sajjad</SelectItem>
+                    <SelectItem value="Mr. Imam Ubaidulla">Mr. Imam Ubaidulla</SelectItem>
+                    <SelectItem value="Mr. Ranatunghe">Mr. Ranatunghe</SelectItem>
+                    <SelectItem value="Mr. Mohamed Rizwan">Mr. Mohamed Rizwan</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DRIVER</label>
+                <Select value={formData.driverName} onValueChange={(value) => handleSelectChange('driverName', value)}>
+                  <SelectTrigger className="bg-white/80 border-blue-200 focus:border-blue-400">
+                    <SelectValue placeholder="SELECT DRIVER" className="uppercase" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white/95 backdrop-blur-sm">
+                    <SelectItem value="Ashoka Udesh">Ashoka Udesh</SelectItem>
+                    <SelectItem value="Johnny Venakady">Johnny Venakady</SelectItem>
+                    <SelectItem value="Kanaya">Kanaya</SelectItem>
+                    <SelectItem value="Bakeeth Idris">Bakeeth Idris</SelectItem>
+                    <SelectItem value="Idries Karar">Idries Karar</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">WHATSAPP NUMBER</label>
+                <Input
+                  name="whatsappNumber"
+                  value={formData.whatsappNumber}
+                  onChange={handleInputChange}
+                  placeholder="+94 XXX XXX XXXX"
+                  className="bg-white/80 border-blue-200 focus:border-blue-400"
+                />
               </div>
             </div>
           </div>
@@ -755,19 +1125,34 @@ const SriLankaInvoiceForm = () => {
                 </Select>
               </div>
               {formData.serviceType === 'SEA FREIGHT' && (
-                <div>
-                  <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">TERMINAL</label>
-                  <Select value={formData.terminal} onValueChange={(value) => handleSelectChange('terminal', value)}>
-                    <SelectTrigger className="bg-white/80 border-green-200 focus:border-green-400">
-                      <SelectValue placeholder="SELECT TERMINAL" className="uppercase" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white/95 backdrop-blur-sm">
-                      {SEA_TERMINALS.map(terminal => (
-                        <SelectItem key={terminal} value={terminal} className="uppercase">{terminal}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">TERMINAL</label>
+                    <Select value={formData.terminal} onValueChange={(value) => handleSelectChange('terminal', value)}>
+                      <SelectTrigger className="bg-white/80 border-green-200 focus:border-green-400">
+                        <SelectValue placeholder="SELECT TERMINAL" className="uppercase" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white/95 backdrop-blur-sm">
+                        {SEA_TERMINALS.map(terminal => (
+                          <SelectItem key={terminal} value={terminal} className="uppercase">{terminal}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DESTINATION WAREHOUSE *</label>
+                    <Select value={formData.warehouse} onValueChange={(value) => handleSelectChange('warehouse', value)}>
+                      <SelectTrigger className="bg-white/80 border-green-200 focus:border-green-400">
+                        <SelectValue placeholder="SELECT WAREHOUSE" className="uppercase" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-white/95 backdrop-blur-sm">
+                        {SEA_WAREHOUSES.map(wh => (
+                          <SelectItem key={wh} value={wh} className="uppercase">{wh}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
               )}
             </div>
           </div>

@@ -1,5 +1,5 @@
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useInvoicePayment } from "./hooks/useInvoicePayment";
@@ -62,21 +62,7 @@ const AddPaymentPage = () => {
     }
   };
 
-  // Check for invoice in session storage (from direct payment link)
-  useEffect(() => {
-    const storedInvoice = sessionStorage.getItem('selectedInvoice');
-    if (storedInvoice) {
-      try {
-        const parsedInvoice = JSON.parse(storedInvoice);
-        console.log("Found invoice in session storage:", parsedInvoice);
-        handleSelectInvoice(parsedInvoice);
-        // Clear session storage after using it
-        sessionStorage.removeItem('selectedInvoice');
-      } catch (error) {
-        console.error("Error parsing stored invoice:", error);
-      }
-    }
-  }, []);
+  // Note: sessionStorage reading is handled by useInvoicePayment hook
 
   return (
     <Layout title="Add Payment">

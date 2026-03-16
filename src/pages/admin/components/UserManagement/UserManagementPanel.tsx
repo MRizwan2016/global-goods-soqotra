@@ -26,7 +26,7 @@ const UserManagementPanel = ({ users, loading, toggleUserStatus }: UserManagemen
             Manage users and system settings
           </p>
         </div>
-        <Button onClick={() => navigate("/admin/register")}>
+        <Button onClick={() => navigate("/register")}>
           <UserPlus className="mr-2 h-4 w-4" />
           Add New User
         </Button>

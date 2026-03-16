@@ -1,33 +1,28 @@
 
 import { RouteConfig } from "./types";
-import Login from "@/pages/admin/Login";
-import ForgotPassword from "@/pages/admin/ForgotPassword";
-import ResetPassword from "@/pages/admin/ResetPassword";
-import Register from "@/pages/admin/Register";
+import Login from "@/pages/auth/Login";
+import ForgotPassword from "@/pages/auth/ForgotPassword";
+import ResetPassword from "@/pages/auth/ResetPassword";
+import Register from "@/pages/auth/Register";
 
 export const authRoutes: RouteConfig[] = [
-  {
-    path: "/admin/login",
-    element: Login,
-    private: false
-  },
   {
     path: "/login",
     element: Login,
     private: false
   },
   {
-    path: "/admin/forgot-password", 
+    path: "/forgot-password", 
     element: ForgotPassword,
     private: false
   },
   {
-    path: "/admin/reset-password",
+    path: "/reset-password",
     element: ResetPassword,
     private: false
   },
   {
-    path: "/admin/register",
+    path: "/register",
     element: Register,
     private: false
   }

@@ -12,7 +12,7 @@ const Landing = () => {
     if (isAuthenticated) {
       navigate("/dashboard");
     } else {
-      navigate("/admin/login");
+      navigate("/login");
     }
   }, [isAuthenticated, navigate]);
 

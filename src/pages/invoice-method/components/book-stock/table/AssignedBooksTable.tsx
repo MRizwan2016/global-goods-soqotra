@@ -2,7 +2,7 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, User } from "lucide-react";
+import { ArrowRightLeft } from "lucide-react";
 import { Book } from "../../../booking-form-stock/types";
 import { ActionButtons } from "./TableComponents";
 import { StatusBadge } from "./TableComponents";
@@ -13,9 +13,10 @@ interface AssignedBooksTableProps {
   onViewDetails: (book: Book) => void;
   onCancelBook?: (book: Book) => void;
   onDeleteBook?: (book: Book) => void;
+  onReassignBook?: (book: Book) => void;
 }
 
-const AssignedBooksTable: React.FC<AssignedBooksTableProps> = ({ books, onAssignUser, onViewDetails, onCancelBook, onDeleteBook }) => {
+const AssignedBooksTable: React.FC<AssignedBooksTableProps> = ({ books, onAssignUser, onViewDetails, onCancelBook, onDeleteBook, onReassignBook }) => {
   return (
     <Card className="p-6">
       <div className="overflow-x-auto">
@@ -67,7 +68,21 @@ const AssignedBooksTable: React.FC<AssignedBooksTableProps> = ({ books, onAssign
                   <StatusBadge />
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <ActionButtons book={book} onViewDetails={onViewDetails} onAssignUser={onAssignUser} />
+                  <div className="flex gap-2">
+                    <ActionButtons book={book} onViewDetails={onViewDetails} onAssignUser={onAssignUser} />
+                    {onReassignBook && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 px-2 text-primary hover:text-primary/80 hover:bg-primary/10 border-primary/20"
+                        onClick={() => onReassignBook(book)}
+                        title="Reassign to another sales rep"
+                      >
+                        <ArrowRightLeft className="h-4 w-4 mr-1" />
+                        Reassign
+                      </Button>
+                    )}
+                  </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex gap-2">

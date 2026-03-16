@@ -10,36 +10,7 @@ export const useInvoiceSearch = () => {
   const [showInvoiceSelector, setShowInvoiceSelector] = useState<boolean>(false);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
-  // Check if there's a stored invoice from another component
-  useEffect(() => {
-    const storedInvoice = sessionStorage.getItem('selectedInvoice');
-    if (storedInvoice) {
-      try {
-        console.log("Found stored invoice in sessionStorage:", storedInvoice);
-        const parsedInvoice = JSON.parse(storedInvoice);
-        
-        // Set the invoice prefix to help with debugging
-        setInvoicePrefix(parsedInvoice.invoiceNumber || "");
-        
-        // Set the selected invoice
-        setSelectedInvoice(parsedInvoice);
-        
-        // Clear from session storage to prevent reuse
-        sessionStorage.removeItem('selectedInvoice');
-        
-        toast.success("Invoice loaded", {
-          description: `Invoice ${parsedInvoice.invoiceNumber} has been loaded for payment`,
-        });
-      } catch (error) {
-        console.error("Error parsing stored invoice:", error);
-        toast.error("Error loading invoice", {
-          description: "There was a problem loading the selected invoice",
-        });
-      }
-    } else {
-      console.log("No stored invoice found in sessionStorage");
-    }
-  }, []);
+  // Note: sessionStorage reading is handled by useInvoicePayment to properly populate form state
 
   // Handle invoice search automatically when prefix changes
   useEffect(() => {
@@ -51,7 +22,8 @@ export const useInvoiceSearch = () => {
   // Handle invoice search
   const handleInvoiceSearch = async () => {
     // Don't show dropdown for empty input
-    if (invoicePrefix.trim() === "") {
+    const prefix = String(invoicePrefix || '').trim();
+    if (prefix === "") {
       setMatchingInvoices([]);
       setShowInvoiceSelector(false);
       return;
@@ -118,7 +90,7 @@ export const useInvoiceSearch = () => {
 
     // Filter to match the invoicePrefix
     const filteredInvoices = allInvoices.filter(inv => 
-      inv.invoiceNumber?.toLowerCase().includes(invoicePrefix.toLowerCase())
+      String(inv.invoiceNumber || '').toLowerCase().includes(prefix.toLowerCase())
     );
 
     // All invoices are already combined, just filter them

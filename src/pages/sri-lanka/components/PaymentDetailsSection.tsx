@@ -147,8 +147,13 @@ const PaymentDetailsSection: React.FC<PaymentDetailsSectionProps> = ({
         </h4>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
-            <span className="text-gray-600">Rate:</span>
-            <div className="font-medium">QAR {formData.rate || '0'}</div>
+            <span className="text-gray-600">Freight Charge:</span>
+            <div className="font-medium">QAR {(() => {
+              const rate = parseFloat(formData.rate || '0');
+              const volume = parseFloat(formData.volume || '0');
+              return (volume * rate).toFixed(2);
+            })()}</div>
+            <div className="text-xs text-gray-400">{formData.volume || '0'} CBM × QAR {formData.rate || '0'}</div>
           </div>
           <div>
             <span className="text-gray-600">Documentation:</span>
@@ -156,11 +161,29 @@ const PaymentDetailsSection: React.FC<PaymentDetailsSectionProps> = ({
           </div>
           <div>
             <span className="text-gray-600">Subtotal:</span>
-            <div className="font-medium">QAR {((parseFloat(formData.rate || '0') + parseFloat(formData.documentsFee || '0')) - parseFloat(formData.discount || '0')).toFixed(2)}</div>
+            <div className="font-medium">QAR {(() => {
+              const rate = parseFloat(formData.rate || '0');
+              const volume = parseFloat(formData.volume || '0');
+              const freightCharge = volume * rate;
+              const docFee = parseFloat(formData.documentsFee || '0');
+              const discount = parseFloat(formData.discount || '0');
+              const packing = parseFloat(formData.packingCharges || '0');
+              const transport = parseFloat(formData.transportationFee || '0');
+              return (freightCharge + docFee - discount + packing + transport).toFixed(2);
+            })()}</div>
           </div>
           <div className="border-l pl-4">
             <span className="text-gray-600">Total Amount:</span>
-            <div className="font-bold text-lg text-green-600">QAR {formData.total || '0'}</div>
+            <div className="font-bold text-lg text-green-600">QAR {(() => {
+              const rate = parseFloat(formData.rate || '0');
+              const volume = parseFloat(formData.volume || '0');
+              const freightCharge = volume * rate;
+              const docFee = parseFloat(formData.documentsFee || '0');
+              const discount = parseFloat(formData.discount || '0');
+              const packing = parseFloat(formData.packingCharges || '0');
+              const transport = parseFloat(formData.transportationFee || '0');
+              return (freightCharge + docFee - discount + packing + transport).toFixed(2);
+            })()}</div>
           </div>
         </div>
       </div>

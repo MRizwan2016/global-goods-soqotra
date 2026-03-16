@@ -11,11 +11,11 @@ const Header = ({ title }: { title: string }) => {
 
   const handleLogout = () => {
     logout();
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   const handleLogin = () => {
-    navigate("/admin/login");
+    navigate("/login");
   };
 
   const handleLogoClick = () => {

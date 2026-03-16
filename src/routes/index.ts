@@ -25,9 +25,11 @@ import { sudanRoutes } from "./sudanRoutes";
 import { eritreaRoutes } from "./eritreaRoutes";
 import { upbRoutes } from "./upbRoutes";
 import { scheduleRoutes } from "./scheduleRoutes";
+import { customerPortalRoutes } from "./customerPortalRoutes";
 import { RouteConfig } from "./types";
 import Dashboard from "@/pages/Dashboard";
 import NotFound from "@/pages/NotFound";
+import PaymentReceiptPage from "@/pages/receipt/PaymentReceiptPage";
 import Index from "@/pages/Index";
 import Landing from "@/pages/Landing";
 import InvoicePrint from "@/pages/invoicing/InvoicePrint";
@@ -59,6 +61,11 @@ const baseRoutes: RouteConfig[] = [
     element: DataBackupManager,
     private: true,
     requiredPermission: "controlPanel"
+  },
+  {
+    path: "/receipt",
+    element: PaymentReceiptPage,
+    private: false
   },
   {
     path: "*",
@@ -94,5 +101,6 @@ export const routes: RouteConfig[] = [
   ...masterRoutes,
   ...sellingRatesRoutes,
   ...invoiceRoutes,
-  ...scheduleRoutes
+  ...scheduleRoutes,
+  ...customerPortalRoutes
 ];

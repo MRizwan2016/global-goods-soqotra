@@ -25,12 +25,12 @@ const PaymentDetailsTable: React.FC<PaymentDetailsTableProps> = ({
   const remarks = paymentInfo?.remarks || "";
   
   // Financial details matching ADD PAYMENT calculations
-  const grossAmount = paymentInfo?.grossAmount || invoice?.gross || invoice?.grossAmount || invoice?.amount || 0;
-  const discount = paymentInfo?.discount || invoice?.discount || 0;
-  const netAmount = paymentInfo?.netAmount || invoice?.net || invoice?.netAmount || (grossAmount - discount) || 0;
-  const totalPaid = paymentInfo?.totalPaid || invoice?.totalPaid || 0;
+  const grossAmount = Number(paymentInfo?.grossAmount || invoice?.pricing?.gross || invoice?.gross || invoice?.grossAmount || invoice?.amount || 0);
+  const discount = Number(paymentInfo?.discount || invoice?.pricing?.discount || invoice?.discount || 0);
+  const netAmount = Number(paymentInfo?.netAmount || invoice?.pricing?.net || invoice?.net || invoice?.netAmount || (grossAmount - discount) || 0);
+  const totalPaid = Number(paymentInfo?.totalPaid || invoice?.totalPaid || 0);
   const balanceToPay = netAmount - totalPaid;
-  const amountPaid = paymentInfo?.amountPaid || (balanceToPay > 0 ? balanceToPay : netAmount) || 0;
+  const amountPaid = Number(paymentInfo?.amountPaid || (balanceToPay > 0 ? balanceToPay : netAmount) || 0);
   
   // Payment details
   const paymentDate = paymentInfo?.paymentCollectDate || paymentInfo?.paymentDate || invoice?.paymentDate || "";

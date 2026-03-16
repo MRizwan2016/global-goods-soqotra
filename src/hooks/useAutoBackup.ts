@@ -7,7 +7,7 @@ import DataBackupService from '@/services/DataBackupService';
  * @param enabled - Whether auto-backup is enabled, default true
  */
 export const useAutoBackup = (intervalMinutes: number = 30, enabled: boolean = true) => {
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<ReturnType<typeof setInterval>>();
 
   useEffect(() => {
     if (!enabled) {

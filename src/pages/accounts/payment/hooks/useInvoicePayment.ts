@@ -1,6 +1,5 @@
 
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useInvoiceSearch } from "./useInvoiceSearch";
 import { usePaymentSave } from "./usePaymentSave";
 import { useCurrencyCountry } from "./useCurrencyCountry";
@@ -11,12 +10,10 @@ import { useInvoiceHandler } from "./useInvoiceHandler";
 import { FormState } from "../types";
 
 export const useInvoicePayment = () => {
-  const navigate = useNavigate();
   
-  // Use the date handling hook
+  
   const { date, handleDateSelect } = useDateHandling();
   
-  // Initialize form state
   const initialFormState: FormState = {
     invoiceNumber: "",
     customerName: "",
@@ -30,7 +27,6 @@ export const useInvoicePayment = () => {
     paymentCollectDate: date.toISOString().split('T')[0],
   };
   
-  // Use form handler hook
   const { 
     formState, 
     setFormState, 
@@ -38,7 +34,6 @@ export const useInvoicePayment = () => {
     handleSelectChange 
   } = useFormHandler(initialFormState);
   
-  // Use invoice search hook
   const {
     invoicePrefix,
     setInvoicePrefix,
@@ -50,7 +45,6 @@ export const useInvoicePayment = () => {
     handleInvoiceSearch,
   } = useInvoiceSearch();
   
-  // Use currency country hook
   const {
     filteredCurrencies,
     currencySymbol,
@@ -58,16 +52,11 @@ export const useInvoicePayment = () => {
     handleCountryChange,
   } = useCurrencyCountry();
   
-  // Use payment amounts hook
   const { handlePaymentAmountChange: paymentAmountHandler } = usePaymentAmounts(currencySymbol);
-  
-  // Use invoice handler hook
   const { handleSelectInvoice: invoiceSelectHandler } = useInvoiceHandler();
   
-  // Get payment save handler
   const { handleSave } = usePaymentSave(formState, currencySymbol);
   
-  // Handle date selection with form update
   const handleDateSelectWithFormUpdate = (selectedDate: Date | undefined) => {
     if (selectedDate) {
       const dateString = handleDateSelect(selectedDate);
@@ -75,25 +64,38 @@ export const useInvoicePayment = () => {
     }
   };
   
-  // Wrapper for invoice selection
   const handleSelectInvoice = (invoice: any) => {
     invoiceSelectHandler(invoice, setSelectedInvoice, setFormState, setShowInvoiceSelector);
   };
   
-  // Wrapper for payment amount change
+  // Payment amount change updates only current payment + live remaining balance
   const handlePaymentAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const amount = paymentAmountHandler(e, formState);
-    setFormState(prev => ({ ...prev, amountPaid: amount }));
+
+    setFormState(prev => {
+      const netAmount = Number(prev.netAmount) || 0;
+      const totalPaid = Number(prev.totalPaid) || 0;
+      const baseBalance =
+        prev.originalBalanceToPay !== undefined
+          ? Number(prev.originalBalanceToPay) || 0
+          : Math.max(0, netAmount - totalPaid);
+
+      const normalizedAmount = Math.max(0, Math.min(amount, baseBalance));
+
+      return {
+        ...prev,
+        amountPaid: normalizedAmount,
+        balanceToPay: Math.max(0, baseBalance - normalizedAmount),
+      };
+    });
   };
   
-  // Check for invoice in session storage (from direct payment link)
   useEffect(() => {
     const storedInvoice = sessionStorage.getItem('selectedInvoice');
     if (storedInvoice) {
       try {
         const parsedInvoice = JSON.parse(storedInvoice);
         handleSelectInvoice(parsedInvoice);
-        // Clear session storage after using it
         sessionStorage.removeItem('selectedInvoice');
       } catch (error) {
         console.error("Error parsing stored invoice:", error);

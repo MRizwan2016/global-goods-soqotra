@@ -9,6 +9,7 @@ import BookStockDialogs from "./booking-form-stock/BookStockDialogs";
 import { CancelledBooksHistory } from "./components/book-stock/CancelledBooksHistory";
 import { PageSelectionDialog } from "./components/book-stock/PageSelectionDialog";
 import { ReturnedStockDialog } from "./components/book-stock/ReturnedStockDialog";
+import ReassignBookDialog from "./components/book-stock/ReassignBookDialog";
 import {
   Dialog,
   DialogContent,
@@ -53,6 +54,8 @@ const BookingFormStock = () => {
   const [currentAction, setCurrentAction] = useState<"cancel" | "delete">("cancel");
   const [bookToAction, setBookToAction] = useState<Book | null>(null);
   const [cancelledBooks, setCancelledBooks] = useState<CancelledBook[]>([]);
+  const [reassignDialogOpen, setReassignDialogOpen] = useState(false);
+  const [bookToReassign, setBookToReassign] = useState<Book | null>(null);
 
   // Load cancelled books from localStorage
   useEffect(() => {
@@ -118,6 +121,11 @@ const BookingFormStock = () => {
     setBookToAction(book);
     setCurrentAction("delete");
     setPageSelectionOpen(true);
+  };
+
+  const handleReassignBook = (book: Book) => {
+    setBookToReassign(book);
+    setReassignDialogOpen(true);
   };
 
   // Updated confirmation handler for page-level operations
@@ -285,6 +293,7 @@ const BookingFormStock = () => {
           onAddNewBook={handleAddNewBook}
           onCancelBook={handleCancelBook}
           onDeleteBook={handleDeleteBook}
+          onReassignBook={handleReassignBook}
         />
       </div>
 
@@ -335,6 +344,14 @@ const BookingFormStock = () => {
         open={returnedStockOpen}
         onOpenChange={setReturnedStockOpen}
         onReassign={loadBooks}
+      />
+
+      {/* Reassign Book Dialog */}
+      <ReassignBookDialog
+        open={reassignDialogOpen}
+        onOpenChange={setReassignDialogOpen}
+        book={bookToReassign}
+        onReassigned={loadBooks}
       />
     </Layout>
   );

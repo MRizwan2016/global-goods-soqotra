@@ -9,7 +9,7 @@ import DashboardCard from "@/components/dashboard/DashboardCard";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { HardDrive } from "lucide-react";
+import { HardDrive, Package, Users, Search } from "lucide-react";
 
 const Dashboard = () => {
   const { isLoaded, shipmentData } = useDashboardData();
@@ -18,6 +18,35 @@ const Dashboard = () => {
   return (
     <Layout title="Dashboard">
       <DashboardLayout isLoaded={isLoaded}>
+        {/* Track & Trace Quick Access */}
+        <DashboardCard>
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Package className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold">Track & Trace</h3>
+                <p className="text-muted-foreground text-sm">Customer cargo tracking portal</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Link to="/customer-portal">
+                <Button variant="default" size="sm" className="gap-1.5">
+                  <Search className="h-4 w-4" />
+                  Customer Portal
+                </Button>
+              </Link>
+              <Link to="/customer-portal/admin">
+                <Button variant="outline" size="sm" className="gap-1.5">
+                  <Users className="h-4 w-4" />
+                  Customer Management
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </DashboardCard>
+
         <DashboardCard>
           <PrimaryDestinations />
         </DashboardCard>

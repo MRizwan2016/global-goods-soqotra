@@ -1,6 +1,6 @@
 
 import ControlPanel from "@/pages/admin/ControlPanel";
-import UserRegistration from "@/pages/admin/UserRegistration";
+import UserRegistration from "@/pages/auth/UserRegistration";
 import { RouteConfig } from "./types";
 
 export const adminRoutes: RouteConfig[] = [
@@ -15,7 +15,7 @@ export const adminRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/admin/register",
+    path: "/register",
     element: UserRegistration,
     private: true
   }

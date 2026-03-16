@@ -22,14 +22,43 @@ const CitySelector = () => {
   const [newCity, setNewCity] = useState("");
   const [customCities, setCustomCities] = useState<string[]>([]);
 
-  // Base cities list with all the requested ones
-  const baseCities = [
+  // Qatar cities
+  const qatarCities = [
     "MANSOORA", "NAJMA", "MARKIYA", "UM GARAN", "UM SALAL ALI", 
     "UM SALAL MOHAMED", "UM AL AFFAI", "MAKAINIS", "ONAIZA", "WUKAIR", 
     "NUAIJA", "AL HILAL", "MATHAR AL KADEEM", "THUMAMA", "BAAYA", "MUAITHAR",
     "DOHA", "AL RAYYAN", "AL WAKRAH", "AL KHOR", "UMM SALAL", "AL SHAMAL", "DUKHAN",
     "WESTBAY", "DAFFNA", "KARARA", "KATARA", "INDUSTRIAL AREA",
   ];
+
+  // Saudi Arabia cities
+  const saudiCities = [
+    "RIYADH", "JEDDAH", "MECCA", "MEDINA", "DAMMAM", "KHOBAR", 
+    "TABUK", "ABHA", "BURAYDAH", "HAIL",
+    // Riyadh Region
+    "TAIF",
+    // Eastern Province
+    "DHAHRAN", "AL-AHSA",
+    // Medina Region
+    "YANBU",
+    // Asir Region
+    "KHAMIS MUSHAIT",
+  ];
+
+  // Saudi Arabia regions mapping
+  const saudiRegions: Record<string, string[]> = {
+    "RIYADH REGION": ["RIYADH"],
+    "MECCA REGION": ["MECCA", "JEDDAH", "TAIF"],
+    "EASTERN PROVINCE": ["DAMMAM", "KHOBAR", "DHAHRAN", "AL-AHSA"],
+    "MEDINA REGION": ["MEDINA", "YANBU"],
+    "ASIR REGION": ["ABHA", "KHAMIS MUSHAIT"],
+    "TABUK REGION": ["TABUK"],
+    "HAIL REGION": ["HAIL"],
+    "QASSIM REGION": ["BURAYDAH"],
+  };
+
+  const isSaudiArabia = jobData.country === "Saudi Arabia";
+  const baseCities = isSaudiArabia ? saudiCities : qatarCities;
 
   // Combine base cities with any custom ones
   const allCities = [...new Set([...baseCities, ...customCities])].sort();
@@ -68,17 +97,33 @@ const CitySelector = () => {
           <SelectValue placeholder="SELECT CITY" />
         </SelectTrigger>
         <SelectContent className="max-h-[300px]">
-          <SelectGroup>
-            <SelectLabel>Cities</SelectLabel>
-            {allCities.map((city, index) => (
-              <SelectItem key={index} value={city}>
-                <div className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  <span>{city}</span>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectGroup>
+          {isSaudiArabia ? (
+            Object.entries(saudiRegions).map(([region, cities]) => (
+              <SelectGroup key={region}>
+                <SelectLabel className="text-xs font-semibold bg-muted">{region}</SelectLabel>
+                {cities.map((city) => (
+                  <SelectItem key={city} value={city}>
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      <span>{city}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            ))
+          ) : (
+            <SelectGroup>
+              <SelectLabel>Cities</SelectLabel>
+              {allCities.map((city, index) => (
+                <SelectItem key={index} value={city}>
+                  <div className="flex items-center gap-1">
+                    <MapPin className="h-3 w-3" />
+                    <span>{city}</span>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          )}
         </SelectContent>
       </Select>
 

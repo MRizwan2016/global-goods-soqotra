@@ -84,7 +84,7 @@ const ForgotPassword = () => {
                 asChild
                 className="mt-4 bg-[#1976d2] hover:bg-blue-600"
               >
-                <Link to="/admin/login">Return to Login</Link>
+                <Link to="/login">Return to Login</Link>
               </Button>
             </div>
           ) : (
@@ -127,7 +127,7 @@ const ForgotPassword = () => {
                 </Button>
                 
                 <div className="text-center pt-2">
-                  <Link to="/admin/login" className="text-blue-500 hover:underline">
+                  <Link to="/login" className="text-blue-500 hover:underline">
                     Back to Login
                   </Link>
                 </div>
