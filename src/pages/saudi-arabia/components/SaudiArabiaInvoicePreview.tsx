@@ -27,7 +27,7 @@ const SaudiArabiaInvoicePreview: React.FC<SaudiArabiaInvoicePreviewProps> = ({
     return [
       `INVOICE:${formData.invoiceNumber || "SA12345"}`,
       `DATE:${formData.invoiceDate || new Date().toISOString().split('T')[0]}`,
-      `TOTAL:${formData.net || "0.00"} QAR`,
+      `TOTAL:${formData.net || "0.00"} SAR`,
       `SHIPPER:${formData.shipperName || "N/A"}`,
       `CONSIGNEE:${formData.consigneeName || "N/A"}`,
       `STATUS:${formData.paymentStatus || "UNPAID"}`,
