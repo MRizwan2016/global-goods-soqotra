@@ -158,7 +158,7 @@ export const doorToDoorPricing = {
   JAZAN: { price: 25.00, currency: "SAR" },
   NAJRAN: { price: 25.00, currency: "SAR" },
   HAIL: { price: 25.00, currency: "SAR" },
-  QASSIM: { price: 25.00, currency: "QAR" }
+  QASSIM: { price: 25.00, currency: "SAR" }
 };
 
 // Package details
