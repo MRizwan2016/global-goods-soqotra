@@ -1,5 +1,5 @@
 
-import { Database, DollarSign, Settings, Truck, Package } from "lucide-react";
+import { Database, DollarSign, Settings, Truck, Package, Globe } from "lucide-react";
 import { NavigationSections } from "./types";
 
 export const navigationSections: NavigationSections = {
@@ -211,6 +211,38 @@ export const navigationSections: NavigationSections = {
           { name: "04 STOCK MOVEMENT", path: "/reports/cargo" },
           { name: "05 STOCK BALANCE", path: "/reports/cargo/statistics" },
           { name: "06 JOB STATUS", path: "/qatar/job-status" },
+        ],
+      },
+    ],
+  },
+  saudiArabia: {
+    title: "SAUDI ARABIA",
+    icon: Globe,
+    color: "text-white",
+    bgGradient: "from-green-500 to-emerald-600",
+    borderColor: "border-green-200",
+    iconColor: "text-white",
+    submenu: [
+      {
+        title: "INVOICING",
+        items: [
+          { name: "DASHBOARD", path: "/saudi-arabia" },
+          { name: "ADD NEW INVOICE", path: "/saudi-arabia/invoice/add" },
+          { name: "SAVED INVOICES", path: "/saudi-arabia/saved-invoices" },
+        ],
+      },
+      {
+        title: "COLLECTION & DELIVERY",
+        items: [
+          { name: "COLLECTION & DELIVERY", path: "/saudi-arabia/collection-delivery" },
+          { name: "VIEW SCHEDULES", path: "/saudi-arabia/schedules" },
+        ],
+      },
+      {
+        title: "ACCOUNTS",
+        items: [
+          { name: "PAYMENT RECEIPT", path: "/saudi-arabia/payment-receipt" },
+          { name: "RECONCILIATION", path: "/saudi-arabia/reconciliation" },
         ],
       },
     ],

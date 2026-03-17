@@ -4,6 +4,10 @@ import SaudiArabiaInvoiceForm from "@/pages/saudi-arabia/SaudiArabiaInvoiceForm"
 import SaudiArabiaInvoicePrint from "@/pages/saudi-arabia/SaudiArabiaInvoicePrint";
 import SaudiArabiaAirManifest from "@/pages/saudi-arabia/SaudiArabiaAirManifest";
 import SaudiArabiaSeaManifest from "@/pages/saudi-arabia/SaudiArabiaSeaManifest";
+import SaudiArabiaCollectionDelivery from "@/pages/saudi-arabia/SaudiArabiaCollectionDelivery";
+import SaudiArabiaPaymentReceipt from "@/pages/saudi-arabia/SaudiArabiaPaymentReceipt";
+import SaudiArabiaReconciliation from "@/pages/saudi-arabia/SaudiArabiaReconciliation";
+import SaudiArabiaSavedInvoices from "@/pages/saudi-arabia/SaudiArabiaSavedInvoices";
 import ViewSchedules from "@/pages/schedules/ViewSchedules";
 
 export const saudiArabiaRoutes: RouteConfig[] = [
@@ -15,6 +19,26 @@ export const saudiArabiaRoutes: RouteConfig[] = [
   {
     path: "/saudi-arabia/schedules",
     element: ViewSchedules,
+    private: true
+  },
+  {
+    path: "/saudi-arabia/collection-delivery",
+    element: SaudiArabiaCollectionDelivery,
+    private: true
+  },
+  {
+    path: "/saudi-arabia/payment-receipt",
+    element: SaudiArabiaPaymentReceipt,
+    private: true
+  },
+  {
+    path: "/saudi-arabia/reconciliation",
+    element: SaudiArabiaReconciliation,
+    private: true
+  },
+  {
+    path: "/saudi-arabia/saved-invoices",
+    element: SaudiArabiaSavedInvoices,
     private: true
   },
   {
