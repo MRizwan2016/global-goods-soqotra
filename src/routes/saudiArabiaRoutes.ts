@@ -9,6 +9,7 @@ import SaudiArabiaPaymentReceipt from "@/pages/saudi-arabia/SaudiArabiaPaymentRe
 import SaudiArabiaReconciliation from "@/pages/saudi-arabia/SaudiArabiaReconciliation";
 import SaudiArabiaSavedInvoices from "@/pages/saudi-arabia/SaudiArabiaSavedInvoices";
 import ViewSchedules from "@/pages/schedules/ViewSchedules";
+import SaudiArabiaNewJob from "@/pages/saudi-arabia/SaudiArabiaNewJob";
 
 export const saudiArabiaRoutes: RouteConfig[] = [
   {
@@ -24,6 +25,11 @@ export const saudiArabiaRoutes: RouteConfig[] = [
   {
     path: "/saudi-arabia/collection-delivery",
     element: SaudiArabiaCollectionDelivery,
+    private: true
+  },
+  {
+    path: "/saudi-arabia/new-job",
+    element: SaudiArabiaNewJob,
     private: true
   },
   {
