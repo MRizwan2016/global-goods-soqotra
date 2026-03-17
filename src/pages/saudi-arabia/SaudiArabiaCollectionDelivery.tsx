@@ -130,7 +130,7 @@ const SaudiArabiaCollectionDelivery = () => {
               <Calendar className="h-4 w-4" />
               View Schedules
             </Button>
-            <Button className="gap-2 bg-[#006c35] hover:bg-[#005a2d]" onClick={() => toast.info("Add new job coming soon")}>
+            <Button className="gap-2 bg-[#006c35] hover:bg-[#005a2d]" onClick={() => navigate("/saudi-arabia/new-job")}>
               <Plus className="h-4 w-4" />
               Add New Job
             </Button>
