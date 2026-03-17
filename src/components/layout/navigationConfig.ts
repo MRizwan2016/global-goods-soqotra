@@ -215,4 +215,36 @@ export const navigationSections: NavigationSections = {
       },
     ],
   },
+  saudiArabia: {
+    title: "SAUDI ARABIA",
+    icon: Globe,
+    color: "text-white",
+    bgGradient: "from-green-500 to-emerald-600",
+    borderColor: "border-green-200",
+    iconColor: "text-white",
+    submenu: [
+      {
+        title: "INVOICING",
+        items: [
+          { name: "DASHBOARD", path: "/saudi-arabia" },
+          { name: "ADD NEW INVOICE", path: "/saudi-arabia/invoice/add" },
+          { name: "SAVED INVOICES", path: "/saudi-arabia/saved-invoices" },
+        ],
+      },
+      {
+        title: "COLLECTION & DELIVERY",
+        items: [
+          { name: "COLLECTION & DELIVERY", path: "/saudi-arabia/collection-delivery" },
+          { name: "VIEW SCHEDULES", path: "/saudi-arabia/schedules" },
+        ],
+      },
+      {
+        title: "ACCOUNTS",
+        items: [
+          { name: "PAYMENT RECEIPT", path: "/saudi-arabia/payment-receipt" },
+          { name: "RECONCILIATION", path: "/saudi-arabia/reconciliation" },
+        ],
+      },
+    ],
+  },
 };
