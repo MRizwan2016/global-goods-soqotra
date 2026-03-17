@@ -28,6 +28,11 @@ export const saudiArabiaRoutes: RouteConfig[] = [
     private: true
   },
   {
+    path: "/saudi-arabia/new-job",
+    element: SaudiArabiaNewJob,
+    private: true
+  },
+  {
     path: "/saudi-arabia/payment-receipt",
     element: SaudiArabiaPaymentReceipt,
     private: true
