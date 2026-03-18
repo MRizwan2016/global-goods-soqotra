@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer, FileText, Ship, Package, Receipt } from 'lucide-react';
+import { ArrowLeft, Printer, FileText, Ship, Package, Receipt, MessageCircle } from 'lucide-react';
 import SAPrintStyles from './components/print/SAPrintStyles';
 import SAInvoiceDocument from './components/print/SAInvoiceDocument';
 import SAHBLDocument from './components/print/SAHBLDocument';
@@ -110,9 +110,28 @@ const SaudiArabiaInvoicePrint = () => {
             ))}
           </div>
 
-          <Button size="sm" onClick={handlePrint} className="gap-1.5">
-            <Printer className="h-4 w-4" /> Print
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => {
+              const d = invoiceData;
+              const label = mode === "receipt" ? "PAYMENT RECEIPT" : mode === "hbl" ? "HOUSE BILL OF LADING" : mode === "manifest" ? "CARGO MANIFEST" : "INVOICE";
+              const message = [
+                `📄 *${label}*`,
+                `━━━━━━━━━━━━━━━`,
+                `Invoice #: ${d.invoiceNumber || 'N/A'}`,
+                d.shipperName ? `Shipper: ${d.shipperName}` : '',
+                d.consigneeName ? `Consignee: ${d.consigneeName}` : '',
+                d.totalAmount ? `Amount: SAR ${Number(d.totalAmount).toFixed(2)}` : '',
+                `━━━━━━━━━━━━━━━`,
+                `SOQOTRA LOGISTICS - Saudi Arabia`,
+              ].filter(Boolean).join('\n');
+              window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+            }} className="gap-1.5 text-green-600 border-green-300 hover:bg-green-50">
+              <MessageCircle className="h-4 w-4" /> WhatsApp
+            </Button>
+            <Button size="sm" onClick={handlePrint} className="gap-1.5">
+              <Printer className="h-4 w-4" /> Print
+            </Button>
+          </div>
         </div>
       </div>
 
