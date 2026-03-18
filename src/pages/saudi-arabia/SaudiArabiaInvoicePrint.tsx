@@ -1,8 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
+import { ArrowLeft, Printer, FileText, Ship, Package, Receipt } from 'lucide-react';
+import SAPrintStyles from './components/print/SAPrintStyles';
+import SAInvoiceDocument from './components/print/SAInvoiceDocument';
+import SAHBLDocument from './components/print/SAHBLDocument';
+import SACargoManifestDocument from './components/print/SACargoManifestDocument';
+import SAReceiptDocument from './components/print/SAReceiptDocument';
+
+type PrintMode = "invoice" | "hbl" | "manifest" | "receipt";
 
 const SaudiArabiaInvoicePrint = () => {
   const { id } = useParams();
@@ -10,367 +16,119 @@ const SaudiArabiaInvoicePrint = () => {
   const location = useLocation();
   const printRef = useRef<HTMLDivElement>(null);
   const [invoiceData, setInvoiceData] = useState<any>(null);
+  const [allInvoices, setAllInvoices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isPaid, setIsPaid] = useState(false);
+  const [mode, setMode] = useState<PrintMode>("invoice");
 
   useEffect(() => {
     if (id) {
       const storedInvoices = localStorage.getItem('saudiArabiaInvoices');
       if (storedInvoices) {
         const invoices = JSON.parse(storedInvoices);
+        setAllInvoices(invoices);
         const invoice = invoices.find((inv: any) => inv.id === id);
         if (invoice) {
           setInvoiceData(invoice);
-          
-          // Check payment status
-          const payments = localStorage.getItem('payments');
-          if (payments) {
-            const paymentData = JSON.parse(payments);
-            const payment = paymentData.find((p: any) => p.invoiceNumber === invoice.invoiceNumber);
-            setIsPaid(!!payment);
-          }
-        } else {
-          // Fallback data
-          setInvoiceData({
-            id: id,
-            invoiceNumber: `SA${Date.now()}`,
-            date: new Date().toLocaleDateString('en-GB'),
-            shipper: {
-              name: "SAMPLE SHIPPER",
-              address: "DOHA, QATAR",
-              mobile: "+974 1234 5678"
-            },
-            consignee: {
-              name: "SAMPLE CONSIGNEE",
-              address: "RIYADH, SAUDI ARABIA",
-              mobile: "+966 50 123 4567",
-              idNumber: "123456789"
-            },
-            packages: [
-              { id: 1, name: "SAMPLE PACKAGE", length: 50, width: 40, height: 30, volume: 0.06 }
-            ],
-            totalWeight: 25,
-            pricing: {
-              gross: 500,
-              discount: 50,
-              net: 450
-            }
-          });
         }
       }
     }
     setLoading(false);
   }, [id]);
 
-  const getCompanyName = (shipperCountry: string) => {
-    switch(shipperCountry?.toLowerCase()) {
-      case 'qatar':
-      case 'doha':
-        return 'SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL';
-      case 'saudi arabia':
-      case 'riyadh':
-        return 'SOQOTRA LOGISTICS SERVICES KSA';
-      default:
-        return 'SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL';
-    }
-  };
-
   const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow && printRef.current) {
-      const printContent = printRef.current.innerHTML;
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Print Invoice</title>
-            <style>
-              body { 
-                margin: 0; 
-                padding: 20px; 
-                font-family: Arial, sans-serif; 
-                font-size: 12px;
-                line-height: 1.4;
-              }
-              .print-container { 
-                max-width: 800px; 
-                margin: 0 auto; 
-                background: white;
-              }
-              table { 
-                width: 100%; 
-                border-collapse: collapse; 
-              }
-              th, td { 
-                border: 1px solid #000; 
-                padding: 8px; 
-                text-align: left; 
-              }
-              .font-bold { font-weight: bold; }
-              .text-center { text-align: center; }
-              .text-right { text-align: right; }
-              .border-t { border-top: 1px solid #000; }
-              .border-r { border-right: 1px solid #000; }
-              .border-b { border-bottom: 1px solid #000; }
-              .underline { text-decoration: underline; }
-              .flex { display: flex; }
-              .w-1\\/2 { width: 50%; }
-              .w-1\\/4 { width: 25%; }
-              .w-2\\/4 { width: 50%; }
-              .p-2 { padding: 8px; }
-              .mt-1 { margin-top: 4px; }
-              .mb-1 { margin-bottom: 4px; }
-              .text-lg { font-size: 16px; }
-              .text-base { font-size: 14px; }
-              .text-sm { font-size: 12px; }
-              .text-xs { font-size: 10px; }
-              img { max-width: 100%; height: auto; }
-              @media print {
-                body { margin: 0; padding: 0; }
-                .no-print { display: none; }
-              }
-            </style>
-          </head>
-          <body>
-            <div class="print-container">
-              ${printContent}
-            </div>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.print();
-    }
+    window.print();
   };
 
   const handleBack = () => {
     if (location.state?.from) {
       navigate(location.state.from);
     } else {
-      navigate(`/saudi-arabia/invoice/edit/${id}`);
+      navigate('/saudi-arabia');
     }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
+        <div className="animate-pulse text-lg">Loading...</div>
       </div>
     );
   }
 
+  if (!invoiceData) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4">
+        <p className="text-destructive font-medium">Invoice not found.</p>
+        <Button variant="outline" onClick={handleBack}><ArrowLeft className="h-4 w-4 mr-2" />Go Back</Button>
+      </div>
+    );
+  }
+
+  const modes: { key: PrintMode; label: string; icon: React.ReactNode; size: string }[] = [
+    { key: "invoice", label: "Invoice", icon: <FileText className="h-4 w-4" />, size: "A4" },
+    { key: "hbl", label: "HBL", icon: <Ship className="h-4 w-4" />, size: "A4" },
+    { key: "manifest", label: "Cargo Manifest", icon: <Package className="h-4 w-4" />, size: "A4 Landscape" },
+    { key: "receipt", label: "Receipt", icon: <Receipt className="h-4 w-4" />, size: "A5" },
+  ];
+
+  const getContainerStyle = (): React.CSSProperties => {
+    if (mode === "manifest") return { width: "297mm", minHeight: "210mm" };
+    if (mode === "receipt") return { width: "148mm", minHeight: "210mm" };
+    return { width: "210mm", minHeight: "297mm" };
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
-      {/* Toolbar */}
-      <div className="max-w-4xl mx-auto mb-6 no-print">
-        <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
-          <Button onClick={handleBack} variant="outline" className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-          <Button onClick={handlePrint} className="flex items-center gap-2">
-            <Printer className="h-4 w-4" />
-            Print
+    <div className="min-h-screen bg-muted/40 sa-print-container">
+      <SAPrintStyles mode={mode} />
+
+      {/* Toolbar - hidden during print */}
+      <div className="sa-print-toolbar sticky top-0 z-50 bg-background border-b shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="outline" size="sm" onClick={handleBack}>
+              <ArrowLeft className="h-4 w-4 mr-1" /> Back
+            </Button>
+            <span className="text-sm font-medium text-muted-foreground">
+              Invoice #{invoiceData.invoiceNumber}
+            </span>
+          </div>
+
+          {/* Mode Buttons */}
+          <div className="flex items-center gap-1">
+            {modes.map(m => (
+              <Button
+                key={m.key}
+                variant={mode === m.key ? "default" : "outline"}
+                size="sm"
+                onClick={() => setMode(m.key)}
+                className="gap-1.5"
+              >
+                {m.icon}
+                <span className="hidden md:inline">{m.label}</span>
+                <span className="text-[10px] opacity-70">({m.size})</span>
+              </Button>
+            ))}
+          </div>
+
+          <Button size="sm" onClick={handlePrint} className="gap-1.5">
+            <Printer className="h-4 w-4" /> Print
           </Button>
         </div>
       </div>
 
-      {/* Invoice Content */}
-      <div className="max-w-4xl mx-auto bg-white shadow-lg" ref={printRef}>
-        {invoiceData && (
-          <div style={{ border: '3px solid #000', padding: '0', fontFamily: 'Arial, sans-serif' }}>
-            {/* Header Section */}
-            <div style={{ display: 'flex', padding: '10px', borderBottom: '2px solid #000' }}>
-              {/* Logo */}
-              <div style={{ width: '100px', marginRight: '20px' }}>
-                <img 
-                  src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
-                  alt="Soqotra Logo" 
-                  style={{ width: '100%', height: 'auto' }}
-                />
-              </div>
-              
-              {/* Title Section */}
-              <div style={{ flex: 1, textAlign: 'center' }}>
-                <div style={{ fontSize: '18px', fontWeight: 'bold', margin: '0' }}>
-                  SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL
-                </div>
-                <div style={{ fontSize: '14px', fontWeight: 'bold', marginTop: '5px' }}>
-                  COLLECTION / DELIVERY JOB SHEET
-                </div>
-                <div style={{ fontSize: '12px', marginTop: '5px' }}>
-                  (SCHEDULE NO: 3820-744)
-                </div>
-              </div>
-              
-              {/* Page & QR Section */}
-              <div style={{ width: '150px', textAlign: 'center' }}>
-                <div style={{ border: '1px solid #000', padding: '5px', marginBottom: '10px' }}>
-                  <div style={{ fontSize: '10px' }}>PAGE</div>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold' }}>1</div>
-                </div>
-                <QRCodeSVG 
-                  value={`INVOICE:${invoiceData.invoiceNumber}\nDATE:${invoiceData.date}\nAMOUNT:${invoiceData.pricing?.net || 0} SAR`} 
-                  size={60} 
-                  level="M"
-                />
-                <div style={{ fontSize: '12px', fontWeight: 'bold', marginTop: '10px' }}>
-                  QATAR
-                </div>
-              </div>
-            </div>
-            
-            {/* Job Details Section */}
-            <div style={{ borderBottom: '2px solid #000', padding: '10px' }}>
-              <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse' }}>
-                <tr>
-                  <td style={{ padding: '5px', fontWeight: 'bold', width: '15%' }}>PRINTED TIME:</td>
-                  <td style={{ padding: '5px', width: '20%' }}>{new Date().toLocaleString()}</td>
-                  <td style={{ padding: '5px', fontWeight: 'bold', width: '15%' }}>PRINTED BY</td>
-                  <td style={{ padding: '5px', width: '20%' }}>MR. SALIH</td>
-                  <td style={{ padding: '5px', fontWeight: 'bold', width: '15%' }}>VEHICLE</td>
-                  <td style={{ padding: '5px', width: '15%' }}>{invoiceData.invoiceNumber}</td>
-                </tr>
-                <tr>
-                  <td style={{ padding: '5px', fontWeight: 'bold' }}>DRIVER</td>
-                  <td style={{ padding: '5px' }}>MR. LAHIRU</td>
-                  <td style={{ padding: '5px', fontWeight: 'bold' }}>SALES REP</td>
-                  <td style={{ padding: '5px' }}>MR. YOUSUF</td>
-                  <td style={{ padding: '5px' }}></td>
-                  <td style={{ padding: '5px' }}></td>
-                </tr>
-              </table>
-            </div>
-
-            {/* Shipper/Consignee */}
-            <div className="flex border-t border-black">
-              <div className="w-1/2 border-r border-black p-2">
-                <div className="font-bold underline">SHIPPER:</div>
-                <div>{invoiceData.shipper?.name || "SAMPLE SHIPPER"}</div>
-                <div>-</div>
-                <div>-</div>
-                <div>THUMAMA, DOHA</div>
-                <div className="mt-1 font-semibold">Mobile: {invoiceData.shipper?.mobile || "+974 1234 5678"}</div>
-              </div>
-              
-              <div className="w-1/2 p-2">
-                <div className="font-bold underline">CONSIGNEE:</div>
-                <div>{invoiceData.consignee?.name || "SAMPLE CONSIGNEE"}</div>
-                <div>KING FAHD DISTRICT</div>
-                <div>AL RIYADH</div>
-                <div>RIYADH, SAUDI ARABIA</div>
-                <div>ID NO : {invoiceData.consignee?.idNumber || "123456789"}</div>
-                <div className="mt-1 font-semibold">Mobile: {invoiceData.consignee?.mobile || "+966 50 123 4567"}</div>
-              </div>
-            </div>
-
-            {/* Destination */}
-            <div className="border-t border-black p-2 flex">
-              <div className="font-bold">Destination Warehouse: Riyadh</div>
-              <div className="mx-4 font-bold">(WAREHOUSE COLLECT)</div>
-              <div className="ml-auto font-bold">LANDCARGO</div>
-            </div>
-
-            {/* Cargo Table */}
-            <table className="w-full border-t border-black">
-              <thead>
-                <tr>
-                  <th className="border border-black p-2 text-center w-16">S.L</th>
-                  <th className="border border-black p-2 text-center">CARGO DESCRIPTION</th>
-                  <th className="border border-black p-2 text-center w-16">L</th>
-                  <th className="border border-black p-2 text-center w-16">W</th>
-                  <th className="border border-black p-2 text-center w-16">H</th>
-                  <th className="border border-black p-2 text-center w-20">CBF</th>
-                  <th className="border border-black p-2 text-center w-20">CBM</th>
-                </tr>
-              </thead>
-              <tbody>
-                {invoiceData.packages?.map((pkg: any, index: number) => (
-                  <tr key={index}>
-                    <td className="border border-black p-2 text-center">{index + 1}</td>
-                    <td className="border border-black p-2">{pkg.name || `PACKAGE ${index + 1}`}</td>
-                    <td className="border border-black p-2 text-center">{pkg.length || 50}</td>
-                    <td className="border border-black p-2 text-center">{pkg.width || 40}</td>
-                    <td className="border border-black p-2 text-center">{pkg.height || 30}</td>
-                    <td className="border border-black p-2 text-center">{((pkg.volume || 0.06) * 35.315).toFixed(2)}</td>
-                    <td className="border border-black p-2 text-center">{(pkg.volume || 0.06).toFixed(3)}</td>
-                  </tr>
-                ))}
-                {/* Empty rows for consistent layout */}
-                {Array.from({ length: Math.max(0, 10 - (invoiceData.packages?.length || 0)) }).map((_, index) => (
-                  <tr key={`empty-${index}`}>
-                    <td className="border border-black p-2 text-center"></td>
-                    <td className="border border-black p-2"></td>
-                    <td className="border border-black p-2 text-center"></td>
-                    <td className="border border-black p-2 text-center"></td>
-                    <td className="border border-black p-2 text-center"></td>
-                    <td className="border border-black p-2 text-center"></td>
-                    <td className="border border-black p-2 text-center"></td>
-                  </tr>
-                ))}
-                <tr className="font-bold">
-                  <td className="border border-black p-2 text-center" colSpan={5}>
-                    TOTAL WEIGHT: {invoiceData.totalWeight || 25} KG
-                  </td>
-                  <td className="border border-black p-2 text-center">
-                    {((invoiceData.packages?.reduce((sum: number, pkg: any) => sum + (pkg.volume || 0), 0) || 0.06) * 35.315).toFixed(2)}
-                  </td>
-                  <td className="border border-black p-2 text-center">
-                    {(invoiceData.packages?.reduce((sum: number, pkg: any) => sum + (pkg.volume || 0), 0) || 0.06).toFixed(3)}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            {/* Footer */}
-            <div className="flex border-t border-black">
-              <div className="w-1/2 border-r border-black p-2">
-                <div className="font-bold mb-2">CONDITIONS:</div>
-                <div className="text-xs space-y-1">
-                  <div>1. Any disputes must be reported within 24 hours of delivery.</div>
-                  <div>2. Payment terms: Net 30 days from invoice date.</div>
-                  <div>3. Late payment charges apply after due date.</div>
-                  <div>4. Company not liable for damages beyond service charges.</div>
-                  <div>5. All packages subject to customs inspection.</div>
-                </div>
-                <div className="mt-4 text-center">
-                  <div className="font-bold">CUSTOMER SIGNATURE</div>
-                  <div className="border-t border-black mt-8 pt-2">DATE & SIGNATURE</div>
-                </div>
-              </div>
-              
-              <div className="w-1/2 p-2">
-                <table className="w-full">
-                  <tbody>
-                    <tr>
-                      <td className="border border-black p-2 font-bold">GROSS:</td>
-                      <td className="border border-black p-2 text-right">{(invoiceData.pricing?.gross || 0).toFixed(2)} SAR</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-black p-2 font-bold">DISCOUNT:</td>
-                      <td className="border border-black p-2 text-right">{(invoiceData.pricing?.discount || 0).toFixed(2)} SAR</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-black p-2 font-bold">NET:</td>
-                      <td className="border border-black p-2 text-right font-bold">{(invoiceData.pricing?.net || 0).toFixed(2)} SAR</td>
-                    </tr>
-                    <tr>
-                      <td className="border border-black p-2 font-bold">PAYMENT STATUS:</td>
-                      <td className={`border border-black p-2 text-right font-bold ${isPaid ? 'text-green-600' : 'text-red-600'}`}>
-                        {isPaid ? 'PAID' : 'UNPAID'}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-                
-                <div className="mt-4 text-center">
-                  <div className="font-bold">AUTHORIZED SIGNATURE</div>
-                  <div className="border-t border-black mt-8 pt-2">SOQOTRA LOGISTICS</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+      {/* Print Content */}
+      <div className="flex justify-center p-6 print:p-0">
+        <div
+          ref={printRef}
+          id="sa-print-content"
+          className="bg-white shadow-lg print:shadow-none mx-auto"
+          style={getContainerStyle()}
+        >
+          {mode === "invoice" && <SAInvoiceDocument invoiceData={invoiceData} />}
+          {mode === "hbl" && <SAHBLDocument invoiceData={invoiceData} />}
+          {mode === "manifest" && <SACargoManifestDocument invoiceData={invoiceData} allInvoices={allInvoices} />}
+          {mode === "receipt" && <SAReceiptDocument invoiceData={invoiceData} />}
+        </div>
       </div>
     </div>
   );
