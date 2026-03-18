@@ -1,4 +1,4 @@
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/zixy600yjq8z/public_html/
-    - /bin/cp -R dist/* $DEPLOYPATH/bin/cp -R * $DEPLOYPATH
+    - export DEPLOYMENTPATH=/home/zixy600yjq8z/public_html/
+    - /bin/cp -R dist/* $DEPLOYMENTPATH
