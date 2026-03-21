@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer, FileText, Ship, Package, Receipt, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Printer, FileText, Ship, Package, Receipt, MessageCircle, Download } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { toast } from 'sonner';
 import SAPrintStyles from './components/print/SAPrintStyles';
 import SAInvoiceDocument from './components/print/SAInvoiceDocument';
 import SAHBLDocument from './components/print/SAHBLDocument';
@@ -111,6 +114,31 @@ const SaudiArabiaInvoicePrint = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={async () => {
+              if (!printRef.current) return;
+              try {
+                toast.loading("Generating PDF...", { id: "pdf" });
+                const canvas = await html2canvas(printRef.current, { scale: 2, useCORS: true });
+                const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                const isLandscape = mode === "manifest";
+                const isA5 = mode === "receipt";
+                const pdf = new jsPDF({
+                  orientation: isLandscape ? 'landscape' : 'portrait',
+                  unit: 'mm',
+                  format: isA5 ? 'a5' : 'a4'
+                });
+                const pdfW = pdf.internal.pageSize.getWidth();
+                const pdfH = (canvas.height * pdfW) / canvas.width;
+                pdf.addImage(imgData, 'JPEG', 0, 0, pdfW, pdfH);
+                const label = mode === "receipt" ? "Receipt" : mode === "hbl" ? "HBL" : mode === "manifest" ? "Manifest" : "Invoice";
+                pdf.save(`${label}-${invoiceData.invoiceNumber}.pdf`);
+                toast.success("PDF downloaded", { id: "pdf" });
+              } catch {
+                toast.error("Failed to generate PDF", { id: "pdf" });
+              }
+            }} className="gap-1.5">
+              <Download className="h-4 w-4" /> PDF
+            </Button>
             <Button size="sm" variant="outline" onClick={() => {
               const d = invoiceData;
               const label = mode === "receipt" ? "PAYMENT RECEIPT" : mode === "hbl" ? "HOUSE BILL OF LADING" : mode === "manifest" ? "CARGO MANIFEST" : "INVOICE";
