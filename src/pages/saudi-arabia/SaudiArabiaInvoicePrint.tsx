@@ -142,6 +142,23 @@ const SaudiArabiaInvoicePrint = () => {
             <Button size="sm" variant="outline" onClick={() => {
               const d = invoiceData;
               const label = mode === "receipt" ? "PAYMENT RECEIPT" : mode === "hbl" ? "HOUSE BILL OF LADING" : mode === "manifest" ? "CARGO MANIFEST" : "INVOICE";
+              const subject = `${label} #${d.invoiceNumber || 'N/A'} - SOQOTRA LOGISTICS`;
+              const body = [
+                `${label}`,
+                `Invoice #: ${d.invoiceNumber || 'N/A'}`,
+                d.shipperName ? `Shipper: ${d.shipperName}` : '',
+                d.consigneeName ? `Consignee: ${d.consigneeName}` : '',
+                d.totalAmount ? `Amount: SAR ${Number(d.totalAmount).toFixed(2)}` : '',
+                '',
+                'SOQOTRA LOGISTICS - Saudi Arabia',
+              ].filter(Boolean).join('\n');
+              window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_self');
+            }} className="gap-1.5">
+              <Mail className="h-4 w-4" /> Email
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => {
+              const d = invoiceData;
+              const label = mode === "receipt" ? "PAYMENT RECEIPT" : mode === "hbl" ? "HOUSE BILL OF LADING" : mode === "manifest" ? "CARGO MANIFEST" : "INVOICE";
               const message = [
                 `📄 *${label}*`,
                 `━━━━━━━━━━━━━━━`,
