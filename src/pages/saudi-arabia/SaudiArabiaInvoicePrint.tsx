@@ -1,7 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer, FileText, Ship, Package, Receipt, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Printer, FileText, Ship, Package, Receipt, MessageCircle, Download } from 'lucide-react';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import { toast } from 'sonner';
 import SAPrintStyles from './components/print/SAPrintStyles';
 import SAInvoiceDocument from './components/print/SAInvoiceDocument';
 import SAHBLDocument from './components/print/SAHBLDocument';
