@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import { navigationSections } from "./navigationConfig";
+import { NavigationSections } from "./types";
 
-export const useMainNavigation = (sectionKeys: string[]) => {
+export const useMainNavigation = (sections: NavigationSections, sectionKeys: string[]) => {
   // Initialize with empty object (all collapsed)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(
     Object.fromEntries(sectionKeys.map((k) => [k, false]))
@@ -17,7 +17,8 @@ export const useMainNavigation = (sectionKeys: string[]) => {
     
     // Find which section contains the current path
     sectionKeys.forEach(key => {
-      const section = navigationSections[key];
+      const section = sections[key];
+      if (!section) return;
       
       // Check if any item in this section matches the current path
       const hasActivePath = section.submenu.some(submenu => 
