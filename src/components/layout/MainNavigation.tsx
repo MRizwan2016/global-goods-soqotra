@@ -9,6 +9,7 @@ import { useLocation } from 'react-router-dom';
 export const MainNavigation: React.FC = () => {
   const { currentUser, isAdmin } = useAuth();
   const sectionKeys = Object.keys(navigationSections);
+  console.log('ALL SECTION KEYS:', sectionKeys, 'has sriLanka:', 'sriLanka' in navigationSections);
   const { expandedSections, toggleSection, isPathActive, location } = useMainNavigation(sectionKeys);
   
   // Auto-expand the section that contains the current path
