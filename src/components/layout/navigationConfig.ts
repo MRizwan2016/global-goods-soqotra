@@ -167,8 +167,7 @@ export const navigationSections: NavigationSections = {
       {
         title: "SRI LANKA",
         items: [
-          { name: "DASHBOARD", path: "/sri-lanka" },
-          { name: "VIEW SCHEDULES", path: "/sri-lanka/schedules" },
+          { name: "DASHBOARD", path: "/sri-lanka/collection-delivery" },
         ],
       },
       {
