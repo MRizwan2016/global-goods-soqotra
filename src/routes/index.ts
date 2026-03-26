@@ -1,4 +1,4 @@
-
+// Routes configuration - all country modules including SRI LANKA standalone
 import { adminRoutes } from "./adminRoutes";
 import { dataEntryRoutes } from "./dataEntryRoutes";
 import accountsRoutes from "./accountsRoutes"; 
