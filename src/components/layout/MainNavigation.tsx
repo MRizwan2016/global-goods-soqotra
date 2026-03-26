@@ -1,21 +1,67 @@
 // MainNavigation - renders all sidebar sections including standalone country modules
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
+import { Globe } from 'lucide-react';
 import { navigationSections } from './navigationConfig';
 import { useMainNavigation } from './useMainNavigation';
 import MenuSection from './MenuSection';
+import { NavigationSection } from './types';
 import { useAuth } from '@/hooks/use-auth';
 import { useLocation } from 'react-router-dom';
 
+const sriLankaStandaloneFallback: NavigationSection = {
+  title: "SRI LANKA",
+  icon: Globe,
+  color: "text-white",
+  bgGradient: "from-amber-600 to-amber-800",
+  borderColor: "border-amber-200",
+  iconColor: "text-white",
+  submenu: [
+    {
+      title: "INVOICING",
+      items: [
+        { name: "DASHBOARD", path: "/sri-lanka" },
+        { name: "ADD NEW INVOICE", path: "/sri-lanka/invoice/add" },
+      ],
+    },
+    {
+      title: "COLLECTION & DELIVERY",
+      items: [
+        { name: "COLLECTION & DELIVERY", path: "/sri-lanka/collection-delivery" },
+        { name: "ADD NEW JOB", path: "/sri-lanka/new-job" },
+        { name: "VIEW SCHEDULES", path: "/sri-lanka/schedules" },
+      ],
+    },
+    {
+      title: "ACCOUNTS",
+      items: [
+        { name: "PAYMENT RECEIPT", path: "/sri-lanka/payment-receipt" },
+        { name: "RECONCILIATION", path: "/sri-lanka/reconciliation" },
+      ],
+    },
+  ],
+};
+
 export const MainNavigation: React.FC = () => {
   const { currentUser, isAdmin } = useAuth();
-  const allSectionKeys = Object.keys(navigationSections);
-  const { expandedSections, toggleSection, isPathActive, location } = useMainNavigation(allSectionKeys);
+  const sections = useMemo(() => ({
+    ...navigationSections,
+    sriLanka: navigationSections.sriLanka ?? sriLankaStandaloneFallback,
+  }), []);
+
+  const preferredOrder = ['upb', 'accounts', 'admin', 'cargo', 'sriLanka', 'saudiArabia'];
+  const allSectionKeys = [
+    ...preferredOrder.filter((key) => Boolean(sections[key])),
+    ...Object.keys(sections).filter((key) => !preferredOrder.includes(key)),
+  ];
+
+  const { expandedSections, toggleSection, isPathActive, location } = useMainNavigation(sections, allSectionKeys);
   
   // Auto-expand the section that contains the current path
   useEffect(() => {
     if (location.pathname) {
       allSectionKeys.forEach(key => {
-        const section = navigationSections[key];
+        const section = sections[key];
+        if (!section) return;
         const hasActivePath = section.submenu.some(submenu => 
           submenu.items.some(item => isPathActive(item.path))
         );
@@ -58,7 +104,8 @@ export const MainNavigation: React.FC = () => {
   return (
     <nav className="w-full space-y-1">
       {filteredSectionKeys.map((sectionKey) => {
-        const section = navigationSections[sectionKey];
+        const section = sections[sectionKey];
+        if (!section) return null;
         return (
           <MenuSection
             key={sectionKey}
