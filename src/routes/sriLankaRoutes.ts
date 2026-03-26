@@ -4,6 +4,10 @@ import SriLankaInvoiceForm from "@/pages/sri-lanka/SriLankaInvoiceForm";
 import SriLankaInvoicePrint from "@/pages/sri-lanka/SriLankaInvoicePrint";
 import SriLankaAirManifestPage from "@/pages/sri-lanka/manifest/SriLankaAirManifestPage";
 import SriLankaSeaManifestPage from "@/pages/sri-lanka/manifest/SriLankaSeaManifestPage";
+import SriLankaCollectionDelivery from "@/pages/sri-lanka/SriLankaCollectionDelivery";
+import SriLankaNewJob from "@/pages/sri-lanka/SriLankaNewJob";
+import SriLankaPaymentReceipt from "@/pages/sri-lanka/SriLankaPaymentReceipt";
+import SriLankaReconciliation from "@/pages/sri-lanka/SriLankaReconciliation";
 import ViewSchedules from "@/pages/schedules/ViewSchedules";
 
 export const sriLankaRoutes: RouteConfig[] = [
@@ -40,6 +44,26 @@ export const sriLankaRoutes: RouteConfig[] = [
   {
     path: "/sri-lanka/manifest/sea/:manifestId",
     element: SriLankaSeaManifestPage,
+    private: true
+  },
+  {
+    path: "/sri-lanka/collection-delivery",
+    element: SriLankaCollectionDelivery,
+    private: true
+  },
+  {
+    path: "/sri-lanka/new-job",
+    element: SriLankaNewJob,
+    private: true
+  },
+  {
+    path: "/sri-lanka/payment-receipt",
+    element: SriLankaPaymentReceipt,
+    private: true
+  },
+  {
+    path: "/sri-lanka/reconciliation",
+    element: SriLankaReconciliation,
     private: true
   }
 ];
