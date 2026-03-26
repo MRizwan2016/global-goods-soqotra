@@ -1,4 +1,4 @@
-// Navigation configuration for all sidebar sections
+/* Navigation configuration for all sidebar sections - includes SRI LANKA and SAUDI ARABIA standalone sections */
 import { Database, DollarSign, Settings, Truck, Package, Globe } from "lucide-react";
 import { NavigationSections } from "./types";
 
