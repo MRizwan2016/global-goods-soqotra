@@ -1,4 +1,4 @@
-
+// MainNavigation - renders all sidebar sections including standalone country modules
 import React, { useEffect } from 'react';
 import { navigationSections } from './navigationConfig';
 import { useMainNavigation } from './useMainNavigation';
