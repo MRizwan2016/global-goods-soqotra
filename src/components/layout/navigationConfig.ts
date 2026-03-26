@@ -214,6 +214,38 @@ export const navigationSections: NavigationSections = {
       },
     ],
   },
+  sriLanka: {
+    title: "SRI LANKA",
+    icon: Globe,
+    color: "text-white",
+    bgGradient: "from-amber-600 to-amber-800",
+    borderColor: "border-amber-200",
+    iconColor: "text-white",
+    submenu: [
+      {
+        title: "INVOICING",
+        items: [
+          { name: "DASHBOARD", path: "/sri-lanka" },
+          { name: "ADD NEW INVOICE", path: "/sri-lanka/invoice/add" },
+        ],
+      },
+      {
+        title: "COLLECTION & DELIVERY",
+        items: [
+          { name: "COLLECTION & DELIVERY", path: "/sri-lanka/collection-delivery" },
+          { name: "ADD NEW JOB", path: "/sri-lanka/new-job" },
+          { name: "VIEW SCHEDULES", path: "/sri-lanka/schedules" },
+        ],
+      },
+      {
+        title: "ACCOUNTS",
+        items: [
+          { name: "PAYMENT RECEIPT", path: "/sri-lanka/payment-receipt" },
+          { name: "RECONCILIATION", path: "/sri-lanka/reconciliation" },
+        ],
+      },
+    ],
+  },
   saudiArabia: {
     title: "SAUDI ARABIA",
     icon: Globe,
