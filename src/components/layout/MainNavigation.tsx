@@ -329,7 +329,7 @@ export const MainNavigation: React.FC = () => {
     if (!currentUser || isAdmin) return true;
     const perm = PERMISSION_MAP[sectionKey];
     if (!perm) return true; // cargo, sriLanka, saudiArabia → always visible
-    return (currentUser.permissions as Record<string, boolean>)[perm] || false;
+    return (currentUser.permissions as any)[perm] || false;
   });
 
   return (
