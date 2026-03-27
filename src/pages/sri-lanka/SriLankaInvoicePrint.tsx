@@ -644,8 +644,13 @@ const SriLankaInvoicePrint = () => {
                 <p>Sea Manifest Document - Coming Soon</p>
               </div>
             )}
+            
+            {mode === 'receipt' && (
+              <SLReceiptDocument invoiceData={invoiceData} />
+            )}
           </>
         )}
+        </div>
       </div>
     </div>
   );
