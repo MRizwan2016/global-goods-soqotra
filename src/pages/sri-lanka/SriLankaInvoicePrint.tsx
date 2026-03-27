@@ -640,10 +640,7 @@ const SriLankaInvoicePrint = () => {
             )}
             
             {mode === 'sea-manifest' && invoiceData?.serviceType === 'SEA FREIGHT' && (
-              <div className="p-8 text-center text-gray-500">
-                <h2 className="text-2xl font-bold mb-4">Sea Freight Manifest</h2>
-                <p>Sea Manifest Document - Coming Soon</p>
-              </div>
+              <SriLankaSeaManifestDocument shipments={[invoiceData]} vesselInfo={vesselInfo} />
             )}
             
             {mode === 'receipt' && (
