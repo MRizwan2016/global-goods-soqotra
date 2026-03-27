@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer, Download, Share2 } from 'lucide-react';
+import { ArrowLeft, Printer, Download, Share2, FileText, Ship, Package, Receipt, MessageCircle, Mail } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import SriLankaHAWB from './documents/SriLankaHAWB';
 import SriLankaAirManifest from './documents/SriLankaAirManifest';
+import SLPrintStyles from './components/print/SLPrintStyles';
+import SLReceiptDocument from './components/print/SLReceiptDocument';
 import { toast } from 'sonner';
 import { SEA_FREIGHT_RATES } from './utils/sriLankaPricing';
 
@@ -18,7 +20,7 @@ const SriLankaInvoicePrint = () => {
   const [invoiceData, setInvoiceData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isPaid, setIsPaid] = useState(false);
-  const [mode, setMode] = useState<'invoice' | 'hawb' | 'hbl' | 'air-manifest' | 'sea-manifest'>('invoice');
+  const [mode, setMode] = useState<'invoice' | 'hawb' | 'hbl' | 'air-manifest' | 'sea-manifest' | 'receipt'>('invoice');
 
   useEffect(() => {
     if (id) {
@@ -125,9 +127,15 @@ const SriLankaInvoicePrint = () => {
         logging: false,
         backgroundColor: '#ffffff',
       });
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = 210;
-      const pdfHeight = 297;
+      const isLandscape = mode === 'air-manifest' || mode === 'sea-manifest';
+      const isA5 = mode === 'receipt';
+      const pdf = new jsPDF({
+        orientation: isLandscape ? 'landscape' : 'portrait',
+        unit: 'mm',
+        format: isA5 ? 'a5' : 'a4'
+      });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgWidth = pdfWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -144,12 +152,29 @@ const SriLankaInvoicePrint = () => {
         heightLeft -= pdfHeight;
       }
 
-      pdf.save(`Invoice-${invoiceData?.invoiceNumber || 'document'}.pdf`);
+      const label = mode === 'receipt' ? 'Receipt' : mode === 'hbl' ? 'HBL' : mode === 'hawb' ? 'HAWB' : mode.includes('manifest') ? 'Manifest' : 'Invoice';
+      pdf.save(`${label}-${invoiceData?.invoiceNumber || 'document'}.pdf`);
       toast.success('PDF downloaded successfully');
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast.error('Failed to generate PDF');
     }
+  };
+
+  const handleEmailShare = () => {
+    const d = invoiceData;
+    const label = mode === 'receipt' ? 'PAYMENT RECEIPT' : mode === 'hbl' ? 'HOUSE BILL OF LADING' : mode === 'hawb' ? 'HAWB' : mode.includes('manifest') ? 'CARGO MANIFEST' : 'INVOICE';
+    const subject = `${label} #${d?.invoiceNumber || 'N/A'} - SOQOTRA LOGISTICS`;
+    const body = [
+      label,
+      `Invoice #: ${d?.invoiceNumber || 'N/A'}`,
+      d?.shipper?.name ? `Shipper: ${d.shipper.name}` : '',
+      d?.consignee?.name ? `Consignee: ${d.consignee.name}` : '',
+      d?.pricing?.net ? `Amount: QAR ${d.pricing.net.toFixed(2)}` : '',
+      '',
+      'SOQOTRA LOGISTICS - Sri Lanka Operations',
+    ].filter(Boolean).join('\n');
+    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_self');
   };
 
   const handleWhatsAppShare = async () => {
@@ -231,9 +256,10 @@ const SriLankaInvoicePrint = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
+      <SLPrintStyles mode={mode} />
       {/* Toolbar */}
       <div className="max-w-4xl mx-auto mb-6 no-print">
-        <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+        <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <Button onClick={handleBack} variant="outline" className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
@@ -242,7 +268,7 @@ const SriLankaInvoicePrint = () => {
             <span className="text-sm font-medium ml-2">Invoice #{invoiceData?.invoiceNumber || 'Loading...'}</span>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <div className="flex border rounded-md overflow-hidden">
               <button
                 onClick={() => setMode("invoice")}
@@ -282,25 +308,36 @@ const SriLankaInvoicePrint = () => {
                   </button>
                 </>
               )}
+              <button
+                onClick={() => setMode("receipt")}
+                className={`px-3 py-1.5 text-sm border-l ${mode === "receipt" ? "bg-gray-100 font-semibold" : "hover:bg-gray-50"}`}
+              >
+                <span className="flex items-center gap-1"><Receipt className="h-3 w-3" /> Receipt</span>
+              </button>
             </div>
-            <Button onClick={handleWhatsAppShare} variant="outline" className="flex items-center gap-2 text-green-600 border-green-300 hover:bg-green-50">
-              <Share2 className="h-4 w-4" />
-              WhatsApp
+            <Button onClick={handleDownloadPDF} variant="outline" size="sm" className="flex items-center gap-1.5">
+              <Download className="h-4 w-4" /> PDF
             </Button>
-            <Button onClick={handleDownloadPDF} variant="outline" className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              Download PDF
+            <Button onClick={handleEmailShare} variant="outline" size="sm" className="flex items-center gap-1.5">
+              <Mail className="h-4 w-4" /> Email
             </Button>
-            <Button onClick={handlePrint} className="flex items-center gap-2">
-              <Printer className="h-4 w-4" />
-              Print
+            <Button onClick={handleWhatsAppShare} variant="outline" size="sm" className="flex items-center gap-1.5 text-green-600 border-green-300 hover:bg-green-50">
+              <MessageCircle className="h-4 w-4" /> WhatsApp
+            </Button>
+            <Button onClick={handlePrint} size="sm" className="flex items-center gap-1.5">
+              <Printer className="h-4 w-4" /> Print
             </Button>
           </div>
         </div>
       </div>
 
       {/* Document Content */}
-      <div className="max-w-4xl mx-auto bg-white shadow-lg" ref={printRef}>
+      <div className="flex justify-center">
+        <div 
+          className="bg-white shadow-lg" 
+          ref={printRef}
+          style={mode === 'receipt' ? { width: '148mm', minHeight: '210mm' } : mode === 'air-manifest' || mode === 'sea-manifest' ? { width: '297mm', minHeight: '210mm' } : { maxWidth: '210mm', width: '100%' }}
+        >
         {invoiceData && (
           <>
             {mode === 'invoice' && (
@@ -607,8 +644,13 @@ const SriLankaInvoicePrint = () => {
                 <p>Sea Manifest Document - Coming Soon</p>
               </div>
             )}
+            
+            {mode === 'receipt' && (
+              <SLReceiptDocument invoiceData={invoiceData} />
+            )}
           </>
         )}
+        </div>
       </div>
     </div>
   );
