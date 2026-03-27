@@ -9,6 +9,7 @@ import SriLankaHAWB from './documents/SriLankaHAWB';
 import SriLankaAirManifest from './documents/SriLankaAirManifest';
 import SLPrintStyles from './components/print/SLPrintStyles';
 import SLReceiptDocument from './components/print/SLReceiptDocument';
+import SriLankaSeaManifestDocument from './documents/SriLankaSeaManifestDocument';
 import { toast } from 'sonner';
 import { SEA_FREIGHT_RATES } from './utils/sriLankaPricing';
 
@@ -639,10 +640,7 @@ const SriLankaInvoicePrint = () => {
             )}
             
             {mode === 'sea-manifest' && invoiceData?.serviceType === 'SEA FREIGHT' && (
-              <div className="p-8 text-center text-gray-500">
-                <h2 className="text-2xl font-bold mb-4">Sea Freight Manifest</h2>
-                <p>Sea Manifest Document - Coming Soon</p>
-              </div>
+              <SriLankaSeaManifestDocument shipments={[invoiceData]} />
             )}
             
             {mode === 'receipt' && (
