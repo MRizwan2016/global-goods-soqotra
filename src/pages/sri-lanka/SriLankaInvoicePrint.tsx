@@ -127,9 +127,15 @@ const SriLankaInvoicePrint = () => {
         logging: false,
         backgroundColor: '#ffffff',
       });
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = 210;
-      const pdfHeight = 297;
+      const isLandscape = mode === 'air-manifest' || mode === 'sea-manifest';
+      const isA5 = mode === 'receipt';
+      const pdf = new jsPDF({
+        orientation: isLandscape ? 'landscape' : 'portrait',
+        unit: 'mm',
+        format: isA5 ? 'a5' : 'a4'
+      });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgWidth = pdfWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
@@ -146,12 +152,29 @@ const SriLankaInvoicePrint = () => {
         heightLeft -= pdfHeight;
       }
 
-      pdf.save(`Invoice-${invoiceData?.invoiceNumber || 'document'}.pdf`);
+      const label = mode === 'receipt' ? 'Receipt' : mode === 'hbl' ? 'HBL' : mode === 'hawb' ? 'HAWB' : mode.includes('manifest') ? 'Manifest' : 'Invoice';
+      pdf.save(`${label}-${invoiceData?.invoiceNumber || 'document'}.pdf`);
       toast.success('PDF downloaded successfully');
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast.error('Failed to generate PDF');
     }
+  };
+
+  const handleEmailShare = () => {
+    const d = invoiceData;
+    const label = mode === 'receipt' ? 'PAYMENT RECEIPT' : mode === 'hbl' ? 'HOUSE BILL OF LADING' : mode === 'hawb' ? 'HAWB' : mode.includes('manifest') ? 'CARGO MANIFEST' : 'INVOICE';
+    const subject = `${label} #${d?.invoiceNumber || 'N/A'} - SOQOTRA LOGISTICS`;
+    const body = [
+      label,
+      `Invoice #: ${d?.invoiceNumber || 'N/A'}`,
+      d?.shipper?.name ? `Shipper: ${d.shipper.name}` : '',
+      d?.consignee?.name ? `Consignee: ${d.consignee.name}` : '',
+      d?.pricing?.net ? `Amount: QAR ${d.pricing.net.toFixed(2)}` : '',
+      '',
+      'SOQOTRA LOGISTICS - Sri Lanka Operations',
+    ].filter(Boolean).join('\n');
+    window.open(`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`, '_self');
   };
 
   const handleWhatsAppShare = async () => {
