@@ -640,7 +640,7 @@ const SriLankaInvoicePrint = () => {
             )}
             
             {mode === 'sea-manifest' && invoiceData?.serviceType === 'SEA FREIGHT' && (
-              <SriLankaSeaManifestDocument shipments={[invoiceData]} vesselInfo={vesselInfo} />
+              <SriLankaSeaManifestDocument shipments={[invoiceData]} />
             )}
             
             {mode === 'receipt' && (
