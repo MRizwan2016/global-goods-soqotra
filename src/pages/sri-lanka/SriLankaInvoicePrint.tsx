@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Printer, Download, Share2 } from 'lucide-react';
+import { ArrowLeft, Printer, Download, Share2, FileText, Ship, Package, Receipt, MessageCircle, Mail } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import SriLankaHAWB from './documents/SriLankaHAWB';
 import SriLankaAirManifest from './documents/SriLankaAirManifest';
+import SLPrintStyles from './components/print/SLPrintStyles';
+import SLReceiptDocument from './components/print/SLReceiptDocument';
 import { toast } from 'sonner';
 import { SEA_FREIGHT_RATES } from './utils/sriLankaPricing';
 
