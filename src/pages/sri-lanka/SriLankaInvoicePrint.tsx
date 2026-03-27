@@ -20,7 +20,7 @@ const SriLankaInvoicePrint = () => {
   const [invoiceData, setInvoiceData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isPaid, setIsPaid] = useState(false);
-  const [mode, setMode] = useState<'invoice' | 'hawb' | 'hbl' | 'air-manifest' | 'sea-manifest'>('invoice');
+  const [mode, setMode] = useState<'invoice' | 'hawb' | 'hbl' | 'air-manifest' | 'sea-manifest' | 'receipt'>('invoice');
 
   useEffect(() => {
     if (id) {
