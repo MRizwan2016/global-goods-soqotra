@@ -256,9 +256,10 @@ const SriLankaInvoicePrint = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
+      <SLPrintStyles mode={mode} />
       {/* Toolbar */}
       <div className="max-w-4xl mx-auto mb-6 no-print">
-        <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+        <div className="flex items-center justify-between bg-white p-4 rounded-lg shadow flex-wrap gap-2">
           <div className="flex items-center gap-2">
             <Button onClick={handleBack} variant="outline" className="flex items-center gap-2">
               <ArrowLeft className="h-4 w-4" />
@@ -267,7 +268,7 @@ const SriLankaInvoicePrint = () => {
             <span className="text-sm font-medium ml-2">Invoice #{invoiceData?.invoiceNumber || 'Loading...'}</span>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <div className="flex border rounded-md overflow-hidden">
               <button
                 onClick={() => setMode("invoice")}
@@ -307,25 +308,36 @@ const SriLankaInvoicePrint = () => {
                   </button>
                 </>
               )}
+              <button
+                onClick={() => setMode("receipt")}
+                className={`px-3 py-1.5 text-sm border-l ${mode === "receipt" ? "bg-gray-100 font-semibold" : "hover:bg-gray-50"}`}
+              >
+                <span className="flex items-center gap-1"><Receipt className="h-3 w-3" /> Receipt</span>
+              </button>
             </div>
-            <Button onClick={handleWhatsAppShare} variant="outline" className="flex items-center gap-2 text-green-600 border-green-300 hover:bg-green-50">
-              <Share2 className="h-4 w-4" />
-              WhatsApp
+            <Button onClick={handleDownloadPDF} variant="outline" size="sm" className="flex items-center gap-1.5">
+              <Download className="h-4 w-4" /> PDF
             </Button>
-            <Button onClick={handleDownloadPDF} variant="outline" className="flex items-center gap-2">
-              <Download className="h-4 w-4" />
-              Download PDF
+            <Button onClick={handleEmailShare} variant="outline" size="sm" className="flex items-center gap-1.5">
+              <Mail className="h-4 w-4" /> Email
             </Button>
-            <Button onClick={handlePrint} className="flex items-center gap-2">
-              <Printer className="h-4 w-4" />
-              Print
+            <Button onClick={handleWhatsAppShare} variant="outline" size="sm" className="flex items-center gap-1.5 text-green-600 border-green-300 hover:bg-green-50">
+              <MessageCircle className="h-4 w-4" /> WhatsApp
+            </Button>
+            <Button onClick={handlePrint} size="sm" className="flex items-center gap-1.5">
+              <Printer className="h-4 w-4" /> Print
             </Button>
           </div>
         </div>
       </div>
 
       {/* Document Content */}
-      <div className="max-w-4xl mx-auto bg-white shadow-lg" ref={printRef}>
+      <div className="flex justify-center">
+        <div 
+          className="bg-white shadow-lg" 
+          ref={printRef}
+          style={mode === 'receipt' ? { width: '148mm', minHeight: '210mm' } : mode === 'air-manifest' || mode === 'sea-manifest' ? { width: '297mm', minHeight: '210mm' } : { maxWidth: '210mm', width: '100%' }}
+        >
         {invoiceData && (
           <>
             {mode === 'invoice' && (
