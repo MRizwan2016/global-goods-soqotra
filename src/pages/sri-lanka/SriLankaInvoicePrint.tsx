@@ -9,6 +9,7 @@ import SriLankaHAWB from './documents/SriLankaHAWB';
 import SriLankaAirManifest from './documents/SriLankaAirManifest';
 import SLPrintStyles from './components/print/SLPrintStyles';
 import SLReceiptDocument from './components/print/SLReceiptDocument';
+import SriLankaSeaManifestDocument from './documents/SriLankaSeaManifestDocument';
 import { toast } from 'sonner';
 import { SEA_FREIGHT_RATES } from './utils/sriLankaPricing';
 
