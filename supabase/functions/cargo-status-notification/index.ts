@@ -171,10 +171,8 @@ Deno.serve(async (req) => {
       throw new Error("RESEND_API_KEY is not configured");
     }
 
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    // Use the admin client already created above
+    const supabase = supabaseAdmin;
 
     const payload = await req.json();
     // Support both webhook payload and direct call
