@@ -137,6 +137,8 @@ const SECTIONS: NavigationSections = {
       {
         title: "TRACK & TRACE",
         items: [
+          { name: "PUBLIC TRACK & TRACE", path: "/track" },
+          { name: "STAFF DASHBOARD", path: "/staff-dashboard" },
           { name: "CUSTOMER PORTAL", path: "/customer-portal" },
           { name: "ADMIN - CARGO TRACKING", path: "/admin/control-panel" },
           { name: "CUSTOMER MANAGEMENT", path: "/customer-portal/admin" },
