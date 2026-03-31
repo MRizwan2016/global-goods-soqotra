@@ -765,6 +765,27 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_customer_active: { Args: { _user_id: string }; Returns: boolean }
+      track_cargo_by_invoice: {
+        Args: { _invoice_number: string }
+        Returns: {
+          arrival_date: string
+          cargo_description: string
+          clearance_date: string
+          collection_date: string
+          created_at: string
+          current_status: string
+          customer_name: string
+          delivery_date: string
+          destination: string
+          id: string
+          in_transit_date: string
+          invoice_number: string
+          loaded_date: string
+          notes: string
+          origin: string
+          processing_date: string
+        }[]
+      }
     }
     Enums: {
       app_role: "admin" | "staff" | "customer"

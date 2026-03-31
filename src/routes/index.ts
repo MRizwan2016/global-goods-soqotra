@@ -34,8 +34,15 @@ import Index from "@/pages/Index";
 import Landing from "@/pages/Landing";
 import InvoicePrint from "@/pages/invoicing/InvoicePrint";
 import { DataBackupManager } from "@/components/data-backup/DataBackupManager";
+import PublicTrackTrace from "@/pages/track/PublicTrackTrace";
+import StaffDashboard from "@/pages/staff/StaffDashboard";
 
 const baseRoutes: RouteConfig[] = [
+  {
+    path: "/track",
+    element: PublicTrackTrace,
+    private: false
+  },
   {
     path: "/",
     element: Index,
@@ -61,6 +68,11 @@ const baseRoutes: RouteConfig[] = [
     element: DataBackupManager,
     private: true,
     requiredPermission: "controlPanel"
+  },
+  {
+    path: "/staff-dashboard",
+    element: StaffDashboard,
+    private: true
   },
   {
     path: "/receipt",
