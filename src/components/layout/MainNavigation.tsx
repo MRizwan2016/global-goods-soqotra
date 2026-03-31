@@ -43,7 +43,7 @@ const SECTIONS: NavigationSections = {
       {
         title: "MASTER DATA",
         items: [
-          { name: "INVOICE BOOK", path: "/master/book/stock" },
+          { name: "MANAGE INVOICE BOOK STOCK", path: "/master/book/stock" },
           { name: "SALES REP", path: "/master/salesrep/list" },
           { name: "TOWN", path: "/master/town" },
           { name: "PACKAGE OPTIONS", path: "/master/package/list" },

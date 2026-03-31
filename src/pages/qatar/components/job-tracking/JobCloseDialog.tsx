@@ -119,7 +119,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
         // Fetch book metadata from Supabase (without processing all pages)
         try {
           const { data: dbBooks, error } = await supabase
-            .from('invoice_books')
+            .from('manage_invoice_book_stock')
             .select('book_number, assigned_to_sales_rep, assigned_to_driver, country, assigned_date, status')
             .in('status', ['assigned', 'available', 'active']);
           
@@ -134,7 +134,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
             });
           }
         } catch (dbError) {
-          console.error("Error querying invoice_books:", dbError);
+          console.error("Error querying manage_invoice_book_stock:", dbError);
         }
         
         if (booksMap.size === 0) {
@@ -223,7 +223,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
 
         try {
           const { data: dbBook, error } = await supabase
-            .from("invoice_books")
+            .from("manage_invoice_book_stock")
             .select("book_number, assigned_to_sales_rep, assigned_to_driver, assigned_date, start_page, end_page")
             .eq("book_number", bookNum)
             .maybeSingle();

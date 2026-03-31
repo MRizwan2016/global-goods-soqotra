@@ -96,7 +96,7 @@ const SriLankaInvoiceForm = () => {
     const fetchBooks = async () => {
       try {
         const { data, error } = await supabase
-          .from('invoice_books')
+          .from('manage_invoice_book_stock')
           .select('*')
           .eq('country', 'Sri Lanka')
           .in('status', ['available', 'assigned']);

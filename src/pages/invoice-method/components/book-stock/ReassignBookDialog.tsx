@@ -77,7 +77,7 @@ const ReassignBookDialog: React.FC<ReassignBookDialogProps> = ({
     try {
       // Update in Supabase
       const { error } = await supabase
-        .from("invoice_books")
+        .from("manage_invoice_book_stock")
         .update({
           assigned_to_sales_rep: newRep.name,
           assigned_date: new Date().toISOString(),

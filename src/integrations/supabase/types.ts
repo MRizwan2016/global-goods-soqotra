@@ -276,7 +276,55 @@ export type Database = {
         }
         Relationships: []
       }
-      invoice_books: {
+      invoices: {
+        Row: {
+          book_no: string | null
+          consignee_name: string | null
+          created_at: string
+          id: string
+          invoice_code: string | null
+          invoice_no: string | null
+          num_packages: number | null
+          page_no: string | null
+          shipper_name: string | null
+          total_amount: number | null
+          total_cbm: number | null
+          total_gross_weight_kg: number | null
+          updated_at: string
+        }
+        Insert: {
+          book_no?: string | null
+          consignee_name?: string | null
+          created_at?: string
+          id?: string
+          invoice_code?: string | null
+          invoice_no?: string | null
+          num_packages?: number | null
+          page_no?: string | null
+          shipper_name?: string | null
+          total_amount?: number | null
+          total_cbm?: number | null
+          total_gross_weight_kg?: number | null
+          updated_at?: string
+        }
+        Update: {
+          book_no?: string | null
+          consignee_name?: string | null
+          created_at?: string
+          id?: string
+          invoice_code?: string | null
+          invoice_no?: string | null
+          num_packages?: number | null
+          page_no?: string | null
+          shipper_name?: string | null
+          total_amount?: number | null
+          total_cbm?: number | null
+          total_gross_weight_kg?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      manage_invoice_book_stock: {
         Row: {
           assigned_date: string | null
           assigned_to_driver: string | null
@@ -336,54 +384,6 @@ export type Database = {
           total_pages?: number
           updated_at?: string
           whatsapp_number?: string | null
-        }
-        Relationships: []
-      }
-      invoices: {
-        Row: {
-          book_no: string | null
-          consignee_name: string | null
-          created_at: string
-          id: string
-          invoice_code: string | null
-          invoice_no: string | null
-          num_packages: number | null
-          page_no: string | null
-          shipper_name: string | null
-          total_amount: number | null
-          total_cbm: number | null
-          total_gross_weight_kg: number | null
-          updated_at: string
-        }
-        Insert: {
-          book_no?: string | null
-          consignee_name?: string | null
-          created_at?: string
-          id?: string
-          invoice_code?: string | null
-          invoice_no?: string | null
-          num_packages?: number | null
-          page_no?: string | null
-          shipper_name?: string | null
-          total_amount?: number | null
-          total_cbm?: number | null
-          total_gross_weight_kg?: number | null
-          updated_at?: string
-        }
-        Update: {
-          book_no?: string | null
-          consignee_name?: string | null
-          created_at?: string
-          id?: string
-          invoice_code?: string | null
-          invoice_no?: string | null
-          num_packages?: number | null
-          page_no?: string | null
-          shipper_name?: string | null
-          total_amount?: number | null
-          total_cbm?: number | null
-          total_gross_weight_kg?: number | null
-          updated_at?: string
         }
         Relationships: []
       }
