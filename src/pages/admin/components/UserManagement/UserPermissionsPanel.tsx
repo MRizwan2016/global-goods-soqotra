@@ -13,8 +13,17 @@ interface UserPermissionsPanelProps {
 }
 
 const UserPermissionsPanel = ({ user }: UserPermissionsPanelProps) => {
-  const { toggleUserPermission, toggleFilePermission, isAdmin } = useAuth();
+  const { toggleUserPermission, toggleFilePermission, isAdmin, loading } = useAuth();
   const [saving, setSaving] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        <span className="ml-2 text-sm text-muted-foreground">Loading permissions...</span>
+      </div>
+    );
+  }
   
   // Save user permissions - permissions are saved in real-time via toggleUserPermission/toggleFilePermission
   const handleSavePermissions = async () => {
