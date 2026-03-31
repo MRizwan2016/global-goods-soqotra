@@ -190,12 +190,13 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
                   
                   {/* Actions */}
                   <div className="flex flex-col gap-2 lg:items-end">
-                    {isAdmin && !isEditing && (
+                    {(isAdmin || authLoading) && !isEditing && (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => startEditing(user)}
                         className="bg-white/70 hover:bg-white border-gray-300"
+                        disabled={authLoading}
                       >
                         <Pencil className="h-4 w-4 mr-1" />
                         Edit Details
@@ -205,11 +206,11 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
                       variant="outline"
                       size="sm"
                       onClick={() => openPermissionsDialog(user)}
-                      disabled={!isAdmin}
+                      disabled={authLoading ? true : !isAdmin}
                       className="bg-white/70 hover:bg-white border-gray-300"
                     >
                       <Settings className="h-4 w-4 mr-1" />
-                      {isAdmin ? "Permissions" : "Admin Only"}
+                      {authLoading ? "Loading..." : isAdmin ? "Permissions" : "Admin Only"}
                     </Button>
                     
                     {!user.isAdmin && (
