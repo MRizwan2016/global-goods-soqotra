@@ -119,7 +119,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
         // Fetch book metadata from Supabase (without processing all pages)
         try {
           const { data: dbBooks, error } = await supabase
-            .from('invoice_books')
+            .from('manage_invoice_book_stock')
             .select('book_number, assigned_to_sales_rep, assigned_to_driver, country, assigned_date, status')
             .in('status', ['assigned', 'available', 'active']);
           
