@@ -389,34 +389,40 @@ export type Database = {
       }
       profiles: {
         Row: {
+          country: string | null
           created_at: string
           email: string | null
           full_name: string | null
           id: string
           is_active: boolean | null
           is_admin: boolean | null
+          mobile_number: string | null
           permissions: Json | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
           is_active?: boolean | null
           is_admin?: boolean | null
+          mobile_number?: string | null
           permissions?: Json | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          country?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
           id?: string
           is_active?: boolean | null
           is_admin?: boolean | null
+          mobile_number?: string | null
           permissions?: Json | null
           updated_at?: string
           user_id?: string

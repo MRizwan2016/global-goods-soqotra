@@ -16,22 +16,21 @@ const UserPermissionsPanel = ({ user }: UserPermissionsPanelProps) => {
   const { toggleUserPermission, toggleFilePermission, isAdmin } = useAuth();
   const [saving, setSaving] = useState(false);
   
-  // Save user permissions
-  const handleSavePermissions = () => {
+  // Save user permissions - permissions are saved in real-time via toggleUserPermission/toggleFilePermission
+  const handleSavePermissions = async () => {
     if (!isAdmin) {
       toast.error("Only administrators can save user permissions");
       return;
     }
     
     setSaving(true);
-    
-    // Simulate API call with a timeout
-    setTimeout(() => {
-      // Save logic would go here in a real application
-      
-      setSaving(false);
+    try {
+      // Permissions are already saved to DB on each toggle
+      // This button confirms the final state
       toast.success(`Permissions for ${user.fullName} saved successfully`);
-    }, 800);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
