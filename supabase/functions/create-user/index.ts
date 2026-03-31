@@ -10,7 +10,7 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   );
 
-  const { email, password, full_name, mobile_number } = await req.json();
+  const { email, password, full_name, mobile_number, country } = await req.json();
 
   const { data, error } = await supabaseAdmin.auth.admin.createUser({
     email,
@@ -28,6 +28,7 @@ Deno.serve(async (req) => {
     await supabaseAdmin.from("profiles").update({
       full_name,
       mobile_number: mobile_number || "",
+      country: country || "",
     }).eq("user_id", data.user.id);
   }
 
