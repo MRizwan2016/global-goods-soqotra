@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { User } from "@/types/auth";
 import CategoryPermissions from "./CategoryPermissions";
@@ -13,8 +13,13 @@ interface UserPermissionsPanelProps {
 }
 
 const UserPermissionsPanel = ({ user }: UserPermissionsPanelProps) => {
-  const { toggleUserPermission, toggleFilePermission, isAdmin, loading } = useAuth();
+  const { toggleUserPermission, toggleFilePermission, isAdmin, loading, users } = useAuth();
   const [saving, setSaving] = useState(false);
+
+  const managedUser = useMemo(
+    () => users.find((existingUser) => existingUser.id === user.id) || user,
+    [user, users]
+  );
 
   if (loading) {
     return (
@@ -36,7 +41,7 @@ const UserPermissionsPanel = ({ user }: UserPermissionsPanelProps) => {
     try {
       // Permissions are already saved to DB on each toggle
       // This button confirms the final state
-      toast.success(`Permissions for ${user.fullName} saved successfully`);
+      toast.success(`Permissions for ${managedUser.fullName} saved successfully`);
     } finally {
       setSaving(false);
     }
@@ -44,16 +49,16 @@ const UserPermissionsPanel = ({ user }: UserPermissionsPanelProps) => {
 
   return (
     <div className="space-y-4">
-      <h4 className="font-medium text-lg mb-2">Permissions for {user.fullName}</h4>
+      <h4 className="font-medium text-lg mb-2">Permissions for {managedUser.fullName}</h4>
       
       <CategoryPermissions 
-        user={user} 
+        user={managedUser} 
         toggleUserPermission={toggleUserPermission}
         isAdminOnly={!isAdmin}
       />
       
       <FilePermissionSection 
-        user={user} 
+        user={managedUser} 
         toggleFilePermission={toggleFilePermission}
         isAdminOnly={!isAdmin}
       />
