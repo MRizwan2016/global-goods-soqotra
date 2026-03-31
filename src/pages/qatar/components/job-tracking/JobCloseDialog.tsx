@@ -134,7 +134,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
             });
           }
         } catch (dbError) {
-          console.error("Error querying invoice_books:", dbError);
+          console.error("Error querying manage_invoice_book_stock:", dbError);
         }
         
         if (booksMap.size === 0) {

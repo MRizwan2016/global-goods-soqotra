@@ -10,7 +10,7 @@ export const filePermissions = {
       sellingRates: { label: "Selling Rates", path: "/master/selling-rates" },
       container: { label: "Container Management", path: "/master/container" },
       vessel: { label: "Vessel Management", path: "/master/vessel" },
-      invoiceBook: { label: "Invoice Book", path: "/master/invoice-book" },
+      invoiceBook: { label: "Manage Invoice Book Stock", path: "/master/invoice-book" },
       driverHelper: { label: "Driver/Helper Management", path: "/master/driver-helper" }
     }
   },
