@@ -39,6 +39,11 @@ import StaffDashboard from "@/pages/staff/StaffDashboard";
 
 const baseRoutes: RouteConfig[] = [
   {
+    path: "/track",
+    element: PublicTrackTrace,
+    private: false
+  },
+  {
     path: "/",
     element: Index,
     private: false
