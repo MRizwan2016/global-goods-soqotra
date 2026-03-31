@@ -223,7 +223,7 @@ const JobCloseDialog = ({ isOpen, onClose, jobId, jobNumber, onSuccess }: JobClo
 
         try {
           const { data: dbBook, error } = await supabase
-            .from("invoice_books")
+            .from("manage_invoice_book_stock")
             .select("book_number, assigned_to_sales_rep, assigned_to_driver, assigned_date, start_page, end_page")
             .eq("book_number", bookNum)
             .maybeSingle();
