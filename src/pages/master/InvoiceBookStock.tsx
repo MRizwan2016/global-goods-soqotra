@@ -172,7 +172,7 @@ const InvoiceBookStock = () => {
   };
   
   return (
-    <Layout title="Invoice Book Stock">
+    <Layout title="Manage Invoice Book Stock">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 animate-fade-in">
         <div className="p-4 bg-blue-50 border-b border-blue-100">
           <h3 className="text-lg font-medium text-blue-800">
