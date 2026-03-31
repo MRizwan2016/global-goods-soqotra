@@ -18,7 +18,7 @@ interface UserListProps {
 }
 
 const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
-  const { currentUser, isAdmin } = useAuth();
+  const { currentUser, isAdmin, loading: authLoading } = useAuth();
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [permissionsDialogOpen, setPermissionsDialogOpen] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
