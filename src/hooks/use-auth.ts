@@ -40,9 +40,11 @@ export function useAuth(): LegacyAuthContextType {
   const [legacyUser, setLegacyUser] = useState<LegacyUser | null>(null);
   const [legacyLoading, setLegacyLoading] = useState<boolean>(true);
 
+  // Re-load profiles whenever the Supabase auth user changes
+  // so RLS-gated queries run with a valid session token
   useEffect(() => {
     loadUsersFromBothSources();
-  }, []);
+  }, [ctx?.user?.id]);
 
   const loadUsersFromBothSources = async () => {
     try {
