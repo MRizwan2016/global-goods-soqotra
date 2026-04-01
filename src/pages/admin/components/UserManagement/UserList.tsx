@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { User } from "@/types/auth";
-import { UserCheck, UserX, Settings, Pencil, Save, X } from "lucide-react";
+import { UserCheck, UserX, Settings, Pencil, Save, X, KeyRound } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import UserPermissionsPanel from "./UserPermissionsPanel";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Label } from "@/components/ui/label";
 
 interface UserListProps {
   users: User[];
@@ -24,6 +25,11 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ email: "", mobileNumber: "", country: "" });
   const [saving, setSaving] = useState(false);
+
+  // Password reset state
+  const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [resettingPassword, setResettingPassword] = useState(false);
 
   const handleToggleStatus = async (userId: string) => {
     await toggleUserStatus(userId);
@@ -66,13 +72,49 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
       } else {
         toast.success("User details updated successfully");
         setEditingUserId(null);
-        // Reload page to reflect changes
         window.location.reload();
       }
     } catch (err) {
       toast.error("Error saving user details");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetPasswordUser || !newPassword) return;
+    if (newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    setResettingPassword(true);
+    try {
+      const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+      const anonKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const resp = await fetch(
+        `https://${projectId}.supabase.co/functions/v1/reset-user-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": anonKey,
+            "Authorization": `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          },
+          body: JSON.stringify({ user_id: resetPasswordUser.id, new_password: newPassword }),
+        }
+      );
+      const result = await resp.json();
+      if (result.success) {
+        toast.success(`Password reset successfully for ${resetPasswordUser.fullName}`);
+        setResetPasswordUser(null);
+        setNewPassword("");
+      } else {
+        toast.error(result.error || "Failed to reset password");
+      }
+    } catch (err) {
+      toast.error("Error resetting password");
+    } finally {
+      setResettingPassword(false);
     }
   };
 
@@ -116,17 +158,14 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
             className={`group p-6 rounded-xl border-2 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg ${userColors}`}
           >
             <div className="flex items-start gap-4">
-              {/* User Number Circle */}
               <div className="flex-shrink-0">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-200 ${circleColors}`}>
                   <span className="text-lg font-bold">{userNumber}</span>
                 </div>
               </div>
               
-              {/* User Info */}
               <div className="flex-1">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                  {/* Primary Info */}
                   <div className="lg:col-span-2">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-semibold text-gray-800">{user.fullName}</h3>
@@ -188,19 +227,30 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
                     )}
                   </div>
                   
-                  {/* Actions */}
                   <div className="flex flex-col gap-2 lg:items-end">
                     {(isAdmin || authLoading) && !isEditing && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => startEditing(user)}
-                        className="bg-white/70 hover:bg-white border-gray-300"
-                        disabled={authLoading}
-                      >
-                        <Pencil className="h-4 w-4 mr-1" />
-                        Edit Details
-                      </Button>
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => startEditing(user)}
+                          className="bg-white/70 hover:bg-white border-gray-300"
+                          disabled={authLoading}
+                        >
+                          <Pencil className="h-4 w-4 mr-1" />
+                          Edit Details
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => { setResetPasswordUser(user); setNewPassword(""); }}
+                          className="bg-white/70 hover:bg-white border-amber-400 text-amber-700 hover:text-amber-800"
+                          disabled={authLoading}
+                        >
+                          <KeyRound className="h-4 w-4 mr-1" />
+                          Reset Password
+                        </Button>
+                      </>
                     )}
                     <Button
                       variant="outline"
@@ -238,6 +288,7 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
         );
       })}
 
+      {/* Permissions Dialog */}
       <Dialog open={permissionsDialogOpen} onOpenChange={setPermissionsDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
@@ -252,6 +303,46 @@ const UserList = ({ users, loading, toggleUserStatus }: UserListProps) => {
               user={users.find(u => u.id === selectedUser.id) || selectedUser}
             />
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Password Dialog */}
+      <Dialog open={!!resetPasswordUser} onOpenChange={(open) => { if (!open) { setResetPasswordUser(null); setNewPassword(""); } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="h-5 w-5 text-amber-600" />
+              Reset Password
+            </DialogTitle>
+            <DialogDescription>
+              Set a new password for <strong>{resetPasswordUser?.fullName}</strong> ({resetPasswordUser?.email})
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-2">
+              <Label htmlFor="new-pw">New Password</Label>
+              <Input
+                id="new-pw"
+                type="text"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password (min 6 chars)"
+                minLength={6}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" className="flex-1" onClick={() => { setResetPasswordUser(null); setNewPassword(""); }}>
+                Cancel
+              </Button>
+              <Button
+                className="flex-1 bg-amber-600 hover:bg-amber-700 text-white"
+                onClick={handleResetPassword}
+                disabled={resettingPassword || newPassword.length < 6}
+              >
+                {resettingPassword ? "Resetting..." : "Reset Password"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
