@@ -76,6 +76,11 @@ const baseRoutes: RouteConfig[] = [
     private: true
   },
   {
+    path: "/staff-portal",
+    element: StaffInvoicePortal,
+    private: true
+  },
+  {
     path: "/receipt",
     element: PaymentReceiptPage,
     private: false
