@@ -36,6 +36,7 @@ import InvoicePrint from "@/pages/invoicing/InvoicePrint";
 import { DataBackupManager } from "@/components/data-backup/DataBackupManager";
 import PublicTrackTrace from "@/pages/track/PublicTrackTrace";
 import StaffDashboard from "@/pages/staff/StaffDashboard";
+import StaffInvoicePortal from "@/pages/staff/StaffInvoicePortal";
 
 const baseRoutes: RouteConfig[] = [
   {
@@ -72,6 +73,11 @@ const baseRoutes: RouteConfig[] = [
   {
     path: "/staff-dashboard",
     element: StaffDashboard,
+    private: true
+  },
+  {
+    path: "/staff-portal",
+    element: StaffInvoicePortal,
     private: true
   },
   {

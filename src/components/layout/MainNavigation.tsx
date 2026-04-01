@@ -139,6 +139,7 @@ const SECTIONS: NavigationSections = {
         items: [
           { name: "PUBLIC TRACK & TRACE", path: "/track" },
           { name: "STAFF DASHBOARD", path: "/staff-dashboard" },
+          { name: "STAFF INVOICE PORTAL", path: "/staff-portal" },
           { name: "CUSTOMER PORTAL", path: "/customer-portal" },
           { name: "ADMIN - CARGO TRACKING", path: "/admin/control-panel" },
           { name: "CUSTOMER MANAGEMENT", path: "/customer-portal/admin" },
