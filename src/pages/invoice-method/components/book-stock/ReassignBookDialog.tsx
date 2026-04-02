@@ -97,6 +97,12 @@ const ReassignBookDialog: React.FC<ReassignBookDialogProps> = ({
 
       if (error) throw error;
 
+      // Auto-sync to external project
+      syncToExternal("update", "manage_invoice_book_stock", {
+        assigned_to_sales_rep: newRep.name,
+        assigned_date: new Date().toISOString(),
+      }, "book_number", book.bookNumber);
+
       // Also update localStorage for backward compatibility
       const storedBooks = JSON.parse(localStorage.getItem("invoiceBooks") || "[]");
       const updatedBooks = storedBooks.map((b: any) =>
