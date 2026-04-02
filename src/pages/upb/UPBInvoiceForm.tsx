@@ -37,7 +37,19 @@ const UPBInvoiceForm = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [name]: value };
+      // When shipper name changes, auto-sync consignee to be identical
+      if (name === 'shipperName') {
+        updated.consigneeName = value;
+      }
+      // When customer name changes, sync both shipper and consignee
+      if (name === 'customerName') {
+        updated.shipperName = value;
+        updated.consigneeName = value;
+      }
+      return updated;
+    });
   };
 
   const handleAddPackage = (packageItem: UPBPackageItem) => {
