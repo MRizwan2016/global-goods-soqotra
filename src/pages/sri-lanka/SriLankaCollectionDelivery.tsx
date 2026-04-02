@@ -85,19 +85,17 @@ const SriLankaCollectionDelivery = () => {
     const scheduleNumber = `LK-SCH-${Date.now() % 10000}`;
 
     try {
-      const result = await ScheduleService.createSchedule({
+      const result = await ScheduleService.saveSchedule({
         schedule_number: scheduleNumber,
         schedule_date: new Date().toISOString().split('T')[0],
         vehicle: scheduleVehicle,
         sales_rep: scheduleSalesRep,
         driver: scheduleDriver,
         country: 'sri-lanka',
-        total_jobs: selectedJobsData.length,
-        status: 'active',
-      }, selectedJobsData.map(j => ({ job_data: j })));
+        jobs: selectedJobsData,
+      });
 
       if (result.success) {
-        // Update job statuses
         const updatedJobs = jobs.map(j =>
           selectedJobs.has(j.id)
             ? { ...j, status: "scheduled", scheduleNumber, vehicle: scheduleVehicle }
