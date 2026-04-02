@@ -143,7 +143,7 @@ const SriLankaNewJob = () => {
       const existing = JSON.parse(localStorage.getItem("sriLankaJobs") || "[]");
       existing.push(newJob);
       localStorage.setItem("sriLankaJobs", JSON.stringify(existing));
-      toast.success(`Job ${jobId} created successfully`);
+      toast.success(`Job ${autoJobNumber} created successfully`);
       navigate("/sri-lanka/collection-delivery");
     } catch (error) {
       toast.error("Failed to save job");
