@@ -183,6 +183,15 @@ const SaudiArabiaNewJob = () => {
           </div>
         </div>
 
+        {/* Auto-generated Job Number */}
+        <Card>
+          <CardContent className="py-3 flex items-center gap-4 bg-green-50 border-green-200">
+            <Label className="font-bold text-green-800">JOB NUMBER:</Label>
+            <span className="font-mono text-lg font-bold text-green-900 tracking-wider">{autoJobNumber}</span>
+            <span className="text-xs text-green-600">(Auto-generated, unique)</span>
+          </CardContent>
+        </Card>
+
         {/* Job Type & Date */}
         <Card>
           <CardHeader className="bg-[#006c35] text-white rounded-t-lg py-3">
