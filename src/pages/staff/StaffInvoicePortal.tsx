@@ -122,6 +122,7 @@ const StaffInvoicePortal = () => {
         .eq("id", editBook.id);
 
       if (error) throw error;
+      syncToExternal("update", "manage_invoice_book_stock", { pages_used: editPagesUsed, status: editStatus }, "book_number", editBook.book_number);
       toast.success(`Book ${editBook.book_number} updated`);
       setEditDialogOpen(false);
       loadData();
