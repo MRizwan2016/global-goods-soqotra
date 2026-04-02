@@ -42,9 +42,33 @@ const emptyItem = (): PackageItem => ({
   cbm: 0,
 });
 
+const generateUniqueJobNumber = (prefix: string, storageKey: string): string => {
+  const existing = JSON.parse(localStorage.getItem(storageKey) || "[]");
+  const existingIds = new Set(existing.map((j: any) => j.id));
+  
+  const date = new Date();
+  const year = date.getFullYear().toString().slice(-2);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const dateStr = `${year}${month}${day}`;
+  
+  let seq = 1;
+  let jobId: string;
+  do {
+    jobId = `${prefix}-${dateStr}-${String(seq).padStart(3, "0")}`;
+    seq++;
+  } while (existingIds.has(jobId));
+  
+  return jobId;
+};
+
 const SaudiArabiaNewJob = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
+
+  const [autoJobNumber] = useState(() => 
+    generateUniqueJobNumber("SA", "saudiArabiaJobs")
+  );
 
   const [jobData, setJobData] = useState({
     jobType: "collection" as "collection" | "delivery",
@@ -108,10 +132,9 @@ const SaudiArabiaNewJob = () => {
 
     setIsSaving(true);
 
-    const jobId = `SA${jobData.jobType === "collection" ? "C" : "D"}-${String(Date.now()).slice(-4)}`;
-
     const newJob = {
-      id: jobId,
+      id: autoJobNumber,
+      jobNumber: autoJobNumber,
       ...jobData,
       items,
       totalPackages,
@@ -129,7 +152,7 @@ const SaudiArabiaNewJob = () => {
       const existing = JSON.parse(localStorage.getItem("saudiArabiaJobs") || "[]");
       existing.push(newJob);
       localStorage.setItem("saudiArabiaJobs", JSON.stringify(existing));
-      toast.success(`Job ${jobId} created successfully`);
+      toast.success(`Job ${autoJobNumber} created successfully`);
       navigate("/saudi-arabia/collection-delivery");
     } catch (error) {
       toast.error("Failed to save job");
@@ -159,6 +182,15 @@ const SaudiArabiaNewJob = () => {
             </Button>
           </div>
         </div>
+
+        {/* Auto-generated Job Number */}
+        <Card>
+          <CardContent className="py-3 flex items-center gap-4 bg-green-50 border-green-200">
+            <Label className="font-bold text-green-800">JOB NUMBER:</Label>
+            <span className="font-mono text-lg font-bold text-green-900 tracking-wider">{autoJobNumber}</span>
+            <span className="text-xs text-green-600">(Auto-generated, unique)</span>
+          </CardContent>
+        </Card>
 
         {/* Job Type & Date */}
         <Card>

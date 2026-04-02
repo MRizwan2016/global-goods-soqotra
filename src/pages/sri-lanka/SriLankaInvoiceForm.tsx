@@ -847,9 +847,11 @@ const SriLankaInvoiceForm = () => {
                        if (value.length >= 3) {
                          try {
                            // Check localStorage first
-                           const jobs1 = JSON.parse(localStorage.getItem('jobs') || '[]');
-                           const jobs2 = JSON.parse(localStorage.getItem('qatarJobs') || '[]');
-                           const allJobs = [...jobs1, ...jobs2];
+                            const jobs1 = JSON.parse(localStorage.getItem('jobs') || '[]');
+                            const jobs2 = JSON.parse(localStorage.getItem('qatarJobs') || '[]');
+                            const jobs3 = JSON.parse(localStorage.getItem('sriLankaJobs') || '[]');
+                            const jobs4 = JSON.parse(localStorage.getItem('saudiArabiaJobs') || '[]');
+                            const allJobs = [...jobs1, ...jobs2, ...jobs3, ...jobs4];
                            
                            const matchedJob = allJobs.find((j: any) => 
                              j.jobNumber === value || 

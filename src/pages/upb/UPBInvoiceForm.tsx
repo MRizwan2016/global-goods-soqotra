@@ -28,6 +28,8 @@ const UPBInvoiceForm = () => {
     customerAddress: "",
     date: "",
     destination: "",
+    shipperName: "",
+    consigneeName: "",
   });
 
   const [packages, setPackages] = useState<UPBPackageItem[]>([]);
@@ -35,7 +37,19 @@ const UPBInvoiceForm = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [name]: value };
+      // When shipper name changes, auto-sync consignee to be identical
+      if (name === 'shipperName') {
+        updated.consigneeName = value;
+      }
+      // When customer name changes, sync both shipper and consignee
+      if (name === 'customerName') {
+        updated.shipperName = value;
+        updated.consigneeName = value;
+      }
+      return updated;
+    });
   };
 
   const handleAddPackage = (packageItem: UPBPackageItem) => {
@@ -104,6 +118,30 @@ const UPBInvoiceForm = () => {
                 value={formData.destination}
                 onChange={handleInputChange}
                 placeholder="Enter destination"
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="shipperName">Shipper Name</Label>
+              <Input
+                id="shipperName"
+                name="shipperName"
+                value={formData.shipperName}
+                onChange={handleInputChange}
+                placeholder="Enter shipper name"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Consignee name will be set identical automatically</p>
+            </div>
+            <div>
+              <Label htmlFor="consigneeName">Consignee Name</Label>
+              <Input
+                id="consigneeName"
+                name="consigneeName"
+                value={formData.consigneeName}
+                readOnly
+                className="bg-gray-50"
+                placeholder="Auto-filled from shipper"
               />
             </div>
           </div>
