@@ -122,10 +122,10 @@ const SriLankaNewJob = () => {
     if (!jobData.driver) { toast.error("Please assign a driver"); return; }
 
     setIsSaving(true);
-    const jobId = `LK${jobData.jobType === "collection" ? "C" : "D"}-${String(Date.now()).slice(-4)}`;
 
     const newJob = {
-      id: jobId,
+      id: autoJobNumber,
+      jobNumber: autoJobNumber,
       ...jobData,
       items,
       totalPackages,
