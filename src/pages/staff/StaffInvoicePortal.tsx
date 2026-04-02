@@ -167,6 +167,7 @@ const StaffInvoicePortal = () => {
         .eq("id", book.id);
 
       if (error) throw error;
+      syncToExternal("delete", "manage_invoice_book_stock", undefined, "book_number", book.book_number);
       toast.success(`Book ${book.book_number} deleted`);
       loadData();
     } catch (err: any) {
