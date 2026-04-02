@@ -147,6 +147,7 @@ const StaffInvoicePortal = () => {
         .eq("id", selectedBookId);
 
       if (error) throw error;
+      syncToExternal("update", "manage_invoice_book_stock", { assigned_to_sales_rep: assignToName, assigned_date: new Date().toISOString(), status: "assigned" }, "id", selectedBookId);
       toast.success(`Book assigned to ${assignToName}`);
       setAssignDialogOpen(false);
       setSelectedBookId("");
