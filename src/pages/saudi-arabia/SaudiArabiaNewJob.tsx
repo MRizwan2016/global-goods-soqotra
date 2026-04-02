@@ -42,9 +42,33 @@ const emptyItem = (): PackageItem => ({
   cbm: 0,
 });
 
+const generateUniqueJobNumber = (prefix: string, storageKey: string): string => {
+  const existing = JSON.parse(localStorage.getItem(storageKey) || "[]");
+  const existingIds = new Set(existing.map((j: any) => j.id));
+  
+  const date = new Date();
+  const year = date.getFullYear().toString().slice(-2);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const dateStr = `${year}${month}${day}`;
+  
+  let seq = 1;
+  let jobId: string;
+  do {
+    jobId = `${prefix}-${dateStr}-${String(seq).padStart(3, "0")}`;
+    seq++;
+  } while (existingIds.has(jobId));
+  
+  return jobId;
+};
+
 const SaudiArabiaNewJob = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
+
+  const [autoJobNumber] = useState(() => 
+    generateUniqueJobNumber("SA", "saudiArabiaJobs")
+  );
 
   const [jobData, setJobData] = useState({
     jobType: "collection" as "collection" | "delivery",
