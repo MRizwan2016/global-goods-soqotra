@@ -121,6 +121,30 @@ const UPBInvoiceForm = () => {
               />
             </div>
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="shipperName">Shipper Name</Label>
+              <Input
+                id="shipperName"
+                name="shipperName"
+                value={formData.shipperName}
+                onChange={handleInputChange}
+                placeholder="Enter shipper name"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Consignee name will be set identical automatically</p>
+            </div>
+            <div>
+              <Label htmlFor="consigneeName">Consignee Name</Label>
+              <Input
+                id="consigneeName"
+                name="consigneeName"
+                value={formData.consigneeName}
+                readOnly
+                className="bg-gray-50"
+                placeholder="Auto-filled from shipper"
+              />
+            </div>
+          </div>
           <div>
             <Label htmlFor="customerAddress">Customer Address</Label>
             <Textarea
