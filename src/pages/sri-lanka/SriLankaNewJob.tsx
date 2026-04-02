@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Save, Plus, Trash2, Truck } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Truck, Package } from "lucide-react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -16,61 +16,64 @@ import {
   sriLankaDrivers,
   sriLankaSalesReps,
   sriLankaCities,
-  sriLankaPackageTypes,
   doorToDoorPricing,
 } from "./data/sriLankaData";
+import {
+  cargoCollectionPackages,
+  calcVolumeCBM,
+  getCollectionPriceFromVolume,
+  destinationRates,
+  CargoPackage,
+} from "@/data/cargoPackages";
 
 interface PackageItem {
   id: string;
+  boxNumber: number;
   description: string;
   quantity: number;
   weightKg: number;
-  lengthCm: number;
-  widthCm: number;
-  heightCm: number;
-  cbm: number;
+  length: number; // inches
+  width: number;  // inches
+  height: number; // inches
+  volume: number; // CBM
+  collectionPrice: number;
+  deliveryPriceWhite: number;
+  deliveryPriceBlack: number;
 }
 
-const emptyItem = (): PackageItem => ({
+const emptyItem = (boxNum: number): PackageItem => ({
   id: uuidv4(),
+  boxNumber: boxNum,
   description: "",
   quantity: 1,
   weightKg: 0,
-  lengthCm: 0,
-  widthCm: 0,
-  heightCm: 0,
-  cbm: 0,
+  length: 0,
+  width: 0,
+  height: 0,
+  volume: 0,
+  collectionPrice: 0,
+  deliveryPriceWhite: 0,
+  deliveryPriceBlack: 0,
 });
 
 const generateUniqueJobNumber = (prefix: string, storageKey: string): string => {
   const existing = JSON.parse(localStorage.getItem(storageKey) || "[]");
   const existingIds = new Set(existing.map((j: any) => j.id));
-  
   const date = new Date();
-  const year = date.getFullYear().toString().slice(-2);
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const dateStr = `${year}${month}${day}`;
-  
-  // Find the next sequential number for today
+  const dateStr = `${date.getFullYear().toString().slice(-2)}${String(date.getMonth() + 1).padStart(2, "0")}${String(date.getDate()).padStart(2, "0")}`;
   let seq = 1;
   let jobId: string;
   do {
     jobId = `${prefix}-${dateStr}-${String(seq).padStart(3, "0")}`;
     seq++;
   } while (existingIds.has(jobId));
-  
   return jobId;
 };
 
 const SriLankaNewJob = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
-
-  // Auto-generate unique job number on mount
-  const [autoJobNumber] = useState(() => 
-    generateUniqueJobNumber("LK", "sriLankaJobs")
-  );
+  const [autoJobNumber] = useState(() => generateUniqueJobNumber("LK", "sriLankaJobs"));
 
   const [jobData, setJobData] = useState({
     jobType: "collection" as "collection" | "delivery",
@@ -87,34 +90,106 @@ const SriLankaNewJob = () => {
     advanceAmount: 0,
   });
 
-  const [items, setItems] = useState<PackageItem[]>([emptyItem()]);
+  const [items, setItems] = useState<PackageItem[]>([emptyItem(1)]);
+  const [nextBoxNumber, setNextBoxNumber] = useState(2);
 
   const updateField = (field: string, value: any) =>
     setJobData((prev) => ({ ...prev, [field]: value }));
 
-  const updateItem = (id: string, field: keyof PackageItem, value: any) => {
-    setItems((prev) =>
-      prev.map((item) => {
-        if (item.id !== id) return item;
-        const updated = { ...item, [field]: value };
-        if (["lengthCm", "widthCm", "heightCm"].includes(field)) {
-          updated.cbm = (updated.lengthCm * updated.widthCm * updated.heightCm) / 1000000;
-        }
-        return updated;
-      })
-    );
+  const recalcPrice = (item: PackageItem, sector: string, jobType: string): PackageItem => {
+    if (item.volume > 0 && jobType === "collection") {
+      return { ...item, collectionPrice: getCollectionPriceFromVolume(item.volume, sector || "COLOMBO") };
+    }
+    return item;
   };
 
-  const addItem = () => setItems((prev) => [...prev, emptyItem()]);
-  const removeItem = (id: string) =>
-    setItems((prev) => (prev.length > 1 ? prev.filter((i) => i.id !== id) : prev));
+  const selectPackage = (itemId: string, pkgName: string) => {
+    const pkg = cargoCollectionPackages.find(p => p.name === pkgName);
+    setItems(prev => prev.map(item => {
+      if (item.id !== itemId) return item;
+      if (!pkg) return { ...item, description: pkgName };
+      const vol = pkg.hasManualDimensions ? 0 : pkg.volume;
+      const colPrice = jobData.jobType === "collection"
+        ? getCollectionPriceFromVolume(vol, jobData.sector || "COLOMBO")
+        : 0;
+      return {
+        ...item,
+        description: pkg.name,
+        length: pkg.dimensions.length,
+        width: pkg.dimensions.width,
+        height: pkg.dimensions.height,
+        volume: vol,
+        collectionPrice: colPrice,
+        deliveryPriceWhite: pkg.deliveryPrices.whitePlywood12mm,
+        deliveryPriceBlack: pkg.deliveryPrices.blackPlywood18mm,
+      };
+    }));
+  };
+
+  const updateItem = (id: string, field: keyof PackageItem, value: any) => {
+    setItems(prev => prev.map(item => {
+      if (item.id !== id) return item;
+      const updated = { ...item, [field]: value };
+      if (["length", "width", "height"].includes(field)) {
+        updated.volume = Math.round(calcVolumeCBM(updated.length, updated.width, updated.height) * 1000) / 1000;
+        if (jobData.jobType === "collection") {
+          updated.collectionPrice = getCollectionPriceFromVolume(updated.volume, jobData.sector || "COLOMBO");
+        }
+      }
+      return updated;
+    }));
+  };
+
+  const addItem = () => {
+    if (nextBoxNumber > 20) {
+      toast.error("Maximum 20 boxes allowed");
+      return;
+    }
+    setItems(prev => [...prev, emptyItem(nextBoxNumber)]);
+    setNextBoxNumber(prev => prev + 1);
+  };
+
+  const removeItem = (id: string) => {
+    setItems(prev => {
+      if (prev.length <= 1) return prev;
+      const filtered = prev.filter(i => i.id !== id);
+      return filtered.map((item, idx) => ({ ...item, boxNumber: idx + 1 }));
+    });
+    setNextBoxNumber(prev => Math.max(2, prev - 1));
+  };
+
+  // Recalc prices when sector or jobType changes
+  const handleSectorChange = (sector: string) => {
+    updateField("sector", sector);
+    if (jobData.jobType === "collection") {
+      setItems(prev => prev.map(item => ({
+        ...item,
+        collectionPrice: item.volume > 0 ? getCollectionPriceFromVolume(item.volume, sector) : 0,
+      })));
+    }
+  };
+
+  const handleJobTypeChange = (type: string) => {
+    updateField("jobType", type);
+    setItems(prev => prev.map(item => ({
+      ...item,
+      collectionPrice: type === "collection" && item.volume > 0
+        ? getCollectionPriceFromVolume(item.volume, jobData.sector || "COLOMBO")
+        : 0,
+    })));
+  };
 
   const totalPackages = items.reduce((s, i) => s + i.quantity, 0);
   const totalWeight = items.reduce((s, i) => s + i.weightKg, 0);
-  const totalCbm = items.reduce((s, i) => s + i.cbm, 0);
+  const totalCbm = items.reduce((s, i) => s + i.volume, 0);
+  const totalCollectionPrice = items.reduce((s, i) => s + i.collectionPrice, 0);
+  const totalDeliveryWhite = items.reduce((s, i) => s + i.deliveryPriceWhite, 0);
+  const totalDeliveryBlack = items.reduce((s, i) => s + i.deliveryPriceBlack, 0);
 
   const sectorPricing = doorToDoorPricing[jobData.sector as keyof typeof doorToDoorPricing];
-  const estimatedCost = sectorPricing ? totalCbm * sectorPricing.price : 0;
+  const estimatedCost = jobData.jobType === "collection"
+    ? totalCollectionPrice
+    : totalDeliveryWhite; // default to white plywood
 
   const handleSave = () => {
     if (!jobData.customer.trim()) { toast.error("Please enter customer name"); return; }
@@ -122,7 +197,6 @@ const SriLankaNewJob = () => {
     if (!jobData.driver) { toast.error("Please assign a driver"); return; }
 
     setIsSaving(true);
-
     const newJob = {
       id: autoJobNumber,
       jobNumber: autoJobNumber,
@@ -152,9 +226,11 @@ const SriLankaNewJob = () => {
     }
   };
 
+  const isCollection = jobData.jobType === "collection";
+
   return (
     <Layout title="Sri Lanka - New Job">
-      <div className="space-y-6 max-w-5xl mx-auto">
+      <div className="space-y-6 max-w-6xl mx-auto">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-8 bg-gradient-to-r from-amber-700 to-amber-900 rounded flex items-center justify-center">
@@ -172,7 +248,6 @@ const SriLankaNewJob = () => {
           </div>
         </div>
 
-        {/* Auto-generated Job Number */}
         <Card>
           <CardContent className="py-3 flex items-center gap-4 bg-green-50 border-green-200">
             <Label className="font-bold text-green-800">JOB NUMBER:</Label>
@@ -188,7 +263,7 @@ const SriLankaNewJob = () => {
           <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
               <Label>Job Type</Label>
-              <Select value={jobData.jobType} onValueChange={(v) => updateField("jobType", v)}>
+              <Select value={jobData.jobType} onValueChange={handleJobTypeChange}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="collection">Collection</SelectItem>
@@ -219,8 +294,8 @@ const SriLankaNewJob = () => {
               </Select>
             </div>
             <div>
-              <Label>Sector</Label>
-              <Select value={jobData.sector} onValueChange={(v) => updateField("sector", v)}>
+              <Label>Sector / Destination</Label>
+              <Select value={jobData.sector} onValueChange={handleSectorChange}>
                 <SelectTrigger><SelectValue placeholder="Select sector" /></SelectTrigger>
                 <SelectContent>
                   {sriLankaSectors.map((s) => (<SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>))}
@@ -259,45 +334,70 @@ const SriLankaNewJob = () => {
 
         <Card>
           <CardHeader className="bg-[#8B4513] text-white rounded-t-lg py-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-base">Package Items</CardTitle>
-            <Button size="sm" variant="secondary" onClick={addItem}><Plus className="h-4 w-4 mr-1" /> Add Item</Button>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              {isCollection ? "CARGO COLLECTIONS" : "BOXES DELIVERIES"} — Packages (Dimensions in Inches)
+            </CardTitle>
+            <Button size="sm" variant="secondary" onClick={addItem} disabled={nextBoxNumber > 20}>
+              <Plus className="h-4 w-4 mr-1" /> Add Box {nextBoxNumber <= 20 ? `#${nextBoxNumber}` : "(Max)"}
+            </Button>
           </CardHeader>
           <CardContent className="pt-4 overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead>Description</TableHead>
-                  <TableHead className="w-20">Qty</TableHead>
-                  <TableHead className="w-24">Weight (kg)</TableHead>
-                  <TableHead className="w-20">L (cm)</TableHead>
-                  <TableHead className="w-20">W (cm)</TableHead>
-                  <TableHead className="w-20">H (cm)</TableHead>
-                  <TableHead className="w-24">CBM</TableHead>
-                  <TableHead className="w-12"></TableHead>
+                <TableRow className="bg-yellow-100">
+                  <TableHead className="w-14 font-bold">BOX #</TableHead>
+                  <TableHead className="font-bold">PACKAGES</TableHead>
+                  <TableHead className="w-16 font-bold">QTY</TableHead>
+                  <TableHead className="w-20 font-bold">L (in)</TableHead>
+                  <TableHead className="w-20 font-bold">W (in)</TableHead>
+                  <TableHead className="w-20 font-bold">H (in)</TableHead>
+                  <TableHead className="w-20 font-bold">VOLUME</TableHead>
+                  {isCollection ? (
+                    <TableHead className="w-28 font-bold text-blue-700">
+                      PRICE ({jobData.sector || "COLOMBO"})
+                    </TableHead>
+                  ) : (
+                    <>
+                      <TableHead className="w-28 font-bold text-green-700">WHITE PLY</TableHead>
+                      <TableHead className="w-28 font-bold text-gray-700">BLACK PLY</TableHead>
+                    </>
+                  )}
+                  <TableHead className="w-20 font-bold">WT (kg)</TableHead>
+                  <TableHead className="w-10"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {items.map((item) => (
                   <TableRow key={item.id}>
+                    <TableCell className="font-bold text-center text-[#8B4513]">{item.boxNumber}</TableCell>
                     <TableCell>
-                      <Select value={item.description} onValueChange={(v) => updateItem(item.id, "description", v)}>
-                        <SelectTrigger className="min-w-[160px]"><SelectValue placeholder="Select type" /></SelectTrigger>
+                      <Select value={item.description} onValueChange={(v) => selectPackage(item.id, v)}>
+                        <SelectTrigger className="min-w-[200px]"><SelectValue placeholder="Select package" /></SelectTrigger>
                         <SelectContent>
-                          {sriLankaPackageTypes.map((p, i) => (
-                            <SelectItem key={i} value={`${p.name} (${p.dimensions.length}x${p.dimensions.width}x${p.dimensions.height})`}>
-                              {p.name} ({p.dimensions.length}x{p.dimensions.width}x{p.dimensions.height})
+                          {cargoCollectionPackages.map((p) => (
+                            <SelectItem key={p.id} value={p.name}>
+                              {p.name} {!p.hasManualDimensions ? `(${p.dimensions.length}×${p.dimensions.width}×${p.dimensions.height})` : ""}
                             </SelectItem>
                           ))}
-                          <SelectItem value="OTHER">OTHER</SelectItem>
+                          <SelectItem value="OTHER">OTHER (Manual Entry)</SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
-                    <TableCell><Input type="number" min={1} value={item.quantity} onChange={(e) => updateItem(item.id, "quantity", parseInt(e.target.value) || 1)} /></TableCell>
-                    <TableCell><Input type="number" min={0} step={0.1} value={item.weightKg} onChange={(e) => updateItem(item.id, "weightKg", parseFloat(e.target.value) || 0)} /></TableCell>
-                    <TableCell><Input type="number" min={0} value={item.lengthCm} onChange={(e) => updateItem(item.id, "lengthCm", parseFloat(e.target.value) || 0)} /></TableCell>
-                    <TableCell><Input type="number" min={0} value={item.widthCm} onChange={(e) => updateItem(item.id, "widthCm", parseFloat(e.target.value) || 0)} /></TableCell>
-                    <TableCell><Input type="number" min={0} value={item.heightCm} onChange={(e) => updateItem(item.id, "heightCm", parseFloat(e.target.value) || 0)} /></TableCell>
-                    <TableCell className="font-medium">{item.cbm.toFixed(4)}</TableCell>
+                    <TableCell><Input type="number" min={1} className="w-16" value={item.quantity} onChange={(e) => updateItem(item.id, "quantity", parseInt(e.target.value) || 1)} /></TableCell>
+                    <TableCell><Input type="number" min={0} className="w-20" value={item.length || ""} onChange={(e) => updateItem(item.id, "length", parseFloat(e.target.value) || 0)} /></TableCell>
+                    <TableCell><Input type="number" min={0} className="w-20" value={item.width || ""} onChange={(e) => updateItem(item.id, "width", parseFloat(e.target.value) || 0)} /></TableCell>
+                    <TableCell><Input type="number" min={0} className="w-20" value={item.height || ""} onChange={(e) => updateItem(item.id, "height", parseFloat(e.target.value) || 0)} /></TableCell>
+                    <TableCell className="font-medium">{item.volume.toFixed(3)}</TableCell>
+                    {isCollection ? (
+                      <TableCell className="font-bold text-blue-700">QAR {item.collectionPrice.toFixed(2)}</TableCell>
+                    ) : (
+                      <>
+                        <TableCell className="font-bold text-green-700">QAR {item.deliveryPriceWhite.toFixed(2)}</TableCell>
+                        <TableCell className="font-bold text-gray-700">{item.deliveryPriceBlack > 0 ? `QAR ${item.deliveryPriceBlack.toFixed(2)}` : "—"}</TableCell>
+                      </>
+                    )}
+                    <TableCell><Input type="number" min={0} step={0.1} className="w-20" value={item.weightKg || ""} onChange={(e) => updateItem(item.id, "weightKg", parseFloat(e.target.value) || 0)} /></TableCell>
                     <TableCell>
                       <Button variant="ghost" size="sm" onClick={() => removeItem(item.id)} className="text-destructive p-1"><Trash2 className="h-4 w-4" /></Button>
                     </TableCell>
@@ -318,14 +418,28 @@ const SriLankaNewJob = () => {
           <Card>
             <CardHeader className="py-3"><CardTitle className="text-base">Summary</CardTitle></CardHeader>
             <CardContent className="space-y-3">
+              <div className="flex justify-between"><span className="text-muted-foreground">Total Boxes:</span><span className="font-bold">{items.length}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Total Packages:</span><span className="font-bold">{totalPackages}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Total Weight:</span><span className="font-bold">{totalWeight.toFixed(2)} kg</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Total CBM:</span><span className="font-bold">{totalCbm.toFixed(4)}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Total CBM:</span><span className="font-bold">{totalCbm.toFixed(3)}</span></div>
               <hr />
-              <div className="flex justify-between text-lg">
-                <span className="font-semibold">Estimated Cost:</span>
-                <span className="font-bold text-[#8B4513]">QAR {estimatedCost.toFixed(2)}</span>
-              </div>
+              {isCollection ? (
+                <div className="flex justify-between text-lg">
+                  <span className="font-semibold">Collection Total:</span>
+                  <span className="font-bold text-blue-700">QAR {totalCollectionPrice.toFixed(2)}</span>
+                </div>
+              ) : (
+                <>
+                  <div className="flex justify-between">
+                    <span className="font-semibold">White Plywood 12mm:</span>
+                    <span className="font-bold text-green-700">QAR {totalDeliveryWhite.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="font-semibold">Black Plywood 18mm:</span>
+                    <span className="font-bold text-gray-700">QAR {totalDeliveryBlack.toFixed(2)}</span>
+                  </div>
+                </>
+              )}
               {jobData.advanceAmount > 0 && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Advance Paid:</span>
