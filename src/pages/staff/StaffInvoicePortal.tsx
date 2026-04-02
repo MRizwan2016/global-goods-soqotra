@@ -11,6 +11,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
+// Fire-and-forget sync to external project
+async function syncToExternal(action: string, table: string, record?: any, matchColumn?: string, matchValue?: string) {
+  try {
+    await supabase.functions.invoke("sync-external", {
+      body: { action, table, record, match_column: matchColumn, match_value: matchValue },
+    });
+  } catch (err) {
+    console.warn("External sync failed (non-blocking):", err);
+  }
+}
+
 interface InvoiceBook {
   id: string;
   book_number: string;
