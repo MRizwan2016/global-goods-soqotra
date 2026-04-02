@@ -11,6 +11,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
+// Fire-and-forget sync to external project
+async function syncToExternal(action: string, table: string, record?: any, matchColumn?: string, matchValue?: string) {
+  try {
+    await supabase.functions.invoke("sync-external", {
+      body: { action, table, record, match_column: matchColumn, match_value: matchValue },
+    });
+  } catch (err) {
+    console.warn("External sync failed (non-blocking):", err);
+  }
+}
+
 interface InvoiceBook {
   id: string;
   book_number: string;
@@ -111,6 +122,7 @@ const StaffInvoicePortal = () => {
         .eq("id", editBook.id);
 
       if (error) throw error;
+      syncToExternal("update", "manage_invoice_book_stock", { pages_used: editPagesUsed, status: editStatus }, "book_number", editBook.book_number);
       toast.success(`Book ${editBook.book_number} updated`);
       setEditDialogOpen(false);
       loadData();
@@ -135,6 +147,7 @@ const StaffInvoicePortal = () => {
         .eq("id", selectedBookId);
 
       if (error) throw error;
+      syncToExternal("update", "manage_invoice_book_stock", { assigned_to_sales_rep: assignToName, assigned_date: new Date().toISOString(), status: "assigned" }, "id", selectedBookId);
       toast.success(`Book assigned to ${assignToName}`);
       setAssignDialogOpen(false);
       setSelectedBookId("");
@@ -154,6 +167,7 @@ const StaffInvoicePortal = () => {
         .eq("id", book.id);
 
       if (error) throw error;
+      syncToExternal("delete", "manage_invoice_book_stock", undefined, "book_number", book.book_number);
       toast.success(`Book ${book.book_number} deleted`);
       loadData();
     } catch (err: any) {

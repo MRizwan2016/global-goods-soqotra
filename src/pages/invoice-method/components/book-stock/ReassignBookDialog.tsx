@@ -20,6 +20,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Book } from "../../booking-form-stock/types";
+
+// Fire-and-forget sync to external project
+async function syncToExternal(action: string, table: string, record?: any, matchColumn?: string, matchValue?: string) {
+  try {
+    await supabase.functions.invoke("sync-external", {
+      body: { action, table, record, match_column: matchColumn, match_value: matchValue },
+    });
+  } catch (err) {
+    console.warn("External sync failed (non-blocking):", err);
+  }
+}
 import { ArrowRightLeft } from "lucide-react";
 
 interface ReassignBookDialogProps {
@@ -85,6 +96,12 @@ const ReassignBookDialog: React.FC<ReassignBookDialogProps> = ({
         .eq("book_number", book.bookNumber);
 
       if (error) throw error;
+
+      // Auto-sync to external project
+      syncToExternal("update", "manage_invoice_book_stock", {
+        assigned_to_sales_rep: newRep.name,
+        assigned_date: new Date().toISOString(),
+      }, "book_number", book.bookNumber);
 
       // Also update localStorage for backward compatibility
       const storedBooks = JSON.parse(localStorage.getItem("invoiceBooks") || "[]");
