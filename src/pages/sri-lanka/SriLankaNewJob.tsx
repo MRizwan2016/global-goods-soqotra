@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Save, Plus, Trash2, Truck, Package } from "lucide-react";
+import { ArrowLeft, Save, Plus, Trash2, Truck, Package, Search } from "lucide-react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -17,14 +17,22 @@ import {
   sriLankaSalesReps,
   sriLankaCities,
   doorToDoorPricing,
+  sriLankaPorts,
 } from "./data/sriLankaData";
 import {
   cargoCollectionPackages,
   calcVolumeCBM,
   getCollectionPriceFromVolume,
-  destinationRates,
   CargoPackage,
 } from "@/data/cargoPackages";
+import { lookupJobData } from "@/hooks/useJobAutoFill";
+
+const NAME_PREFIXES = ["Mr.", "Mrs.", "Ms.", "Pastor", "Rev.", "Dr.", "Prof."];
+
+const QATAR_CITIES = [
+  "Doha", "Al Wakrah", "Al Khor", "Al Rayyan", "Umm Salal",
+  "Al Daayen", "Al Shamal", "Al Shahaniya", "Lusail", "Mesaieed",
+];
 
 interface PackageItem {
   id: string;
@@ -32,10 +40,10 @@ interface PackageItem {
   description: string;
   quantity: number;
   weightKg: number;
-  length: number; // inches
-  width: number;  // inches
-  height: number; // inches
-  volume: number; // CBM
+  length: number;
+  width: number;
+  height: number;
+  volume: number;
   collectionPrice: number;
   deliveryPriceWhite: number;
   deliveryPriceBlack: number;
@@ -74,17 +82,24 @@ const SriLankaNewJob = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [autoJobNumber] = useState(() => generateUniqueJobNumber("LK", "sriLankaJobs"));
+  const [searchJobNumber, setSearchJobNumber] = useState("");
 
   const [jobData, setJobData] = useState({
     jobType: "collection" as "collection" | "delivery",
+    origin: "QATAR",
+    customerPrefix: "Mr.",
     customer: "",
     mobileNumber: "",
+    telephone: "",
     city: "",
     sector: "",
     location: "",
+    destination: "SRI LANKA",
+    warehouse: "COLOMBO",
     date: new Date().toISOString().split("T")[0],
     time: "09:00",
     driver: "",
+    vehicle: "",
     salesRep: "",
     notes: "",
     advanceAmount: 0,
@@ -92,16 +107,44 @@ const SriLankaNewJob = () => {
 
   const [items, setItems] = useState<PackageItem[]>([emptyItem(1)]);
   const [nextBoxNumber, setNextBoxNumber] = useState(2);
+  const [lastDriverSelection, setLastDriverSelection] = useState({ driver: "", vehicle: "", salesRep: "" });
+
+  // Load last used driver/vehicle/salesRep for quick reuse
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("sriLankaLastAssignment");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        setLastDriverSelection(parsed);
+      }
+    } catch {}
+  }, []);
 
   const updateField = (field: string, value: any) =>
     setJobData((prev) => ({ ...prev, [field]: value }));
 
-  const recalcPrice = (item: PackageItem, sector: string, jobType: string): PackageItem => {
-    if (item.volume > 0 && jobType === "collection") {
-      return { ...item, collectionPrice: getCollectionPriceFromVolume(item.volume, sector || "COLOMBO") };
+  const isQatarOrigin = jobData.origin === "QATAR";
+  const cities = isQatarOrigin ? QATAR_CITIES : sriLankaCities;
+
+  // Auto-fill from job number lookup
+  const handleJobLookup = useCallback(async () => {
+    if (!searchJobNumber || searchJobNumber.length < 3) return;
+    const result = await lookupJobData(searchJobNumber);
+    if (result) {
+      setJobData(prev => ({
+        ...prev,
+        customer: result.shipperName || prev.customer,
+        mobileNumber: result.shipperMobile || prev.mobileNumber,
+        city: result.shipperCity || prev.city,
+        location: result.shipperAddress || prev.location,
+        driver: result.driverName || prev.driver,
+        salesRep: result.salesRepresentative || prev.salesRep,
+      }));
+      toast.success("Job data auto-filled!");
+    } else {
+      toast.info("No matching job found for auto-fill");
     }
-    return item;
-  };
+  }, [searchJobNumber]);
 
   const selectPackage = (itemId: string, pkgName: string) => {
     const pkg = cargoCollectionPackages.find(p => p.name === pkgName);
@@ -141,10 +184,7 @@ const SriLankaNewJob = () => {
   };
 
   const addItem = () => {
-    if (nextBoxNumber > 20) {
-      toast.error("Maximum 20 boxes allowed");
-      return;
-    }
+    if (nextBoxNumber > 20) { toast.error("Maximum 20 boxes allowed"); return; }
     setItems(prev => [...prev, emptyItem(nextBoxNumber)]);
     setNextBoxNumber(prev => prev + 1);
   };
@@ -158,7 +198,6 @@ const SriLankaNewJob = () => {
     setNextBoxNumber(prev => Math.max(2, prev - 1));
   };
 
-  // Recalc prices when sector or jobType changes
   const handleSectorChange = (sector: string) => {
     updateField("sector", sector);
     if (jobData.jobType === "collection") {
@@ -179,6 +218,20 @@ const SriLankaNewJob = () => {
     })));
   };
 
+  const applyLastAssignment = () => {
+    if (lastDriverSelection.driver || lastDriverSelection.vehicle || lastDriverSelection.salesRep) {
+      setJobData(prev => ({
+        ...prev,
+        driver: lastDriverSelection.driver || prev.driver,
+        vehicle: lastDriverSelection.vehicle || prev.vehicle,
+        salesRep: lastDriverSelection.salesRep || prev.salesRep,
+      }));
+      toast.success("Previous driver/vehicle/sales rep applied");
+    } else {
+      toast.info("No previous assignment found");
+    }
+  };
+
   const totalPackages = items.reduce((s, i) => s + i.quantity, 0);
   const totalWeight = items.reduce((s, i) => s + i.weightKg, 0);
   const totalCbm = items.reduce((s, i) => s + i.volume, 0);
@@ -186,10 +239,7 @@ const SriLankaNewJob = () => {
   const totalDeliveryWhite = items.reduce((s, i) => s + i.deliveryPriceWhite, 0);
   const totalDeliveryBlack = items.reduce((s, i) => s + i.deliveryPriceBlack, 0);
 
-  const sectorPricing = doorToDoorPricing[jobData.sector as keyof typeof doorToDoorPricing];
-  const estimatedCost = jobData.jobType === "collection"
-    ? totalCollectionPrice
-    : totalDeliveryWhite; // default to white plywood
+  const isCollection = jobData.jobType === "collection";
 
   const handleSave = () => {
     if (!jobData.customer.trim()) { toast.error("Please enter customer name"); return; }
@@ -197,6 +247,11 @@ const SriLankaNewJob = () => {
     if (!jobData.driver) { toast.error("Please assign a driver"); return; }
 
     setIsSaving(true);
+
+    // Save last assignment for reuse
+    const assignment = { driver: jobData.driver, vehicle: jobData.vehicle, salesRep: jobData.salesRep };
+    localStorage.setItem("sriLankaLastAssignment", JSON.stringify(assignment));
+
     const newJob = {
       id: autoJobNumber,
       jobNumber: autoJobNumber,
@@ -205,7 +260,7 @@ const SriLankaNewJob = () => {
       totalPackages,
       totalWeight: totalWeight.toFixed(2),
       totalCbm: totalCbm.toFixed(3),
-      estimatedCost: estimatedCost.toFixed(2),
+      estimatedCost: (isCollection ? totalCollectionPrice : totalDeliveryWhite).toFixed(2),
       status: "scheduled",
       packages: totalPackages,
       weight: totalWeight.toFixed(2),
@@ -219,18 +274,17 @@ const SriLankaNewJob = () => {
       localStorage.setItem("sriLankaJobs", JSON.stringify(existing));
       toast.success(`Job ${autoJobNumber} created successfully`);
       navigate("/sri-lanka/collection-delivery");
-    } catch (error) {
+    } catch {
       toast.error("Failed to save job");
     } finally {
       setIsSaving(false);
     }
   };
 
-  const isCollection = jobData.jobType === "collection";
-
   return (
     <Layout title="Sri Lanka - New Job">
       <div className="space-y-6 max-w-6xl mx-auto">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-8 bg-gradient-to-r from-amber-700 to-amber-900 rounded flex items-center justify-center">
@@ -248,14 +302,31 @@ const SriLankaNewJob = () => {
           </div>
         </div>
 
+        {/* Job Number + Auto-fill */}
         <Card>
-          <CardContent className="py-3 flex items-center gap-4 bg-green-50 border-green-200">
-            <Label className="font-bold text-green-800">JOB NUMBER:</Label>
-            <span className="font-mono text-lg font-bold text-green-900 tracking-wider">{autoJobNumber}</span>
-            <span className="text-xs text-green-600">(Auto-generated, unique)</span>
+          <CardContent className="py-3 flex flex-wrap items-center gap-4 bg-green-50 border-green-200">
+            <div className="flex items-center gap-2">
+              <Label className="font-bold text-green-800">JOB NUMBER:</Label>
+              <span className="font-mono text-lg font-bold text-green-900 tracking-wider">{autoJobNumber}</span>
+              <span className="text-xs text-green-600">(Auto-generated)</span>
+            </div>
+            <div className="flex items-center gap-2 ml-auto">
+              <Label className="text-sm font-medium">Auto-fill from Job #:</Label>
+              <Input
+                placeholder="Enter existing job number"
+                className="w-48"
+                value={searchJobNumber}
+                onChange={(e) => setSearchJobNumber(e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === "Enter" && handleJobLookup()}
+              />
+              <Button size="sm" variant="outline" onClick={handleJobLookup}>
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
+        {/* Job Details */}
         <Card>
           <CardHeader className="bg-[#8B4513] text-white rounded-t-lg py-3">
             <CardTitle className="text-base">Job Details</CardTitle>
@@ -271,30 +342,64 @@ const SriLankaNewJob = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <Label>Origin Country</Label>
+              <Select value={jobData.origin} onValueChange={(v) => updateField("origin", v)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="QATAR">Qatar</SelectItem>
+                  <SelectItem value="SRI LANKA">Sri Lanka</SelectItem>
+                  <SelectItem value="SAUDI ARABIA">Saudi Arabia</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div><Label>Date</Label><Input type="date" value={jobData.date} onChange={(e) => updateField("date", e.target.value)} /></div>
             <div><Label>Time</Label><Input type="time" value={jobData.time} onChange={(e) => updateField("time", e.target.value)} /></div>
-            <div><Label>Advance Amount (QAR)</Label><Input type="number" min={0} value={jobData.advanceAmount} onChange={(e) => updateField("advanceAmount", parseFloat(e.target.value) || 0)} /></div>
           </CardContent>
         </Card>
 
+        {/* Customer Information */}
         <Card>
           <CardHeader className="bg-[#8B4513] text-white rounded-t-lg py-3">
-            <CardTitle className="text-base">Customer Information</CardTitle>
+            <CardTitle className="text-base">
+              Customer Information {isQatarOrigin ? "(Qatar Address)" : "(Sri Lanka Address)"}
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><Label>Customer Name *</Label><Input placeholder="Enter customer name" value={jobData.customer} onChange={(e) => updateField("customer", e.target.value.toUpperCase())} /></div>
-            <div><Label>Mobile Number</Label><Input placeholder="+94 7XXXXXXXX" value={jobData.mobileNumber} onChange={(e) => updateField("mobileNumber", e.target.value)} /></div>
+            <div className="md:col-span-2 grid grid-cols-[120px_1fr] gap-2">
+              <div>
+                <Label>Title</Label>
+                <Select value={jobData.customerPrefix} onValueChange={(v) => updateField("customerPrefix", v)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {NAME_PREFIXES.map((p) => (<SelectItem key={p} value={p}>{p}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Customer Name *</Label>
+                <Input placeholder="Enter customer name" value={jobData.customer} onChange={(e) => updateField("customer", e.target.value.toUpperCase())} />
+              </div>
+            </div>
             <div>
-              <Label>City *</Label>
+              <Label>Mobile Number *</Label>
+              <Input placeholder={isQatarOrigin ? "+974 XXXXXXXX" : "+94 7XXXXXXXX"} value={jobData.mobileNumber} onChange={(e) => updateField("mobileNumber", e.target.value)} />
+            </div>
+            <div>
+              <Label>Telephone No.</Label>
+              <Input placeholder="Landline number" value={jobData.telephone} onChange={(e) => updateField("telephone", e.target.value)} />
+            </div>
+            <div>
+              <Label>City * {isQatarOrigin && <span className="text-xs text-muted-foreground">(Qatar)</span>}</Label>
               <Select value={jobData.city} onValueChange={(v) => updateField("city", v)}>
                 <SelectTrigger><SelectValue placeholder="Select city" /></SelectTrigger>
                 <SelectContent>
-                  {sriLankaCities.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
+                  {cities.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Sector / Destination</Label>
+              <Label>Sector {isQatarOrigin && <span className="text-xs text-muted-foreground">(Qatar)</span>}</Label>
               <Select value={jobData.sector} onValueChange={handleSectorChange}>
                 <SelectTrigger><SelectValue placeholder="Select sector" /></SelectTrigger>
                 <SelectContent>
@@ -302,15 +407,48 @@ const SriLankaNewJob = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="md:col-span-2"><Label>Location / Address</Label><Input placeholder="Full address" value={jobData.location} onChange={(e) => updateField("location", e.target.value)} /></div>
+            <div className="md:col-span-2">
+              <Label>{isQatarOrigin ? "Collection / Delivery Address (Qatar)" : "Location / Address"}</Label>
+              <Input placeholder={isQatarOrigin ? "Full Qatar address" : "Full address"} value={jobData.location} onChange={(e) => updateField("location", e.target.value)} />
+            </div>
           </CardContent>
         </Card>
 
+        {/* Destination */}
         <Card>
           <CardHeader className="bg-[#8B4513] text-white rounded-t-lg py-3">
-            <CardTitle className="text-base">Assignment</CardTitle>
+            <CardTitle className="text-base">Destination</CardTitle>
           </CardHeader>
-          <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label>Destination Country</Label>
+              <Input value="SRI LANKA" readOnly className="bg-muted font-bold" />
+            </div>
+            <div>
+              <Label>Warehouse</Label>
+              <Select value={jobData.warehouse} onValueChange={(v) => updateField("warehouse", v)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {sriLankaPorts.map((p) => (<SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Advance Amount (QAR)</Label>
+              <Input type="number" min={0} value={jobData.advanceAmount} onChange={(e) => updateField("advanceAmount", parseFloat(e.target.value) || 0)} />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Assignment */}
+        <Card>
+          <CardHeader className="bg-[#8B4513] text-white rounded-t-lg py-3 flex flex-row items-center justify-between">
+            <CardTitle className="text-base">Assignment</CardTitle>
+            <Button size="sm" variant="secondary" onClick={applyLastAssignment} className="text-xs">
+              Reuse Last Driver/Vehicle
+            </Button>
+          </CardHeader>
+          <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label>Driver *</Label>
               <Select value={jobData.driver} onValueChange={(v) => updateField("driver", v)}>
@@ -319,6 +457,10 @@ const SriLankaNewJob = () => {
                   {sriLankaDrivers.map((d) => (<SelectItem key={d.value} value={d.label}>{d.label}</SelectItem>))}
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <Label>Vehicle</Label>
+              <Input placeholder="Vehicle / Truck No." value={jobData.vehicle} onChange={(e) => updateField("vehicle", e.target.value.toUpperCase())} />
             </div>
             <div>
               <Label>Sales Representative</Label>
@@ -332,6 +474,7 @@ const SriLankaNewJob = () => {
           </CardContent>
         </Card>
 
+        {/* Packages */}
         <Card>
           <CardHeader className="bg-[#8B4513] text-white rounded-t-lg py-3 flex flex-row items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
@@ -354,9 +497,7 @@ const SriLankaNewJob = () => {
                   <TableHead className="w-20 font-bold">H (in)</TableHead>
                   <TableHead className="w-20 font-bold">VOLUME</TableHead>
                   {isCollection ? (
-                    <TableHead className="w-28 font-bold text-blue-700">
-                      PRICE ({jobData.sector || "COLOMBO"})
-                    </TableHead>
+                    <TableHead className="w-28 font-bold text-blue-700">PRICE ({jobData.sector || "COLOMBO"})</TableHead>
                   ) : (
                     <>
                       <TableHead className="w-28 font-bold text-green-700">WHITE PLY</TableHead>
@@ -408,6 +549,7 @@ const SriLankaNewJob = () => {
           </CardContent>
         </Card>
 
+        {/* Notes + Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="py-3"><CardTitle className="text-base">Notes</CardTitle></CardHeader>
