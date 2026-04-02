@@ -97,19 +97,8 @@ const ConsigneeDetails: React.FC<ConsigneeDetailsProps> = ({
     }
   }, [formState.destination]);
 
-  // Clear consignee name when gift cargo is set to "yes"
-  useEffect(() => {
-    if (formState.giftCargo === "yes" && formState.consignee1) {
-      const clearEvent = {
-        target: {
-          name: "consignee1",
-          value: ""
-        }
-      } as React.ChangeEvent<HTMLInputElement>;
-      
-      handleInputChange(clearEvent);
-    }
-  }, [formState.giftCargo]);
+  // When gift cargo is set to "yes", do NOT clear consignee - allow manual entry
+  // The shipper auto-copy is already prevented by the giftCargo check in ShipperDetailsWithAutoFill
 
   return (
     <div>
