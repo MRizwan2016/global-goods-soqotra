@@ -28,6 +28,8 @@ const UPBInvoiceForm = () => {
     customerAddress: "",
     date: "",
     destination: "",
+    shipperName: "",
+    consigneeName: "",
   });
 
   const [packages, setPackages] = useState<UPBPackageItem[]>([]);
