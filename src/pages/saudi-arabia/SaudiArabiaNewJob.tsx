@@ -132,10 +132,9 @@ const SaudiArabiaNewJob = () => {
 
     setIsSaving(true);
 
-    const jobId = `SA${jobData.jobType === "collection" ? "C" : "D"}-${String(Date.now()).slice(-4)}`;
-
     const newJob = {
-      id: jobId,
+      id: autoJobNumber,
+      jobNumber: autoJobNumber,
       ...jobData,
       items,
       totalPackages,
