@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
         result = await externalClient.from(table).upsert(record, { onConflict: "book_number" });
         break;
       case "update":
-        result = await externalClient.from(table).update(record).eq(match_column, match_value);
+        result = await (externalClient.from(table).update(record) as any).eq(match_column, match_value);
         break;
       case "delete":
         result = await externalClient.from(table).delete().eq(match_column, match_value);
