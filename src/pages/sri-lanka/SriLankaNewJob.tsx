@@ -13,12 +13,11 @@ import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import {
   sriLankaSectors,
-  sriLankaDrivers,
-  sriLankaSalesReps,
   sriLankaCities,
   doorToDoorPricing,
   sriLankaPorts,
 } from "./data/sriLankaData";
+import { VEHICLES, DRIVERS, SALES_REPS, getDriverForVehicle } from "@/data/vehicleDriverMapping";
 import {
   cargoCollectionPackages,
   calcVolumeCBM,
