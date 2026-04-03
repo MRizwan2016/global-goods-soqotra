@@ -387,6 +387,8 @@ const SriLankaCollectionDelivery = () => {
                 </div>
               </>
             )}
+          </div>
+        ))}
       </div>
     );
   };
