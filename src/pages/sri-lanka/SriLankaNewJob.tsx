@@ -449,24 +449,28 @@ const SriLankaNewJob = () => {
           </CardHeader>
           <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label>Driver *</Label>
-              <Select value={jobData.driver} onValueChange={(v) => updateField("driver", v)}>
-                <SelectTrigger><SelectValue placeholder="Assign driver" /></SelectTrigger>
+              <Label>Vehicle / Driver *</Label>
+              <Select value={jobData.driver} onValueChange={(v) => {
+                updateField("driver", v);
+                const match = v.match(/\((\d+)\)/);
+                if (match) updateField("vehicle", match[1]);
+              }}>
+                <SelectTrigger><SelectValue placeholder="Select vehicle/driver" /></SelectTrigger>
                 <SelectContent>
-                  {sriLankaDrivers.map((d) => (<SelectItem key={d.value} value={d.label}>{d.label}</SelectItem>))}
+                  {DRIVERS.map((d) => (<SelectItem key={d.value} value={d.label}>{d.label}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Vehicle</Label>
-              <Input placeholder="Vehicle / Truck No." value={jobData.vehicle} onChange={(e) => updateField("vehicle", e.target.value.toUpperCase())} />
+              <Label>Vehicle Number</Label>
+              <Input placeholder="Auto or manual" value={jobData.vehicle} onChange={(e) => updateField("vehicle", e.target.value.toUpperCase())} />
             </div>
             <div>
               <Label>Sales Representative</Label>
               <Select value={jobData.salesRep} onValueChange={(v) => updateField("salesRep", v)}>
                 <SelectTrigger><SelectValue placeholder="Select sales rep" /></SelectTrigger>
                 <SelectContent>
-                  {sriLankaSalesReps.map((s) => (<SelectItem key={s.value} value={s.label}>{s.label}</SelectItem>))}
+                  {SALES_REPS.map((s) => (<SelectItem key={s.value} value={s.label}>{s.label}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>
