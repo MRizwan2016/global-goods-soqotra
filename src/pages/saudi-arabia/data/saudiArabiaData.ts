@@ -24,16 +24,18 @@ export const saudiArabiaSectors = [
 ];
 
 export const saudiArabiaSalesReps = [
-  { value: "MR_LAHIRU", label: "MR. LAHIRU" },
-  { value: "MR_AHMED", label: "MR. AHMED" },
-  { value: "MR_MOHAMMAD", label: "MR. MOHAMMAD" }
+  { value: "MPA_RANATHUNGA", label: "M.P.A.Ranathunga/204" },
+  { value: "MR_SAJJAD", label: "MR. SAJJAD" },
+  { value: "MR_IMAM", label: "MR. IMAM UBAIDULLA" },
+  { value: "MR_LAHIRU", label: "MR. LAHIRU CHATHURANGA" },
 ];
 
 export const saudiArabiaDrivers = [
-  { value: "MR_HASSAN", label: "MR. HASSAN" },
-  { value: "MR_ABDULLAH", label: "MR. ABDULLAH" },
-  { value: "MR_OMAR", label: "MR. OMAR" },
-  { value: "MR_KHALID", label: "MR. KHALID" }
+  { value: "41067", label: "MR. ASHOKA UDESH (41067)" },
+  { value: "41070", label: "MR. KANAYA (41070)" },
+  { value: "41073", label: "MR. BAKEETH (41073)" },
+  { value: "215004", label: "MR. MOHAMMED NOOR (215004)" },
+  { value: "119929", label: "MR. JOHNY VENAKDY (119929)" },
 ];
 
 export const saudiArabiaDistricts = [
