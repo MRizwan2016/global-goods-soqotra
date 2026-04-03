@@ -306,86 +306,89 @@ const SriLankaCollectionDelivery = () => {
               );
             })}
 
-            {/* Only show summary on the last page */}
+            {/* Only show summary + items on the last page */}
             {pageIdx === pages.length - 1 && (
               <>
-                <table className="border-collapse border border-black text-xs mt-2">
-                  <tbody>
-                    <tr><td className="border border-black p-1 font-bold">NUMBER OF DELIVERIES</td><td className="border border-black p-1 text-center">: {deliveryCount}</td></tr>
-                    <tr><td className="border border-black p-1 font-bold">NUMBER OF COLLECTIONS</td><td className="border border-black p-1 text-center">: {collectionCount}</td></tr>
-                  </tbody>
-                </table>
-                <table className="border-collapse border border-black text-xs mt-2">
-                  <tbody>
-                    <tr><td className="border border-black p-1 font-bold">TOTAL DELIVERY AMOUNT</td><td className="border border-black p-1 text-center">: 0</td></tr>
-                    <tr><td className="border border-black p-1 font-bold">TOTAL COLLECTION AMOUNT</td><td className="border border-black p-1 text-center">: {totalAmount.toFixed(0)}</td></tr>
-                    <tr><td className="border border-black p-1 font-bold">TOTAL AMOUNT</td><td className="border border-black p-1 text-center">: {totalAmount.toFixed(0)}</td></tr>
-                  </tbody>
-                </table>
-                <p className="text-center text-xs mt-2 italic">Page {pageIdx + 1}/{pages.length}</p>
+                <div className="flex gap-4 mt-2">
+                  <div>
+                    <table className="border-collapse border border-black text-xs">
+                      <tbody>
+                        <tr><td className="border border-black p-1 font-bold">NUMBER OF DELIVERIES</td><td className="border border-black p-1 text-center">: {deliveryCount}</td></tr>
+                        <tr><td className="border border-black p-1 font-bold">NUMBER OF COLLECTIONS</td><td className="border border-black p-1 text-center">: {collectionCount}</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div>
+                    <table className="border-collapse border border-black text-xs">
+                      <tbody>
+                        <tr><td className="border border-black p-1 font-bold">TOTAL DELIVERY AMOUNT</td><td className="border border-black p-1 text-center">: 0</td></tr>
+                        <tr><td className="border border-black p-1 font-bold">TOTAL COLLECTION AMOUNT</td><td className="border border-black p-1 text-center">: {totalAmount.toFixed(0)}</td></tr>
+                        <tr><td className="border border-black p-1 font-bold">TOTAL AMOUNT</td><td className="border border-black p-1 text-center">: {totalAmount.toFixed(0)}</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <p className="text-center text-xs mt-1 italic">Page {pageIdx + 1}/{pages.length}</p>
+
+                {/* Items summary tables — same page */}
+                {allItems.length > 0 && (
+                  <div className="flex gap-4 mt-2">
+                    <div className="flex-1">
+                      <table className="w-full border-collapse border border-black text-xs">
+                        <thead>
+                          <tr className="bg-blue-700 text-white">
+                            <th className="border border-black p-1">Num</th>
+                            <th className="border border-black p-1">JOB NUMBER</th>
+                            <th className="border border-black p-1">ITEM</th>
+                            <th className="border border-black p-1">JOB TYPE</th>
+                            <th className="border border-black p-1">QUANTITY</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {allItems.map((it, idx) => (
+                            <tr key={idx}>
+                              <td className="border border-black p-1 text-center">{it.num}</td>
+                              <td className="border border-black p-1 text-center">{it.jobNumber}</td>
+                              <td className="border border-black p-1">{it.item}</td>
+                              <td className="border border-black p-1 text-center">{it.jobType}</td>
+                              <td className="border border-black p-1 text-center">{it.quantity}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <div className="w-[350px]">
+                      <table className="w-full border-collapse border border-black text-xs">
+                        <thead>
+                          <tr className="bg-blue-700 text-white">
+                            <th className="border border-black p-1">Num</th>
+                            <th className="border border-black p-1">ITEM</th>
+                            <th className="border border-black p-1">QUANTITY</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {itemSummary.map((it, idx) => (
+                            <tr key={idx}>
+                              <td className="border border-black p-1 text-center">{idx + 1}</td>
+                              <td className="border border-black p-1">{it.name}</td>
+                              <td className="border border-black p-1 text-center">{it.quantity}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* Print buttons (hidden on print) */}
+                <div className="flex justify-center gap-4 mt-4 no-print">
+                  <Button onClick={() => window.print()} className="bg-blue-600 hover:bg-blue-700"><Printer className="h-4 w-4 mr-2" /> Print</Button>
+                  <Button variant="outline" onClick={() => setShowPrintSchedule(false)}>Go Back</Button>
+                </div>
               </>
             )}
           </div>
         ))}
-
-        {/* Items Table (on new page if needed) */}
-        {allItems.length > 0 && (
-          <div className="page-break">
-            <div className="flex gap-4 mt-2">
-              {/* Left: Per-job items */}
-              <div className="flex-1">
-                <table className="w-full border-collapse border border-black text-xs">
-                  <thead>
-                    <tr className="bg-blue-700 text-white">
-                      <th className="border border-black p-1">Num</th>
-                      <th className="border border-black p-1">JOB NUMBER</th>
-                      <th className="border border-black p-1">ITEM</th>
-                      <th className="border border-black p-1">JOB TYPE</th>
-                      <th className="border border-black p-1">QUANTITY</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {allItems.map((it, idx) => (
-                      <tr key={idx}>
-                        <td className="border border-black p-1 text-center">{it.num}</td>
-                        <td className="border border-black p-1 text-center">{it.jobNumber}</td>
-                        <td className="border border-black p-1">{it.item}</td>
-                        <td className="border border-black p-1 text-center">{it.jobType}</td>
-                        <td className="border border-black p-1 text-center">{it.quantity}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              {/* Right: Aggregated summary */}
-              <div className="w-[350px]">
-                <table className="w-full border-collapse border border-black text-xs">
-                  <thead>
-                    <tr className="bg-blue-700 text-white">
-                      <th className="border border-black p-1">Num</th>
-                      <th className="border border-black p-1">ITEM</th>
-                      <th className="border border-black p-1">QUANTITY</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {itemSummary.map((it, idx) => (
-                      <tr key={idx}>
-                        <td className="border border-black p-1 text-center">{idx + 1}</td>
-                        <td className="border border-black p-1">{it.name}</td>
-                        <td className="border border-black p-1 text-center">{it.quantity}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-            {/* Print buttons (hidden on print) */}
-            <div className="flex justify-center gap-4 mt-4 no-print">
-              <Button onClick={() => window.print()} className="bg-blue-600 hover:bg-blue-700"><Printer className="h-4 w-4 mr-2" /> Print</Button>
-              <Button variant="outline" onClick={() => setShowPrintSchedule(false)}>Go Back</Button>
-            </div>
-          </div>
-        )}
       </div>
     );
   };
