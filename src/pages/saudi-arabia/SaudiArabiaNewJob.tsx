@@ -81,6 +81,7 @@ const SaudiArabiaNewJob = () => {
     date: new Date().toISOString().split("T")[0],
     time: "09:00",
     driver: "",
+    vehicle: "",
     salesRep: "",
     notes: "",
     advanceAmount: 0,
