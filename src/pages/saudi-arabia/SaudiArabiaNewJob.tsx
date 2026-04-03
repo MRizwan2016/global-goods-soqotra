@@ -81,6 +81,7 @@ const SaudiArabiaNewJob = () => {
     date: new Date().toISOString().split("T")[0],
     time: "09:00",
     driver: "",
+    vehicle: "",
     salesRep: "",
     notes: "",
     advanceAmount: 0,
@@ -263,11 +264,16 @@ const SaudiArabiaNewJob = () => {
           <CardHeader className="bg-[#006c35] text-white rounded-t-lg py-3">
             <CardTitle className="text-base">Assignment</CardTitle>
           </CardHeader>
-          <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label>Driver *</Label>
-              <Select value={jobData.driver} onValueChange={(v) => updateField("driver", v)}>
-                <SelectTrigger><SelectValue placeholder="Assign driver" /></SelectTrigger>
+              <Label>Vehicle (Truck) *</Label>
+              <Select value={jobData.driver} onValueChange={(v) => {
+                updateField("driver", v);
+                // Extract truck number from label
+                const match = v.match(/\((\d+)\)/);
+                if (match) updateField("vehicle", match[1]);
+              }}>
+                <SelectTrigger><SelectValue placeholder="Select vehicle/driver" /></SelectTrigger>
                 <SelectContent>
                   {saudiArabiaDrivers.map((d) => (<SelectItem key={d.value} value={d.label}>{d.label}</SelectItem>))}
                 </SelectContent>
@@ -281,6 +287,10 @@ const SaudiArabiaNewJob = () => {
                   {saudiArabiaSalesReps.map((s) => (<SelectItem key={s.value} value={s.label}>{s.label}</SelectItem>))}
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <Label>Vehicle Number</Label>
+              <Input value={jobData.vehicle || ""} readOnly className="bg-muted" placeholder="Auto-filled from driver" />
             </div>
           </CardContent>
         </Card>

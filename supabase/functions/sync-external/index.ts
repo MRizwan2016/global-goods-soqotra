@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
         result = await externalClient.from(table).upsert(record, { onConflict: "book_number" });
         break;
       case "update":
-        result = await externalClient.from(table).update(record).eq(match_column, match_value);
+        result = await (externalClient.from(table).update(record) as any).eq(match_column, match_value);
         break;
       case "delete":
         result = await externalClient.from(table).delete().eq(match_column, match_value);
@@ -81,10 +81,11 @@ Deno.serve(async (req) => {
       JSON.stringify({ success: true, action }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (err) {
+  } catch (err: unknown) {
     console.error("Sync error:", err);
+    const message = err instanceof Error ? err.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: err.message }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
