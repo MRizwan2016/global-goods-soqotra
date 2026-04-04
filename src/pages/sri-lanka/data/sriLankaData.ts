@@ -29,8 +29,8 @@ export const sriLankaDrivers = [
   { value: "41067", label: "MR. ASHOKA UDESH (41067)" },
   { value: "41070", label: "MR. KANAYA (41070)" },
   { value: "41073", label: "MR. BAKEETH (41073)" },
-  { value: "215004", label: "MR. MOHAMMED NOOR (215004)" },
-  { value: "119929", label: "MR. JOHNY VENAKDY (119929)" },
+  { value: "515004", label: "MR. MOHAMMED NOOR (515004)" },
+  { value: "119927", label: "MR. JOHNY VENAKDY (119927)" },
 ];
 
 export const sriLankaCities = [

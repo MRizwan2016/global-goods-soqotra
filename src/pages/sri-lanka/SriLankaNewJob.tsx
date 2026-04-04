@@ -17,7 +17,7 @@ import {
   doorToDoorPricing,
   sriLankaPorts,
 } from "./data/sriLankaData";
-import { VEHICLES, DRIVERS, SALES_REPS, getDriverForVehicle } from "@/data/vehicleDriverMapping";
+import { VEHICLES, DRIVERS, SALES_REPS, VEHICLE_DRIVER_MAP, getDriverForVehicle } from "@/data/vehicleDriverMapping";
 import {
   cargoCollectionPackages,
   calcVolumeCBM,
@@ -25,13 +25,13 @@ import {
   CargoPackage,
 } from "@/data/cargoPackages";
 import { lookupJobData } from "@/hooks/useJobAutoFill";
+import { qatarTowns } from "@/pages/invoicing/constants/locationData";
 
 const NAME_PREFIXES = ["Mr.", "Mrs.", "Ms.", "Pastor", "Rev.", "Dr.", "Prof."];
 
-const QATAR_CITIES = [
-  "Doha", "Al Wakrah", "Al Khor", "Al Rayyan", "Umm Salal",
-  "Al Daayen", "Al Shamal", "Al Shahaniya", "Lusail", "Mesaieed",
-];
+const QATAR_CITIES = qatarTowns;
+
+const QATAR_SECTORS = qatarTowns.map(t => ({ value: t, label: t }));
 
 interface PackageItem {
   id: string;
@@ -107,6 +107,10 @@ const SriLankaNewJob = () => {
   const [items, setItems] = useState<PackageItem[]>([emptyItem(1)]);
   const [nextBoxNumber, setNextBoxNumber] = useState(2);
   const [lastDriverSelection, setLastDriverSelection] = useState({ driver: "", vehicle: "", salesRep: "" });
+  const [manualDriver, setManualDriver] = useState("");
+  const [manualSalesRep, setManualSalesRep] = useState("");
+  const [showManualDriver, setShowManualDriver] = useState(false);
+  const [showManualSalesRep, setShowManualSalesRep] = useState(false);
 
   // Load last used driver/vehicle/salesRep for quick reuse
   useEffect(() => {
@@ -402,7 +406,7 @@ const SriLankaNewJob = () => {
               <Select value={jobData.sector} onValueChange={handleSectorChange}>
                 <SelectTrigger><SelectValue placeholder="Select sector" /></SelectTrigger>
                 <SelectContent>
-                  {sriLankaSectors.map((s) => (<SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>))}
+                  {(isQatarOrigin ? QATAR_SECTORS : sriLankaSectors).map((s) => (<SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>
@@ -448,31 +452,71 @@ const SriLankaNewJob = () => {
             </Button>
           </CardHeader>
           <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Vehicle */}
             <div>
-              <Label>Vehicle / Driver *</Label>
-              <Select value={jobData.driver} onValueChange={(v) => {
-                updateField("driver", v);
-                const match = v.match(/\((\d+)\)/);
-                if (match) updateField("vehicle", match[1]);
+              <Label>Vehicle Number *</Label>
+              <Select value={jobData.vehicle} onValueChange={(v) => {
+                updateField("vehicle", v);
+                const driverName = getDriverForVehicle(v);
+                if (driverName) {
+                  updateField("driver", driverName);
+                  setShowManualDriver(false);
+                }
               }}>
-                <SelectTrigger><SelectValue placeholder="Select vehicle/driver" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Select vehicle" /></SelectTrigger>
                 <SelectContent>
-                  {DRIVERS.map((d) => (<SelectItem key={d.value} value={d.label}>{d.label}</SelectItem>))}
+                  {VEHICLE_DRIVER_MAP.map((v) => (
+                    <SelectItem key={v.truck} value={v.truck}>{v.truck} / {v.driver}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
+              <Input placeholder="Or type vehicle manually" className="mt-1" value={jobData.vehicle} onChange={(e) => updateField("vehicle", e.target.value.toUpperCase())} />
             </div>
+            {/* Driver */}
             <div>
-              <Label>Vehicle Number</Label>
-              <Input placeholder="Auto or manual" value={jobData.vehicle} onChange={(e) => updateField("vehicle", e.target.value.toUpperCase())} />
+              <div className="flex items-center justify-between mb-1">
+                <Label>Driver *</Label>
+                <button type="button" className="text-xs text-blue-600 underline" onClick={() => setShowManualDriver(!showManualDriver)}>
+                  {showManualDriver ? "Select from list" : "Add manually"}
+                </button>
+              </div>
+              {showManualDriver ? (
+                <Input placeholder="Enter driver name" value={manualDriver} onChange={(e) => {
+                  const val = e.target.value.toUpperCase();
+                  setManualDriver(val);
+                  updateField("driver", val);
+                }} />
+              ) : (
+                <Select value={jobData.driver} onValueChange={(v) => updateField("driver", v)}>
+                  <SelectTrigger><SelectValue placeholder="Select driver" /></SelectTrigger>
+                  <SelectContent>
+                    {DRIVERS.map((d) => (<SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
+            {/* Sales Rep */}
             <div>
-              <Label>Sales Representative</Label>
-              <Select value={jobData.salesRep} onValueChange={(v) => updateField("salesRep", v)}>
-                <SelectTrigger><SelectValue placeholder="Select sales rep" /></SelectTrigger>
-                <SelectContent>
-                  {SALES_REPS.map((s) => (<SelectItem key={s.value} value={s.label}>{s.label}</SelectItem>))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center justify-between mb-1">
+                <Label>Sales Representative</Label>
+                <button type="button" className="text-xs text-blue-600 underline" onClick={() => setShowManualSalesRep(!showManualSalesRep)}>
+                  {showManualSalesRep ? "Select from list" : "Add manually"}
+                </button>
+              </div>
+              {showManualSalesRep ? (
+                <Input placeholder="Enter sales rep name" value={manualSalesRep} onChange={(e) => {
+                  const val = e.target.value.toUpperCase();
+                  setManualSalesRep(val);
+                  updateField("salesRep", val);
+                }} />
+              ) : (
+                <Select value={jobData.salesRep} onValueChange={(v) => updateField("salesRep", v)}>
+                  <SelectTrigger><SelectValue placeholder="Select sales rep" /></SelectTrigger>
+                  <SelectContent>
+                    {SALES_REPS.map((s) => (<SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           </CardContent>
         </Card>
