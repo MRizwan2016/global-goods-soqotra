@@ -163,6 +163,7 @@ const SriLankaCollectionDelivery = () => {
             <TableHead className="text-white font-medium">CITY</TableHead>
             <TableHead className="text-white font-medium">BOXES</TableHead>
             <TableHead className="text-white font-medium">CBM</TableHead>
+            <TableHead className="text-white font-medium">VEHICLE</TableHead>
             <TableHead className="text-white font-medium">DRIVER</TableHead>
             <TableHead className="text-white font-medium">STATUS</TableHead>
             <TableHead className="text-white font-medium">ACTIONS</TableHead>
