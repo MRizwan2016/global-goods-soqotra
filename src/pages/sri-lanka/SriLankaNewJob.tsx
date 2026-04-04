@@ -406,7 +406,7 @@ const SriLankaNewJob = () => {
               <Select value={jobData.sector} onValueChange={handleSectorChange}>
                 <SelectTrigger><SelectValue placeholder="Select sector" /></SelectTrigger>
                 <SelectContent>
-                  {sriLankaSectors.map((s) => (<SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>))}
+                  {(isQatarOrigin ? QATAR_SECTORS : sriLankaSectors).map((s) => (<SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>
