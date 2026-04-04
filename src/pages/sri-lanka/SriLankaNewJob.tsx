@@ -17,7 +17,7 @@ import {
   doorToDoorPricing,
   sriLankaPorts,
 } from "./data/sriLankaData";
-import { VEHICLES, DRIVERS, SALES_REPS, getDriverForVehicle } from "@/data/vehicleDriverMapping";
+import { VEHICLES, DRIVERS, SALES_REPS, VEHICLE_DRIVER_MAP, getDriverForVehicle } from "@/data/vehicleDriverMapping";
 import {
   cargoCollectionPackages,
   calcVolumeCBM,
@@ -25,6 +25,7 @@ import {
   CargoPackage,
 } from "@/data/cargoPackages";
 import { lookupJobData } from "@/hooks/useJobAutoFill";
+import { qatarTowns } from "@/pages/invoicing/constants/locationData";
 
 const NAME_PREFIXES = ["Mr.", "Mrs.", "Ms.", "Pastor", "Rev.", "Dr.", "Prof."];
 
