@@ -29,10 +29,9 @@ import { qatarTowns } from "@/pages/invoicing/constants/locationData";
 
 const NAME_PREFIXES = ["Mr.", "Mrs.", "Ms.", "Pastor", "Rev.", "Dr.", "Prof."];
 
-const QATAR_CITIES = [
-  "Doha", "Al Wakrah", "Al Khor", "Al Rayyan", "Umm Salal",
-  "Al Daayen", "Al Shamal", "Al Shahaniya", "Lusail", "Mesaieed",
-];
+const QATAR_CITIES = qatarTowns;
+
+const QATAR_SECTORS = qatarTowns.map(t => ({ value: t, label: t }));
 
 interface PackageItem {
   id: string;
