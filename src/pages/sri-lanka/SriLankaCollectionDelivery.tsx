@@ -184,6 +184,7 @@ const SriLankaCollectionDelivery = () => {
                 <TableCell>{item.city}</TableCell>
                 <TableCell>{item.packages || item.totalPackages || (item.items?.length || 0)}</TableCell>
                 <TableCell>{item.totalCbm || "—"}</TableCell>
+                <TableCell className="font-semibold text-blue-700">{item.vehicle || "—"}</TableCell>
                 <TableCell>{item.driver}</TableCell>
                 <TableCell>{getStatusBadge(item.status)}</TableCell>
                 <TableCell>
