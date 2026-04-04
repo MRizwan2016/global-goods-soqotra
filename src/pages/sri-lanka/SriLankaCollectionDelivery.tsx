@@ -163,6 +163,7 @@ const SriLankaCollectionDelivery = () => {
             <TableHead className="text-white font-medium">CITY</TableHead>
             <TableHead className="text-white font-medium">BOXES</TableHead>
             <TableHead className="text-white font-medium">CBM</TableHead>
+            <TableHead className="text-white font-medium">VEHICLE</TableHead>
             <TableHead className="text-white font-medium">DRIVER</TableHead>
             <TableHead className="text-white font-medium">STATUS</TableHead>
             <TableHead className="text-white font-medium">ACTIONS</TableHead>
@@ -170,7 +171,7 @@ const SriLankaCollectionDelivery = () => {
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
-            <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">No records found</TableCell></TableRow>
+            <TableRow><TableCell colSpan={11} className="text-center py-8 text-muted-foreground">No records found</TableCell></TableRow>
           ) : (
             data.map((item) => (
               <TableRow key={item.id} className={`hover:bg-gray-50 ${selectedJobs.has(item.id) ? "bg-amber-50" : ""}`}>
@@ -183,6 +184,7 @@ const SriLankaCollectionDelivery = () => {
                 <TableCell>{item.city}</TableCell>
                 <TableCell>{item.packages || item.totalPackages || (item.items?.length || 0)}</TableCell>
                 <TableCell>{item.totalCbm || "—"}</TableCell>
+                <TableCell className="font-semibold text-blue-700">{item.vehicle || "—"}</TableCell>
                 <TableCell>{item.driver}</TableCell>
                 <TableCell>{getStatusBadge(item.status)}</TableCell>
                 <TableCell>
