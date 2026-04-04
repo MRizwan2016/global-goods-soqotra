@@ -171,7 +171,7 @@ const SriLankaCollectionDelivery = () => {
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
-            <TableRow><TableCell colSpan={10} className="text-center py-8 text-muted-foreground">No records found</TableCell></TableRow>
+            <TableRow><TableCell colSpan={11} className="text-center py-8 text-muted-foreground">No records found</TableCell></TableRow>
           ) : (
             data.map((item) => (
               <TableRow key={item.id} className={`hover:bg-gray-50 ${selectedJobs.has(item.id) ? "bg-amber-50" : ""}`}>
