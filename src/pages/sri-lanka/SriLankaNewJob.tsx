@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Save, Plus, Trash2, Truck, Package, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { ArrowLeft, Save, Plus, Trash2, Truck, Package, Search, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -111,6 +112,52 @@ const SriLankaNewJob = () => {
   const [manualSalesRep, setManualSalesRep] = useState("");
   const [showManualDriver, setShowManualDriver] = useState(false);
   const [showManualSalesRep, setShowManualSalesRep] = useState(false);
+
+  // Custom package dialog state
+  const [showCustomPkgDialog, setShowCustomPkgDialog] = useState(false);
+  const [customPkgName, setCustomPkgName] = useState("");
+  const [customPkgLength, setCustomPkgLength] = useState("");
+  const [customPkgWidth, setCustomPkgWidth] = useState("");
+  const [customPkgHeight, setCustomPkgHeight] = useState("");
+  const [customPkgWhitePly, setCustomPkgWhitePly] = useState("");
+  const [customPkgBlackPly, setCustomPkgBlackPly] = useState("");
+  const [customPackages, setCustomPackages] = useState<CargoPackage[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("customCargoPackages") || "[]");
+    } catch { return []; }
+  });
+
+  const allPackages = [...cargoCollectionPackages, ...customPackages];
+
+  const saveCustomPackage = () => {
+    if (!customPkgName.trim()) { toast.error("Package name is required"); return; }
+    const l = parseFloat(customPkgLength) || 0;
+    const w = parseFloat(customPkgWidth) || 0;
+    const h = parseFloat(customPkgHeight) || 0;
+    const vol = l > 0 && w > 0 && h > 0 ? Math.round(calcVolumeCBM(l, w, h) * 1000000) / 1000000 : 0;
+    const whitePly = parseFloat(customPkgWhitePly) || 0;
+    const blackPly = parseFloat(customPkgBlackPly) || 0;
+    const newPkg: CargoPackage = {
+      id: 100 + customPackages.length,
+      name: customPkgName.toUpperCase(),
+      dimensions: { length: l, width: w, height: h },
+      volume: Math.round(vol * 1000) / 1000,
+      collectionPrices: {
+        colombo: vol > 0 ? Math.round(vol * 259 * 100) / 100 : 0,
+        kurunegala: vol > 0 ? Math.round(vol * 269 * 100) / 100 : 0,
+        galle: vol > 0 ? Math.round(vol * 269 * 100) / 100 : 0,
+      },
+      deliveryPrices: { whitePlywood12mm: whitePly, blackPlywood18mm: blackPly },
+      hasManualDimensions: l === 0 && w === 0 && h === 0,
+    };
+    const updated = [...customPackages, newPkg];
+    setCustomPackages(updated);
+    localStorage.setItem("customCargoPackages", JSON.stringify(updated));
+    toast.success(`Package "${newPkg.name}" saved for future use`);
+    setShowCustomPkgDialog(false);
+    setCustomPkgName(""); setCustomPkgLength(""); setCustomPkgWidth(""); setCustomPkgHeight("");
+    setCustomPkgWhitePly(""); setCustomPkgBlackPly("");
+  };
 
   // Load last used driver/vehicle/salesRep for quick reuse
   useEffect(() => {
