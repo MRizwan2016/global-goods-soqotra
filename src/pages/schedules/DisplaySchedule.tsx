@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScheduleService } from "@/services/ScheduleService";
-import { ArrowLeft, Printer, Calendar, Truck, User } from "lucide-react";
+import { ArrowLeft, Printer, Calendar, Truck, User, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 interface Schedule {
