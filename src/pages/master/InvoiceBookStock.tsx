@@ -90,23 +90,9 @@ const InvoiceBookStock = () => {
         }));
 
         setBookData(mappedBooks);
-        localStorage.setItem('invoiceBooks', JSON.stringify(mappedBooks));
-        return;
       }
     } catch (error) {
       console.error("Error loading books from database:", error);
-    }
-
-    const savedBooks = localStorage.getItem('invoiceBooks');
-    if (!savedBooks) {
-      setBookData([]);
-      return;
-    }
-
-    try {
-      setBookData(JSON.parse(savedBooks));
-    } catch (error) {
-      console.error("Error parsing stored books:", error);
       setBookData([]);
     }
   };
@@ -127,24 +113,6 @@ const InvoiceBookStock = () => {
     };
   }, []);
 
-  // Save book data to localStorage when it changes
-  useEffect(() => {
-    if (bookData.length > 0) {
-      localStorage.setItem('invoiceBooks', JSON.stringify(bookData));
-
-      // Also save active books in the format used by invoicing components
-      const activeBooks = bookData
-        .filter(book => book.isActivated)
-        .map(book => ({
-          bookNumber: book.bookNumber,
-          assignedTo: book.assignedTo || "System User",
-          availablePages: book.availablePages,
-          pagesUsed: book.pagesUsed
-        }));
-      localStorage.setItem('activeInvoiceBooks', JSON.stringify(activeBooks));
-    }
-    // Don't clear localStorage when bookData is empty - it might contain data from other sources
-  }, [bookData]);
   
   // Filter booking data based on search term
   const filteredData = bookData.filter(item => {

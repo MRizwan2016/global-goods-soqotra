@@ -73,37 +73,7 @@ export function useAuth(): LegacyAuthContextType {
         console.error("Error loading profiles");
       }
 
-      // Load from localStorage as fallback (for legacy users only)
-      let localStorageUsers: LegacyUser[] = [];
-      try {
-        const storedUsers = localStorage.getItem('users');
-        if (storedUsers) {
-          const parsedUsers: LegacyUser[] = JSON.parse(storedUsers);
-          if (Array.isArray(parsedUsers) && parsedUsers.length > 0) {
-            localStorageUsers = parsedUsers;
-          }
-        }
-      } catch (error) {
-        console.error("Error loading from localStorage");
-      }
-
-      // Combine users (Supabase takes priority)
-      const allUsers = [...supabaseUsers];
-      localStorageUsers.forEach(localUser => {
-        const existsInSupabase = supabaseUsers.find(su => su.email === localUser.email);
-        if (!existsInSupabase) {
-          allUsers.push(localUser);
-        }
-      });
-
-      setUsers(allUsers);
-
-      // Check current session
-      const sid = localStorage.getItem('session_user_id');
-      if (sid) {
-        const existing = allUsers.find((u: LegacyUser) => u.id === sid) || null;
-        setLegacyUser(existing);
-      }
+      setUsers(supabaseUsers);
 
       // Check if current user is authenticated via Supabase
       if (ctx?.user) {
