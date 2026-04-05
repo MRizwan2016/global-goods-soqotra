@@ -126,6 +126,23 @@ export function useBookStock() {
 
       if (error) throw error;
 
+      // Also save to sl_book_assignments for Sri Lanka books
+      const country = selectedBook.country || "Qatar";
+      if (country.toLowerCase().includes("sri lanka")) {
+        await supabase
+          .from("sl_book_assignments")
+          .upsert({
+            book_number: selectedBook.bookNumber,
+            start_page_no: selectedBook.startPage,
+            end_page_no: selectedBook.endPage,
+            staff_name: selectedUser.name,
+            assigned_date: updateData.assigned_date,
+            status: "assigned",
+            country: "Sri Lanka",
+            pages_used: Math.max(0, (selectedBook.available?.length || 0)),
+          }, { onConflict: "book_number,country" });
+      }
+
       const totalPages = Math.max(50, Number(selectedBook.endPage) - Number(selectedBook.startPage) + 1 || 50);
       void syncBookStockToExternal({
         book_number: selectedBook.bookNumber,
