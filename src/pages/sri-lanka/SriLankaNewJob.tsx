@@ -575,9 +575,14 @@ const SriLankaNewJob = () => {
               <Package className="h-4 w-4" />
               {isCollection ? "CARGO COLLECTIONS" : "BOXES DELIVERIES"} — Packages (Dimensions in Inches)
             </CardTitle>
-            <Button size="sm" variant="secondary" onClick={addItem} disabled={nextBoxNumber > 20}>
-              <Plus className="h-4 w-4 mr-1" /> Add Box {nextBoxNumber <= 20 ? `#${nextBoxNumber}` : "(Max)"}
-            </Button>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" className="bg-white text-[#8B4513] border-white hover:bg-amber-100" onClick={() => setShowCustomPkgDialog(true)}>
+                <PlusCircle className="h-4 w-4 mr-1" /> Save New Package
+              </Button>
+              <Button size="sm" variant="secondary" onClick={addItem} disabled={nextBoxNumber > 20}>
+                <Plus className="h-4 w-4 mr-1" /> Add Box {nextBoxNumber <= 20 ? `#${nextBoxNumber}` : "(Max)"}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="pt-4 overflow-x-auto">
             <Table>
