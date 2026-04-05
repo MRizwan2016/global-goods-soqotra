@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScheduleService } from "@/services/ScheduleService";
-import { ArrowLeft, Printer, Calendar, Truck, User } from "lucide-react";
+import { ArrowLeft, Printer, Calendar, Truck, User, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 interface Schedule {
@@ -67,6 +67,31 @@ const DisplaySchedule: React.FC = () => {
     navigate(`/schedules/print/${scheduleId}`);
   };
 
+  const handleWhatsApp = () => {
+    if (!schedule) return;
+    const jobLines = jobs.map((job, i) => {
+      const d = job.job_data;
+      return `${i + 1}. ${d.jobNumber || `JOB-${i + 1}`} - ${d.customer || 'N/A'} (${d.status || 'SCHEDULED'})`;
+    }).join('\n');
+
+    const message = [
+      `📋 *SCHEDULE: ${schedule.schedule_number}*`,
+      `📅 Date: ${new Date(schedule.schedule_date).toLocaleDateString()}`,
+      `🚛 Vehicle: ${schedule.vehicle}`,
+      schedule.sales_rep ? `👤 Sales Rep: ${schedule.sales_rep}` : '',
+      schedule.driver ? `🚗 Driver: ${schedule.driver}` : '',
+      `🌍 Country: ${schedule.country}`,
+      `📦 Total Jobs: ${schedule.total_jobs}`,
+      ``,
+      `*Jobs:*`,
+      jobLines,
+      ``,
+      `— Soqotra Logistics`
+    ].filter(Boolean).join('\n');
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
@@ -100,10 +125,16 @@ const DisplaySchedule: React.FC = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Schedules
           </Button>
-          <Button onClick={handlePrint} className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600">
-            <Printer className="h-4 w-4" />
-            Print Schedule
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={handleWhatsApp} variant="outline" className="flex items-center gap-2 text-green-600 border-green-300 hover:bg-green-50">
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
+            </Button>
+            <Button onClick={handlePrint} className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600">
+              <Printer className="h-4 w-4" />
+              Print Schedule
+            </Button>
+          </div>
         </div>
 
         {/* Schedule Details */}
