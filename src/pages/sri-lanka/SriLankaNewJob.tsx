@@ -615,8 +615,8 @@ const SriLankaNewJob = () => {
                       <Select value={item.description} onValueChange={(v) => selectPackage(item.id, v)}>
                         <SelectTrigger className="min-w-[200px]"><SelectValue placeholder="Select package" /></SelectTrigger>
                         <SelectContent>
-                          {cargoCollectionPackages.map((p) => (
-                            <SelectItem key={p.id} value={p.name}>
+                          {allPackages.map((p) => (
+                            <SelectItem key={`pkg-${p.id}`} value={p.name}>
                               {p.name} {!p.hasManualDimensions ? `(${p.dimensions.length}×${p.dimensions.width}×${p.dimensions.height})` : ""}
                             </SelectItem>
                           ))}
