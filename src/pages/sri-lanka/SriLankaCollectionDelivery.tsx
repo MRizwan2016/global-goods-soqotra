@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Search, Truck, Package, MapPin, Calendar, Eye, Clock, Printer, Send, QrCode } from "lucide-react";
+import { Plus, Search, Truck, Package, MapPin, Calendar, Eye, Clock, Printer, Send, QrCode, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { ScheduleService } from "@/services/ScheduleService";
 import { QRCodeSVG } from "qrcode.react";
