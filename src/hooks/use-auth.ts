@@ -179,24 +179,14 @@ export function useAuth(): LegacyAuthContextType {
       const user = users.find(u => u.id === userId);
       if (!user) return;
 
-      const isSupabaseUser = user.id.includes('-') && user.id.length > 20;
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_active: !user.isActive })
+        .eq('user_id', userId);
 
-      if (isSupabaseUser) {
-        const { error } = await supabase
-          .from('profiles')
-          .update({ is_active: !user.isActive })
-          .eq('user_id', userId);
-
-        if (error) {
-          console.error("Error updating user status");
-          return;
-        }
-      } else {
-        const updatedUsers = users.map(u => 
-          u.id === userId ? { ...u, isActive: !u.isActive } : u
-        );
-        const localUsers = updatedUsers.filter(u => !u.id.includes('-') || u.id.length < 20);
-        localStorage.setItem("users", JSON.stringify(localUsers));
+      if (error) {
+        console.error("Error updating user status");
+        return;
       }
 
       await loadUsersFromBothSources();

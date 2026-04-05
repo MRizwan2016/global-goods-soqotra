@@ -196,17 +196,32 @@ const InvoiceBookStock = () => {
         if (error) throw error;
       }
 
+      // Also save to sl_book_assignments for Sri Lanka books
+      const country = normalizeCountryName(selectedBook.country || "");
+      if (country.toLowerCase().includes("sri lanka")) {
+        await supabase
+          .from("sl_book_assignments")
+          .upsert({
+            book_number: selectedBook.bookNumber,
+            start_page_no: selectedBook.startPage,
+            end_page_no: selectedBook.endPage,
+            staff_name: selectedUser.name,
+            assigned_date: bookRecord.assigned_date,
+            status: "assigned",
+            country: "Sri Lanka",
+            pages_used: selectedBook.pagesUsed || 0,
+          }, { onConflict: "book_number,country" });
+      }
+
       await syncBookStockToExternal(bookRecord);
     } catch (error) {
       console.error("Book activation sync error:", error);
-      toast.error("Book saved locally, but backend sync failed");
+      toast.error("Backend sync failed. Please try again.");
     }
     
     setIsActivateDialogOpen(false);
     toast.success(`Book #${selectedBook.bookNumber} has been successfully activated for ${selectedUser.name}`);
-    
-    // Dispatch storage event to notify other components
-    window.dispatchEvent(new Event('storage'));
+    loadBookData();
   };
   
   return (
