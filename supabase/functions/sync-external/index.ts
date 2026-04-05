@@ -26,7 +26,7 @@ const jsonResponse = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: corsHeaders });
 
 async function detectProfilesTable(externalClient: ReturnType<typeof createClient>) {
-  const { error } = await externalClient.from("profiles").select("user_id").limit(1);
+  const { error } = await externalClient.from("profiles").select("*").limit(1);
 
   if (!error) return true;
   if (isMissingTableError(error)) return false;
@@ -34,37 +34,83 @@ async function detectProfilesTable(externalClient: ReturnType<typeof createClien
   throw error;
 }
 
+async function detectProfilesSchema(externalClient: ReturnType<typeof createClient>) {
+  // Fetch one row to discover column names
+  const { data, error } = await externalClient.from("profiles").select("*").limit(1);
+
+  if (error) {
+    if (isMissingTableError(error)) return null;
+    // If the table exists but is empty, try inserting a dummy then reading columns from error
+    // Actually PostgREST returns empty array for empty tables, so data=[] is fine
+    throw error;
+  }
+
+  // If we got data, discover columns from keys; if empty, try to discover via a dummy select
+  let columns: string[] = [];
+  if (data && data.length > 0) {
+    columns = Object.keys(data[0]);
+  } else {
+    // Table is empty — we need to discover columns another way
+    // Try selecting known column names one by one
+    const knownCols = ["id", "user_id", "email", "full_name", "mobile_number", "country", "is_admin", "is_active", "permissions", "created_at", "updated_at"];
+    for (const col of knownCols) {
+      const { error: colErr } = await externalClient.from("profiles").select(col).limit(1);
+      if (!colErr) columns.push(col);
+    }
+  }
+
+  const hasUserIdColumn = columns.includes("user_id");
+  return { hasUserIdColumn, columns };
+}
+
 async function upsertExternalProfile(
   externalClient: ReturnType<typeof createClient>,
   userId: string,
   payload: SyncUserPayload,
+  schema: { hasUserIdColumn: boolean; columns: string[] },
 ) {
-  const profileData = {
-    user_id: userId,
+  // Map of all possible fields we might insert
+  const allFields: Record<string, unknown> = {
     email: payload.email,
     full_name: payload.full_name || payload.email,
-    mobile_number: payload.mobile_number || "",
-    country: payload.country || "",
     is_admin: payload.is_admin ?? false,
     is_active: payload.is_active ?? true,
     permissions: payload.permissions || {},
+    mobile_number: payload.mobile_number || "",
+    country: payload.country || "",
   };
+
+  // Determine the user-linking column
+  const userCol = schema.hasUserIdColumn ? "user_id" : "id";
+  allFields[userCol] = userId;
+
+  // Filter to only columns that actually exist in the external table
+  const profileData: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(allFields)) {
+    if (schema.columns.includes(key)) {
+      profileData[key] = value;
+    }
+  }
 
   const { data: existingProfile, error: lookupError } = await externalClient
     .from("profiles")
-    .select("id")
-    .eq("user_id", userId)
+    .select("*")
+    .eq(userCol, userId)
     .maybeSingle();
 
   if (lookupError) {
     throw lookupError;
   }
 
-  if (existingProfile?.id) {
+  if (existingProfile) {
+    const updateData = { ...profileData };
+    delete updateData[userCol];
+    if (userCol !== "id") delete updateData.id;
+
     const { error } = await externalClient
       .from("profiles")
-      .update(profileData)
-      .eq("id", existingProfile.id);
+      .update(updateData)
+      .eq(userCol, userId);
 
     if (error) throw error;
     return "updated";
@@ -88,7 +134,8 @@ async function syncUsersToExternal(
   if (listUsersError) throw listUsersError;
 
   const existingUsers = authUsersPage.users || [];
-  const profilesTableAvailable = await detectProfilesTable(externalClient);
+  const profilesSchema = await detectProfilesSchema(externalClient);
+  const profilesTableAvailable = profilesSchema !== null;
   const results = [];
 
   for (const user of users) {
@@ -132,11 +179,11 @@ async function syncUsersToExternal(
 
     let profileAction = "skipped";
 
-    if (profilesTableAvailable && authUser?.id) {
+    if (profilesTableAvailable && profilesSchema && authUser?.id) {
       profileAction = await upsertExternalProfile(externalClient, authUser.id, {
         ...user,
         email: normalizedEmail,
-      });
+      }, profilesSchema);
     }
 
     results.push({
