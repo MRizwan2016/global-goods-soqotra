@@ -3,7 +3,152 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Content-Type": "application/json",
 };
+
+type SyncUserPayload = {
+  email: string;
+  password?: string;
+  full_name?: string;
+  mobile_number?: string;
+  country?: string;
+  is_admin?: boolean;
+  is_active?: boolean;
+  permissions?: Record<string, unknown>;
+};
+
+const isMissingTableError = (error: { message?: string } | null | undefined) => {
+  const message = error?.message?.toLowerCase() || "";
+  return message.includes("could not find the table") || message.includes("relation") && message.includes("does not exist");
+};
+
+const jsonResponse = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: corsHeaders });
+
+async function detectProfilesTable(externalClient: ReturnType<typeof createClient>) {
+  const { error } = await externalClient.from("profiles").select("user_id").limit(1);
+
+  if (!error) return true;
+  if (isMissingTableError(error)) return false;
+
+  throw error;
+}
+
+async function upsertExternalProfile(
+  externalClient: ReturnType<typeof createClient>,
+  userId: string,
+  payload: SyncUserPayload,
+) {
+  const profileData = {
+    user_id: userId,
+    email: payload.email,
+    full_name: payload.full_name || payload.email,
+    mobile_number: payload.mobile_number || "",
+    country: payload.country || "",
+    is_admin: payload.is_admin ?? false,
+    is_active: payload.is_active ?? true,
+    permissions: payload.permissions || {},
+  };
+
+  const { data: existingProfile, error: lookupError } = await externalClient
+    .from("profiles")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (lookupError) {
+    throw lookupError;
+  }
+
+  if (existingProfile?.id) {
+    const { error } = await externalClient
+      .from("profiles")
+      .update(profileData)
+      .eq("id", existingProfile.id);
+
+    if (error) throw error;
+    return "updated";
+  }
+
+  const { error } = await externalClient.from("profiles").insert(profileData);
+  if (error) throw error;
+
+  return "created";
+}
+
+async function syncUsersToExternal(
+  externalClient: ReturnType<typeof createClient>,
+  users: SyncUserPayload[],
+) {
+  const { data: authUsersPage, error: listUsersError } = await externalClient.auth.admin.listUsers({
+    page: 1,
+    perPage: 1000,
+  });
+
+  if (listUsersError) throw listUsersError;
+
+  const existingUsers = authUsersPage.users || [];
+  const profilesTableAvailable = await detectProfilesTable(externalClient);
+  const results = [];
+
+  for (const user of users) {
+    if (!user.email) {
+      throw new Error("Each user requires an email address");
+    }
+
+    const normalizedEmail = user.email.trim().toLowerCase();
+    const existingAuthUser = existingUsers.find((entry) => entry.email?.toLowerCase() === normalizedEmail);
+
+    let authUser = existingAuthUser;
+    let authAction = "updated";
+
+    if (existingAuthUser) {
+      const { data, error } = await externalClient.auth.admin.updateUserById(existingAuthUser.id, {
+        email: normalizedEmail,
+        password: user.password,
+        email_confirm: true,
+        user_metadata: {
+          ...(existingAuthUser.user_metadata || {}),
+          full_name: user.full_name || existingAuthUser.user_metadata?.full_name || normalizedEmail,
+        },
+      });
+
+      if (error) throw error;
+      authUser = data.user;
+    } else {
+      authAction = "created";
+      const { data, error } = await externalClient.auth.admin.createUser({
+        email: normalizedEmail,
+        password: user.password,
+        email_confirm: true,
+        user_metadata: {
+          full_name: user.full_name || normalizedEmail,
+        },
+      });
+
+      if (error) throw error;
+      authUser = data.user;
+    }
+
+    let profileAction = "skipped";
+
+    if (profilesTableAvailable && authUser?.id) {
+      profileAction = await upsertExternalProfile(externalClient, authUser.id, {
+        ...user,
+        email: normalizedEmail,
+      });
+    }
+
+    results.push({
+      email: normalizedEmail,
+      user_id: authUser?.id || null,
+      auth: authAction,
+      profile: profileAction,
+    });
+  }
+
+  return { results, profilesTableAvailable };
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -15,22 +160,30 @@ Deno.serve(async (req) => {
     const EXTERNAL_KEY = Deno.env.get("EXTERNAL_SUPABASE_SERVICE_ROLE_KEY");
 
     if (!EXTERNAL_URL || !EXTERNAL_KEY) {
-      return new Response(
-        JSON.stringify({ error: "External Supabase credentials not configured" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return jsonResponse({ error: "External backend credentials are not configured" }, 500);
     }
 
-    const { action, table, record, match_column, match_value } = await req.json();
+    const payload = await req.json();
+    const { action, table, record, match_column, match_value, users } = payload;
 
-    if (!action || !table) {
-      return new Response(
-        JSON.stringify({ error: "Missing action or table" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    if (!action) {
+      return jsonResponse({ error: "Missing action" }, 400);
     }
 
     const externalClient = createClient(EXTERNAL_URL, EXTERNAL_KEY);
+
+    if (action === "sync_users") {
+      if (!Array.isArray(users) || users.length === 0) {
+        return jsonResponse({ error: "Missing users payload" }, 400);
+      }
+
+      const result = await syncUsersToExternal(externalClient, users);
+      return jsonResponse({ success: true, action, ...result });
+    }
+
+    if (!table) {
+      return jsonResponse({ error: "Missing table" }, 400);
+    }
 
     let result;
 
@@ -39,13 +192,12 @@ Deno.serve(async (req) => {
         result = await externalClient.from(table).upsert(record, { onConflict: "book_number" });
         break;
       case "update":
-        result = await (externalClient.from(table).update(record) as any).eq(match_column, match_value);
+        result = await (externalClient.from(table).update(record) as never).eq(match_column, match_value);
         break;
       case "delete":
-        result = await (externalClient.from(table).delete() as any).eq(match_column, match_value);
+        result = await (externalClient.from(table).delete() as never).eq(match_column, match_value);
         break;
       case "bulk_sync": {
-        // Sync all records from Lovable Cloud to external
         const INTERNAL_URL = Deno.env.get("SUPABASE_URL")!;
         const INTERNAL_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
         const internalClient = createClient(INTERNAL_URL, INTERNAL_KEY);
@@ -56,37 +208,24 @@ Deno.serve(async (req) => {
 
         if (fetchErr) throw fetchErr;
 
-        // Upsert all to external
         result = await externalClient
           .from(table)
           .upsert(allBooks || [], { onConflict: "book_number" });
         break;
       }
       default:
-        return new Response(
-          JSON.stringify({ error: `Unknown action: ${action}` }),
-          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        return jsonResponse({ error: `Unknown action: ${action}` }, 400);
     }
 
     if (result.error) {
       console.error("External sync error:", result.error);
-      return new Response(
-        JSON.stringify({ error: result.error.message, details: result.error }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return jsonResponse({ error: result.error.message, details: result.error }, 500);
     }
 
-    return new Response(
-      JSON.stringify({ success: true, action }),
-      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return jsonResponse({ success: true, action });
   } catch (err: unknown) {
     console.error("Sync error:", err);
     const message = err instanceof Error ? err.message : "Unknown error";
-    return new Response(
-      JSON.stringify({ error: message }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    return jsonResponse({ error: message }, 500);
   }
 });
