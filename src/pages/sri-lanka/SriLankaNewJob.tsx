@@ -197,7 +197,7 @@ const SriLankaNewJob = () => {
   }, [searchJobNumber]);
 
   const selectPackage = (itemId: string, pkgName: string) => {
-    const pkg = cargoCollectionPackages.find(p => p.name === pkgName);
+    const pkg = allPackages.find(p => p.name === pkgName);
     setItems(prev => prev.map(item => {
       if (item.id !== itemId) return item;
       if (!pkg) return { ...item, description: pkgName };
