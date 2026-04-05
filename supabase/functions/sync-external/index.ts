@@ -30,8 +30,11 @@ const isMissingTableError = (error: { message?: string } | null | undefined) => 
 const jsonResponse = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: corsHeaders });
 
+// deno-lint-ignore no-explicit-any
+type AnyClient = any;
+
 async function upsertMatch(
-  externalClient: ReturnType<typeof createClient>,
+  externalClient: AnyClient,
   table: string,
   record: Record<string, unknown>,
   matchColumn?: string,
@@ -54,15 +57,14 @@ async function upsertMatch(
   if (existing) {
     const updateRecord = { ...record };
     delete updateRecord.id;
-
-    return await (externalClient.from(table).update(updateRecord) as never).eq(matchColumn, matchValue);
+    return await externalClient.from(table).update(updateRecord).eq(matchColumn, matchValue);
   }
 
   return await externalClient.from(table).insert(record);
 }
 
 async function syncLegacyInvoiceBookTables(
-  externalClient: ReturnType<typeof createClient>,
+  externalClient: AnyClient,
   action: string,
   record: Record<string, unknown>,
   matchColumn?: string,
@@ -75,10 +77,10 @@ async function syncLegacyInvoiceBookTables(
   }
 
   if (action === "delete") {
-    const bookDelete = await (externalClient.from("invoice_books").delete() as never).eq("book_number", bookNumber);
+    const bookDelete = await externalClient.from("invoice_books").delete().eq("book_number", bookNumber);
     if (bookDelete.error && !isMissingTableError(bookDelete.error)) return bookDelete;
 
-    const assignmentDelete = await (externalClient.from("sl_book_assignments").delete() as never).eq("book_number", bookNumber);
+    const assignmentDelete = await externalClient.from("sl_book_assignments").delete().eq("book_number", bookNumber);
     if (assignmentDelete.error && !isMissingTableError(assignmentDelete.error)) return assignmentDelete;
 
     return { error: null };
@@ -120,7 +122,7 @@ async function syncLegacyInvoiceBookTables(
         return assignmentResult;
       }
     } else {
-      const assignmentDelete = await (externalClient.from("sl_book_assignments").delete() as never).eq("book_number", bookNumber);
+      const assignmentDelete = await externalClient.from("sl_book_assignments").delete().eq("book_number", bookNumber);
       if (assignmentDelete.error && !isMissingTableError(assignmentDelete.error)) return assignmentDelete;
     }
   }
@@ -129,7 +131,7 @@ async function syncLegacyInvoiceBookTables(
 }
 
 async function syncScheduleBundle(
-  externalClient: ReturnType<typeof createClient>,
+  externalClient: AnyClient,
   payload: SyncScheduleBundlePayload,
 ) {
   const schedule = payload.schedule || {};
@@ -157,7 +159,7 @@ async function syncScheduleBundle(
     return { error: { message: "Unable to resolve external schedule id" } };
   }
 
-  const deleteResult = await (externalClient.from("schedule_jobs").delete() as never).eq("schedule_id", syncedSchedule.id);
+  const deleteResult = await externalClient.from("schedule_jobs").delete().eq("schedule_id", syncedSchedule.id);
   if (deleteResult.error && !isMissingTableError(deleteResult.error)) {
     return deleteResult;
   }
@@ -177,33 +179,18 @@ async function syncScheduleBundle(
   return { error: null };
 }
 
-async function detectProfilesTable(externalClient: ReturnType<typeof createClient>) {
-  const { error } = await externalClient.from("profiles").select("*").limit(1);
-
-  if (!error) return true;
-  if (isMissingTableError(error)) return false;
-
-  throw error;
-}
-
-async function detectProfilesSchema(externalClient: ReturnType<typeof createClient>) {
-  // Fetch one row to discover column names
+async function detectProfilesSchema(externalClient: AnyClient) {
   const { data, error } = await externalClient.from("profiles").select("*").limit(1);
 
   if (error) {
     if (isMissingTableError(error)) return null;
-    // If the table exists but is empty, try inserting a dummy then reading columns from error
-    // Actually PostgREST returns empty array for empty tables, so data=[] is fine
     throw error;
   }
 
-  // If we got data, discover columns from keys; if empty, try to discover via a dummy select
   let columns: string[] = [];
   if (data && data.length > 0) {
     columns = Object.keys(data[0]);
   } else {
-    // Table is empty — we need to discover columns another way
-    // Try selecting known column names one by one
     const knownCols = ["id", "user_id", "email", "full_name", "mobile_number", "country", "is_admin", "is_active", "permissions", "created_at", "updated_at"];
     for (const col of knownCols) {
       const { error: colErr } = await externalClient.from("profiles").select(col).limit(1);
@@ -216,12 +203,11 @@ async function detectProfilesSchema(externalClient: ReturnType<typeof createClie
 }
 
 async function upsertExternalProfile(
-  externalClient: ReturnType<typeof createClient>,
+  externalClient: AnyClient,
   userId: string,
   payload: SyncUserPayload,
   schema: { hasUserIdColumn: boolean; columns: string[] },
 ) {
-  // Map of all possible fields we might insert
   const allFields: Record<string, unknown> = {
     email: payload.email,
     full_name: payload.full_name || payload.email,
@@ -232,11 +218,9 @@ async function upsertExternalProfile(
     country: payload.country || "",
   };
 
-  // Determine the user-linking column
   const userCol = schema.hasUserIdColumn ? "user_id" : "id";
   allFields[userCol] = userId;
 
-  // Filter to only columns that actually exist in the external table
   const profileData: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(allFields)) {
     if (schema.columns.includes(key)) {
@@ -275,7 +259,7 @@ async function upsertExternalProfile(
 }
 
 async function syncUsersToExternal(
-  externalClient: ReturnType<typeof createClient>,
+  externalClient: AnyClient,
   users: SyncUserPayload[],
 ) {
   const { data: authUsersPage, error: listUsersError } = await externalClient.auth.admin.listUsers({
@@ -296,7 +280,7 @@ async function syncUsersToExternal(
     }
 
     const normalizedEmail = user.email.trim().toLowerCase();
-    const existingAuthUser = existingUsers.find((entry) => entry.email?.toLowerCase() === normalizedEmail);
+    const existingAuthUser = existingUsers.find((entry: { email?: string }) => entry.email?.toLowerCase() === normalizedEmail);
 
     let authUser = existingAuthUser;
     let authAction = "updated";
@@ -384,7 +368,7 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "Missing table" }, 400);
     }
 
-    let result;
+    let result: { error: { message?: string } | null };
 
     switch (action) {
       case "upsert":
@@ -401,14 +385,14 @@ Deno.serve(async (req) => {
         if (table === "manage_invoice_book_stock") {
           result = await syncLegacyInvoiceBookTables(externalClient, action, record || {}, match_column, match_value);
         } else {
-          result = await (externalClient.from(table).update(record) as never).eq(match_column, match_value);
+          result = await externalClient.from(table).update(record).eq(match_column, match_value);
         }
         break;
       case "delete":
         if (table === "manage_invoice_book_stock") {
           result = await syncLegacyInvoiceBookTables(externalClient, action, record || {}, match_column, match_value);
         } else {
-          result = await (externalClient.from(table).delete() as never).eq(match_column, match_value);
+          result = await externalClient.from(table).delete().eq(match_column, match_value);
         }
         break;
       case "sync_schedule_bundle":
