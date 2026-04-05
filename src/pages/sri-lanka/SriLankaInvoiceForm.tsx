@@ -370,7 +370,7 @@ const SriLankaInvoiceForm = () => {
     setManualInvoiceNumber('');
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     console.log('Form data before validation:', formData);
     
     // Check all required fields with more precise validation
