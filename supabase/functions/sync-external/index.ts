@@ -26,7 +26,7 @@ const jsonResponse = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: corsHeaders });
 
 async function detectProfilesTable(externalClient: ReturnType<typeof createClient>) {
-  const { error } = await externalClient.from("profiles").select("user_id").limit(1);
+  const { error } = await externalClient.from("profiles").select("*").limit(1);
 
   if (!error) return true;
   if (isMissingTableError(error)) return false;
@@ -34,37 +34,65 @@ async function detectProfilesTable(externalClient: ReturnType<typeof createClien
   throw error;
 }
 
+async function detectProfilesSchema(externalClient: ReturnType<typeof createClient>) {
+  // Try to fetch one row to discover which columns exist
+  const { data, error } = await externalClient.from("profiles").select("*").limit(1);
+
+  if (error) {
+    if (isMissingTableError(error)) return null;
+    throw error;
+  }
+
+  // Determine if the table uses user_id or id for linking
+  // We check by looking at a sample row's keys, or fallback to trying both
+  const sampleKeys = data && data.length > 0 ? Object.keys(data[0]) : [];
+  const hasUserIdColumn = sampleKeys.includes("user_id");
+  return { hasUserIdColumn };
+}
+
 async function upsertExternalProfile(
   externalClient: ReturnType<typeof createClient>,
   userId: string,
   payload: SyncUserPayload,
+  schema: { hasUserIdColumn: boolean },
 ) {
-  const profileData = {
-    user_id: userId,
+  // Build profile data dynamically based on available columns
+  const profileData: Record<string, unknown> = {
     email: payload.email,
     full_name: payload.full_name || payload.email,
-    mobile_number: payload.mobile_number || "",
-    country: payload.country || "",
     is_admin: payload.is_admin ?? false,
     is_active: payload.is_active ?? true,
     permissions: payload.permissions || {},
   };
 
+  // Add optional fields
+  if (payload.mobile_number !== undefined) profileData.mobile_number = payload.mobile_number;
+  if (payload.country !== undefined) profileData.country = payload.country;
+
+  // Determine the user-linking column
+  const userCol = schema.hasUserIdColumn ? "user_id" : "id";
+  profileData[userCol] = userId;
+
   const { data: existingProfile, error: lookupError } = await externalClient
     .from("profiles")
-    .select("id")
-    .eq("user_id", userId)
+    .select("*")
+    .eq(userCol, userId)
     .maybeSingle();
 
   if (lookupError) {
     throw lookupError;
   }
 
-  if (existingProfile?.id) {
+  if (existingProfile) {
+    // Remove the primary key from the update payload to avoid conflicts
+    const updateData = { ...profileData };
+    delete updateData[userCol];
+    if (userCol !== "id") delete updateData.id;
+
     const { error } = await externalClient
       .from("profiles")
-      .update(profileData)
-      .eq("id", existingProfile.id);
+      .update(updateData)
+      .eq(userCol, userId);
 
     if (error) throw error;
     return "updated";
@@ -88,7 +116,8 @@ async function syncUsersToExternal(
   if (listUsersError) throw listUsersError;
 
   const existingUsers = authUsersPage.users || [];
-  const profilesTableAvailable = await detectProfilesTable(externalClient);
+  const profilesSchema = await detectProfilesSchema(externalClient);
+  const profilesTableAvailable = profilesSchema !== null;
   const results = [];
 
   for (const user of users) {
@@ -132,11 +161,11 @@ async function syncUsersToExternal(
 
     let profileAction = "skipped";
 
-    if (profilesTableAvailable && authUser?.id) {
+    if (profilesTableAvailable && profilesSchema && authUser?.id) {
       profileAction = await upsertExternalProfile(externalClient, authUser.id, {
         ...user,
         email: normalizedEmail,
-      });
+      }, profilesSchema);
     }
 
     results.push({
