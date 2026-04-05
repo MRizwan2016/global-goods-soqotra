@@ -412,12 +412,39 @@ const SriLankaCollectionDelivery = () => {
   if (showPrintSchedule && lastScheduleData) {
     return (
       <Layout title="Print Schedule">
-        <div className="no-print mb-4">
-          <Button variant="outline" onClick={() => setShowPrintSchedule(false)} className="mr-2">
+        <div className="no-print mb-4 flex flex-wrap gap-2">
+          <Button variant="outline" onClick={() => setShowPrintSchedule(false)}>
             ← Back to Collection & Delivery
           </Button>
           <Button onClick={() => window.print()} className="bg-blue-600 hover:bg-blue-700">
             <Printer className="h-4 w-4 mr-2" /> Print Schedule
+          </Button>
+          <Button
+            variant="outline"
+            className="text-green-600 border-green-300 hover:bg-green-50"
+            onClick={() => {
+              if (!lastScheduleData) return;
+              const sJobs = lastScheduleData.jobs || [];
+              const jobLines = sJobs.map((j: any, i: number) => {
+                return `${i + 1}. ${j.jobNumber || j.id} - ${j.customer || "N/A"} (${(j.type || j.jobType || "COLLECTION").toUpperCase()})`;
+              }).join("\n");
+              const msg = [
+                `📋 *SCHEDULE: ${lastScheduleData.scheduleNumber}*`,
+                `📅 Date: ${lastScheduleData.date}`,
+                `🚛 Vehicle: ${lastScheduleData.vehicle}`,
+                `🚗 Driver: ${lastScheduleData.driver}`,
+                `👤 Sales Rep: ${lastScheduleData.salesRep}`,
+                `📦 Total Jobs: ${sJobs.length}`,
+                ``,
+                `*Jobs:*`,
+                jobLines,
+                ``,
+                `— Soqotra Logistics`
+              ].filter(Boolean).join("\n");
+              window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+            }}
+          >
+            <MessageCircle className="h-4 w-4 mr-2" /> WhatsApp
           </Button>
         </div>
         {renderSchedulePrint()}
