@@ -252,12 +252,25 @@ const SriLankaCollectionDelivery = () => {
 
         {pages.map((pageJobs, pageIdx) => (
           <div key={pageIdx} className={pageIdx > 0 ? "page-break" : ""}>
-            {/* Header */}
-            <div className="text-center mb-2">
-              <h1 className="text-sm font-bold underline">
-                COLLECTION/ DELIVERY JOB SHEET [ SCHEDULE NO: {lastScheduleData.scheduleNumber} ] - [ALMARAAM LOGISTICS SERVICES & ]
-              </h1>
-              <p className="text-xs mt-1">Printed Time: {printTime}</p>
+            {/* Header with QR Code */}
+            <div className="flex justify-between items-start mb-2">
+              <div className="flex-1 text-center">
+                <h1 className="text-sm font-bold underline">
+                  COLLECTION/ DELIVERY JOB SHEET [ SCHEDULE NO: {lastScheduleData.scheduleNumber} ] - [ALMARAAM LOGISTICS SERVICES & ]
+                </h1>
+                <p className="text-xs mt-1">Printed Time: {printTime}</p>
+              </div>
+              {pageIdx === 0 && (
+                <div className="flex flex-col items-center ml-4">
+                  <QRCodeSVG
+                    value={`${window.location.origin}/schedules/display/${lastScheduleData.scheduleId || ""}?schedule=${lastScheduleData.scheduleNumber}&verified=true`}
+                    size={80}
+                    level="M"
+                    includeMargin={false}
+                  />
+                  <p className="text-[8px] text-gray-500 mt-0.5">Scan for Details</p>
+                </div>
+              )}
             </div>
 
             {/* Schedule Info Table */}
