@@ -698,6 +698,56 @@ const SriLankaNewJob = () => {
           </Button>
         </div>
       </div>
+
+      {/* Custom Package Save Dialog */}
+      <Dialog open={showCustomPkgDialog} onOpenChange={setShowCustomPkgDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Save New Custom Package</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Package Name *</Label>
+              <Input placeholder="e.g. CUSTOM BOX - TALL" value={customPkgName} onChange={(e) => setCustomPkgName(e.target.value.toUpperCase())} />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <Label>Length (in)</Label>
+                <Input type="number" placeholder="0" value={customPkgLength} onChange={(e) => setCustomPkgLength(e.target.value)} />
+              </div>
+              <div>
+                <Label>Width (in)</Label>
+                <Input type="number" placeholder="0" value={customPkgWidth} onChange={(e) => setCustomPkgWidth(e.target.value)} />
+              </div>
+              <div>
+                <Label>Height (in)</Label>
+                <Input type="number" placeholder="0" value={customPkgHeight} onChange={(e) => setCustomPkgHeight(e.target.value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label>White Plywood Price (QAR)</Label>
+                <Input type="number" placeholder="0" value={customPkgWhitePly} onChange={(e) => setCustomPkgWhitePly(e.target.value)} />
+              </div>
+              <div>
+                <Label>Black Plywood Price (QAR)</Label>
+                <Input type="number" placeholder="0" value={customPkgBlackPly} onChange={(e) => setCustomPkgBlackPly(e.target.value)} />
+              </div>
+            </div>
+            {customPkgLength && customPkgWidth && customPkgHeight && (
+              <p className="text-sm text-muted-foreground">
+                Volume: {(calcVolumeCBM(parseFloat(customPkgLength) || 0, parseFloat(customPkgWidth) || 0, parseFloat(customPkgHeight) || 0)).toFixed(6)} CBM
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCustomPkgDialog(false)}>Cancel</Button>
+            <Button className="bg-[#8B4513] hover:bg-[#6d3610]" onClick={saveCustomPackage}>
+              <Save className="h-4 w-4 mr-1" /> Save Package
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
