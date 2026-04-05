@@ -15,6 +15,8 @@ import { PenLine, UserCheck, FileText } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { normalizeCountryName, syncBookStockToExternal } from "@/lib/externalSync";
 
 // Define the user type
 interface User {
@@ -33,6 +35,8 @@ interface InvoiceBook {
   assignedTo?: string;
   pagesUsed: number;
   availablePages: string[];
+   country?: string;
+   driverName?: string;
 }
 
 // Mock users for the system
@@ -63,20 +67,46 @@ const InvoiceBookStock = () => {
   const [selectedUserId, setSelectedUserId] = useState("");
   
   // Function to load book data
-  const loadBookData = () => {
-    console.log("Loading book data from localStorage");
-    const savedBooks = localStorage.getItem('invoiceBooks');
-    if (savedBooks) {
-      try {
-        const parsedBooks = JSON.parse(savedBooks);
-        setBookData(parsedBooks);
-        console.log("Loaded books:", parsedBooks);
-      } catch (error) {
-        console.error("Error parsing stored books:", error);
-        setBookData([]);
+  const loadBookData = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("manage_invoice_book_stock")
+        .select("id, book_number, start_page, end_page, status, assigned_to_sales_rep, assigned_to_driver, pages_used, available_pages, country")
+        .order("book_number");
+
+      if (!error && data && data.length > 0) {
+        const mappedBooks = data.map((book: any) => ({
+          id: book.id,
+          bookNumber: String(book.book_number),
+          startPage: String(book.start_page),
+          endPage: String(book.end_page),
+          isIssued: false,
+          isActivated: String(book.status || "available") !== "available",
+          assignedTo: book.assigned_to_sales_rep || undefined,
+          pagesUsed: Number(book.pages_used || 0),
+          availablePages: Array.isArray(book.available_pages) ? book.available_pages.map(String) : [],
+          country: book.country || undefined,
+          driverName: book.assigned_to_driver || undefined,
+        }));
+
+        setBookData(mappedBooks);
+        localStorage.setItem('invoiceBooks', JSON.stringify(mappedBooks));
+        return;
       }
-    } else {
-      console.log("No books found in localStorage");
+    } catch (error) {
+      console.error("Error loading books from database:", error);
+    }
+
+    const savedBooks = localStorage.getItem('invoiceBooks');
+    if (!savedBooks) {
+      setBookData([]);
+      return;
+    }
+
+    try {
+      setBookData(JSON.parse(savedBooks));
+    } catch (error) {
+      console.error("Error parsing stored books:", error);
       setBookData([]);
     }
   };
@@ -138,7 +168,7 @@ const InvoiceBookStock = () => {
     setIsViewDialogOpen(true);
   };
   
-  const confirmActivation = () => {
+  const confirmActivation = async () => {
     if (!selectedBook || !selectedUserId) {
       toast.error("Please select a user to activate this book");
       return;
@@ -151,18 +181,58 @@ const InvoiceBookStock = () => {
       return;
     }
     
-    // Update the book data with activation info
-    setBookData(prev => 
-      prev.map(book => 
-        book.id === selectedBook.id 
-        ? { 
-            ...book, 
-            isActivated: true, 
-            assignedTo: selectedUser.name
-          } 
-        : book
-      )
-    );
+    const updatedBook = {
+      ...selectedBook,
+      isActivated: true,
+      assignedTo: selectedUser.name,
+    };
+
+    setBookData(prev => prev.map(book => book.id === selectedBook.id ? updatedBook : book));
+
+    const bookRecord = {
+      book_number: selectedBook.bookNumber,
+      country: normalizeCountryName(selectedBook.country || ""),
+      country_id_number: selectedBook.startPage.length > 6 ? selectedBook.startPage.slice(0, 2) : null,
+      start_page: selectedBook.startPage,
+      end_page: selectedBook.endPage,
+      total_pages: Math.max(1, Number(selectedBook.endPage) - Number(selectedBook.startPage) + 1 || 50),
+      pages_used: selectedBook.pagesUsed || 0,
+      available_pages: selectedBook.availablePages || [],
+      assigned_to_sales_rep: selectedUser.name,
+      assigned_to_driver: selectedBook.driverName || null,
+      assigned_date: new Date().toISOString(),
+      status: "assigned",
+    };
+
+    try {
+      const { data: existingBook, error: existingBookError } = await supabase
+        .from("manage_invoice_book_stock")
+        .select("id")
+        .eq("book_number", selectedBook.bookNumber)
+        .maybeSingle();
+
+      if (existingBookError) throw existingBookError;
+
+      if (existingBook?.id) {
+        const { error } = await supabase
+          .from("manage_invoice_book_stock")
+          .update(bookRecord)
+          .eq("id", existingBook.id);
+
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("manage_invoice_book_stock")
+          .insert(bookRecord);
+
+        if (error) throw error;
+      }
+
+      await syncBookStockToExternal(bookRecord);
+    } catch (error) {
+      console.error("Book activation sync error:", error);
+      toast.error("Book saved locally, but backend sync failed");
+    }
     
     setIsActivateDialogOpen(false);
     toast.success(`Book #${selectedBook.bookNumber} has been successfully activated for ${selectedUser.name}`);

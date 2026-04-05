@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { syncInvoiceToExternal } from "@/lib/externalSync";
 
 // Interface for individual package items
 export interface SudanPackageItem {
@@ -321,6 +322,7 @@ export const useSudanInvoice = () => {
       }
 
       localStorage.setItem('sudanInvoices', JSON.stringify(existingInvoices));
+      await syncInvoiceToExternal(invoiceData);
       toast.success("Invoice saved successfully");
       
       return invoiceData.id;

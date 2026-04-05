@@ -25,6 +25,7 @@ import {
   getAllDistricts, 
   getAllProvinces 
 } from './utils/districtProvinceMapping';
+import { syncInvoiceToExternal } from '@/lib/externalSync';
 
 const SriLankaInvoiceForm = () => {
   const navigate = useNavigate();
@@ -499,6 +500,7 @@ const SriLankaInvoiceForm = () => {
       
       // Save back to localStorage
       localStorage.setItem('sriLankaInvoices', JSON.stringify(updatedInvoices));
+      await syncInvoiceToExternal(invoiceData);
       
       toast.success('Invoice saved successfully');
       console.log('Invoice saved:', invoiceData);

@@ -2,6 +2,7 @@
 import { toast } from "sonner";
 import { FormState, PackageItem } from "../types/invoiceForm";
 import { JobStorageService } from "@/pages/qatar/services/JobStorageService";
+import { syncInvoiceToExternal } from "@/lib/externalSync";
 
 export const useInvoiceSubmit = () => {
   const handleSubmit = async (formState: FormState, packageItems: PackageItem[], isEditing: boolean, id?: string): Promise<string> => {
@@ -90,6 +91,7 @@ export const useInvoiceSubmit = () => {
     
     // Save to localStorage
     localStorage.setItem('invoices', JSON.stringify(existingInvoices));
+    await syncInvoiceToExternal(completeInvoice);
     
     // Also save an easily accessible list of invoice numbers for checking duplicates
     try {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { doorToDoorPricing, eritreaPackageTypes, calculateVolumeWeight, calculateCubicFeet, countryCodes, sectorCitiesMapping, eritreaSectorPricing } from "../data/eritreaData";
 import { toast } from "sonner";
+import { syncInvoiceToExternal } from "@/lib/externalSync";
 
 export interface EritreaPackageItem {
   id: string;
@@ -488,6 +489,7 @@ export const useEritreaInvoice = (invoiceId?: string) => {
       
       console.log("💾 Saving to localStorage - total invoices:", existingInvoices.length);
       localStorage.setItem(storageKey, JSON.stringify(existingInvoices));
+      await syncInvoiceToExternal(invoiceData);
       
       // Verify the save was successful
       const verifyInvoices = JSON.parse(localStorage.getItem(storageKey) || "[]");

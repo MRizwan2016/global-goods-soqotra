@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { supabase } from "@/integrations/supabase/client";
+import { normalizeCountryName, syncBookStockToExternal } from "@/lib/externalSync";
 
 const InvoiceBookForm = () => {
   const navigate = useNavigate();
@@ -155,7 +157,7 @@ const InvoiceBookForm = () => {
     });
   };
   
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.country) {
       toast.error("Please select a country");
       return;
@@ -201,14 +203,31 @@ const InvoiceBookForm = () => {
       const existingBooksJson = localStorage.getItem('invoiceBooks');
       const existingBooks = existingBooksJson ? JSON.parse(existingBooksJson) : [];
       
+      const salesRepLabel = getSalesRepresentatives(formData.country).find(rep => rep.value === formData.salesRepresentative)?.label || formData.salesRepresentative;
+      const driverLabel = getDrivers(formData.country).find(driver => driver.value === formData.driverName)?.label || formData.driverName;
+
       // Check for duplicates in the range
       const duplicates: string[] = [];
+      const requestedBookNumbers: string[] = [];
       for (let bn = startBookNum; bn <= endBookNum; bn++) {
         const bnStr = bn.toString();
+        requestedBookNumbers.push(bnStr);
         if (existingBooks.some((book: any) => book.bookNumber === bnStr)) {
           duplicates.push(bnStr);
         }
       }
+
+      const { data: existingDbBooks, error: existingDbBooksError } = await supabase
+        .from("manage_invoice_book_stock")
+        .select("book_number")
+        .in("book_number", requestedBookNumbers);
+
+      if (existingDbBooksError) throw existingDbBooksError;
+
+      (existingDbBooks || []).forEach((book: any) => {
+        const value = String(book.book_number);
+        if (!duplicates.includes(value)) duplicates.push(value);
+      });
 
       if (duplicates.length > 0) {
         toast.error(`Book number(s) ${duplicates.join(', ')} already exist. Please choose different numbers.`);
@@ -230,8 +249,9 @@ const InvoiceBookForm = () => {
           isActivated: true,
           bookType: formData.bookType,
           pagesUsed: 0,
+          assignedTo: salesRepLabel,
           salesRepresentative: formData.salesRepresentative,
-          driverName: formData.driverName,
+          driverName: driverLabel,
           availablePages: Array.from(
             { length: pagesPerBook }, 
             (_, i) => (firstPage + i).toString()
@@ -255,6 +275,29 @@ const InvoiceBookForm = () => {
       }));
       const updatedActiveBooks = [...activeBooks, ...newActiveEntries];
       localStorage.setItem('activeInvoiceBooks', JSON.stringify(updatedActiveBooks));
+
+      const dbRows = newBooks.map((book) => ({
+        book_number: book.bookNumber,
+        country: normalizeCountryName(formData.country),
+        country_id_number: book.startPage.length > 6 ? book.startPage.slice(0, 2) : null,
+        start_page: book.startPage,
+        end_page: book.endPage,
+        total_pages: Number(formData.pagesInBook || 50),
+        pages_used: 0,
+        available_pages: book.availablePages,
+        assigned_to_sales_rep: salesRepLabel,
+        assigned_to_driver: driverLabel,
+        assigned_date: new Date().toISOString(),
+        status: "assigned",
+      }));
+
+      const { error: insertError } = await supabase
+        .from("manage_invoice_book_stock")
+        .insert(dbRows);
+
+      if (insertError) throw insertError;
+
+      await Promise.all(dbRows.map((row) => syncBookStockToExternal(row)));
       
       const count = newBooks.length;
       toast.success(

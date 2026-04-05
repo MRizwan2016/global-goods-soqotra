@@ -20,17 +20,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Book } from "../../booking-form-stock/types";
-
-// Fire-and-forget sync to external project
-async function syncToExternal(action: string, table: string, record?: any, matchColumn?: string, matchValue?: string) {
-  try {
-    await supabase.functions.invoke("sync-external", {
-      body: { action, table, record, match_column: matchColumn, match_value: matchValue },
-    });
-  } catch (err) {
-    console.warn("External sync failed (non-blocking):", err);
-  }
-}
+import { syncBookStockToExternal } from "@/lib/externalSync";
 import { ArrowRightLeft } from "lucide-react";
 
 interface ReassignBookDialogProps {
@@ -97,11 +87,17 @@ const ReassignBookDialog: React.FC<ReassignBookDialogProps> = ({
 
       if (error) throw error;
 
-      // Auto-sync to external project
-      syncToExternal("update", "manage_invoice_book_stock", {
+      void syncBookStockToExternal({
+        book_number: book.bookNumber,
+        start_page: book.startPage,
+        end_page: book.endPage,
+        total_pages: Math.max(50, Number(book.endPage) - Number(book.startPage) + 1 || 50),
+        pages_used: Math.max(0, Math.max(50, Number(book.endPage) - Number(book.startPage) + 1 || 50) - (book.available?.length || 0)),
         assigned_to_sales_rep: newRep.name,
         assigned_date: new Date().toISOString(),
-      }, "book_number", book.bookNumber);
+        status: "assigned",
+        country: book.country || "Qatar",
+      });
 
       // Also update localStorage for backward compatibility
       const storedBooks = JSON.parse(localStorage.getItem("invoiceBooks") || "[]");
