@@ -77,7 +77,7 @@ export function useAuth(): LegacyAuthContextType {
 
       // Check if current user is authenticated via Supabase
       if (ctx?.user) {
-        const currentProfile = allUsers.find((u: any) => u.id === ctx.user.id);
+        const currentProfile = supabaseUsers.find((u: any) => u.id === ctx.user.id);
         if (currentProfile) {
           setLegacyUser(currentProfile);
         }
