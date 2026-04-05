@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Save, Plus, Trash2, Truck, Package, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { ArrowLeft, Save, Plus, Trash2, Truck, Package, Search, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -112,6 +113,52 @@ const SriLankaNewJob = () => {
   const [showManualDriver, setShowManualDriver] = useState(false);
   const [showManualSalesRep, setShowManualSalesRep] = useState(false);
 
+  // Custom package dialog state
+  const [showCustomPkgDialog, setShowCustomPkgDialog] = useState(false);
+  const [customPkgName, setCustomPkgName] = useState("");
+  const [customPkgLength, setCustomPkgLength] = useState("");
+  const [customPkgWidth, setCustomPkgWidth] = useState("");
+  const [customPkgHeight, setCustomPkgHeight] = useState("");
+  const [customPkgWhitePly, setCustomPkgWhitePly] = useState("");
+  const [customPkgBlackPly, setCustomPkgBlackPly] = useState("");
+  const [customPackages, setCustomPackages] = useState<CargoPackage[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("customCargoPackages") || "[]");
+    } catch { return []; }
+  });
+
+  const allPackages = [...cargoCollectionPackages, ...customPackages];
+
+  const saveCustomPackage = () => {
+    if (!customPkgName.trim()) { toast.error("Package name is required"); return; }
+    const l = parseFloat(customPkgLength) || 0;
+    const w = parseFloat(customPkgWidth) || 0;
+    const h = parseFloat(customPkgHeight) || 0;
+    const vol = l > 0 && w > 0 && h > 0 ? Math.round(calcVolumeCBM(l, w, h) * 1000000) / 1000000 : 0;
+    const whitePly = parseFloat(customPkgWhitePly) || 0;
+    const blackPly = parseFloat(customPkgBlackPly) || 0;
+    const newPkg: CargoPackage = {
+      id: 100 + customPackages.length,
+      name: customPkgName.toUpperCase(),
+      dimensions: { length: l, width: w, height: h },
+      volume: Math.round(vol * 1000) / 1000,
+      collectionPrices: {
+        colombo: vol > 0 ? Math.round(vol * 259 * 100) / 100 : 0,
+        kurunegala: vol > 0 ? Math.round(vol * 269 * 100) / 100 : 0,
+        galle: vol > 0 ? Math.round(vol * 269 * 100) / 100 : 0,
+      },
+      deliveryPrices: { whitePlywood12mm: whitePly, blackPlywood18mm: blackPly },
+      hasManualDimensions: l === 0 && w === 0 && h === 0,
+    };
+    const updated = [...customPackages, newPkg];
+    setCustomPackages(updated);
+    localStorage.setItem("customCargoPackages", JSON.stringify(updated));
+    toast.success(`Package "${newPkg.name}" saved for future use`);
+    setShowCustomPkgDialog(false);
+    setCustomPkgName(""); setCustomPkgLength(""); setCustomPkgWidth(""); setCustomPkgHeight("");
+    setCustomPkgWhitePly(""); setCustomPkgBlackPly("");
+  };
+
   // Load last used driver/vehicle/salesRep for quick reuse
   useEffect(() => {
     try {
@@ -150,7 +197,7 @@ const SriLankaNewJob = () => {
   }, [searchJobNumber]);
 
   const selectPackage = (itemId: string, pkgName: string) => {
-    const pkg = cargoCollectionPackages.find(p => p.name === pkgName);
+    const pkg = allPackages.find(p => p.name === pkgName);
     setItems(prev => prev.map(item => {
       if (item.id !== itemId) return item;
       if (!pkg) return { ...item, description: pkgName };
@@ -528,9 +575,14 @@ const SriLankaNewJob = () => {
               <Package className="h-4 w-4" />
               {isCollection ? "CARGO COLLECTIONS" : "BOXES DELIVERIES"} — Packages (Dimensions in Inches)
             </CardTitle>
-            <Button size="sm" variant="secondary" onClick={addItem} disabled={nextBoxNumber > 20}>
-              <Plus className="h-4 w-4 mr-1" /> Add Box {nextBoxNumber <= 20 ? `#${nextBoxNumber}` : "(Max)"}
-            </Button>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" className="bg-white text-[#8B4513] border-white hover:bg-amber-100" onClick={() => setShowCustomPkgDialog(true)}>
+                <PlusCircle className="h-4 w-4 mr-1" /> Save New Package
+              </Button>
+              <Button size="sm" variant="secondary" onClick={addItem} disabled={nextBoxNumber > 20}>
+                <Plus className="h-4 w-4 mr-1" /> Add Box {nextBoxNumber <= 20 ? `#${nextBoxNumber}` : "(Max)"}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="pt-4 overflow-x-auto">
             <Table>
@@ -563,8 +615,8 @@ const SriLankaNewJob = () => {
                       <Select value={item.description} onValueChange={(v) => selectPackage(item.id, v)}>
                         <SelectTrigger className="min-w-[200px]"><SelectValue placeholder="Select package" /></SelectTrigger>
                         <SelectContent>
-                          {cargoCollectionPackages.map((p) => (
-                            <SelectItem key={p.id} value={p.name}>
+                          {allPackages.map((p) => (
+                            <SelectItem key={`pkg-${p.id}`} value={p.name}>
                               {p.name} {!p.hasManualDimensions ? `(${p.dimensions.length}×${p.dimensions.width}×${p.dimensions.height})` : ""}
                             </SelectItem>
                           ))}
@@ -646,6 +698,56 @@ const SriLankaNewJob = () => {
           </Button>
         </div>
       </div>
+
+      {/* Custom Package Save Dialog */}
+      <Dialog open={showCustomPkgDialog} onOpenChange={setShowCustomPkgDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Save New Custom Package</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Package Name *</Label>
+              <Input placeholder="e.g. CUSTOM BOX - TALL" value={customPkgName} onChange={(e) => setCustomPkgName(e.target.value.toUpperCase())} />
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <Label>Length (in)</Label>
+                <Input type="number" placeholder="0" value={customPkgLength} onChange={(e) => setCustomPkgLength(e.target.value)} />
+              </div>
+              <div>
+                <Label>Width (in)</Label>
+                <Input type="number" placeholder="0" value={customPkgWidth} onChange={(e) => setCustomPkgWidth(e.target.value)} />
+              </div>
+              <div>
+                <Label>Height (in)</Label>
+                <Input type="number" placeholder="0" value={customPkgHeight} onChange={(e) => setCustomPkgHeight(e.target.value)} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label>White Plywood Price (QAR)</Label>
+                <Input type="number" placeholder="0" value={customPkgWhitePly} onChange={(e) => setCustomPkgWhitePly(e.target.value)} />
+              </div>
+              <div>
+                <Label>Black Plywood Price (QAR)</Label>
+                <Input type="number" placeholder="0" value={customPkgBlackPly} onChange={(e) => setCustomPkgBlackPly(e.target.value)} />
+              </div>
+            </div>
+            {customPkgLength && customPkgWidth && customPkgHeight && (
+              <p className="text-sm text-muted-foreground">
+                Volume: {(calcVolumeCBM(parseFloat(customPkgLength) || 0, parseFloat(customPkgWidth) || 0, parseFloat(customPkgHeight) || 0)).toFixed(6)} CBM
+              </p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCustomPkgDialog(false)}>Cancel</Button>
+            <Button className="bg-[#8B4513] hover:bg-[#6d3610]" onClick={saveCustomPackage}>
+              <Save className="h-4 w-4 mr-1" /> Save Package
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
