@@ -67,6 +67,31 @@ const DisplaySchedule: React.FC = () => {
     navigate(`/schedules/print/${scheduleId}`);
   };
 
+  const handleWhatsApp = () => {
+    if (!schedule) return;
+    const jobLines = jobs.map((job, i) => {
+      const d = job.job_data;
+      return `${i + 1}. ${d.jobNumber || `JOB-${i + 1}`} - ${d.customer || 'N/A'} (${d.status || 'SCHEDULED'})`;
+    }).join('\n');
+
+    const message = [
+      `📋 *SCHEDULE: ${schedule.schedule_number}*`,
+      `📅 Date: ${new Date(schedule.schedule_date).toLocaleDateString()}`,
+      `🚛 Vehicle: ${schedule.vehicle}`,
+      schedule.sales_rep ? `👤 Sales Rep: ${schedule.sales_rep}` : '',
+      schedule.driver ? `🚗 Driver: ${schedule.driver}` : '',
+      `🌍 Country: ${schedule.country}`,
+      `📦 Total Jobs: ${schedule.total_jobs}`,
+      ``,
+      `*Jobs:*`,
+      jobLines,
+      ``,
+      `— Soqotra Logistics`
+    ].filter(Boolean).join('\n');
+
+    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
