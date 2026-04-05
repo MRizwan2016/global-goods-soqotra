@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Book, User } from "../booking-form-stock/types";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { syncBookStockToExternal } from "@/lib/externalSync";
 
 export const mockUsers: User[] = [
   { id: "1", name: "Mr. Lahiru Chathuranga" },
@@ -23,17 +24,6 @@ export const mockUsers: User[] = [
   { id: "15", name: "Mr. Saleh" },
   { id: "16", name: "Mr. Abdul Qader" },
 ];
-
-// Helper to sync a record to the external project (fire-and-forget)
-async function syncToExternal(action: string, table: string, record?: any, matchColumn?: string, matchValue?: string) {
-  try {
-    await supabase.functions.invoke("sync-external", {
-      body: { action, table, record, match_column: matchColumn, match_value: matchValue },
-    });
-  } catch (err) {
-    console.warn("External sync failed (non-blocking):", err);
-  }
-}
 
 export function useBookStock() {
   const { users: authUsers } = useAuth();
@@ -136,8 +126,19 @@ export function useBookStock() {
 
       if (error) throw error;
 
-      // Auto-sync to external project
-      syncToExternal("update", "manage_invoice_book_stock", updateData, "book_number", selectedBook.bookNumber);
+      const totalPages = Math.max(50, Number(selectedBook.endPage) - Number(selectedBook.startPage) + 1 || 50);
+      void syncBookStockToExternal({
+        book_number: selectedBook.bookNumber,
+        start_page: selectedBook.startPage,
+        end_page: selectedBook.endPage,
+        total_pages: totalPages,
+        pages_used: totalPages - (selectedBook.available?.length || 0),
+        available_pages: selectedBook.available || [],
+        assigned_to_sales_rep: selectedUser.name,
+        assigned_date: updateData.assigned_date,
+        status: updateData.status,
+        country: selectedBook.country || "Qatar",
+      });
 
       setIsAssignDialogOpen(false);
       toast.success(`Book #${selectedBook.bookNumber} has been assigned to ${selectedUser.name}`);

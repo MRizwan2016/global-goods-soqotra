@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { syncScheduleBundleToExternal } from "@/lib/externalSync";
 
 export interface Schedule {
   id: string;
@@ -75,6 +76,8 @@ export class ScheduleService {
           return { success: false, error: jobsError.message };
         }
       }
+
+      await syncScheduleBundleToExternal(schedule, scheduleData.jobs);
 
       return { success: true, schedule };
     } catch (error) {

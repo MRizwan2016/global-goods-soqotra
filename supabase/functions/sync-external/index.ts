@@ -17,6 +17,11 @@ type SyncUserPayload = {
   permissions?: Record<string, unknown>;
 };
 
+type SyncScheduleBundlePayload = {
+  schedule?: Record<string, unknown>;
+  jobs?: Record<string, unknown>[];
+};
+
 const isMissingTableError = (error: { message?: string } | null | undefined) => {
   const message = error?.message?.toLowerCase() || "";
   return message.includes("could not find the table") || message.includes("relation") && message.includes("does not exist");
@@ -24,6 +29,153 @@ const isMissingTableError = (error: { message?: string } | null | undefined) => 
 
 const jsonResponse = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: corsHeaders });
+
+async function upsertMatch(
+  externalClient: ReturnType<typeof createClient>,
+  table: string,
+  record: Record<string, unknown>,
+  matchColumn?: string,
+  matchValue?: string,
+) {
+  if (!matchColumn || !matchValue) {
+    return await externalClient.from(table).insert(record);
+  }
+
+  const { data: existing, error: lookupError } = await externalClient
+    .from(table)
+    .select("*")
+    .eq(matchColumn, matchValue)
+    .maybeSingle();
+
+  if (lookupError) {
+    return { error: lookupError };
+  }
+
+  if (existing) {
+    const updateRecord = { ...record };
+    delete updateRecord.id;
+
+    return await (externalClient.from(table).update(updateRecord) as never).eq(matchColumn, matchValue);
+  }
+
+  return await externalClient.from(table).insert(record);
+}
+
+async function syncLegacyInvoiceBookTables(
+  externalClient: ReturnType<typeof createClient>,
+  action: string,
+  record: Record<string, unknown>,
+  matchColumn?: string,
+  matchValue?: string,
+) {
+  const bookNumber = String(record.book_number ?? matchValue ?? "");
+
+  if (!bookNumber) {
+    return { error: { message: "Missing book_number for invoice book sync" } };
+  }
+
+  if (action === "delete") {
+    const bookDelete = await (externalClient.from("invoice_books").delete() as never).eq("book_number", bookNumber);
+    if (bookDelete.error && !isMissingTableError(bookDelete.error)) return bookDelete;
+
+    const assignmentDelete = await (externalClient.from("sl_book_assignments").delete() as never).eq("book_number", bookNumber);
+    if (assignmentDelete.error && !isMissingTableError(assignmentDelete.error)) return assignmentDelete;
+
+    return { error: null };
+  }
+
+  const totalPages = Number(record.total_pages ?? 50);
+  const invoiceBookRecord = {
+    country: String(record.country ?? ""),
+    book_number: bookNumber,
+    country_id_number: record.country_id_number ? Number(record.country_id_number) : null,
+    start_page: record.start_page ? Number(record.start_page) : null,
+    end_page: record.end_page ? Number(record.end_page) : null,
+    total_pages: Number.isFinite(totalPages) ? totalPages : 50,
+    pages_used: Number(record.pages_used ?? 0) || 0,
+  };
+
+  const bookResult = await upsertMatch(externalClient, "invoice_books", invoiceBookRecord, "book_number", bookNumber);
+  if (bookResult.error && !isMissingTableError(bookResult.error)) {
+    return bookResult;
+  }
+
+  const assignedStaff = String(record.assigned_to_sales_rep ?? "").trim();
+  const normalizedCountry = String(record.country ?? "").toLowerCase();
+  const shouldSyncSriLankaAssignment = normalizedCountry.includes("sri") || bookNumber.startsWith("8");
+
+  if (shouldSyncSriLankaAssignment) {
+    if (assignedStaff) {
+      const assignmentRecord = {
+        book_number: bookNumber,
+        start_page_no: record.start_page ? Number(record.start_page) : null,
+        end_page_no: record.end_page ? Number(record.end_page) : null,
+        total_pages: Number.isFinite(totalPages) ? totalPages : 50,
+        staff_name: assignedStaff,
+        assigned_date: record.assigned_date ? String(record.assigned_date).slice(0, 10) : null,
+      };
+
+      const assignmentResult = await upsertMatch(externalClient, "sl_book_assignments", assignmentRecord, "book_number", bookNumber);
+      if (assignmentResult.error && !isMissingTableError(assignmentResult.error)) {
+        return assignmentResult;
+      }
+    } else {
+      const assignmentDelete = await (externalClient.from("sl_book_assignments").delete() as never).eq("book_number", bookNumber);
+      if (assignmentDelete.error && !isMissingTableError(assignmentDelete.error)) return assignmentDelete;
+    }
+  }
+
+  return { error: null };
+}
+
+async function syncScheduleBundle(
+  externalClient: ReturnType<typeof createClient>,
+  payload: SyncScheduleBundlePayload,
+) {
+  const schedule = payload.schedule || {};
+  const jobs = Array.isArray(payload.jobs) ? payload.jobs : [];
+  const scheduleNumber = String(schedule.schedule_number ?? "");
+
+  if (!scheduleNumber) {
+    return { error: { message: "Missing schedule_number" } };
+  }
+
+  const scheduleResult = await upsertMatch(externalClient, "schedules", schedule, "schedule_number", scheduleNumber);
+  if (scheduleResult.error) return scheduleResult;
+
+  const { data: syncedSchedule, error: syncedScheduleError } = await externalClient
+    .from("schedules")
+    .select("id")
+    .eq("schedule_number", scheduleNumber)
+    .maybeSingle();
+
+  if (syncedScheduleError) {
+    return { error: syncedScheduleError };
+  }
+
+  if (!syncedSchedule?.id) {
+    return { error: { message: "Unable to resolve external schedule id" } };
+  }
+
+  const deleteResult = await (externalClient.from("schedule_jobs").delete() as never).eq("schedule_id", syncedSchedule.id);
+  if (deleteResult.error && !isMissingTableError(deleteResult.error)) {
+    return deleteResult;
+  }
+
+  if (jobs.length > 0) {
+    const jobsToInsert = jobs.map((job) => ({
+      schedule_id: syncedSchedule.id,
+      job_data: job,
+    }));
+
+    const insertResult = await externalClient.from("schedule_jobs").insert(jobsToInsert);
+    if (insertResult.error && !isMissingTableError(insertResult.error)) {
+      return insertResult;
+    }
+  }
+
+  return { error: null };
+}
 
 async function detectProfilesTable(externalClient: ReturnType<typeof createClient>) {
   const { error } = await externalClient.from("profiles").select("*").limit(1);
@@ -238,11 +390,29 @@ Deno.serve(async (req) => {
       case "upsert":
         result = await externalClient.from(table).upsert(record, { onConflict: "book_number" });
         break;
+      case "upsert_match":
+        if (table === "manage_invoice_book_stock") {
+          result = await syncLegacyInvoiceBookTables(externalClient, action, record || {}, match_column, match_value);
+        } else {
+          result = await upsertMatch(externalClient, table, record || {}, match_column, match_value);
+        }
+        break;
       case "update":
-        result = await (externalClient.from(table).update(record) as never).eq(match_column, match_value);
+        if (table === "manage_invoice_book_stock") {
+          result = await syncLegacyInvoiceBookTables(externalClient, action, record || {}, match_column, match_value);
+        } else {
+          result = await (externalClient.from(table).update(record) as never).eq(match_column, match_value);
+        }
         break;
       case "delete":
-        result = await (externalClient.from(table).delete() as never).eq(match_column, match_value);
+        if (table === "manage_invoice_book_stock") {
+          result = await syncLegacyInvoiceBookTables(externalClient, action, record || {}, match_column, match_value);
+        } else {
+          result = await (externalClient.from(table).delete() as never).eq(match_column, match_value);
+        }
+        break;
+      case "sync_schedule_bundle":
+        result = await syncScheduleBundle(externalClient, (record || {}) as SyncScheduleBundlePayload);
         break;
       case "bulk_sync": {
         const INTERNAL_URL = Deno.env.get("SUPABASE_URL")!;
@@ -255,9 +425,19 @@ Deno.serve(async (req) => {
 
         if (fetchErr) throw fetchErr;
 
-        result = await externalClient
-          .from(table)
-          .upsert(allBooks || [], { onConflict: "book_number" });
+        if (table === "manage_invoice_book_stock") {
+          for (const book of allBooks || []) {
+            const syncResult = await syncLegacyInvoiceBookTables(externalClient, "upsert_match", book as Record<string, unknown>, "book_number", String((book as Record<string, unknown>).book_number || ""));
+            if (syncResult.error && !isMissingTableError(syncResult.error as { message?: string })) {
+              return jsonResponse({ error: (syncResult.error as { message?: string }).message || "Bulk sync failed" }, 500);
+            }
+          }
+          result = { error: null };
+        } else {
+          result = await externalClient
+            .from(table)
+            .upsert(allBooks || [], { onConflict: "book_number" });
+        }
         break;
       }
       default:

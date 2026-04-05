@@ -10,17 +10,7 @@ import { BookOpen, User, Calendar, RefreshCw, Pencil, Trash2, UserPlus } from "l
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-
-// Fire-and-forget sync to external project
-async function syncToExternal(action: string, table: string, record?: any, matchColumn?: string, matchValue?: string) {
-  try {
-    await supabase.functions.invoke("sync-external", {
-      body: { action, table, record, match_column: matchColumn, match_value: matchValue },
-    });
-  } catch (err) {
-    console.warn("External sync failed (non-blocking):", err);
-  }
-}
+import { syncBookStockToExternal } from "@/lib/externalSync";
 
 interface InvoiceBook {
   id: string;
@@ -122,7 +112,17 @@ const StaffInvoicePortal = () => {
         .eq("id", editBook.id);
 
       if (error) throw error;
-      syncToExternal("update", "manage_invoice_book_stock", { pages_used: editPagesUsed, status: editStatus }, "book_number", editBook.book_number);
+      void syncBookStockToExternal({
+        book_number: editBook.book_number,
+        start_page: editBook.start_page,
+        end_page: editBook.end_page,
+        total_pages: editBook.total_pages,
+        pages_used: editPagesUsed,
+        assigned_to_sales_rep: editBook.assigned_to_sales_rep,
+        assigned_date: editBook.assigned_date,
+        status: editStatus,
+        country: editBook.country,
+      });
       toast.success(`Book ${editBook.book_number} updated`);
       setEditDialogOpen(false);
       loadData();
@@ -147,7 +147,20 @@ const StaffInvoicePortal = () => {
         .eq("id", selectedBookId);
 
       if (error) throw error;
-      syncToExternal("update", "manage_invoice_book_stock", { assigned_to_sales_rep: assignToName, assigned_date: new Date().toISOString(), status: "assigned" }, "id", selectedBookId);
+      const selectedBook = books.find((book) => book.id === selectedBookId);
+      if (selectedBook) {
+        void syncBookStockToExternal({
+          book_number: selectedBook.book_number,
+          start_page: selectedBook.start_page,
+          end_page: selectedBook.end_page,
+          total_pages: selectedBook.total_pages,
+          pages_used: selectedBook.pages_used,
+          assigned_to_sales_rep: assignToName,
+          assigned_date: new Date().toISOString(),
+          status: "assigned",
+          country: selectedBook.country,
+        });
+      }
       toast.success(`Book assigned to ${assignToName}`);
       setAssignDialogOpen(false);
       setSelectedBookId("");
@@ -167,7 +180,17 @@ const StaffInvoicePortal = () => {
         .eq("id", book.id);
 
       if (error) throw error;
-      syncToExternal("delete", "manage_invoice_book_stock", undefined, "book_number", book.book_number);
+      void syncBookStockToExternal({
+        book_number: book.book_number,
+        start_page: book.start_page,
+        end_page: book.end_page,
+        total_pages: book.total_pages,
+        pages_used: book.pages_used,
+        assigned_to_sales_rep: "",
+        assigned_date: null,
+        status: "deleted",
+        country: book.country,
+      });
       toast.success(`Book ${book.book_number} deleted`);
       loadData();
     } catch (err: any) {
