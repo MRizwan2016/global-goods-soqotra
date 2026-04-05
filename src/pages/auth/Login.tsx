@@ -94,9 +94,11 @@ const Login = () => {
     setError(null);
     setIsLoading(true);
     try {
-      const success = await login(values.email, values.password);
-      if (success) {
+      const result = await login(values.email, values.password);
+      if (result === true) {
         navigate(from, { replace: true });
+      } else if (typeof result === 'string') {
+        setError(result);
       } else {
         setError("Invalid email or password. Please try again.");
       }
