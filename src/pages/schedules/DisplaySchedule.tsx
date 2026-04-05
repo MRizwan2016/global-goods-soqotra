@@ -125,10 +125,16 @@ const DisplaySchedule: React.FC = () => {
             <ArrowLeft className="h-4 w-4" />
             Back to Schedules
           </Button>
-          <Button onClick={handlePrint} className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600">
-            <Printer className="h-4 w-4" />
-            Print Schedule
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={handleWhatsApp} variant="outline" className="flex items-center gap-2 text-green-600 border-green-300 hover:bg-green-50">
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
+            </Button>
+            <Button onClick={handlePrint} className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600">
+              <Printer className="h-4 w-4" />
+              Print Schedule
+            </Button>
+          </div>
         </div>
 
         {/* Schedule Details */}
