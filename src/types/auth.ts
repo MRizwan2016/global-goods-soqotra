@@ -57,7 +57,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   loading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<boolean | string>;
   logout: () => void;
   register: (userData: Omit<User, "id" | "isActive" | "isAdmin" | "createdAt" | "permissions"> & { password: string }) => Promise<boolean>;
   requestPasswordReset: (email: string) => Promise<boolean>;
