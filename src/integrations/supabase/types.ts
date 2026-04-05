@@ -530,6 +530,48 @@ export type Database = {
         }
         Relationships: []
       }
+      sl_book_assignments: {
+        Row: {
+          assigned_date: string
+          book_number: string
+          country: string
+          created_at: string
+          end_page_no: string
+          id: string
+          pages_used: number
+          staff_name: string
+          start_page_no: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_date?: string
+          book_number: string
+          country?: string
+          created_at?: string
+          end_page_no: string
+          id?: string
+          pages_used?: number
+          staff_name: string
+          start_page_no: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_date?: string
+          book_number?: string
+          country?: string
+          created_at?: string
+          end_page_no?: string
+          id?: string
+          pages_used?: number
+          staff_name?: string
+          start_page_no?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       tunisia_containers: {
         Row: {
           container_number: string
