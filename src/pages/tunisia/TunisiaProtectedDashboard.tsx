@@ -31,10 +31,14 @@ const TunisiaProtectedDashboard: React.FC = () => {
         mobileNumber: '',
       });
     } else {
-      ok = await login(email, password);
+      const result = await login(email, password);
+      ok = result === true;
+      if (typeof result === 'string') {
+        setError(result);
+      }
     }
 
-    if (!ok) {
+    if (!ok && !error) {
       setError('Invalid login credentials');
     }
 

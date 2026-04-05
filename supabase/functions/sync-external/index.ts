@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
         result = await (externalClient.from(table).update(record) as any).eq(match_column, match_value);
         break;
       case "delete":
-        result = await externalClient.from(table).delete().eq(match_column, match_value);
+        result = await (externalClient.from(table).delete() as any).eq(match_column, match_value);
         break;
       case "bulk_sync": {
         // Sync all records from Lovable Cloud to external

@@ -131,26 +131,30 @@ export function useAuth(): LegacyAuthContextType {
   const isAuthenticated = !!ctx?.user || !!legacyUser;
   const isAdmin = currentUser?.isAdmin ?? false;
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string): Promise<boolean | string> => {
     const normalizedEmail = (email || '').trim().toLowerCase();
 
-    // First try Supabase authentication
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: normalizedEmail,
         password: password
       });
 
-      if (!error && data.user) {
+      if (error) {
+        console.error("Supabase auth error:", error.message);
+        return error.message;
+      }
+
+      if (data.user) {
         await loadUsersFromBothSources();
         return true;
       }
-    } catch (error) {
-      // Supabase auth failed, try localStorage fallback
-    }
 
-    // localStorage fallback removed for security
-    return false;
+      return "Authentication failed. Please try again.";
+    } catch (err: any) {
+      console.error("Login network error:", err);
+      return "Network error. Please check your connection and try again.";
+    }
   };
 
   const logout = async () => {
