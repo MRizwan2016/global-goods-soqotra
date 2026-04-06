@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { doorToDoorPricing, saudiArabiaPackageTypes, calculateVolumeWeight, calculateCubicFeet, countryCodes } from "../data/saudiArabiaData";
 import { toast } from "sonner";
 import { syncInvoiceToExternal } from "@/lib/externalSync";
+import { RegionalInvoiceService } from "@/services/RegionalInvoiceService";
 
 export interface SaudiArabiaPackageItem {
   id: string;
@@ -320,79 +321,96 @@ export const useSaudiArabiaInvoice = (invoiceId?: string) => {
 
   const saveInvoice = async () => {
     console.log("💾 SAUDI ARABIA INVOICE SAVE - Starting save process");
-    console.log("📊 Form data:", formData);
-    console.log("📦 Package items:", packageItems);
     
     try {
-      // Validate required fields
       if (!formData.invoiceNumber) {
-        console.log("❌ VALIDATION FAILED: No invoice number");
         toast.error("Invoice number is required");
         return false;
       }
-      
       if (!formData.shipperName || !formData.consigneeName) {
-        console.log("❌ VALIDATION FAILED: Missing shipper or consignee name");
-        console.log("Shipper:", formData.shipperName, "Consignee:", formData.consigneeName);
         toast.error("Shipper and Consignee names are required");
         return false;
       }
-
       if (packageItems.length === 0) {
-        console.log("❌ VALIDATION FAILED: No package items");
         toast.error("At least one package item is required");
         return false;
       }
 
-      console.log("✅ VALIDATION PASSED - Proceeding with save");
-
-      // Save to localStorage for now (can be replaced with API call)
-      const invoiceData = {
-        ...formData,
-        packageItems,
-        id: invoiceId || formData.invoiceNumber,
-        country: 'saudi-arabia',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+      const invoiceRow = {
+        country: 'Saudi Arabia',
+        invoice_number: formData.invoiceNumber,
+        invoice_date: formData.invoiceDate,
+        job_number: formData.jobNumber,
+        book_number: formData.bookNumber,
+        service_type: formData.freightBy,
+        freight_by: formData.freightBy,
+        shipper_prefix: formData.shipperPrefix,
+        shipper_name: formData.shipperName,
+        shipper_country: formData.shipperCountry,
+        shipper_city: formData.shipperCity,
+        shipper_address: formData.shipperAddress,
+        shipper_mobile: formData.shipperMobile,
+        shipper_email: formData.shipperEmail,
+        shipper_id_number: formData.shipperIdNumber,
+        consignee_prefix: formData.consigneePrefix,
+        consignee_name: formData.consigneeName,
+        consignee_country: formData.consigneeCountry,
+        consignee_city: formData.consigneeCity,
+        consignee_address: formData.consigneeAddress,
+        consignee_mobile: formData.consigneeMobile,
+        consignee_email: formData.consigneeEmail,
+        consignee_id_number: formData.consigneeIdNumber,
+        sales_representative: formData.salesRep,
+        driver_name: formData.driver,
+        port: formData.port,
+        sector: formData.sector,
+        district: formData.district,
+        door_to_door: formData.doorToDoor,
+        total_packages: formData.totalPackages,
+        total_weight: formData.totalWeight,
+        total_volume: formData.totalVolume,
+        freight: formData.freight,
+        documents_fee: formData.documentsFee,
+        local_transport: formData.localTransport,
+        destination_transport: formData.destinationTransport,
+        packing_charges: formData.packing,
+        storage: formData.storage,
+        destination_clearing: formData.destinationClearing,
+        destination_door_delivery: formData.destinationDoorDelivery,
+        other: formData.other,
+        gross: formData.gross,
+        discount: formData.discount,
+        net: formData.net,
+        gift_cargo: formData.giftCargo,
+        pre_paid: formData.prePaid,
+        payment_status: formData.paymentStatus,
+        remarks: formData.remarks,
+        status: 'ACTIVE',
       };
 
-      console.log("📝 Prepared invoice data:", invoiceData);
+      const pkgRows = packageItems.map((item, idx) => ({
+        package_name: item.name,
+        length: item.length,
+        width: item.width,
+        height: item.height,
+        weight: item.weight,
+        quantity: item.quantity,
+        cubic_metre: item.cubicMetre,
+        cubic_feet: item.cubicFeet,
+        volume_weight: item.volumeWeight,
+        box_number: idx + 1,
+      }));
 
-      // Use consistent localStorage key
-      const storageKey = "saudiArabiaInvoices";
-      const existingInvoices = JSON.parse(localStorage.getItem(storageKey) || "[]");
-      console.log("📚 Current invoices count:", existingInvoices.length);
+      const savedId = await RegionalInvoiceService.save(invoiceRow as any, pkgRows as any, invoiceId);
       
-      const invoiceIndex = existingInvoices.findIndex((inv: any) => inv.id === invoiceData.id);
-      console.log("🔍 Invoice index check:", invoiceIndex);
-      
-      if (invoiceIndex >= 0) {
-        console.log("📝 Updating existing invoice");
-        existingInvoices[invoiceIndex] = invoiceData;
-      } else {
-        console.log("➕ Adding new invoice");
-        existingInvoices.push(invoiceData);
-      }
-      
-      console.log("💾 Saving to localStorage - total invoices:", existingInvoices.length);
-      localStorage.setItem(storageKey, JSON.stringify(existingInvoices));
-      await syncInvoiceToExternal(invoiceData);
-      
-      // Verify the save was successful
-      const verifyInvoices = JSON.parse(localStorage.getItem(storageKey) || "[]");
-      const savedInvoice = verifyInvoices.find((inv: any) => inv.id === invoiceData.id);
-      
-      if (savedInvoice) {
-        console.log("✅ SAUDI ARABIA INVOICE - Save verified successfully!");
-        console.log("Saved invoice:", savedInvoice);
+      if (savedId) {
+        await syncInvoiceToExternal({ ...invoiceRow, id: savedId, packageItems });
         toast.success("Saudi Arabia invoice saved successfully!");
         return true;
       } else {
-        console.log("❌ SAUDI ARABIA INVOICE - Save verification failed");
-        toast.error("Failed to verify invoice save");
+        toast.error("Failed to save invoice");
         return false;
       }
-      
     } catch (error) {
       console.error("❌ SAUDI ARABIA INVOICE SAVE ERROR:", error);
       toast.error("Failed to save Saudi Arabia invoice");
@@ -402,15 +420,69 @@ export const useSaudiArabiaInvoice = (invoiceId?: string) => {
 
   const loadInvoice = async (id: string) => {
     try {
-      const existingInvoices = JSON.parse(localStorage.getItem("saudiArabiaInvoices") || "[]");
-      const invoice = existingInvoices.find((inv: any) => inv.id === id);
-      
-      if (invoice) {
-        setFormData(invoice);
-        setPackageItems(invoice.packageItems || []);
+      const result = await RegionalInvoiceService.getById(id);
+      if (result) {
+        const inv = result.invoice;
+        setFormData(prev => ({
+          ...prev,
+          invoiceNumber: inv.invoice_number || '',
+          invoiceDate: inv.invoice_date || prev.invoiceDate,
+          jobNumber: inv.job_number || '',
+          bookNumber: inv.book_number || '',
+          port: inv.port || '',
+          sector: inv.sector || '',
+          salesRep: inv.sales_representative || '',
+          driver: inv.driver_name || '',
+          district: inv.district || '',
+          doorToDoor: (inv.door_to_door as any) || 'NO',
+          shipperPrefix: inv.shipper_prefix || '',
+          shipperName: inv.shipper_name || '',
+          shipperCity: inv.shipper_city || '',
+          shipperAddress: inv.shipper_address || '',
+          shipperMobile: inv.shipper_mobile || '',
+          shipperEmail: inv.shipper_email || '',
+          shipperIdNumber: inv.shipper_id_number || '',
+          shipperCountry: inv.shipper_country || 'QATAR',
+          consigneePrefix: inv.consignee_prefix || '',
+          consigneeName: inv.consignee_name || '',
+          consigneeCity: inv.consignee_city || '',
+          consigneeAddress: inv.consignee_address || '',
+          consigneeMobile: inv.consignee_mobile || '',
+          consigneeEmail: inv.consignee_email || '',
+          consigneeIdNumber: inv.consignee_id_number || '',
+          consigneeCountry: inv.consignee_country || '',
+          freight: inv.freight || 0,
+          documentsFee: inv.documents_fee || 0,
+          localTransport: inv.local_transport || 0,
+          destinationTransport: inv.destination_transport || 0,
+          packing: inv.packing_charges || 0,
+          storage: inv.storage || 0,
+          destinationClearing: inv.destination_clearing || 0,
+          destinationDoorDelivery: inv.destination_door_delivery || 0,
+          other: inv.other || 0,
+          gross: inv.gross || 0,
+          discount: inv.discount || 0,
+          net: inv.net || 0,
+          freightBy: (inv.freight_by as any) || 'SEA',
+          giftCargo: (inv.gift_cargo as any) || 'NO',
+          prePaid: (inv.pre_paid as any) || 'NO',
+          paymentStatus: (inv.payment_status as any) || 'UNPAID',
+          remarks: inv.remarks || '',
+        }));
+        setPackageItems(result.packages.map(p => ({
+          id: p.id,
+          name: p.package_name || '',
+          length: p.length || 0,
+          width: p.width || 0,
+          height: p.height || 0,
+          weight: p.weight || 0,
+          quantity: p.quantity || 1,
+          cubicMetre: p.cubic_metre || 0,
+          cubicFeet: p.cubic_feet || 0,
+          volumeWeight: p.volume_weight || 0,
+        })));
         return true;
       }
-      
       toast.error("Invoice not found");
       return false;
     } catch (error) {
