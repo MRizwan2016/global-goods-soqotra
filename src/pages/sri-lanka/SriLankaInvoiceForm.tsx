@@ -239,12 +239,8 @@ const SriLankaInvoiceForm = () => {
       });
     }
   }, []);
-            setPackageItems(existingInvoice.packageItems);
-          }
-        }
-      }
-    }
-  }, []);
+
+
 
   // Sri Lanka specific data
   const CARGO_TYPES = ['GIFT CARGO', 'UPB CARGO'];
