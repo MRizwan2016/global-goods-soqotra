@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -8,14 +8,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ArrowLeft, Save, Plus, Trash2, Truck, Package } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { ArrowLeft, Save, Plus, Trash2, Truck, Package, Search, PlusCircle } from "lucide-react";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
 import {
   saudiArabiaSectors,
   saudiArabiaDrivers,
   saudiArabiaSalesReps,
+  saudiArabiaVehicles,
+  saudiVehicleDriverMap,
+  getSaudiDriverForVehicle,
+  saudiProvinces,
   saudiCities,
+  saudiWarehouses,
+  qatarCities,
+  namePrefixes,
   doorToDoorPricing,
 } from "./data/saudiArabiaData";
 import {
@@ -23,6 +31,13 @@ import {
   calcVolumeCBM,
   CargoPackage,
 } from "@/data/cargoPackages";
+import { lookupJobData } from "@/hooks/useJobAutoFill";
+import { qatarTowns } from "@/pages/invoicing/constants/locationData";
+
+const NAME_PREFIXES = ["Mr.", "Mrs.", "Ms.", "Pastor", "Rev.", "Dr.", "Prof.", "Sheikh"];
+
+const QATAR_CITIES = qatarTowns.length > 0 ? qatarTowns : qatarCities;
+const QATAR_SECTORS = QATAR_CITIES.map(t => ({ value: t, label: t }));
 
 interface PackageItem {
   id: string;
@@ -70,14 +85,21 @@ const SaudiArabiaNewJob = () => {
   const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
   const [autoJobNumber] = useState(() => generateUniqueJobNumber("SA", "saudiArabiaJobs"));
+  const [searchJobNumber, setSearchJobNumber] = useState("");
 
   const [jobData, setJobData] = useState({
     jobType: "collection" as "collection" | "delivery",
+    origin: "SAUDI ARABIA",
+    customerPrefix: "Mr.",
     customer: "",
     mobileNumber: "",
+    telephone: "",
     city: "",
     sector: "",
+    province: "",
     location: "",
+    destination: "JEDDAH",
+    warehouse: "JEDDAH",
     date: new Date().toISOString().split("T")[0],
     time: "09:00",
     driver: "",
@@ -89,12 +111,94 @@ const SaudiArabiaNewJob = () => {
 
   const [items, setItems] = useState<PackageItem[]>([emptyItem(1)]);
   const [nextBoxNumber, setNextBoxNumber] = useState(2);
+  const [lastDriverSelection, setLastDriverSelection] = useState({ driver: "", vehicle: "", salesRep: "" });
+  const [manualDriver, setManualDriver] = useState("");
+  const [manualSalesRep, setManualSalesRep] = useState("");
+  const [showManualDriver, setShowManualDriver] = useState(false);
+  const [showManualSalesRep, setShowManualSalesRep] = useState(false);
+
+  // Custom package dialog
+  const [showCustomPkgDialog, setShowCustomPkgDialog] = useState(false);
+  const [customPkgName, setCustomPkgName] = useState("");
+  const [customPkgLength, setCustomPkgLength] = useState("");
+  const [customPkgWidth, setCustomPkgWidth] = useState("");
+  const [customPkgHeight, setCustomPkgHeight] = useState("");
+  const [customPkgWhitePly, setCustomPkgWhitePly] = useState("");
+  const [customPkgBlackPly, setCustomPkgBlackPly] = useState("");
+  const [customPackages, setCustomPackages] = useState<CargoPackage[]>(() => {
+    try { return JSON.parse(localStorage.getItem("customCargoPackages") || "[]"); } catch { return []; }
+  });
+
+  const allPackages = [...cargoCollectionPackages, ...customPackages];
+
+  const saveCustomPackage = () => {
+    if (!customPkgName.trim()) { toast.error("Package name is required"); return; }
+    const l = parseFloat(customPkgLength) || 0;
+    const w = parseFloat(customPkgWidth) || 0;
+    const h = parseFloat(customPkgHeight) || 0;
+    const vol = l > 0 && w > 0 && h > 0 ? Math.round(calcVolumeCBM(l, w, h) * 1000000) / 1000000 : 0;
+    const newPkg: CargoPackage = {
+      id: 100 + customPackages.length,
+      name: customPkgName.toUpperCase(),
+      dimensions: { length: l, width: w, height: h },
+      volume: Math.round(vol * 1000) / 1000,
+      collectionPrices: { colombo: 0, kurunegala: 0, galle: 0 },
+      deliveryPrices: { whitePlywood12mm: parseFloat(customPkgWhitePly) || 0, blackPlywood18mm: parseFloat(customPkgBlackPly) || 0 },
+      hasManualDimensions: l === 0 && w === 0 && h === 0,
+    };
+    const updated = [...customPackages, newPkg];
+    setCustomPackages(updated);
+    localStorage.setItem("customCargoPackages", JSON.stringify(updated));
+    toast.success(`Package "${newPkg.name}" saved`);
+    setShowCustomPkgDialog(false);
+    setCustomPkgName(""); setCustomPkgLength(""); setCustomPkgWidth(""); setCustomPkgHeight("");
+    setCustomPkgWhitePly(""); setCustomPkgBlackPly("");
+  };
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("saudiArabiaLastAssignment");
+      if (saved) setLastDriverSelection(JSON.parse(saved));
+    } catch {}
+  }, []);
 
   const updateField = (field: string, value: any) =>
     setJobData((prev) => ({ ...prev, [field]: value }));
 
+  const isSaudiOrigin = jobData.origin === "SAUDI ARABIA";
+  const isQatarOrigin = jobData.origin === "QATAR";
+
+  // Cities based on origin and province
+  const getCities = () => {
+    if (isQatarOrigin) return QATAR_CITIES;
+    if (isSaudiOrigin && jobData.province) {
+      return saudiProvinces[jobData.province] || saudiCities;
+    }
+    return saudiCities;
+  };
+
+  // Auto-fill from job number lookup
+  const handleJobLookup = useCallback(async () => {
+    if (!searchJobNumber || searchJobNumber.length < 3) return;
+    const result = await lookupJobData(searchJobNumber);
+    if (result) {
+      setJobData(prev => ({
+        ...prev,
+        customer: result.shipperName || prev.customer,
+        mobileNumber: result.shipperMobile || prev.mobileNumber,
+        city: result.shipperCity || prev.city,
+        location: result.shipperAddress || prev.location,
+        driver: result.driverName || prev.driver,
+        salesRep: result.salesRepresentative || prev.salesRep,
+      }));
+      toast.success("Job data auto-filled!");
+    } else {
+      toast.info("No matching job found");
+    }
+  }, [searchJobNumber]);
+
   const selectPackage = (itemId: string, pkgName: string) => {
-    const pkg = cargoCollectionPackages.find(p => p.name === pkgName);
+    const pkg = allPackages.find(p => p.name === pkgName);
     setItems(prev => prev.map(item => {
       if (item.id !== itemId) return item;
       if (!pkg) return { ...item, description: pkgName };
@@ -124,7 +228,7 @@ const SaudiArabiaNewJob = () => {
   };
 
   const addItem = () => {
-    if (nextBoxNumber > 20) { toast.error("Maximum 20 boxes allowed"); return; }
+    if (nextBoxNumber > 20) { toast.error("Maximum 20 boxes"); return; }
     setItems(prev => [...prev, emptyItem(nextBoxNumber)]);
     setNextBoxNumber(prev => prev + 1);
   };
@@ -138,13 +242,26 @@ const SaudiArabiaNewJob = () => {
     setNextBoxNumber(prev => Math.max(2, prev - 1));
   };
 
+  const applyLastAssignment = () => {
+    if (lastDriverSelection.driver || lastDriverSelection.vehicle || lastDriverSelection.salesRep) {
+      setJobData(prev => ({
+        ...prev,
+        driver: lastDriverSelection.driver || prev.driver,
+        vehicle: lastDriverSelection.vehicle || prev.vehicle,
+        salesRep: lastDriverSelection.salesRep || prev.salesRep,
+      }));
+      toast.success("Previous assignment applied");
+    } else {
+      toast.info("No previous assignment found");
+    }
+  };
+
   const totalPackages = items.reduce((s, i) => s + i.quantity, 0);
   const totalWeight = items.reduce((s, i) => s + i.weightKg, 0);
   const totalCbm = items.reduce((s, i) => s + i.volume, 0);
   const totalDeliveryWhite = items.reduce((s, i) => s + i.deliveryPriceWhite, 0);
   const totalDeliveryBlack = items.reduce((s, i) => s + i.deliveryPriceBlack, 0);
 
-  // For Saudi: collection has no special volume pricing, delivery uses plywood prices
   const isDelivery = jobData.jobType === "delivery";
 
   const handleSave = () => {
@@ -153,6 +270,9 @@ const SaudiArabiaNewJob = () => {
     if (!jobData.driver) { toast.error("Please assign a driver"); return; }
 
     setIsSaving(true);
+    const assignment = { driver: jobData.driver, vehicle: jobData.vehicle, salesRep: jobData.salesRep };
+    localStorage.setItem("saudiArabiaLastAssignment", JSON.stringify(assignment));
+
     const newJob = {
       id: autoJobNumber,
       jobNumber: autoJobNumber,
@@ -175,7 +295,7 @@ const SaudiArabiaNewJob = () => {
       localStorage.setItem("saudiArabiaJobs", JSON.stringify(existing));
       toast.success(`Job ${autoJobNumber} created successfully`);
       navigate("/saudi-arabia/collection-delivery");
-    } catch (error) {
+    } catch {
       toast.error("Failed to save job");
     } finally {
       setIsSaving(false);
@@ -202,14 +322,31 @@ const SaudiArabiaNewJob = () => {
           </div>
         </div>
 
+        {/* Job Number + Auto-fill */}
         <Card>
-          <CardContent className="py-3 flex items-center gap-4 bg-green-50 border-green-200">
-            <Label className="font-bold text-green-800">JOB NUMBER:</Label>
-            <span className="font-mono text-lg font-bold text-green-900 tracking-wider">{autoJobNumber}</span>
-            <span className="text-xs text-green-600">(Auto-generated, unique)</span>
+          <CardContent className="py-3 flex flex-wrap items-center gap-4 bg-green-50 border-green-200">
+            <div className="flex items-center gap-2">
+              <Label className="font-bold text-green-800">JOB NUMBER:</Label>
+              <span className="font-mono text-lg font-bold text-green-900 tracking-wider">{autoJobNumber}</span>
+              <span className="text-xs text-green-600">(Auto-generated)</span>
+            </div>
+            <div className="flex items-center gap-2 ml-auto">
+              <Label className="text-sm font-medium">Auto-fill from Job #:</Label>
+              <Input
+                placeholder="Enter existing job number"
+                className="w-48"
+                value={searchJobNumber}
+                onChange={(e) => setSearchJobNumber(e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === "Enter" && handleJobLookup()}
+              />
+              <Button size="sm" variant="outline" onClick={handleJobLookup}>
+                <Search className="h-4 w-4" />
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
+        {/* Job Details */}
         <Card>
           <CardHeader className="bg-[#006c35] text-white rounded-t-lg py-3">
             <CardTitle className="text-base">Job Details</CardTitle>
@@ -225,85 +362,200 @@ const SaudiArabiaNewJob = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <Label>Origin Country</Label>
+              <Select value={jobData.origin} onValueChange={(v) => { updateField("origin", v); updateField("city", ""); updateField("province", ""); }}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="SAUDI ARABIA">Saudi Arabia</SelectItem>
+                  <SelectItem value="QATAR">Qatar</SelectItem>
+                  <SelectItem value="UAE">UAE</SelectItem>
+                  <SelectItem value="BAHRAIN">Bahrain</SelectItem>
+                  <SelectItem value="KUWAIT">Kuwait</SelectItem>
+                  <SelectItem value="OMAN">Oman</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div><Label>Date</Label><Input type="date" value={jobData.date} onChange={(e) => updateField("date", e.target.value)} /></div>
             <div><Label>Time</Label><Input type="time" value={jobData.time} onChange={(e) => updateField("time", e.target.value)} /></div>
-            <div><Label>Advance Amount (SAR)</Label><Input type="number" min={0} value={jobData.advanceAmount} onChange={(e) => updateField("advanceAmount", parseFloat(e.target.value) || 0)} /></div>
           </CardContent>
         </Card>
 
+        {/* Customer Information */}
         <Card>
           <CardHeader className="bg-[#006c35] text-white rounded-t-lg py-3">
-            <CardTitle className="text-base">Customer Information</CardTitle>
+            <CardTitle className="text-base">
+              Customer Information {isQatarOrigin ? "(Qatar Address)" : isSaudiOrigin ? "(Saudi Arabia Address)" : `(${jobData.origin} Address)`}
+            </CardTitle>
           </CardHeader>
           <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><Label>Customer Name *</Label><Input placeholder="Enter customer name" value={jobData.customer} onChange={(e) => updateField("customer", e.target.value.toUpperCase())} /></div>
-            <div><Label>Mobile Number</Label><Input placeholder="+966 5XXXXXXXX" value={jobData.mobileNumber} onChange={(e) => updateField("mobileNumber", e.target.value)} /></div>
+            <div className="md:col-span-2 grid grid-cols-[120px_1fr] gap-2">
+              <div>
+                <Label>Title</Label>
+                <Select value={jobData.customerPrefix} onValueChange={(v) => updateField("customerPrefix", v)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {NAME_PREFIXES.map((p) => (<SelectItem key={p} value={p}>{p}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Customer Name *</Label>
+                <Input placeholder="Enter customer name" value={jobData.customer} onChange={(e) => updateField("customer", e.target.value.toUpperCase())} />
+              </div>
+            </div>
             <div>
-              <Label>City *</Label>
+              <Label>Mobile Number *</Label>
+              <Input placeholder={isQatarOrigin ? "+974 XXXXXXXX" : "+966 5XXXXXXXX"} value={jobData.mobileNumber} onChange={(e) => updateField("mobileNumber", e.target.value)} />
+            </div>
+            <div>
+              <Label>Telephone No.</Label>
+              <Input placeholder="Landline number" value={jobData.telephone} onChange={(e) => updateField("telephone", e.target.value)} />
+            </div>
+
+            {isSaudiOrigin && (
+              <div>
+                <Label>Province</Label>
+                <Select value={jobData.province} onValueChange={(v) => { updateField("province", v); updateField("city", ""); }}>
+                  <SelectTrigger><SelectValue placeholder="Select province" /></SelectTrigger>
+                  <SelectContent>
+                    {Object.keys(saudiProvinces).map((p) => (<SelectItem key={p} value={p}>{p}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div>
+              <Label>City * {isQatarOrigin && <span className="text-xs text-muted-foreground">(Qatar)</span>}</Label>
               <Select value={jobData.city} onValueChange={(v) => updateField("city", v)}>
                 <SelectTrigger><SelectValue placeholder="Select city" /></SelectTrigger>
                 <SelectContent>
-                  {saudiCities.slice(0, 30).map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
+                  {getCities().map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label>Sector</Label>
-              <Select value={jobData.sector} onValueChange={(v) => updateField("sector", v)}>
-                <SelectTrigger><SelectValue placeholder="Select sector" /></SelectTrigger>
-                <SelectContent>
-                  {saudiArabiaSectors.map((s) => (<SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>))}
-                </SelectContent>
-              </Select>
+            {!isSaudiOrigin && (
+              <div>
+                <Label>Sector {isQatarOrigin && <span className="text-xs text-muted-foreground">(Qatar)</span>}</Label>
+                <Select value={jobData.sector} onValueChange={(v) => updateField("sector", v)}>
+                  <SelectTrigger><SelectValue placeholder="Select sector" /></SelectTrigger>
+                  <SelectContent>
+                    {(isQatarOrigin ? QATAR_SECTORS : saudiArabiaSectors).map((s) => (<SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            <div className={isSaudiOrigin ? "" : "md:col-span-2"}>
+              <Label>{isQatarOrigin ? "Collection / Delivery Address (Qatar)" : "Location / Address"}</Label>
+              <Input placeholder="Full address" value={jobData.location} onChange={(e) => updateField("location", e.target.value)} />
             </div>
-            <div className="md:col-span-2"><Label>Location / Address</Label><Input placeholder="Full address" value={jobData.location} onChange={(e) => updateField("location", e.target.value)} /></div>
           </CardContent>
         </Card>
 
+        {/* Destination */}
         <Card>
           <CardHeader className="bg-[#006c35] text-white rounded-t-lg py-3">
-            <CardTitle className="text-base">Assignment</CardTitle>
+            <CardTitle className="text-base">Destination — Jeddah Islamic Port (Key Transit Hub)</CardTitle>
           </CardHeader>
           <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <Label>Vehicle (Truck) *</Label>
-              <Select value={jobData.driver} onValueChange={(v) => {
-                updateField("driver", v);
-                // Extract truck number from label
-                const match = v.match(/\((\d+)\)/);
-                if (match) updateField("vehicle", match[1]);
-              }}>
-                <SelectTrigger><SelectValue placeholder="Select vehicle/driver" /></SelectTrigger>
+              <Label>Transit Port</Label>
+              <Select value={jobData.warehouse} onValueChange={(v) => updateField("warehouse", v)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {saudiArabiaDrivers.map((d) => (<SelectItem key={d.value} value={d.label}>{d.label}</SelectItem>))}
+                  {saudiWarehouses.map((p) => (<SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Sales Representative</Label>
-              <Select value={jobData.salesRep} onValueChange={(v) => updateField("salesRep", v)}>
-                <SelectTrigger><SelectValue placeholder="Select sales rep" /></SelectTrigger>
-                <SelectContent>
-                  {saudiArabiaSalesReps.map((s) => (<SelectItem key={s.value} value={s.label}>{s.label}</SelectItem>))}
-                </SelectContent>
-              </Select>
+              <Label>Destination</Label>
+              <Input value="JEDDAH PORT — TRANSIT TO AFRICA/ASIA" readOnly className="bg-muted font-bold text-xs" />
             </div>
             <div>
-              <Label>Vehicle Number</Label>
-              <Input value={jobData.vehicle || ""} readOnly className="bg-muted" placeholder="Auto-filled from driver" />
+              <Label>Advance Amount (SAR)</Label>
+              <Input type="number" min={0} value={jobData.advanceAmount} onChange={(e) => updateField("advanceAmount", parseFloat(e.target.value) || 0)} />
             </div>
           </CardContent>
         </Card>
 
+        {/* Assignment */}
+        <Card>
+          <CardHeader className="bg-[#006c35] text-white rounded-t-lg py-3 flex flex-row items-center justify-between">
+            <CardTitle className="text-base">Assignment</CardTitle>
+            <Button size="sm" variant="secondary" onClick={applyLastAssignment} className="text-xs">
+              Reuse Last Driver/Vehicle
+            </Button>
+          </CardHeader>
+          <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label>Vehicle Number *</Label>
+              <Select value={jobData.vehicle} onValueChange={(v) => {
+                updateField("vehicle", v);
+                const driverName = getSaudiDriverForVehicle(v);
+                if (driverName) { updateField("driver", driverName); setShowManualDriver(false); }
+              }}>
+                <SelectTrigger><SelectValue placeholder="Select vehicle" /></SelectTrigger>
+                <SelectContent>
+                  {saudiVehicleDriverMap.map((v) => (
+                    <SelectItem key={v.truck} value={v.truck}>{v.truck} / {v.driver}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Input placeholder="Or type vehicle manually" className="mt-1" value={jobData.vehicle} onChange={(e) => updateField("vehicle", e.target.value.toUpperCase())} />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <Label>Driver *</Label>
+                <button type="button" className="text-xs text-blue-600 underline" onClick={() => setShowManualDriver(!showManualDriver)}>
+                  {showManualDriver ? "Select from list" : "Add manually"}
+                </button>
+              </div>
+              {showManualDriver ? (
+                <Input placeholder="Enter driver name" value={manualDriver} onChange={(e) => { const val = e.target.value.toUpperCase(); setManualDriver(val); updateField("driver", val); }} />
+              ) : (
+                <Select value={jobData.driver} onValueChange={(v) => updateField("driver", v)}>
+                  <SelectTrigger><SelectValue placeholder="Select driver" /></SelectTrigger>
+                  <SelectContent>
+                    {saudiArabiaDrivers.map((d) => (<SelectItem key={d.value} value={d.label}>{d.label}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <Label>Sales Representative</Label>
+                <button type="button" className="text-xs text-blue-600 underline" onClick={() => setShowManualSalesRep(!showManualSalesRep)}>
+                  {showManualSalesRep ? "Select from list" : "Add manually"}
+                </button>
+              </div>
+              {showManualSalesRep ? (
+                <Input placeholder="Enter sales rep name" value={manualSalesRep} onChange={(e) => { const val = e.target.value.toUpperCase(); setManualSalesRep(val); updateField("salesRep", val); }} />
+              ) : (
+                <Select value={jobData.salesRep} onValueChange={(v) => updateField("salesRep", v)}>
+                  <SelectTrigger><SelectValue placeholder="Select sales rep" /></SelectTrigger>
+                  <SelectContent>
+                    {saudiArabiaSalesReps.map((s) => (<SelectItem key={s.value} value={s.label}>{s.label}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Packages */}
         <Card>
           <CardHeader className="bg-[#006c35] text-white rounded-t-lg py-3 flex flex-row items-center justify-between">
             <CardTitle className="text-base flex items-center gap-2">
               <Package className="h-4 w-4" />
               {isDelivery ? "BOXES DELIVERIES" : "CARGO COLLECTIONS"} — Packages (Inches)
             </CardTitle>
-            <Button size="sm" variant="secondary" onClick={addItem} disabled={nextBoxNumber > 20}>
-              <Plus className="h-4 w-4 mr-1" /> Add Box {nextBoxNumber <= 20 ? `#${nextBoxNumber}` : "(Max)"}
-            </Button>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" className="bg-white text-[#006c35] border-white hover:bg-green-100" onClick={() => setShowCustomPkgDialog(true)}>
+                <PlusCircle className="h-4 w-4 mr-1" /> Save New Package
+              </Button>
+              <Button size="sm" variant="secondary" onClick={addItem} disabled={nextBoxNumber > 20}>
+                <Plus className="h-4 w-4 mr-1" /> Add Box {nextBoxNumber <= 20 ? `#${nextBoxNumber}` : "(Max)"}
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="pt-4 overflow-x-auto">
             <Table>
@@ -334,8 +586,8 @@ const SaudiArabiaNewJob = () => {
                       <Select value={item.description} onValueChange={(v) => selectPackage(item.id, v)}>
                         <SelectTrigger className="min-w-[200px]"><SelectValue placeholder="Select package" /></SelectTrigger>
                         <SelectContent>
-                          {cargoCollectionPackages.map((p) => (
-                            <SelectItem key={p.id} value={p.name}>
+                          {allPackages.map((p) => (
+                            <SelectItem key={`pkg-${p.id}`} value={p.name}>
                               {p.name} {!p.hasManualDimensions ? `(${p.dimensions.length}×${p.dimensions.width}×${p.dimensions.height})` : ""}
                             </SelectItem>
                           ))}
@@ -350,8 +602,8 @@ const SaudiArabiaNewJob = () => {
                     <TableCell className="font-medium">{item.volume.toFixed(3)}</TableCell>
                     {isDelivery && (
                       <>
-                        <TableCell className="font-bold text-green-700">QAR {item.deliveryPriceWhite.toFixed(2)}</TableCell>
-                        <TableCell className="font-bold text-gray-700">{item.deliveryPriceBlack > 0 ? `QAR ${item.deliveryPriceBlack.toFixed(2)}` : "—"}</TableCell>
+                        <TableCell className="font-bold text-green-700">SAR {item.deliveryPriceWhite.toFixed(2)}</TableCell>
+                        <TableCell className="font-bold text-gray-700">{item.deliveryPriceBlack > 0 ? `SAR ${item.deliveryPriceBlack.toFixed(2)}` : "—"}</TableCell>
                       </>
                     )}
                     <TableCell><Input type="number" min={0} step={0.1} className="w-20" value={item.weightKg || ""} onChange={(e) => updateItem(item.id, "weightKg", parseFloat(e.target.value) || 0)} /></TableCell>
@@ -365,6 +617,7 @@ const SaudiArabiaNewJob = () => {
           </CardContent>
         </Card>
 
+        {/* Notes + Summary */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardHeader className="py-3"><CardTitle className="text-base">Notes</CardTitle></CardHeader>
@@ -414,6 +667,34 @@ const SaudiArabiaNewJob = () => {
           </Button>
         </div>
       </div>
+
+      {/* Custom Package Save Dialog */}
+      <Dialog open={showCustomPkgDialog} onOpenChange={setShowCustomPkgDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Save New Custom Package</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div><Label>Package Name *</Label><Input placeholder="e.g. CUSTOM BOX" value={customPkgName} onChange={(e) => setCustomPkgName(e.target.value.toUpperCase())} /></div>
+            <div className="grid grid-cols-3 gap-2">
+              <div><Label>Length (in)</Label><Input type="number" placeholder="0" value={customPkgLength} onChange={(e) => setCustomPkgLength(e.target.value)} /></div>
+              <div><Label>Width (in)</Label><Input type="number" placeholder="0" value={customPkgWidth} onChange={(e) => setCustomPkgWidth(e.target.value)} /></div>
+              <div><Label>Height (in)</Label><Input type="number" placeholder="0" value={customPkgHeight} onChange={(e) => setCustomPkgHeight(e.target.value)} /></div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div><Label>White Plywood Price (SAR)</Label><Input type="number" placeholder="0" value={customPkgWhitePly} onChange={(e) => setCustomPkgWhitePly(e.target.value)} /></div>
+              <div><Label>Black Plywood Price (SAR)</Label><Input type="number" placeholder="0" value={customPkgBlackPly} onChange={(e) => setCustomPkgBlackPly(e.target.value)} /></div>
+            </div>
+            {customPkgLength && customPkgWidth && customPkgHeight && (
+              <p className="text-sm text-muted-foreground">Volume: {calcVolumeCBM(parseFloat(customPkgLength) || 0, parseFloat(customPkgWidth) || 0, parseFloat(customPkgHeight) || 0).toFixed(6)} CBM</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCustomPkgDialog(false)}>Cancel</Button>
+            <Button className="bg-[#006c35] hover:bg-[#005a2d]" onClick={saveCustomPackage}><Save className="h-4 w-4 mr-1" /> Save Package</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };
