@@ -109,71 +109,7 @@ const SriLankaInvoicePrint = () => {
         }
         setLoading(false);
       }).catch(() => setLoading(false));
-      
-      console.log('Found invoice:', invoice);
-      
-      if (invoice) {
-          const processedInvoice = {
-            ...invoice,
-            packages: invoice.packageItems?.map((pkg: any) => ({
-              id: pkg.id,
-              name: pkg.name || pkg.description || "PACKAGE",
-              length: parseFloat(pkg.length || '0'),
-              width: parseFloat(pkg.width || '0'),
-              height: parseFloat(pkg.height || '0'),
-              volume: parseFloat(pkg.volume || '0') || ((parseFloat(pkg.length || '0') * parseFloat(pkg.width || '0') * parseFloat(pkg.height || '0')) / 1000000)
-            })) || [],
-            shipper: {
-              name: `${invoice.shipperPrefix || ''} ${invoice.shipperName || ''}`.trim() || "SAMPLE SHIPPER",
-              address: invoice.shipperAddress || '',
-              city: invoice.shipperCity === 'CUSTOM' ? (invoice.shipperCustomCity || '') : (invoice.shipperCity || ''),
-              country: invoice.shipperCountry || 'QATAR',
-              mobile: invoice.shipperMobile || ""
-            },
-            consignee: {
-              name: `${invoice.consigneePrefix || ''} ${invoice.consigneeName || ''}`.trim() || "SAMPLE CONSIGNEE",
-              address: invoice.consigneeAddress || '',
-              district: invoice.consigneeDistrict || '',
-              province: invoice.consigneeProvince || '',
-              country: invoice.consigneeCountry || 'SRI LANKA',
-              mobile: invoice.consigneeMobile || "",
-              idNumber: invoice.consigneeId || ""
-            },
-            warehouse: invoice.warehouse || 'Colombo Warehouse',
-            totalWeight: parseFloat(invoice.weight || '0'),
-            pricing: (() => {
-              // Recalculate total from raw data to avoid stale stored values
-              const volume = parseFloat(invoice.volume || '0') || 0;
-              const rate = parseFloat(invoice.rate || '0') || 0;
-              const docFee = parseFloat(invoice.documentsFee || '0') || 0;
-              const discount = parseFloat(invoice.discount || '0') || 0;
-              const packing = parseFloat(invoice.packingCharges || '0') || 0;
-              const transport = parseFloat(invoice.transportationFee || '0') || 0;
-              const freightCharge = invoice.serviceType === 'SEA FREIGHT' ? volume * rate : rate;
-              const net = freightCharge + docFee - discount + packing + transport;
-              const gross = net + discount;
-              return { gross, discount, net };
-            })()
-          };
-          
-          setInvoiceData(processedInvoice);
-          
-          const payments = localStorage.getItem('payments');
-          if (payments) {
-            const paymentData = JSON.parse(payments);
-            const payment = paymentData.find((p: any) => p.invoiceNumber === processedInvoice.invoiceNumber);
-            setIsPaid(!!payment);
-          }
-          
-          // Check if invoice itself is marked as paid
-          if (invoice.paid || invoice.paidAmount > 0 || invoice.totalPaid > 0) {
-            setIsPaid(true);
-          }
-      } else {
-          setInvoiceData(null);
-      }
     }
-    setLoading(false);
   }, [id]);
 
   const handlePrint = () => {
