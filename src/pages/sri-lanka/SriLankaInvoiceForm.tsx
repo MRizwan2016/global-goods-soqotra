@@ -172,13 +172,73 @@ const SriLankaInvoiceForm = () => {
     const currentPath = window.location.pathname;
     if (currentPath.includes('/edit/')) {
       const invoiceId = currentPath.split('/edit/')[1];
-      const storedInvoices = localStorage.getItem('sriLankaInvoices');
-      if (storedInvoices) {
-        const invoices = JSON.parse(storedInvoices);
-        const existingInvoice = invoices.find((inv: any) => inv.id === invoiceId);
-        if (existingInvoice) {
-          setFormData(existingInvoice);
-          if (existingInvoice.packageItems) {
+      RegionalInvoiceService.getById(invoiceId).then(result => {
+        if (result) {
+          const inv = result.invoice;
+          setFormData(prev => ({
+            ...prev,
+            invoiceNumber: inv.invoice_number || '',
+            date: inv.invoice_date || prev.date,
+            cargoType: inv.cargo_type || '',
+            jobNumber: inv.job_number || '',
+            bookNumber: inv.book_number || '',
+            pageNumber: inv.page_number || '',
+            salesRepresentative: inv.sales_representative || '',
+            driverName: inv.driver_name || '',
+            whatsappNumber: inv.whatsapp_number || '',
+            shipperPrefix: inv.shipper_prefix || '',
+            shipperName: inv.shipper_name || '',
+            shipperCountry: inv.shipper_country || '',
+            shipperCity: inv.shipper_city || '',
+            shipperAddress: inv.shipper_address || '',
+            shipperMobile: inv.shipper_mobile || '',
+            consigneePrefix: inv.consignee_prefix || '',
+            consigneeName: inv.consignee_name || '',
+            consigneeCountry: inv.consignee_country || 'SRI LANKA',
+            consigneeDistrict: inv.consignee_district || '',
+            consigneeProvince: inv.consignee_province || '',
+            consigneeAddress: inv.consignee_address || '',
+            deliveryAddress: inv.consignee_delivery_address || '',
+            consigneeMobile: inv.consignee_mobile || '',
+            consigneeId: inv.consignee_id_number || '',
+            serviceType: inv.service_type || '',
+            destination: inv.destination || '',
+            terminal: inv.terminal || '',
+            warehouse: inv.warehouse || '',
+            weight: String(inv.total_weight || ''),
+            volume: String(inv.total_volume || ''),
+            description: inv.description || '',
+            rate: String(inv.rate || ''),
+            documentsFee: String(inv.documents_fee || '0'),
+            total: String(inv.net || ''),
+            paymentMethod: inv.payment_method || '',
+            paymentStatus: inv.payment_status || 'UNPAID',
+            paymentDate: inv.payment_date || '',
+            receiptNumber: inv.receipt_number || '',
+            discount: String(inv.discount || '0'),
+            packingCharges: String(inv.packing_charges || '0'),
+            transportationFee: String(inv.transportation_fee || '0'),
+            remarks: inv.remarks || '',
+          }));
+          // Map packages
+          if (result.packages.length > 0) {
+            setPackageItems(result.packages.map(p => ({
+              id: p.id,
+              description: p.package_name || '',
+              length: String(p.length || ''),
+              width: String(p.width || ''),
+              height: String(p.height || ''),
+              weight: String(p.weight || ''),
+              volume: p.volume || String(p.cubic_metre || ''),
+              quantity: String(p.quantity || 1),
+              boxNumber: String(p.box_number || ''),
+              price: String(p.price || ''),
+            })));
+          }
+        }
+      });
+    }
+  }, []);
             setPackageItems(existingInvoice.packageItems);
           }
         }
