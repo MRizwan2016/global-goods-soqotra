@@ -12,6 +12,7 @@ import SLReceiptDocument from './components/print/SLReceiptDocument';
 import SriLankaSeaManifestDocument from './documents/SriLankaSeaManifestDocument';
 import { toast } from 'sonner';
 import { SEA_FREIGHT_RATES } from './utils/sriLankaPricing';
+import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
 
 const SriLankaInvoicePrint = () => {
   const { id } = useParams();
@@ -27,26 +28,87 @@ const SriLankaInvoicePrint = () => {
     if (id) {
       console.log('Loading invoice with ID:', id);
       
-      // Try localStorage first
-      const storedInvoices = localStorage.getItem('sriLankaInvoices');
-      let invoice: any = null;
-      
-      if (storedInvoices) {
-        const invoices = JSON.parse(storedInvoices);
-        invoice = invoices.find((inv: any) => inv.id === id);
-      }
-      
-      // Fallback: check localStorage printInvoiceData
-      if (!invoice) {
-        const printData = localStorage.getItem('printInvoiceData');
-        if (printData) {
-          const parsed = JSON.parse(printData);
-          if (parsed.id === id) {
-            invoice = parsed;
-            localStorage.removeItem('printInvoiceData');
+      RegionalInvoiceService.getById(id).then(result => {
+        if (result) {
+          const inv = result.invoice;
+          // Build a compatible invoiceData object for printing
+          const invoice: any = {
+            id: inv.id,
+            invoiceNumber: inv.invoice_number,
+            date: inv.invoice_date,
+            cargoType: inv.cargo_type,
+            jobNumber: inv.job_number,
+            bookNumber: inv.book_number,
+            pageNumber: inv.page_number,
+            salesRepresentative: inv.sales_representative,
+            driverName: inv.driver_name,
+            whatsappNumber: inv.whatsapp_number,
+            shipperPrefix: inv.shipper_prefix,
+            shipperName: inv.shipper_name,
+            shipperCountry: inv.shipper_country,
+            shipperCity: inv.shipper_city,
+            shipperAddress: inv.shipper_address,
+            shipperMobile: inv.shipper_mobile,
+            consigneePrefix: inv.consignee_prefix,
+            consigneeName: inv.consignee_name,
+            consigneeCountry: inv.consignee_country,
+            consigneeDistrict: inv.consignee_district,
+            consigneeProvince: inv.consignee_province,
+            consigneeAddress: inv.consignee_address,
+            consigneeMobile: inv.consignee_mobile,
+            consigneeId: inv.consignee_id_number,
+            serviceType: inv.service_type,
+            destination: inv.destination,
+            terminal: inv.terminal,
+            warehouse: inv.warehouse,
+            weight: String(inv.total_weight || ''),
+            volume: String(inv.total_volume || ''),
+            description: inv.description,
+            rate: String(inv.rate || ''),
+            documentsFee: String(inv.documents_fee || '0'),
+            total: String(inv.net || ''),
+            discount: String(inv.discount || '0'),
+            packingCharges: String(inv.packing_charges || '0'),
+            transportationFee: String(inv.transportation_fee || '0'),
+            paymentMethod: inv.payment_method,
+            paymentStatus: inv.payment_status,
+            paymentDate: inv.payment_date,
+            receiptNumber: inv.receipt_number,
+            remarks: inv.remarks,
+            packageItems: result.packages.map(p => ({
+              id: p.id,
+              description: p.package_name || '',
+              name: p.package_name || '',
+              length: String(p.length || ''),
+              width: String(p.width || ''),
+              height: String(p.height || ''),
+              weight: String(p.weight || ''),
+              volume: p.volume || String(p.cubic_metre || ''),
+              quantity: p.quantity || 1,
+              boxNumber: String(p.box_number || ''),
+              price: p.price || 0,
+              total: (p.price || 0) * (p.quantity || 1),
+            })),
+            pricing: {
+              gross: inv.gross || 0,
+              discount: inv.discount || 0,
+              net: inv.net || 0,
+            }
+          };
+          setInvoiceData(invoice);
+        } else {
+          // Fallback: check localStorage printInvoiceData
+          const printData = localStorage.getItem('printInvoiceData');
+          if (printData) {
+            const parsed = JSON.parse(printData);
+            if (parsed.id === id) {
+              setInvoiceData(parsed);
+              localStorage.removeItem('printInvoiceData');
+            }
           }
         }
-      }
+        setLoading(false);
+      }).catch(() => setLoading(false));
       
       console.log('Found invoice:', invoice);
       

@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { DollarSign, Search, Receipt, Printer, CheckCircle, AlertCircle, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
 
 const SriLankaPaymentReceipt = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,14 +24,28 @@ const SriLankaPaymentReceipt = () => {
   const [paymentMethod, setPaymentMethod] = useState("cash");
 
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem('sriLankaInvoices') || '[]');
-      setInvoices(stored);
-      const storedPayments = JSON.parse(localStorage.getItem('sriLankaPayments') || '[]');
-      setPayments(storedPayments);
-    } catch (e) {
-      console.error("Error loading data:", e);
-    }
+    const load = async () => {
+      try {
+        const rows = await RegionalInvoiceService.getByCountry('Sri Lanka');
+        const mapped = rows.map(r => ({
+          id: r.id,
+          invoiceNumber: r.invoice_number,
+          shipperName: r.shipper_name || '',
+          consigneeName: r.consignee_name || '',
+          date: r.invoice_date || '',
+          total: String(r.net || 0),
+          pricing: { net: r.net || 0 },
+          paymentStatus: r.payment_status || 'UNPAID',
+          paid: 0,
+        }));
+        setInvoices(mapped);
+        const storedPayments = JSON.parse(localStorage.getItem('sriLankaPayments') || '[]');
+        setPayments(storedPayments);
+      } catch (e) {
+        console.error("Error loading data:", e);
+      }
+    };
+    load();
   }, []);
 
   const mockInvoices = invoices.length > 0 ? invoices.map(inv => ({
