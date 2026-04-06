@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Plus, Search, Edit, Eye, Trash2, FileText, Save, Briefcase } from "lucide-react";
 import { toast } from "sonner";
+import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
 
 const SaudiArabiaSavedInvoices = () => {
   const navigate = useNavigate();
@@ -15,12 +16,24 @@ const SaudiArabiaSavedInvoices = () => {
   const [invoices, setInvoices] = useState<any[]>([]);
 
   useEffect(() => {
-    try {
-      const stored = JSON.parse(localStorage.getItem('saudiArabiaInvoices') || '[]');
-      setInvoices(stored);
-    } catch (e) {
-      console.error("Error loading invoices:", e);
-    }
+    const load = async () => {
+      try {
+        const rows = await RegionalInvoiceService.getByCountry('Saudi Arabia');
+        const mapped = rows.map(r => ({
+          id: r.id,
+          invoiceNumber: r.invoice_number,
+          consigneeName: r.consignee_name || '',
+          customer: r.consignee_name || r.shipper_name || '',
+          date: r.invoice_date || '',
+          net: r.net || 0,
+          netAmount: r.net || 0,
+        }));
+        setInvoices(mapped);
+      } catch (e) {
+        console.error("Error loading invoices:", e);
+      }
+    };
+    load();
   }, []);
 
   const filteredInvoices = invoices.filter(inv => {
@@ -29,11 +42,14 @@ const SaudiArabiaSavedInvoices = () => {
     return name.includes(searchTerm.toLowerCase()) || num.includes(searchTerm.toLowerCase());
   });
 
-  const handleDelete = (id: string) => {
-    const updated = invoices.filter(inv => (inv.id || inv.invoiceNumber) !== id);
-    setInvoices(updated);
-    localStorage.setItem('saudiArabiaInvoices', JSON.stringify(updated));
-    toast.success("Invoice deleted");
+  const handleDelete = async (id: string) => {
+    const ok = await RegionalInvoiceService.delete(id);
+    if (ok) {
+      setInvoices(prev => prev.filter(inv => (inv.id || inv.invoiceNumber) !== id));
+      toast.success("Invoice deleted");
+    } else {
+      toast.error("Failed to delete invoice");
+    }
   };
 
   const totalNet = invoices.reduce((sum, inv) => sum + (inv.net || inv.netAmount || 0), 0);

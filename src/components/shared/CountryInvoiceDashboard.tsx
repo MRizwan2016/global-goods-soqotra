@@ -6,6 +6,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, FileText, Edit, Trash2, Eye, Plane, Ship, MessageCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import Layout from '@/components/layout/Layout';
+import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
 
 export interface CountryInvoice {
   id: string;
@@ -55,10 +56,31 @@ const CountryInvoiceDashboard: React.FC<CountryInvoiceDashboardProps> = ({
     loadInvoices();
   }, []);
 
-  const loadInvoices = () => {
-    const stored = localStorage.getItem(storageKey);
-    if (stored) {
-      setInvoices(JSON.parse(stored));
+  const loadInvoices = async () => {
+    try {
+      const rows = await RegionalInvoiceService.getByCountry(countryName);
+      const mapped: CountryInvoice[] = rows.map(r => ({
+        id: r.id,
+        invoiceNumber: r.invoice_number,
+        date: r.invoice_date || '',
+        shipperName: r.shipper_name || '',
+        consigneeName: r.consignee_name || '',
+        serviceType: r.service_type || '',
+        total: String(r.net || r.gross || 0),
+        status: r.status || 'DRAFT',
+        bookNumber: r.book_number || '',
+        pageNumber: r.page_number || '',
+        salesRepresentative: r.sales_representative || '',
+        driverName: r.driver_name || '',
+        whatsappNumber: r.whatsapp_number || '',
+        shipperMobile: r.shipper_mobile || '',
+        consigneeMobile: r.consignee_mobile || '',
+        jobNumber: r.job_number || '',
+        pricing: { net: r.net || 0, gross: r.gross || 0 },
+      }));
+      setInvoices(mapped);
+    } catch (err) {
+      console.error('Error loading invoices:', err);
     }
   };
 
@@ -73,12 +95,15 @@ const CountryInvoiceDashboard: React.FC<CountryInvoiceDashboardProps> = ({
   const handleEditInvoice = (id: string) => navigate(`/${countrySlug}/invoice/edit/${id}`);
   const handlePrintInvoice = (id: string) => navigate(`/${countrySlug}/invoice/print/${id}`);
 
-  const handleDeleteInvoice = (id: string) => {
+  const handleDeleteInvoice = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this invoice?')) {
-      const updatedInvoices = invoices.filter(inv => inv.id !== id);
-      localStorage.setItem(storageKey, JSON.stringify(updatedInvoices));
-      setInvoices(updatedInvoices);
-      toast.success('Invoice deleted successfully');
+      const ok = await RegionalInvoiceService.delete(id);
+      if (ok) {
+        setInvoices(prev => prev.filter(inv => inv.id !== id));
+        toast.success('Invoice deleted successfully');
+      } else {
+        toast.error('Failed to delete invoice');
+      }
     }
   };
 
