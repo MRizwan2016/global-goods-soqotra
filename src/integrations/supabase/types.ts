@@ -429,6 +429,290 @@ export type Database = {
         }
         Relationships: []
       }
+      regional_invoice_packages: {
+        Row: {
+          box_number: number | null
+          created_at: string
+          cubic_feet: number | null
+          cubic_metre: number | null
+          height: number | null
+          id: string
+          invoice_id: string
+          length: number | null
+          package_name: string | null
+          price: number | null
+          quantity: number | null
+          volume: string | null
+          volume_weight: number | null
+          weight: number | null
+          width: number | null
+        }
+        Insert: {
+          box_number?: number | null
+          created_at?: string
+          cubic_feet?: number | null
+          cubic_metre?: number | null
+          height?: number | null
+          id?: string
+          invoice_id: string
+          length?: number | null
+          package_name?: string | null
+          price?: number | null
+          quantity?: number | null
+          volume?: string | null
+          volume_weight?: number | null
+          weight?: number | null
+          width?: number | null
+        }
+        Update: {
+          box_number?: number | null
+          created_at?: string
+          cubic_feet?: number | null
+          cubic_metre?: number | null
+          height?: number | null
+          id?: string
+          invoice_id?: string
+          length?: number | null
+          package_name?: string | null
+          price?: number | null
+          quantity?: number | null
+          volume?: string | null
+          volume_weight?: number | null
+          weight?: number | null
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "regional_invoice_packages_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "regional_invoices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      regional_invoices: {
+        Row: {
+          banking_date: string | null
+          book_number: string | null
+          cargo_type: string | null
+          consignee_address: string | null
+          consignee_city: string | null
+          consignee_country: string | null
+          consignee_delivery_address: string | null
+          consignee_district: string | null
+          consignee_email: string | null
+          consignee_id_number: string | null
+          consignee_landline: string | null
+          consignee_mobile: string | null
+          consignee_name: string | null
+          consignee_prefix: string | null
+          consignee_province: string | null
+          country: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          destination: string | null
+          destination_clearing: number | null
+          destination_door_delivery: number | null
+          destination_transport: number | null
+          discount: number | null
+          district: string | null
+          documents_fee: number | null
+          door_to_door: string | null
+          driver_name: string | null
+          extra_data: Json | null
+          freight: number | null
+          freight_by: string | null
+          gift_cargo: string | null
+          gross: number | null
+          id: string
+          invoice_date: string | null
+          invoice_number: string
+          job_number: string | null
+          local_transport: number | null
+          net: number | null
+          other: number | null
+          packing_charges: number | null
+          page_number: string | null
+          payment_date: string | null
+          payment_method: string | null
+          payment_status: string | null
+          port: string | null
+          pre_paid: string | null
+          rate: number | null
+          receipt_number: string | null
+          remarks: string | null
+          sales_representative: string | null
+          sector: string | null
+          service_type: string | null
+          shipper_address: string | null
+          shipper_city: string | null
+          shipper_country: string | null
+          shipper_email: string | null
+          shipper_id_number: string | null
+          shipper_mobile: string | null
+          shipper_name: string | null
+          shipper_prefix: string | null
+          status: string | null
+          storage: number | null
+          terminal: string | null
+          total_packages: number | null
+          total_volume: number | null
+          total_weight: number | null
+          transportation_fee: number | null
+          updated_at: string
+          warehouse: string | null
+          whatsapp_number: string | null
+        }
+        Insert: {
+          banking_date?: string | null
+          book_number?: string | null
+          cargo_type?: string | null
+          consignee_address?: string | null
+          consignee_city?: string | null
+          consignee_country?: string | null
+          consignee_delivery_address?: string | null
+          consignee_district?: string | null
+          consignee_email?: string | null
+          consignee_id_number?: string | null
+          consignee_landline?: string | null
+          consignee_mobile?: string | null
+          consignee_name?: string | null
+          consignee_prefix?: string | null
+          consignee_province?: string | null
+          country: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          destination?: string | null
+          destination_clearing?: number | null
+          destination_door_delivery?: number | null
+          destination_transport?: number | null
+          discount?: number | null
+          district?: string | null
+          documents_fee?: number | null
+          door_to_door?: string | null
+          driver_name?: string | null
+          extra_data?: Json | null
+          freight?: number | null
+          freight_by?: string | null
+          gift_cargo?: string | null
+          gross?: number | null
+          id?: string
+          invoice_date?: string | null
+          invoice_number: string
+          job_number?: string | null
+          local_transport?: number | null
+          net?: number | null
+          other?: number | null
+          packing_charges?: number | null
+          page_number?: string | null
+          payment_date?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          port?: string | null
+          pre_paid?: string | null
+          rate?: number | null
+          receipt_number?: string | null
+          remarks?: string | null
+          sales_representative?: string | null
+          sector?: string | null
+          service_type?: string | null
+          shipper_address?: string | null
+          shipper_city?: string | null
+          shipper_country?: string | null
+          shipper_email?: string | null
+          shipper_id_number?: string | null
+          shipper_mobile?: string | null
+          shipper_name?: string | null
+          shipper_prefix?: string | null
+          status?: string | null
+          storage?: number | null
+          terminal?: string | null
+          total_packages?: number | null
+          total_volume?: number | null
+          total_weight?: number | null
+          transportation_fee?: number | null
+          updated_at?: string
+          warehouse?: string | null
+          whatsapp_number?: string | null
+        }
+        Update: {
+          banking_date?: string | null
+          book_number?: string | null
+          cargo_type?: string | null
+          consignee_address?: string | null
+          consignee_city?: string | null
+          consignee_country?: string | null
+          consignee_delivery_address?: string | null
+          consignee_district?: string | null
+          consignee_email?: string | null
+          consignee_id_number?: string | null
+          consignee_landline?: string | null
+          consignee_mobile?: string | null
+          consignee_name?: string | null
+          consignee_prefix?: string | null
+          consignee_province?: string | null
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          destination?: string | null
+          destination_clearing?: number | null
+          destination_door_delivery?: number | null
+          destination_transport?: number | null
+          discount?: number | null
+          district?: string | null
+          documents_fee?: number | null
+          door_to_door?: string | null
+          driver_name?: string | null
+          extra_data?: Json | null
+          freight?: number | null
+          freight_by?: string | null
+          gift_cargo?: string | null
+          gross?: number | null
+          id?: string
+          invoice_date?: string | null
+          invoice_number?: string
+          job_number?: string | null
+          local_transport?: number | null
+          net?: number | null
+          other?: number | null
+          packing_charges?: number | null
+          page_number?: string | null
+          payment_date?: string | null
+          payment_method?: string | null
+          payment_status?: string | null
+          port?: string | null
+          pre_paid?: string | null
+          rate?: number | null
+          receipt_number?: string | null
+          remarks?: string | null
+          sales_representative?: string | null
+          sector?: string | null
+          service_type?: string | null
+          shipper_address?: string | null
+          shipper_city?: string | null
+          shipper_country?: string | null
+          shipper_email?: string | null
+          shipper_id_number?: string | null
+          shipper_mobile?: string | null
+          shipper_name?: string | null
+          shipper_prefix?: string | null
+          status?: string | null
+          storage?: number | null
+          terminal?: string | null
+          total_packages?: number | null
+          total_volume?: number | null
+          total_weight?: number | null
+          transportation_fee?: number | null
+          updated_at?: string
+          warehouse?: string | null
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
       sales_representatives: {
         Row: {
           country: string
