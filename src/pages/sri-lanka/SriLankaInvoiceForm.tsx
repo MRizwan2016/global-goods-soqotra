@@ -230,9 +230,10 @@ const SriLankaInvoiceForm = () => {
               height: String(p.height || ''),
               weight: String(p.weight || ''),
               volume: p.volume || String(p.cubic_metre || ''),
-              quantity: String(p.quantity || 1),
+              quantity: p.quantity || 1,
               boxNumber: String(p.box_number || ''),
-              price: String(p.price || ''),
+              price: p.price || 0,
+              total: (p.price || 0) * (p.quantity || 1),
             })));
           }
         }
