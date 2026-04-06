@@ -26,6 +26,7 @@ import {
   getAllProvinces 
 } from './utils/districtProvinceMapping';
 import { syncInvoiceToExternal } from '@/lib/externalSync';
+import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
 
 const SriLankaInvoiceForm = () => {
   const navigate = useNavigate();
@@ -171,19 +172,76 @@ const SriLankaInvoiceForm = () => {
     const currentPath = window.location.pathname;
     if (currentPath.includes('/edit/')) {
       const invoiceId = currentPath.split('/edit/')[1];
-      const storedInvoices = localStorage.getItem('sriLankaInvoices');
-      if (storedInvoices) {
-        const invoices = JSON.parse(storedInvoices);
-        const existingInvoice = invoices.find((inv: any) => inv.id === invoiceId);
-        if (existingInvoice) {
-          setFormData(existingInvoice);
-          if (existingInvoice.packageItems) {
-            setPackageItems(existingInvoice.packageItems);
+      RegionalInvoiceService.getById(invoiceId).then(result => {
+        if (result) {
+          const inv = result.invoice;
+          setFormData(prev => ({
+            ...prev,
+            invoiceNumber: inv.invoice_number || '',
+            date: inv.invoice_date || prev.date,
+            cargoType: inv.cargo_type || '',
+            jobNumber: inv.job_number || '',
+            bookNumber: inv.book_number || '',
+            pageNumber: inv.page_number || '',
+            salesRepresentative: inv.sales_representative || '',
+            driverName: inv.driver_name || '',
+            whatsappNumber: inv.whatsapp_number || '',
+            shipperPrefix: inv.shipper_prefix || '',
+            shipperName: inv.shipper_name || '',
+            shipperCountry: inv.shipper_country || '',
+            shipperCity: inv.shipper_city || '',
+            shipperAddress: inv.shipper_address || '',
+            shipperMobile: inv.shipper_mobile || '',
+            consigneePrefix: inv.consignee_prefix || '',
+            consigneeName: inv.consignee_name || '',
+            consigneeCountry: inv.consignee_country || 'SRI LANKA',
+            consigneeDistrict: inv.consignee_district || '',
+            consigneeProvince: inv.consignee_province || '',
+            consigneeAddress: inv.consignee_address || '',
+            deliveryAddress: inv.consignee_delivery_address || '',
+            consigneeMobile: inv.consignee_mobile || '',
+            consigneeId: inv.consignee_id_number || '',
+            serviceType: inv.service_type || '',
+            destination: inv.destination || '',
+            terminal: inv.terminal || '',
+            warehouse: inv.warehouse || '',
+            weight: String(inv.total_weight || ''),
+            volume: String(inv.total_volume || ''),
+            description: inv.description || '',
+            rate: String(inv.rate || ''),
+            documentsFee: String(inv.documents_fee || '0'),
+            total: String(inv.net || ''),
+            paymentMethod: inv.payment_method || '',
+            paymentStatus: inv.payment_status || 'UNPAID',
+            paymentDate: inv.payment_date || '',
+            receiptNumber: inv.receipt_number || '',
+            discount: String(inv.discount || '0'),
+            packingCharges: String(inv.packing_charges || '0'),
+            transportationFee: String(inv.transportation_fee || '0'),
+            remarks: inv.remarks || '',
+          }));
+          // Map packages
+          if (result.packages.length > 0) {
+            setPackageItems(result.packages.map(p => ({
+              id: p.id,
+              description: p.package_name || '',
+              length: String(p.length || ''),
+              width: String(p.width || ''),
+              height: String(p.height || ''),
+              weight: String(p.weight || ''),
+              volume: p.volume || String(p.cubic_metre || ''),
+              quantity: p.quantity || 1,
+              boxNumber: String(p.box_number || ''),
+              price: p.price || 0,
+              total: (p.price || 0) * (p.quantity || 1),
+            })));
           }
         }
-      }
+      });
     }
   }, []);
+
+
 
   // Sri Lanka specific data
   const CARGO_TYPES = ['GIFT CARGO', 'UPB CARGO'];
@@ -423,91 +481,86 @@ const SriLankaInvoiceForm = () => {
     }
     
     try {
-      // Get existing invoices from localStorage
-      const existingInvoices = JSON.parse(localStorage.getItem('sriLankaInvoices') || '[]');
-      
-      // Check if we're editing an existing invoice
       const currentPath = window.location.pathname;
       const isEditing = currentPath.includes('/edit/');
-      const existingId = isEditing ? currentPath.split('/edit/')[1] : null;
-      
-      // Auto-generate job number if not present
+      const existingId = isEditing ? currentPath.split('/edit/')[1] : undefined;
       const jobNumber = formData.jobNumber || `SL-JOB-${Date.now()}`;
-      
-      // Use existing ID if editing, otherwise generate new one
-      const invoiceId = existingId || `sri-lanka-${Date.now()}`;
-      
-      // Create proper invoice structure for printing
-      const invoiceData = {
-        id: invoiceId,
-        ...formData,
-        jobNumber,
-        packageItems: packageItems,
-        createdAt: isEditing ? (existingInvoices.find((inv: any) => inv.id === existingId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        country: 'SRI LANKA',
-        // Map to print structure
-        shipper: {
-          name: formData.shipperName,
-          address: `${formData.shipperCity}, ${formData.shipperCountry}`,
-          mobile: formData.shipperMobile
-        },
-        consignee: {
-          name: formData.consigneeName,
-          address: `${formData.consigneeAddress}, ${formData.consigneeDistrict}, ${formData.consigneeCountry}`,
-          mobile: formData.consigneeMobile,
-          idNumber: formData.consigneeId
-        },
-        packages: packageItems.map(item => ({
-          name: item.description,
-          length: parseFloat(item.length || '0'),
-          width: parseFloat(item.width || '0'),
-          height: parseFloat(item.height || '0'),
-          volume: (parseFloat(item.length || '0') * parseFloat(item.width || '0') * parseFloat(item.height || '0')) / 1000000
-        })),
-        totalWeight: parseFloat(formData.weight || '0'),
-        pricing: (() => {
-          const vol = parseFloat(formData.volume || '0') || 0;
-          const r = parseFloat(formData.rate || '0') || 0;
-          const df = parseFloat(formData.documentsFee || '0') || 0;
-          const disc = parseFloat(formData.discount || '0') || 0;
-          const pack = parseFloat(formData.packingCharges || '0') || 0;
-          const trans = parseFloat(formData.transportationFee || '0') || 0;
-          const fc = formData.serviceType === 'SEA FREIGHT' ? vol * r : r;
-          const net = fc + df - disc + pack + trans;
-          return { gross: net + disc, discount: disc, net };
-        })(),
-        // Payment details
-        paymentStatus: formData.paymentStatus,
-        paymentMethod: formData.paymentMethod,
-        paymentDate: formData.paymentDate,
-        receiptNumber: formData.receiptNumber,
-        packingCharges: parseFloat(formData.packingCharges || '0'),
-        transportationFee: parseFloat(formData.transportationFee || '0')
+
+      // Build the DB row
+      const invoiceRow = {
+        country: 'Sri Lanka',
+        invoice_number: formData.invoiceNumber,
+        invoice_date: formData.date,
+        job_number: jobNumber,
+        book_number: formData.bookNumber,
+        page_number: formData.pageNumber,
+        cargo_type: formData.cargoType,
+        service_type: formData.serviceType,
+        shipper_prefix: formData.shipperPrefix,
+        shipper_name: formData.shipperName,
+        shipper_country: formData.shipperCountry,
+        shipper_city: formData.shipperCity === 'CUSTOM' ? (formData as any).shipperCustomCity : formData.shipperCity,
+        shipper_address: formData.shipperAddress,
+        shipper_mobile: formData.shipperMobile,
+        consignee_prefix: formData.consigneePrefix,
+        consignee_name: formData.consigneeName,
+        consignee_country: formData.consigneeCountry,
+        consignee_district: formData.consigneeDistrict,
+        consignee_province: formData.consigneeProvince,
+        consignee_address: formData.consigneeAddress,
+        consignee_delivery_address: formData.deliveryAddress,
+        consignee_mobile: formData.consigneeMobile,
+        consignee_id_number: formData.consigneeId,
+        sales_representative: formData.salesRepresentative,
+        driver_name: formData.driverName,
+        whatsapp_number: formData.whatsappNumber,
+        destination: formData.destination,
+        terminal: formData.terminal,
+        warehouse: formData.warehouse,
+        total_weight: parseFloat(formData.weight || '0'),
+        total_volume: parseFloat(formData.volume || '0'),
+        description: formData.description,
+        rate: rate,
+        documents_fee: docFee,
+        discount: discount,
+        packing_charges: packing,
+        transportation_fee: transport,
+        gross: expectedTotal + discount,
+        net: expectedTotal,
+        payment_method: formData.paymentMethod,
+        payment_status: formData.paymentStatus,
+        payment_date: formData.paymentDate,
+        receipt_number: formData.receiptNumber,
+        remarks: formData.remarks,
+        status: 'ACTIVE',
       };
+
+      // Build package rows
+      const pkgRows = packageItems.map((item, idx) => ({
+        package_name: item.description || item.name || '',
+        length: parseFloat(item.length || '0'),
+        width: parseFloat(item.width || '0'),
+        height: parseFloat(item.height || '0'),
+        weight: parseFloat(item.weight || '0'),
+        quantity: typeof item.quantity === 'number' ? item.quantity : parseInt(String(item.quantity || '1')),
+        cubic_metre: parseFloat(item.volume || '0'),
+        box_number: idx + 1,
+        price: typeof item.price === 'number' ? item.price : parseFloat(String(item.price || '0')),
+        volume: item.volume || '',
+      }));
+
+      const savedId = await RegionalInvoiceService.save(invoiceRow as any, pkgRows as any, existingId);
       
-      // Update existing or add new
-      let updatedInvoices;
-      if (isEditing) {
-        updatedInvoices = existingInvoices.map((inv: any) => inv.id === existingId ? invoiceData : inv);
-        // If not found (first save after creation), add it
-        if (!existingInvoices.some((inv: any) => inv.id === existingId)) {
-          updatedInvoices = [...existingInvoices, invoiceData];
+      if (savedId) {
+        // Also sync externally
+        await syncInvoiceToExternal({ ...invoiceRow, id: savedId, packageItems });
+        toast.success('Invoice saved successfully');
+        
+        if (!isEditing) {
+          navigate(`/sri-lanka/invoice/edit/${savedId}`);
         }
       } else {
-        updatedInvoices = [...existingInvoices, invoiceData];
-      }
-      
-      // Save back to localStorage
-      localStorage.setItem('sriLankaInvoices', JSON.stringify(updatedInvoices));
-      await syncInvoiceToExternal(invoiceData);
-      
-      toast.success('Invoice saved successfully');
-      console.log('Invoice saved:', invoiceData);
-      
-      // Navigate to edit page with the saved invoice ID
-      if (!isEditing) {
-        navigate(`/sri-lanka/invoice/edit/${invoiceData.id}`);
+        toast.error('Failed to save invoice');
       }
       
     } catch (error) {

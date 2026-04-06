@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart3, Search, TrendingUp, TrendingDown, FileText, CheckSquare } from "lucide-react";
 import { toast } from "sonner";
+import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
 
 const SriLankaReconciliation = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,10 +19,20 @@ const SriLankaReconciliation = () => {
   const [payments, setPayments] = useState<any[]>([]);
 
   useEffect(() => {
-    try {
-      setInvoices(JSON.parse(localStorage.getItem('sriLankaInvoices') || '[]'));
-      setPayments(JSON.parse(localStorage.getItem('sriLankaPayments') || '[]'));
-    } catch (e) { console.error("Error:", e); }
+    const load = async () => {
+      try {
+        const rows = await RegionalInvoiceService.getByCountry('Sri Lanka');
+        const mapped = rows.map(r => ({
+          id: r.id,
+          invoiceNumber: r.invoice_number,
+          total: String(r.net || 0),
+          pricing: { net: r.net || 0 },
+        }));
+        setInvoices(mapped);
+        setPayments(JSON.parse(localStorage.getItem('sriLankaPayments') || '[]'));
+      } catch (e) { console.error("Error:", e); }
+    };
+    load();
   }, []);
 
   const totalInvoiced = invoices.reduce((sum, inv) => sum + (parseFloat((inv as any).pricing?.net || inv.total || '0')), 0) || 1950.00;
