@@ -11,6 +11,7 @@ interface PackageNameSelectorProps {
   packageOptions: PackageOption[];
   handlePackageSelect: (description: string) => void;
   onOpenManualDialog: () => void;
+  dbPackageTypes?: { id: string; name: string; volume_cbm: number; length_inches: number; width_inches: number; height_inches: number }[];
 }
 
 const PackageNameSelector: React.FC<PackageNameSelectorProps> = ({
@@ -18,6 +19,7 @@ const PackageNameSelector: React.FC<PackageNameSelectorProps> = ({
   packageOptions,
   handlePackageSelect,
   onOpenManualDialog,
+  dbPackageTypes,
 }) => {
   const { language } = useLanguage();
   const [isSelectOpen, setIsSelectOpen] = React.useState(false);
@@ -148,6 +150,22 @@ const PackageNameSelector: React.FC<PackageNameSelectorProps> = ({
                 </SelectItem>
               ))}
             </SelectGroup>
+            
+            {/* Database-stored package types (custom + official SL packages) */}
+            {dbPackageTypes && dbPackageTypes.length > 0 && (
+              <SelectGroup>
+                <SelectLabel className="font-bold text-green-600 pt-2 border-t mt-2">
+                  {language === 'ar' ? "أنواع الطرود المحفوظة" : "📦 Saved Package Types (DB)"}
+                </SelectLabel>
+                {dbPackageTypes
+                  .filter(p => !packageOptions.some(po => po.description === p.name))
+                  .map(pkg => (
+                    <SelectItem key={`db-${pkg.id}`} value={pkg.name}>
+                      {pkg.name} {pkg.volume_cbm > 0 ? `(${pkg.volume_cbm} CBM)` : ''}
+                    </SelectItem>
+                  ))}
+              </SelectGroup>
+            )}
           </SelectContent>
         </Select>
         <Button 

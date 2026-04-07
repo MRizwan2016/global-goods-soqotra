@@ -387,6 +387,48 @@ export type Database = {
         }
         Relationships: []
       }
+      package_types: {
+        Row: {
+          country: string | null
+          created_at: string
+          height_inches: number | null
+          id: string
+          is_default: boolean | null
+          length_inches: number | null
+          name: string
+          updated_at: string
+          volume_cbm: number | null
+          weight_kg: number | null
+          width_inches: number | null
+        }
+        Insert: {
+          country?: string | null
+          created_at?: string
+          height_inches?: number | null
+          id?: string
+          is_default?: boolean | null
+          length_inches?: number | null
+          name: string
+          updated_at?: string
+          volume_cbm?: number | null
+          weight_kg?: number | null
+          width_inches?: number | null
+        }
+        Update: {
+          country?: string | null
+          created_at?: string
+          height_inches?: number | null
+          id?: string
+          is_default?: boolean | null
+          length_inches?: number | null
+          name?: string
+          updated_at?: string
+          volume_cbm?: number | null
+          weight_kg?: number | null
+          width_inches?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           country: string | null
