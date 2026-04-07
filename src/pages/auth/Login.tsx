@@ -113,7 +113,7 @@ const Login = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 p-4 overflow-hidden">
       {/* Decorative background elements */}
-      <div className="absolute inset-0 z-0 bg-[url('/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png')] bg-no-repeat bg-center bg-contain opacity-10 blur-sm"></div>
+      <div className="absolute inset-0 z-0 bg-[url('/lovable-uploads/SOQO_NEW_LOGO.jpeg')] bg-no-repeat bg-center bg-contain opacity-10 blur-sm"></div>
       <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-600/10 to-indigo-600/10 z-0"></div>
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl z-0"></div>
       <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl z-0"></div>
@@ -127,7 +127,7 @@ const Login = () => {
         {/* Logo and header */}
         <div className="text-center mb-8">
           <img 
-            src="/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png" 
+            src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" 
             alt="Soqotra Logo" 
             className="h-24 mx-auto mb-6 drop-shadow-lg animate-fade-in"
           />

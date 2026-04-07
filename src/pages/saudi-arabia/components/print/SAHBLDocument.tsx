@@ -16,7 +16,7 @@ const SAHBLDocument: React.FC<SAHBLDocumentProps> = ({ invoiceData }) => {
       {/* Header */}
       <div className="p-4 border-b-2 border-black text-center">
         <div className="flex items-center justify-between">
-          <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Logo" className="w-28 h-auto" />
+          <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Logo" className="w-28 h-auto" />
           <div className="flex-1">
             <h1 className="text-xl font-bold">HOUSE BILL OF LADING</h1>
             <p className="text-sm font-bold mt-1">SOQOTRA SOLUTIONS WLL - KSA</p>

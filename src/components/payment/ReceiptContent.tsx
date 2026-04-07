@@ -35,7 +35,7 @@ const ReceiptContent: React.FC<ReceiptContentProps> = ({ receiptData, currencySy
 
   return (
     <div className="p-6">
-      <CompanyInfo logo="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" />
+      <CompanyInfo logo="/lovable-uploads/SOQO_NEW_LOGO.jpeg" />
       
       <PaymentDetails
         receiptNumber={receiptData.receiptNumber}

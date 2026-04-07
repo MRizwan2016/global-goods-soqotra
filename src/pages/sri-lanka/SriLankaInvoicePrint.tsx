@@ -32,6 +32,20 @@ const SriLankaInvoicePrint = () => {
         if (result) {
           const inv = result.invoice;
           // Build a compatible invoiceData object for printing
+          const packages = result.packages.map(p => ({
+              id: p.id,
+              description: p.package_name || '',
+              name: p.package_name || '',
+              length: String(p.length || ''),
+              width: String(p.width || ''),
+              height: String(p.height || ''),
+              weight: String(p.weight || ''),
+              volume: p.cubic_metre || 0,
+              quantity: p.quantity || 1,
+              boxNumber: String(p.box_number || ''),
+              price: p.price || 0,
+              total: (p.price || 0) * (p.quantity || 1),
+            }));
           const invoice: any = {
             id: inv.id,
             invoiceNumber: inv.invoice_number,
@@ -43,24 +57,11 @@ const SriLankaInvoicePrint = () => {
             salesRepresentative: inv.sales_representative,
             driverName: inv.driver_name,
             whatsappNumber: inv.whatsapp_number,
-            shipperPrefix: inv.shipper_prefix,
-            shipperName: inv.shipper_name,
-            shipperCountry: inv.shipper_country,
-            shipperCity: inv.shipper_city,
-            shipperAddress: inv.shipper_address,
-            shipperMobile: inv.shipper_mobile,
-            consigneePrefix: inv.consignee_prefix,
-            consigneeName: inv.consignee_name,
-            consigneeCountry: inv.consignee_country,
-            consigneeDistrict: inv.consignee_district,
-            consigneeProvince: inv.consignee_province,
-            consigneeAddress: inv.consignee_address,
-            consigneeMobile: inv.consignee_mobile,
-            consigneeId: inv.consignee_id_number,
             serviceType: inv.service_type,
             destination: inv.destination,
             terminal: inv.terminal,
             warehouse: inv.warehouse,
+            totalWeight: String(inv.total_weight || '0'),
             weight: String(inv.total_weight || ''),
             volume: String(inv.total_volume || ''),
             description: inv.description,
@@ -75,20 +76,24 @@ const SriLankaInvoicePrint = () => {
             paymentDate: inv.payment_date,
             receiptNumber: inv.receipt_number,
             remarks: inv.remarks,
-            packageItems: result.packages.map(p => ({
-              id: p.id,
-              description: p.package_name || '',
-              name: p.package_name || '',
-              length: String(p.length || ''),
-              width: String(p.width || ''),
-              height: String(p.height || ''),
-              weight: String(p.weight || ''),
-              volume: p.volume || String(p.cubic_metre || ''),
-              quantity: p.quantity || 1,
-              boxNumber: String(p.box_number || ''),
-              price: p.price || 0,
-              total: (p.price || 0) * (p.quantity || 1),
-            })),
+            shipper: {
+              name: [inv.shipper_prefix, inv.shipper_name].filter(Boolean).join(' '),
+              address: inv.shipper_address || '',
+              city: inv.shipper_city || '',
+              country: inv.shipper_country || 'QATAR',
+              mobile: inv.shipper_mobile || '',
+            },
+            consignee: {
+              name: [inv.consignee_prefix, inv.consignee_name].filter(Boolean).join(' '),
+              address: inv.consignee_address || '',
+              district: inv.consignee_district || '',
+              province: inv.consignee_province || '',
+              country: inv.consignee_country || 'SRI LANKA',
+              mobile: inv.consignee_mobile || '',
+              idNumber: inv.consignee_id_number || '',
+            },
+            packages: packages,
+            packageItems: packages,
             pricing: {
               gross: inv.gross || 0,
               discount: inv.discount || 0,
@@ -347,7 +352,7 @@ const SriLankaInvoicePrint = () => {
                     <tbody>
                       <tr>
                         <td className="p-2 w-24 align-middle border-r border-black">
-                          <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Soqotra Logo" className="h-14 w-auto object-contain" />
+                          <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Soqotra Logo" className="h-14 w-auto object-contain" />
                         </td>
                         <td className="p-2 align-middle text-xs leading-tight text-center">
                           <div className="font-bold text-sm">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</div>
@@ -525,7 +530,7 @@ const SriLankaInvoicePrint = () => {
                 {/* HBL Header */}
                 <div className="border-b-2 border-black pb-3 mb-4">
                   <div className="flex items-center justify-between">
-                    <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Soqotra Logo" className="h-12 w-auto object-contain" />
+                    <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Soqotra Logo" className="h-12 w-auto object-contain" />
                     <div className="text-center flex-1">
                       <div className="text-xs font-semibold">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</div>
                       <h1 className="text-xl font-bold mt-1">HOUSE BILL OF LADING (HBL)</h1>

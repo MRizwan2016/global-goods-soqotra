@@ -70,7 +70,7 @@ const PublicTrackTrace = () => {
       {/* Header */}
       <header className="bg-[#1a365d] border-b border-white/10 py-4 px-6">
         <div className="max-w-5xl mx-auto flex items-center gap-3">
-          <img src="/lovable-uploads/0cc8e06c-f4fc-44ee-8e5c-4effd61273ec.png" alt="Logo" className="h-10 w-10 object-contain" />
+          <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Logo" className="h-10 w-10 object-contain" />
           <div>
             <h1 className="text-white text-lg font-bold tracking-wide">SOQOTRA LOGISTICS</h1>
             <p className="text-white/60 text-xs">Track & Trace</p>

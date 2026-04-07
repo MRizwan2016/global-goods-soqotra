@@ -21,7 +21,7 @@ const SLReceiptDocument: React.FC<SLReceiptDocumentProps> = ({ invoiceData }) =>
       {/* Header */}
       <div className="p-3 border-b-2 border-black text-center">
         <div className="flex items-center justify-between px-2">
-          <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Logo" className="w-20 h-auto" />
+          <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Logo" className="w-20 h-auto" />
           <div className="flex-1 px-2">
             <h1 className="text-base font-bold">PAYMENT RECEIPT</h1>
             <p className="text-[8pt] font-bold">SOQOTRA LOGISTICS SERVICES WLL</p>

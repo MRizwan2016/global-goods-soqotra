@@ -38,7 +38,7 @@ const SACargoManifestDocument: React.FC<SACargoManifestDocumentProps> = ({ invoi
     <div style={{ fontFamily: "Arial, sans-serif", fontSize: "9pt" }}>
       {/* Header */}
       <div className="flex items-center justify-between p-3 border-b-2 border-black">
-        <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Logo" className="w-28 h-auto" />
+        <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Logo" className="w-28 h-auto" />
         <div className="text-center flex-1">
           <h1 className="text-lg font-bold">CARGO MANIFEST</h1>
           <p className="text-sm font-bold">SOQOTRA SOLUTIONS WLL - KSA</p>
