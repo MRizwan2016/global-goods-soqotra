@@ -131,25 +131,30 @@ const SaudiArabiaSavedInvoices = () => {
         </div>
 
         {/* Table */}
-        <div className="rounded-md border">
+        <div className="rounded-md border overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow className="bg-[#006c35] hover:bg-[#006c35]">
                 <TableHead className="text-white">#</TableHead>
                 <TableHead className="text-white">INVOICE #</TableHead>
+                <TableHead className="text-white">JOB #</TableHead>
                 <TableHead className="text-white">DATE</TableHead>
-                <TableHead className="text-white">CUSTOMER</TableHead>
-                <TableHead className="text-white">PACKAGES</TableHead>
-                <TableHead className="text-white">WEIGHT (KG)</TableHead>
-                <TableHead className="text-white">VOLUME (CBM)</TableHead>
-                <TableHead className="text-white">NET (SAR)</TableHead>
+                <TableHead className="text-white">BOOK #</TableHead>
+                <TableHead className="text-white">PAGE #</TableHead>
+                <TableHead className="text-white">SALES REP</TableHead>
+                <TableHead className="text-white">DRIVER</TableHead>
+                <TableHead className="text-white">SHIPPER</TableHead>
+                <TableHead className="text-white">CONSIGNEE</TableHead>
+                <TableHead className="text-white">SERVICE</TableHead>
+                <TableHead className="text-white">TOTAL (SAR)</TableHead>
+                <TableHead className="text-white">WHATSAPP</TableHead>
                 <TableHead className="text-white">ACTIONS</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredInvoices.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={14} className="text-center py-8 text-muted-foreground">
                     {invoices.length === 0 ? "No saved invoices yet. Create your first invoice!" : "No matching invoices found"}
                   </TableCell>
                 </TableRow>
@@ -158,12 +163,27 @@ const SaudiArabiaSavedInvoices = () => {
                   <TableRow key={inv.id || idx} className="hover:bg-gray-50">
                     <TableCell>{idx + 1}</TableCell>
                     <TableCell className="font-medium text-[#006c35]">{inv.invoiceNumber || inv.id}</TableCell>
+                    <TableCell>{inv.jobNumber || '-'}</TableCell>
                     <TableCell>{inv.invoiceDate ? new Date(inv.invoiceDate).toLocaleDateString('en-GB') : "-"}</TableCell>
+                    <TableCell className="font-medium">{inv.bookNumber || '-'}</TableCell>
+                    <TableCell className="font-medium">{inv.pageNumber || '-'}</TableCell>
+                    <TableCell>{inv.salesRep || '-'}</TableCell>
+                    <TableCell>{inv.driverName || '-'}</TableCell>
+                    <TableCell>{inv.shipperName || '-'}</TableCell>
                     <TableCell className="font-medium">{inv.consigneeName || inv.customer || "-"}</TableCell>
-                    <TableCell>{inv.totalPackages || 0}</TableCell>
-                    <TableCell>{(inv.totalWeight || 0).toFixed(2)}</TableCell>
-                    <TableCell>{(inv.totalVolume || 0).toFixed(2)}</TableCell>
-                    <TableCell className="font-medium">{(inv.net || inv.netAmount || 0).toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-xs">{inv.serviceType || 'SEA'}</Badge>
+                    </TableCell>
+                    <TableCell className="font-medium">SAR {(inv.net || inv.netAmount || 0).toFixed(2)}</TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="sm" className="text-green-600 p-1" onClick={() => {
+                        const phone = (inv.whatsappNumber || '').replace(/[^0-9+]/g, '');
+                        const msg = `📄 Invoice #${inv.invoiceNumber}\nShipper: ${inv.shipperName || '-'}\nConsignee: ${inv.consigneeName || '-'}\nTotal: SAR ${(inv.net || 0).toFixed(2)}\n\nSOQOTRA SOLUTIONS WLL`;
+                        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+                      }}>
+                        <MessageCircle className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="sm" className="text-blue-600 p-1" onClick={() => navigate(`/saudi-arabia/invoice/edit/${inv.id || inv.invoiceNumber}`)}>
