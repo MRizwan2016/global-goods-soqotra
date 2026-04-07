@@ -90,7 +90,7 @@ const SudanInvoicePrint = () => {
             {/* Logo - Top left corner, very large */}
             <div className="flex justify-start mb-6">
               <img 
-                src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
+                src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" 
                 alt="Soqotra Logo" 
                 className="w-[550px] h-auto object-contain"
                 style={{ 

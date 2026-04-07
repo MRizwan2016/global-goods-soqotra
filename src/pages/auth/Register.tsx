@@ -84,7 +84,7 @@ const Register = () => {
       <div className="bg-[#1976d2] text-white py-8 text-center">
         <div className="container mx-auto px-4">
           <img 
-            src="/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png"
+            src="/lovable-uploads/SOQO_NEW_LOGO.jpeg"
             alt="Soqotra Logo" 
             className="h-20 mx-auto mb-4 bg-white p-2 rounded"
           />

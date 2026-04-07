@@ -241,7 +241,7 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
           {/* Header */}
           <div className="text-center border-b border-black pb-3 mb-3">
             <div className="flex justify-between items-center">
-              <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Logo" className="h-12 w-16 object-contain" />
+              <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Logo" className="h-12 w-16 object-contain" />
               <div>
                 <h1 className="text-lg font-bold">AIR FREIGHT MANIFEST</h1>
                 <p className="text-sm">ALMARAAM LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>

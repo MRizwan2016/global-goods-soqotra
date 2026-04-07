@@ -347,7 +347,7 @@ const SriLankaInvoicePrint = () => {
                     <tbody>
                       <tr>
                         <td className="p-2 w-24 align-middle border-r border-black">
-                          <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Soqotra Logo" className="h-14 w-auto object-contain" />
+                          <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Soqotra Logo" className="h-14 w-auto object-contain" />
                         </td>
                         <td className="p-2 align-middle text-xs leading-tight text-center">
                           <div className="font-bold text-sm">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</div>
@@ -525,7 +525,7 @@ const SriLankaInvoicePrint = () => {
                 {/* HBL Header */}
                 <div className="border-b-2 border-black pb-3 mb-4">
                   <div className="flex items-center justify-between">
-                    <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Soqotra Logo" className="h-12 w-auto object-contain" />
+                    <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Soqotra Logo" className="h-12 w-auto object-contain" />
                     <div className="text-center flex-1">
                       <div className="text-xs font-semibold">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</div>
                       <h1 className="text-xl font-bold mt-1">HOUSE BILL OF LADING (HBL)</h1>

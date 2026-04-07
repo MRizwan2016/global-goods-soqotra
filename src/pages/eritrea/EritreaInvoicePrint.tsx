@@ -258,7 +258,7 @@ const EritreaInvoicePrint = () => {
               {/* Logo */}
               <div style={{ width: '150px', marginRight: '20px' }}>
                 <img 
-                  src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
+                  src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" 
                   alt="Soqotra Logo" 
                   style={{ width: '100%', height: 'auto', fontSize: '25px' }}
                 />

@@ -15,7 +15,7 @@ const SAInvoiceDocument: React.FC<SAInvoiceDocumentProps> = ({ invoiceData }) =>
       {/* Header */}
       <div className="relative p-4 border-b-2 border-black">
         <div className="absolute top-2 left-2">
-          <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Logo" className="w-36 h-auto" />
+          <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Logo" className="w-36 h-auto" />
         </div>
         <div className="text-center pt-6">
           <h1 className="text-lg font-bold">SOQOTRA SOLUTIONS WLL</h1>

@@ -72,7 +72,7 @@ const HouseBillOfLadingDocument: React.FC<HouseBillOfLadingProps> = ({ blData })
         {/* Header with Logo */}
         <div className="text-center border-b-2 border-black pb-2 mb-3">
           <div className="flex justify-center mb-2">
-            <img src="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" alt="Soqotra Logo" className="h-12" />
+            <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Soqotra Logo" className="h-12" />
           </div>
           <p className="text-xs mb-1">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>
           <h1 className="text-xl font-bold">HOUSE BILL OF LADING (H-BL)</h1>

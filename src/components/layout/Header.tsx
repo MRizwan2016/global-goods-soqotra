@@ -27,7 +27,7 @@ const Header = ({ title }: { title: string }) => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-6 flex-1">
           <img 
-            src="/lovable-uploads/10e20b91-b031-4e79-840f-238128cec5b4.png" 
+            src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" 
             alt="SOQOTRA LOGO" 
             className="h-12 w-auto cursor-pointer transition-opacity hover:opacity-80"
             onClick={handleLogoClick}

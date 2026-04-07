@@ -144,7 +144,7 @@ const NewCollectionDeliverySchedule: React.FC = () => {
           <div className="flex items-start p-4">
             <div className="w-32 mr-4">
               <img 
-                src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" 
+                src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" 
                 alt="Soqotra Logo" 
                 className="w-full h-auto"
               />

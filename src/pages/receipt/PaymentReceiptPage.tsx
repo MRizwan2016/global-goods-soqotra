@@ -18,7 +18,7 @@ const PaymentReceiptPage: React.FC = () => {
         {/* Logo */}
         <div className="flex justify-center mb-2">
           <img 
-            src="/lovable-uploads/09288c32-edf3-48e9-9839-a23ae45397ae.png" 
+            src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" 
             alt="Soqotra Logo" 
             className="h-28 object-contain"
           />

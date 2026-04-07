@@ -72,7 +72,7 @@ const SriLankaHAWB: React.FC<HAWBProps> = ({ invoiceData, onPrint }) => {
           <div className="border-b border-black p-4">
             <div className="flex justify-between items-center">
               <div>
-                <img src="/lovable-uploads/81c06014-f31f-4df1-9773-d03c1d480c1f.png" alt="Almaraam Logo" className="h-16 w-24 object-contain" />
+                <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Almaraam Logo" className="h-16 w-24 object-contain" />
               </div>
               <div className="text-center">
                 <h1 className="text-xl font-bold">HOUSE AIR WAYBILL (HAWB)</h1>
