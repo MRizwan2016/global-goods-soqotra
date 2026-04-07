@@ -150,6 +150,22 @@ const PackageNameSelector: React.FC<PackageNameSelectorProps> = ({
                 </SelectItem>
               ))}
             </SelectGroup>
+            
+            {/* Database-stored package types (custom + official SL packages) */}
+            {dbPackageTypes && dbPackageTypes.length > 0 && (
+              <SelectGroup>
+                <SelectLabel className="font-bold text-green-600 pt-2 border-t mt-2">
+                  {language === 'ar' ? "أنواع الطرود المحفوظة" : "📦 Saved Package Types (DB)"}
+                </SelectLabel>
+                {dbPackageTypes
+                  .filter(p => !packageOptions.some(po => po.description === p.name))
+                  .map(pkg => (
+                    <SelectItem key={`db-${pkg.id}`} value={pkg.name}>
+                      {pkg.name} {pkg.volume_cbm > 0 ? `(${pkg.volume_cbm} CBM)` : ''}
+                    </SelectItem>
+                  ))}
+              </SelectGroup>
+            )}
           </SelectContent>
         </Select>
         <Button 
