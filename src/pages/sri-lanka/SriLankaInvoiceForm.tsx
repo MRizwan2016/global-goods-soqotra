@@ -1550,6 +1550,7 @@ const SriLankaInvoiceForm = () => {
                 handleAddPackage={handleAddPackage}
                 packageItems={packageItems}
                 handleRemovePackage={handleRemovePackage}
+                dbPackageTypes={dbPackageTypes}
               />
               
               {/* Volume and Weight Information */}
