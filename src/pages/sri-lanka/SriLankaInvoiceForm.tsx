@@ -377,12 +377,24 @@ const SriLankaInvoiceForm = () => {
         volume = 0;
       }
       
+      // Auto-fill weight: 1 CBM = 1000 KG
+      const weight = volume * 1000;
+      // Auto doc fee: CBM >= 1.0 → QAR 50
+      const docFee = volume >= 1.0 ? 50 : 0;
+      // Auto price based on warehouse rate
+      const warehouse = formData.warehouse || 'Colombo Warehouse';
+      const rate = warehouse.includes('Kurunegala') || warehouse.includes('Galle') ? 269 : 259;
+      const price = volume * rate;
+      
       setFormData(prev => ({
         ...prev,
-        volume: volume.toFixed(4)
+        volume: volume.toFixed(4),
+        weight: weight.toFixed(1),
+        documentsFee: docFee.toString(),
+        price: price.toFixed(2),
       }));
     }
-  }, [formData.length, formData.width, formData.height, formData.serviceType]);
+  }, [formData.length, formData.width, formData.height, formData.serviceType, formData.warehouse]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
