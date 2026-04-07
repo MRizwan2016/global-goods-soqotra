@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Edit, Eye, Trash2, FileText, Save, Briefcase } from "lucide-react";
+import { Plus, Search, Edit, Eye, Trash2, FileText, Save, Briefcase, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
 
