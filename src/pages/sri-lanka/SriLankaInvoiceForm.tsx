@@ -94,6 +94,9 @@ const SriLankaInvoiceForm = () => {
   const [dbBooks, setDbBooks] = useState<any[]>([]);
   const [availablePages, setAvailablePages] = useState<string[]>([]);
 
+  // Database-driven package types
+  const [dbPackageTypes, setDbPackageTypes] = useState<any[]>([]);
+
   // Load Sri Lanka invoice books from database
   useEffect(() => {
     const fetchBooks = async () => {
