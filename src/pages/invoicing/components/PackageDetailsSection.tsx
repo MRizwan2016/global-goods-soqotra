@@ -14,6 +14,7 @@ interface PackageDetailsSectionProps {
   handleAddPackage: () => void;
   packageItems: PackageItem[];
   handleRemovePackage: (id: string) => void;
+  dbPackageTypes?: any[];
 }
 
 const PackageDetailsSection: React.FC<PackageDetailsSectionProps> = ({
@@ -25,6 +26,7 @@ const PackageDetailsSection: React.FC<PackageDetailsSectionProps> = ({
   handleAddPackage,
   packageItems,
   handleRemovePackage,
+  dbPackageTypes,
 }) => {
   return (
     <div className="mt-8">
@@ -40,6 +42,7 @@ const PackageDetailsSection: React.FC<PackageDetailsSectionProps> = ({
         handleManualPackage={handleManualPackage}
         handleAddPackage={handleAddPackage}
         packageItems={packageItems}
+        dbPackageTypes={dbPackageTypes}
       />
       
       <PackageList 
