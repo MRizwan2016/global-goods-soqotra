@@ -640,41 +640,70 @@ const SriLankaInvoiceForm = () => {
 
   // Package handlers
   const handlePackageSelect = (description: string) => {
+    // First check DB package types
+    const dbPkg = dbPackageTypes.find(p => p.name === description);
+    if (dbPkg) {
+      const volume = dbPkg.volume_cbm || 0;
+      const weight = volume * 1000; // 1 CBM = 1000 KG
+      const warehouse = formData.warehouse || 'Colombo Warehouse';
+      const rate = warehouse.includes('Kurunegala') || warehouse.includes('Galle') ? 269 : 259;
+      
+      // Check for door-to-door fixed rate
+      const fixedRate = DOOR_TO_DOOR_FIXED_RATES[description];
+      const price = fixedRate || (volume * rate);
+      const docFee = volume >= 1.0 ? 50 : 0;
+      
+      setFormData(prev => ({
+        ...prev,
+        packagesName: description,
+        description: 'PERSONAL EFFECTS',
+        length: String(dbPkg.length_inches || ''),
+        width: String(dbPkg.width_inches || ''),
+        height: String(dbPkg.height_inches || ''),
+        volume: volume.toFixed(4),
+        weight: weight.toFixed(1),
+        price: price.toFixed(2),
+        documentsFee: docFee.toString(),
+      }));
+      return;
+    }
+    
+    // Fallback to old packageOptions
     const selectedPackage = packageOptions.find(pkg => pkg.description === description);
     if (selectedPackage) {
-      // Calculate volume from dimensions based on service type
       let volume: number;
       if (formData.serviceType === 'AIR FREIGHT') {
-        // Air freight: dimensions in CM
         volume = calculateVolumeCBM(
           selectedPackage.dimensions.length,
           selectedPackage.dimensions.width, 
           selectedPackage.dimensions.height
         );
-      } else if (formData.serviceType === 'SEA FREIGHT') {
-        // Sea freight: dimensions in Inches
+      } else {
         volume = calculateVolumeCBMFromInches(
           selectedPackage.dimensions.length,
           selectedPackage.dimensions.width, 
           selectedPackage.dimensions.height
         );
-      } else {
-        volume = 0;
       }
       
-      // Calculate weight from volume (assuming 1 CBM = 167 kg for air freight)
-      const estimatedWeight = volume * 167;
+      const weight = volume * 1000; // 1 CBM = 1000 KG
+      const docFee = volume >= 1.0 ? 50 : 0;
+      const fixedRate = DOOR_TO_DOOR_FIXED_RATES[description];
+      const warehouse = formData.warehouse || 'Colombo Warehouse';
+      const rate = warehouse.includes('Kurunegala') || warehouse.includes('Galle') ? 269 : 259;
+      const price = fixedRate || (volume * rate);
       
       setFormData(prev => ({
         ...prev,
         packagesName: selectedPackage.description,
-        description: 'PERSONAL EFFECTS', // Default description
+        description: 'PERSONAL EFFECTS',
         length: selectedPackage.dimensions.length.toString(),
         width: selectedPackage.dimensions.width.toString(),
         height: selectedPackage.dimensions.height.toString(),
         volume: volume.toFixed(4),
-        weight: estimatedWeight.toFixed(1),
-        price: selectedPackage.pricing.sriLanka.price.toString()
+        weight: weight.toFixed(1),
+        price: price.toFixed(2),
+        documentsFee: docFee.toString(),
       }));
     }
   };
