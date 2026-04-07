@@ -122,6 +122,24 @@ const SriLankaInvoiceForm = () => {
     fetchBooks();
   }, []);
 
+  // Load package types from Supabase
+  useEffect(() => {
+    const fetchPackageTypes = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('package_types')
+          .select('*')
+          .order('name');
+        if (!error && data) {
+          setDbPackageTypes(data);
+        }
+      } catch (err) {
+        console.error('Error loading package types:', err);
+      }
+    };
+    fetchPackageTypes();
+  }, []);
+
   // Auto-fill when book number changes - lookup from DB
   const handleBookNumberChange = useCallback((bookNum: string) => {
     setFormData(prev => ({ ...prev, bookNumber: bookNum }));
