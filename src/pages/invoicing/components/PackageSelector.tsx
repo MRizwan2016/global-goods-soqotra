@@ -16,6 +16,7 @@ interface PackageSelectorProps {
   handleManualPackage?: (packageName: string, price: string, dimensions?: string, volume?: string, pricingType?: string, docsFee?: string) => void;
   handleAddPackage: () => void;
   packageItems: PackageItem[];
+  dbPackageTypes?: any[];
 }
 
 const PackageSelector: React.FC<PackageSelectorProps> = ({
@@ -26,6 +27,7 @@ const PackageSelector: React.FC<PackageSelectorProps> = ({
   handleManualPackage,
   handleAddPackage,
   packageItems,
+  dbPackageTypes,
 }) => {
   const [showManualDialog, setShowManualDialog] = useState(false);
 
@@ -42,6 +44,7 @@ const PackageSelector: React.FC<PackageSelectorProps> = ({
         packageOptions={packageOptions}
         handlePackageSelect={handlePackageSelect}
         onOpenManualDialog={() => setShowManualDialog(true)}
+        dbPackageTypes={dbPackageTypes}
       />
       
       <PriceFields 
