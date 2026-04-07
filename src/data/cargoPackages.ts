@@ -75,25 +75,63 @@ export const cargoCollectionPackages: CargoPackage[] = [
   makePackage(11, "WOODEN BOX - 1.5 METER / LONG", 59, 39, 39, 350.00, 470.00),
   makePackage(12, "WOODEN BOX - 2 METER", 48, 48, 48, 380.00, 500.00),
   makePackage(13, "WOODEN BOX - 2 METER / LONG", 78, 39, 39, 430.00, 550.00),
-  makePackage(14, "WOODEN BOX - 2.5 METER", 60, 48, 48, 450.00, 600.00),
-  makePackage(15, "WOODEN BOX - 3 METER", 78, 48, 48, 520.00, 630.00),
-  makePackage(16, "WOODEN BOX - 4 METER", 48, 48, 96, 580.00, 730.00),
-  makePackage(17, "PLASTIC DRUM", 22, 22, 34, 120.00, 0),
-  makePackage(18, "PLASTIC TANK", 48, 39, 38, 0, 0),
-  makePackage(19, "PLASTIC DRUM - BIG", 23, 23, 36, 90.00, 0),
+  makePackage(14, "WOODEN BOX - 3 METER", 78, 48, 48, 520.00, 630.00),
+  makePackage(15, "WOODEN BOX - 4 METER", 48, 48, 96, 580.00, 730.00),
+  makePackage(16, "PLASTIC DRUM", 22, 22, 34, 120.00, 0),
+  makePackage(17, "PLASTIC TANK", 48, 39, 38, 0, 0),
+  makePackage(18, "PLASTIC DRUM - BIG", 23, 23, 36, 90.00, 0),
   // Blank items - manual dimensions required
-  makePackage(20, "TELEVISION - 55 INCH", 0, 0, 0, 0, 0, true),
-  makePackage(21, "TELEVISION - 65 INCH", 0, 0, 0, 0, 0, true),
-  makePackage(22, "REFRIDGERATOR - 450 LITER", 0, 0, 0, 0, 0, true),
-  makePackage(23, "REFRIDGERATOR - 500 LITER", 0, 0, 0, 0, 0, true),
-  makePackage(24, "REFRIDGERATOR - 550 LITER", 0, 0, 0, 0, 0, true),
-  makePackage(25, "REFRIDGERATOR - 600 LITER", 0, 0, 0, 0, 0, true),
-  makePackage(26, "MATTRESS", 0, 0, 0, 0, 0, true),
-  makePackage(27, "MATTRESS BUNDLE", 0, 0, 0, 0, 0, true),
-  makePackage(28, "SOFA SET", 0, 0, 0, 0, 0, true),
-  makePackage(29, "STEEL BED", 0, 0, 0, 0, 0, true),
-  makePackage(30, "BED BUNDLE", 0, 0, 0, 0, 0, true),
+  makePackage(19, "TELEVISION - 55 INCH", 0, 0, 0, 0, 0, true),
+  makePackage(20, "TELEVISION - 65 INCH", 0, 0, 0, 0, 0, true),
+  makePackage(21, "REFRIDGERATOR - 450 LITER", 0, 0, 0, 0, 0, true),
+  makePackage(22, "REFRIDGERATOR - 500 LITER", 0, 0, 0, 0, 0, true),
+  makePackage(23, "REFRIDGERATOR - 550 LITER", 0, 0, 0, 0, 0, true),
+  makePackage(24, "REFRIDGERATOR - 600 LITER", 0, 0, 0, 0, 0, true),
+  makePackage(25, "MATTRESS", 0, 0, 0, 0, 0, true),
+  makePackage(26, "MATTRESS BUNDLE", 0, 0, 0, 0, 0, true),
+  makePackage(27, "SOFA SET", 0, 0, 0, 0, 0, true),
+  makePackage(28, "STEEL BED", 0, 0, 0, 0, 0, true),
+  makePackage(29, "BED BUNDLE", 0, 0, 0, 0, 0, true),
 ];
+
+// Fixed volume overrides from the official reference sheet (CBM values)
+const VOLUME_OVERRIDES: Record<string, number> = {
+  "CARTON BOX - SMALL": 0.134,
+  "CARTON BOX - MEDIUM": 0.176,
+  "CARTON BOX - LARGE": 0.204,
+  "CARTON BOX - EXTRA LARGE": 0.290,
+  "CARTON BOX - JUMBO": 0.251,
+  "CARTON BOX - SUPER JUMBO": 0.453,
+  "CARTON BOX - BULILIT": 0.046,
+  "WOODEN BOX - HALF METER": 0.464,
+  "WOODEN BOX - 1 METER": 0.902,
+  "WOODEN BOX - 1.5 METER": 1.391,
+  "WOODEN BOX - 1.5 METER / LONG": 1.505,
+  "WOODEN BOX - 2 METER": 1.855,
+  "WOODEN BOX - 2 METER / LONG": 1.990,
+  "WOODEN BOX - 3 METER": 3.014,
+  "WOODEN BOX - 4 METER": 3.710,
+  "PLASTIC DRUM": 0.276,
+  "PLASTIC TANK": 1.193,
+  "PLASTIC DRUM - BIG": 0.319,
+};
+
+// Apply official volume overrides
+cargoCollectionPackages.forEach(pkg => {
+  if (VOLUME_OVERRIDES[pkg.name]) {
+    pkg.volume = VOLUME_OVERRIDES[pkg.name];
+    // Recalculate collection prices with correct volume
+    pkg.collectionPrices.colombo = calcPriceByRate(pkg.volume, COLOMBO_RATE);
+    pkg.collectionPrices.kurunegala = calcPriceByRate(pkg.volume, KURUNEGALA_RATE);
+    pkg.collectionPrices.galle = calcPriceByRate(pkg.volume, GALLE_RATE);
+  }
+});
+
+// Door-to-door fixed rates for small/medium cartons
+export const DOOR_TO_DOOR_FIXED_RATES: Record<string, number> = {
+  "CARTON BOX - SMALL": 260,   // Fixed QAR 260
+  "CARTON BOX - MEDIUM": 285,  // Fixed QAR 285
+};
 
 // Destination rates for collection price calculation
 export const destinationRates: Record<string, number> = {
