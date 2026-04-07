@@ -11,6 +11,7 @@ interface PackageNameSelectorProps {
   packageOptions: PackageOption[];
   handlePackageSelect: (description: string) => void;
   onOpenManualDialog: () => void;
+  dbPackageTypes?: { id: string; name: string; volume_cbm: number; length_inches: number; width_inches: number; height_inches: number }[];
 }
 
 const PackageNameSelector: React.FC<PackageNameSelectorProps> = ({
@@ -18,6 +19,7 @@ const PackageNameSelector: React.FC<PackageNameSelectorProps> = ({
   packageOptions,
   handlePackageSelect,
   onOpenManualDialog,
+  dbPackageTypes,
 }) => {
   const { language } = useLanguage();
   const [isSelectOpen, setIsSelectOpen] = React.useState(false);
