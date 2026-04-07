@@ -22,11 +22,23 @@ const SaudiArabiaSavedInvoices = () => {
         const mapped = rows.map(r => ({
           id: r.id,
           invoiceNumber: r.invoice_number,
+          jobNumber: r.job_number || '',
+          bookNumber: r.book_number || '',
+          pageNumber: r.page_number || '',
+          invoiceDate: r.invoice_date || '',
+          salesRep: r.sales_representative || '',
+          driverName: r.driver_name || '',
+          shipperName: r.shipper_name || '',
           consigneeName: r.consignee_name || '',
           customer: r.consignee_name || r.shipper_name || '',
-          date: r.invoice_date || '',
+          serviceType: r.service_type || '',
+          whatsappNumber: r.whatsapp_number || '',
+          totalPackages: r.total_packages || 0,
+          totalWeight: r.total_weight || 0,
+          totalVolume: r.total_volume || 0,
           net: r.net || 0,
           netAmount: r.net || 0,
+          date: r.invoice_date || '',
         }));
         setInvoices(mapped);
       } catch (e) {
