@@ -27,6 +27,7 @@ import {
 } from './utils/districtProvinceMapping';
 import { syncInvoiceToExternal } from '@/lib/externalSync';
 import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
+import { DOOR_TO_DOOR_FIXED_RATES } from '@/data/cargoPackages';
 
 const SriLankaInvoiceForm = () => {
   const navigate = useNavigate();
