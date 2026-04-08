@@ -223,8 +223,8 @@ const SriLankaHAWB: React.FC<HAWBProps> = ({ invoiceData, onPrint }) => {
             
             <div className="w-1/2 p-3">
               <div className="font-bold text-sm mb-2">AGENT DETAILS:</div>
-              <div className="text-sm">Agent: ALMARAAM LOGISTICS</div>
-              <div className="text-sm">Code: AL001</div>
+              <div className="text-sm">Agent: SOQOTRA LOGISTICS</div>
+              <div className="text-sm">Code: SQ001</div>
               <div className="text-sm">License: LL/2024/001</div>
               <div className="mt-8 border-t border-black pt-2 text-center text-sm">
                 AGENT STAMP & SIGNATURE

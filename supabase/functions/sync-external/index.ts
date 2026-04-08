@@ -385,7 +385,7 @@ Deno.serve(async (req) => {
         if (table === "manage_invoice_book_stock") {
           result = await syncLegacyInvoiceBookTables(externalClient, action, record || {}, match_column, match_value);
         } else {
-          result = await externalClient.from(table).update(record).eq(match_column, match_value);
+          result = await externalClient.from(table).update(record as any).eq(match_column, match_value);
         }
         break;
       case "delete":
