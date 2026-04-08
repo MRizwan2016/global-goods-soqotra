@@ -74,7 +74,7 @@ const SriLankaSeaManifest: React.FC<SeaManifestProps> = ({ shipments, vesselInfo
         <div className="border border-black p-3">
           <div className="text-center border-b border-black pb-3 mb-3">
             <h1 className="text-lg font-bold">SEA FREIGHT MANIFEST</h1>
-            <p className="text-sm">ALMARAAM LOGISTICS SERVICES</p>
+            <p className="text-sm">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>
             <div className="text-right text-xs">
               <div>Manifest No: {manifestNumber}</div>
               <div>Date: {new Date().toLocaleDateString()}</div>

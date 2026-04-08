@@ -60,7 +60,7 @@ const EritreaHBLDocument: React.FC<EritreaHBLDocumentProps> = ({ hbl }) => {
             <h2 className="text-lg font-bold mb-2">AL MARAAM CARGO COMPANY</h2>
             <p className="text-sm">P.O. Box 23135, Doha, Qatar</p>
             <p className="text-sm">Tel: +974 4460 4664</p>
-            <p className="text-sm">Email: accounts@almaraamcc.com</p>
+            <p className="text-sm">Email: accounts@soqotralogistics.com</p>
           </div>
           <div className="text-right">
             <div className="border border-black p-2">

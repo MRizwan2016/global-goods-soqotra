@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -252,25 +254,26 @@ const SriLankaCollectionDelivery = () => {
 
         {pages.map((pageJobs, pageIdx) => (
           <div key={pageIdx} className={pageIdx > 0 ? "page-break" : ""}>
-            {/* Header with QR Code */}
+            {/* Header with Logo and QR Code */}
             <div className="flex justify-between items-start mb-2">
+              <div className="w-[120px] flex-shrink-0">
+                <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Soqotra Logo" className="h-20 w-28 object-contain" />
+              </div>
               <div className="flex-1 text-center">
                 <h1 className="text-sm font-bold underline">
-                  COLLECTION/ DELIVERY JOB SHEET [ SCHEDULE NO: {lastScheduleData.scheduleNumber} ] - [ALMARAAM LOGISTICS SERVICES & ]
+                  COLLECTION/ DELIVERY JOB SHEET [ SCHEDULE NO: {lastScheduleData.scheduleNumber} ] — [ SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL ]
                 </h1>
                 <p className="text-xs mt-1">Printed Time: {printTime}</p>
               </div>
-              {pageIdx === 0 && (
-                <div className="flex flex-col items-center ml-4">
-                  <QRCodeSVG
-                    value={`${window.location.origin}/schedules/display/${lastScheduleData.scheduleId || ""}?schedule=${lastScheduleData.scheduleNumber}&verified=true`}
-                    size={80}
-                    level="M"
-                    includeMargin={false}
-                  />
-                  <p className="text-[8px] text-gray-500 mt-0.5">Scan for Details</p>
-                </div>
-              )}
+              <div className="flex flex-col items-center ml-4 flex-shrink-0">
+                <QRCodeSVG
+                  value={`${window.location.origin}/schedules/display/${lastScheduleData.scheduleId || ""}?schedule=${lastScheduleData.scheduleNumber}&verified=true`}
+                  size={80}
+                  level="M"
+                  includeMargin={false}
+                />
+                <p className="text-[8px] text-gray-500 mt-0.5">Scan for Details</p>
+              </div>
             </div>
 
             {/* Schedule Info Table */}
@@ -408,6 +411,37 @@ const SriLankaCollectionDelivery = () => {
     );
   };
 
+  // Generate PDF from schedule and share via WhatsApp
+  const handleScheduleWhatsAppPDF = useCallback(async () => {
+    const el = printRef.current?.querySelector('.print-schedule-content') as HTMLElement || printRef.current;
+    if (!el) { toast.error("Nothing to share"); return; }
+    toast.info("Generating PDF...");
+    try {
+      const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+      const imgData = canvas.toDataURL('image/jpeg', 0.85);
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      const pdfW = pdf.internal.pageSize.getWidth();
+      const pdfH = pdf.internal.pageSize.getHeight();
+      const imgRatio = canvas.width / canvas.height;
+      let w = pdfW - 10, h = w / imgRatio;
+      if (h > pdfH - 10) { h = pdfH - 10; w = h * imgRatio; }
+      pdf.addImage(imgData, 'JPEG', 5, 5, w, h);
+      const blob = pdf.output('blob');
+      const file = new File([blob], `Schedule_${lastScheduleData?.scheduleNumber || ''}.pdf`, { type: 'application/pdf' });
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: `Schedule ${lastScheduleData?.scheduleNumber}` });
+      } else {
+        // Fallback: download + open WhatsApp with text summary
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = file.name; a.click();
+        URL.revokeObjectURL(url);
+        const msg = encodeURIComponent(`📋 *SCHEDULE: ${lastScheduleData?.scheduleNumber}*\n📅 ${lastScheduleData?.date}\n🚛 ${lastScheduleData?.vehicle}\n👤 ${lastScheduleData?.driver}\nPDF downloaded — please attach to this chat.\n— Soqotra Logistics`);
+        window.open(`https://wa.me/?text=${msg}`, '_blank');
+      }
+      toast.success("PDF ready for sharing!");
+    } catch (err) { console.error(err); toast.error("Failed to generate PDF"); }
+  }, [lastScheduleData]);
+
   // If showing print schedule, render only that
   if (showPrintSchedule && lastScheduleData) {
     return (
@@ -422,32 +456,14 @@ const SriLankaCollectionDelivery = () => {
           <Button
             variant="outline"
             className="text-green-600 border-green-300 hover:bg-green-50"
-            onClick={() => {
-              if (!lastScheduleData) return;
-              const sJobs = lastScheduleData.jobs || [];
-              const jobLines = sJobs.map((j: any, i: number) => {
-                return `${i + 1}. ${j.jobNumber || j.id} - ${j.customer || "N/A"} (${(j.type || j.jobType || "COLLECTION").toUpperCase()})`;
-              }).join("\n");
-              const msg = [
-                `📋 *SCHEDULE: ${lastScheduleData.scheduleNumber}*`,
-                `📅 Date: ${lastScheduleData.date}`,
-                `🚛 Vehicle: ${lastScheduleData.vehicle}`,
-                `🚗 Driver: ${lastScheduleData.driver}`,
-                `👤 Sales Rep: ${lastScheduleData.salesRep}`,
-                `📦 Total Jobs: ${sJobs.length}`,
-                ``,
-                `*Jobs:*`,
-                jobLines,
-                ``,
-                `— Soqotra Logistics`
-              ].filter(Boolean).join("\n");
-              window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
-            }}
+            onClick={handleScheduleWhatsAppPDF}
           >
-            <MessageCircle className="h-4 w-4 mr-2" /> WhatsApp
+            <MessageCircle className="h-4 w-4 mr-2" /> WhatsApp PDF
           </Button>
         </div>
-        {renderSchedulePrint()}
+        <div ref={printRef}>
+          {renderSchedulePrint()}
+        </div>
       </Layout>
     );
   }

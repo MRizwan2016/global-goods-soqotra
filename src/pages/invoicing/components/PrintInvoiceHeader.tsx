@@ -12,7 +12,7 @@ const PrintInvoiceHeader = ({ invoiceNumber, date, net }: InvoiceHeaderProps) =>
     <div className="flex p-2 border-b border-gray-300">
       {/* Logo section */}
       <div className="w-1/4 flex items-center justify-center">
-        <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Soqotra Logo" className="h-24 w-32 object-contain" />
+        <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Soqotra Logo" className="h-28 w-36 object-contain" />
       </div>
       
       {/* QR Code section */}
