@@ -75,7 +75,7 @@ const CertificateMode: React.FC<CertificateModeProps> = ({
       
       <div className="mb-6">
         <p className="mb-2">
-          <span className="font-bold">Vessel/Shipment:</span> ALMARAAM LOGISTICS SERVICE
+          <span className="font-bold">Vessel/Shipment:</span> SOQOTRA LOGISTICS SERVICES
         </p>
         <p className="mb-2">
           <span className="font-bold">Port of Loading:</span> DOHA, QATAR
@@ -86,7 +86,7 @@ const CertificateMode: React.FC<CertificateModeProps> = ({
       </div>
       
       <div className="mt-12">
-        <p className="mb-2 font-bold">ALMARAAM LOGISTICS SERVICES & TRADING W.L.L</p>
+        <p className="mb-2 font-bold">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>
         <div className="h-16"></div>
         <p>Authorized Signature & Stamp</p>
       </div>

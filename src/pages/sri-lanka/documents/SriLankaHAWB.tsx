@@ -72,7 +72,7 @@ const SriLankaHAWB: React.FC<HAWBProps> = ({ invoiceData, onPrint }) => {
           <div className="border-b border-black p-4">
             <div className="flex justify-between items-center">
               <div>
-                <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Almaraam Logo" className="h-16 w-24 object-contain" />
+                <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Soqotra Logo" className="h-24 w-32 object-contain" />
               </div>
               <div className="text-center">
                 <h1 className="text-xl font-bold">HOUSE AIR WAYBILL (HAWB)</h1>
@@ -214,7 +214,7 @@ const SriLankaHAWB: React.FC<HAWBProps> = ({ invoiceData, onPrint }) => {
           <div className="flex">
             <div className="w-1/2 border-r border-black p-3">
               <div className="font-bold text-sm mb-2">ISSUED BY:</div>
-              <div className="text-sm">ALMARAAM LOGISTICS SERVICES</div>
+              <div className="text-sm">SOQOTRA LOGISTICS SERVICES</div>
               <div className="text-sm">Date: {new Date().toLocaleDateString()}</div>
               <div className="mt-8 border-t border-black pt-2 text-center text-sm">
                 AUTHORIZED SIGNATURE

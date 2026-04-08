@@ -244,7 +244,7 @@ const SriLankaAirManifest: React.FC<AirManifestProps> = ({ shipments, flightInfo
               <img src="/lovable-uploads/SOQO_NEW_LOGO.jpeg" alt="Logo" className="h-12 w-16 object-contain" />
               <div>
                 <h1 className="text-lg font-bold">AIR FREIGHT MANIFEST</h1>
-                <p className="text-sm">ALMARAAM LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>
+                <p className="text-sm">SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL</p>
               </div>
               <div className="text-right text-xs">
                 <div>Manifest No: {manifestNumber}</div>
