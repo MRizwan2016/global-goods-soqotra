@@ -571,7 +571,7 @@ const SriLankaInvoiceForm = () => {
 
       // Build package rows
       const pkgRows = packageItems.map((item, idx) => ({
-        package_name: item.description || item.name || '',
+        package_name: item.name || item.description || '',
         length: parseFloat(item.length || '0'),
         width: parseFloat(item.width || '0'),
         height: parseFloat(item.height || '0'),
