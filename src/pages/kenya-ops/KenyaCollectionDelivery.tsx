@@ -70,7 +70,7 @@ const KenyaCollectionDelivery = () => {
     const selectedJobsList = jobs.filter(j => selectedJobs.has(j.id));
     
     try {
-      await ScheduleService.createSchedule({
+      await ScheduleService.saveSchedule({
         schedule_number: num,
         schedule_date: new Date().toISOString().split('T')[0],
         vehicle: scheduleVehicle,
