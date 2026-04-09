@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,8 @@ import { ArrowLeft, Save, Plus, Trash2 } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from "uuid";
-import { sudanSectors, sudanDrivers, sudanSalesReps, sudanVehicles, getSudanDriverForVehicle, sudanCities, namePrefixes, qatarCities } from "./data/sudanOpsData";
+import { supabase } from "@/integrations/supabase/client";
+import { sudanSectors, sudanDrivers, sudanSalesReps, sudanVehicles, getSudanDriverForVehicle, sudanCities, sudanPackageTypes, namePrefixes, qatarCities } from "./data/sudanOpsData";
 
 const NAME_PREFIXES = ["Mr.", "Mrs.", "Ms.", "Dr.", "Prof.", "Sheikh"];
 
@@ -33,6 +34,30 @@ const SudanOpsNewJob = () => {
   });
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [pkgInput, setPkgInput] = useState({ description: "", quantity: "1", weightKg: "", length: "", width: "", height: "" });
+  const [allPackageTypes, setAllPackageTypes] = useState(sudanPackageTypes);
+  const [selectedPkgType, setSelectedPkgType] = useState("");
+
+  // Load package types from Supabase
+  useEffect(() => {
+    const fetchPkgTypes = async () => {
+      try {
+        const { data } = await supabase
+          .from('package_types')
+          .select('*')
+          .or('country.eq.Sudan,country.is.null');
+        if (data) {
+          const dbTypes = data.map(p => ({
+            name: p.name,
+            dimensions: { length: Number(p.length_inches) || 0, width: Number(p.width_inches) || 0, height: Number(p.height_inches) || 0 },
+            volume: Number(p.volume_cbm) || 0,
+          }));
+          const staticNames = new Set(sudanPackageTypes.map(s => s.name));
+          setAllPackageTypes([...sudanPackageTypes, ...dbTypes.filter(d => !staticNames.has(d.name))]);
+        }
+      } catch (e) { console.error("Error loading package types:", e); }
+    };
+    fetchPkgTypes();
+  }, []);
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -42,7 +67,24 @@ const SudanOpsNewJob = () => {
     }
   };
 
-  const addPackage = () => {
+  const handlePkgTypeSelect = (pkgName: string) => {
+    const selected = allPackageTypes.find(p => p.name === pkgName);
+    if (selected) {
+      const vol = (selected.dimensions.length * selected.dimensions.width * selected.dimensions.height) / 1000000;
+      const weight = vol * 1000;
+      setPkgInput({
+        description: selected.name,
+        length: selected.dimensions.length.toString(),
+        width: selected.dimensions.width.toString(),
+        height: selected.dimensions.height.toString(),
+        weightKg: weight.toFixed(2),
+        quantity: "1",
+      });
+      setSelectedPkgType(pkgName);
+    }
+  };
+
+  const addPackage = async () => {
     if (!pkgInput.description) { toast.error("Enter package description"); return; }
     const l = parseFloat(pkgInput.length) || 0;
     const w = parseFloat(pkgInput.width) || 0;
@@ -50,15 +92,32 @@ const SudanOpsNewJob = () => {
     const vol = (l * w * h) / 1000000;
     const weight = parseFloat(pkgInput.weightKg) || vol * 1000;
     setPackages(prev => [...prev, { id: uuidv4(), boxNumber: prev.length + 1, description: pkgInput.description, quantity: parseInt(pkgInput.quantity) || 1, weightKg: weight, length: l, width: w, height: h, volumeCBM: vol }]);
+
+    // Save custom package type
+    const isKnown = allPackageTypes.some(p => p.name === pkgInput.description);
+    if (!isKnown) {
+      try {
+        await supabase.from('package_types').upsert({
+          name: pkgInput.description,
+          length_inches: l, width_inches: w, height_inches: h,
+          volume_cbm: vol, weight_kg: weight,
+          country: 'Sudan', is_default: false,
+        }, { onConflict: 'name' });
+        setAllPackageTypes(prev => [...prev, { name: pkgInput.description, dimensions: { length: l, width: w, height: h }, volume: vol }]);
+      } catch (e) { console.error("Error saving package type:", e); }
+    }
+
     setPkgInput({ description: "", quantity: "1", weightKg: "", length: "", width: "", height: "" });
+    setSelectedPkgType("");
     toast.success("Package added");
   };
 
   const removePackage = (id: string) => setPackages(prev => prev.filter(p => p.id !== id));
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.shipperName || !formData.consigneeName) { toast.error("Shipper and consignee names are required"); return; }
-    const job = {
+
+    const jobData = {
       id: uuidv4(), ...formData, type: jobType,
       packages: packages.length,
       totalWeight: packages.reduce((s, p) => s + p.weightKg * p.quantity, 0),
@@ -67,11 +126,66 @@ const SudanOpsNewJob = () => {
       city: formData.consigneeCity || formData.shipperCity,
       status: "pending", createdAt: new Date().toISOString(),
     };
-    const existing = JSON.parse(localStorage.getItem("sudanJobs") || "[]");
-    existing.push(job);
-    localStorage.setItem("sudanJobs", JSON.stringify(existing));
-    toast.success("Job saved successfully!");
-    navigate("/sudan-ops/collection-delivery");
+
+    // Save to regional_invoices as a job record
+    try {
+      const invoiceRow = {
+        country: 'Sudan',
+        invoice_number: formData.jobNumber,
+        invoice_date: formData.date,
+        job_number: formData.jobNumber,
+        service_type: jobType === 'collection' ? 'COLLECTION' : 'DELIVERY',
+        shipper_prefix: formData.shipperPrefix,
+        shipper_name: formData.shipperName,
+        shipper_mobile: formData.shipperMobile,
+        shipper_city: formData.shipperCity,
+        shipper_address: formData.shipperAddress,
+        shipper_country: 'QATAR',
+        consignee_prefix: formData.consigneePrefix,
+        consignee_name: formData.consigneeName,
+        consignee_mobile: formData.consigneeMobile,
+        consignee_city: formData.consigneeCity,
+        consignee_address: formData.consigneeAddress,
+        consignee_country: 'SUDAN',
+        sales_representative: formData.salesRep,
+        driver_name: formData.driver,
+        sector: formData.sector,
+        total_packages: packages.length,
+        total_weight: jobData.totalWeight,
+        total_volume: jobData.totalVolume,
+        status: 'PENDING',
+        extra_data: { jobType, packageItems: packages } as any,
+      };
+
+      const { data: user } = await supabase.auth.getUser();
+      if (user?.user) {
+        (invoiceRow as any).created_by = user.user.id;
+      }
+
+      const { data, error } = await supabase.from('regional_invoices').insert(invoiceRow).select('id').single();
+      if (error) throw error;
+
+      // Save packages
+      if (data && packages.length > 0) {
+        const pkgRows = packages.map((p, idx) => ({
+          invoice_id: data.id,
+          package_name: p.description,
+          length: p.length, width: p.width, height: p.height,
+          weight: p.weightKg, quantity: p.quantity,
+          cubic_metre: p.volumeCBM,
+          cubic_feet: p.volumeCBM * 35.3147,
+          volume_weight: (p.length * p.width * p.height) / 6000,
+          box_number: idx + 1,
+        }));
+        await supabase.from('regional_invoice_packages').insert(pkgRows);
+      }
+
+      toast.success("Job saved successfully!");
+      navigate("/sudan-ops/collection-delivery");
+    } catch (error) {
+      console.error("Error saving job:", error);
+      toast.error("Failed to save job");
+    }
   };
 
   return (
@@ -156,6 +270,17 @@ const SudanOpsNewJob = () => {
         <Card>
           <CardHeader className="bg-red-700 text-white"><CardTitle>PACKAGES</CardTitle></CardHeader>
           <CardContent className="space-y-4 pt-6">
+            <div className="space-y-2">
+              <Label>PACKAGE TYPE (from saved list)</Label>
+              <Select value={selectedPkgType} onValueChange={handlePkgTypeSelect}>
+                <SelectTrigger><SelectValue placeholder="Select Package Type" /></SelectTrigger>
+                <SelectContent>
+                  {allPackageTypes.map((pkg, i) => (
+                    <SelectItem key={i} value={pkg.name}>{pkg.name} ({pkg.dimensions.length}×{pkg.dimensions.width}×{pkg.dimensions.height} - {pkg.volume.toFixed(3)}m³)</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="space-y-2"><Label>DESCRIPTION</Label><Input value={pkgInput.description} onChange={(e) => setPkgInput(p => ({ ...p, description: e.target.value }))} /></div>
               <div className="space-y-2"><Label>L (cm)</Label><Input type="number" value={pkgInput.length} onChange={(e) => setPkgInput(p => ({ ...p, length: e.target.value }))} /></div>

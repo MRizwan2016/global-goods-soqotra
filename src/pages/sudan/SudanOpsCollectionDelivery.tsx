@@ -11,8 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Search, Calendar } from "lucide-react";
+import { Plus, Search, Calendar, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { ScheduleService } from "@/services/ScheduleService";
 import { sudanDrivers, sudanSalesReps, sudanVehicles, getSudanDriverForVehicle } from "./data/sudanOpsData";
 
@@ -21,6 +22,7 @@ const SudanOpsCollectionDelivery = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("collections");
   const [jobs, setJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [selectedJobs, setSelectedJobs] = useState<Set<string>>(new Set());
   const [showScheduleDialog, setShowScheduleDialog] = useState(false);
   const [scheduleVehicle, setScheduleVehicle] = useState("");
@@ -28,18 +30,52 @@ const SudanOpsCollectionDelivery = () => {
   const [scheduleSalesRep, setScheduleSalesRep] = useState("");
   const [scheduleNumber, setScheduleNumber] = useState("");
 
-  useEffect(() => {
+  const fetchJobs = async () => {
+    setLoading(true);
     try {
-      const storedJobs = JSON.parse(localStorage.getItem("sudanJobs") || "[]");
-      setJobs(storedJobs);
+      const { data, error } = await supabase
+        .from('regional_invoices')
+        .select('*')
+        .eq('country', 'Sudan')
+        .in('service_type', ['COLLECTION', 'DELIVERY'])
+        .order('created_at', { ascending: false });
+      
+      if (error) throw error;
+
+      const mappedJobs = (data || []).map(inv => {
+        const extraData = inv.extra_data as any;
+        return {
+          id: inv.id,
+          jobNumber: inv.job_number || inv.invoice_number,
+          shipperName: inv.shipper_name,
+          consigneeName: inv.consignee_name,
+          city: inv.consignee_city || inv.shipper_city,
+          packages: inv.total_packages || 0,
+          totalWeight: inv.total_weight || 0,
+          totalVolume: inv.total_volume || 0,
+          type: extraData?.jobType || (inv.service_type === 'COLLECTION' ? 'collection' : 'delivery'),
+          status: inv.status?.toLowerCase() || 'pending',
+          date: inv.invoice_date,
+          salesRep: inv.sales_representative,
+          driver: inv.driver_name,
+        };
+      });
+
+      setJobs(mappedJobs);
     } catch (error) {
       console.error("Error loading jobs:", error);
+      toast.error("Failed to load jobs");
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  };
+
+  useEffect(() => { fetchJobs(); }, []);
 
   const filteredJobs = jobs.filter(job => {
     const matchesSearch = (job.shipperName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         (job.consigneeName || '').toLowerCase().includes(searchTerm.toLowerCase());
+                         (job.consigneeName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (job.jobNumber || '').toLowerCase().includes(searchTerm.toLowerCase());
     const matchesTab = activeTab === "collections" ? job.type === "collection" : job.type === "delivery";
     return matchesSearch && matchesTab;
   });
@@ -83,6 +119,9 @@ const SudanOpsCollectionDelivery = () => {
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-[#1e2a3a]">Collection & Delivery - Sudan</h1>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={fetchJobs} className="gap-2">
+              <RefreshCw className="h-4 w-4" />Refresh
+            </Button>
             <Button className="gap-2 bg-red-700 hover:bg-red-800" onClick={() => navigate("/sudan-ops/new-job")}>
               <Plus className="h-4 w-4" />Add New Job
             </Button>
@@ -101,38 +140,42 @@ const SudanOpsCollectionDelivery = () => {
                 <div className="flex gap-4 mb-4">
                   <div className="relative flex-1">
                     <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
+                    <Input placeholder="Search by name or job number..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
                   </div>
                 </div>
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-red-700 hover:bg-red-700">
-                      <TableHead className="text-white w-10"></TableHead>
-                      <TableHead className="text-white">JOB #</TableHead>
-                      <TableHead className="text-white">SHIPPER</TableHead>
-                      <TableHead className="text-white">CONSIGNEE</TableHead>
-                      <TableHead className="text-white">CITY</TableHead>
-                      <TableHead className="text-white">PKGS</TableHead>
-                      <TableHead className="text-white">STATUS</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredJobs.map(job => (
-                      <TableRow key={job.id}>
-                        <TableCell><Checkbox checked={selectedJobs.has(job.id)} onCheckedChange={() => handleToggleJob(job.id)} /></TableCell>
-                        <TableCell className="font-medium">{job.jobNumber || job.id}</TableCell>
-                        <TableCell>{job.shipperName}</TableCell>
-                        <TableCell>{job.consigneeName}</TableCell>
-                        <TableCell>{job.city}</TableCell>
-                        <TableCell>{job.packages}</TableCell>
-                        <TableCell><Badge variant={job.status === 'completed' ? 'secondary' : 'default'}>{job.status || 'pending'}</Badge></TableCell>
+                {loading ? (
+                  <div className="text-center py-8 text-gray-500">Loading jobs...</div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-red-700 hover:bg-red-700">
+                        <TableHead className="text-white w-10"></TableHead>
+                        <TableHead className="text-white">JOB #</TableHead>
+                        <TableHead className="text-white">SHIPPER</TableHead>
+                        <TableHead className="text-white">CONSIGNEE</TableHead>
+                        <TableHead className="text-white">CITY</TableHead>
+                        <TableHead className="text-white">PKGS</TableHead>
+                        <TableHead className="text-white">STATUS</TableHead>
                       </TableRow>
-                    ))}
-                    {filteredJobs.length === 0 && (
-                      <TableRow><TableCell colSpan={7} className="text-center py-8 text-gray-500">No jobs found.</TableCell></TableRow>
-                    )}
-                  </TableBody>
-                </Table>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredJobs.map(job => (
+                        <TableRow key={job.id}>
+                          <TableCell><Checkbox checked={selectedJobs.has(job.id)} onCheckedChange={() => handleToggleJob(job.id)} /></TableCell>
+                          <TableCell className="font-medium">{job.jobNumber || job.id}</TableCell>
+                          <TableCell>{job.shipperName}</TableCell>
+                          <TableCell>{job.consigneeName}</TableCell>
+                          <TableCell>{job.city}</TableCell>
+                          <TableCell>{job.packages}</TableCell>
+                          <TableCell><Badge variant={job.status === 'completed' ? 'secondary' : 'default'}>{job.status || 'pending'}</Badge></TableCell>
+                        </TableRow>
+                      ))}
+                      {filteredJobs.length === 0 && (
+                        <TableRow><TableCell colSpan={7} className="text-center py-8 text-gray-500">No jobs found.</TableCell></TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
