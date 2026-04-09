@@ -24,14 +24,39 @@ interface PackageItem {
 const SudanOpsNewJob = () => {
   const navigate = useNavigate();
   const [jobType, setJobType] = useState<"collection" | "delivery">("collection");
+  const [consigneeNameManuallyEdited, setConsigneeNameManuallyEdited] = useState(false);
   const [formData, setFormData] = useState({
-    jobNumber: `SD-${Date.now().toString().slice(-6)}`,
+    jobNumber: "",
     date: new Date().toISOString().split("T")[0],
     sector: "", salesRep: "", driver: "", vehicle: "",
     shipperPrefix: "", shipperName: "", shipperMobile: "", shipperCity: "", shipperAddress: "",
     consigneePrefix: "", consigneeName: "", consigneeMobile: "", consigneeCity: "", consigneeAddress: "",
     remarks: "",
   });
+
+  // Generate unique job number on mount
+  useEffect(() => {
+    const generateJobNumber = async () => {
+      const today = new Date();
+      const prefix = `SD-${today.getFullYear().toString().slice(-2)}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+      try {
+        const { data } = await supabase
+          .from('regional_invoices')
+          .select('job_number')
+          .eq('country', 'Sudan')
+          .like('job_number', `${prefix}-%`)
+          .order('job_number', { ascending: false })
+          .limit(1);
+        const lastSeq = data && data.length > 0 
+          ? parseInt(data[0].job_number?.split('-').pop() || '0', 10) 
+          : 0;
+        setFormData(prev => ({ ...prev, jobNumber: `${prefix}-${String(lastSeq + 1).padStart(3, '0')}` }));
+      } catch {
+        setFormData(prev => ({ ...prev, jobNumber: `${prefix}-001` }));
+      }
+    };
+    generateJobNumber();
+  }, []);
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [pkgInput, setPkgInput] = useState({ description: "", quantity: "1", weightKg: "", length: "", width: "", height: "" });
   const [allPackageTypes, setAllPackageTypes] = useState(sudanPackageTypes);
@@ -60,11 +85,26 @@ const SudanOpsNewJob = () => {
   }, []);
 
   const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (field === 'vehicle') {
-      const d = getSudanDriverForVehicle(value);
-      if (d) setFormData(prev => ({ ...prev, driver: d, vehicle: value }));
-    }
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value };
+      // Auto-copy shipper name to consignee if not manually edited
+      if (field === 'shipperName' && !consigneeNameManuallyEdited) {
+        updated.consigneeName = value;
+      }
+      if (field === 'shipperPrefix' && !consigneeNameManuallyEdited) {
+        updated.consigneePrefix = value;
+      }
+      if (field === 'vehicle') {
+        const d = getSudanDriverForVehicle(value);
+        if (d) updated.driver = d;
+      }
+      return updated;
+    });
+  };
+
+  const handleConsigneeNameChange = (value: string) => {
+    setConsigneeNameManuallyEdited(true);
+    setFormData(prev => ({ ...prev, consigneeName: value }));
   };
 
   const handlePkgTypeSelect = (pkgName: string) => {
@@ -255,7 +295,7 @@ const SudanOpsNewJob = () => {
                   <SelectContent>{NAME_PREFIXES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2"><Label>NAME</Label><Input value={formData.consigneeName} onChange={(e) => handleChange('consigneeName', e.target.value)} /></div>
+              <div className="space-y-2"><Label>NAME</Label><Input value={formData.consigneeName} onChange={(e) => handleConsigneeNameChange(e.target.value)} /></div>
               <div className="space-y-2"><Label>MOBILE</Label><Input value={formData.consigneeMobile} onChange={(e) => handleChange('consigneeMobile', e.target.value)} placeholder="+249..." /></div>
               <div className="space-y-2"><Label>CITY</Label>
                 <Select value={formData.consigneeCity} onValueChange={(v) => handleChange('consigneeCity', v)}>
