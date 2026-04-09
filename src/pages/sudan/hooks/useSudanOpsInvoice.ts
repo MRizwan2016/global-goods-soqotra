@@ -3,6 +3,7 @@ import { doorToDoorPricing, sudanPackageTypes, calculateVolumeWeight, calculateC
 import { toast } from "sonner";
 import { syncInvoiceToExternal } from "@/lib/externalSync";
 import { RegionalInvoiceService } from "@/services/RegionalInvoiceService";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface SudanOpsPackageItem {
   id: string;
@@ -68,6 +69,12 @@ export interface SudanOpsFormData {
   paymentStatus: "PAID" | "UNPAID";
 }
 
+export interface SudanPackageTypeOption {
+  name: string;
+  dimensions: { length: number; width: number; height: number };
+  volume: number;
+}
+
 export const useSudanOpsInvoice = (invoiceId?: string) => {
   const [formData, setFormData] = useState<SudanOpsFormData>({
     invoiceNumber: "",
@@ -131,6 +138,38 @@ export const useSudanOpsInvoice = (invoiceId?: string) => {
     quantity: "1"
   });
 
+  // Load package types from Supabase + static defaults
+  const [allPackageTypes, setAllPackageTypes] = useState<SudanPackageTypeOption[]>(sudanPackageTypes);
+
+  useEffect(() => {
+    const fetchPackageTypes = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('package_types')
+          .select('*')
+          .or('country.eq.Sudan,country.is.null');
+        if (!error && data) {
+          const dbTypes: SudanPackageTypeOption[] = data.map(p => ({
+            name: p.name,
+            dimensions: {
+              length: Number(p.length_inches) || 0,
+              width: Number(p.width_inches) || 0,
+              height: Number(p.height_inches) || 0,
+            },
+            volume: Number(p.volume_cbm) || 0,
+          }));
+          // Merge: static defaults + DB types (avoid duplicates)
+          const staticNames = new Set(sudanPackageTypes.map(s => s.name));
+          const merged = [...sudanPackageTypes, ...dbTypes.filter(d => !staticNames.has(d.name))];
+          setAllPackageTypes(merged);
+        }
+      } catch (e) {
+        console.error("Error loading package types:", e);
+      }
+    };
+    fetchPackageTypes();
+  }, []);
+
   // Door-to-door pricing
   useEffect(() => {
     if (formData.doorToDoor === "YES" && formData.sector && formData.totalWeight > 0) {
@@ -193,7 +232,7 @@ export const useSudanOpsInvoice = (invoiceId?: string) => {
   };
 
   const handlePackageTypeSelect = (packageType: string) => {
-    const selectedType = sudanPackageTypes.find(pkg => pkg.name === packageType);
+    const selectedType = allPackageTypes.find(pkg => pkg.name === packageType);
     if (selectedType) {
       const cbm = (selectedType.dimensions.length * selectedType.dimensions.width * selectedType.dimensions.height) / 1000000;
       const autoWeight = cbm * 1000;
@@ -248,11 +287,10 @@ export const useSudanOpsInvoice = (invoiceId?: string) => {
     };
     setPackageItems(prev => [...prev, newItem]);
 
-    // Save custom package type
-    const isKnown = sudanPackageTypes.some(p => p.name === packageInput.name);
+    // Save custom package type to Supabase
+    const isKnown = allPackageTypes.some(p => p.name === packageInput.name);
     if (!isKnown) {
       try {
-        const { supabase } = await import("@/integrations/supabase/client");
         await supabase.from('package_types').upsert({
           name: packageInput.name,
           length_inches: length,
@@ -263,6 +301,12 @@ export const useSudanOpsInvoice = (invoiceId?: string) => {
           country: 'Sudan',
           is_default: false,
         }, { onConflict: 'name' });
+        // Add to local list
+        setAllPackageTypes(prev => [...prev, {
+          name: packageInput.name,
+          dimensions: { length, width, height },
+          volume: cubicMetre,
+        }]);
       } catch (e) {
         console.error("Error saving package type:", e);
       }
@@ -444,6 +488,7 @@ export const useSudanOpsInvoice = (invoiceId?: string) => {
     packageItems,
     selectedPackageType,
     packageInput,
+    allPackageTypes,
     handleFormChange,
     handlePackageTypeSelect,
     handlePackageInputChange,
