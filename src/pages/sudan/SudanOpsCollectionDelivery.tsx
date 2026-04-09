@@ -105,6 +105,8 @@ const SudanOpsCollectionDelivery = () => {
       shipperName: j.shipperName,
       consigneeName: j.consigneeName,
       city: j.city,
+      fromAddress: j.shipperAddress ? `${j.shipperAddress}, ${j.shipperCity}` : j.shipperCity || 'N/A',
+      toAddress: j.consigneeAddress ? `${j.consigneeAddress}, ${j.consigneeCity}` : j.consigneeCity || 'N/A',
       packages: j.packages,
       totalWeight: j.totalWeight,
       totalVolume: j.totalVolume,
