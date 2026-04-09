@@ -75,24 +75,77 @@ export const useReceiptActions = (
     }
   };
 
-  const handleWhatsAppShare = () => {
-    const data = receiptData;
-    const currencyLabel = data?.currency === "QAR" ? "QR" : data?.currency || "";
-    const message = [
-      `📧 *PAYMENT RECEIPT*`,
-      `━━━━━━━━━━━━━━━`,
-      `Receipt #: ${receiptNumber}`,
-      data?.invoiceNumber ? `Invoice #: ${data.invoiceNumber}` : '',
-      data?.customer ? `Customer: ${data.customer}` : '',
-      data?.amount ? `Amount Paid: ${currencyLabel} ${data.amount.toFixed(2)}` : '',
-      `━━━━━━━━━━━━━━━`,
-      `Thank you for your payment!`,
-      `SOQOTRA LOGISTICS`,
-    ].filter(Boolean).join('\n');
+  const handleWhatsAppShare = async () => {
+    if (!receiptRef.current) {
+      toast.error("Cannot generate PDF: Receipt content not found");
+      return;
+    }
 
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
-    toast.success("Opening WhatsApp...");
+    try {
+      toast.info("Generating receipt PDF...");
+      
+      const canvas = await html2canvas(receiptRef.current, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+      });
+
+      // A5 size: 148mm x 210mm
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a5'
+      });
+
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const maxHeight = pdf.internal.pageSize.getHeight();
+      const finalHeight = Math.min(pdfHeight, maxHeight);
+
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pdfWidth, finalHeight);
+
+      const pdfBlob = pdf.output('blob');
+      const pdfFile = new File([pdfBlob], `Receipt-${receiptNumber}.pdf`, { type: 'application/pdf' });
+
+      // Try Web Share API with file
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+        await navigator.share({
+          title: `Payment Receipt ${receiptNumber}`,
+          text: `Receipt #${receiptNumber}`,
+          files: [pdfFile]
+        });
+        toast.success("Receipt shared successfully!");
+      } else {
+        // Fallback: download PDF then open WhatsApp with text
+        pdf.save(`Receipt-${receiptNumber}.pdf`);
+        
+        const data = receiptData;
+        const currencyLabel = data?.currency === "QAR" ? "QR" : data?.currency || "";
+        const message = [
+          `📧 *PAYMENT RECEIPT*`,
+          `━━━━━━━━━━━━━━━`,
+          `Receipt #: ${receiptNumber}`,
+          data?.invoiceNumber ? `Invoice #: ${data.invoiceNumber}` : '',
+          data?.customer ? `Customer: ${data.customer}` : '',
+          data?.amount ? `Amount Paid: ${currencyLabel} ${data.amount.toFixed(2)}` : '',
+          `━━━━━━━━━━━━━━━`,
+          `Thank you for your payment!`,
+          `SOQOTRA LOGISTICS`,
+          ``,
+          `📎 PDF receipt downloaded - please attach it to this chat.`
+        ].filter(Boolean).join('\n');
+
+        const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, '_blank');
+        toast.success("PDF downloaded! Attach it in WhatsApp.");
+      }
+    } catch (error) {
+      if (error instanceof Error && error.name !== 'AbortError') {
+        console.error("WhatsApp share failed:", error);
+        toast.error("Failed to share receipt");
+      }
+    }
   };
 
   return {
