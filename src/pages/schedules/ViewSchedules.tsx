@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScheduleService } from "@/services/ScheduleService";
-import { Printer, Eye, Calendar, Truck, Search } from "lucide-react";
+import { Printer, Eye, Calendar, Search, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
 interface Schedule {
@@ -51,7 +51,7 @@ const ViewSchedules: React.FC = () => {
   };
 
   const country = getCountryFromPath();
-  const countryLower = country.toLowerCase().replace(/\s+/g, '-');
+  
 
   useEffect(() => {
     loadSchedules();
@@ -65,8 +65,7 @@ const ViewSchedules: React.FC = () => {
   const loadSchedules = async () => {
     try {
       setLoading(true);
-      // Query with both casings to match existing data
-      const result = await ScheduleService.getSchedules({ country: countryLower });
+      const result = await ScheduleService.getSchedules({ country });
       if (result.success && result.schedules) {
         setSchedules(result.schedules);
       } else {
@@ -82,8 +81,8 @@ const ViewSchedules: React.FC = () => {
 
   const loadFilterOptions = async () => {
     try {
-      const vehicleList = await ScheduleService.getUniqueVehicles(countryLower);
-      const scheduleList = await ScheduleService.getUniqueScheduleNumbers(countryLower);
+      const vehicleList = await ScheduleService.getUniqueVehicles(country);
+      const scheduleList = await ScheduleService.getUniqueScheduleNumbers(country);
       setVehicles(vehicleList);
       setScheduleNumbers(scheduleList);
     } catch (error) {
@@ -116,6 +115,22 @@ const ViewSchedules: React.FC = () => {
 
   const handlePrintSchedule = (scheduleId: string) => {
     navigate(`/schedules/print/${scheduleId}`);
+  };
+
+  const handleShareWhatsApp = async (scheduleId: string, scheduleNum: string) => {
+    try {
+      const result = await ScheduleService.getScheduleWithJobs(scheduleId);
+      if (!result.success || !result.schedule) { toast.error("Could not load schedule"); return; }
+      const s = result.schedule;
+      const jobLines = (result.jobs || []).map((j: any, i: number) => {
+        const d = j.job_data;
+        return `${i+1}. ${d.jobNumber || d.job_number || ''} - ${d.shipperName || d.customer || 'N/A'} → ${d.city || ''}`;
+      }).join('\n');
+      const msg = `📋 *SCHEDULE: ${s.schedule_number}*\n📅 ${new Date(s.schedule_date).toLocaleDateString()}\n🚛 Vehicle: ${s.vehicle}\n👤 Driver: ${s.driver || '—'}\n📦 Jobs: ${s.total_jobs}\n\n${jobLines}\n\n— Soqotra Logistics`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    } catch {
+      toast.error("Failed to share");
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -265,6 +280,15 @@ const ViewSchedules: React.FC = () => {
                             >
                               <Printer className="h-4 w-4 mr-1" />
                               Print
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleShareWhatsApp(schedule.id, schedule.schedule_number)}
+                              className="text-green-600 border-green-600 hover:bg-green-50"
+                            >
+                              <MessageCircle className="h-4 w-4 mr-1" />
+                              Share
                             </Button>
                           </div>
                         </TableCell>

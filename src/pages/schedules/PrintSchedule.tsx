@@ -2,9 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ScheduleService } from "@/services/ScheduleService";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Printer, MessageCircle } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 interface Schedule {
   id: string;
@@ -33,9 +35,7 @@ const PrintSchedule: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (scheduleId) {
-      loadScheduleData();
-    }
+    if (scheduleId) loadScheduleData();
   }, [scheduleId]);
 
   const loadScheduleData = async () => {
@@ -47,251 +47,169 @@ const PrintSchedule: React.FC = () => {
         setJobs(result.jobs);
       } else {
         toast.error(result.error || "Failed to load schedule");
-        navigate("/schedules");
+        navigate(-1);
       }
     } catch (error) {
       console.error("Error loading schedule:", error);
       toast.error("Failed to load schedule");
-      navigate("/schedules");
+      navigate(-1);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleBack = () => {
-    navigate("/schedules");
-  };
-
   const handlePrint = () => {
-    if (printRef.current) {
-      printRef.current.style.display = "block";
-      printRef.current.style.visibility = "visible";
-      
-      // Ensure QR code and all content is visible
-      const qrElements = printRef.current.querySelectorAll('svg, canvas, .qrcode');
-      qrElements.forEach(element => {
-        (element as HTMLElement).style.display = 'block';
-        (element as HTMLElement).style.visibility = 'visible';
-      });
+    window.print();
+  };
+
+  const handleShareWhatsApp = async () => {
+    if (!printRef.current || !schedule) return;
+    try {
+      toast.info("Generating PDF...");
+      const canvas = await html2canvas(printRef.current, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+      pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
+      const pdfBlob = pdf.output('blob');
+      const file = new File([pdfBlob], `Schedule-${schedule.schedule_number}.pdf`, { type: 'application/pdf' });
+
+      if (navigator.share && navigator.canShare({ files: [file] })) {
+        await navigator.share({ title: `Schedule ${schedule.schedule_number}`, files: [file] });
+      } else {
+        // Fallback: download + open WhatsApp with text
+        const url = URL.createObjectURL(pdfBlob);
+        const a = document.createElement('a');
+        a.href = url; a.download = file.name; a.click();
+        URL.revokeObjectURL(url);
+
+        const msg = `📋 *SCHEDULE: ${schedule.schedule_number}*\n📅 ${new Date(schedule.schedule_date).toLocaleDateString()}\n🚛 Vehicle: ${schedule.vehicle}\n📦 Jobs: ${schedule.total_jobs}\n\nPDF downloaded. Please attach and send.`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+      }
+    } catch (err) {
+      console.error('Share error:', err);
+      toast.error("Failed to share");
     }
-    
-    setTimeout(() => {
-      window.print();
-    }, 500);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString();
-  };
+  const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString();
 
-  // Generate QR code data
   const generateQRCodeData = () => {
     if (!schedule) return "";
-    const baseUrl = window.location.origin;
-    return `${baseUrl}/schedules/display/${schedule.id}?schedule=${schedule.schedule_number}&date=${schedule.schedule_date}&vehicle=${schedule.vehicle}&verified=true`;
+    return `${window.location.origin}/schedules/display/${schedule.id}`;
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Loading schedule...</div>
-      </div>
-    );
-  }
+  const isSudan = schedule?.country?.toLowerCase().includes('sudan');
+  const companyName = isSudan ? 'SOQOTRA LOGISTICS SERVICES' : 'SOQOTRA LOGISTICS SERVICES, TRANSPORTATION & TRADING WLL';
+  const headerColor = isSudan ? '#991b1b' : '#3b82f6';
 
-  if (!schedule) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Schedule not found</div>
-      </div>
-    );
-  }
+  if (loading) return <div className="flex items-center justify-center h-64"><div className="text-lg">Loading schedule...</div></div>;
+  if (!schedule) return <div className="flex items-center justify-center h-64"><div className="text-lg">Schedule not found</div></div>;
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Print Styles */}
-      <style>
-        {`
-          @media print {
-            .print\\:hidden { display: none !important; }
-            .print-container { 
-              margin: 0 !important; 
-              padding: 0 !important;
-              background: white !important;
-            }
-            body { 
-              margin: 0 !important; 
-              padding: 0 !important;
-              background: white !important;
-              font-size: 12px !important;
-            }
-            .print-content {
-              margin: 0 !important;
-              padding: 20px !important;
-              background: white !important;
-              width: 100% !important;
-              max-width: none !important;
-            }
-            table { 
-              width: 100% !important; 
-              border-collapse: collapse !important;
-              margin: 0 !important;
-            }
-            th, td { 
-              border: 1px solid #000 !important; 
-              padding: 8px !important;
-              font-size: 11px !important;
-            }
-            .qr-code {
-              break-inside: avoid !important;
-              page-break-inside: avoid !important;
-            }
-            svg, canvas, .qrcode {
-              max-width: 100px !important;
-              max-height: 100px !important;
-              width: 100px !important;
-              height: 100px !important;
-              display: block !important;
-              visibility: visible !important;
-            }
-          }
-        `}
-      </style>
+      <style>{`
+        @media print {
+          .no-print { display: none !important; }
+          @page { size: A4 landscape; margin: 10mm; }
+          body { margin: 0 !important; padding: 0 !important; background: white !important; }
+          .print-page { width: 100% !important; max-width: none !important; padding: 0 !important; margin: 0 !important; }
+          table { width: 100% !important; border-collapse: collapse !important; font-size: 10px !important; }
+          th, td { border: 1px solid #000 !important; padding: 4px 6px !important; }
+          svg { display: block !important; visibility: visible !important; }
+        }
+      `}</style>
 
-      {/* Print Controls - Hidden when printing */}
-      <div className="print:hidden p-4 bg-white shadow-md mb-4 sticky top-0 z-10 flex items-center justify-between">
-        <Button variant="outline" onClick={handleBack} className="flex items-center gap-2">
-          <ArrowLeft className="h-4 w-4" />
-          Back
+      <div className="no-print p-4 bg-white shadow-md mb-4 sticky top-0 z-10 flex items-center justify-between">
+        <Button variant="outline" onClick={() => navigate(-1)} className="flex items-center gap-2">
+          <ArrowLeft className="h-4 w-4" /> Back
         </Button>
-        <div className="text-xl font-bold">Print Schedule - {schedule.schedule_number}</div>
-        <Button onClick={handlePrint} className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600">
-          <Printer className="h-4 w-4" />
-          Print
-        </Button>
+        <div className="text-xl font-bold">Schedule - {schedule.schedule_number}</div>
+        <div className="flex gap-2">
+          <Button onClick={handleShareWhatsApp} variant="outline" className="flex items-center gap-2 text-green-600 border-green-300 hover:bg-green-50">
+            <MessageCircle className="h-4 w-4" /> Share PDF
+          </Button>
+          <Button onClick={handlePrint} className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white">
+            <Printer className="h-4 w-4" /> Print
+          </Button>
+        </div>
       </div>
 
-      {/* Print Content */}
-      <div ref={printRef} className="print-content bg-white p-8">
-        {/* Header with Company Info and QR Code */}
-        <div className="flex justify-between items-start mb-6">
+      <div ref={printRef} className="print-page bg-white p-6 mx-auto" style={{ maxWidth: '1100px' }}>
+        {/* Header */}
+        <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-blue-600 mb-2">QATAR CARGO COLLECTION & DELIVERY</h1>
-            <div className="text-sm text-gray-600">
-              <p>P.O. Box: 22550, Doha - Qatar</p>
-              <p>Tel: +974 4460 4470 | Mobile: +974 5554 4470</p>
-              <p>Email: info@qatarcargo.com</p>
-            </div>
+            <h1 className="text-xl font-bold" style={{ color: headerColor }}>{companyName}</h1>
+            <p className="text-xs text-gray-500 mt-1">{schedule.country?.toUpperCase()} — COLLECTION & DELIVERY SCHEDULE</p>
           </div>
-          
-          {/* QR Code */}
-          <div className="qr-code flex flex-col items-center">
-            <QRCodeSVG 
-              value={generateQRCodeData()}
-              size={100}
-              level="M"
-              includeMargin={true}
-              className="border border-gray-300"
-            />
-            <p className="text-xs text-gray-600 mt-1 text-center">Scan for Details</p>
+          <div className="flex flex-col items-center">
+            <QRCodeSVG value={generateQRCodeData()} size={80} level="M" includeMargin />
+            <p className="text-[9px] text-gray-500 mt-0.5">Scan to verify</p>
           </div>
         </div>
 
-        {/* Schedule Header */}
-        <div className="border-2 border-blue-500 p-4 mb-6">
-          <h2 className="text-xl font-bold text-center mb-4">JOB SCHEDULE</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p><strong>Schedule Number:</strong> {schedule.schedule_number}</p>
-              <p><strong>Date:</strong> {formatDate(schedule.schedule_date)}</p>
-              <p><strong>Vehicle:</strong> {schedule.vehicle}</p>
-            </div>
-            <div>
-              <p><strong>Sales Representative:</strong> {schedule.sales_rep}</p>
-              {schedule.driver && <p><strong>Driver:</strong> {schedule.driver}</p>}
-              {schedule.helper && <p><strong>Helper:</strong> {schedule.helper}</p>}
-            </div>
-          </div>
+        {/* Schedule Info Bar */}
+        <div className="border rounded p-3 mb-4 grid grid-cols-5 gap-2 text-sm" style={{ borderColor: headerColor }}>
+          <div><span className="font-semibold">Schedule #:</span> {schedule.schedule_number}</div>
+          <div><span className="font-semibold">Date:</span> {formatDate(schedule.schedule_date)}</div>
+          <div><span className="font-semibold">Vehicle:</span> {schedule.vehicle}</div>
+          <div><span className="font-semibold">Driver:</span> {schedule.driver || '—'}</div>
+          <div><span className="font-semibold">Sales Rep:</span> {schedule.sales_rep || '—'}</div>
         </div>
 
-        {/* Jobs Table */}
-        <div className="mb-6">
-          <table className="w-full border-collapse border border-black">
-            <thead>
-              <tr className="bg-blue-500 text-white">
-                <th className="border border-black p-2 text-left">SL#</th>
-                <th className="border border-black p-2 text-left">Job Number</th>
-                <th className="border border-black p-2 text-left">Customer</th>
-                <th className="border border-black p-2 text-left">From Address</th>
-                <th className="border border-black p-2 text-left">To Address</th>
-                <th className="border border-black p-2 text-left">Service Type</th>
-                <th className="border border-black p-2 text-left">Items</th>
-                <th className="border border-black p-2 text-left">Signature</th>
-              </tr>
-            </thead>
-            <tbody>
-              {jobs.length > 0 ? (
-                jobs.map((job, index) => {
-                  const jobData = job.job_data;
-                  const itemsCount = jobData.items ? jobData.items.length : 0;
-                  return (
-                    <tr key={job.id}>
-                      <td className="border border-black p-2">{index + 1}</td>
-                      <td className="border border-black p-2">{jobData.jobNumber || `JOB-${index + 1}`}</td>
-                      <td className="border border-black p-2">{jobData.customer || 'N/A'}</td>
-                      <td className="border border-black p-2 text-xs">{jobData.fromAddress || 'N/A'}</td>
-                      <td className="border border-black p-2 text-xs">{jobData.toAddress || 'N/A'}</td>
-                      <td className="border border-black p-2">{jobData.serviceType || 'N/A'}</td>
-                      <td className="border border-black p-2 text-center">{itemsCount}</td>
-                      <td className="border border-black p-2" style={{ minWidth: '100px', height: '40px' }}></td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={8} className="border border-black p-4 text-center">No jobs found in this schedule</td>
+        {/* Jobs Table - Landscape optimized */}
+        <table className="w-full border-collapse border border-black text-xs">
+          <thead>
+            <tr style={{ backgroundColor: headerColor, color: 'white' }}>
+              <th className="border border-black p-1.5 text-left w-8">SL#</th>
+              <th className="border border-black p-1.5 text-left">JOB #</th>
+              <th className="border border-black p-1.5 text-left">SHIPPER</th>
+              <th className="border border-black p-1.5 text-left">CONSIGNEE</th>
+              <th className="border border-black p-1.5 text-left">CITY</th>
+              <th className="border border-black p-1.5 text-center w-12">PKGS</th>
+              <th className="border border-black p-1.5 text-center w-16">WEIGHT</th>
+              <th className="border border-black p-1.5 text-left">TYPE</th>
+              <th className="border border-black p-1.5 text-left" style={{ minWidth: '100px' }}>SIGNATURE</th>
+            </tr>
+          </thead>
+          <tbody>
+            {jobs.length > 0 ? jobs.map((job, index) => {
+              const d = job.job_data;
+              return (
+                <tr key={job.id} className={index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}>
+                  <td className="border border-black p-1.5">{index + 1}</td>
+                  <td className="border border-black p-1.5 font-medium">{d.jobNumber || d.job_number || '—'}</td>
+                  <td className="border border-black p-1.5">{d.shipperName || d.customer || '—'}</td>
+                  <td className="border border-black p-1.5">{d.consigneeName || d.customer || '—'}</td>
+                  <td className="border border-black p-1.5">{d.city || d.toAddress || '—'}</td>
+                  <td className="border border-black p-1.5 text-center">{d.packages || d.items?.length || 0}</td>
+                  <td className="border border-black p-1.5 text-center">{d.totalWeight || '—'}</td>
+                  <td className="border border-black p-1.5">{d.serviceType || d.type || '—'}</td>
+                  <td className="border border-black p-1.5" style={{ height: '30px' }}></td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+              );
+            }) : (
+              <tr><td colSpan={9} className="border border-black p-4 text-center">No jobs in this schedule</td></tr>
+            )}
+          </tbody>
+        </table>
 
-        {/* Summary */}
-        <div className="grid grid-cols-2 gap-6 mt-6">
-          <div className="border border-black p-4">
-            <h3 className="font-bold mb-2">Schedule Summary</h3>
-            <p>Total Jobs: {jobs.length}</p>
-            <p>Vehicle: {schedule.vehicle}</p>
-            <p>Date: {formatDate(schedule.schedule_date)}</p>
+        {/* Summary + Signatures */}
+        <div className="grid grid-cols-2 gap-4 mt-4 text-xs">
+          <div className="border border-black p-3">
+            <h3 className="font-bold mb-1">Summary</h3>
+            <p>Total Jobs: {jobs.length} | Vehicle: {schedule.vehicle} | Date: {formatDate(schedule.schedule_date)}</p>
           </div>
-          
-          <div className="border border-black p-4">
-            <h3 className="font-bold mb-2">Team Signatures</h3>
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm">Sales Rep: {schedule.sales_rep}</p>
-                <div className="border-b border-gray-400 mt-2" style={{ height: '30px' }}></div>
-              </div>
-              {schedule.driver && (
-                <div>
-                  <p className="text-sm">Driver: {schedule.driver}</p>
-                  <div className="border-b border-gray-400 mt-2" style={{ height: '30px' }}></div>
-                </div>
-              )}
-              {schedule.helper && (
-                <div>
-                  <p className="text-sm">Helper: {schedule.helper}</p>
-                  <div className="border-b border-gray-400 mt-2" style={{ height: '30px' }}></div>
-                </div>
-              )}
+          <div className="border border-black p-3">
+            <h3 className="font-bold mb-1">Authorised Signatures</h3>
+            <div className="flex justify-between mt-2">
+              <div className="text-center flex-1"><div className="border-b border-gray-400 mb-1" style={{ height: '20px' }}></div><span>Sales Rep</span></div>
+              <div className="text-center flex-1"><div className="border-b border-gray-400 mb-1" style={{ height: '20px' }}></div><span>Driver</span></div>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="mt-6 text-center text-xs text-gray-600">
-          <p>This is a computer-generated schedule. For verification, scan the QR code above.</p>
-          <p>Generated on: {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}</p>
+        <div className="mt-3 text-center text-[9px] text-gray-400">
+          Generated on {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()} — Scan QR code for digital verification
         </div>
       </div>
     </div>
