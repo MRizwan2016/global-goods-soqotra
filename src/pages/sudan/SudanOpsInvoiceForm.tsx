@@ -44,7 +44,7 @@ const SudanOpsInvoiceForm = () => {
   }, []);
 
   const {
-    formData, packageItems, selectedPackageType, packageInput,
+    formData, packageItems, selectedPackageType, packageInput, allPackageTypes,
     handleFormChange, handlePackageTypeSelect, handlePackageInputChange,
     addPackageItem, removePackageItem, saveInvoice, loadInvoice
   } = useSudanOpsInvoice(id);
@@ -306,8 +306,8 @@ const SudanOpsInvoiceForm = () => {
                 <Select value={selectedPackageType} onValueChange={handlePackageTypeSelect}>
                   <SelectTrigger><SelectValue placeholder="Select Package Type" /></SelectTrigger>
                   <SelectContent>
-                    {sudanPackageTypes.map((pkg, i) => (
-                      <SelectItem key={i} value={pkg.name}>{pkg.name} ({pkg.dimensions.length}x{pkg.dimensions.width}x{pkg.dimensions.height} - {pkg.volume}m³)</SelectItem>
+                    {allPackageTypes.map((pkg, i) => (
+                      <SelectItem key={i} value={pkg.name}>{pkg.name} ({pkg.dimensions.length}×{pkg.dimensions.width}×{pkg.dimensions.height} - {pkg.volume.toFixed(3)}m³)</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
