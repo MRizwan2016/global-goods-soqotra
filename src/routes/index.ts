@@ -4,6 +4,7 @@ import { dataEntryRoutes } from "./dataEntryRoutes";
 import accountsRoutes from "./accountsRoutes"; 
 import reconciliationRoutes from "./reconciliationRoutes";
 import { kenyaRoutes } from "./kenyaRoutes";
+import { kenyaOpsRoutes } from "./kenyaOpsRoutes";
 import { qatarRoutes } from "./qatarRoutes";
 import { ugandaRoutes } from "./ugandaRoutes";
 import { sriLankaRoutes } from "./sriLankaRoutes";
@@ -100,6 +101,7 @@ export const routes: RouteConfig[] = [
   ...accountsRoutes,
   ...reconciliationRoutes,
   ...kenyaRoutes,
+  ...kenyaOpsRoutes,
   ...qatarRoutes,
   ...ugandaRoutes,
   ...sriLankaRoutes,

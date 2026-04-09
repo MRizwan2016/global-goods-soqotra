@@ -78,8 +78,8 @@ const KenyaCollectionDelivery = () => {
         sales_rep: scheduleSalesRep,
         helper: scheduleHelper,
         country: 'Kenya',
-        total_jobs: selectedJobsList.length,
-      }, selectedJobsList);
+        jobs: selectedJobsList,
+      });
       toast.success("Schedule posted successfully!");
       setShowScheduleDialog(false);
       setSelectedJobs(new Set());
