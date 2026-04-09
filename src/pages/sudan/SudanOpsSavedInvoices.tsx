@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, Edit, MessageCircle } from "lucide-react";
 import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
+import SudanManifestDialog from "./components/SudanManifestDialog";
 
 const SudanOpsSavedInvoices = () => {
   const navigate = useNavigate();
