@@ -67,8 +67,7 @@ const ViewSchedules: React.FC = () => {
   const loadSchedules = async () => {
     try {
       setLoading(true);
-      // Query with both casings to match existing data
-      const result = await ScheduleService.getSchedules({ country: countryLower });
+      const result = await ScheduleService.getSchedules({ country });
       if (result.success && result.schedules) {
         setSchedules(result.schedules);
       } else {
@@ -84,8 +83,8 @@ const ViewSchedules: React.FC = () => {
 
   const loadFilterOptions = async () => {
     try {
-      const vehicleList = await ScheduleService.getUniqueVehicles(countryLower);
-      const scheduleList = await ScheduleService.getUniqueScheduleNumbers(countryLower);
+      const vehicleList = await ScheduleService.getUniqueVehicles(country);
+      const scheduleList = await ScheduleService.getUniqueScheduleNumbers(country);
       setVehicles(vehicleList);
       setScheduleNumbers(scheduleList);
     } catch (error) {
