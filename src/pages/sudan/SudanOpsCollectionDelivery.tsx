@@ -88,11 +88,25 @@ const SudanOpsCollectionDelivery = () => {
     });
   };
 
+  const selectedJobsList = jobs.filter(j => selectedJobs.has(j.id));
+
   const handlePostSchedule = async () => {
     if (selectedJobs.size === 0) { toast.error("Select at least one job"); return; }
     if (!scheduleVehicle) { toast.error("Select a vehicle"); return; }
+    const jobNumbers = selectedJobsList.map(j => j.jobNumber).join(', ');
     const num = scheduleNumber || `SD-SCH-${Date.now().toString().slice(-6)}`;
-    const selectedJobsList = jobs.filter(j => selectedJobs.has(j.id));
+    const jobsToSave = selectedJobsList.map(j => ({
+      jobNumber: j.jobNumber,
+      customer: j.shipperName,
+      shipperName: j.shipperName,
+      consigneeName: j.consigneeName,
+      city: j.city,
+      packages: j.packages,
+      totalWeight: j.totalWeight,
+      totalVolume: j.totalVolume,
+      serviceType: j.type === 'collection' ? 'COLLECTION' : 'DELIVERY',
+      status: 'SCHEDULED',
+    }));
     try {
       await ScheduleService.saveSchedule({
         schedule_number: num,
@@ -102,7 +116,7 @@ const SudanOpsCollectionDelivery = () => {
         sales_rep: scheduleSalesRep,
         helper: "",
         country: 'Sudan',
-        jobs: selectedJobsList,
+        jobs: jobsToSave,
       });
       toast.success("Schedule posted successfully!");
       setShowScheduleDialog(false);
@@ -182,9 +196,20 @@ const SudanOpsCollectionDelivery = () => {
         </Tabs>
 
         <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
-          <DialogContent>
+          <DialogContent className="max-w-lg">
             <DialogHeader><DialogTitle>Post to Schedule</DialogTitle></DialogHeader>
             <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Selected Jobs ({selectedJobsList.length})</Label>
+                <div className="bg-gray-50 rounded p-2 text-sm max-h-24 overflow-y-auto">
+                  {selectedJobsList.map(j => (
+                    <div key={j.id} className="flex justify-between py-0.5">
+                      <span className="font-medium">{j.jobNumber}</span>
+                      <span className="text-gray-500">{j.shipperName} → {j.city}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
               <div className="space-y-2"><Label>Schedule Number</Label><Input value={scheduleNumber} onChange={(e) => setScheduleNumber(e.target.value)} placeholder="Auto-generated" /></div>
               <div className="space-y-2">
                 <Label>Vehicle</Label>
