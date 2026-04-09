@@ -1,0 +1,283 @@
+import React, { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import Layout from "@/components/layout/Layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Save, Plus, Trash2 } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { toast } from "sonner";
+import { v4 as uuidv4 } from "uuid";
+import {
+  kenyaSectors,
+  kenyaDrivers,
+  kenyaSalesReps,
+  kenyaVehicles,
+  getKenyaDriverForVehicle,
+  kenyaCities,
+  namePrefixes,
+  qatarCities,
+  destinationCountries,
+} from "./data/kenyaData";
+import { cargoCollectionPackages, calcVolumeCBM } from "@/data/cargoPackages";
+
+const NAME_PREFIXES = ["Mr.", "Mrs.", "Ms.", "Pastor", "Rev.", "Dr.", "Prof.", "Sheikh"];
+
+interface PackageItem {
+  id: string;
+  boxNumber: number;
+  description: string;
+  quantity: number;
+  weightKg: number;
+  length: number;
+  width: number;
+  height: number;
+  volumeCBM: number;
+}
+
+const KenyaNewJob = () => {
+  const navigate = useNavigate();
+  const [jobType, setJobType] = useState<"collection" | "delivery">("collection");
+  const [formData, setFormData] = useState({
+    jobNumber: `KE-${Date.now().toString().slice(-6)}`,
+    date: new Date().toISOString().split("T")[0],
+    sector: "",
+    salesRep: "",
+    driver: "",
+    vehicle: "",
+    shipperPrefix: "",
+    shipperName: "",
+    shipperMobile: "",
+    shipperCity: "",
+    shipperAddress: "",
+    consigneePrefix: "",
+    consigneeName: "",
+    consigneeMobile: "",
+    consigneeCity: "",
+    consigneeAddress: "",
+    remarks: "",
+  });
+
+  const [packages, setPackages] = useState<PackageItem[]>([]);
+  const [pkgInput, setPkgInput] = useState({ description: "", quantity: "1", weightKg: "", length: "", width: "", height: "" });
+
+  const handleChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'vehicle') {
+      const d = getKenyaDriverForVehicle(value);
+      if (d) setFormData(prev => ({ ...prev, driver: d, vehicle: value }));
+    }
+  };
+
+  const addPackage = () => {
+    if (!pkgInput.description) { toast.error("Enter package description"); return; }
+    const l = parseFloat(pkgInput.length) || 0;
+    const w = parseFloat(pkgInput.width) || 0;
+    const h = parseFloat(pkgInput.height) || 0;
+    const vol = (l * w * h) / 1000000;
+    const weight = parseFloat(pkgInput.weightKg) || vol * 1000;
+
+    setPackages(prev => [...prev, {
+      id: uuidv4(),
+      boxNumber: prev.length + 1,
+      description: pkgInput.description,
+      quantity: parseInt(pkgInput.quantity) || 1,
+      weightKg: weight,
+      length: l, width: w, height: h,
+      volumeCBM: vol,
+    }]);
+    setPkgInput({ description: "", quantity: "1", weightKg: "", length: "", width: "", height: "" });
+    toast.success("Package added");
+  };
+
+  const removePackage = (id: string) => setPackages(prev => prev.filter(p => p.id !== id));
+
+  const handleSave = () => {
+    if (!formData.shipperName || !formData.consigneeName) {
+      toast.error("Shipper and consignee names are required");
+      return;
+    }
+    const job = {
+      id: uuidv4(),
+      ...formData,
+      type: jobType,
+      packages: packages.length,
+      totalWeight: packages.reduce((s, p) => s + p.weightKg * p.quantity, 0),
+      totalVolume: packages.reduce((s, p) => s + p.volumeCBM * p.quantity, 0),
+      packageItems: packages,
+      city: formData.consigneeCity || formData.shipperCity,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+    };
+
+    const existing = JSON.parse(localStorage.getItem("kenyaJobs") || "[]");
+    existing.push(job);
+    localStorage.setItem("kenyaJobs", JSON.stringify(existing));
+    toast.success("Job saved successfully!");
+    navigate("/kenya-ops/collection-delivery");
+  };
+
+  return (
+    <Layout title="Add New Job - Kenya">
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" onClick={() => navigate("/kenya-ops/collection-delivery")}>
+            <ArrowLeft className="h-4 w-4 mr-2" />Back
+          </Button>
+          <h1 className="text-3xl font-bold text-[#1e2a3a]">Add New Job - Kenya</h1>
+        </div>
+
+        <Card>
+          <CardHeader><CardTitle>Job Details</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>JOB TYPE</Label>
+                <Select value={jobType} onValueChange={(v: any) => setJobType(v)}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="collection">Collection</SelectItem>
+                    <SelectItem value="delivery">Delivery</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>JOB NUMBER</Label>
+                <Input value={formData.jobNumber} readOnly className="bg-gray-50" />
+              </div>
+              <div className="space-y-2">
+                <Label>DATE</Label>
+                <Input type="date" value={formData.date} onChange={(e) => handleChange('date', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>VEHICLE</Label>
+                <Select value={formData.vehicle} onValueChange={(v) => handleChange('vehicle', v)}>
+                  <SelectTrigger><SelectValue placeholder="Select vehicle" /></SelectTrigger>
+                  <SelectContent>{kenyaVehicles.map(v => <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>DRIVER</Label>
+                <Input value={formData.driver} onChange={(e) => handleChange('driver', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>SALES REP</Label>
+                <Select value={formData.salesRep} onValueChange={(v) => handleChange('salesRep', v)}>
+                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>{kenyaSalesReps.map(r => <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Shipper */}
+        <Card>
+          <CardHeader><CardTitle>SHIPPER</CardTitle></CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>PREFIX</Label>
+                <Select value={formData.shipperPrefix} onValueChange={(v) => handleChange('shipperPrefix', v)}>
+                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>{NAME_PREFIXES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2"><Label>NAME</Label><Input value={formData.shipperName} onChange={(e) => handleChange('shipperName', e.target.value)} /></div>
+              <div className="space-y-2"><Label>MOBILE</Label><Input value={formData.shipperMobile} onChange={(e) => handleChange('shipperMobile', e.target.value)} placeholder="+974..." /></div>
+              <div className="space-y-2">
+                <Label>CITY</Label>
+                <Select value={formData.shipperCity} onValueChange={(v) => handleChange('shipperCity', v)}>
+                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>{qatarCities.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2 md:col-span-2"><Label>ADDRESS</Label><Textarea value={formData.shipperAddress} onChange={(e) => handleChange('shipperAddress', e.target.value)} rows={2} /></div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Consignee */}
+        <Card>
+          <CardHeader><CardTitle>CONSIGNEE</CardTitle></CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>PREFIX</Label>
+                <Select value={formData.consigneePrefix} onValueChange={(v) => handleChange('consigneePrefix', v)}>
+                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>{NAME_PREFIXES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2"><Label>NAME</Label><Input value={formData.consigneeName} onChange={(e) => handleChange('consigneeName', e.target.value)} /></div>
+              <div className="space-y-2"><Label>MOBILE</Label><Input value={formData.consigneeMobile} onChange={(e) => handleChange('consigneeMobile', e.target.value)} placeholder="+254..." /></div>
+              <div className="space-y-2">
+                <Label>CITY</Label>
+                <Select value={formData.consigneeCity} onValueChange={(v) => handleChange('consigneeCity', v)}>
+                  <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                  <SelectContent>{kenyaCities.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2 md:col-span-2"><Label>ADDRESS</Label><Textarea value={formData.consigneeAddress} onChange={(e) => handleChange('consigneeAddress', e.target.value)} rows={2} /></div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Packages */}
+        <Card>
+          <CardHeader className="bg-green-700 text-white"><CardTitle>PACKAGES</CardTitle></CardHeader>
+          <CardContent className="space-y-4 pt-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="space-y-2"><Label>DESCRIPTION</Label><Input value={pkgInput.description} onChange={(e) => setPkgInput(p => ({ ...p, description: e.target.value }))} /></div>
+              <div className="space-y-2"><Label>L (cm)</Label><Input type="number" value={pkgInput.length} onChange={(e) => setPkgInput(p => ({ ...p, length: e.target.value }))} /></div>
+              <div className="space-y-2"><Label>W (cm)</Label><Input type="number" value={pkgInput.width} onChange={(e) => setPkgInput(p => ({ ...p, width: e.target.value }))} /></div>
+              <div className="space-y-2"><Label>H (cm)</Label><Input type="number" value={pkgInput.height} onChange={(e) => setPkgInput(p => ({ ...p, height: e.target.value }))} /></div>
+              <div className="space-y-2"><Label>WEIGHT (kg)</Label><Input type="number" value={pkgInput.weightKg} onChange={(e) => setPkgInput(p => ({ ...p, weightKg: e.target.value }))} /></div>
+              <div className="space-y-2"><Label>QTY</Label><Input type="number" value={pkgInput.quantity} onChange={(e) => setPkgInput(p => ({ ...p, quantity: e.target.value }))} /></div>
+            </div>
+            <Button onClick={addPackage} className="gap-2"><Plus className="h-4 w-4" />Add Package</Button>
+
+            {packages.length > 0 && (
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-green-700 hover:bg-green-700">
+                    <TableHead className="text-white">#</TableHead>
+                    <TableHead className="text-white">DESCRIPTION</TableHead>
+                    <TableHead className="text-white">DIMS</TableHead>
+                    <TableHead className="text-white">VOL (CBM)</TableHead>
+                    <TableHead className="text-white">WEIGHT</TableHead>
+                    <TableHead className="text-white">QTY</TableHead>
+                    <TableHead className="text-white">ACTION</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {packages.map((p, i) => (
+                    <TableRow key={p.id}>
+                      <TableCell>{i + 1}</TableCell>
+                      <TableCell>{p.description}</TableCell>
+                      <TableCell>{p.length}×{p.width}×{p.height}</TableCell>
+                      <TableCell>{p.volumeCBM.toFixed(3)}</TableCell>
+                      <TableCell>{p.weightKg} kg</TableCell>
+                      <TableCell>{p.quantity}</TableCell>
+                      <TableCell><Button variant="ghost" size="sm" onClick={() => removePackage(p.id)}><Trash2 className="h-4 w-4 text-red-600" /></Button></TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </CardContent>
+        </Card>
+
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => navigate("/kenya-ops/collection-delivery")}>Cancel</Button>
+          <Button className="bg-green-700 hover:bg-green-800 gap-2" onClick={handleSave}><Save className="h-4 w-4" />Save Job</Button>
+        </div>
+      </div>
+    </Layout>
+  );
+};
+
+export default KenyaNewJob;
