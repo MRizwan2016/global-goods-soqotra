@@ -16,7 +16,7 @@ import { lookupJobData } from "@/hooks/useJobAutoFill";
 import { supabase } from "@/integrations/supabase/client";
 import {
   sudanPorts, sudanSectors, sudanSalesReps, sudanDrivers, sudanDistricts,
-  sudanPackageTypes, doorToDoorPricing, namePrefixes, qatarCities, sudanCities,
+  doorToDoorPricing, namePrefixes, qatarCities, sudanCities,
   destinationCountries, countryCodes,
 } from "./data/sudanOpsData";
 import { toast } from "sonner";
