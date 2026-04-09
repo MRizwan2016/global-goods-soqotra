@@ -290,9 +290,42 @@ const SECTIONS: NavigationSections = {
       },
     ],
   },
+  kenya: {
+    title: "KENYA",
+    icon: Globe,
+    color: "text-white",
+    bgGradient: "from-green-600 to-green-800",
+    borderColor: "border-green-200",
+    iconColor: "text-white",
+    submenu: [
+      {
+        title: "INVOICING",
+        items: [
+          { name: "DASHBOARD", path: "/kenya-ops" },
+          { name: "ADD NEW INVOICE", path: "/kenya-ops/invoice/add" },
+          { name: "SAVED INVOICES", path: "/kenya-ops/saved-invoices" },
+        ],
+      },
+      {
+        title: "COLLECTION & DELIVERY",
+        items: [
+          { name: "COLLECTION & DELIVERY", path: "/kenya-ops/collection-delivery" },
+          { name: "ADD NEW JOB", path: "/kenya-ops/new-job" },
+          { name: "VIEW SCHEDULES", path: "/kenya-ops/schedules" },
+        ],
+      },
+      {
+        title: "ACCOUNTS",
+        items: [
+          { name: "PAYMENT RECEIPT", path: "/kenya-ops/payment-receipt" },
+          { name: "RECONCILIATION", path: "/kenya-ops/reconciliation" },
+        ],
+      },
+    ],
+  },
 };
 
-const SECTION_ORDER = ['upb', 'accounts', 'admin', 'cargo', 'sriLanka', 'saudiArabia'] as const;
+const SECTION_ORDER = ['upb', 'accounts', 'admin', 'cargo', 'sriLanka', 'saudiArabia', 'kenya'] as const;
 
 const PERMISSION_MAP: Record<string, string> = {
   upb: 'masterData',
