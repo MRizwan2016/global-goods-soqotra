@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScheduleService } from "@/services/ScheduleService";
-import { Printer, Eye, Calendar, Truck, Search } from "lucide-react";
+import { Printer, Eye, Calendar, Truck, Search, MessageCircle } from "lucide-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { toast } from "sonner";
 
 interface Schedule {
