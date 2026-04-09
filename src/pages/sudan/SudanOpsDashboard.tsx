@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Search, Edit, Eye, Trash2, Ship, Package, FileText } from "lucide-react";
 import { RegionalInvoiceService } from "@/services/RegionalInvoiceService";
+import SudanManifestDialog from "./components/SudanManifestDialog";
 
 const SudanOpsDashboard = () => {
   const navigate = useNavigate();
@@ -68,9 +69,12 @@ const SudanOpsDashboard = () => {
             <div className="w-12 h-8 bg-gradient-to-b from-red-600 via-white to-black rounded"></div>
             <h1 className="text-3xl font-bold text-[#1e2a3a]">Dashboard - Sudan</h1>
           </div>
-          <Button className="gap-2 bg-red-700 hover:bg-red-800" onClick={() => navigate("/sudan-ops/invoice/add")}>
-            <Plus className="h-4 w-4" />Add New
-          </Button>
+          <div className="flex gap-2">
+            <SudanManifestDialog />
+            <Button className="gap-2 bg-red-700 hover:bg-red-800" onClick={() => navigate("/sudan-ops/invoice/add")}>
+              <Plus className="h-4 w-4" />Add New
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

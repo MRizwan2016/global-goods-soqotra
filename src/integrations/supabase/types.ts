@@ -531,6 +531,13 @@ export type Database = {
             referencedRelation: "regional_invoices"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "regional_invoice_packages_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "sudan_customs_manifest"
+            referencedColumns: ["id"]
+          },
         ]
       }
       regional_invoices: {
@@ -1119,6 +1126,54 @@ export type Database = {
           total_volume_cbm: number | null
           total_weight_kg: number | null
           week_start: string | null
+        }
+        Relationships: []
+      }
+      sudan_customs_manifest: {
+        Row: {
+          book_number: string | null
+          consignee_name: string | null
+          description: string | null
+          id: string | null
+          invoice_date: string | null
+          invoice_number: string | null
+          job_number: string | null
+          page_number: string | null
+          sector: string | null
+          shipper_name: string | null
+          total_packages: number | null
+          total_volume: number | null
+          total_weight: number | null
+        }
+        Insert: {
+          book_number?: string | null
+          consignee_name?: string | null
+          description?: string | null
+          id?: string | null
+          invoice_date?: string | null
+          invoice_number?: string | null
+          job_number?: string | null
+          page_number?: string | null
+          sector?: string | null
+          shipper_name?: string | null
+          total_packages?: number | null
+          total_volume?: number | null
+          total_weight?: number | null
+        }
+        Update: {
+          book_number?: string | null
+          consignee_name?: string | null
+          description?: string | null
+          id?: string | null
+          invoice_date?: string | null
+          invoice_number?: string | null
+          job_number?: string | null
+          page_number?: string | null
+          sector?: string | null
+          shipper_name?: string | null
+          total_packages?: number | null
+          total_volume?: number | null
+          total_weight?: number | null
         }
         Relationships: []
       }
