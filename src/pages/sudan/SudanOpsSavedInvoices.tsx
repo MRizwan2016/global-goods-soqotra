@@ -52,9 +52,12 @@ const SudanOpsSavedInvoices = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold text-[#1e2a3a]">Saved Invoices - Sudan</h1>
-          <Button className="gap-2 bg-red-700 hover:bg-red-800" onClick={() => navigate("/sudan-ops/invoice/add")}>
-            <Plus className="h-4 w-4" />Add New Invoice
-          </Button>
+          <div className="flex gap-2">
+            <SudanManifestDialog />
+            <Button className="gap-2 bg-red-700 hover:bg-red-800" onClick={() => navigate("/sudan-ops/invoice/add")}>
+              <Plus className="h-4 w-4" />Add New Invoice
+            </Button>
+          </div>
         </div>
         <div className="relative">
           <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
