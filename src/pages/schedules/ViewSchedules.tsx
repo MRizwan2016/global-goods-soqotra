@@ -9,7 +9,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ScheduleService } from "@/services/ScheduleService";
 import { Printer, Eye, Calendar, Search, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
-import { toast } from "sonner";
 
 interface Schedule {
   id: string;
