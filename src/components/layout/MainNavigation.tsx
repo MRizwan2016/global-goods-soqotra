@@ -323,9 +323,42 @@ const SECTIONS: NavigationSections = {
       },
     ],
   },
+  sudan: {
+    title: "SUDAN",
+    icon: Globe,
+    color: "text-white",
+    bgGradient: "from-red-600 to-red-800",
+    borderColor: "border-red-200",
+    iconColor: "text-white",
+    submenu: [
+      {
+        title: "INVOICING",
+        items: [
+          { name: "DASHBOARD", path: "/sudan-ops" },
+          { name: "ADD NEW INVOICE", path: "/sudan-ops/invoice/add" },
+          { name: "SAVED INVOICES", path: "/sudan-ops/saved-invoices" },
+        ],
+      },
+      {
+        title: "COLLECTION & DELIVERY",
+        items: [
+          { name: "COLLECTION & DELIVERY", path: "/sudan-ops/collection-delivery" },
+          { name: "ADD NEW JOB", path: "/sudan-ops/new-job" },
+          { name: "VIEW SCHEDULES", path: "/sudan-ops/schedules" },
+        ],
+      },
+      {
+        title: "ACCOUNTS",
+        items: [
+          { name: "PAYMENT RECEIPT", path: "/sudan-ops/payment-receipt" },
+          { name: "RECONCILIATION", path: "/sudan-ops/reconciliation" },
+        ],
+      },
+    ],
+  },
 };
 
-const SECTION_ORDER = ['upb', 'accounts', 'admin', 'cargo', 'sriLanka', 'saudiArabia', 'kenya'] as const;
+const SECTION_ORDER = ['upb', 'accounts', 'admin', 'cargo', 'sriLanka', 'saudiArabia', 'kenya', 'sudan'] as const;
 
 const PERMISSION_MAP: Record<string, string> = {
   upb: 'masterData',

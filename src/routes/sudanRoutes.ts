@@ -1,28 +1,21 @@
-
 import { RouteConfig } from "./types";
-import SudanDashboard from "@/pages/sudan/SudanDashboard";
-import SudanInvoiceForm from "@/pages/sudan/SudanInvoiceForm";
-import SudanInvoicePrint from "@/pages/sudan/SudanInvoicePrint";
+import SudanOpsDashboard from "@/pages/sudan/SudanOpsDashboard";
+import SudanOpsInvoiceForm from "@/pages/sudan/SudanOpsInvoiceForm";
+import SudanOpsSavedInvoices from "@/pages/sudan/SudanOpsSavedInvoices";
+import SudanOpsCollectionDelivery from "@/pages/sudan/SudanOpsCollectionDelivery";
+import SudanOpsNewJob from "@/pages/sudan/SudanOpsNewJob";
+import SudanOpsPaymentReceipt from "@/pages/sudan/SudanOpsPaymentReceipt";
+import SudanOpsReconciliation from "@/pages/sudan/SudanOpsReconciliation";
+import ViewSchedules from "@/pages/schedules/ViewSchedules";
 
 export const sudanRoutes: RouteConfig[] = [
-  {
-    path: "/sudan",
-    element: SudanDashboard,
-    private: true
-  },
-  {
-    path: "/sudan/invoice/add",
-    element: SudanInvoiceForm,
-    private: true
-  },
-  {
-    path: "/sudan/invoice/edit/:id",
-    element: SudanInvoiceForm,
-    private: true
-  },
-  {
-    path: "/sudan/invoice/print/:id",
-    element: SudanInvoicePrint,
-    private: true
-  }
+  { path: "/sudan-ops", element: SudanOpsDashboard, private: true },
+  { path: "/sudan-ops/invoice/add", element: SudanOpsInvoiceForm, private: true },
+  { path: "/sudan-ops/invoice/edit/:id", element: SudanOpsInvoiceForm, private: true },
+  { path: "/sudan-ops/saved-invoices", element: SudanOpsSavedInvoices, private: true },
+  { path: "/sudan-ops/collection-delivery", element: SudanOpsCollectionDelivery, private: true },
+  { path: "/sudan-ops/new-job", element: SudanOpsNewJob, private: true },
+  { path: "/sudan-ops/schedules", element: ViewSchedules, private: true },
+  { path: "/sudan-ops/payment-receipt", element: SudanOpsPaymentReceipt, private: true },
+  { path: "/sudan-ops/reconciliation", element: SudanOpsReconciliation, private: true },
 ];
