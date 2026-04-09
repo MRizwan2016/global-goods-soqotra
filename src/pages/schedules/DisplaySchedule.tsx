@@ -201,10 +201,10 @@ const DisplaySchedule: React.FC = () => {
                       const jobData = job.job_data;
                       return (
                         <TableRow key={job.id} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                          <TableCell className="font-medium">{jobData.jobNumber || `JOB-${index + 1}`}</TableCell>
-                          <TableCell>{jobData.customer || 'N/A'}</TableCell>
-                          <TableCell>{jobData.fromAddress || 'N/A'}</TableCell>
-                          <TableCell>{jobData.toAddress || 'N/A'}</TableCell>
+                          <TableCell className="font-medium">{jobData.jobNumber || jobData.job_number || `JOB-${index + 1}`}</TableCell>
+                          <TableCell>{jobData.customer || jobData.shipperName || 'N/A'}</TableCell>
+                          <TableCell>{jobData.fromAddress || jobData.shipperAddress || jobData.shipper_address || (jobData.shipperCity ? `${jobData.shipperCity}` : 'N/A')}</TableCell>
+                          <TableCell>{jobData.toAddress || jobData.consigneeAddress || jobData.consignee_address || (jobData.consigneeCity ? `${jobData.consigneeCity}` : 'N/A')}</TableCell>
                           <TableCell>{jobData.serviceType || 'N/A'}</TableCell>
                           <TableCell>
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${
