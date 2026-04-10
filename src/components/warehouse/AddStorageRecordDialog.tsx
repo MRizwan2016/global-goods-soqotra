@@ -88,11 +88,18 @@ const AddStorageRecordDialog: React.FC<AddStorageRecordDialogProps> = ({ country
         <div className="space-y-4">
           <div>
             <Label>{t('table.invoiceNumber')}</Label>
-            <Input value={form.invoice_number} onChange={e => setForm(f => ({ ...f, invoice_number: e.target.value }))} />
+            <div className="relative">
+              <Input value={form.invoice_number} onChange={e => {
+                const val = e.target.value;
+                setForm(f => ({ ...f, invoice_number: val }));
+                lookupInvoice(val);
+              }} />
+              {lookupLoading && <Loader2 className="h-4 w-4 animate-spin absolute right-3 top-3 text-muted-foreground" />}
+            </div>
           </div>
           <div>
             <Label>{t('table.customer')}</Label>
-            <Input value={form.customer_name} onChange={e => setForm(f => ({ ...f, customer_name: e.target.value }))} />
+            <Input value={form.customer_name} readOnly className="bg-muted" />
           </div>
           <div>
             <Label>{t('storage.cargoType')}</Label>
