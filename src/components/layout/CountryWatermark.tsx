@@ -46,9 +46,9 @@ const CountryWatermark: React.FC = () => {
           backgroundImage: `url("${bgImage}")`,
           backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center center',
-          backgroundSize: country ? '50%' : '35%',
-          opacity: 0.07,
-          filter: 'grayscale(30%)',
+          backgroundSize: country ? '55%' : '40%',
+          opacity: 0.10,
+          filter: 'grayscale(20%)',
         }}
       />
     </div>
