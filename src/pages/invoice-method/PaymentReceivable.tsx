@@ -9,6 +9,7 @@ import { useInvoiceFilters } from "./hooks/useInvoiceFilters";
 import { toast } from "sonner";
 import PaymentReceiptHandler from "./components/PaymentReceiptHandler";
 import DigitalCalculator from "@/components/calculator/DigitalCalculator";
+import WarehouseStorageInvoiceList from "@/components/warehouse/WarehouseStorageInvoiceList";
 
 const PaymentReceivable = () => {
   const { invoices } = useInvoiceData();
@@ -44,10 +45,10 @@ const PaymentReceivable = () => {
         />
         <StatusTabs invoices={filteredInvoices} />
         
-        {/* Add PaymentReceiptHandler to handle receipt generation */}
-        <PaymentReceiptHandler />
+        {/* Warehouse Storage Invoices Section */}
+        <WarehouseStorageInvoiceList />
         
-        {/* Add Digital Calculator */}
+        <PaymentReceiptHandler />
         <DigitalCalculator />
       </div>
     </Layout>
