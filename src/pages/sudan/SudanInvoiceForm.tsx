@@ -40,6 +40,7 @@ import {
 import { calculateCubicMeter } from "@/pages/invoicing/utils/packageDimensions";
 
 const SudanInvoiceForm = () => {
+  const { salesReps: dbSalesReps } = useSalesReps('Sudan');
   const navigate = useNavigate();
   const { id } = useParams();
   
@@ -447,8 +448,8 @@ const SudanInvoiceForm = () => {
                   <SelectValue placeholder="Select sales rep" />
                 </SelectTrigger>
                 <SelectContent>
-                  {sudanSalesReps.map((rep) => (
-                    <SelectItem key={rep.value} value={rep.value}>
+                  {dbSalesReps.map((rep) => (
+                    <SelectItem key={rep.value} value={rep.label}>
                       {rep.label}
                     </SelectItem>
                   ))}
