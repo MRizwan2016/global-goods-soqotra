@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Warehouse } from 'lucide-react';
+import { Warehouse, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { supabase } from '@/integrations/supabase/client';
+import { debounce } from 'lodash';
 
 interface AddStorageRecordDialogProps {
   country: string;
@@ -16,6 +18,7 @@ interface AddStorageRecordDialogProps {
 const AddStorageRecordDialog: React.FC<AddStorageRecordDialogProps> = ({ country, onAdd }) => {
   const { t } = useLanguage();
   const [open, setOpen] = useState(false);
+  const [lookupLoading, setLookupLoading] = useState(false);
   const [form, setForm] = useState({
     invoice_number: '',
     customer_name: '',
@@ -25,6 +28,31 @@ const AddStorageRecordDialog: React.FC<AddStorageRecordDialogProps> = ({ country
     notes: '',
   });
 
+  const lookupInvoice = useCallback(
+    debounce(async (invoiceNumber: string) => {
+      if (!invoiceNumber || invoiceNumber.length < 3) return;
+      setLookupLoading(true);
+      try {
+        const { data } = await supabase
+          .from('regional_invoices')
+          .select('shipper_name, total_volume')
+          .eq('invoice_number', invoiceNumber)
+          .maybeSingle();
+        if (data) {
+          setForm(f => ({
+            ...f,
+            customer_name: data.shipper_name || '',
+            total_cbm: Number(data.total_volume) || 0,
+          }));
+        }
+      } catch (e) {
+        console.error('Invoice lookup failed:', e);
+      } finally {
+        setLookupLoading(false);
+      }
+    }, 500),
+    []
+  );
   const handleSubmit = async () => {
     if (!form.invoice_number) {
       toast.error('Invoice number is required');
