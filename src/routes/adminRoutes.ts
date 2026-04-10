@@ -26,5 +26,11 @@ export const adminRoutes: RouteConfig[] = [
     path: "/register",
     element: UserRegistration,
     private: true
+  },
+  {
+    path: "/admin/employee-leaderboard",
+    element: EmployeeLeaderboard,
+    private: true,
+    requiredPermission: "controlPanel"
   }
 ];
