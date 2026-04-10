@@ -2,6 +2,7 @@
 import ControlPanel from "@/pages/admin/ControlPanel";
 import UserRegistration from "@/pages/auth/UserRegistration";
 import VehicleMaintenance from "@/pages/admin/VehicleMaintenance";
+import EmployeeLeaderboard from "@/pages/admin/EmployeeLeaderboard";
 import { RouteConfig } from "./types";
 
 export const adminRoutes: RouteConfig[] = [
