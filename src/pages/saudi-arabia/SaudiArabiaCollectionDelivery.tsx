@@ -160,16 +160,16 @@ const SaudiArabiaCollectionDelivery = () => {
         <TableHeader>
           <TableRow className="bg-[#006c35] hover:bg-[#006c35]">
             <TableHead className="text-white font-medium w-10">✓</TableHead>
-            <TableHead className="text-white font-medium">JOB #</TableHead>
-            <TableHead className="text-white font-medium">DATE</TableHead>
-            <TableHead className="text-white font-medium">CUSTOMER</TableHead>
-            <TableHead className="text-white font-medium">CITY</TableHead>
-            <TableHead className="text-white font-medium">BOXES</TableHead>
-            <TableHead className="text-white font-medium">CBM</TableHead>
-            <TableHead className="text-white font-medium">VEHICLE</TableHead>
-            <TableHead className="text-white font-medium">DRIVER</TableHead>
-            <TableHead className="text-white font-medium">STATUS</TableHead>
-            <TableHead className="text-white font-medium">ACTIONS</TableHead>
+            <TableHead className="text-white font-medium">{t("table.jobNumber")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.date")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.customer")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.city")}</TableHead>
+            <TableHead className="text-white font-medium">{isRTL ? "صناديق" : "BOXES"}</TableHead>
+            <TableHead className="text-white font-medium">{t("unit.cbm")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.vehicle")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.driver")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.status")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -369,26 +369,26 @@ const SaudiArabiaCollectionDelivery = () => {
   }
 
   return (
-    <Layout title="Saudi Arabia - Collection & Delivery">
-      <div className="space-y-6">
+    <Layout title={t("page.collectionDeliverySaudi")}>
+      <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-4">
             <div className="w-12 h-8 bg-gradient-to-r from-green-600 to-green-800 rounded flex items-center justify-center">
               <Truck className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">Collection & Delivery - Saudi Arabia</h1>
+            <h1 className="text-3xl font-bold text-foreground">{t("page.collectionDeliverySaudi")}</h1>
           </div>
           <div className="flex gap-2 flex-wrap">
             {selectedJobs.size > 0 && (
               <Button className="gap-2 bg-purple-600 hover:bg-purple-700" onClick={() => setShowScheduleDialog(true)}>
-                <Calendar className="h-4 w-4" /> Post to Schedule ({selectedJobs.size})
+                <Calendar className="h-4 w-4" /> {isRTL ? "إرسال للجدول" : "Post to Schedule"} ({selectedJobs.size})
               </Button>
             )}
             <Button className="gap-2 bg-[#006c35] hover:bg-[#005a2d]" onClick={() => navigate("/saudi-arabia/schedules")}>
-              <Calendar className="h-4 w-4" /> View Schedules
+              <Calendar className="h-4 w-4" /> {t("collection.viewSchedules")}
             </Button>
             <Button className="gap-2 bg-[#006c35] hover:bg-[#005a2d]" onClick={() => navigate("/saudi-arabia/new-job")}>
-              <Plus className="h-4 w-4" /> Add New Job
+              <Plus className="h-4 w-4" /> {t("collection.addNewJob")}
             </Button>
           </div>
         </div>
@@ -407,23 +407,23 @@ const SaudiArabiaCollectionDelivery = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Select value={selectedCity} onValueChange={setSelectedCity}>
-            <SelectTrigger><SelectValue placeholder="All Cities" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t("warehouse.allCities")} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Cities</SelectItem>
+              <SelectItem value="all">{t("warehouse.allCities")}</SelectItem>
               {["RIYADH", "JEDDAH", "DAMMAM", "AL-KHOBAR", "MECCA", "MEDINAH", "TABUK", "ABHA"].map(c => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
             </SelectContent>
           </Select>
           <div className="relative col-span-2">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search by customer or job #..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
+            <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 h-4 w-4 text-muted-foreground`} />
+            <Input placeholder={t("search.searchJobs")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={isRTL ? 'pr-10' : 'pl-10'} />
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
-            <TabsTrigger value="collections">Collections ({collections.length})</TabsTrigger>
-            <TabsTrigger value="deliveries">Deliveries ({deliveries.length})</TabsTrigger>
-            <TabsTrigger value="all">All Jobs ({allJobs.length})</TabsTrigger>
+            <TabsTrigger value="collections">{isRTL ? "التحصيلات" : "Collections"} ({collections.length})</TabsTrigger>
+            <TabsTrigger value="deliveries">{isRTL ? "التوصيلات" : "Deliveries"} ({deliveries.length})</TabsTrigger>
+            <TabsTrigger value="all">{t("label.all")} ({allJobs.length})</TabsTrigger>
           </TabsList>
           <TabsContent value="collections">{renderJobTable(filterJobs(collections))}</TabsContent>
           <TabsContent value="deliveries">{renderJobTable(filterJobs(deliveries))}</TabsContent>
