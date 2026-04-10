@@ -429,6 +429,91 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_transactions: {
+        Row: {
+          amount_paid: number
+          balance_after: number | null
+          country: string | null
+          created_at: string
+          created_by: string | null
+          currency: string | null
+          discount_applied: number | null
+          gross_amount: number | null
+          id: string
+          invoice_id: string | null
+          invoice_number: string
+          net_amount: number | null
+          payment_date: string | null
+          payment_method: string | null
+          receipt_number: string | null
+          remarks: string | null
+          updated_at: string
+          warehouse: string | null
+        }
+        Insert: {
+          amount_paid?: number
+          balance_after?: number | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          discount_applied?: number | null
+          gross_amount?: number | null
+          id?: string
+          invoice_id?: string | null
+          invoice_number: string
+          net_amount?: number | null
+          payment_date?: string | null
+          payment_method?: string | null
+          receipt_number?: string | null
+          remarks?: string | null
+          updated_at?: string
+          warehouse?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          balance_after?: number | null
+          country?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string | null
+          discount_applied?: number | null
+          gross_amount?: number | null
+          id?: string
+          invoice_id?: string | null
+          invoice_number?: string
+          net_amount?: number | null
+          payment_date?: string | null
+          payment_method?: string | null
+          receipt_number?: string | null
+          remarks?: string | null
+          updated_at?: string
+          warehouse?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_transactions_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "payment_receivable_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "regional_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_transactions_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "sudan_customs_manifest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           country: string | null
@@ -524,6 +609,13 @@ export type Database = {
           width?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "regional_invoice_packages_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "payment_receivable_summary"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "regional_invoice_packages_invoice_id_fkey"
             columns: ["invoice_id"]
@@ -1096,6 +1188,32 @@ export type Database = {
       }
     }
     Views: {
+      payment_receivable_summary: {
+        Row: {
+          balance_due: number | null
+          book_number: string | null
+          consignee_mobile: string | null
+          consignee_name: string | null
+          country: string | null
+          created_at: string | null
+          currency: string | null
+          discount: number | null
+          gross: number | null
+          id: string | null
+          invoice_date: string | null
+          invoice_number: string | null
+          job_number: string | null
+          net: number | null
+          payment_method: string | null
+          payment_status: string | null
+          shipper_mobile: string | null
+          shipper_name: string | null
+          total_discount_applied: number | null
+          total_paid: number | null
+          warehouse: string | null
+        }
+        Relationships: []
+      }
       staff_annual_performance: {
         Row: {
           avg_satisfaction: number | null
