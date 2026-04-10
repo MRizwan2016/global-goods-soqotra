@@ -27,7 +27,28 @@ const PaymentModal: React.FC<PaymentModalProps> = ({ invoice, isOpen, onClose, o
 
   const gross = Number(invoice?.gross) || Number(invoice?.net) || Number(invoice?.amount) || 0;
   const existingPaid = Number(invoice?.totalPaid) || 0;
-  const currencySymbol = invoice?.currency || "QAR";
+
+  // Determine currency from country
+  const getCurrencyForCountry = (country?: string): string => {
+    switch (country?.toLowerCase()) {
+      case 'qatar': return 'QAR';
+      case 'saudi arabia': return 'SAR';
+      case 'sri lanka': return 'LKR';
+      case 'kenya': return 'KES';
+      case 'sudan': return 'SDG';
+      case 'uae': return 'AED';
+      case 'tunisia': return 'TND';
+      case 'oman': return 'OMR';
+      case 'bahrain': return 'BHD';
+      case 'kuwait': return 'KWD';
+      case 'egypt': return 'EGP';
+      case 'ethiopia': return 'ETB';
+      case 'somalia': return 'USD';
+      case 'uganda': return 'UGX';
+      default: return 'QAR';
+    }
+  };
+  const currencySymbol = invoice?.currency || getCurrencyForCountry(invoice?.country);
 
   // Live calculation
   const liveCalc = useMemo(() => {
