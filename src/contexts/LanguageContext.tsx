@@ -239,7 +239,10 @@ const countryLanguages: Record<string, Language[]> = {
   "kenya": ["en", "ar", "sw"],
   "sri-lanka": ["en", "ar", "si", "ta"],
   "srilanka": ["en", "ar", "si", "ta"],
-  // Default for other countries
+  "saudi-arabia": ["en", "ar"],
+  "sudan": ["en", "ar"],
+  "sudan-ops": ["en", "ar"],
+  "tunisia": ["en", "ar"],
   "default": ["en", "ar"]
 };
 
