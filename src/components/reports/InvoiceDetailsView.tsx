@@ -12,6 +12,7 @@ import CargoDetailsTable from './invoice-details/CargoDetailsTable';
 import ShippingTrackingInfo from './invoice-details/ShippingTrackingInfo';
 import ActionButtons from './invoice-details/ActionButtons';
 import { mockInvoiceData } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
 
 export const InvoiceDetailsView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
