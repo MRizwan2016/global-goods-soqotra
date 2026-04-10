@@ -858,23 +858,32 @@ export type Database = {
         Row: {
           country: string
           created_at: string
+          employee_number: string | null
           id: string
           is_active: boolean
           name: string
+          operation: string | null
+          title: string | null
         }
         Insert: {
           country: string
           created_at?: string
+          employee_number?: string | null
           id?: string
           is_active?: boolean
           name: string
+          operation?: string | null
+          title?: string | null
         }
         Update: {
           country?: string
           created_at?: string
+          employee_number?: string | null
           id?: string
           is_active?: boolean
           name?: string
+          operation?: string | null
+          title?: string | null
         }
         Relationships: []
       }
