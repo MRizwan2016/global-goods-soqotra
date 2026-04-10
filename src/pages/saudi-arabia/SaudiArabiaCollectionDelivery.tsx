@@ -434,37 +434,37 @@ const SaudiArabiaCollectionDelivery = () => {
       {/* Post to Schedule Dialog */}
       <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
         <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>Post {selectedJobs.size} Job(s) to Schedule</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{isRTL ? `إرسال ${selectedJobs.size} عمل للجدول` : `Post ${selectedJobs.size} Job(s) to Schedule`}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Vehicle (Truck) *</Label>
+              <Label>{t("schedule.vehicle")} *</Label>
               <Select value={scheduleVehicle} onValueChange={handleVehicleChange}>
-                <SelectTrigger><SelectValue placeholder="Select vehicle" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t("form.selectVehicle")} /></SelectTrigger>
                 <SelectContent>{saudiArabiaVehicles.map(v => (<SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>))}</SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Driver</Label>
+              <Label>{t("schedule.driver")}</Label>
               <Select value={scheduleDriver} onValueChange={setScheduleDriver}>
-                <SelectTrigger><SelectValue placeholder="Select driver" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t("form.selectDriver")} /></SelectTrigger>
                 <SelectContent>{saudiArabiaDrivers.map(d => (<SelectItem key={d.value} value={d.label}>{d.label}</SelectItem>))}</SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Sales Rep</Label>
+              <Label>{t("schedule.salesRep")}</Label>
               <Select value={scheduleSalesRep} onValueChange={setScheduleSalesRep}>
-                <SelectTrigger><SelectValue placeholder="Select sales rep" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={isRTL ? "اختر مندوب المبيعات" : "Select sales rep"} /></SelectTrigger>
                 <SelectContent>{saudiArabiaSalesReps.map(s => (<SelectItem key={s.value} value={s.label}>{s.label}</SelectItem>))}</SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Helper</Label>
-              <Input placeholder="Enter helper name" value={scheduleHelper} onChange={(e) => setScheduleHelper(e.target.value)} />
+              <Label>{t("schedule.helper")}</Label>
+              <Input placeholder={isRTL ? "أدخل اسم المساعد" : "Enter helper name"} value={scheduleHelper} onChange={(e) => setScheduleHelper(e.target.value)} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowScheduleDialog(false)}>Cancel</Button>
-            <Button className="bg-[#006c35] hover:bg-[#005a2d]" onClick={handlePostToSchedule}>Create Schedule</Button>
+            <Button variant="outline" onClick={() => setShowScheduleDialog(false)}>{t("action.cancel")}</Button>
+            <Button className="bg-[#006c35] hover:bg-[#005a2d]" onClick={handlePostToSchedule}>{t("action.createSchedule")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
