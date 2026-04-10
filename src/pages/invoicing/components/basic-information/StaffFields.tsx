@@ -2,6 +2,7 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useSalesReps } from "@/hooks/useSalesReps";
 
 interface StaffFieldsProps {
   formState: any;
@@ -18,22 +19,12 @@ const DRIVERS = [
   "Mr. Idris Karar"
 ];
 
-const SALES_REPS = [
-  "Mr. Lahiru Chathuranga",
-  "Mr. Ali Hussain",
-  "Mr. Paolo Fernando",
-  "Mr. Evans",
-  "Mr. Paul Onchano",
-  "Mr. Edwin Mbugua",
-  "Mr. Zacharia",
-  "Mr. Jun Jun Santos",
-  "Mr. Raymond"
-];
-
 const StaffFields: React.FC<StaffFieldsProps> = ({
   formState,
   handleSelectChange,
 }) => {
+  const { salesReps: dbSalesReps } = useSalesReps();
+
   return (
     <>
       <div className="space-y-2">
@@ -46,8 +37,8 @@ const StaffFields: React.FC<StaffFieldsProps> = ({
             <SelectValue placeholder="Select Sales Rep" />
           </SelectTrigger>
           <SelectContent>
-            {SALES_REPS.map((rep) => (
-              <SelectItem key={rep} value={rep}>{rep}</SelectItem>
+            {dbSalesReps.map((rep) => (
+              <SelectItem key={rep.value} value={rep.value}>{rep.label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
