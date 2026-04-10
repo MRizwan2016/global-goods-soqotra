@@ -9,7 +9,8 @@ import { toast } from "sonner";
 // Import Sudan-specific components and data
 import { useSudanInvoice } from "./hooks/useSudanInvoice";
 import SudanInvoicePreview from "./components/SudanInvoicePreview";
-import { sudanSectors, sudanSalesReps, sudanDrivers, sudanDistricts, sudanPorts } from "./data/sudanData";
+import { sudanSectors, sudanDrivers, sudanDistricts, sudanPorts } from "./data/sudanData";
+import { useSalesReps } from "@/hooks/useSalesReps";
 
 // Import shipping components
 import ShipperDetails from "./components/shipping/ShipperDetails";
