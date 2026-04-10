@@ -1,6 +1,7 @@
 import { RouteConfig } from "./types";
 import TunisiaProtectedDashboard from "@/pages/tunisia/TunisiaProtectedDashboard";
 import TunisiaInvoiceDashboard from "@/pages/tunisia/TunisiaInvoiceDashboard";
+import TunisiaInvoiceFormPage from "@/pages/tunisia/TunisiaInvoiceFormPage";
 import TunisiaAirManifest from "@/pages/tunisia/TunisiaAirManifest";
 import TunisiaSeaManifest from "@/pages/tunisia/TunisiaSeaManifest";
 import ViewSchedules from "@/pages/schedules/ViewSchedules";
@@ -24,12 +25,12 @@ export const tunisiaRoutes: RouteConfig[] = [
   },
   {
     path: "/tunisia/invoice/add",
-    element: TunisiaInvoiceDashboard,
+    element: TunisiaInvoiceFormPage,
     private: true
   },
   {
     path: "/tunisia/invoice/edit/:id",
-    element: TunisiaInvoiceDashboard,
+    element: TunisiaInvoiceFormPage,
     private: true
   },
   {
