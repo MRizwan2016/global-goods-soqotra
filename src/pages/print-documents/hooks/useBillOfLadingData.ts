@@ -7,7 +7,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { transformBLRecord, transformInvoiceToHBL } from "../utils/blDataTransformers";
 import { BillOfLadingData } from "../types/billOfLadingTypes";
 import { getBillOfLadingById, saveBillOfLading } from "@/pages/bill-of-lading/services/BillOfLadingService";
-import { getBillOfLadingById, saveBillOfLading } from "@/pages/bill-of-lading/services/BillOfLadingService";
 
 export const useBillOfLadingData = () => {
   const { id } = useParams();
