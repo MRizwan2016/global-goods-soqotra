@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Search, Edit, MessageCircle } from "lucide-react";
+import WarehouseStoragePanel from "@/components/warehouse/WarehouseStoragePanel";
 import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
 import SudanManifestDialog from "./components/SudanManifestDialog";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -105,6 +106,8 @@ const SudanOpsSavedInvoices = () => {
             </Table>
           </CardContent>
         </Card>
+
+        <WarehouseStoragePanel country="Sudan" />
       </div>
     </Layout>
   );

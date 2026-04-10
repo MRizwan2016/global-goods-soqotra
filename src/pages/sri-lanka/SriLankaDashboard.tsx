@@ -7,6 +7,7 @@ import { Plus, FileText, Printer, Edit, Trash2, Eye, Plane, Ship, MessageCircle 
 import { toast } from 'sonner';
 import Layout from '@/components/layout/Layout';
 import { RegionalInvoiceService, RegionalInvoiceRow } from '@/services/RegionalInvoiceService';
+import WarehouseStoragePanel from '@/components/warehouse/WarehouseStoragePanel';
 
 interface SriLankaInvoice {
   id: string;
@@ -283,6 +284,8 @@ const SriLankaDashboard = () => {
             )}
           </CardContent>
         </Card>
+
+        <WarehouseStoragePanel country="Sri Lanka" />
       </div>
     </Layout>
   );
