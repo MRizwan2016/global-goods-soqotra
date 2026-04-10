@@ -24,6 +24,7 @@ import { Search, CreditCard, BookOpen, Ship, Trash2 } from "lucide-react";
 import { TunisiaStorageService } from "./services/TunisiaStorageService";
 import { TunisiaInvoiceBookService } from "./services/TunisiaInvoiceBookService";
 import { toast } from "sonner";
+import WarehouseStoragePanel from "@/components/warehouse/WarehouseStoragePanel";
 
 const TunisiaDashboard: React.FC = () => {
   const { language } = useLanguage();
@@ -975,6 +976,8 @@ const TunisiaDashboard: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+
+        <WarehouseStoragePanel country="Tunisia" />
       </div>
     </Layout>
   );
