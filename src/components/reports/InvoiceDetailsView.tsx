@@ -78,12 +78,34 @@ export const InvoiceDetailsView: React.FC = () => {
             .maybeSingle();
 
           if (dbInvoice) {
+            // Fetch package details from regional_invoice_packages
+            const { data: dbPackages } = await supabase
+              .from('regional_invoice_packages')
+              .select('*')
+              .eq('invoice_id', dbInvoice.id)
+              .order('box_number', { ascending: true });
+
+            const packageDetails = (dbPackages || []).map((pkg: any) => ({
+              id: pkg.id,
+              name: pkg.package_name || '-',
+              length: pkg.length,
+              width: pkg.width,
+              height: pkg.height,
+              volume: pkg.cubic_metre || pkg.volume,
+              weight: pkg.weight,
+              price: pkg.price,
+              quantity: pkg.quantity || 1,
+              boxNumber: pkg.box_number,
+            }));
+
             foundInvoice = {
               id: dbInvoice.id,
               invoiceNumber: dbInvoice.invoice_number,
               date: dbInvoice.invoice_date || dbInvoice.created_at?.split('T')[0],
               shipper1: dbInvoice.shipper_name,
+              shipper2: '',
               consignee1: dbInvoice.consignee_name,
+              consignee2: '',
               country: dbInvoice.country,
               gross: dbInvoice.gross,
               discount: dbInvoice.discount,
@@ -94,26 +116,55 @@ export const InvoiceDetailsView: React.FC = () => {
               pageNumber: dbInvoice.page_number,
               jobNumber: dbInvoice.job_number,
               shipperMobile: dbInvoice.shipper_mobile,
+              shipperAddress: dbInvoice.shipper_address,
+              shipperCity: dbInvoice.shipper_city,
+              shipperCountry: dbInvoice.shipper_country,
+              shipperEmail: dbInvoice.shipper_email,
+              shipperIdNumber: dbInvoice.shipper_id_number,
               consigneeMobile: dbInvoice.consignee_mobile,
               consigneeAddress: dbInvoice.consignee_address,
-              shipperAddress: dbInvoice.shipper_address,
+              consigneeCity: dbInvoice.consignee_city,
+              consigneeCountry: dbInvoice.consignee_country,
+              consigneeEmail: dbInvoice.consignee_email,
+              consigneeIdNumber: dbInvoice.consignee_id_number,
+              consigneeLandPhone: dbInvoice.consignee_landline,
+              consigneeDistrict: dbInvoice.consignee_district,
+              consigneeProvince: dbInvoice.consignee_province,
               freight: dbInvoice.freight,
               localTransport: dbInvoice.local_transport,
               packingCharges: dbInvoice.packing_charges,
               storage: dbInvoice.storage,
               other: dbInvoice.other,
+              destinationTransport: dbInvoice.destination_transport,
+              destinationClearing: dbInvoice.destination_clearing,
+              destinationDoorDelivery: dbInvoice.destination_door_delivery,
+              documentsFee: dbInvoice.documents_fee,
+              transportationFee: dbInvoice.transportation_fee,
               paid: dbInvoice.payment_status === 'paid',
               partiallyPaid: dbInvoice.payment_status === 'partial',
               paymentStatus: dbInvoice.payment_status,
               paymentMethod: dbInvoice.payment_method,
               remarks: dbInvoice.remarks,
-              totalPackages: dbInvoice.total_packages,
+              totalPackages: dbPackages?.length || dbInvoice.total_packages,
               totalWeight: dbInvoice.total_weight,
               totalVolume: dbInvoice.total_volume,
               description: dbInvoice.description,
               destination: dbInvoice.destination,
               cargoType: dbInvoice.cargo_type,
               salesRepresentative: dbInvoice.sales_representative,
+              serviceType: dbInvoice.service_type,
+              freightBy: dbInvoice.freight_by,
+              doorToDoor: dbInvoice.door_to_door,
+              prePaid: dbInvoice.pre_paid,
+              sector: dbInvoice.sector,
+              district: dbInvoice.district,
+              driverName: dbInvoice.driver_name,
+              rate: dbInvoice.rate,
+              terminal: dbInvoice.terminal,
+              port: dbInvoice.port,
+              giftCargo: dbInvoice.gift_cargo,
+              consigneeDeliveryAddress: dbInvoice.consignee_delivery_address,
+              packageDetails: packageDetails,
             };
           }
         }

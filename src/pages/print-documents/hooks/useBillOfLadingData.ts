@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { mockInvoiceData } from "@/data/mockData";
+import { supabase } from "@/integrations/supabase/client";
 import { transformBLRecord, transformInvoiceToHBL } from "../utils/blDataTransformers";
 import { BillOfLadingData } from "../types/billOfLadingTypes";
 import { getBillOfLadingById, saveBillOfLading } from "@/pages/bill-of-lading/services/BillOfLadingService";
@@ -51,6 +52,55 @@ export const useBillOfLadingData = () => {
         // If not in localStorage, check mock data
         if (!invoiceData) {
           invoiceData = mockInvoiceData.find(inv => inv.id === id);
+        }
+        
+        // If still not found, check database
+        if (!invoiceData) {
+          const { data: dbInvoice } = await supabase
+            .from('regional_invoices')
+            .select('*')
+            .or(`id.eq.${id},invoice_number.eq.${id}`)
+            .maybeSingle();
+          
+          if (dbInvoice) {
+            const { data: dbPackages } = await supabase
+              .from('regional_invoice_packages')
+              .select('*')
+              .eq('invoice_id', dbInvoice.id)
+              .order('box_number', { ascending: true });
+
+            const packageDetails = (dbPackages || []).map((pkg: any) => ({
+              name: pkg.package_name || '-',
+              length: pkg.length,
+              width: pkg.width,
+              height: pkg.height,
+              volume: pkg.cubic_metre || pkg.volume,
+              weight: pkg.weight,
+            }));
+
+            invoiceData = {
+              id: dbInvoice.id,
+              invoiceNumber: dbInvoice.invoice_number,
+              date: dbInvoice.invoice_date,
+              shipper1: dbInvoice.shipper_name,
+              consignee1: dbInvoice.consignee_name,
+              consigneeIdNumber: dbInvoice.consignee_id_number,
+              shipperAddress: dbInvoice.shipper_address,
+              consigneeAddress: dbInvoice.consignee_address,
+              consigneeMobile: dbInvoice.consignee_mobile,
+              shipperMobile: dbInvoice.shipper_mobile,
+              country: dbInvoice.country,
+              warehouse: dbInvoice.warehouse,
+              weight: dbInvoice.total_weight?.toString() || "0",
+              volume: dbInvoice.total_volume?.toString() || "0",
+              packages: (dbPackages?.length || dbInvoice.total_packages || 1).toString(),
+              paid: dbInvoice.payment_status === 'paid',
+              cargoType: dbInvoice.cargo_type,
+              description: dbInvoice.description,
+              destination: dbInvoice.destination,
+              packageDetails: packageDetails,
+            };
+          }
         }
         
         // If still no data found, show error
