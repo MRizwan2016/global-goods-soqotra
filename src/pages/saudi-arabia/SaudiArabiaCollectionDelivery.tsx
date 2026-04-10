@@ -148,10 +148,10 @@ const SaudiArabiaCollectionDelivery = () => {
   };
 
   const stats = [
-    { title: "Total Collections", value: collections.length.toString(), icon: Package, color: "bg-emerald-500" },
-    { title: "Total Deliveries", value: deliveries.length.toString(), icon: Truck, color: "bg-blue-500" },
-    { title: "Completed", value: allJobs.filter(j => j.status === "completed" || j.status === "delivered").length.toString(), icon: Clock, color: "bg-green-600" },
-    { title: "Selected", value: selectedJobs.size.toString(), icon: Calendar, color: "bg-purple-600" },
+    { title: t("collection.cargoCollections"), value: collections.length.toString(), icon: Package, color: "bg-emerald-500" },
+    { title: t("collection.boxesDeliveries"), value: deliveries.length.toString(), icon: Truck, color: "bg-blue-500" },
+    { title: t("status.completed"), value: allJobs.filter(j => j.status === "completed" || j.status === "delivered").length.toString(), icon: Clock, color: "bg-green-600" },
+    { title: isRTL ? "محدد" : "Selected", value: selectedJobs.size.toString(), icon: Calendar, color: "bg-purple-600" },
   ];
 
   const renderJobTable = (data: any[]) => (
