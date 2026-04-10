@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Invoice } from "../types/invoice";
 import { toast } from "sonner";
@@ -11,36 +10,30 @@ interface UseStatusTabsProps {
 export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
   const [selectedTab, setSelectedTab] = useState("unpaid");
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showPaymentDetails, setShowPaymentDetails] = useState(false);
   const [showReceiptDialog, setShowReceiptDialog] = useState(false);
   const navigate = useNavigate();
 
-  // Split invoices into paid and unpaid
+  // Split invoices: unpaid = balance > 0 or not paid
   const unpaidInvoices = invoices.filter(invoice => !invoice.paid);
   const paidInvoices = invoices.filter(invoice => invoice.paid);
 
-  const handlePayClick = (invoice: Invoice) => {
-    console.log("Pay button clicked for invoice:", invoice);
+  const handlePayClick = useCallback((invoice: Invoice) => {
     setSelectedInvoice(invoice);
-    
-    // Store the invoice data temporarily to use it in the payment form
-    sessionStorage.setItem('selectedInvoice', JSON.stringify(invoice));
-    
-    // Navigate to the payment page
-    navigate('/accounts/payment/add');
-    
-    toast.success("Payment form opened", {
-      description: `Processing payment for invoice ${invoice.invoiceNumber}`,
-    });
-  };
+    setShowPaymentModal(true);
+  }, []);
+
+  const handleClosePaymentModal = useCallback(() => {
+    setShowPaymentModal(false);
+    setSelectedInvoice(null);
+  }, []);
 
   const handleViewPaymentDetails = (invoice: Invoice) => {
-    console.log("View payment details for invoice:", invoice);
     setSelectedInvoice(invoice);
     setShowPaymentDetails(true);
     setShowReceiptDialog(true);
-    
-    // Look for payment data in localStorage
+
     let paymentData: any = null;
     try {
       const payments = JSON.parse(localStorage.getItem('payments') || '[]');
@@ -49,7 +42,6 @@ export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
       console.error("Error reading payments:", e);
     }
 
-    // Dispatch event to open receipt dialog with invoice payment details
     const receiptData = {
       receiptNumber: paymentData?.receiptNumber || invoice.receiptNumber || `RCP-${invoice.invoiceNumber}`,
       invoiceNumber: invoice.invoiceNumber,
@@ -65,8 +57,6 @@ export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
   };
 
   const handleViewInvoice = (id: string) => {
-    console.log("View invoice details for ID:", id);
-    // Navigate to the InvoiceDetailsView component instead of print preview
     navigate(`/reports/cargo/invoice/${id}`);
     toast.success("Opening invoice details");
   };
@@ -82,9 +72,11 @@ export const useStatusTabs = ({ invoices }: UseStatusTabsProps) => {
     unpaidInvoices,
     paidInvoices,
     selectedInvoice,
+    showPaymentModal,
     showPaymentDetails,
     showReceiptDialog,
     handlePayClick,
+    handleClosePaymentModal,
     handleViewPaymentDetails,
     handleViewInvoice,
     handleClosePaymentDetails

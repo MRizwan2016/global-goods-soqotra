@@ -5,54 +5,93 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const useInvoiceData = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  
+
   useEffect(() => {
     const loadAllInvoices = async () => {
       try {
         let allInvoices: Invoice[] = [];
 
-        // Load from regional_invoices (Sri Lanka, Saudi Arabia, Kenya, Sudan, etc.)
-        const { data: regionalData, error: regionalError } = await supabase
-          .from('regional_invoices')
+        // Load from payment_receivable_summary view (regional invoices with payment data)
+        const { data: summaryData, error: summaryError } = await supabase
+          .from('payment_receivable_summary' as any)
           .select('*')
           .order('created_at', { ascending: false })
           .limit(1000);
 
-        if (!regionalError && regionalData) {
-          const regionalConverted = regionalData.map((inv): Invoice => {
-            const net = inv.net || inv.gross || 0;
-            const totalPaid = inv.payment_status === 'PAID' ? net : 
-                              inv.payment_status === 'PARTIAL' ? (net * 0.5) : 0;
-            const isPaid = inv.payment_status === 'PAID';
-            const isPartial = inv.payment_status === 'PARTIAL';
-            
+        if (!summaryError && summaryData) {
+          const converted = (summaryData as any[]).map((inv): Invoice => {
+            const net = Number(inv.net) || Number(inv.gross) || 0;
+            const totalPaid = Number(inv.total_paid) || 0;
+            const balanceDue = Number(inv.balance_due) || 0;
+            const isPaid = balanceDue <= 0 && totalPaid > 0;
+            const isPartial = totalPaid > 0 && balanceDue > 0;
+
             return {
               id: inv.id,
               invoiceNumber: inv.invoice_number,
-              date: inv.invoice_date || inv.created_at?.split('T')[0] || '',
+              date: inv.invoice_date || '',
               shipper1: inv.shipper_name || '',
               consignee1: inv.consignee_name || '',
               net: net,
-              gross: inv.gross || net,
-              discount: inv.discount || 0,
+              gross: Number(inv.gross) || net,
+              discount: Number(inv.discount) || 0,
               paid: isPaid,
               partiallyPaid: isPartial,
               totalPaid: totalPaid,
               paidAmount: totalPaid,
-              balanceToPay: Math.max(0, net - totalPaid),
-              currency: inv.country === 'Sudan' ? 'SDG' : 
-                        inv.country === 'Kenya' ? 'KES' : 'QAR',
+              balanceToPay: balanceDue,
+              currency: inv.currency || 'QAR',
               country: inv.country || '',
               amount: net,
               bookingForm: inv.book_number || inv.job_number || '',
-              warehouse: inv.destination || '',
+              warehouse: inv.warehouse || '',
               paymentStatus: inv.payment_status || 'UNPAID',
               paymentMethod: inv.payment_method || '',
               shipperMobile: inv.shipper_mobile || '',
               consigneeMobile: inv.consignee_mobile || '',
             };
           });
-          allInvoices.push(...regionalConverted);
+          allInvoices.push(...converted);
+        } else if (summaryError) {
+          console.warn("Could not load summary view, falling back to regional_invoices", summaryError);
+          // Fallback to regional_invoices directly
+          const { data: regionalData } = await supabase
+            .from('regional_invoices')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(1000);
+
+          if (regionalData) {
+            const regionalConverted = regionalData.map((inv): Invoice => {
+              const net = inv.net || inv.gross || 0;
+              const isPaid = inv.payment_status === 'PAID';
+              const isPartial = inv.payment_status === 'PARTIAL';
+              const totalPaid = isPaid ? net : isPartial ? (net * 0.5) : 0;
+
+              return {
+                id: inv.id,
+                invoiceNumber: inv.invoice_number,
+                date: inv.invoice_date || inv.created_at?.split('T')[0] || '',
+                shipper1: inv.shipper_name || '',
+                consignee1: inv.consignee_name || '',
+                net, gross: inv.gross || net,
+                discount: inv.discount || 0,
+                paid: isPaid, partiallyPaid: isPartial,
+                totalPaid, paidAmount: totalPaid,
+                balanceToPay: Math.max(0, net - totalPaid),
+                currency: inv.country === 'Sudan' ? 'SDG' : inv.country === 'Kenya' ? 'KES' : 'QAR',
+                country: inv.country || '',
+                amount: net,
+                bookingForm: inv.book_number || inv.job_number || '',
+                warehouse: inv.destination || '',
+                paymentStatus: inv.payment_status || 'UNPAID',
+                paymentMethod: inv.payment_method || '',
+                shipperMobile: inv.shipper_mobile || '',
+                consigneeMobile: inv.consignee_mobile || '',
+              };
+            });
+            allInvoices.push(...regionalConverted);
+          }
         }
 
         // Also load from invoices table (legacy Qatar)
@@ -61,7 +100,7 @@ export const useInvoiceData = () => {
             .from('invoices')
             .select('*')
             .limit(500);
-          
+
           if (!error && dbInvoices && dbInvoices.length > 0) {
             const dbConverted = dbInvoices.map((inv): Invoice => ({
               id: inv.id,
@@ -79,7 +118,7 @@ export const useInvoiceData = () => {
               country: 'QATAR',
               amount: inv.total_amount || 0,
             }));
-            
+
             const existingNumbers = new Set(allInvoices.map(i => i.invoiceNumber));
             const newDbInvoices = dbConverted.filter(i => i.invoiceNumber && !existingNumbers.has(i.invoiceNumber));
             allInvoices.push(...newDbInvoices);
@@ -95,16 +134,15 @@ export const useInvoiceData = () => {
           seen.add(inv.invoiceNumber);
           return true;
         });
-        
+
         console.log(`Loaded ${allInvoices.length} total invoices from database`);
         setInvoices(allInvoices);
-        
       } catch (error) {
         console.error("Error loading invoices:", error);
         toast.error("Could not load invoice data");
       }
     };
-    
+
     loadAllInvoices();
   }, []);
 
