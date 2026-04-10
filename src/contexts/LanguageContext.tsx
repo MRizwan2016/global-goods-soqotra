@@ -15,6 +15,23 @@ interface LanguageContextType {
 const translations: Record<Language, Record<string, string>> = {
   en: {
     "language.switch": "العربية",
+    "dashboard.title": "Dashboard Overview",
+    "dashboard.primaryDestinations": "Primary Destinations",
+    "dashboard.additionalDestinations": "Additional Destinations",
+    "dashboard.viewDetails": "View Details",
+    "navigation.back": "Back",
+    "country.kenya": "Kenya",
+    "country.tunisia": "Tunisia",
+    "country.uganda": "Uganda",
+    "country.philippines": "Philippines",
+    "country.sriLanka": "Sri Lanka",
+    "country.somalia": "Somalia",
+    "country.syria": "Syria",
+    "country.saudiArabia": "Saudi Arabia",
+    "country.ethiopia": "Ethiopia",
+    "country.sudan": "Sudan",
+    "country.eritrea": "Eritrea",
+    "country.algeria": "Algeria",
   },
   ar: arTranslations,
   am: {
