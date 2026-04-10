@@ -38,7 +38,11 @@ const TunisiaInvoiceFormPage: React.FC = () => {
 
   const handleSave = async (invoice: TunisiaInvoice) => {
     try {
-      await TunisiaStorageService.saveInvoice(invoice);
+      if (id) {
+        await TunisiaStorageService.updateInvoice(invoice);
+      } else {
+        await TunisiaStorageService.addInvoice(invoice);
+      }
       toast.success(id ? 'Invoice updated successfully' : 'Invoice created successfully');
       navigate('/tunisia/invoices');
     } catch (err) {
