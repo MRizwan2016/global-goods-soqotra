@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Invoice } from "../types/invoice";
 import { supabase } from "@/integrations/supabase/client";
+import { calculateStorageFee } from "@/utils/storageFeesCalculator";
 
 export const useInvoiceData = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -134,6 +135,45 @@ export const useInvoiceData = () => {
           seen.add(inv.invoiceNumber);
           return true;
         });
+
+        // Load warehouse storage fees and add to balances
+        try {
+          const { data: storageData } = await supabase
+            .from('warehouse_storage' as any)
+            .select('*')
+            .eq('storage_fee_paid', false);
+
+          if (storageData && (storageData as any[]).length > 0) {
+            const storageFeeMap = new Map<string, number>();
+            for (const sr of storageData as any[]) {
+              const fee = calculateStorageFee(
+                sr.cargo_type === 'vehicle' ? 'vehicle' : 'personal_effects',
+                sr.warehouse_received_date,
+                Number(sr.total_cbm) || 0
+              );
+              if (fee.totalFee > 0) {
+                const existing = storageFeeMap.get(sr.invoice_number) || 0;
+                storageFeeMap.set(sr.invoice_number, existing + fee.totalFee);
+              }
+            }
+
+            // Add storage fees to matching invoices' balance
+            allInvoices = allInvoices.map(inv => {
+              const storageFee = storageFeeMap.get(inv.invoiceNumber) || 0;
+              if (storageFee > 0) {
+                return {
+                  ...inv,
+                  storageFee,
+                  balanceToPay: (inv.balanceToPay || 0) + storageFee,
+                  net: (inv.net || 0) + storageFee,
+                };
+              }
+              return inv;
+            });
+          }
+        } catch (storageErr) {
+          console.log("Could not load storage fees:", storageErr);
+        }
 
         console.log(`Loaded ${allInvoices.length} total invoices from database`);
         setInvoices(allInvoices);
