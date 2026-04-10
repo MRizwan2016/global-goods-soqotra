@@ -14,45 +14,57 @@ import {
 } from "@/components/ui/table";
 import { PenLine } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface SalesRep {
   id: string;
-  title?: string; // Make optional for backward compatibility
+  title: string;
   name: string;
-  employeeNumber: string;
+  employee_number: string;
   operation: string;
-  available: string;
+  is_active: boolean;
+  country: string;
 }
 
 const SalesRepList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [salesReps, setSalesReps] = useState<SalesRep[]>([]);
+  const [loading, setLoading] = useState(true);
   
-  // Load sales reps on component mount
   useEffect(() => {
-    try {
-      const loadedSalesReps = JSON.parse(localStorage.getItem('salesReps') || '[]');
-      // Ensure backward compatibility by adding title if it doesn't exist
-      const updatedReps = loadedSalesReps.map((rep: SalesRep) => {
-        if (!rep.title) {
-          return { ...rep, title: "Mr." };
-        }
-        return rep;
-      });
-      setSalesReps(updatedReps);
-    } catch (error) {
-      console.error("Failed to load sales reps:", error);
-      toast.error("Failed to load sales representatives data");
-    }
+    const loadReps = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('sales_representatives')
+        .select('*')
+        .order('created_at', { ascending: true });
+      
+      if (error) {
+        console.error("Failed to load sales reps:", error);
+        toast.error("Failed to load sales representatives");
+      } else {
+        setSalesReps((data as any[]).map(r => ({
+          id: r.id,
+          title: r.title || 'Mr.',
+          name: r.name,
+          employee_number: r.employee_number || '-',
+          operation: r.operation || 'UPB - SYSTEM',
+          is_active: r.is_active,
+          country: r.country,
+        })));
+      }
+      setLoading(false);
+    };
+    loadReps();
   }, []);
   
-  // Filter sales reps based on search term
   const filteredData = salesReps.filter(rep => {
     if (!searchTerm) return true;
     return (
       rep.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      rep.employeeNumber?.includes(searchTerm) || 
-      rep.operation?.toLowerCase().includes(searchTerm.toLowerCase())
+      rep.employee_number?.includes(searchTerm) || 
+      rep.operation?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      rep.country?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
   
@@ -63,7 +75,9 @@ const SalesRepList = () => {
           <h3 className="text-lg font-medium text-green-800">
             View Sales Representative List
           </h3>
-          <p className="text-sm text-green-600">Record Listed.</p>
+          <p className="text-sm text-green-600">
+            {loading ? 'Loading...' : `${salesReps.length} Record${salesReps.length !== 1 ? 's' : ''} Listed.`}
+          </p>
         </div>
         
         <div className="p-4">
@@ -103,6 +117,7 @@ const SalesRepList = () => {
                   <BookingTableHead>Num</BookingTableHead>
                   <BookingTableHead>NAME</BookingTableHead>
                   <BookingTableHead>EMPLOYEE NUMBER</BookingTableHead>
+                  <BookingTableHead>COUNTRY</BookingTableHead>
                   <BookingTableHead>STATUS</BookingTableHead>
                   <BookingTableHead>OPERATION</BookingTableHead>
                   <BookingTableHead>MODIFY</BookingTableHead>
@@ -113,9 +128,12 @@ const SalesRepList = () => {
                   filteredData.map((rep, index) => (
                     <TableRow key={rep.id} className="hover:bg-green-50/50 transition-colors">
                       <BookingTableCell className="text-center">{index + 1}</BookingTableCell>
-                      <BookingTableCell>{rep.title || "Mr."} {rep.name}</BookingTableCell>
-                      <BookingTableCell>{rep.employeeNumber}</BookingTableCell>
-                      <BookingTableCell className="text-center">{rep.available}</BookingTableCell>
+                      <BookingTableCell>{rep.title} {rep.name}</BookingTableCell>
+                      <BookingTableCell>{rep.employee_number}</BookingTableCell>
+                      <BookingTableCell>{rep.country}</BookingTableCell>
+                      <BookingTableCell className="text-center">
+                        {rep.is_active ? 'Y' : 'N'}
+                      </BookingTableCell>
                       <BookingTableCell>{rep.operation}</BookingTableCell>
                       <BookingTableCell className="text-center">
                         <Link to={`/master/salesrep/edit/${rep.id}`}>
@@ -128,8 +146,8 @@ const SalesRepList = () => {
                   ))
                 ) : (
                   <TableRow>
-                    <BookingTableCell colSpan={6} className="text-center py-4 text-gray-500">
-                      No sales representatives found. Add a new one to get started.
+                    <BookingTableCell colSpan={7} className="text-center py-4 text-gray-500">
+                      {loading ? 'Loading...' : 'No sales representatives found. Add a new one to get started.'}
                     </BookingTableCell>
                   </TableRow>
                 )}
