@@ -6,7 +6,6 @@ interface ShippingDetailsProps {
   isFullScreen?: boolean;
 }
 
-// Safely extract a string from a value that might be an object
 const safeStr = (val: any, fallback = "-"): string => {
   if (val == null || val === "") return fallback;
   if (typeof val === "string") return val;
@@ -21,26 +20,6 @@ const ShippingDetails: React.FC<ShippingDetailsProps> = ({
   invoice, 
   isFullScreen = false 
 }) => {
-  // Get NIC/passport number from multiple possible properties
-  const getNicNumber = () => {
-    const possibleFields = ['nic', 'passport', 'idNumber', 'shipperIdNumber', 'consigneeIdNumber'];
-    
-    for (const field of possibleFields) {
-      if (invoice[field] && invoice[field].trim() !== '') {
-        return invoice[field];
-      }
-    }
-    
-    // Special case handling for demo invoices
-    if (invoice.id === "inv-13136051" || invoice.invoiceNumber === "13136051") {
-      return "QAT987654";
-    }
-    
-    return "N11234009"; // Default fallback value
-  };
-  
-  const nicNumber = getNicNumber();
-  
   return (
     <div className={`mt-6 ${isFullScreen ? 'animate-fade-in' : ''}`}>
       <div className="bg-blue-600 text-white p-2 font-semibold">
@@ -51,7 +30,7 @@ const ShippingDetails: React.FC<ShippingDetailsProps> = ({
         <div className="border rounded">
           <div className="grid grid-cols-2 border-b">
             <div className="p-2 bg-gray-100 font-semibold">HAND-OVER BY:</div>
-            <div className="p-2">{safeStr(invoice.handOverBy, "PAOLO")}</div>
+            <div className="p-2">{safeStr(invoice.driverName || invoice.handOverBy)}</div>
           </div>
           <div className="grid grid-cols-2 border-b">
             <div className="p-2 bg-gray-100 font-semibold">SHIPPER 1:</div>
@@ -71,11 +50,11 @@ const ShippingDetails: React.FC<ShippingDetailsProps> = ({
           </div>
           <div className="grid grid-cols-2 border-b">
             <div className="p-2 bg-gray-100 font-semibold">CITY:</div>
-            <div className="p-2 bg-blue-400 text-white">DOHA · 171</div>
+            <div className="p-2">{safeStr(invoice.shipperCity, "DOHA")}</div>
           </div>
           <div className="grid grid-cols-2 border-b">
             <div className="p-2 bg-gray-100 font-semibold">TOWN:</div>
-            <div className="p-2">{safeStr(invoice.shipperTown, "DOHA CITY")}</div>
+            <div className="p-2">{safeStr(invoice.shipperTown, safeStr(invoice.shipperCity, "DOHA"))}</div>
           </div>
           <div className="grid grid-cols-2 border-b">
             <div className="p-2 bg-gray-100 font-semibold">COUNTRY:</div>
@@ -110,19 +89,19 @@ const ShippingDetails: React.FC<ShippingDetailsProps> = ({
           </div>
           <div className="grid grid-cols-2 border-b">
             <div className="p-2 bg-gray-100 font-semibold">ADDRESS:</div>
-            <div className="p-2">{safeStr(invoice.address, "MAHAGAHAGODA YAKGAHA")}</div>
+            <div className="p-2">{safeStr(invoice.consigneeAddress)}</div>
           </div>
           <div className="grid grid-cols-2 border-b">
-            <div className="p-2 bg-gray-100 font-semibold"></div>
-            <div className="p-2">WALAHANDUWA</div>
+            <div className="p-2 bg-gray-100 font-semibold">DELIVERY ADDRESS:</div>
+            <div className="p-2">{safeStr(invoice.consigneeDeliveryAddress)}</div>
           </div>
           <div className="grid grid-cols-2 border-b">
             <div className="p-2 bg-gray-100 font-semibold">TOWN:</div>
-            <div className="p-2">{safeStr(invoice.consigneeTown, "SRI LANKA")}</div>
+            <div className="p-2">{safeStr(invoice.consigneeCity || invoice.consigneeCountry || invoice.country)}</div>
           </div>
           <div className="grid grid-cols-2 border-b">
             <div className="p-2 bg-gray-100 font-semibold">COUNTRY:</div>
-            <div className="p-2">{safeStr(invoice.country, "SRI LANKA")}</div>
+            <div className="p-2">{safeStr(invoice.consigneeCountry || invoice.country)}</div>
           </div>
           <div className="grid grid-cols-2 border-b">
             <div className="p-2 bg-gray-100 font-semibold">MOBILE:</div>
@@ -134,7 +113,7 @@ const ShippingDetails: React.FC<ShippingDetailsProps> = ({
           </div>
           <div className="grid grid-cols-2 border-b">
             <div className="p-2 bg-gray-100 font-semibold">PASSPORT /NIC:</div>
-            <div className="p-2 font-semibold text-blue-600">{safeStr(invoice.consigneeIdNumber, nicNumber)}</div>
+            <div className="p-2 font-semibold text-blue-600">{safeStr(invoice.consigneeIdNumber)}</div>
           </div>
           <div className="grid grid-cols-2">
             <div className="p-2 bg-gray-100 font-semibold">EMAIL:</div>
