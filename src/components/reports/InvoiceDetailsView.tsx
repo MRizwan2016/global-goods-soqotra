@@ -14,6 +14,21 @@ import ActionButtons from './invoice-details/ActionButtons';
 import { mockInvoiceData } from '@/data/mockData';
 import { supabase } from '@/integrations/supabase/client';
 
+const getCurrencyForCountry = (country?: string | null): string => {
+  switch (country?.toLowerCase()) {
+    case 'qatar': return 'QAR';
+    case 'saudi arabia': return 'SAR';
+    case 'sri lanka': return 'LKR';
+    case 'sudan': return 'SDG';
+    case 'kenya': return 'KES';
+    case 'tunisia': return 'TND';
+    case 'uae': case 'united arab emirates': return 'AED';
+    case 'oman': return 'OMR';
+    case 'somalia': return 'USD';
+    default: return 'QAR';
+  }
+};
+
 export const InvoiceDetailsView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
