@@ -68,18 +68,18 @@ const StorageInvoicePDF: React.FC<StorageInvoicePDFProps> = ({ record }) => {
 
           <table>
             <tbody>
-              <tr><th style={{ width: '40%' }}>{t('table.invoiceNumber')}</th><td>{record.invoice_number}</td></tr>
-              <tr><th>{t('table.customer')}</th><td>{record.customer_name || '-'}</td></tr>
-              <tr><th>{t('storage.cargoType')}</th><td>{record.cargo_type === 'vehicle' ? t('storage.vehicle') : t('storage.personalEffects')}</td></tr>
-              <tr><th>{t('storage.receivedDate')}</th><td>{record.warehouse_received_date}</td></tr>
-              <tr><th>{t('storage.daysInStorage')}</th><td>{fee?.daysInStorage || 0}</td></tr>
+              <tr><th style={{ width: '40%' }}>Invoice Number</th><td>{record.invoice_number}</td></tr>
+              <tr><th>Customer</th><td>{record.customer_name || '-'}</td></tr>
+              <tr><th>Cargo Type</th><td>{record.cargo_type === 'vehicle' ? 'Vehicle' : 'Personal Effects'}</td></tr>
+              <tr><th>Warehouse Received Date</th><td>{record.warehouse_received_date}</td></tr>
+              <tr><th>Days in Storage</th><td>{fee?.daysInStorage || 0}</td></tr>
               {record.cargo_type === 'vehicle' && (
-                <tr><th>{t('storage.gracePeriod')}</th><td>{record.grace_period_days} {t('storage.days')}</td></tr>
+                <tr><th>Grace Period</th><td>{record.grace_period_days} Days</td></tr>
               )}
-              <tr><th>{t('storage.chargeableDays')}</th><td>{fee?.chargeableDays || 0}</td></tr>
-              <tr><th>{t('storage.dailyRate')}</th><td>QAR {fee?.dailyRate?.toFixed(2) || '0.00'}</td></tr>
+              <tr><th>Chargeable Days</th><td>{fee?.chargeableDays || 0}</td></tr>
+              <tr><th>Daily Rate</th><td>QAR {fee?.dailyRate?.toFixed(2) || '0.00'}</td></tr>
               {record.cargo_type === 'personal_effects' && (
-                <tr><th>{t('table.volume')} (CBM)</th><td>{record.total_cbm}</td></tr>
+                <tr><th>Volume (CBM)</th><td>{record.total_cbm}</td></tr>
               )}
             </tbody>
           </table>
@@ -87,7 +87,7 @@ const StorageInvoicePDF: React.FC<StorageInvoicePDFProps> = ({ record }) => {
           <table>
             <tbody>
               <tr className="total-row">
-                <th style={{ width: '40%' }}>{t('storage.totalStorageFee')}</th>
+                <th style={{ width: '40%' }}>Total Storage Fee</th>
                 <td>QAR {fee?.totalFee?.toFixed(2) || '0.00'}</td>
               </tr>
             </tbody>
