@@ -1,5 +1,5 @@
 
-import { ArrowRight, Globe } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -8,9 +8,10 @@ interface DestinationCardProps {
   bgColor: string;
   borderColor?: string;
   to: string;
+  flagEmoji?: string;
 }
 
-const DestinationCard = ({ country, bgColor, borderColor = "", to }: DestinationCardProps) => {
+const DestinationCard = ({ country, bgColor, borderColor = "", to, flagEmoji }: DestinationCardProps) => {
   const { language, t } = useLanguage();
   
   const getFlagClass = (country: string) => {
@@ -21,22 +22,30 @@ const DestinationCard = ({ country, bgColor, borderColor = "", to }: Destination
   return (
     <Link to={to} className="block group">
       <div className="
-        bg-white rounded-lg border border-gray-200 p-5
+        bg-white rounded-xl border border-gray-200 p-5
         shadow-sm transition-all duration-300 ease-out
-        hover:shadow-md hover:border-[#3b5998]/30 hover:-translate-y-0.5
-        cursor-pointer
+        hover:shadow-lg hover:border-[#3b5998]/30 hover:-translate-y-1
+        cursor-pointer relative overflow-hidden
       ">
-        <div className={`flex items-center gap-3 mb-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
-          <div className="w-10 h-10 rounded-full bg-[#1e2a3a]/5 flex items-center justify-center flex-shrink-0">
-            <span className={`flag-icon ${getFlagClass(country.toLowerCase())} transform transition-transform duration-300 group-hover:scale-110`}></span>
+        {/* Subtle gradient overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent to-gray-50/50 group-hover:to-blue-50/30 transition-colors duration-300" />
+        
+        <div className={`relative flex items-center gap-3 mb-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
+          {/* Flag container */}
+          <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:shadow-md transition-shadow duration-300 overflow-hidden">
+            {flagEmoji ? (
+              <span className="text-3xl leading-none">{flagEmoji}</span>
+            ) : (
+              <span className={`flag-icon ${getFlagClass(country)} transform transition-transform duration-300 group-hover:scale-110`} style={{ width: '32px', height: '32px', borderRadius: '4px' }}></span>
+            )}
           </div>
-          <h3 className={`text-base font-semibold text-[#1e2a3a] ${language === 'ar' ? 'font-arabic' : ''}`}>
+          <h3 className={`text-base font-bold text-[#1e2a3a] ${language === 'ar' ? 'font-arabic' : ''}`}>
             {country}
           </h3>
         </div>
         
         <div className={`
-          flex items-center gap-1.5 text-[#3b5998] 
+          relative flex items-center gap-1.5 text-[#3b5998] 
           font-medium text-sm transition-all duration-300
           group-hover:gap-2.5 ${language === 'ar' ? 'font-arabic flex-row-reverse' : ''}
         `}>
