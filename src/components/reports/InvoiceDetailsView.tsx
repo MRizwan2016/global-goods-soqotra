@@ -53,6 +53,55 @@ export const InvoiceDetailsView: React.FC = () => {
         if (!foundInvoice) {
           foundInvoice = mockInvoiceData.find(inv => inv.id === id);
         }
+
+        // If still not found, query the database (regional_invoices)
+        if (!foundInvoice) {
+          const { data: dbInvoice } = await supabase
+            .from('regional_invoices')
+            .select('*')
+            .or(`id.eq.${id},invoice_number.eq.${id}`)
+            .maybeSingle();
+
+          if (dbInvoice) {
+            foundInvoice = {
+              id: dbInvoice.id,
+              invoiceNumber: dbInvoice.invoice_number,
+              date: dbInvoice.invoice_date || dbInvoice.created_at?.split('T')[0],
+              shipper1: dbInvoice.shipper_name,
+              consignee1: dbInvoice.consignee_name,
+              country: dbInvoice.country,
+              gross: dbInvoice.gross,
+              discount: dbInvoice.discount,
+              net: dbInvoice.net,
+              currency: dbInvoice.currency || getCurrencyForCountry(dbInvoice.country),
+              warehouse: dbInvoice.warehouse,
+              bookNumber: dbInvoice.book_number,
+              pageNumber: dbInvoice.page_number,
+              jobNumber: dbInvoice.job_number,
+              shipperMobile: dbInvoice.shipper_mobile,
+              consigneeMobile: dbInvoice.consignee_mobile,
+              consigneeAddress: dbInvoice.consignee_address,
+              shipperAddress: dbInvoice.shipper_address,
+              freight: dbInvoice.freight,
+              localTransport: dbInvoice.local_transport,
+              packingCharges: dbInvoice.packing_charges,
+              storage: dbInvoice.storage,
+              other: dbInvoice.other,
+              paid: dbInvoice.payment_status === 'paid',
+              partiallyPaid: dbInvoice.payment_status === 'partial',
+              paymentStatus: dbInvoice.payment_status,
+              paymentMethod: dbInvoice.payment_method,
+              remarks: dbInvoice.remarks,
+              totalPackages: dbInvoice.total_packages,
+              totalWeight: dbInvoice.total_weight,
+              totalVolume: dbInvoice.total_volume,
+              description: dbInvoice.description,
+              destination: dbInvoice.destination,
+              cargoType: dbInvoice.cargo_type,
+              salesRepresentative: dbInvoice.sales_representative,
+            };
+          }
+        }
         
         if (foundInvoice) {
           console.log("Found invoice:", foundInvoice);
