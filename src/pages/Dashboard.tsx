@@ -9,11 +9,13 @@ import DashboardCard from "@/components/dashboard/DashboardCard";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { HardDrive, Package, Users, Search } from "lucide-react";
+import { HardDrive, Package, Users, Search, AlertTriangle } from "lucide-react";
+import { useMaintenanceAlerts } from "@/hooks/useMaintenanceAlerts";
 
 const Dashboard = () => {
   const { isLoaded, shipmentData } = useDashboardData();
   const { isAdmin, currentUser } = useAuth();
+  const { alerts } = useMaintenanceAlerts();
 
   return (
     <Layout title="Dashboard">
