@@ -2,6 +2,7 @@
 import { ReactNode } from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import CountryWatermark from './CountryWatermark';
 
 interface LayoutProps {
   children: ReactNode;
@@ -14,8 +15,11 @@ const Layout = ({ children, title }: LayoutProps) => {
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header title={title} />
-        <main className="flex-1 p-6 overflow-auto">
-          {children}
+        <main className="flex-1 p-6 overflow-auto relative">
+          <CountryWatermark />
+          <div className="relative z-[1]">
+            {children}
+          </div>
         </main>
       </div>
     </div>
