@@ -4,6 +4,27 @@ import { Invoice } from "../types/invoice";
 import { supabase } from "@/integrations/supabase/client";
 import { calculateStorageFee } from "@/utils/storageFeesCalculator";
 
+const getCurrencyForCountry = (country?: string): string => {
+  switch (country?.toLowerCase()) {
+    case 'qatar': return 'QAR';
+    case 'saudi arabia': return 'SAR';
+    case 'sri lanka': return 'LKR';
+    case 'kenya': return 'KES';
+    case 'sudan': return 'SDG';
+    case 'uae': case 'united arab emirates': return 'AED';
+    case 'tunisia': return 'TND';
+    case 'somalia': return 'USD';
+    case 'oman': return 'OMR';
+    case 'bahrain': return 'BHD';
+    case 'kuwait': return 'KWD';
+    case 'egypt': return 'EGP';
+    case 'ethiopia': return 'ETB';
+    case 'uganda': return 'UGX';
+    case 'india': return 'INR';
+    default: return 'QAR';
+  }
+};
+
 export const useInvoiceData = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
@@ -80,7 +101,7 @@ export const useInvoiceData = () => {
                 paid: isPaid, partiallyPaid: isPartial,
                 totalPaid, paidAmount: totalPaid,
                 balanceToPay: Math.max(0, net - totalPaid),
-                currency: inv.country === 'Sudan' ? 'SDG' : inv.country === 'Kenya' ? 'KES' : 'QAR',
+                currency: getCurrencyForCountry(inv.country),
                 country: inv.country || '',
                 amount: net,
                 bookingForm: inv.book_number || inv.job_number || '',
