@@ -36,6 +36,7 @@ const SECTIONS: NavigationSections = {
         items: [
           { name: "FINANCIAL REPORTS", path: "/reports/financial" },
           { name: "CARGO REPORTS", path: "/reports/cargo" },
+          { name: "CARGO STOCK", path: "/warehouse/stock" },
           { name: "SALES REP REPORT", path: "/reports/sales-rep" },
           { name: "STAFF PERFORMANCE", path: "/reports/staff-performance" },
         ],
