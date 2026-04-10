@@ -1434,6 +1434,23 @@ export type Database = {
         }
         Relationships: []
       }
+      weekly_performance_leaderboard: {
+        Row: {
+          employee_number: string | null
+          is_active: boolean | null
+          jobs_closed: number | null
+          month_start: string | null
+          net_revenue: number | null
+          operation: string | null
+          region: string | null
+          rep_id: string | null
+          rep_name: string | null
+          total_revenue: number | null
+          week_start: string | null
+          year: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       has_role: {
