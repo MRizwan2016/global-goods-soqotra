@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +7,7 @@ import { useWarehouseStorage, WarehouseStorageRecord } from '@/hooks/useWarehous
 import { getStorageRowClass } from '@/utils/storageFeesCalculator';
 import StorageFeesBadge from './StorageFeesBadge';
 import StorageInvoicePDF from './StorageInvoicePDF';
+import StoragePaymentDialog from './StoragePaymentDialog';
 import AddStorageRecordDialog from './AddStorageRecordDialog';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -16,7 +17,7 @@ interface WarehouseStoragePanelProps {
 
 const WarehouseStoragePanel: React.FC<WarehouseStoragePanelProps> = ({ country }) => {
   const { t, isRTL } = useLanguage();
-  const { records, loading, addRecord, totalUnpaidFees } = useWarehouseStorage(country);
+  const { records, loading, addRecord, updateRecord, totalUnpaidFees, loadRecords } = useWarehouseStorage(country);
 
   if (loading) return null;
 
@@ -77,9 +78,19 @@ const WarehouseStoragePanel: React.FC<WarehouseStoragePanelProps> = ({ country }
                       )}
                     </TableCell>
                     <TableCell>
-                      {!record.storage_fee_paid && record.feeResult && record.feeResult.totalFee > 0 && (
+                      <div className="flex items-center gap-1">
                         <StorageInvoicePDF record={record} />
-                      )}
+                        {!record.storage_fee_paid && record.feeResult && record.feeResult.totalFee > 0 && (
+                          <StoragePaymentDialog record={record} onPaymentComplete={async (id, amount) => {
+                            await updateRecord(id, {
+                              storage_fee_paid: true,
+                              paid_amount: amount,
+                              paid_date: new Date().toISOString().split('T')[0],
+                            });
+                            await loadRecords();
+                          }} />
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
