@@ -80,7 +80,7 @@ export const useInvoiceData = () => {
                 paid: isPaid, partiallyPaid: isPartial,
                 totalPaid, paidAmount: totalPaid,
                 balanceToPay: Math.max(0, net - totalPaid),
-                currency: inv.country === 'Sudan' ? 'SDG' : inv.country === 'Kenya' ? 'KES' : 'QAR',
+                currency: getCurrencyForCountry(inv.country),
                 country: inv.country || '',
                 amount: net,
                 bookingForm: inv.book_number || inv.job_number || '',
