@@ -1,6 +1,7 @@
 
 import ControlPanel from "@/pages/admin/ControlPanel";
 import UserRegistration from "@/pages/auth/UserRegistration";
+import VehicleMaintenance from "@/pages/admin/VehicleMaintenance";
 import { RouteConfig } from "./types";
 
 export const adminRoutes: RouteConfig[] = [
@@ -10,9 +11,15 @@ export const adminRoutes: RouteConfig[] = [
     private: true
   },
   {
-    path: "/admin/control-panel", // Added this route
+    path: "/admin/control-panel",
     element: ControlPanel,
     private: true
+  },
+  {
+    path: "/admin/vehicle-maintenance",
+    element: VehicleMaintenance,
+    private: true,
+    requiredPermission: "controlPanel"
   },
   {
     path: "/register",

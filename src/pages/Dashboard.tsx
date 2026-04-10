@@ -9,11 +9,13 @@ import DashboardCard from "@/components/dashboard/DashboardCard";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import { HardDrive, Package, Users, Search } from "lucide-react";
+import { HardDrive, Package, Users, Search, AlertTriangle } from "lucide-react";
+import { useMaintenanceAlerts } from "@/hooks/useMaintenanceAlerts";
 
 const Dashboard = () => {
   const { isLoaded, shipmentData } = useDashboardData();
   const { isAdmin, currentUser } = useAuth();
+  const { alerts } = useMaintenanceAlerts();
 
   return (
     <Layout title="Dashboard">
@@ -63,6 +65,35 @@ const Dashboard = () => {
             philippinesData={shipmentData.philippines}
           />
         </DashboardCard>
+
+        {alerts.length > 0 && (
+          <DashboardCard>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-lg bg-destructive/10 flex items-center justify-center">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Maintenance Alerts</h3>
+                  <p className="text-muted-foreground text-sm">{alerts.length} vehicle(s) overdue for service</p>
+                </div>
+              </div>
+              <div className="space-y-1">
+                {alerts.map(a => (
+                  <div key={a.vehicle_number} className="flex justify-between items-center text-sm border rounded px-3 py-2 bg-destructive/5">
+                    <span className="font-bold">Vehicle #{a.vehicle_number}</span>
+                    <span className="text-muted-foreground">{a.service_type} — due {a.next_service_due}</span>
+                  </div>
+                ))}
+              </div>
+              <Link to="/admin/vehicle-maintenance">
+                <Button variant="outline" size="sm" className="gap-1.5">
+                  <AlertTriangle className="h-4 w-4" /> View Maintenance
+                </Button>
+              </Link>
+            </div>
+          </DashboardCard>
+        )}
 
         {isAdmin && (
           <DashboardCard>
