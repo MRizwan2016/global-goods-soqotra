@@ -29,6 +29,9 @@ const ShipperConsigneeDetails: React.FC<ShipperConsigneeDetailsProps> = ({
   handleInputChange,
   handleSelectChange
 }) => {
+  const { salesReps: dbSalesReps } = useSalesReps();
+  const SALES_REPS = dbSalesReps.map(r => r.label);
+
   // Handler for select components
   const onSelectChange = (name: string, value: string) => {
     if (handleSelectChange) {
