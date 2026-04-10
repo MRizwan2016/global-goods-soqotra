@@ -357,9 +357,42 @@ const SECTIONS: NavigationSections = {
       },
     ],
   },
+  tunisia: {
+    title: "TUNISIA",
+    icon: Globe,
+    color: "text-white",
+    bgGradient: "from-red-500 to-red-700",
+    borderColor: "border-red-200",
+    iconColor: "text-white",
+    submenu: [
+      {
+        title: "VEHICLE & CARGO",
+        items: [
+          { name: "DASHBOARD", path: "/tunisia" },
+          { name: "CREATE INVOICE", path: "/tunisia/invoices" },
+          { name: "CONTAINER LOADING", path: "/tunisia" },
+        ],
+      },
+      {
+        title: "DOCUMENTATION",
+        items: [
+          { name: "HBL GENERATOR", path: "/tunisia" },
+          { name: "LOADING RECORDS", path: "/tunisia" },
+          { name: "VIEW SCHEDULES", path: "/tunisia/schedules" },
+        ],
+      },
+      {
+        title: "ACCOUNTS",
+        items: [
+          { name: "PAYMENT TRACKER", path: "/tunisia" },
+          { name: "RECONCILIATION", path: "/accounts/reconciliation/country/tn" },
+        ],
+      },
+    ],
+  },
 };
 
-const SECTION_ORDER = ['upb', 'accounts', 'admin', 'cargo', 'sriLanka', 'saudiArabia', 'kenya', 'sudan'] as const;
+const SECTION_ORDER = ['upb', 'accounts', 'admin', 'cargo', 'sriLanka', 'saudiArabia', 'kenya', 'sudan', 'tunisia'] as const;
 
 const PERMISSION_MAP: Record<string, string> = {
   upb: 'masterData',
