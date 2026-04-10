@@ -142,18 +142,38 @@ export const InvoiceDetailsView: React.FC = () => {
   }, [id, navigate]);
   
   // Function to fetch payment information
-  const fetchPaymentInfo = (invoiceNumber: string) => {
+  const fetchPaymentInfo = async (invoiceNumber: string) => {
     try {
+      // Check localStorage first
       const payments = localStorage.getItem('payments');
       if (payments) {
         const parsedPayments = JSON.parse(payments);
-        // Find payment for this specific invoice
         const payment = parsedPayments.find((p: any) => p.invoiceNumber === invoiceNumber);
-        
         if (payment) {
-          console.log("Found payment for invoice:", payment);
           setPaymentInfo(payment);
+          return;
         }
+      }
+
+      // Check database
+      const { data } = await supabase
+        .from('payment_transactions')
+        .select('*')
+        .eq('invoice_number', invoiceNumber)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data) {
+        setPaymentInfo({
+          invoiceNumber: data.invoice_number,
+          amountPaid: data.amount_paid,
+          paymentMethod: data.payment_method,
+          paymentDate: data.payment_date,
+          receiptNumber: data.receipt_number,
+          remarks: data.remarks,
+          currency: data.currency,
+        });
       }
     } catch (error) {
       console.error("Error fetching payment info:", error);
