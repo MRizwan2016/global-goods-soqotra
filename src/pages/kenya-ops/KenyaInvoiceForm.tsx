@@ -17,7 +17,6 @@ import { supabase } from "@/integrations/supabase/client";
 import {
   kenyaPorts,
   kenyaSectors,
-  kenyaSalesReps,
   kenyaDrivers,
   kenyaDistricts,
   kenyaPackageTypes,
@@ -32,6 +31,7 @@ import { toast } from "sonner";
 import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 
 const KenyaInvoiceForm = () => {
+  const { salesReps: kenyaSalesReps } = useSalesReps('Kenya');
   const navigate = useNavigate();
   const { id } = useParams();
   const [showPreview, setShowPreview] = useState(false);
