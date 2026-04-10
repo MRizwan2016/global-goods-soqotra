@@ -12,6 +12,22 @@ import CargoDetailsTable from './invoice-details/CargoDetailsTable';
 import ShippingTrackingInfo from './invoice-details/ShippingTrackingInfo';
 import ActionButtons from './invoice-details/ActionButtons';
 import { mockInvoiceData } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
+
+const getCurrencyForCountry = (country?: string | null): string => {
+  switch (country?.toLowerCase()) {
+    case 'qatar': return 'QAR';
+    case 'saudi arabia': return 'SAR';
+    case 'sri lanka': return 'LKR';
+    case 'sudan': return 'SDG';
+    case 'kenya': return 'KES';
+    case 'tunisia': return 'TND';
+    case 'uae': case 'united arab emirates': return 'AED';
+    case 'oman': return 'OMR';
+    case 'somalia': return 'USD';
+    default: return 'QAR';
+  }
+};
 
 export const InvoiceDetailsView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -52,6 +68,55 @@ export const InvoiceDetailsView: React.FC = () => {
         if (!foundInvoice) {
           foundInvoice = mockInvoiceData.find(inv => inv.id === id);
         }
+
+        // If still not found, query the database (regional_invoices)
+        if (!foundInvoice) {
+          const { data: dbInvoice } = await supabase
+            .from('regional_invoices')
+            .select('*')
+            .or(`id.eq.${id},invoice_number.eq.${id}`)
+            .maybeSingle();
+
+          if (dbInvoice) {
+            foundInvoice = {
+              id: dbInvoice.id,
+              invoiceNumber: dbInvoice.invoice_number,
+              date: dbInvoice.invoice_date || dbInvoice.created_at?.split('T')[0],
+              shipper1: dbInvoice.shipper_name,
+              consignee1: dbInvoice.consignee_name,
+              country: dbInvoice.country,
+              gross: dbInvoice.gross,
+              discount: dbInvoice.discount,
+              net: dbInvoice.net,
+              currency: getCurrencyForCountry(dbInvoice.country),
+              warehouse: dbInvoice.warehouse,
+              bookNumber: dbInvoice.book_number,
+              pageNumber: dbInvoice.page_number,
+              jobNumber: dbInvoice.job_number,
+              shipperMobile: dbInvoice.shipper_mobile,
+              consigneeMobile: dbInvoice.consignee_mobile,
+              consigneeAddress: dbInvoice.consignee_address,
+              shipperAddress: dbInvoice.shipper_address,
+              freight: dbInvoice.freight,
+              localTransport: dbInvoice.local_transport,
+              packingCharges: dbInvoice.packing_charges,
+              storage: dbInvoice.storage,
+              other: dbInvoice.other,
+              paid: dbInvoice.payment_status === 'paid',
+              partiallyPaid: dbInvoice.payment_status === 'partial',
+              paymentStatus: dbInvoice.payment_status,
+              paymentMethod: dbInvoice.payment_method,
+              remarks: dbInvoice.remarks,
+              totalPackages: dbInvoice.total_packages,
+              totalWeight: dbInvoice.total_weight,
+              totalVolume: dbInvoice.total_volume,
+              description: dbInvoice.description,
+              destination: dbInvoice.destination,
+              cargoType: dbInvoice.cargo_type,
+              salesRepresentative: dbInvoice.sales_representative,
+            };
+          }
+        }
         
         if (foundInvoice) {
           console.log("Found invoice:", foundInvoice);
@@ -77,18 +142,38 @@ export const InvoiceDetailsView: React.FC = () => {
   }, [id, navigate]);
   
   // Function to fetch payment information
-  const fetchPaymentInfo = (invoiceNumber: string) => {
+  const fetchPaymentInfo = async (invoiceNumber: string) => {
     try {
+      // Check localStorage first
       const payments = localStorage.getItem('payments');
       if (payments) {
         const parsedPayments = JSON.parse(payments);
-        // Find payment for this specific invoice
         const payment = parsedPayments.find((p: any) => p.invoiceNumber === invoiceNumber);
-        
         if (payment) {
-          console.log("Found payment for invoice:", payment);
           setPaymentInfo(payment);
+          return;
         }
+      }
+
+      // Check database
+      const { data } = await supabase
+        .from('payment_transactions')
+        .select('*')
+        .eq('invoice_number', invoiceNumber)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (data) {
+        setPaymentInfo({
+          invoiceNumber: data.invoice_number,
+          amountPaid: data.amount_paid,
+          paymentMethod: data.payment_method,
+          paymentDate: data.payment_date,
+          receiptNumber: data.receipt_number,
+          remarks: data.remarks,
+          currency: data.currency,
+        });
       }
     } catch (error) {
       console.error("Error fetching payment info:", error);
