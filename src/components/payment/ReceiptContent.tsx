@@ -34,7 +34,7 @@ const ReceiptContent: React.FC<ReceiptContentProps> = ({ receiptData, currencySy
   console.log("Generating QR code with data:", qrData);
 
   return (
-    <div className="p-6">
+    <div className="p-3">
       <CompanyInfo logo="/lovable-uploads/SOQO_NEW_LOGO.jpeg" />
       
       <PaymentDetails
