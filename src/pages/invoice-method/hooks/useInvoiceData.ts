@@ -25,6 +25,23 @@ const getCurrencyForCountry = (country?: string): string => {
   }
 };
 
+const getDisplayCurrency = (
+  summaryInvoice: { currency?: string | null; country?: string | null },
+  regionalInvoice?: { shipper_country?: string | null; country?: string | null } | null
+): string => {
+  const originCountry = regionalInvoice?.shipper_country?.trim();
+
+  if (originCountry) {
+    return getCurrencyForCountry(originCountry);
+  }
+
+  if (summaryInvoice.currency?.trim()) {
+    return summaryInvoice.currency;
+  }
+
+  return getCurrencyForCountry(summaryInvoice.country || undefined);
+};
+
 export const useInvoiceData = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
 
@@ -41,12 +58,30 @@ export const useInvoiceData = () => {
           .limit(1000);
 
         if (!summaryError && summaryData) {
+          const invoiceNumbers = (summaryData as any[])
+            .map((inv) => inv.invoice_number)
+            .filter(Boolean);
+
+          let regionalCurrencyMap = new Map<string, { shipper_country?: string | null; country?: string | null }>();
+
+          if (invoiceNumbers.length > 0) {
+            const { data: regionalCurrencyData } = await supabase
+              .from('regional_invoices')
+              .select('invoice_number, shipper_country, country')
+              .in('invoice_number', invoiceNumbers);
+
+            regionalCurrencyMap = new Map(
+              (regionalCurrencyData || []).map((invoice) => [invoice.invoice_number, invoice])
+            );
+          }
+
           const converted = (summaryData as any[]).map((inv): Invoice => {
             const net = Number(inv.net) || Number(inv.gross) || 0;
             const totalPaid = Number(inv.total_paid) || 0;
             const balanceDue = Number(inv.balance_due) || 0;
             const isPaid = balanceDue <= 0 && totalPaid > 0;
             const isPartial = totalPaid > 0 && balanceDue > 0;
+            const regionalInvoice = regionalCurrencyMap.get(inv.invoice_number);
 
             return {
               id: inv.id,
@@ -62,7 +97,7 @@ export const useInvoiceData = () => {
               totalPaid: totalPaid,
               paidAmount: totalPaid,
               balanceToPay: balanceDue,
-              currency: inv.currency || 'QAR',
+              currency: getDisplayCurrency(inv, regionalInvoice),
               country: inv.country || '',
               amount: net,
               bookingForm: inv.book_number || inv.job_number || '',

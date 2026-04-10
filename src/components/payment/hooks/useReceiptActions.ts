@@ -9,6 +9,8 @@ export const useReceiptActions = (
   receiptNumber: string,
   receiptData?: { invoiceNumber: string; customer: string; amount: number; currency: string }
 ) => {
+  const receiptSize: [number, number] = [80, 120];
+
   const handlePrint = useReactToPrint({
     documentTitle: `Receipt-${receiptNumber}`,
     onBeforePrint: async () => {
@@ -36,7 +38,7 @@ export const useReceiptActions = (
         const pdf = new jsPDF({
           orientation: 'portrait',
           unit: 'mm',
-          format: 'a5'
+          format: receiptSize
         });
         
         const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -91,11 +93,10 @@ export const useReceiptActions = (
         backgroundColor: '#ffffff'
       });
 
-      // A5 size: 148mm x 210mm
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
-        format: 'a5'
+        format: receiptSize
       });
 
       const pdfWidth = pdf.internal.pageSize.getWidth();

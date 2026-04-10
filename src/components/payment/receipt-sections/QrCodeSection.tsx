@@ -8,17 +8,17 @@ interface QrCodeSectionProps {
 
 const QrCodeSection: React.FC<QrCodeSectionProps> = ({ qrData }) => {
   return (
-    <div className="flex justify-center mt-4 mb-6">
+    <div className="flex justify-center mt-2 mb-3">
       <div className="text-center">
         <QRCodeSVG 
           value={qrData} 
-          size={120} 
+          size={72} 
           bgColor={"#ffffff"}
           fgColor={"#000000"}
           level={"M"}
           includeMargin={false}
         />
-        <p className="text-xs text-gray-500 mt-2">Scan to verify receipt</p>
+        <p className="text-[9px] text-gray-500 mt-1">Scan to verify receipt</p>
       </div>
     </div>
   );

@@ -6,6 +6,9 @@ import ReceiptContent from "./ReceiptContent";
 import ReceiptActions from "./ReceiptActions";
 import { useReceiptActions } from "./hooks/useReceiptActions";
 
+const RECEIPT_WIDTH_CM = 8;
+const RECEIPT_HEIGHT_CM = 12;
+
 interface ReceiptViewProps {
   isOpen: boolean;
   onClose: () => void;
@@ -40,8 +43,47 @@ const ReceiptView: React.FC<ReceiptViewProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto bg-white rounded-lg shadow-lg p-0 overflow-hidden print:shadow-none print:border-none">
-        <div ref={receiptRef} id="receipt-printable" className="print:p-6">
+      <DialogContent className="mx-auto w-fit max-w-none bg-white rounded-lg shadow-lg p-0 overflow-hidden print:shadow-none print:border-none print:max-w-none">
+        <style>
+          {`
+            @media print {
+              @page {
+                size: ${RECEIPT_WIDTH_CM}cm ${RECEIPT_HEIGHT_CM}cm;
+                margin: 0;
+              }
+
+              body {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+              }
+
+              body * {
+                visibility: hidden !important;
+              }
+
+              #receipt-printable,
+              #receipt-printable * {
+                visibility: visible !important;
+              }
+
+              #receipt-printable {
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: ${RECEIPT_WIDTH_CM}cm !important;
+                min-height: ${RECEIPT_HEIGHT_CM}cm !important;
+                margin: 0 !important;
+              }
+            }
+          `}
+        </style>
+        <div
+          ref={receiptRef}
+          id="receipt-printable"
+          className="bg-background"
+          style={{ width: `${RECEIPT_WIDTH_CM}cm`, minHeight: `${RECEIPT_HEIGHT_CM}cm` }}
+        >
           <ReceiptHeader onClose={onClose} />
           <ReceiptContent 
             receiptData={receiptData}
