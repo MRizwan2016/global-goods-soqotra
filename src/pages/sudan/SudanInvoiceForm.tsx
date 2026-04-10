@@ -9,7 +9,8 @@ import { toast } from "sonner";
 // Import Sudan-specific components and data
 import { useSudanInvoice } from "./hooks/useSudanInvoice";
 import SudanInvoicePreview from "./components/SudanInvoicePreview";
-import { sudanSectors, sudanSalesReps, sudanDrivers, sudanDistricts, sudanPorts } from "./data/sudanData";
+import { sudanSectors, sudanDrivers, sudanDistricts, sudanPorts } from "./data/sudanData";
+import { useSalesReps } from "@/hooks/useSalesReps";
 
 // Import shipping components
 import ShipperDetails from "./components/shipping/ShipperDetails";
@@ -39,6 +40,7 @@ import {
 import { calculateCubicMeter } from "@/pages/invoicing/utils/packageDimensions";
 
 const SudanInvoiceForm = () => {
+  const { salesReps: dbSalesReps } = useSalesReps('Sudan');
   const navigate = useNavigate();
   const { id } = useParams();
   
@@ -446,8 +448,8 @@ const SudanInvoiceForm = () => {
                   <SelectValue placeholder="Select sales rep" />
                 </SelectTrigger>
                 <SelectContent>
-                  {sudanSalesReps.map((rep) => (
-                    <SelectItem key={rep.value} value={rep.value}>
+                  {dbSalesReps.map((rep) => (
+                    <SelectItem key={rep.value} value={rep.label}>
                       {rep.label}
                     </SelectItem>
                   ))}

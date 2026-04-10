@@ -7,18 +7,7 @@ import ShipperDetailsWithAutoFill from "./shipper-consignee/ShipperDetailsWithAu
 import ConsigneeDetails from "./shipper-consignee/ConsigneeDetails";
 import HandoverSelection from "./shipper-consignee/HandoverSelection";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-const SALES_REPS = [
-  "Mr. Lahiru Chathuranga",
-  "Mr. Ali Hussain",
-  "Mr. Paolo Fernando",
-  "Mr. Evans",
-  "Mr. Paul Onchano",
-  "Mr. Edwin Mbugua",
-  "Mr. Zacharia",
-  "Mr. Jun Jun Santos",
-  "Mr. Raymond"
-];
+import { useSalesReps } from "@/hooks/useSalesReps";
 
 const DRIVERS = [
   "Mr. Abdullah",
@@ -40,6 +29,9 @@ const ShipperConsigneeDetails: React.FC<ShipperConsigneeDetailsProps> = ({
   handleInputChange,
   handleSelectChange
 }) => {
+  const { salesReps: dbSalesReps } = useSalesReps();
+  const SALES_REPS = dbSalesReps.map(r => r.label);
+
   // Handler for select components
   const onSelectChange = (name: string, value: string) => {
     if (handleSelectChange) {
