@@ -1,13 +1,19 @@
 
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { LogIn, LogOut } from "lucide-react";
+import LanguageSwitcher from "@/components/ui/language-switcher";
+
+const ARABIC_COUNTRIES = ['/saudi-arabia', '/sudan-ops', '/sudan', '/tunisia'];
 
 const Header = ({ title }: { title: string }) => {
   const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const showLanguageSwitcher = ARABIC_COUNTRIES.some(prefix => location.pathname.startsWith(prefix));
 
   const handleLogout = () => {
     logout();
@@ -38,6 +44,7 @@ const Header = ({ title }: { title: string }) => {
         </div>
         
         <div className="flex items-center gap-2">
+          {showLanguageSwitcher && <LanguageSwitcher />}
           {isAuthenticated ? (
             <Button 
               variant="ghost" 
