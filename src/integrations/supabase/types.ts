@@ -1049,6 +1049,51 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_maintenance: {
+        Row: {
+          cost: number | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          driver_name: string | null
+          id: string
+          next_service_due: string | null
+          service_date: string
+          service_type: string
+          status: string
+          updated_at: string
+          vehicle_number: string
+        }
+        Insert: {
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          driver_name?: string | null
+          id?: string
+          next_service_due?: string | null
+          service_date?: string
+          service_type?: string
+          status?: string
+          updated_at?: string
+          vehicle_number: string
+        }
+        Update: {
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          driver_name?: string | null
+          id?: string
+          next_service_due?: string | null
+          service_date?: string
+          service_type?: string
+          status?: string
+          updated_at?: string
+          vehicle_number?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       staff_annual_performance: {
