@@ -25,6 +25,7 @@ import {
 } from "./data/saudiArabiaData";
 
 const SaudiArabiaCollectionDelivery = () => {
+  const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCity, setSelectedCity] = useState("all");
