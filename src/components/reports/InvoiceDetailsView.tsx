@@ -88,7 +88,7 @@ export const InvoiceDetailsView: React.FC = () => {
               gross: dbInvoice.gross,
               discount: dbInvoice.discount,
               net: dbInvoice.net,
-              currency: dbInvoice.currency || getCurrencyForCountry(dbInvoice.country),
+              currency: getCurrencyForCountry(dbInvoice.country),
               warehouse: dbInvoice.warehouse,
               bookNumber: dbInvoice.book_number,
               pageNumber: dbInvoice.page_number,
