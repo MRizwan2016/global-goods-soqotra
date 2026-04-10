@@ -14,6 +14,7 @@ import UPBIntegrationCard from "@/components/invoice/UPBIntegrationCard";
 import { useKenyaInvoice } from "./hooks/useKenyaInvoice";
 import { lookupJobData } from "@/hooks/useJobAutoFill";
 import { supabase } from "@/integrations/supabase/client";
+import { useSalesReps } from "@/hooks/useSalesReps";
 import {
   kenyaPorts,
   kenyaSectors,
