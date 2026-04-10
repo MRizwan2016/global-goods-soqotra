@@ -1186,6 +1186,91 @@ export type Database = {
         }
         Relationships: []
       }
+      warehouse_storage: {
+        Row: {
+          cargo_type: string
+          country: string
+          created_at: string
+          created_by: string | null
+          customer_name: string | null
+          daily_rate: number
+          grace_period_days: number
+          id: string
+          invoice_id: string | null
+          invoice_number: string
+          notes: string | null
+          paid_amount: number | null
+          paid_date: string | null
+          storage_fee_paid: boolean
+          storage_invoice_number: string | null
+          total_cbm: number | null
+          updated_at: string
+          warehouse_received_date: string
+        }
+        Insert: {
+          cargo_type?: string
+          country: string
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string | null
+          daily_rate?: number
+          grace_period_days?: number
+          id?: string
+          invoice_id?: string | null
+          invoice_number: string
+          notes?: string | null
+          paid_amount?: number | null
+          paid_date?: string | null
+          storage_fee_paid?: boolean
+          storage_invoice_number?: string | null
+          total_cbm?: number | null
+          updated_at?: string
+          warehouse_received_date?: string
+        }
+        Update: {
+          cargo_type?: string
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          customer_name?: string | null
+          daily_rate?: number
+          grace_period_days?: number
+          id?: string
+          invoice_id?: string | null
+          invoice_number?: string
+          notes?: string | null
+          paid_amount?: number | null
+          paid_date?: string | null
+          storage_fee_paid?: boolean
+          storage_invoice_number?: string | null
+          total_cbm?: number | null
+          updated_at?: string
+          warehouse_received_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "warehouse_storage_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "payment_receivable_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "warehouse_storage_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "regional_invoices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "warehouse_storage_invoice_id_fkey"
+            columns: ["invoice_id"]
+            isOneToOne: false
+            referencedRelation: "sudan_customs_manifest"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       payment_receivable_summary: {
