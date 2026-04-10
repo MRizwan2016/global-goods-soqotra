@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Search, Truck, Package, MapPin, Calendar, Eye, Clock, Printer, Send, MessageCircle } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "sonner";
 import { ScheduleService } from "@/services/ScheduleService";
 import { QRCodeSVG } from "qrcode.react";
@@ -24,6 +25,7 @@ import {
 } from "./data/saudiArabiaData";
 
 const SaudiArabiaCollectionDelivery = () => {
+  const { t, isRTL } = useLanguage();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCity, setSelectedCity] = useState("all");
@@ -146,10 +148,10 @@ const SaudiArabiaCollectionDelivery = () => {
   };
 
   const stats = [
-    { title: "Total Collections", value: collections.length.toString(), icon: Package, color: "bg-emerald-500" },
-    { title: "Total Deliveries", value: deliveries.length.toString(), icon: Truck, color: "bg-blue-500" },
-    { title: "Completed", value: allJobs.filter(j => j.status === "completed" || j.status === "delivered").length.toString(), icon: Clock, color: "bg-green-600" },
-    { title: "Selected", value: selectedJobs.size.toString(), icon: Calendar, color: "bg-purple-600" },
+    { title: t("collection.cargoCollections"), value: collections.length.toString(), icon: Package, color: "bg-emerald-500" },
+    { title: t("collection.boxesDeliveries"), value: deliveries.length.toString(), icon: Truck, color: "bg-blue-500" },
+    { title: t("status.completed"), value: allJobs.filter(j => j.status === "completed" || j.status === "delivered").length.toString(), icon: Clock, color: "bg-green-600" },
+    { title: isRTL ? "محدد" : "Selected", value: selectedJobs.size.toString(), icon: Calendar, color: "bg-purple-600" },
   ];
 
   const renderJobTable = (data: any[]) => (
@@ -158,16 +160,16 @@ const SaudiArabiaCollectionDelivery = () => {
         <TableHeader>
           <TableRow className="bg-[#006c35] hover:bg-[#006c35]">
             <TableHead className="text-white font-medium w-10">✓</TableHead>
-            <TableHead className="text-white font-medium">JOB #</TableHead>
-            <TableHead className="text-white font-medium">DATE</TableHead>
-            <TableHead className="text-white font-medium">CUSTOMER</TableHead>
-            <TableHead className="text-white font-medium">CITY</TableHead>
-            <TableHead className="text-white font-medium">BOXES</TableHead>
-            <TableHead className="text-white font-medium">CBM</TableHead>
-            <TableHead className="text-white font-medium">VEHICLE</TableHead>
-            <TableHead className="text-white font-medium">DRIVER</TableHead>
-            <TableHead className="text-white font-medium">STATUS</TableHead>
-            <TableHead className="text-white font-medium">ACTIONS</TableHead>
+            <TableHead className="text-white font-medium">{t("table.jobNumber")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.date")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.customer")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.city")}</TableHead>
+            <TableHead className="text-white font-medium">{isRTL ? "صناديق" : "BOXES"}</TableHead>
+            <TableHead className="text-white font-medium">{t("unit.cbm")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.vehicle")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.driver")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.status")}</TableHead>
+            <TableHead className="text-white font-medium">{t("table.actions")}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -367,26 +369,26 @@ const SaudiArabiaCollectionDelivery = () => {
   }
 
   return (
-    <Layout title="Saudi Arabia - Collection & Delivery">
-      <div className="space-y-6">
+    <Layout title={t("page.collectionDeliverySaudi")}>
+      <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-4">
             <div className="w-12 h-8 bg-gradient-to-r from-green-600 to-green-800 rounded flex items-center justify-center">
               <Truck className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">Collection & Delivery - Saudi Arabia</h1>
+            <h1 className="text-3xl font-bold text-foreground">{t("page.collectionDeliverySaudi")}</h1>
           </div>
           <div className="flex gap-2 flex-wrap">
             {selectedJobs.size > 0 && (
               <Button className="gap-2 bg-purple-600 hover:bg-purple-700" onClick={() => setShowScheduleDialog(true)}>
-                <Calendar className="h-4 w-4" /> Post to Schedule ({selectedJobs.size})
+                <Calendar className="h-4 w-4" /> {isRTL ? "إرسال للجدول" : "Post to Schedule"} ({selectedJobs.size})
               </Button>
             )}
             <Button className="gap-2 bg-[#006c35] hover:bg-[#005a2d]" onClick={() => navigate("/saudi-arabia/schedules")}>
-              <Calendar className="h-4 w-4" /> View Schedules
+              <Calendar className="h-4 w-4" /> {t("collection.viewSchedules")}
             </Button>
             <Button className="gap-2 bg-[#006c35] hover:bg-[#005a2d]" onClick={() => navigate("/saudi-arabia/new-job")}>
-              <Plus className="h-4 w-4" /> Add New Job
+              <Plus className="h-4 w-4" /> {t("collection.addNewJob")}
             </Button>
           </div>
         </div>
@@ -405,23 +407,23 @@ const SaudiArabiaCollectionDelivery = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Select value={selectedCity} onValueChange={setSelectedCity}>
-            <SelectTrigger><SelectValue placeholder="All Cities" /></SelectTrigger>
+            <SelectTrigger><SelectValue placeholder={t("warehouse.allCities")} /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Cities</SelectItem>
+              <SelectItem value="all">{t("warehouse.allCities")}</SelectItem>
               {["RIYADH", "JEDDAH", "DAMMAM", "AL-KHOBAR", "MECCA", "MEDINAH", "TABUK", "ABHA"].map(c => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
             </SelectContent>
           </Select>
           <div className="relative col-span-2">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search by customer or job #..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
+            <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 h-4 w-4 text-muted-foreground`} />
+            <Input placeholder={t("search.searchJobs")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={isRTL ? 'pr-10' : 'pl-10'} />
           </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
-            <TabsTrigger value="collections">Collections ({collections.length})</TabsTrigger>
-            <TabsTrigger value="deliveries">Deliveries ({deliveries.length})</TabsTrigger>
-            <TabsTrigger value="all">All Jobs ({allJobs.length})</TabsTrigger>
+            <TabsTrigger value="collections">{isRTL ? "التحصيلات" : "Collections"} ({collections.length})</TabsTrigger>
+            <TabsTrigger value="deliveries">{isRTL ? "التوصيلات" : "Deliveries"} ({deliveries.length})</TabsTrigger>
+            <TabsTrigger value="all">{t("label.all")} ({allJobs.length})</TabsTrigger>
           </TabsList>
           <TabsContent value="collections">{renderJobTable(filterJobs(collections))}</TabsContent>
           <TabsContent value="deliveries">{renderJobTable(filterJobs(deliveries))}</TabsContent>
@@ -432,37 +434,37 @@ const SaudiArabiaCollectionDelivery = () => {
       {/* Post to Schedule Dialog */}
       <Dialog open={showScheduleDialog} onOpenChange={setShowScheduleDialog}>
         <DialogContent className="max-w-md">
-          <DialogHeader><DialogTitle>Post {selectedJobs.size} Job(s) to Schedule</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{isRTL ? `إرسال ${selectedJobs.size} عمل للجدول` : `Post ${selectedJobs.size} Job(s) to Schedule`}</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Vehicle (Truck) *</Label>
+              <Label>{t("schedule.vehicle")} *</Label>
               <Select value={scheduleVehicle} onValueChange={handleVehicleChange}>
-                <SelectTrigger><SelectValue placeholder="Select vehicle" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t("form.selectVehicle")} /></SelectTrigger>
                 <SelectContent>{saudiArabiaVehicles.map(v => (<SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>))}</SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Driver</Label>
+              <Label>{t("schedule.driver")}</Label>
               <Select value={scheduleDriver} onValueChange={setScheduleDriver}>
-                <SelectTrigger><SelectValue placeholder="Select driver" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t("form.selectDriver")} /></SelectTrigger>
                 <SelectContent>{saudiArabiaDrivers.map(d => (<SelectItem key={d.value} value={d.label}>{d.label}</SelectItem>))}</SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Sales Rep</Label>
+              <Label>{t("schedule.salesRep")}</Label>
               <Select value={scheduleSalesRep} onValueChange={setScheduleSalesRep}>
-                <SelectTrigger><SelectValue placeholder="Select sales rep" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={isRTL ? "اختر مندوب المبيعات" : "Select sales rep"} /></SelectTrigger>
                 <SelectContent>{saudiArabiaSalesReps.map(s => (<SelectItem key={s.value} value={s.label}>{s.label}</SelectItem>))}</SelectContent>
               </Select>
             </div>
             <div>
-              <Label>Helper</Label>
-              <Input placeholder="Enter helper name" value={scheduleHelper} onChange={(e) => setScheduleHelper(e.target.value)} />
+              <Label>{t("schedule.helper")}</Label>
+              <Input placeholder={isRTL ? "أدخل اسم المساعد" : "Enter helper name"} value={scheduleHelper} onChange={(e) => setScheduleHelper(e.target.value)} />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowScheduleDialog(false)}>Cancel</Button>
-            <Button className="bg-[#006c35] hover:bg-[#005a2d]" onClick={handlePostToSchedule}>Create Schedule</Button>
+            <Button variant="outline" onClick={() => setShowScheduleDialog(false)}>{t("action.cancel")}</Button>
+            <Button className="bg-[#006c35] hover:bg-[#005a2d]" onClick={handlePostToSchedule}>{t("action.createSchedule")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
