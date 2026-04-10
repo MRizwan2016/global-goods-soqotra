@@ -115,12 +115,10 @@ const AddStorageRecordDialog: React.FC<AddStorageRecordDialogProps> = ({ country
             <Label>{t('storage.receivedDate')}</Label>
             <Input type="date" value={form.warehouse_received_date} onChange={e => setForm(f => ({ ...f, warehouse_received_date: e.target.value }))} />
           </div>
-          {form.cargo_type === 'personal_effects' && (
-            <div>
-              <Label>{t('table.volume')} (CBM)</Label>
-              <Input type="number" step="0.01" value={form.total_cbm} onChange={e => setForm(f => ({ ...f, total_cbm: parseFloat(e.target.value) || 0 }))} />
-            </div>
-          )}
+          <div>
+            <Label>{t('table.volume')} (CBM)</Label>
+            <Input type="number" step="0.01" value={form.total_cbm} readOnly className="bg-muted" />
+          </div>
           <div>
             <Label>{t('storage.notes')}</Label>
             <Input value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} />
