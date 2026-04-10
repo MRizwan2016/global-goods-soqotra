@@ -10,12 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { BarChart3, Search, TrendingUp, TrendingDown, DollarSign, FileText, ArrowUpDown, CheckSquare } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const SaudiArabiaReconciliation = () => {
+  const { t, isRTL } = useLanguage();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("summary");
   const [dateRange, setDateRange] = useState("this-month");
-
   const [invoices, setInvoices] = useState<any[]>([]);
   const [payments, setPayments] = useState<any[]>([]);
 
@@ -41,111 +42,100 @@ const SaudiArabiaReconciliation = () => {
   ];
 
   const getStatusBadge = (status: string) => {
+    const labels: Record<string, string> = {
+      reconciled: isRTL ? "مطابق" : "Reconciled",
+      unreconciled: isRTL ? "غير مطابق" : "Unreconciled",
+      partial: t("status.partial"),
+    };
     const config: Record<string, { variant: "default" | "secondary" | "destructive" | "outline"; label: string }> = {
-      reconciled: { variant: "secondary", label: "Reconciled" },
-      unreconciled: { variant: "destructive", label: "Unreconciled" },
-      partial: { variant: "default", label: "Partial" },
+      reconciled: { variant: "secondary", label: labels.reconciled },
+      unreconciled: { variant: "destructive", label: labels.unreconciled },
+      partial: { variant: "default", label: labels.partial },
     };
     const c = config[status] || config.unreconciled;
     return <Badge variant={c.variant}>{c.label}</Badge>;
   };
 
   return (
-    <Layout title="Saudi Arabia - Reconciliation">
-      <div className="space-y-6">
-        {/* Header */}
+    <Layout title={t("page.reconciliationSaudi")}>
+      <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-8 bg-gradient-to-r from-green-600 to-green-800 rounded flex items-center justify-center">
               <BarChart3 className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground">Reconciliation - Saudi Arabia</h1>
+            <h1 className="text-3xl font-bold text-foreground">{t("page.reconciliationSaudi")}</h1>
           </div>
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
+            <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="today">Today</SelectItem>
-              <SelectItem value="this-week">This Week</SelectItem>
-              <SelectItem value="this-month">This Month</SelectItem>
-              <SelectItem value="this-quarter">This Quarter</SelectItem>
-              <SelectItem value="this-year">This Year</SelectItem>
+              <SelectItem value="today">{isRTL ? "اليوم" : "Today"}</SelectItem>
+              <SelectItem value="this-week">{isRTL ? "هذا الأسبوع" : "This Week"}</SelectItem>
+              <SelectItem value="this-month">{isRTL ? "هذا الشهر" : "This Month"}</SelectItem>
+              <SelectItem value="this-quarter">{isRTL ? "هذا الربع" : "This Quarter"}</SelectItem>
+              <SelectItem value="this-year">{isRTL ? "هذه السنة" : "This Year"}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
-        {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Total Invoiced</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">{t("reconciliation.totalInvoiced")}</CardTitle>
               <FileText className="h-4 w-4 text-blue-500" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{totalInvoiced.toFixed(2)} SAR</div>
-            </CardContent>
+            <CardContent><div className="text-2xl font-bold text-foreground">{totalInvoiced.toFixed(2)} {t("unit.sar")}</div></CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Total Paid</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">{t("reconciliation.totalCollected")}</CardTitle>
               <TrendingUp className="h-4 w-4 text-green-500" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">{totalPaid.toFixed(2)} SAR</div>
-            </CardContent>
+            <CardContent><div className="text-2xl font-bold text-green-600">{totalPaid.toFixed(2)} {t("unit.sar")}</div></CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Outstanding</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">{t("reconciliation.outstanding")}</CardTitle>
               <TrendingDown className="h-4 w-4 text-red-500" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">{totalOutstanding.toFixed(2)} SAR</div>
-            </CardContent>
+            <CardContent><div className="text-2xl font-bold text-red-600">{totalOutstanding.toFixed(2)} {t("unit.sar")}</div></CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm text-muted-foreground">Collection Rate</CardTitle>
+              <CardTitle className="text-sm text-muted-foreground">{t("reconciliation.collectionRate")}</CardTitle>
               <CheckSquare className="h-4 w-4 text-amber-500" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{collectionRate}%</div>
-            </CardContent>
+            <CardContent><div className="text-2xl font-bold text-foreground">{collectionRate}%</div></CardContent>
           </Card>
         </div>
 
-        {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search transactions..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="pl-10" />
+          <Search className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-3 h-4 w-4 text-muted-foreground`} />
+          <Input placeholder={t("search.searchInvoices")} value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={isRTL ? 'pr-10' : 'pl-10'} />
         </div>
 
-        {/* Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList>
-            <TabsTrigger value="summary">Summary</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
-            <TabsTrigger value="unreconciled">Unreconciled</TabsTrigger>
+            <TabsTrigger value="summary">{isRTL ? "ملخص" : "Summary"}</TabsTrigger>
+            <TabsTrigger value="transactions">{isRTL ? "المعاملات" : "Transactions"}</TabsTrigger>
+            <TabsTrigger value="unreconciled">{isRTL ? "غير مطابق" : "Unreconciled"}</TabsTrigger>
           </TabsList>
           <TabsContent value="summary">
             <Card>
-              <CardHeader>
-                <CardTitle>Reconciliation Summary - SAR</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle>{t("reconciliation.invoiceSummary")} - {t("unit.sar")}</CardTitle></CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between py-3 border-b">
-                    <span className="text-muted-foreground">Total Debits (Invoices)</span>
-                    <span className="font-bold">{totalInvoiced.toFixed(2)} SAR</span>
+                    <span className="text-muted-foreground">{isRTL ? "إجمالي المدين (الفواتير)" : "Total Debits (Invoices)"}</span>
+                    <span className="font-bold">{totalInvoiced.toFixed(2)} {t("unit.sar")}</span>
                   </div>
                   <div className="flex justify-between py-3 border-b">
-                    <span className="text-muted-foreground">Total Credits (Payments)</span>
-                    <span className="font-bold text-green-600">-{totalPaid.toFixed(2)} SAR</span>
+                    <span className="text-muted-foreground">{isRTL ? "إجمالي الدائن (المدفوعات)" : "Total Credits (Payments)"}</span>
+                    <span className="font-bold text-green-600">-{totalPaid.toFixed(2)} {t("unit.sar")}</span>
                   </div>
                   <div className="flex justify-between py-3 border-b-2 border-foreground">
-                    <span className="font-bold text-foreground">Net Balance</span>
-                    <span className="font-bold text-red-600">{totalOutstanding.toFixed(2)} SAR</span>
+                    <span className="font-bold text-foreground">{isRTL ? "الرصيد الصافي" : "Net Balance"}</span>
+                    <span className="font-bold text-red-600">{totalOutstanding.toFixed(2)} {t("unit.sar")}</span>
                   </div>
                 </div>
               </CardContent>
@@ -156,12 +146,12 @@ const SaudiArabiaReconciliation = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-[#006c35] hover:bg-[#006c35]">
-                    <TableHead className="text-white">#</TableHead>
-                    <TableHead className="text-white">DATE</TableHead>
-                    <TableHead className="text-white">DESCRIPTION</TableHead>
-                    <TableHead className="text-white">DEBIT (SAR)</TableHead>
-                    <TableHead className="text-white">CREDIT (SAR)</TableHead>
-                    <TableHead className="text-white">STATUS</TableHead>
+                    <TableHead className="text-white">{t("table.number")}</TableHead>
+                    <TableHead className="text-white">{t("table.date")}</TableHead>
+                    <TableHead className="text-white">{t("table.description")}</TableHead>
+                    <TableHead className="text-white">{isRTL ? "مدين" : "DEBIT"} ({t("unit.sar")})</TableHead>
+                    <TableHead className="text-white">{t("charges.credit")} ({t("unit.sar")})</TableHead>
+                    <TableHead className="text-white">{t("table.status")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -184,12 +174,12 @@ const SaudiArabiaReconciliation = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-[#006c35] hover:bg-[#006c35]">
-                    <TableHead className="text-white">#</TableHead>
-                    <TableHead className="text-white">DATE</TableHead>
-                    <TableHead className="text-white">DESCRIPTION</TableHead>
-                    <TableHead className="text-white">AMOUNT (SAR)</TableHead>
-                    <TableHead className="text-white">STATUS</TableHead>
-                    <TableHead className="text-white">ACTION</TableHead>
+                    <TableHead className="text-white">{t("table.number")}</TableHead>
+                    <TableHead className="text-white">{t("table.date")}</TableHead>
+                    <TableHead className="text-white">{t("table.description")}</TableHead>
+                    <TableHead className="text-white">{t("table.amount")} ({t("unit.sar")})</TableHead>
+                    <TableHead className="text-white">{t("table.status")}</TableHead>
+                    <TableHead className="text-white">{t("table.action")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -201,8 +191,8 @@ const SaudiArabiaReconciliation = () => {
                       <TableCell className="font-medium">{(entry.debit || entry.credit).toFixed(2)}</TableCell>
                       <TableCell>{getStatusBadge(entry.status)}</TableCell>
                       <TableCell>
-                        <Button size="sm" variant="outline" className="gap-1" onClick={() => toast.success("Marked as reconciled")}>
-                          <CheckSquare className="h-3 w-3" /> Reconcile
+                        <Button size="sm" variant="outline" className="gap-1" onClick={() => toast.success(isRTL ? "تم التطابق" : "Marked as reconciled")}>
+                          <CheckSquare className="h-3 w-3" /> {isRTL ? "مطابقة" : "Reconcile"}
                         </Button>
                       </TableCell>
                     </TableRow>
