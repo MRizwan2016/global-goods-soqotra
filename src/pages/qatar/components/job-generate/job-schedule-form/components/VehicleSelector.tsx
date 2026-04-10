@@ -12,7 +12,8 @@ import {
 import { QatarVehicle } from "../../../../types/vehicleTypes";
 import { QatarJob } from "../../../../types/jobTypes";
 import { cityVehicleMapping } from "../../../../data/cityVehicleMapping";
-import { Truck } from "lucide-react";
+import { Truck, AlertTriangle } from "lucide-react";
+import { useMaintenanceAlerts } from "@/hooks/useMaintenanceAlerts";
 
 interface VehicleSelectorProps {
   value: string;
@@ -32,6 +33,8 @@ const VehicleSelector: React.FC<VehicleSelectorProps> = ({
   uniqueCities,
   selectedJobs,
 }) => {
+  const { isVehicleOverdue } = useMaintenanceAlerts();
+
   // Prioritize the specific vehicles and put them at the top
   const prioritizedVehicles = [...filteredVehicles].sort((a, b) => {
     const aIsSpecific = specificVehicleNumbers.includes(a.number);
@@ -68,18 +71,24 @@ const VehicleSelector: React.FC<VehicleSelectorProps> = ({
           {prioritizedVehicles.length > 0 ? (
             prioritizedVehicles.map(vehicle => {
               const isSpecific = specificVehicleNumbers.includes(vehicle.number);
+              const overdue = isVehicleOverdue(vehicle.number);
               return (
                 <SelectItem 
                   key={vehicle.id} 
                   value={vehicle.number}
-                  className={`py-2 hover:bg-blue-50 transition-colors ${isSpecific ? 'bg-blue-50' : ''}`}
+                  className={`py-2 hover:bg-blue-50 transition-colors ${isSpecific ? 'bg-blue-50' : ''} ${overdue ? 'border-l-4 border-l-destructive' : ''}`}
                 >
                   <div className="flex flex-col">
                     <div className="flex items-center">
                       <span className="font-bold">{vehicle.number}</span>
                       <span className="mx-2">|</span>
                       <span>{vehicle.type}</span>
-                      {isSpecific && (
+                      {overdue && (
+                        <Badge className="ml-2 bg-red-100 text-red-800 gap-1">
+                          <AlertTriangle className="h-3 w-3" /> Service Due
+                        </Badge>
+                      )}
+                      {isSpecific && !overdue && (
                         <Badge className="ml-2 bg-green-100 text-green-800">Recommended</Badge>
                       )}
                     </div>
