@@ -252,6 +252,12 @@ const SECTIONS: NavigationSections = {
         ],
       },
       {
+        title: "VESSEL & CONTAINER",
+        items: [
+          { name: "VESSEL & CONTAINER MANAGEMENT", path: "/sri-lanka/vessel-container" },
+        ],
+      },
+      {
         title: "ACCOUNTS",
         items: [
           { name: "PAYMENT RECEIPT", path: "/sri-lanka/payment-receipt" },
@@ -281,6 +287,12 @@ const SECTIONS: NavigationSections = {
         items: [
           { name: "COLLECTION & DELIVERY", path: "/saudi-arabia/collection-delivery" },
           { name: "VIEW SCHEDULES", path: "/saudi-arabia/schedules" },
+        ],
+      },
+      {
+        title: "VESSEL & CONTAINER",
+        items: [
+          { name: "VESSEL & CONTAINER MANAGEMENT", path: "/saudi-arabia/vessel-container" },
         ],
       },
       {
@@ -350,6 +362,12 @@ const SECTIONS: NavigationSections = {
         ],
       },
       {
+        title: "VESSEL & CONTAINER",
+        items: [
+          { name: "VESSEL & CONTAINER MANAGEMENT", path: "/sudan-ops/vessel-container" },
+        ],
+      },
+      {
         title: "ACCOUNTS",
         items: [
           { name: "PAYMENT RECEIPT", path: "/sudan-ops/payment-receipt" },
@@ -372,6 +390,12 @@ const SECTIONS: NavigationSections = {
           { name: "DASHBOARD", path: "/tunisia" },
           { name: "CREATE INVOICE", path: "/tunisia/invoices" },
           { name: "CONTAINER LOADING", path: "/tunisia" },
+        ],
+      },
+      {
+        title: "VESSEL & CONTAINER",
+        items: [
+          { name: "VESSEL & CONTAINER MANAGEMENT", path: "/tunisia/vessel-container" },
         ],
       },
       {
