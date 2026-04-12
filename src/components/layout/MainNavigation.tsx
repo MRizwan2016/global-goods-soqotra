@@ -393,6 +393,12 @@ const SECTIONS: NavigationSections = {
         ],
       },
       {
+        title: "VESSEL & CONTAINER",
+        items: [
+          { name: "VESSEL & CONTAINER MANAGEMENT", path: "/tunisia/vessel-container" },
+        ],
+      },
+      {
         title: "DOCUMENTATION",
         items: [
           { name: "HBL GENERATOR", path: "/tunisia" },
