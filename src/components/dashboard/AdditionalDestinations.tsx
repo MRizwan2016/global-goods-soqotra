@@ -7,12 +7,12 @@ const AdditionalDestinations = () => {
   const { t, language } = useLanguage();
   
   const destinations = [
-    { country: t("country.syria"), to: "/syria", flag: "🇸🇾" },
-    { country: t("country.saudiArabia"), to: "/saudi-arabia", flag: "🇸🇦" },
-    { country: t("country.ethiopia"), to: "/ethiopia", flag: "🇪🇹" },
-    { country: t("country.sudan"), to: "/sudan", flag: "🇸🇩" },
-    { country: t("country.eritrea"), to: "/eritrea", flag: "🇪🇷" },
-    { country: t("country.algeria"), to: "/algeria", flag: "🇩🇿" },
+    { country: t("country.syria"), to: "/syria", flagKey: "syria" },
+    { country: t("country.saudiArabia"), to: "/saudi-arabia", flagKey: "saudi-arabia" },
+    { country: t("country.ethiopia"), to: "/ethiopia", flagKey: "ethiopia" },
+    { country: t("country.sudan"), to: "/sudan", flagKey: "sudan" },
+    { country: t("country.eritrea"), to: "/eritrea", flagKey: "eritrea" },
+    { country: t("country.algeria"), to: "/algeria", flagKey: "algeria" },
   ];
 
   return (
@@ -28,7 +28,7 @@ const AdditionalDestinations = () => {
             country={dest.country}
             bgColor=""
             to={dest.to}
-            flagEmoji={dest.flag}
+            flagKey={dest.flagKey}
           />
         ))}
       </div>
