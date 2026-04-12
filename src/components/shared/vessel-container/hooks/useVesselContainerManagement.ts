@@ -1,0 +1,202 @@
+
+import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
+import { toast } from "sonner";
+import { VesselData, ContainerData, CountryConfig, ViewMode } from "../types";
+
+const STORAGE_KEY_VESSELS = (code: string) => `vessels_${code}`;
+const STORAGE_KEY_CONTAINERS = (code: string) => `containers_${code}`;
+
+function getNextRunningNumber(existing: string[], prefix: string): string {
+  let max = 0;
+  existing.forEach((rn) => {
+    const num = parseInt(rn.replace(/\D/g, ""), 10);
+    if (!isNaN(num) && num > max) max = num;
+  });
+  return `${max + 1} ${prefix}`;
+}
+
+export function useVesselContainerManagement(config: CountryConfig) {
+  const [vessels, setVessels] = useState<VesselData[]>([]);
+  const [containers, setContainers] = useState<ContainerData[]>([]);
+  const [viewMode, setViewMode] = useState<ViewMode>("vessel-list");
+  const [selectedSector, setSelectedSector] = useState(config.sectors[0]?.code || "");
+  const [confirmFilter, setConfirmFilter] = useState("NOT CONFIRM");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [entriesPerPage, setEntriesPerPage] = useState(50);
+
+  // Vessel form state
+  const [vesselForm, setVesselForm] = useState<Partial<VesselData>>({});
+  // Container form state
+  const [containerForm, setContainerForm] = useState<Partial<ContainerData>>({});
+
+  // Load from localStorage
+  useEffect(() => {
+    try {
+      const savedV = localStorage.getItem(STORAGE_KEY_VESSELS(config.countryCode));
+      if (savedV) setVessels(JSON.parse(savedV));
+    } catch (e) {
+      console.error("Error loading vessels:", e);
+    }
+    try {
+      const savedC = localStorage.getItem(STORAGE_KEY_CONTAINERS(config.countryCode));
+      if (savedC) setContainers(JSON.parse(savedC));
+    } catch (e) {
+      console.error("Error loading containers:", e);
+    }
+  }, [config.countryCode]);
+
+  // Save vessels
+  useEffect(() => {
+    if (vessels.length > 0) {
+      localStorage.setItem(STORAGE_KEY_VESSELS(config.countryCode), JSON.stringify(vessels));
+    }
+  }, [vessels, config.countryCode]);
+
+  // Save containers
+  useEffect(() => {
+    if (containers.length > 0) {
+      localStorage.setItem(STORAGE_KEY_CONTAINERS(config.countryCode), JSON.stringify(containers));
+    }
+  }, [containers, config.countryCode]);
+
+  // Initialize vessel form
+  const initVesselForm = () => {
+    const existingNumbers = vessels.map((v) => v.runningNumber);
+    setVesselForm({
+      id: uuidv4(),
+      runningNumber: getNextRunningNumber(existingNumbers, selectedSector),
+      vesselName: "",
+      voyage: "",
+      portOfLoading: config.portsOfLoading[0] || "",
+      portOfDischarge: "",
+      shippingLine: "",
+      direction: "MIX",
+      masterBL: "",
+      etd: "",
+      eta: "",
+      sector: config.sectors[0]?.label || "",
+      status: "NEW",
+      containers: [],
+    });
+    setViewMode("add-vessel");
+  };
+
+  // Initialize container form
+  const initContainerForm = () => {
+    const existingNumbers = containers.map((c) => c.runningNumber);
+    setContainerForm({
+      id: uuidv4(),
+      runningNumber: getNextRunningNumber(existingNumbers, selectedSector),
+      containerNumber: "",
+      sealNumber: "",
+      containerType: config.containerTypes[0] || "20FT_NML",
+      direction: config.sectors[0]?.label || "",
+      etd: "",
+      eta: "",
+      sector: config.sectors[0]?.label || "",
+      status: "NOT CONFIRM",
+      weight: 0,
+    });
+    setViewMode("add-container");
+  };
+
+  // Save vessel
+  const saveVessel = () => {
+    if (!vesselForm.vesselName || !vesselForm.voyage) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    const vessel: VesselData = {
+      id: vesselForm.id || uuidv4(),
+      runningNumber: vesselForm.runningNumber || "",
+      vesselName: vesselForm.vesselName || "",
+      voyage: vesselForm.voyage || "",
+      portOfLoading: vesselForm.portOfLoading || "",
+      portOfDischarge: vesselForm.portOfDischarge || "",
+      shippingLine: vesselForm.shippingLine || "",
+      direction: vesselForm.direction || "MIX",
+      masterBL: vesselForm.masterBL || "",
+      etd: vesselForm.etd || "",
+      eta: vesselForm.eta || "",
+      sector: vesselForm.sector || "",
+      status: "NEW",
+      containers: [],
+    };
+    setVessels((prev) => [vessel, ...prev]);
+    toast.success(`Vessel ${vessel.vesselName} created successfully`);
+    setViewMode("vessel-list");
+  };
+
+  // Save container
+  const saveContainer = () => {
+    if (!containerForm.containerNumber) {
+      toast.error("Please fill in container number");
+      return;
+    }
+    const container: ContainerData = {
+      id: containerForm.id || uuidv4(),
+      runningNumber: containerForm.runningNumber || "",
+      containerNumber: containerForm.containerNumber || "",
+      sealNumber: containerForm.sealNumber || "",
+      containerType: containerForm.containerType || "20FT_NML",
+      direction: containerForm.direction || "",
+      etd: containerForm.etd || "",
+      eta: containerForm.eta || "",
+      sector: containerForm.sector || "",
+      status: containerForm.status || "NOT CONFIRM",
+      weight: containerForm.weight || 0,
+      numberPlate: containerForm.numberPlate,
+    };
+    setContainers((prev) => [container, ...prev]);
+    toast.success(`Container ${container.containerNumber} created successfully`);
+    setViewMode("container-list");
+  };
+
+  // Filter vessels by sector
+  const filteredVessels = vessels.filter((v) => {
+    const sectorMatch = !selectedSector || v.sector?.includes(selectedSector) || 
+      config.sectors.find(s => s.code === selectedSector)?.label === v.sector;
+    const searchMatch = !searchTerm || 
+      v.vesselName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      v.runningNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      v.voyage.toLowerCase().includes(searchTerm.toLowerCase());
+    return sectorMatch && searchMatch;
+  });
+
+  // Filter containers by sector & confirm status
+  const filteredContainers = containers.filter((c) => {
+    const sectorMatch = !selectedSector || c.sector?.includes(selectedSector) ||
+      config.sectors.find(s => s.code === selectedSector)?.label === c.sector;
+    const confirmMatch = !confirmFilter || confirmFilter === "all" || c.status === confirmFilter;
+    const searchMatch = !searchTerm || 
+      c.containerNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.runningNumber.toLowerCase().includes(searchTerm.toLowerCase());
+    return sectorMatch && confirmMatch && searchMatch;
+  });
+
+  return {
+    vessels,
+    containers,
+    viewMode,
+    setViewMode,
+    selectedSector,
+    setSelectedSector,
+    confirmFilter,
+    setConfirmFilter,
+    searchTerm,
+    setSearchTerm,
+    entriesPerPage,
+    setEntriesPerPage,
+    vesselForm,
+    setVesselForm,
+    containerForm,
+    setContainerForm,
+    initVesselForm,
+    initContainerForm,
+    saveVessel,
+    saveContainer,
+    filteredVessels,
+    filteredContainers,
+  };
+}
