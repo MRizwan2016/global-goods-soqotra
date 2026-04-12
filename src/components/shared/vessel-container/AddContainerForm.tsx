@@ -73,15 +73,14 @@ const AddContainerForm: React.FC<AddContainerFormProps> = ({ config, form, setFo
             <tr className="border-b">
               <td className="py-2 px-3 font-semibold text-sm bg-gray-50">DIRECT/MIX:</td>
               <td className="py-2 px-3">
-                <Select value={form.direction || config.sectors[0]?.label || ""} onValueChange={(v) => update("direction", v)}>
+                <Select value={form.direction || config.directions[0] || ""} onValueChange={(v) => update("direction", v)}>
                   <SelectTrigger className="w-48 bg-blue-500 text-white hover:bg-blue-600">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {config.sectors.map(s => (
-                      <SelectItem key={s.label} value={s.label}>{s.label}</SelectItem>
+                    {config.directions.map(d => (
+                      <SelectItem key={d} value={d}>{d}</SelectItem>
                     ))}
-                    <SelectItem value="MIX">MIX</SelectItem>
                   </SelectContent>
                 </Select>
               </td>
