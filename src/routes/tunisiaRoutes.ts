@@ -4,6 +4,7 @@ import TunisiaInvoiceDashboard from "@/pages/tunisia/TunisiaInvoiceDashboard";
 import TunisiaInvoiceFormPage from "@/pages/tunisia/TunisiaInvoiceFormPage";
 import TunisiaAirManifest from "@/pages/tunisia/TunisiaAirManifest";
 import TunisiaSeaManifest from "@/pages/tunisia/TunisiaSeaManifest";
+import TunisiaVesselContainer from "@/pages/tunisia/TunisiaVesselContainer";
 import ViewSchedules from "@/pages/schedules/ViewSchedules";
 import AuthPage from "@/pages/auth/AuthPage";
 
@@ -41,6 +42,11 @@ export const tunisiaRoutes: RouteConfig[] = [
   {
     path: "/tunisia/manifest/sea/:manifestId",
     element: TunisiaSeaManifest,
+    private: true
+  },
+  {
+    path: "/tunisia/vessel-container",
+    element: TunisiaVesselContainer,
     private: true
   },
   {

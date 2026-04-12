@@ -8,6 +8,7 @@ import SaudiArabiaCollectionDelivery from "@/pages/saudi-arabia/SaudiArabiaColle
 import SaudiArabiaPaymentReceipt from "@/pages/saudi-arabia/SaudiArabiaPaymentReceipt";
 import SaudiArabiaReconciliation from "@/pages/saudi-arabia/SaudiArabiaReconciliation";
 import SaudiArabiaSavedInvoices from "@/pages/saudi-arabia/SaudiArabiaSavedInvoices";
+import SaudiArabiaVesselContainer from "@/pages/saudi-arabia/SaudiArabiaVesselContainer";
 import ViewSchedules from "@/pages/schedules/ViewSchedules";
 import SaudiArabiaNewJob from "@/pages/saudi-arabia/SaudiArabiaNewJob";
 
@@ -70,6 +71,11 @@ export const saudiArabiaRoutes: RouteConfig[] = [
   {
     path: "/saudi-arabia/manifest/sea/:manifestId",
     element: SaudiArabiaSeaManifest,
+    private: true
+  },
+  {
+    path: "/saudi-arabia/vessel-container",
+    element: SaudiArabiaVesselContainer,
     private: true
   }
 ];
