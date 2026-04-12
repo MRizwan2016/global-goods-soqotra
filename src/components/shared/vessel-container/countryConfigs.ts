@@ -7,8 +7,7 @@ export const SRI_LANKA_CONFIG: CountryConfig = {
   runningNumberPrefix: "C",
   containerRunningPrefix: "C",
   sectors: [
-    { label: "COLOMBO", code: "C" },
-    { label: "HAMBANTOTA", code: "H" },
+    { label: "SRI LANKA", code: "C" },
   ],
   shippingLines: [
     { label: "ABUDHABI SHIPPING", code: "ADS" },
@@ -23,7 +22,7 @@ export const SRI_LANKA_CONFIG: CountryConfig = {
   portsOfLoading: ["DOHA, QATAR", "HAMAD PORT, QATAR"],
   portsOfDischarge: ["COLOMBO, SRI LANKA", "HAMBANTOTA, SRI LANKA"],
   containerTypes: ["20FT_NML", "40FT_NML", "40FT_HC", "45FT_HC"],
-  directions: ["EXPORT", "IMPORT", "MIX"],
+  directions: ["COLOMBO", "GALLE", "KURUNEGALA", "MIX"],
   confirmStatuses: ["NOT CONFIRM", "CONFIRMED"],
   useNumberPlate: false,
 };

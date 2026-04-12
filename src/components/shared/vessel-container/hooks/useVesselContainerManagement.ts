@@ -91,7 +91,7 @@ export function useVesselContainerManagement(config: CountryConfig) {
       containerNumber: "",
       sealNumber: "",
       containerType: config.containerTypes[0] || "20FT_NML",
-      direction: config.sectors[0]?.label || "",
+      direction: config.directions[0] || "MIX",
       etd: "",
       eta: "",
       sector: config.sectors[0]?.label || "",
