@@ -252,6 +252,12 @@ const SECTIONS: NavigationSections = {
         ],
       },
       {
+        title: "VESSEL & CONTAINER",
+        items: [
+          { name: "VESSEL & CONTAINER MANAGEMENT", path: "/sri-lanka/vessel-container" },
+        ],
+      },
+      {
         title: "ACCOUNTS",
         items: [
           { name: "PAYMENT RECEIPT", path: "/sri-lanka/payment-receipt" },
@@ -281,6 +287,12 @@ const SECTIONS: NavigationSections = {
         items: [
           { name: "COLLECTION & DELIVERY", path: "/saudi-arabia/collection-delivery" },
           { name: "VIEW SCHEDULES", path: "/saudi-arabia/schedules" },
+        ],
+      },
+      {
+        title: "VESSEL & CONTAINER",
+        items: [
+          { name: "VESSEL & CONTAINER MANAGEMENT", path: "/saudi-arabia/vessel-container" },
         ],
       },
       {
@@ -347,6 +359,12 @@ const SECTIONS: NavigationSections = {
           { name: "COLLECTION & DELIVERY", path: "/sudan-ops/collection-delivery" },
           { name: "ADD NEW JOB", path: "/sudan-ops/new-job" },
           { name: "VIEW SCHEDULES", path: "/sudan-ops/schedules" },
+        ],
+      },
+      {
+        title: "VESSEL & CONTAINER",
+        items: [
+          { name: "VESSEL & CONTAINER MANAGEMENT", path: "/sudan-ops/vessel-container" },
         ],
       },
       {
