@@ -7,12 +7,12 @@ const PrimaryDestinations = () => {
   const { t, language } = useLanguage();
   
   const destinations = [
-    { country: t("country.kenya"), to: "/kenya", flag: "🇰🇪" },
-    { country: t("country.tunisia"), to: "/tunisia", flag: "🇹🇳" },
-    { country: t("country.uganda"), to: "/uganda", flag: "🇺🇬" },
-    { country: t("country.philippines"), to: "/philippines", flag: "🇵🇭" },
-    { country: t("country.sriLanka"), to: "/sri-lanka", flag: "🇱🇰" },
-    { country: t("country.somalia"), to: "/somalia", flag: "🇸🇴" },
+    { country: t("country.kenya"), to: "/kenya", flagKey: "kenya" },
+    { country: t("country.tunisia"), to: "/tunisia", flagKey: "tunisia" },
+    { country: t("country.uganda"), to: "/uganda", flagKey: "uganda" },
+    { country: t("country.philippines"), to: "/philippines", flagKey: "philippines" },
+    { country: t("country.sriLanka"), to: "/sri-lanka", flagKey: "sri-lanka" },
+    { country: t("country.somalia"), to: "/somalia", flagKey: "somalia" },
   ];
 
   return (
@@ -28,7 +28,7 @@ const PrimaryDestinations = () => {
             country={dest.country}
             bgColor=""
             to={dest.to}
-            flagEmoji={dest.flag}
+            flagKey={dest.flagKey}
           />
         ))}
       </div>

@@ -9,12 +9,18 @@ interface DestinationCardProps {
   borderColor?: string;
   to: string;
   flagEmoji?: string;
+  flagKey?: string;
 }
 
-const DestinationCard = ({ country, bgColor, borderColor = "", to, flagEmoji }: DestinationCardProps) => {
+const DestinationCard = ({ country, bgColor, borderColor = "", to, flagEmoji, flagKey }: DestinationCardProps) => {
   const { language, t } = useLanguage();
   
-  const getFlagClass = (country: string) => {
+  const getFlagClass = () => {
+    if (flagKey) return `flag-${flagKey}`;
+
+    const routeKey = to.replace(/^\//, '').toLowerCase();
+    if (routeKey) return `flag-${routeKey}`;
+
     const countryLower = country.toLowerCase();
     return `flag-${countryLower.replace(/\s+/g, "-")}`;
   };
@@ -33,10 +39,12 @@ const DestinationCard = ({ country, bgColor, borderColor = "", to, flagEmoji }: 
         <div className={`relative flex items-center gap-3 mb-3 ${language === 'ar' ? 'flex-row-reverse' : ''}`}>
           {/* Flag container */}
           <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 shadow-inner group-hover:shadow-md transition-shadow duration-300 overflow-hidden">
-            {flagEmoji ? (
+            {flagKey || (!flagEmoji && to) ? (
+              <span className={`flag-icon ${getFlagClass()} transform transition-transform duration-300 group-hover:scale-110`} style={{ width: '32px', height: '32px', borderRadius: '4px', marginRight: 0 }}></span>
+            ) : flagEmoji ? (
               <span className="text-3xl leading-none">{flagEmoji}</span>
             ) : (
-              <span className={`flag-icon ${getFlagClass(country)} transform transition-transform duration-300 group-hover:scale-110`} style={{ width: '32px', height: '32px', borderRadius: '4px' }}></span>
+              <span className={`flag-icon ${getFlagClass()} transform transition-transform duration-300 group-hover:scale-110`} style={{ width: '32px', height: '32px', borderRadius: '4px', marginRight: 0 }}></span>
             )}
           </div>
           <h3 className={`text-base font-bold text-[#1e2a3a] ${language === 'ar' ? 'font-arabic' : ''}`}>
