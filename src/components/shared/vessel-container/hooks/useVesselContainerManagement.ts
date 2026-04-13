@@ -107,6 +107,16 @@ export function useVesselContainerManagement(config: CountryConfig) {
       toast.error("Please fill in all required fields");
       return;
     }
+    const isDuplicateVessel = vessels.some(
+      (v) =>
+        v.id !== vesselForm.id &&
+        v.vesselName.toLowerCase() === (vesselForm.vesselName || "").toLowerCase() &&
+        v.voyage.toLowerCase() === (vesselForm.voyage || "").toLowerCase()
+    );
+    if (isDuplicateVessel) {
+      toast.error(`Vessel "${vesselForm.vesselName}" with voyage "${vesselForm.voyage}" already exists`);
+      return;
+    }
     const vessel: VesselData = {
       id: vesselForm.id || uuidv4(),
       runningNumber: vesselForm.runningNumber || "",
@@ -120,11 +130,18 @@ export function useVesselContainerManagement(config: CountryConfig) {
       etd: vesselForm.etd || "",
       eta: vesselForm.eta || "",
       sector: vesselForm.sector || "",
-      status: "NEW",
-      containers: [],
+      status: vesselForm.status || "NEW",
+      containers: vesselForm.containers || [],
+      loadDate: vesselForm.loadDate,
     };
-    setVessels((prev) => [vessel, ...prev]);
-    toast.success(`Vessel ${vessel.vesselName} created successfully`);
+    const existingIndex = vessels.findIndex((v) => v.id === vessel.id);
+    if (existingIndex >= 0) {
+      setVessels((prev) => prev.map((v) => (v.id === vessel.id ? vessel : v)));
+      toast.success(`Vessel ${vessel.vesselName} updated successfully`);
+    } else {
+      setVessels((prev) => [vessel, ...prev]);
+      toast.success(`Vessel ${vessel.vesselName} created successfully`);
+    }
     setViewMode("vessel-list");
   };
 
@@ -132,6 +149,16 @@ export function useVesselContainerManagement(config: CountryConfig) {
   const saveContainer = () => {
     if (!containerForm.containerNumber) {
       toast.error("Please fill in container number");
+      return;
+    }
+    const isDuplicateContainer = containers.some(
+      (c) =>
+        c.id !== containerForm.id &&
+        c.containerNumber.toLowerCase() === (containerForm.containerNumber || "").toLowerCase() &&
+        c.sealNumber.toLowerCase() === (containerForm.sealNumber || "").toLowerCase()
+    );
+    if (isDuplicateContainer) {
+      toast.error(`Container "${containerForm.containerNumber}" with seal "${containerForm.sealNumber}" already exists`);
       return;
     }
     const container: ContainerData = {
@@ -147,10 +174,51 @@ export function useVesselContainerManagement(config: CountryConfig) {
       status: containerForm.status || "NOT CONFIRM",
       weight: containerForm.weight || 0,
       numberPlate: containerForm.numberPlate,
+      loadDate: containerForm.loadDate,
     };
-    setContainers((prev) => [container, ...prev]);
-    toast.success(`Container ${container.containerNumber} created successfully`);
+    const existingIndex = containers.findIndex((c) => c.id === container.id);
+    if (existingIndex >= 0) {
+      setContainers((prev) => prev.map((c) => (c.id === container.id ? container : c)));
+      toast.success(`Container ${container.containerNumber} updated successfully`);
+    } else {
+      setContainers((prev) => [container, ...prev]);
+      toast.success(`Container ${container.containerNumber} created successfully`);
+    }
     setViewMode("container-list");
+  };
+
+  // Delete vessel
+  const deleteVessel = (vesselId: string) => {
+    const vessel = vessels.find((v) => v.id === vesselId);
+    setVessels((prev) => {
+      const updated = prev.filter((v) => v.id !== vesselId);
+      if (updated.length === 0) {
+        localStorage.removeItem(STORAGE_KEY_VESSELS(config.countryCode));
+      }
+      return updated;
+    });
+    toast.success(`Vessel "${vessel?.vesselName || ""}" deleted`);
+  };
+
+  // Delete container
+  const deleteContainer = (containerId: string) => {
+    const container = containers.find((c) => c.id === containerId);
+    setContainers((prev) => {
+      const updated = prev.filter((c) => c.id !== containerId);
+      if (updated.length === 0) {
+        localStorage.removeItem(STORAGE_KEY_CONTAINERS(config.countryCode));
+      }
+      return updated;
+    });
+    setVessels((prev) =>
+      prev.map((v) => ({
+        ...v,
+        containers: v.containers.filter(
+          (rn) => rn !== container?.runningNumber && rn !== containerId
+        ),
+      }))
+    );
+    toast.success(`Container "${container?.containerNumber || ""}" deleted`);
   };
 
   // Filter vessels by sector
@@ -205,6 +273,8 @@ export function useVesselContainerManagement(config: CountryConfig) {
     initContainerForm,
     saveVessel,
     saveContainer,
+    deleteVessel,
+    deleteContainer,
     filteredVessels,
     filteredContainers,
     updateVesselContainers,
