@@ -231,7 +231,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
                 <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">VOYAGE:</div>
                 <div className="border-b border-gray-200 px-2 py-1">{vessel?.voyage || "-"}</div>
                 <div className="border-r border-gray-200 px-2 py-1 font-medium">DATE CONFIRM:</div>
-                <div className="px-2 py-1">{vessel?.loadDate || "-"}</div>
+                <div className={`px-2 py-1 ${confirmDate ? "text-green-700 font-bold" : ""}`}>{confirmDate || vessel?.loadDate || "-"}</div>
               </div>
             </div>
             <div>
