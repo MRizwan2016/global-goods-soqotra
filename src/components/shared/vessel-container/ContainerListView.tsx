@@ -137,7 +137,6 @@ const ContainerListView: React.FC<ContainerListViewProps> = ({
                         <Button size="sm" className="text-xs h-7 bg-blue-600 hover:bg-blue-700 text-white" onClick={(e) => { e.stopPropagation(); onViewManifest?.(c); }}>Manifest</Button>
                       </div>
                     </td>
-                    </td>
                   </tr>
                 ))
               ) : (
