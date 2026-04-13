@@ -18,6 +18,7 @@ interface VesselListViewProps {
   onEditVessel?: (vessel: VesselData) => void;
   onLoadVessel?: (vessel: VesselData) => void;
   onViewVesselManifest?: (vessel: VesselData) => void;
+  onDeleteVessel?: (vessel: VesselData) => void;
 }
 
 const VesselListView: React.FC<VesselListViewProps> = ({
@@ -33,6 +34,7 @@ const VesselListView: React.FC<VesselListViewProps> = ({
   onEditVessel,
   onLoadVessel,
   onViewVesselManifest,
+  onDeleteVessel,
 }) => {
   const displayVessels = vessels.slice(0, entriesPerPage);
 
@@ -124,6 +126,7 @@ const VesselListView: React.FC<VesselListViewProps> = ({
                         <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => onEditVessel?.(v)}>Edit</Button>
                         <Button size="sm" className="text-xs h-7 bg-green-600 hover:bg-green-700 text-white" onClick={() => onLoadVessel?.(v)}>Load</Button>
                         <Button size="sm" className="text-xs h-7 bg-blue-600 hover:bg-blue-700 text-white" onClick={() => onViewVesselManifest?.(v)}>Manifest</Button>
+                        <Button size="sm" className="text-xs h-7 bg-red-600 hover:bg-red-700 text-white" onClick={() => { if (window.confirm(`Delete vessel "${v.vesselName}"?`)) onDeleteVessel?.(v); }}>Delete</Button>
                       </div>
                     </td>
                   </tr>

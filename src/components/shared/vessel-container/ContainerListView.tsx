@@ -20,6 +20,7 @@ interface ContainerListViewProps {
   onLoadContainer?: (container: ContainerData) => void;
   onViewManifest?: (container: ContainerData) => void;
   onEditContainer?: (container: ContainerData) => void;
+  onDeleteContainer?: (container: ContainerData) => void;
 }
 
 const ContainerListView: React.FC<ContainerListViewProps> = ({
@@ -37,6 +38,7 @@ const ContainerListView: React.FC<ContainerListViewProps> = ({
   onLoadContainer,
   onViewManifest,
   onEditContainer,
+  onDeleteContainer,
 }) => {
   const displayContainers = containers.slice(0, entriesPerPage);
 
@@ -137,6 +139,7 @@ const ContainerListView: React.FC<ContainerListViewProps> = ({
                         <Button size="sm" variant="outline" className="text-xs h-7" onClick={(e) => { e.stopPropagation(); onEditContainer?.(c); }}>Edit</Button>
                         <Button size="sm" className="text-xs h-7 bg-green-600 hover:bg-green-700 text-white" onClick={(e) => { e.stopPropagation(); onLoadContainer?.(c); }}>Load</Button>
                         <Button size="sm" className="text-xs h-7 bg-blue-600 hover:bg-blue-700 text-white" onClick={(e) => { e.stopPropagation(); onViewManifest?.(c); }}>Manifest</Button>
+                        <Button size="sm" className="text-xs h-7 bg-red-600 hover:bg-red-700 text-white" onClick={(e) => { e.stopPropagation(); if (window.confirm(`Delete container "${c.containerNumber}"?`)) onDeleteContainer?.(c); }}>Delete</Button>
                       </div>
                     </td>
                   </tr>
