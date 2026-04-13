@@ -649,6 +649,7 @@ export type Database = {
           consignee_name: string | null
           consignee_prefix: string | null
           consignee_province: string | null
+          container_running_number: string | null
           country: string
           created_at: string
           created_by: string | null
@@ -671,6 +672,7 @@ export type Database = {
           invoice_date: string | null
           invoice_number: string
           job_number: string | null
+          loaded_at: string | null
           local_transport: number | null
           net: number | null
           other: number | null
@@ -703,6 +705,7 @@ export type Database = {
           total_weight: number | null
           transportation_fee: number | null
           updated_at: string
+          vessel_running_number: string | null
           warehouse: string | null
           whatsapp_number: string | null
         }
@@ -722,6 +725,7 @@ export type Database = {
           consignee_name?: string | null
           consignee_prefix?: string | null
           consignee_province?: string | null
+          container_running_number?: string | null
           country: string
           created_at?: string
           created_by?: string | null
@@ -744,6 +748,7 @@ export type Database = {
           invoice_date?: string | null
           invoice_number: string
           job_number?: string | null
+          loaded_at?: string | null
           local_transport?: number | null
           net?: number | null
           other?: number | null
@@ -776,6 +781,7 @@ export type Database = {
           total_weight?: number | null
           transportation_fee?: number | null
           updated_at?: string
+          vessel_running_number?: string | null
           warehouse?: string | null
           whatsapp_number?: string | null
         }
@@ -795,6 +801,7 @@ export type Database = {
           consignee_name?: string | null
           consignee_prefix?: string | null
           consignee_province?: string | null
+          container_running_number?: string | null
           country?: string
           created_at?: string
           created_by?: string | null
@@ -817,6 +824,7 @@ export type Database = {
           invoice_date?: string | null
           invoice_number?: string
           job_number?: string | null
+          loaded_at?: string | null
           local_transport?: number | null
           net?: number | null
           other?: number | null
@@ -849,6 +857,7 @@ export type Database = {
           total_weight?: number | null
           transportation_fee?: number | null
           updated_at?: string
+          vessel_running_number?: string | null
           warehouse?: string | null
           whatsapp_number?: string | null
         }
