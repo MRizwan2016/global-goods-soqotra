@@ -55,6 +55,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
   const [invoices, setInvoices] = useState<ManifestInvoice[]>([]);
   const [packages, setPackages] = useState<PackageRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [confirmDate, setConfirmDate] = useState<string | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
