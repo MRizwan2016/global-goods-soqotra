@@ -86,11 +86,6 @@ const baseRoutes: RouteConfig[] = [
     element: PaymentReceiptPage,
     private: false
   },
-  {
-    path: "*",
-    element: NotFound,
-    private: false
-  }
 ];
 
 export const routes: RouteConfig[] = [
@@ -122,5 +117,11 @@ export const routes: RouteConfig[] = [
   ...sellingRatesRoutes,
   ...invoiceRoutes,
   ...scheduleRoutes,
-  ...customerPortalRoutes
+  ...customerPortalRoutes,
+  // Catch-all 404 route must be last
+  {
+    path: "*",
+    element: NotFound,
+    private: false
+  }
 ];
