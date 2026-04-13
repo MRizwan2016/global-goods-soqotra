@@ -20,6 +20,7 @@ interface InvoiceRow {
   payment_status: string | null;
   warehouse: string | null;
   description: string | null;
+  packageNames?: string;
 }
 
 interface ContainerLoadingPanelProps {
@@ -58,7 +59,6 @@ const ContainerLoadingPanel: React.FC<ContainerLoadingPanelProps> = ({
         .order("created_at", { ascending: false });
 
       if (err1) throw err1;
-      setInvoices(unloaded || []);
 
       // Fetch already loaded invoices for this container
       const { data: loaded, error: err2 } = await supabase
@@ -69,7 +69,36 @@ const ContainerLoadingPanel: React.FC<ContainerLoadingPanelProps> = ({
         .order("created_at", { ascending: false });
 
       if (err2) throw err2;
-      setLoadedInvoices(loaded || []);
+
+      // Fetch package names for all relevant invoices
+      const allIds = [...(unloaded || []), ...(loaded || [])].map(i => i.id);
+      let pkgMap: Record<string, string> = {};
+
+      if (allIds.length > 0) {
+        const { data: packages } = await supabase
+          .from("regional_invoice_packages")
+          .select("invoice_id, package_name")
+          .in("invoice_id", allIds);
+
+        if (packages) {
+          const grouped: Record<string, string[]> = {};
+          packages.forEach(p => {
+            if (!grouped[p.invoice_id]) grouped[p.invoice_id] = [];
+            if (p.package_name && !grouped[p.invoice_id].includes(p.package_name)) {
+              grouped[p.invoice_id].push(p.package_name);
+            }
+          });
+          Object.entries(grouped).forEach(([id, names]) => {
+            pkgMap[id] = names.join(", ");
+          });
+        }
+      }
+
+      const enrichWithPkgs = (rows: InvoiceRow[]) =>
+        rows.map(r => ({ ...r, packageNames: pkgMap[r.id] || r.description || "" }));
+
+      setInvoices(enrichWithPkgs(unloaded || []));
+      setLoadedInvoices(enrichWithPkgs(loaded || []));
     } catch (error) {
       console.error("Error fetching invoices:", error);
       toast.error("Failed to load invoices");
@@ -286,7 +315,7 @@ const ContainerLoadingPanel: React.FC<ContainerLoadingPanelProps> = ({
                       <td className="border px-2 py-1">{inv.shipper_name}</td>
                       <td className="border px-2 py-1">{inv.consignee_name}</td>
                       <td className="border px-2 py-1">{inv.warehouse}</td>
-                      <td className="border px-2 py-1">{inv.description}</td>
+                      <td className="border px-2 py-1">{inv.packageNames || inv.description}</td>
                       <td className="border px-2 py-1 text-right">{(inv.total_weight || 0).toFixed(2)}</td>
                       <td className="border px-2 py-1 text-right">{(inv.total_volume || 0).toFixed(3)}</td>
                       <td className="border px-2 py-1 text-right">{(inv.net || 0).toFixed(2)}</td>
