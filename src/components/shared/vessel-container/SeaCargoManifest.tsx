@@ -160,6 +160,32 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     }, 500);
   };
 
+  const handleDownloadPDF = async () => {
+    if (!printRef.current) return;
+    toast.info("Generating A4 Landscape PDF...");
+    try {
+      const canvas = await html2canvas(printRef.current, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      const pdfW = pdf.internal.pageSize.getWidth();
+      const pdfH = pdf.internal.pageSize.getHeight();
+      const imgRatio = canvas.width / canvas.height;
+      let w = pdfW - 16;
+      let h = w / imgRatio;
+      if (h > pdfH - 16) {
+        h = pdfH - 16;
+        w = h * imgRatio;
+      }
+      const containerNum = container.containerNumber || container.runningNumber;
+      pdf.addImage(imgData, "PNG", 8, 8, w, h);
+      pdf.save(`Sea_Cargo_Manifest_${containerNum}_${new Date().toISOString().slice(0, 10)}.pdf`);
+      toast.success("PDF downloaded successfully");
+    } catch (err) {
+      console.error("PDF generation error:", err);
+      toast.error("Failed to generate PDF");
+    }
+  };
+
   if (loading) {
     return (
       <div className="text-center py-16">
