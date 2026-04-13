@@ -132,6 +132,14 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
   const totalVolume = invoices.reduce((s, i) => s + (i.total_volume || 0), 0);
   const totalWeight = invoices.reduce((s, i) => s + (i.total_weight || 0), 0);
 
+  const handleConfirmManifest = () => {
+    const today = new Date().toLocaleDateString("en-GB", {
+      day: "2-digit", month: "2-digit", year: "numeric"
+    });
+    setConfirmDate(today);
+    toast.success("Manifest confirmed for Customs on " + today);
+  };
+
   const handlePrint = () => {
     const style = document.createElement("style");
     style.id = "manifest-print-style";
