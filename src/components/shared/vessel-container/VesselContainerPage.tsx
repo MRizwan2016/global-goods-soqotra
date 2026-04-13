@@ -42,6 +42,8 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
     vessels,
     containers,
     updateVesselContainers,
+    deleteVessel,
+    deleteContainer,
   } = useVesselContainerManagement(config);
 
   const [activeContainer, setActiveContainer] = useState<ContainerData | null>(null);
@@ -144,6 +146,7 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
           onEditVessel={handleEditVessel}
           onLoadVessel={handleLoadVessel}
           onViewVesselManifest={handleViewVesselManifest}
+          onDeleteVessel={(v) => deleteVessel(v.id)}
         />
       )}
 
@@ -163,6 +166,7 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
           onLoadContainer={handleLoadContainer}
           onViewManifest={handleViewManifest}
           onEditContainer={handleEditContainer}
+          onDeleteContainer={(c) => deleteContainer(c.id)}
         />
       )}
 
