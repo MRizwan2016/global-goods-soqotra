@@ -175,6 +175,15 @@ export function useVesselContainerManagement(config: CountryConfig) {
     return sectorMatch && confirmMatch && searchMatch;
   });
 
+  // Update vessel containers list
+  const updateVesselContainers = (vesselId: string, containerRunningNumbers: string[]) => {
+    setVessels((prev) =>
+      prev.map((v) =>
+        v.id === vesselId ? { ...v, containers: containerRunningNumbers } : v
+      )
+    );
+  };
+
   return {
     vessels,
     containers,
@@ -198,5 +207,6 @@ export function useVesselContainerManagement(config: CountryConfig) {
     saveContainer,
     filteredVessels,
     filteredContainers,
+    updateVesselContainers,
   };
 }
