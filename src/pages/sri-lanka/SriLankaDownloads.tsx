@@ -5,128 +5,76 @@ import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import { Loader2, Eye, Download, Printer } from "lucide-react";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
-
-interface ContainerRecord {
-  id: string;
-  runningNumber: string;
-  containerNumber: string;
-  sealNumber: string;
-  containerType: string;
-  direction: string;
-  etd: string;
-  eta: string;
-  weight: number;
-  packages: number;
-  volume: number;
-  dateConfirm: string;
-}
+import { Loader2, Download, ArrowLeft } from "lucide-react";
+import { ContainerData, VesselData } from "@/components/shared/vessel-container/types";
+import SeaCargoManifest from "@/components/shared/vessel-container/SeaCargoManifest";
 
 const SriLankaDownloads: React.FC = () => {
   const [activeSection, setActiveSection] = useState<"load-sheet" | "sea-manifest" | "air-manifest" | null>(null);
-  const [containers, setContainers] = useState<ContainerRecord[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [containers, setContainers] = useState<ContainerData[]>([]);
+  const [vessels, setVessels] = useState<VesselData[]>([]);
+  const [selectedContainer, setSelectedContainer] = useState<ContainerData | null>(null);
   const [sectorFilter, setSectorFilter] = useState("all");
   const [confirmFilter, setConfirmFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState(50);
-  const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (activeSection === "load-sheet" || activeSection === "sea-manifest") {
-      fetchContainers();
-    }
-  }, [activeSection]);
+    loadData();
+  }, []);
 
-  const fetchContainers = async () => {
-    setLoading(true);
+  const loadData = () => {
     try {
-      // Fetch containers from regional_invoices grouped by container_running_number
-      const { data, error } = await supabase
-        .from("regional_invoices")
-        .select("container_running_number, total_packages, total_volume, total_weight")
-        .eq("country", "SRI LANKA")
-        .not("container_running_number", "is", null)
-        .order("container_running_number", { ascending: false });
-
-      if (error) throw error;
-
-      // Group by container running number
-      const containerMap: Record<string, ContainerRecord> = {};
-      (data || []).forEach((inv) => {
-        const rn = inv.container_running_number || "";
-        if (!rn) return;
-        if (!containerMap[rn]) {
-          containerMap[rn] = {
-            id: rn,
-            runningNumber: rn,
-            containerNumber: "",
-            sealNumber: "",
-            containerType: "40FT_HIGHC",
-            direction: "",
-            etd: "",
-            eta: "",
-            weight: 0,
-            packages: 0,
-            volume: 0,
-            dateConfirm: "",
-          };
-        }
-        containerMap[rn].packages += 1;
-        containerMap[rn].volume += inv.total_volume || 0;
-        containerMap[rn].weight += inv.total_weight || 0;
-      });
-
-      setContainers(Object.values(containerMap));
-    } catch (err) {
-      console.error("Error fetching containers:", err);
-      toast.error("Failed to load container data");
-    } finally {
-      setLoading(false);
+      const savedC = localStorage.getItem("containers_LK");
+      if (savedC) setContainers(JSON.parse(savedC));
+      const savedV = localStorage.getItem("vessels_LK");
+      if (savedV) setVessels(JSON.parse(savedV));
+    } catch (e) {
+      console.error("Error loading data:", e);
     }
   };
 
+  const findVesselForContainer = (container: ContainerData): VesselData | null => {
+    return vessels.find((v) =>
+      v.containers?.includes(container.runningNumber) ||
+      v.containers?.includes(container.id)
+    ) || null;
+  };
+
   const filteredContainers = containers.filter((c) => {
+    if (sectorFilter !== "all") {
+      const sectorMap: Record<string, string> = { colombo: "COLOMBO", galle: "GALLE", kurunegala: "KURUNEGALA", mix: "MIX" };
+      const target = sectorMap[sectorFilter] || "";
+      if (!c.direction?.toUpperCase().includes(target) && !c.sector?.toUpperCase().includes(target)) return false;
+    }
+    if (confirmFilter === "confirmed" && c.status !== "CONFIRMED") return false;
+    if (confirmFilter === "not-confirmed" && c.status === "CONFIRMED") return false;
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      return (
-        c.runningNumber.toLowerCase().includes(term) ||
-        c.containerNumber.toLowerCase().includes(term)
-      );
+      return c.runningNumber.toLowerCase().includes(term) ||
+        c.containerNumber.toLowerCase().includes(term) ||
+        c.sealNumber?.toLowerCase().includes(term);
     }
     return true;
   });
 
-  const handlePrintPDF = async () => {
-    if (!printRef.current) return;
-    toast.info("Generating PDF...");
-    try {
-      const canvas = await html2canvas(printRef.current, { scale: 2, useCORS: true });
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-      const pdfW = pdf.internal.pageSize.getWidth();
-      const pdfH = pdf.internal.pageSize.getHeight();
-      const imgRatio = canvas.width / canvas.height;
-      const pdfRatio = pdfW / pdfH;
-      let w = pdfW - 16;
-      let h = w / imgRatio;
-      if (h > pdfH - 16) {
-        h = pdfH - 16;
-        w = h * imgRatio;
-      }
-      pdf.addImage(imgData, "PNG", 8, 8, w, h);
-      pdf.save(`Container_Loading_List_${new Date().toISOString().slice(0, 10)}.pdf`);
-      toast.success("PDF downloaded successfully");
-    } catch (err) {
-      console.error("PDF generation error:", err);
-      toast.error("Failed to generate PDF");
-    }
-  };
+  // If viewing a specific container's manifest
+  if (selectedContainer) {
+    const vessel = findVesselForContainer(selectedContainer);
+    return (
+      <Layout title="Dashboard - SRI LANKA">
+        <PageBreadcrumb className="mb-4" />
+        <SeaCargoManifest
+          container={selectedContainer}
+          vessel={vessel}
+          countryName="SRI LANKA"
+          onBack={() => setSelectedContainer(null)}
+        />
+      </Layout>
+    );
+  }
 
+  // Downloads menu
   if (!activeSection) {
     return (
       <Layout title="Dashboard - SRI LANKA">
@@ -176,7 +124,6 @@ const SriLankaDownloads: React.FC = () => {
     );
   }
 
-  // Container Loading List / Sea Manifest list view
   const title = activeSection === "load-sheet" ? "View Container Loading List" : "Manifest Sea Cargo";
 
   return (
@@ -239,63 +186,61 @@ const SriLankaDownloads: React.FC = () => {
         </div>
 
         {/* Table */}
-        {loading ? (
-          <div className="p-8 text-center"><Loader2 className="animate-spin mx-auto" size={32} /></div>
-        ) : (
-          <div ref={printRef} className="overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
-              <thead>
-                <tr className="bg-blue-600 text-white">
-                  <th className="border px-2 py-2 text-center">Num</th>
-                  <th className="border px-2 py-2 text-center">RUNNING NUMBER</th>
-                  <th className="border px-2 py-2 text-center">CONTAINER NUMBER</th>
-                  <th className="border px-2 py-2 text-center">SEAL NUMBER</th>
-                  <th className="border px-2 py-2 text-center">CONTAINER TYPE</th>
-                  <th className="border px-2 py-2 text-center">DIR/MIX</th>
-                  <th className="border px-2 py-2 text-center">E.T.D</th>
-                  <th className="border px-2 py-2 text-center">E.T.A</th>
-                  <th className="border px-2 py-2 text-center">WEIGHT</th>
-                  <th className="border px-2 py-2 text-center">PACKAGES</th>
-                  <th className="border px-2 py-2 text-center">VOLUME</th>
-                  <th className="border px-2 py-2 text-center">DATE CONFIRM</th>
-                  <th className="border px-2 py-2 text-center">VIEW</th>
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="bg-blue-600 text-white">
+                <th className="border px-2 py-2 text-center">Num</th>
+                <th className="border px-2 py-2 text-center">RUNNING NUMBER</th>
+                <th className="border px-2 py-2 text-center">CONTAINER NUMBER</th>
+                <th className="border px-2 py-2 text-center">SEAL NUMBER</th>
+                <th className="border px-2 py-2 text-center">CONTAINER TYPE</th>
+                <th className="border px-2 py-2 text-center">DIR/MIX</th>
+                <th className="border px-2 py-2 text-center">E.T.D</th>
+                <th className="border px-2 py-2 text-center">E.T.A</th>
+                <th className="border px-2 py-2 text-center">WEIGHT</th>
+                <th className="border px-2 py-2 text-center">PACKAGES</th>
+                <th className="border px-2 py-2 text-center">VOLUME</th>
+                <th className="border px-2 py-2 text-center">LOAD DATE</th>
+                <th className="border px-2 py-2 text-center">VIEW</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredContainers.slice(0, entriesPerPage).map((c, i) => (
+                <tr key={c.id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                  <td className="border px-2 py-1.5 text-center">{i + 1}</td>
+                  <td className="border px-2 py-1.5 text-center font-medium">{c.runningNumber}</td>
+                  <td className="border px-2 py-1.5 text-center">{c.containerNumber}</td>
+                  <td className="border px-2 py-1.5 text-center">{c.sealNumber}</td>
+                  <td className="border px-2 py-1.5 text-center">{c.containerType}</td>
+                  <td className="border px-2 py-1.5 text-center">{c.direction}</td>
+                  <td className="border px-2 py-1.5 text-center">{c.etd}</td>
+                  <td className="border px-2 py-1.5 text-center">{c.eta}</td>
+                  <td className="border px-2 py-1.5 text-center">{c.weight || 0}</td>
+                  <td className="border px-2 py-1.5 text-center">-</td>
+                  <td className="border px-2 py-1.5 text-center">-</td>
+                  <td className="border px-2 py-1.5 text-center">{c.loadDate || "-"}</td>
+                  <td className="border px-2 py-1.5 text-center">
+                    {activeSection === "sea-manifest" ? (
+                      <button
+                        onClick={() => setSelectedContainer(c)}
+                        className="text-blue-600 font-bold hover:underline"
+                      >
+                        {c.runningNumber}
+                      </button>
+                    ) : (
+                      <span className="text-blue-600 font-bold">{c.runningNumber}</span>
+                    )}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {filteredContainers.slice(0, entriesPerPage).map((c, i) => (
-                  <tr key={c.id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                    <td className="border px-2 py-1.5 text-center">{i + 1}</td>
-                    <td className="border px-2 py-1.5 text-center font-medium">{c.runningNumber}</td>
-                    <td className="border px-2 py-1.5 text-center">{c.containerNumber}</td>
-                    <td className="border px-2 py-1.5 text-center">{c.sealNumber}</td>
-                    <td className="border px-2 py-1.5 text-center">{c.containerType}</td>
-                    <td className="border px-2 py-1.5 text-center">{c.direction}</td>
-                    <td className="border px-2 py-1.5 text-center">{c.etd}</td>
-                    <td className="border px-2 py-1.5 text-center">{c.eta}</td>
-                    <td className="border px-2 py-1.5 text-center">{c.weight.toFixed(0)}</td>
-                    <td className="border px-2 py-1.5 text-center">{c.packages}</td>
-                    <td className="border px-2 py-1.5 text-center">{c.volume.toFixed(3)}</td>
-                    <td className="border px-2 py-1.5 text-center">{c.dateConfirm}</td>
-                    <td className="border px-2 py-1.5 text-center">
-                      <span className="text-blue-600 font-bold cursor-pointer hover:underline">{c.runningNumber}</span>
-                    </td>
-                  </tr>
-                ))}
-                {filteredContainers.length === 0 && (
-                  <tr>
-                    <td colSpan={13} className="border px-4 py-8 text-center text-gray-500">No records found.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Action bar */}
-        <div className="p-4 border-t flex justify-end gap-2">
-          <Button onClick={handlePrintPDF} className="bg-green-600 hover:bg-green-700 flex items-center gap-2">
-            <Download size={16} /> Download PDF
-          </Button>
+              ))}
+              {filteredContainers.length === 0 && (
+                <tr>
+                  <td colSpan={13} className="border px-4 py-8 text-center text-gray-500">No records found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </Layout>
