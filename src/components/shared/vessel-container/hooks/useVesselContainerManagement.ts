@@ -205,6 +205,8 @@ export function useVesselContainerManagement(config: CountryConfig) {
     initContainerForm,
     saveVessel,
     saveContainer,
+    deleteVessel,
+    deleteContainer,
     filteredVessels,
     filteredContainers,
     updateVesselContainers,
