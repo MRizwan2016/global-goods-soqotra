@@ -56,6 +56,16 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
     setViewMode("manifest-view");
   };
 
+  const handleEditVessel = (vessel: any) => {
+    setVesselForm(vessel);
+    setViewMode("add-vessel");
+  };
+
+  const handleEditContainer = (container: ContainerData) => {
+    setContainerForm(container);
+    setViewMode("add-container");
+  };
+
   // Find the vessel that contains this container
   const findVesselForContainer = (container: ContainerData) => {
     return vessels.find((v) =>
@@ -97,6 +107,7 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
           entriesPerPage={entriesPerPage}
           setEntriesPerPage={setEntriesPerPage}
           onAddNew={initVesselForm}
+          onEditVessel={handleEditVessel}
         />
       )}
 
@@ -115,6 +126,7 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
           onAddNew={initContainerForm}
           onLoadContainer={handleLoadContainer}
           onViewManifest={handleViewManifest}
+          onEditContainer={handleEditContainer}
         />
       )}
 
