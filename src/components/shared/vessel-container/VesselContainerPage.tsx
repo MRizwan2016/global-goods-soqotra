@@ -2,13 +2,14 @@
 import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import PageBreadcrumb from "@/components/ui/page-breadcrumb";
-import { CountryConfig, ContainerData } from "./types";
+import { CountryConfig, ContainerData, VesselData } from "./types";
 import { useVesselContainerManagement } from "./hooks/useVesselContainerManagement";
 import VesselListView from "./VesselListView";
 import ContainerListView from "./ContainerListView";
 import AddVesselForm from "./AddVesselForm";
 import AddContainerForm from "./AddContainerForm";
 import ContainerLoadingPanel from "./ContainerLoadingPanel";
+import VesselLoadingPanel from "./VesselLoadingPanel";
 import SeaCargoManifest from "./SeaCargoManifest";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -39,9 +40,12 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
     filteredVessels,
     filteredContainers,
     vessels,
+    containers,
+    updateVesselContainers,
   } = useVesselContainerManagement(config);
 
   const [activeContainer, setActiveContainer] = useState<ContainerData | null>(null);
+  const [activeVessel, setActiveVessel] = useState<VesselData | null>(null);
 
   const isListMode = viewMode === "vessel-list" || viewMode === "container-list";
   const activeTab = viewMode === "vessel-list" || viewMode === "add-vessel" ? "vessels" : "containers";
@@ -56,7 +60,7 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
     setViewMode("manifest-view");
   };
 
-  const handleEditVessel = (vessel: any) => {
+  const handleEditVessel = (vessel: VesselData) => {
     setVesselForm(vessel);
     setViewMode("add-vessel");
   };
@@ -64,6 +68,36 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
   const handleEditContainer = (container: ContainerData) => {
     setContainerForm(container);
     setViewMode("add-container");
+  };
+
+  const handleLoadVessel = (vessel: VesselData) => {
+    setActiveVessel(vessel);
+    setViewMode("load-vessel");
+  };
+
+  const handleVesselLoadComplete = (vesselId: string, containerRunningNumbers: string[]) => {
+    updateVesselContainers(vesselId, containerRunningNumbers);
+    setViewMode("vessel-list");
+  };
+
+  const handleViewVesselManifest = (vessel: VesselData) => {
+    // Show manifest for the first container in the vessel, with vessel details
+    if (vessel.containers && vessel.containers.length > 0) {
+      const firstContainerRN = vessel.containers[0];
+      const container = containers.find(
+        (c) => c.runningNumber === firstContainerRN || c.id === firstContainerRN
+      );
+      if (container) {
+        setActiveContainer(container);
+        setActiveVessel(vessel);
+        setViewMode("manifest-view");
+        return;
+      }
+    }
+    // If no containers loaded, still show manifest with vessel info
+    setActiveVessel(vessel);
+    setActiveContainer(null);
+    setViewMode("vessel-manifest");
   };
 
   // Find the vessel that contains this container
@@ -108,6 +142,8 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
           setEntriesPerPage={setEntriesPerPage}
           onAddNew={initVesselForm}
           onEditVessel={handleEditVessel}
+          onLoadVessel={handleLoadVessel}
+          onViewVesselManifest={handleViewVesselManifest}
         />
       )}
 
@@ -159,13 +195,32 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
         />
       )}
 
+      {viewMode === "load-vessel" && activeVessel && (
+        <VesselLoadingPanel
+          vessel={activeVessel}
+          allContainers={containers}
+          onBack={() => setViewMode("vessel-list")}
+          onLoadComplete={handleVesselLoadComplete}
+        />
+      )}
+
       {viewMode === "manifest-view" && activeContainer && (
         <SeaCargoManifest
           container={activeContainer}
-          vessel={findVesselForContainer(activeContainer)}
+          vessel={activeVessel || findVesselForContainer(activeContainer)}
           countryName={config.country}
-          onBack={() => setViewMode("container-list")}
+          onBack={() => { setActiveVessel(null); setViewMode("container-list"); }}
         />
+      )}
+
+      {viewMode === "vessel-manifest" && activeVessel && (
+        <div className="bg-white rounded-lg shadow-sm border p-6 text-center text-gray-500">
+          <p className="text-lg font-medium mb-2">No containers loaded into this vessel yet.</p>
+          <p>Use the "Load" button to assign containers to vessel <strong>{activeVessel.vesselName}</strong> first.</p>
+          <div className="mt-4">
+            <button onClick={() => setViewMode("vessel-list")} className="text-blue-600 underline">Go Back</button>
+          </div>
+        </div>
       )}
     </Layout>
   );
