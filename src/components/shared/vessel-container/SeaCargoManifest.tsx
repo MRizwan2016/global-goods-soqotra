@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer, Loader2 } from "lucide-react";
+import { ArrowLeft, Printer, Loader2, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ContainerData, VesselData } from "./types";
@@ -55,6 +55,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
   const [invoices, setInvoices] = useState<ManifestInvoice[]>([]);
   const [packages, setPackages] = useState<PackageRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [confirmDate, setConfirmDate] = useState<string | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -131,6 +132,14 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
   const totalVolume = invoices.reduce((s, i) => s + (i.total_volume || 0), 0);
   const totalWeight = invoices.reduce((s, i) => s + (i.total_weight || 0), 0);
 
+  const handleConfirmManifest = () => {
+    const today = new Date().toLocaleDateString("en-GB", {
+      day: "2-digit", month: "2-digit", year: "numeric"
+    });
+    setConfirmDate(today);
+    toast.success("Manifest confirmed for Customs on " + today);
+  };
+
   const handlePrint = () => {
     const style = document.createElement("style");
     style.id = "manifest-print-style";
@@ -182,6 +191,15 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
           <ArrowLeft size={16} /> Go Back
         </Button>
         <div className="flex gap-2">
+          {!confirmDate ? (
+            <Button onClick={handleConfirmManifest} className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2">
+              <CheckCircle2 size={16} /> Confirm Manifest
+            </Button>
+          ) : (
+            <span className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded font-medium text-sm border border-green-300">
+              <CheckCircle2 size={16} /> Confirmed: {confirmDate}
+            </span>
+          )}
           <Button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2">
             <Printer size={16} /> Print
           </Button>
@@ -213,7 +231,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
                 <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">VOYAGE:</div>
                 <div className="border-b border-gray-200 px-2 py-1">{vessel?.voyage || "-"}</div>
                 <div className="border-r border-gray-200 px-2 py-1 font-medium">DATE CONFIRM:</div>
-                <div className="px-2 py-1">{vessel?.loadDate || "-"}</div>
+                <div className={`px-2 py-1 ${confirmDate ? "text-green-700 font-bold" : ""}`}>{confirmDate || vessel?.loadDate || "-"}</div>
               </div>
             </div>
             <div>
