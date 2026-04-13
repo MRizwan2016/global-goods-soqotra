@@ -1,0 +1,481 @@
+
+import React, { useState, useEffect, useRef } from "react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Printer, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { ContainerData, VesselData } from "./types";
+
+interface ManifestInvoice {
+  id: string;
+  invoice_number: string;
+  shipper_name: string | null;
+  consignee_name: string | null;
+  consignee_address: string | null;
+  consignee_city: string | null;
+  consignee_mobile: string | null;
+  total_packages: number | null;
+  total_volume: number | null;
+  total_weight: number | null;
+  net: number | null;
+  payment_status: string | null;
+  warehouse: string | null;
+  description: string | null;
+}
+
+interface PackageRow {
+  id: string;
+  invoice_id: string;
+  package_name: string | null;
+  quantity: number | null;
+  weight: number | null;
+  cubic_metre: number | null;
+}
+
+interface SeaCargoManifestProps {
+  container: ContainerData;
+  vessel: VesselData | null;
+  countryName: string;
+  onBack: () => void;
+}
+
+const VOLUME_CATEGORIES = [
+  { label: "0.001 > 0.5", min: 0.001, max: 0.5 },
+  { label: "0.500 > 1", min: 0.5, max: 1 },
+  { label: "1.000 > 2", min: 1, max: 2 },
+  { label: "2.000 > 100", min: 2, max: 100 },
+];
+
+const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
+  container,
+  vessel,
+  countryName,
+  onBack,
+}) => {
+  const [invoices, setInvoices] = useState<ManifestInvoice[]>([]);
+  const [packages, setPackages] = useState<PackageRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetchManifestData();
+  }, [container]);
+
+  const fetchManifestData = async () => {
+    setLoading(true);
+    try {
+      const { data: invData, error: invErr } = await supabase
+        .from("regional_invoices")
+        .select("id, invoice_number, shipper_name, consignee_name, consignee_address, consignee_city, consignee_mobile, total_packages, total_volume, total_weight, net, payment_status, warehouse, description")
+        .eq("country", countryName)
+        .eq("container_running_number", container.runningNumber)
+        .order("invoice_number", { ascending: true });
+
+      if (invErr) throw invErr;
+      setInvoices(invData || []);
+
+      if (invData && invData.length > 0) {
+        const invoiceIds = invData.map((i) => i.id);
+        const { data: pkgData, error: pkgErr } = await supabase
+          .from("regional_invoice_packages")
+          .select("id, invoice_id, package_name, quantity, weight, cubic_metre")
+          .in("invoice_id", invoiceIds);
+        if (pkgErr) throw pkgErr;
+        setPackages(pkgData || []);
+      }
+    } catch (error) {
+      console.error("Error fetching manifest data:", error);
+      toast.error("Failed to load manifest data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Zone breakdown (by warehouse)
+  const zones = ["Colombo", "Galle", "Kurunegala"];
+  const getZoneData = () => {
+    return zones.map((zone) => {
+      const zoneInvoices = invoices.filter((i) =>
+        i.warehouse?.toLowerCase().includes(zone.toLowerCase())
+      );
+      const cats = VOLUME_CATEGORIES.map((cat) => {
+        const catInvoices = zoneInvoices.filter((inv) => {
+          const vol = inv.total_volume || 0;
+          return vol >= cat.min && vol < cat.max;
+        });
+        const pkgs = catInvoices.length;
+        const vol = catInvoices.reduce((s, i) => s + (i.total_volume || 0), 0);
+        return { pkgs, vol };
+      });
+      const totalPkgs = zoneInvoices.length;
+      const totalVol = zoneInvoices.reduce((s, i) => s + (i.total_volume || 0), 0);
+      return { zone, cats, totalPkgs, totalVol };
+    });
+  };
+
+  // Item list summary
+  const getItemSummary = () => {
+    const itemMap: Record<string, { qty: number; vol: number }> = {};
+    packages.forEach((pkg) => {
+      const name = (pkg.package_name || "UNKNOWN").toUpperCase();
+      if (!itemMap[name]) itemMap[name] = { qty: 0, vol: 0 };
+      itemMap[name].qty += pkg.quantity || 1;
+      itemMap[name].vol += pkg.cubic_metre || 0;
+    });
+    return Object.entries(itemMap)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([name, data], i) => ({ num: i + 1, name, ...data }));
+  };
+
+  const totalPackages = invoices.length;
+  const totalVolume = invoices.reduce((s, i) => s + (i.total_volume || 0), 0);
+  const totalWeight = invoices.reduce((s, i) => s + (i.total_weight || 0), 0);
+
+  const handlePrint = () => {
+    const style = document.createElement("style");
+    style.id = "manifest-print-style";
+    style.textContent = `
+      @media print {
+        @page { size: A4 landscape; margin: 8mm; }
+        body * { visibility: hidden; }
+        #manifest-print-area, #manifest-print-area * { visibility: visible; }
+        #manifest-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+      }
+    `;
+    document.head.appendChild(style);
+    window.print();
+    setTimeout(() => {
+      document.getElementById("manifest-print-style")?.remove();
+    }, 500);
+  };
+
+  if (loading) {
+    return (
+      <div className="text-center py-16">
+        <Loader2 className="animate-spin mx-auto mb-2" size={32} />
+        <p className="text-gray-500">Loading manifest data...</p>
+      </div>
+    );
+  }
+
+  const zoneData = getZoneData();
+  const itemSummary = getItemSummary();
+  const totalZone = {
+    cats: VOLUME_CATEGORIES.map((_, ci) => ({
+      pkgs: zoneData.reduce((s, z) => s + z.cats[ci].pkgs, 0),
+      vol: zoneData.reduce((s, z) => s + z.cats[ci].vol, 0),
+    })),
+    totalPkgs: zoneData.reduce((s, z) => s + z.totalPkgs, 0),
+    totalVol: zoneData.reduce((s, z) => s + z.totalVol, 0),
+  };
+
+  // Unsettled invoices
+  const unsettledInvoices = invoices.filter(
+    (inv) => inv.payment_status !== "PAID" && inv.payment_status !== "Fully Paid"
+  );
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      {/* Action buttons */}
+      <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+        <Button variant="outline" onClick={onBack} className="flex items-center gap-2">
+          <ArrowLeft size={16} /> Go Back
+        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2">
+            <Printer size={16} /> Print
+          </Button>
+          <Button onClick={handlePrint} className="bg-teal-600 hover:bg-teal-700 flex items-center gap-2">
+            <Printer size={16} /> Print D2D
+          </Button>
+          <Button onClick={handlePrint} className="bg-teal-700 hover:bg-teal-800 flex items-center gap-2">
+            <Printer size={16} /> Print D2D Bulk BLs
+          </Button>
+        </div>
+      </div>
+
+      <div id="manifest-print-area" ref={printRef} className="p-4">
+        {/* Title */}
+        <h2 className="text-green-700 font-bold text-lg mb-4">Manifest Sea Cargo</h2>
+
+        {/* Vessel Details */}
+        <div className="border border-gray-300 mb-4">
+          <div className="bg-blue-600 text-white text-center font-bold py-1.5 text-sm">VESSEL DETAILS</div>
+          <div className="grid grid-cols-2 text-sm">
+            <div className="border-r border-b border-gray-300">
+              <div className="grid grid-cols-[140px_1fr]">
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">SECTOR:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{vessel?.sector || container.sector}</div>
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">RUNNING NUMBER:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{vessel?.runningNumber || "-"}</div>
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">VESSEL NAME:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{vessel?.vesselName || "-"}</div>
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">VOYAGE:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{vessel?.voyage || "-"}</div>
+                <div className="border-r border-gray-200 px-2 py-1 font-medium">DATE CONFIRM:</div>
+                <div className="px-2 py-1">{vessel?.loadDate || "-"}</div>
+              </div>
+            </div>
+            <div>
+              <div className="grid grid-cols-[140px_1fr]">
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">P.O.L:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{vessel?.portOfLoading || "HAMAD SEA PORT"}</div>
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">P.O.D:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{vessel?.portOfDischarge || "COLOMBO"}</div>
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">DIRECT/ MIX:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{vessel?.direction || container.direction}</div>
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">E.T.D:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{vessel?.etd || container.etd}</div>
+                <div className="border-r border-gray-200 px-2 py-1 font-medium">E.T.A:</div>
+                <div className="px-2 py-1">{vessel?.eta || container.eta}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Container Details */}
+        <div className="border border-gray-300 mb-4">
+          <div className="bg-blue-600 text-white text-center font-bold py-1.5 text-sm">
+            {container.runningNumber} CONTAINER DETAILS:- {container.containerNumber}
+          </div>
+          <div className="grid grid-cols-2 text-sm">
+            <div className="border-r border-gray-300">
+              <div className="grid grid-cols-[160px_1fr]">
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">RUNNING NUMBER:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{container.runningNumber}</div>
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">PACKAGES:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{totalPackages}</div>
+                <div className="border-r border-gray-200 px-2 py-1 font-medium">VOLUME:</div>
+                <div className="px-2 py-1">{totalVolume.toFixed(3)}</div>
+              </div>
+            </div>
+            <div>
+              <div className="grid grid-cols-[160px_1fr]">
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">SEAL NUMBER:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{container.sealNumber}</div>
+                <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">CONTAINER TYPE:</div>
+                <div className="border-b border-gray-200 px-2 py-1">{container.containerType}</div>
+                <div className="border-r border-gray-200 px-2 py-1 font-medium">CONTAINER WEIGHT:</div>
+                <div className="px-2 py-1">{totalWeight.toFixed(0)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Zone Volume Breakdown */}
+        <div className="overflow-x-auto mb-4">
+          <table className="w-full border-collapse text-xs">
+            <thead>
+              <tr>
+                <th className="border border-gray-300 px-2 py-1 bg-gray-100 font-bold" rowSpan={2}>Zone</th>
+                {VOLUME_CATEGORIES.map((cat) => (
+                  <th key={cat.label} className="border border-gray-300 px-1 py-1 bg-blue-100 text-blue-800 font-bold text-center" colSpan={3}>
+                    {cat.label}
+                  </th>
+                ))}
+                <th className="border border-gray-300 px-1 py-1 bg-green-100 text-green-800 font-bold text-center" colSpan={3}>
+                  Total
+                </th>
+              </tr>
+              <tr>
+                {[...VOLUME_CATEGORIES, { label: "Total" }].map((cat) => (
+                  <React.Fragment key={`hdr-${cat.label}`}>
+                    <th className="border border-gray-300 px-1 py-1 bg-gray-50 text-center font-medium">Pkgs</th>
+                    <th className="border border-gray-300 px-1 py-1 bg-gray-50 text-center font-medium">Vol</th>
+                    <th className="border border-gray-300 px-1 py-1 bg-gray-50 text-center font-medium">%</th>
+                  </React.Fragment>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {zoneData.map((z) => (
+                <tr key={z.zone}>
+                  <td className="border border-gray-300 px-2 py-1 font-medium bg-gray-50">{z.zone}</td>
+                  {z.cats.map((cat, ci) => (
+                    <React.Fragment key={ci}>
+                      <td className="border border-gray-300 px-1 py-1 text-center">{cat.pkgs}</td>
+                      <td className="border border-gray-300 px-1 py-1 text-center">{cat.vol.toFixed(3)}</td>
+                      <td className="border border-gray-300 px-1 py-1 text-center">
+                        {totalZone.totalVol > 0 ? ((cat.vol / totalZone.totalVol) * 100).toFixed(1) : "0.0"}
+                      </td>
+                    </React.Fragment>
+                  ))}
+                  <td className="border border-gray-300 px-1 py-1 text-center font-medium">{z.totalPkgs}</td>
+                  <td className="border border-gray-300 px-1 py-1 text-center font-medium">{z.totalVol.toFixed(3)}</td>
+                  <td className="border border-gray-300 px-1 py-1 text-center font-medium">
+                    {totalZone.totalVol > 0 ? ((z.totalVol / totalZone.totalVol) * 100).toFixed(1) : "0.0"}
+                  </td>
+                </tr>
+              ))}
+              <tr className="font-bold bg-gray-100">
+                <td className="border border-gray-300 px-2 py-1">Total :</td>
+                {totalZone.cats.map((cat, ci) => (
+                  <React.Fragment key={ci}>
+                    <td className="border border-gray-300 px-1 py-1 text-center">{cat.pkgs}</td>
+                    <td className="border border-gray-300 px-1 py-1 text-center">{cat.vol.toFixed(3)}</td>
+                    <td className="border border-gray-300 px-1 py-1 text-center">
+                      {totalZone.totalVol > 0 ? ((cat.vol / totalZone.totalVol) * 100).toFixed(1) : "0.0"}
+                    </td>
+                  </React.Fragment>
+                ))}
+                <td className="border border-gray-300 px-1 py-1 text-center">{totalZone.totalPkgs}</td>
+                <td className="border border-gray-300 px-1 py-1 text-center">{totalZone.totalVol.toFixed(3)}</td>
+                <td className="border border-gray-300 px-1 py-1 text-center">100.0</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Cargo List */}
+        <div className="overflow-x-auto mb-4">
+          <table className="w-full border-collapse text-xs">
+            <thead>
+              <tr className="bg-blue-600 text-white">
+                <th className="border px-2 py-1.5 text-left">Num</th>
+                <th className="border px-2 py-1.5 text-left">INVOICE</th>
+                <th className="border px-2 py-1.5 text-left">W/H</th>
+                <th className="border px-2 py-1.5 text-left">SHIPPER</th>
+                <th className="border px-2 py-1.5 text-left">PPT.No</th>
+                <th className="border px-2 py-1.5 text-left">CONSIGNEE</th>
+                <th className="border px-2 py-1.5 text-left">PKG</th>
+                <th className="border px-2 py-1.5 text-right">WGHT</th>
+                <th className="border px-2 py-1.5 text-right">VOL</th>
+                <th className="border px-2 py-1.5 text-left">LNO</th>
+                <th className="border px-2 py-1.5 text-left">P/F</th>
+                <th className="border px-2 py-1.5 text-left">CRNO</th>
+                <th className="border px-2 py-1.5 text-left">PAY</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoices.map((inv, i) => {
+                const invPkgs = packages.filter((p) => p.invoice_id === inv.id);
+                const warehouseCode = inv.warehouse?.charAt(0)?.toUpperCase() || "";
+                return (
+                  <tr key={inv.id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td className="border px-2 py-1">{i + 1}</td>
+                    <td className="border px-2 py-1 font-medium">{inv.invoice_number}</td>
+                    <td className="border px-2 py-1">{warehouseCode}</td>
+                    <td className="border px-2 py-1 text-[11px]">
+                      <div className="font-medium">{inv.shipper_name}</div>
+                    </td>
+                    <td className="border px-2 py-1"></td>
+                    <td className="border px-2 py-1 text-[11px]">
+                      <div className="font-medium">{inv.consignee_name}</div>
+                      <div className="text-gray-500">{inv.consignee_address}</div>
+                      <div className="text-gray-500">{inv.consignee_city}</div>
+                    </td>
+                    <td className="border px-2 py-1 text-[11px]">
+                      {invPkgs.map((p, pi) => (
+                        <div key={p.id}>{p.package_name}</div>
+                      ))}
+                    </td>
+                    <td className="border px-2 py-1 text-right">
+                      {invPkgs.map((p) => (
+                        <div key={p.id}>{(p.weight || 0).toFixed(2)}</div>
+                      ))}
+                    </td>
+                    <td className="border px-2 py-1 text-right">
+                      {invPkgs.map((p) => (
+                        <div key={p.id}>{(p.cubic_metre || 0).toFixed(3)}</div>
+                      ))}
+                    </td>
+                    <td className="border px-2 py-1 text-[11px]">
+                      {invPkgs.map((p, pi) => (
+                        <div key={p.id}>{pi + 1}/{invPkgs.length}</div>
+                      ))}
+                    </td>
+                    <td className="border px-2 py-1">Full</td>
+                    <td className="border px-2 py-1">{container.runningNumber}</td>
+                    <td className="border px-2 py-1 text-[11px]">
+                      {inv.payment_status === "PAID" || inv.payment_status === "Fully Paid" ? "Fully Paid" : ""}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              <tr className="bg-gray-100 font-bold text-xs">
+                <td className="border px-2 py-1" colSpan={6}>Total :</td>
+                <td className="border px-2 py-1">{packages.length}</td>
+                <td className="border px-2 py-1 text-right">{totalWeight.toFixed(2)}</td>
+                <td className="border px-2 py-1 text-right">{totalVolume.toFixed(3)}</td>
+                <td className="border px-2 py-1" colSpan={4}></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        {/* Item List Summary */}
+        <div className="mb-4">
+          <table className="w-full max-w-2xl mx-auto border-collapse text-sm">
+            <thead>
+              <tr className="bg-blue-600 text-white">
+                <th className="border px-2 py-1.5 text-center" colSpan={4}>ITEM LIST</th>
+              </tr>
+              <tr className="bg-blue-500 text-white">
+                <th className="border px-2 py-1.5 text-center">Num</th>
+                <th className="border px-2 py-1.5 text-left">ITEM NAME</th>
+                <th className="border px-2 py-1.5 text-right">QUANTITY</th>
+                <th className="border px-2 py-1.5 text-right">VOLUME</th>
+              </tr>
+            </thead>
+            <tbody>
+              {itemSummary.map((item) => (
+                <tr key={item.num} className={item.num % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                  <td className="border px-2 py-1 text-center">{item.num}</td>
+                  <td className="border px-2 py-1">{item.name}</td>
+                  <td className="border px-2 py-1 text-right">{item.qty}</td>
+                  <td className="border px-2 py-1 text-right">{item.vol.toFixed(3)}</td>
+                </tr>
+              ))}
+              <tr className="font-bold bg-gray-100">
+                <td className="border px-2 py-1 text-right font-bold" colSpan={2}>TOTAL:</td>
+                <td className="border px-2 py-1 text-right">
+                  {itemSummary.reduce((s, i) => s + i.qty, 0)}
+                </td>
+                <td className="border px-2 py-1 text-right">
+                  {itemSummary.reduce((s, i) => s + i.vol, 0).toFixed(3)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Unsettled Invoices */}
+        {unsettledInvoices.length > 0 && (
+          <div className="mb-4">
+            <table className="w-full max-w-3xl mx-auto border-collapse text-sm">
+              <thead>
+                <tr className="bg-blue-600 text-white">
+                  <th className="border px-2 py-1.5 text-center" colSpan={6}>UN SETTLE INVOICES</th>
+                </tr>
+                <tr className="bg-blue-500 text-white">
+                  <th className="border px-2 py-1.5 text-center">Num</th>
+                  <th className="border px-2 py-1.5 text-center">GY</th>
+                  <th className="border px-2 py-1.5 text-left">SHIPPER</th>
+                  <th className="border px-2 py-1.5 text-left">CONSIGNEE</th>
+                  <th className="border px-2 py-1.5 text-right">NET</th>
+                  <th className="border px-2 py-1.5 text-right">DUE</th>
+                </tr>
+              </thead>
+              <tbody>
+                {unsettledInvoices.map((inv, i) => (
+                  <tr key={inv.id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                    <td className="border px-2 py-1 text-center">{i + 1}</td>
+                    <td className="border px-2 py-1 text-center">{inv.invoice_number}</td>
+                    <td className="border px-2 py-1">{inv.shipper_name}</td>
+                    <td className="border px-2 py-1">{inv.consignee_name}</td>
+                    <td className="border px-2 py-1 text-right">{(inv.net || 0).toFixed(0)}</td>
+                    <td className="border px-2 py-1 text-right">{(inv.net || 0).toFixed(0)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default SeaCargoManifest;

@@ -17,6 +17,8 @@ interface ContainerListViewProps {
   entriesPerPage: number;
   setEntriesPerPage: (v: number) => void;
   onAddNew: () => void;
+  onLoadContainer?: (container: ContainerData) => void;
+  onViewManifest?: (container: ContainerData) => void;
 }
 
 const ContainerListView: React.FC<ContainerListViewProps> = ({
@@ -31,6 +33,8 @@ const ContainerListView: React.FC<ContainerListViewProps> = ({
   entriesPerPage,
   setEntriesPerPage,
   onAddNew,
+  onLoadContainer,
+  onViewManifest,
 }) => {
   const displayContainers = containers.slice(0, entriesPerPage);
 
@@ -127,7 +131,11 @@ const ContainerListView: React.FC<ContainerListViewProps> = ({
                     <td className="border px-2 py-1.5">{c.eta}</td>
                     <td className="border px-2 py-1.5">{c.loadDate || ""}</td>
                     <td className="border px-2 py-1.5">
-                      <Button size="sm" variant="outline" className="text-xs h-7">Edit</Button>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline" className="text-xs h-7">Edit</Button>
+                        <Button size="sm" className="text-xs h-7 bg-green-600 hover:bg-green-700 text-white" onClick={(e) => { e.stopPropagation(); onLoadContainer?.(c); }}>Load</Button>
+                        <Button size="sm" className="text-xs h-7 bg-blue-600 hover:bg-blue-700 text-white" onClick={(e) => { e.stopPropagation(); onViewManifest?.(c); }}>Manifest</Button>
+                      </div>
                     </td>
                   </tr>
                 ))
