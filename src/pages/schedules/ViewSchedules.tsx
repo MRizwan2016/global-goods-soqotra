@@ -75,6 +75,19 @@ const ViewSchedules: React.FC = () => {
     loadFilterOptions();
   }, [country]);
 
+  // Realtime subscription for instant updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('schedules-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'schedules' },
+        () => { loadSchedules(); }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [country]);
+
   useEffect(() => {
     filterSchedules();
   }, [schedules, searchTerm, vehicleFilter, scheduleNumberFilter]);
@@ -154,14 +167,6 @@ const ViewSchedules: React.FC = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
-  const getCountryDisplayName = (country: string) => {
-    switch (country) {
-      case 'Qatar': return 'Qatar';
-      case 'Kenya': return 'Kenya';
-      case 'Uganda': return 'Uganda';
-      default: return country;
-    }
-  };
 
   // Pagination
   const itemsPerPage = parseInt(entriesPerPage);
