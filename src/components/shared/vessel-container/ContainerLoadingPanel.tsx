@@ -20,6 +20,7 @@ interface InvoiceRow {
   payment_status: string | null;
   warehouse: string | null;
   description: string | null;
+  packageNames?: string;
 }
 
 interface ContainerLoadingPanelProps {
