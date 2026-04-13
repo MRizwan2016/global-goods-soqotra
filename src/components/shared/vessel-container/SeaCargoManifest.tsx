@@ -429,7 +429,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
                 </tr>
               ))}
               <tr className="font-bold bg-gray-100">
-                <td className="border px-2 py-1" colSpan={2} className="border px-2 py-1 text-right font-bold">TOTAL:</td>
+                <td className="border px-2 py-1 text-right font-bold" colSpan={2}>TOTAL:</td>
                 <td className="border px-2 py-1 text-right">
                   {itemSummary.reduce((s, i) => s + i.qty, 0)}
                 </td>
