@@ -50,4 +50,4 @@ export interface CountryConfig {
   containerRunningPrefix: string;
 }
 
-export type ViewMode = "vessel-list" | "add-vessel" | "container-list" | "add-container";
+export type ViewMode = "vessel-list" | "add-vessel" | "container-list" | "add-container" | "load-container" | "manifest-view";
