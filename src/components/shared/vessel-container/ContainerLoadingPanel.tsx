@@ -59,7 +59,6 @@ const ContainerLoadingPanel: React.FC<ContainerLoadingPanelProps> = ({
         .order("created_at", { ascending: false });
 
       if (err1) throw err1;
-      setInvoices(unloaded || []);
 
       // Fetch already loaded invoices for this container
       const { data: loaded, error: err2 } = await supabase
@@ -70,7 +69,36 @@ const ContainerLoadingPanel: React.FC<ContainerLoadingPanelProps> = ({
         .order("created_at", { ascending: false });
 
       if (err2) throw err2;
-      setLoadedInvoices(loaded || []);
+
+      // Fetch package names for all relevant invoices
+      const allIds = [...(unloaded || []), ...(loaded || [])].map(i => i.id);
+      let pkgMap: Record<string, string> = {};
+
+      if (allIds.length > 0) {
+        const { data: packages } = await supabase
+          .from("regional_invoice_packages")
+          .select("invoice_id, package_name")
+          .in("invoice_id", allIds);
+
+        if (packages) {
+          const grouped: Record<string, string[]> = {};
+          packages.forEach(p => {
+            if (!grouped[p.invoice_id]) grouped[p.invoice_id] = [];
+            if (p.package_name && !grouped[p.invoice_id].includes(p.package_name)) {
+              grouped[p.invoice_id].push(p.package_name);
+            }
+          });
+          Object.entries(grouped).forEach(([id, names]) => {
+            pkgMap[id] = names.join(", ");
+          });
+        }
+      }
+
+      const enrichWithPkgs = (rows: InvoiceRow[]) =>
+        rows.map(r => ({ ...r, packageNames: pkgMap[r.id] || r.description || "" }));
+
+      setInvoices(enrichWithPkgs(unloaded || []));
+      setLoadedInvoices(enrichWithPkgs(loaded || []));
     } catch (error) {
       console.error("Error fetching invoices:", error);
       toast.error("Failed to load invoices");
