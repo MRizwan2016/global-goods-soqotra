@@ -177,7 +177,7 @@ export class ScheduleService {
         .select('vehicle');
 
       if (country) {
-        query = query.eq('country', country);
+        query = query.ilike('country', country);
       }
 
       const { data, error } = await query;
@@ -202,7 +202,7 @@ export class ScheduleService {
         .select('schedule_number');
 
       if (country) {
-        query = query.eq('country', country);
+        query = query.ilike('country', country);
       }
 
       const { data, error } = await query;
