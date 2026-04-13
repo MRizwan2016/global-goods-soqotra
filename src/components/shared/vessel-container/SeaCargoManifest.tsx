@@ -1,9 +1,11 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer, Loader2, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Printer, Loader2, CheckCircle2, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import { ContainerData, VesselData } from "./types";
 
 interface ManifestInvoice {
@@ -158,6 +160,32 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     }, 500);
   };
 
+  const handleDownloadPDF = async () => {
+    if (!printRef.current) return;
+    toast.info("Generating A4 Landscape PDF...");
+    try {
+      const canvas = await html2canvas(printRef.current, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      const pdfW = pdf.internal.pageSize.getWidth();
+      const pdfH = pdf.internal.pageSize.getHeight();
+      const imgRatio = canvas.width / canvas.height;
+      let w = pdfW - 16;
+      let h = w / imgRatio;
+      if (h > pdfH - 16) {
+        h = pdfH - 16;
+        w = h * imgRatio;
+      }
+      const containerNum = container.containerNumber || container.runningNumber;
+      pdf.addImage(imgData, "PNG", 8, 8, w, h);
+      pdf.save(`Sea_Cargo_Manifest_${containerNum}_${new Date().toISOString().slice(0, 10)}.pdf`);
+      toast.success("PDF downloaded successfully");
+    } catch (err) {
+      console.error("PDF generation error:", err);
+      toast.error("Failed to generate PDF");
+    }
+  };
+
   if (loading) {
     return (
       <div className="text-center py-16">
@@ -208,6 +236,9 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
           </Button>
           <Button onClick={handlePrint} className="bg-teal-700 hover:bg-teal-800 flex items-center gap-2">
             <Printer size={16} /> Print D2D Bulk BLs
+          </Button>
+          <Button onClick={handleDownloadPDF} className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2">
+            <Download size={16} /> Download PDF
           </Button>
         </div>
       </div>

@@ -258,6 +258,12 @@ const SECTIONS: NavigationSections = {
         ],
       },
       {
+        title: "DOWNLOADS",
+        items: [
+          { name: "DOWNLOADS", path: "/sri-lanka/downloads" },
+        ],
+      },
+      {
         title: "ACCOUNTS",
         items: [
           { name: "PAYMENT RECEIPT", path: "/sri-lanka/payment-receipt" },
