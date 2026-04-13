@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScheduleService } from "@/services/ScheduleService";
+import { supabase } from "@/integrations/supabase/client";
 import { Printer, Eye, Calendar, Search, MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -39,15 +40,31 @@ const ViewSchedules: React.FC = () => {
   // Get country from current path
   const getCountryFromPath = (): string => {
     const path = window.location.pathname;
-    if (path.includes('/sudan-ops')) return 'Sudan';
-    if (path.includes('/sri-lanka')) return 'Sri Lanka';
-    if (path.includes('/qatar')) return 'Qatar';
-    if (path.includes('/kenya')) return 'Kenya';
-    if (path.includes('/uganda')) return 'Uganda';
-    if (path.includes('/saudi')) return 'Saudi Arabia';
-    if (path.includes('/ethiopia')) return 'Ethiopia';
-    if (path.includes('/eritrea')) return 'Eritrea';
-    return 'Qatar'; // Default
+    if (path.includes('/sudan-ops')) return 'sudan';
+    if (path.includes('/sri-lanka')) return 'sri-lanka';
+    if (path.includes('/qatar')) return 'qatar';
+    if (path.includes('/kenya')) return 'kenya';
+    if (path.includes('/uganda')) return 'uganda';
+    if (path.includes('/saudi')) return 'saudi-arabia';
+    if (path.includes('/ethiopia')) return 'ethiopia';
+    if (path.includes('/eritrea')) return 'eritrea';
+    if (path.includes('/tunisia')) return 'tunisia';
+    return 'qatar';
+  };
+
+  const getCountryDisplayName = (c: string): string => {
+    const map: Record<string, string> = {
+      'sri-lanka': 'SRI LANKA',
+      'saudi-arabia': 'SAUDI ARABIA',
+      'qatar': 'QATAR',
+      'kenya': 'KENYA',
+      'sudan': 'SUDAN',
+      'uganda': 'UGANDA',
+      'tunisia': 'TUNISIA',
+      'ethiopia': 'ETHIOPIA',
+      'eritrea': 'ERITREA',
+    };
+    return map[c] || c.toUpperCase();
   };
 
   const country = getCountryFromPath();
