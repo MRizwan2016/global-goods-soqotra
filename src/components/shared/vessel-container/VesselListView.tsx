@@ -15,6 +15,7 @@ interface VesselListViewProps {
   entriesPerPage: number;
   setEntriesPerPage: (v: number) => void;
   onAddNew: () => void;
+  onEditVessel?: (vessel: VesselData) => void;
 }
 
 const VesselListView: React.FC<VesselListViewProps> = ({
@@ -27,6 +28,7 @@ const VesselListView: React.FC<VesselListViewProps> = ({
   entriesPerPage,
   setEntriesPerPage,
   onAddNew,
+  onEditVessel,
 }) => {
   const displayVessels = vessels.slice(0, entriesPerPage);
 
@@ -114,7 +116,7 @@ const VesselListView: React.FC<VesselListViewProps> = ({
                     <td className="border px-2 py-1.5">{v.eta}</td>
                     <td className="border px-2 py-1.5">{v.loadDate || ""}</td>
                     <td className="border px-2 py-1.5">
-                      <Button size="sm" variant="outline" className="text-xs h-7">Edit</Button>
+                      <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => onEditVessel?.(v)}>Edit</Button>
                     </td>
                   </tr>
                 ))

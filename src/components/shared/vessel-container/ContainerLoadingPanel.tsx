@@ -279,7 +279,7 @@ const ContainerLoadingPanel: React.FC<ContainerLoadingPanelProps> = ({
                       className={`cursor-pointer ${selectedIds.has(inv.id) ? "bg-blue-50" : i % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-blue-100`}
                       onClick={() => toggleSelect(inv.id)}
                     >
-                      <td className="border px-2 py-1 text-center">
+                      <td className="border px-2 py-1 text-center" onClick={(e) => e.stopPropagation()}>
                         <Checkbox checked={selectedIds.has(inv.id)} onCheckedChange={() => toggleSelect(inv.id)} />
                       </td>
                       <td className="border px-2 py-1 font-medium">{inv.invoice_number}</td>
