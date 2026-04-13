@@ -101,7 +101,7 @@ export class ScheduleService {
         .order('schedule_number', { ascending: false });
 
       if (filters.country) {
-        query = query.eq('country', filters.country);
+        query = query.ilike('country', filters.country);
       }
 
       if (filters.vehicle && filters.vehicle !== 'ALL VEHICLES') {
@@ -109,7 +109,7 @@ export class ScheduleService {
       }
 
       if (filters.schedule_number) {
-        query = query.eq('schedule_number', filters.schedule_number);
+        query = query.ilike('schedule_number', `%${filters.schedule_number}%`);
       }
 
       if (filters.date_from) {
@@ -177,7 +177,7 @@ export class ScheduleService {
         .select('vehicle');
 
       if (country) {
-        query = query.eq('country', country);
+        query = query.ilike('country', country);
       }
 
       const { data, error } = await query;
@@ -202,7 +202,7 @@ export class ScheduleService {
         .select('schedule_number');
 
       if (country) {
-        query = query.eq('country', country);
+        query = query.ilike('country', country);
       }
 
       const { data, error } = await query;
