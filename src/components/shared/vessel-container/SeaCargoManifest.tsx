@@ -191,6 +191,15 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
           <ArrowLeft size={16} /> Go Back
         </Button>
         <div className="flex gap-2">
+          {!confirmDate ? (
+            <Button onClick={handleConfirmManifest} className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2">
+              <CheckCircle2 size={16} /> Confirm Manifest
+            </Button>
+          ) : (
+            <span className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded font-medium text-sm border border-green-300">
+              <CheckCircle2 size={16} /> Confirmed: {confirmDate}
+            </span>
+          )}
           <Button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2">
             <Printer size={16} /> Print
           </Button>
