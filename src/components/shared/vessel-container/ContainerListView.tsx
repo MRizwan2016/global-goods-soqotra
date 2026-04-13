@@ -33,6 +33,8 @@ const ContainerListView: React.FC<ContainerListViewProps> = ({
   entriesPerPage,
   setEntriesPerPage,
   onAddNew,
+  onLoadContainer,
+  onViewManifest,
 }) => {
   const displayContainers = containers.slice(0, entriesPerPage);
 
