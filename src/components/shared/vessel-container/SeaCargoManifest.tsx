@@ -237,6 +237,9 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
           <Button onClick={handlePrint} className="bg-teal-700 hover:bg-teal-800 flex items-center gap-2">
             <Printer size={16} /> Print D2D Bulk BLs
           </Button>
+          <Button onClick={handleDownloadPDF} className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2">
+            <Download size={16} /> Download PDF
+          </Button>
         </div>
       </div>
 
