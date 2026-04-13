@@ -9,6 +9,7 @@ import SriLankaNewJob from "@/pages/sri-lanka/SriLankaNewJob";
 import SriLankaPaymentReceipt from "@/pages/sri-lanka/SriLankaPaymentReceipt";
 import SriLankaReconciliation from "@/pages/sri-lanka/SriLankaReconciliation";
 import SriLankaVesselContainer from "@/pages/sri-lanka/SriLankaVesselContainer";
+import SriLankaDownloads from "@/pages/sri-lanka/SriLankaDownloads";
 import ViewSchedules from "@/pages/schedules/ViewSchedules";
 
 export const sriLankaRoutes: RouteConfig[] = [
@@ -70,6 +71,11 @@ export const sriLankaRoutes: RouteConfig[] = [
   {
     path: "/sri-lanka/vessel-container",
     element: SriLankaVesselContainer,
+    private: true
+  },
+  {
+    path: "/sri-lanka/downloads",
+    element: SriLankaDownloads,
     private: true
   }
 ];
