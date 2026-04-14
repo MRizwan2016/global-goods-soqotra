@@ -43,6 +43,7 @@ export function useContainerLoadMetrics(
     () => containers.map((container) => container.runningNumber).filter(Boolean),
     [containers],
   );
+  const runningNumbersKey = useMemo(() => runningNumbers.join("|"), [runningNumbers]);
 
   useEffect(() => {
     const fetchMetrics = async () => {
@@ -60,7 +61,6 @@ export function useContainerLoadMetrics(
         supabase
           .from("regional_invoices")
           .select("container_running_number, total_packages, total_volume, total_weight, loaded_at")
-          .eq("country", countryName)
           .in("container_running_number", runningNumbers),
       ]);
 
@@ -107,7 +107,7 @@ export function useContainerLoadMetrics(
     };
 
     void fetchMetrics();
-  }, [countryName, refreshKey, runningNumbers]);
+  }, [countryName, refreshKey, runningNumbers, runningNumbersKey]);
 
   const vesselMetrics = useMemo(() => {
     const metrics: Record<string, LoadMetric> = {};
