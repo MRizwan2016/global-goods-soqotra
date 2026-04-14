@@ -463,7 +463,18 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       </div>
 
       <div id="manifest-print-area" ref={printRef} className="p-4">
-        <h2 className="text-green-700 font-bold text-lg mb-4">Manifest Sea Cargo</h2>
+        {/* Header with title and QR code */}
+        <div className="flex items-start justify-between mb-4">
+          <h2 className="text-green-700 font-bold text-lg">Manifest Sea Cargo</h2>
+          <div className="flex flex-col items-center">
+            <QRCodeSVG
+              value={`https://soqotralog.com/manifest/${container.containerNumber || container.runningNumber}`}
+              size={80}
+              level="M"
+            />
+            <span className="text-[8px] text-gray-500 mt-0.5">Scan to verify</span>
+          </div>
+        </div>
 
         {/* Vessel Details */}
         <div className="border border-gray-300 mb-4">
