@@ -1,13 +1,13 @@
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import PageBreadcrumb from "@/components/ui/page-breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Loader2, Download, ArrowLeft } from "lucide-react";
 import { ContainerData, VesselData } from "@/components/shared/vessel-container/types";
 import SeaCargoManifest from "@/components/shared/vessel-container/SeaCargoManifest";
+import ContainerLoadSheet from "@/components/shared/vessel-container/ContainerLoadSheet";
 import { useContainerLoadMetrics } from "@/components/shared/vessel-container/hooks/useContainerLoadMetrics";
 
 const SriLankaDownloads: React.FC = () => {
@@ -15,6 +15,7 @@ const SriLankaDownloads: React.FC = () => {
   const [containers, setContainers] = useState<ContainerData[]>([]);
   const [vessels, setVessels] = useState<VesselData[]>([]);
   const [selectedContainer, setSelectedContainer] = useState<ContainerData | null>(null);
+  const [viewMode, setViewMode] = useState<"manifest" | "loadsheet" | null>(null);
   const [sectorFilter, setSectorFilter] = useState("all");
   const [confirmFilter, setConfirmFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -60,8 +61,8 @@ const SriLankaDownloads: React.FC = () => {
     return true;
   });
 
-  // If viewing a specific container's manifest
-  if (selectedContainer) {
+  // Viewing a specific container detail
+  if (selectedContainer && viewMode === "manifest") {
     const vessel = findVesselForContainer(selectedContainer);
     return (
       <Layout title="Dashboard - SRI LANKA">
@@ -70,7 +71,19 @@ const SriLankaDownloads: React.FC = () => {
           container={selectedContainer}
           vessel={vessel}
           countryName="SRI LANKA"
-          onBack={() => setSelectedContainer(null)}
+          onBack={() => { setSelectedContainer(null); setViewMode(null); }}
+        />
+      </Layout>
+    );
+  }
+
+  if (selectedContainer && viewMode === "loadsheet") {
+    return (
+      <Layout title="Dashboard - SRI LANKA">
+        <PageBreadcrumb className="mb-4" />
+        <ContainerLoadSheet
+          container={selectedContainer}
+          onBack={() => { setSelectedContainer(null); setViewMode(null); }}
         />
       </Layout>
     );
@@ -223,16 +236,15 @@ const SriLankaDownloads: React.FC = () => {
                   <td className="border px-2 py-1.5 text-center">{containerMetrics[c.runningNumber]?.volume ? containerMetrics[c.runningNumber].volume.toFixed(3) : "-"}</td>
                   <td className="border px-2 py-1.5 text-center">{containerMetrics[c.runningNumber]?.loadDate ? new Date(containerMetrics[c.runningNumber].loadDate).toLocaleDateString() : (c.loadDate || "-")}</td>
                   <td className="border px-2 py-1.5 text-center">
-                    {activeSection === "sea-manifest" ? (
-                      <button
-                        onClick={() => setSelectedContainer(c)}
-                        className="text-blue-600 font-bold hover:underline"
-                      >
-                        {c.runningNumber}
-                      </button>
-                    ) : (
-                      <span className="text-blue-600 font-bold">{c.runningNumber}</span>
-                    )}
+                    <button
+                      onClick={() => {
+                        setSelectedContainer(c);
+                        setViewMode(activeSection === "sea-manifest" ? "manifest" : "loadsheet");
+                      }}
+                      className="text-blue-600 font-bold hover:underline"
+                    >
+                      {c.runningNumber}
+                    </button>
                   </td>
                 </tr>
               ))}
