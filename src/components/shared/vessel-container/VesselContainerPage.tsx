@@ -12,6 +12,7 @@ import ContainerLoadingPanel from "./ContainerLoadingPanel";
 import VesselLoadingPanel from "./VesselLoadingPanel";
 import SeaCargoManifest from "./SeaCargoManifest";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useContainerLoadMetrics } from "./hooks/useContainerLoadMetrics";
 
 interface VesselContainerPageProps {
   config: CountryConfig;
@@ -48,6 +49,12 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
 
   const [activeContainer, setActiveContainer] = useState<ContainerData | null>(null);
   const [activeVessel, setActiveVessel] = useState<VesselData | null>(null);
+  const { containerMetrics, vesselMetrics } = useContainerLoadMetrics(
+    config.country,
+    containers,
+    vessels,
+    viewMode,
+  );
 
   const isListMode = viewMode === "vessel-list" || viewMode === "container-list";
   const activeTab = viewMode === "vessel-list" || viewMode === "add-vessel" ? "vessels" : "containers";
@@ -147,6 +154,7 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
           onLoadVessel={handleLoadVessel}
           onViewVesselManifest={handleViewVesselManifest}
           onDeleteVessel={(v) => deleteVessel(v.id)}
+          vesselMetrics={vesselMetrics}
         />
       )}
 
@@ -167,6 +175,7 @@ const VesselContainerPage: React.FC<VesselContainerPageProps> = ({ config }) => 
           onViewManifest={handleViewManifest}
           onEditContainer={handleEditContainer}
           onDeleteContainer={(c) => deleteContainer(c.id)}
+          containerMetrics={containerMetrics}
         />
       )}
 

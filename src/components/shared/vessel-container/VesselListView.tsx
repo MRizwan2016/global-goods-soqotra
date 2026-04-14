@@ -5,6 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CountryConfig, VesselData } from "./types";
 
+interface VesselMetric {
+  packages: number;
+  volume: number;
+  weight: number;
+  loadDate: string;
+}
+
 interface VesselListViewProps {
   config: CountryConfig;
   vessels: VesselData[];
@@ -19,6 +26,7 @@ interface VesselListViewProps {
   onLoadVessel?: (vessel: VesselData) => void;
   onViewVesselManifest?: (vessel: VesselData) => void;
   onDeleteVessel?: (vessel: VesselData) => void;
+  vesselMetrics?: Record<string, VesselMetric>;
 }
 
 const VesselListView: React.FC<VesselListViewProps> = ({
@@ -35,6 +43,7 @@ const VesselListView: React.FC<VesselListViewProps> = ({
   onLoadVessel,
   onViewVesselManifest,
   onDeleteVessel,
+  vesselMetrics = {},
 }) => {
   const displayVessels = vessels.slice(0, entriesPerPage);
 
@@ -120,7 +129,7 @@ const VesselListView: React.FC<VesselListViewProps> = ({
                     <td className="border px-2 py-1.5">{v.direction}</td>
                     <td className="border px-2 py-1.5">{v.etd}</td>
                     <td className="border px-2 py-1.5">{v.eta}</td>
-                    <td className="border px-2 py-1.5">{v.loadDate || ""}</td>
+                    <td className="border px-2 py-1.5">{vesselMetrics[v.id]?.loadDate || v.loadDate || ""}</td>
                     <td className="border px-2 py-1.5">
                       <div className="flex gap-1">
                         <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => onEditVessel?.(v)}>Edit</Button>
