@@ -207,7 +207,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     try {
       // Save manifest data to localStorage
       const manifestData = {
-        containerRunningNumber: container.runningNumber,
+        containerRunningNumber: String(container.runningNumber),
         confirmDate,
         totalPackages,
         totalVolume,
@@ -218,9 +218,29 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       if (confirmDate) {
         localStorage.setItem(`manifest_confirm_${container.runningNumber}`, confirmDate);
       }
+
+      // Ensure all invoices have container_running_number as string
+      const invoiceIds = [...new Set(packages.map((p) => p.invoice_id))];
+      if (invoiceIds.length > 0) {
+        const { error: invErr } = await supabase
+          .from("regional_invoices")
+          .update({
+            container_running_number: String(container.runningNumber),
+            loaded_at: new Date().toISOString(),
+          })
+          .in("id", invoiceIds);
+
+        if (invErr) {
+          console.error("Supabase save error (invoices):", invErr);
+          toast.error(`Failed to sync invoices: ${invErr.message}`);
+          return;
+        }
+      }
+
       toast.success("Manifest saved successfully");
-    } catch (error) {
-      toast.error("Failed to save manifest");
+    } catch (error: any) {
+      console.error("Save manifest error:", error);
+      toast.error(`Failed to save manifest: ${error?.message || error}`);
     } finally {
       setSaving(false);
     }
