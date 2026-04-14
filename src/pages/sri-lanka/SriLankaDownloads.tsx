@@ -8,6 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Loader2, Download, ArrowLeft } from "lucide-react";
 import { ContainerData, VesselData } from "@/components/shared/vessel-container/types";
 import SeaCargoManifest from "@/components/shared/vessel-container/SeaCargoManifest";
+import { supabase } from "@/integrations/supabase/client";
+
+interface ContainerStats {
+  packages: number;
+  volume: number;
+  loadDate: string;
+}
 
 const SriLankaDownloads: React.FC = () => {
   const [activeSection, setActiveSection] = useState<"load-sheet" | "sea-manifest" | "air-manifest" | null>(null);
@@ -18,6 +25,7 @@ const SriLankaDownloads: React.FC = () => {
   const [confirmFilter, setConfirmFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState(50);
+  const [containerStats, setContainerStats] = useState<Record<string, ContainerStats>>({});
 
   useEffect(() => {
     loadData();
@@ -33,6 +41,34 @@ const SriLankaDownloads: React.FC = () => {
       console.error("Error loading data:", e);
     }
   };
+
+  // Fetch package stats for all containers from the database
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (containers.length === 0) return;
+      const runningNumbers = containers.map(c => c.runningNumber);
+      const { data } = await supabase
+        .from("regional_invoice_packages")
+        .select("container_running_number, quantity, cubic_metre, loaded_at")
+        .in("container_running_number", runningNumbers)
+        .eq("loading_status", "LOADED");
+      
+      if (data) {
+        const stats: Record<string, ContainerStats> = {};
+        data.forEach(pkg => {
+          const rn = pkg.container_running_number || "";
+          if (!stats[rn]) stats[rn] = { packages: 0, volume: 0, loadDate: "" };
+          stats[rn].packages += (pkg.quantity || 1);
+          stats[rn].volume += Number(pkg.cubic_metre || 0);
+          if (pkg.loaded_at && pkg.loaded_at > stats[rn].loadDate) {
+            stats[rn].loadDate = pkg.loaded_at;
+          }
+        });
+        setContainerStats(stats);
+      }
+    };
+    fetchStats();
+  }, [containers]);
 
   const findVesselForContainer = (container: ContainerData): VesselData | null => {
     return vessels.find((v) =>
@@ -217,9 +253,9 @@ const SriLankaDownloads: React.FC = () => {
                   <td className="border px-2 py-1.5 text-center">{c.etd}</td>
                   <td className="border px-2 py-1.5 text-center">{c.eta}</td>
                   <td className="border px-2 py-1.5 text-center">{c.weight || 0}</td>
-                  <td className="border px-2 py-1.5 text-center">-</td>
-                  <td className="border px-2 py-1.5 text-center">-</td>
-                  <td className="border px-2 py-1.5 text-center">{c.loadDate || "-"}</td>
+                  <td className="border px-2 py-1.5 text-center">{containerStats[c.runningNumber]?.packages || "-"}</td>
+                  <td className="border px-2 py-1.5 text-center">{containerStats[c.runningNumber]?.volume ? containerStats[c.runningNumber].volume.toFixed(3) : "-"}</td>
+                  <td className="border px-2 py-1.5 text-center">{containerStats[c.runningNumber]?.loadDate ? new Date(containerStats[c.runningNumber].loadDate).toLocaleDateString() : (c.loadDate || "-")}</td>
                   <td className="border px-2 py-1.5 text-center">
                     {activeSection === "sea-manifest" ? (
                       <button
