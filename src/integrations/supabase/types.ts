@@ -559,6 +559,7 @@ export type Database = {
       regional_invoice_packages: {
         Row: {
           box_number: number | null
+          container_running_number: string | null
           created_at: string
           cubic_feet: number | null
           cubic_metre: number | null
@@ -566,6 +567,9 @@ export type Database = {
           id: string
           invoice_id: string
           length: number | null
+          loaded_at: string | null
+          loaded_by: string | null
+          loading_status: string
           package_name: string | null
           price: number | null
           quantity: number | null
@@ -576,6 +580,7 @@ export type Database = {
         }
         Insert: {
           box_number?: number | null
+          container_running_number?: string | null
           created_at?: string
           cubic_feet?: number | null
           cubic_metre?: number | null
@@ -583,6 +588,9 @@ export type Database = {
           id?: string
           invoice_id: string
           length?: number | null
+          loaded_at?: string | null
+          loaded_by?: string | null
+          loading_status?: string
           package_name?: string | null
           price?: number | null
           quantity?: number | null
@@ -593,6 +601,7 @@ export type Database = {
         }
         Update: {
           box_number?: number | null
+          container_running_number?: string | null
           created_at?: string
           cubic_feet?: number | null
           cubic_metre?: number | null
@@ -600,6 +609,9 @@ export type Database = {
           id?: string
           invoice_id?: string
           length?: number | null
+          loaded_at?: string | null
+          loaded_by?: string | null
+          loading_status?: string
           package_name?: string | null
           price?: number | null
           quantity?: number | null
