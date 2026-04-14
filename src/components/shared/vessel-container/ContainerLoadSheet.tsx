@@ -19,6 +19,7 @@ interface PackageRow {
   cubic_metre: number | null;
   consignee_name: string | null;
   shipper_name: string | null;
+  shipper_mobile: string | null;
   warehouse: string | null;
   sector: string | null;
   pre_paid: string | null;
@@ -60,13 +61,13 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
 
       // Get invoice details
       const invoiceIds = [...new Set((pkgs || []).map((p) => p.invoice_id))];
-      type InvInfo = { invoice_number: string; consignee_name: string | null; shipper_name: string | null; warehouse: string | null; sector: string | null; pre_paid: string | null };
+      type InvInfo = { invoice_number: string; consignee_name: string | null; shipper_name: string | null; shipper_mobile: string | null; warehouse: string | null; sector: string | null; pre_paid: string | null };
       const invoiceMap: Record<string, InvInfo> = {};
 
       if (invoiceIds.length > 0) {
         const { data: invData, error: invErr } = await supabase
           .from("regional_invoices")
-          .select("id, invoice_number, consignee_name, shipper_name, warehouse, sector, pre_paid")
+          .select("id, invoice_number, consignee_name, shipper_name, shipper_mobile, warehouse, sector, pre_paid")
           .in("id", invoiceIds);
 
         if (invErr) throw invErr;
@@ -75,6 +76,7 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
             invoice_number: inv.invoice_number,
             consignee_name: inv.consignee_name,
             shipper_name: inv.shipper_name,
+            shipper_mobile: inv.shipper_mobile,
             warehouse: inv.warehouse,
             sector: inv.sector,
             pre_paid: inv.pre_paid,
@@ -84,12 +86,13 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
 
       // Combine data
       const rows: PackageRow[] = (pkgs || []).map((p) => {
-        const inv: InvInfo = invoiceMap[p.invoice_id] || { invoice_number: "", consignee_name: null, shipper_name: null, warehouse: null, sector: null, pre_paid: null };
+        const inv: InvInfo = invoiceMap[p.invoice_id] || { invoice_number: "", consignee_name: null, shipper_name: null, shipper_mobile: null, warehouse: null, sector: null, pre_paid: null };
         return {
           ...p,
           invoice_number: inv.invoice_number,
           consignee_name: inv.consignee_name,
           shipper_name: inv.shipper_name,
+          shipper_mobile: inv.shipper_mobile,
           warehouse: inv.warehouse,
           sector: inv.sector,
           pre_paid: inv.pre_paid,
@@ -225,7 +228,11 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
                 <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">TYPE:</div>
                 <div className="border-b border-gray-200 px-2 py-1">{container.containerType}</div>
                 <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">DIRECT/ MIX:</div>
-                <div className="border-b border-gray-200 px-2 py-1">{container.direction}</div>
+                <div className="border-b border-gray-200 px-2 py-1">{(() => {
+                  const cities = [...new Set(allRows.map(r => (r.warehouse || "").replace(/\s*UPB\s*WAREHOUSE/i, "").trim().toUpperCase()).filter(Boolean))];
+                  if (cities.length <= 1) return cities[0] || container.direction || "";
+                  return `MIX`;
+                })()}</div>
                 <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">WEIGHT:</div>
                 <div className="border-b border-gray-200 px-2 py-1">{totalWeight.toFixed(0)}</div>
                 <div className="border-r border-gray-200 px-2 py-1 font-medium">TOTAL PACKAGES:</div>
@@ -268,7 +275,7 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
                 <th className="border px-2 py-1.5 text-center">Num</th>
                 <th className="border px-2 py-1.5 text-center">INVOICE</th>
                 <th className="border px-2 py-1.5 text-center">L. Num</th>
-                <th className="border px-2 py-1.5 text-center">BARCODE</th>
+                <th className="border px-2 py-1.5 text-center">SHIPPER TEL</th>
                 <th className="border px-2 py-1.5 text-left">PACKAGE</th>
                 <th className="border px-2 py-1.5 text-right">VOLUME</th>
                 <th className="border px-2 py-1.5 text-left">CONSIGNEE</th>
@@ -288,7 +295,7 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
                     <td className="border px-2 py-1 text-center">{globalIdx}</td>
                     <td className="border px-2 py-1 text-center font-medium">{row.invoice_number}</td>
                     <td className="border px-2 py-1 text-center">{getLineNumber(row)}</td>
-                    <td className="border px-2 py-1 text-center"></td>
+                    <td className="border px-2 py-1 text-center text-[10px]">{row.shipper_mobile || ""}</td>
                     <td className="border px-2 py-1">{row.package_name || "UNKNOWN"}</td>
                     <td className="border px-2 py-1 text-right">{(row.cubic_metre || 0).toFixed(3)}</td>
                     <td className="border px-2 py-1">{row.consignee_name}</td>
