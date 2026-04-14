@@ -103,88 +103,98 @@ export function useVesselContainerManagement(config: CountryConfig) {
 
   // Save vessel
   const saveVessel = () => {
-    if (!vesselForm.vesselName || !vesselForm.voyage) {
-      toast.error("Please fill in all required fields");
-      return;
+    try {
+      if (!vesselForm.vesselName || !vesselForm.voyage) {
+        toast.error("Please fill in all required fields");
+        return;
+      }
+      const isDuplicateVessel = vessels.some(
+        (v) =>
+          v.id !== vesselForm.id &&
+          v.vesselName.toLowerCase() === (vesselForm.vesselName || "").toLowerCase() &&
+          v.voyage.toLowerCase() === (vesselForm.voyage || "").toLowerCase()
+      );
+      if (isDuplicateVessel) {
+        toast.error(`Vessel "${vesselForm.vesselName}" with voyage "${vesselForm.voyage}" already exists`);
+        return;
+      }
+      const vessel: VesselData = {
+        id: vesselForm.id || uuidv4(),
+        runningNumber: vesselForm.runningNumber || "",
+        vesselName: vesselForm.vesselName || "",
+        voyage: vesselForm.voyage || "",
+        portOfLoading: vesselForm.portOfLoading || "",
+        portOfDischarge: vesselForm.portOfDischarge || "",
+        shippingLine: vesselForm.shippingLine || "",
+        direction: vesselForm.direction || "MIX",
+        masterBL: vesselForm.masterBL || "",
+        etd: vesselForm.etd || "",
+        eta: vesselForm.eta || "",
+        sector: vesselForm.sector || "",
+        status: vesselForm.status || "NEW",
+        containers: vesselForm.containers || [],
+        loadDate: vesselForm.loadDate,
+      };
+      const existingIndex = vessels.findIndex((v) => v.id === vessel.id);
+      if (existingIndex >= 0) {
+        setVessels((prev) => prev.map((v) => (v.id === vessel.id ? vessel : v)));
+        toast.success(`Vessel ${vessel.vesselName} updated successfully`);
+      } else {
+        setVessels((prev) => [vessel, ...prev]);
+        toast.success(`Vessel ${vessel.vesselName} created successfully`);
+      }
+      setViewMode("vessel-list");
+    } catch (error: any) {
+      console.error("Save vessel error:", error);
+      toast.error(`Failed to save vessel: ${error?.message || error}`);
     }
-    const isDuplicateVessel = vessels.some(
-      (v) =>
-        v.id !== vesselForm.id &&
-        v.vesselName.toLowerCase() === (vesselForm.vesselName || "").toLowerCase() &&
-        v.voyage.toLowerCase() === (vesselForm.voyage || "").toLowerCase()
-    );
-    if (isDuplicateVessel) {
-      toast.error(`Vessel "${vesselForm.vesselName}" with voyage "${vesselForm.voyage}" already exists`);
-      return;
-    }
-    const vessel: VesselData = {
-      id: vesselForm.id || uuidv4(),
-      runningNumber: vesselForm.runningNumber || "",
-      vesselName: vesselForm.vesselName || "",
-      voyage: vesselForm.voyage || "",
-      portOfLoading: vesselForm.portOfLoading || "",
-      portOfDischarge: vesselForm.portOfDischarge || "",
-      shippingLine: vesselForm.shippingLine || "",
-      direction: vesselForm.direction || "MIX",
-      masterBL: vesselForm.masterBL || "",
-      etd: vesselForm.etd || "",
-      eta: vesselForm.eta || "",
-      sector: vesselForm.sector || "",
-      status: vesselForm.status || "NEW",
-      containers: vesselForm.containers || [],
-      loadDate: vesselForm.loadDate,
-    };
-    const existingIndex = vessels.findIndex((v) => v.id === vessel.id);
-    if (existingIndex >= 0) {
-      setVessels((prev) => prev.map((v) => (v.id === vessel.id ? vessel : v)));
-      toast.success(`Vessel ${vessel.vesselName} updated successfully`);
-    } else {
-      setVessels((prev) => [vessel, ...prev]);
-      toast.success(`Vessel ${vessel.vesselName} created successfully`);
-    }
-    setViewMode("vessel-list");
   };
 
   // Save container
   const saveContainer = () => {
-    if (!containerForm.containerNumber) {
-      toast.error("Please fill in container number");
-      return;
+    try {
+      if (!containerForm.containerNumber) {
+        toast.error("Please fill in container number");
+        return;
+      }
+      const isDuplicateContainer = containers.some(
+        (c) =>
+          c.id !== containerForm.id &&
+          c.containerNumber.toLowerCase() === (containerForm.containerNumber || "").toLowerCase() &&
+          c.sealNumber.toLowerCase() === (containerForm.sealNumber || "").toLowerCase()
+      );
+      if (isDuplicateContainer) {
+        toast.error(`Container "${containerForm.containerNumber}" with seal "${containerForm.sealNumber}" already exists`);
+        return;
+      }
+      const container: ContainerData = {
+        id: containerForm.id || uuidv4(),
+        runningNumber: containerForm.runningNumber || "",
+        containerNumber: containerForm.containerNumber || "",
+        sealNumber: containerForm.sealNumber || "",
+        containerType: containerForm.containerType || "20FT_NML",
+        direction: containerForm.direction || "",
+        etd: containerForm.etd || "",
+        eta: containerForm.eta || "",
+        sector: containerForm.sector || "",
+        status: containerForm.status || "NOT CONFIRM",
+        weight: containerForm.weight || 0,
+        numberPlate: containerForm.numberPlate,
+        loadDate: containerForm.loadDate,
+      };
+      const existingIndex = containers.findIndex((c) => c.id === container.id);
+      if (existingIndex >= 0) {
+        setContainers((prev) => prev.map((c) => (c.id === container.id ? container : c)));
+        toast.success(`Container ${container.containerNumber} updated successfully`);
+      } else {
+        setContainers((prev) => [container, ...prev]);
+        toast.success(`Container ${container.containerNumber} created successfully`);
+      }
+      setViewMode("container-list");
+    } catch (error: any) {
+      console.error("Save container error:", error);
+      toast.error(`Failed to save container: ${error?.message || error}`);
     }
-    const isDuplicateContainer = containers.some(
-      (c) =>
-        c.id !== containerForm.id &&
-        c.containerNumber.toLowerCase() === (containerForm.containerNumber || "").toLowerCase() &&
-        c.sealNumber.toLowerCase() === (containerForm.sealNumber || "").toLowerCase()
-    );
-    if (isDuplicateContainer) {
-      toast.error(`Container "${containerForm.containerNumber}" with seal "${containerForm.sealNumber}" already exists`);
-      return;
-    }
-    const container: ContainerData = {
-      id: containerForm.id || uuidv4(),
-      runningNumber: containerForm.runningNumber || "",
-      containerNumber: containerForm.containerNumber || "",
-      sealNumber: containerForm.sealNumber || "",
-      containerType: containerForm.containerType || "20FT_NML",
-      direction: containerForm.direction || "",
-      etd: containerForm.etd || "",
-      eta: containerForm.eta || "",
-      sector: containerForm.sector || "",
-      status: containerForm.status || "NOT CONFIRM",
-      weight: containerForm.weight || 0,
-      numberPlate: containerForm.numberPlate,
-      loadDate: containerForm.loadDate,
-    };
-    const existingIndex = containers.findIndex((c) => c.id === container.id);
-    if (existingIndex >= 0) {
-      setContainers((prev) => prev.map((c) => (c.id === container.id ? container : c)));
-      toast.success(`Container ${container.containerNumber} updated successfully`);
-    } else {
-      setContainers((prev) => [container, ...prev]);
-      toast.success(`Container ${container.containerNumber} created successfully`);
-    }
-    setViewMode("container-list");
   };
 
   // Delete vessel
