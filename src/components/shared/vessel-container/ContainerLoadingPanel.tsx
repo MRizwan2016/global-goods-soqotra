@@ -183,9 +183,9 @@ const ContainerLoadingPanel: React.FC<ContainerLoadingPanelProps> = ({
         await handleSelectInvoice(pkg.invoice_id);
       }
       await fetchData();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error unloading package:", error);
-      toast.error("Failed to unload package");
+      toast.error(`Failed to unload package: ${error?.message || error}`);
     }
   };
 
@@ -204,8 +204,8 @@ const ContainerLoadingPanel: React.FC<ContainerLoadingPanelProps> = ({
         await handleSelectInvoice(invoiceId);
       }
       await fetchData();
-    } catch (error) {
-      toast.error("Failed to mark short-shipped");
+    } catch (error: any) {
+      toast.error(`Failed to mark short-shipped: ${error?.message || error}`);
     }
   };
 
