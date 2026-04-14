@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer, Loader2, CheckCircle2, Download } from "lucide-react";
+import { ArrowLeft, Printer, Loader2, CheckCircle2, Download, Edit, Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
@@ -32,6 +32,7 @@ interface PackageRow {
   quantity: number | null;
   weight: number | null;
   cubic_metre: number | null;
+  loading_status: string;
 }
 
 interface SeaCargoManifestProps {
@@ -58,39 +59,85 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
   const [packages, setPackages] = useState<PackageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmDate, setConfirmDate] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [editMode, setEditMode] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchManifestData();
+    checkAdminRole();
   }, [container]);
+
+  const checkAdminRole = async () => {
+    try {
+      const { data: userData } = await supabase.auth.getUser();
+      if (!userData?.user?.id) return;
+      const { data } = await supabase.rpc("has_role", {
+        _user_id: userData.user.id,
+        _role: "admin",
+      });
+      setIsAdmin(data === true);
+    } catch {
+      setIsAdmin(false);
+    }
+  };
 
   const fetchManifestData = async () => {
     setLoading(true);
     try {
-      const { data: invData, error: invErr } = await supabase
-        .from("regional_invoices")
-        .select("id, invoice_number, shipper_name, consignee_name, consignee_address, consignee_city, consignee_mobile, total_packages, total_volume, total_weight, net, payment_status, warehouse, description")
-        .eq("country", countryName)
+      // Get invoices that have LOADED packages in this container
+      // First get all loaded packages for this container
+      const { data: loadedPkgs, error: pkgErr } = await supabase
+        .from("regional_invoice_packages")
+        .select("id, invoice_id, package_name, quantity, weight, cubic_metre, loading_status")
         .eq("container_running_number", container.runningNumber)
-        .order("invoice_number", { ascending: true });
+        .eq("loading_status", "LOADED");
 
-      if (invErr) throw invErr;
-      setInvoices(invData || []);
+      if (pkgErr) throw pkgErr;
+      setPackages((loadedPkgs as PackageRow[]) || []);
 
-      if (invData && invData.length > 0) {
-        const invoiceIds = invData.map((i) => i.id);
-        const { data: pkgData, error: pkgErr } = await supabase
-          .from("regional_invoice_packages")
-          .select("id, invoice_id, package_name, quantity, weight, cubic_metre")
-          .in("invoice_id", invoiceIds);
-        if (pkgErr) throw pkgErr;
-        setPackages(pkgData || []);
+      // Get unique invoice IDs
+      const invoiceIds = [...new Set((loadedPkgs || []).map((p) => p.invoice_id))];
+
+      if (invoiceIds.length > 0) {
+        const { data: invData, error: invErr } = await supabase
+          .from("regional_invoices")
+          .select("id, invoice_number, shipper_name, consignee_name, consignee_address, consignee_city, consignee_mobile, total_packages, total_volume, total_weight, net, payment_status, warehouse, description")
+          .in("id", invoiceIds)
+          .order("invoice_number", { ascending: true });
+
+        if (invErr) throw invErr;
+        setInvoices(invData || []);
+      } else {
+        setInvoices([]);
       }
     } catch (error) {
       console.error("Error fetching manifest data:", error);
       toast.error("Failed to load manifest data");
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Admin: Remove a package from manifest
+  const handleAdminRemovePackage = async (pkgId: string) => {
+    if (!window.confirm("Remove this package from the manifest? It will revert to PENDING status.")) return;
+    try {
+      const { error } = await supabase
+        .from("regional_invoice_packages")
+        .update({
+          loading_status: "PENDING",
+          container_running_number: null,
+          loaded_at: null,
+          loaded_by: null,
+        })
+        .eq("id", pkgId);
+
+      if (error) throw error;
+      toast.success("Package removed from manifest, status reverted to PENDING");
+      await fetchManifestData();
+    } catch (error) {
+      toast.error("Failed to remove package");
     }
   };
 
@@ -102,25 +149,30 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
         i.warehouse?.toLowerCase().includes(zone.toLowerCase())
       );
       const cats = VOLUME_CATEGORIES.map((cat) => {
-        const catInvoices = zoneInvoices.filter((inv) => {
-          const vol = inv.total_volume || 0;
+        // Calculate volume from loaded packages for this zone
+        const zoneInvIds = zoneInvoices.map((inv) => inv.id);
+        const zonePkgs = packages.filter((p) => zoneInvIds.includes(p.invoice_id));
+        const catPkgs = zonePkgs.filter((p) => {
+          const vol = p.cubic_metre || 0;
           return vol >= cat.min && vol < cat.max;
         });
-        const pkgs = catInvoices.length;
-        const vol = catInvoices.reduce((s, i) => s + (i.total_volume || 0), 0);
+        const pkgs = catPkgs.length;
+        const vol = catPkgs.reduce((s, p) => s + (p.cubic_metre || 0), 0);
         return { pkgs, vol };
       });
-      const totalPkgs = zoneInvoices.length;
-      const totalVol = zoneInvoices.reduce((s, i) => s + (i.total_volume || 0), 0);
+      const zoneInvIds = zoneInvoices.map((inv) => inv.id);
+      const zonePkgs = packages.filter((p) => zoneInvIds.includes(p.invoice_id));
+      const totalPkgs = zonePkgs.length;
+      const totalVol = zonePkgs.reduce((s, p) => s + (p.cubic_metre || 0), 0);
       return { zone, cats, totalPkgs, totalVol };
     });
   };
 
-  // Item list summary
+  // Item list summary - uses actual package names, never "PERSONAL EFFECTS"
   const getItemSummary = () => {
     const itemMap: Record<string, { qty: number; vol: number }> = {};
     packages.forEach((pkg) => {
-      const name = (pkg.package_name || "UNKNOWN").toUpperCase();
+      const name = (pkg.package_name || "UNKNOWN ITEM").toUpperCase();
       if (!itemMap[name]) itemMap[name] = { qty: 0, vol: 0 };
       itemMap[name].qty += pkg.quantity || 1;
       itemMap[name].vol += pkg.cubic_metre || 0;
@@ -130,13 +182,13 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       .map(([name, data], i) => ({ num: i + 1, name, ...data }));
   };
 
-  const totalPackages = invoices.length;
-  const totalVolume = invoices.reduce((s, i) => s + (i.total_volume || 0), 0);
-  const totalWeight = invoices.reduce((s, i) => s + (i.total_weight || 0), 0);
+  const totalPackages = packages.length;
+  const totalVolume = packages.reduce((s, p) => s + (p.cubic_metre || 0), 0);
+  const totalWeight = packages.reduce((s, p) => s + (p.weight || 0), 0);
 
   const handleConfirmManifest = () => {
     const today = new Date().toLocaleDateString("en-GB", {
-      day: "2-digit", month: "2-digit", year: "numeric"
+      day: "2-digit", month: "2-digit", year: "numeric",
     });
     setConfirmDate(today);
     toast.success("Manifest confirmed for Customs on " + today);
@@ -206,7 +258,6 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     totalVol: zoneData.reduce((s, z) => s + z.totalVol, 0),
   };
 
-  // Unsettled invoices
   const unsettledInvoices = invoices.filter(
     (inv) => inv.payment_status !== "PAID" && inv.payment_status !== "Fully Paid"
   );
@@ -214,11 +265,21 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       {/* Action buttons */}
-      <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+      <div className="flex items-center justify-between p-4 border-b bg-gray-50 flex-wrap gap-2">
         <Button variant="outline" onClick={onBack} className="flex items-center gap-2">
           <ArrowLeft size={16} /> Go Back
         </Button>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          {/* Admin-only edit button */}
+          {isAdmin && confirmDate && (
+            <Button
+              onClick={() => setEditMode(!editMode)}
+              className={`flex items-center gap-2 ${editMode ? "bg-red-600 hover:bg-red-700" : "bg-amber-600 hover:bg-amber-700"}`}
+            >
+              <Edit size={16} /> {editMode ? "Exit Edit Mode" : "Edit Confirmed Manifest"}
+            </Button>
+          )}
+
           {!confirmDate ? (
             <Button onClick={handleConfirmManifest} className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2">
               <CheckCircle2 size={16} /> Confirm Manifest
@@ -244,7 +305,6 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       </div>
 
       <div id="manifest-print-area" ref={printRef} className="p-4">
-        {/* Title */}
         <h2 className="text-green-700 font-bold text-lg mb-4">Manifest Sea Cargo</h2>
 
         {/* Vessel Details */}
@@ -322,9 +382,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
                     {cat.label}
                   </th>
                 ))}
-                <th className="border border-gray-300 px-1 py-1 bg-green-100 text-green-800 font-bold text-center" colSpan={3}>
-                  Total
-                </th>
+                <th className="border border-gray-300 px-1 py-1 bg-green-100 text-green-800 font-bold text-center" colSpan={3}>Total</th>
               </tr>
               <tr>
                 {[...VOLUME_CATEGORIES, { label: "Total" }].map((cat) => (
@@ -375,7 +433,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
           </table>
         </div>
 
-        {/* Cargo List */}
+        {/* Cargo List - shows actual package names, never PERSONAL EFFECTS */}
         <div className="overflow-x-auto mb-4">
           <table className="w-full border-collapse text-xs">
             <thead>
@@ -393,6 +451,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
                 <th className="border px-2 py-1.5 text-left">P/F</th>
                 <th className="border px-2 py-1.5 text-left">CRNO</th>
                 <th className="border px-2 py-1.5 text-left">PAY</th>
+                {editMode && <th className="border px-2 py-1.5 text-center">Action</th>}
               </tr>
             </thead>
             <tbody>
@@ -414,8 +473,8 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
                       <div className="text-gray-500">{inv.consignee_city}</div>
                     </td>
                     <td className="border px-2 py-1 text-[11px]">
-                      {invPkgs.map((p, pi) => (
-                        <div key={p.id}>{p.package_name}</div>
+                      {invPkgs.map((p) => (
+                        <div key={p.id}>{p.package_name || "UNKNOWN ITEM"}</div>
                       ))}
                     </td>
                     <td className="border px-2 py-1 text-right">
@@ -433,11 +492,29 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
                         <div key={p.id}>{pi + 1}/{invPkgs.length}</div>
                       ))}
                     </td>
-                    <td className="border px-2 py-1">Full</td>
+                    <td className="border px-2 py-1">
+                      {invPkgs.length === (inv.total_packages || 0) ? "Full" : "Partial"}
+                    </td>
                     <td className="border px-2 py-1">{container.runningNumber}</td>
                     <td className="border px-2 py-1 text-[11px]">
                       {inv.payment_status === "PAID" || inv.payment_status === "Fully Paid" ? "Fully Paid" : ""}
                     </td>
+                    {editMode && (
+                      <td className="border px-2 py-1 text-center">
+                        {invPkgs.map((p) => (
+                          <div key={p.id} className="mb-1">
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="h-5 text-[10px] px-1"
+                              onClick={() => handleAdminRemovePackage(p.id)}
+                            >
+                              <X size={10} className="mr-0.5" /> {p.package_name?.substring(0, 8)}
+                            </Button>
+                          </div>
+                        ))}
+                      </td>
+                    )}
                   </tr>
                 );
               })}
@@ -448,7 +525,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
                 <td className="border px-2 py-1">{packages.length}</td>
                 <td className="border px-2 py-1 text-right">{totalWeight.toFixed(2)}</td>
                 <td className="border px-2 py-1 text-right">{totalVolume.toFixed(3)}</td>
-                <td className="border px-2 py-1" colSpan={4}></td>
+                <td className="border px-2 py-1" colSpan={editMode ? 5 : 4}></td>
               </tr>
             </tfoot>
           </table>
