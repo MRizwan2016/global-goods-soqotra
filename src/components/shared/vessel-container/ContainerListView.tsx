@@ -5,6 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CountryConfig, ContainerData } from "./types";
 
+interface ContainerMetric {
+  packages: number;
+  volume: number;
+  weight: number;
+  loadDate: string;
+}
+
 interface ContainerListViewProps {
   config: CountryConfig;
   containers: ContainerData[];
@@ -21,6 +28,7 @@ interface ContainerListViewProps {
   onViewManifest?: (container: ContainerData) => void;
   onEditContainer?: (container: ContainerData) => void;
   onDeleteContainer?: (container: ContainerData) => void;
+  containerMetrics?: Record<string, ContainerMetric>;
 }
 
 const ContainerListView: React.FC<ContainerListViewProps> = ({
@@ -39,6 +47,7 @@ const ContainerListView: React.FC<ContainerListViewProps> = ({
   onViewManifest,
   onEditContainer,
   onDeleteContainer,
+  containerMetrics = {},
 }) => {
   const displayContainers = containers.slice(0, entriesPerPage);
 
@@ -133,7 +142,7 @@ const ContainerListView: React.FC<ContainerListViewProps> = ({
                     <td className="border px-2 py-1.5">{c.direction}</td>
                     <td className="border px-2 py-1.5">{c.etd}</td>
                     <td className="border px-2 py-1.5">{c.eta}</td>
-                    <td className="border px-2 py-1.5">{c.loadDate || ""}</td>
+                    <td className="border px-2 py-1.5">{containerMetrics[c.runningNumber]?.loadDate || c.loadDate || ""}</td>
                     <td className="border px-2 py-1.5">
                       <div className="flex gap-1">
                         <Button size="sm" variant="outline" className="text-xs h-7" onClick={(e) => { e.stopPropagation(); onEditContainer?.(c); }}>Edit</Button>
