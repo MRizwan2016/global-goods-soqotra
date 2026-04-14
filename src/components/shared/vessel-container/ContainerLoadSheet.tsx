@@ -60,7 +60,8 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
 
       // Get invoice details
       const invoiceIds = [...new Set((pkgs || []).map((p) => p.invoice_id))];
-      let invoiceMap: Record<string, { invoice_number: string; consignee_name: string | null; shipper_name: string | null; warehouse: string | null; sector: string | null; pre_paid: string | null }> = {};
+      type InvInfo = { invoice_number: string; consignee_name: string | null; shipper_name: string | null; warehouse: string | null; sector: string | null; pre_paid: string | null };
+      const invoiceMap: Record<string, InvInfo> = {};
 
       if (invoiceIds.length > 0) {
         const { data: invData, error: invErr } = await supabase
@@ -83,15 +84,15 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
 
       // Combine data
       const rows: PackageRow[] = (pkgs || []).map((p) => {
-        const inv = invoiceMap[p.invoice_id] || {};
+        const inv: InvInfo = invoiceMap[p.invoice_id] || { invoice_number: "", consignee_name: null, shipper_name: null, warehouse: null, sector: null, pre_paid: null };
         return {
           ...p,
-          invoice_number: inv.invoice_number || "",
-          consignee_name: inv.consignee_name || null,
-          shipper_name: inv.shipper_name || null,
-          warehouse: inv.warehouse || null,
-          sector: inv.sector || null,
-          pre_paid: inv.pre_paid || null,
+          invoice_number: inv.invoice_number,
+          consignee_name: inv.consignee_name,
+          shipper_name: inv.shipper_name,
+          warehouse: inv.warehouse,
+          sector: inv.sector,
+          pre_paid: inv.pre_paid,
         };
       });
 
