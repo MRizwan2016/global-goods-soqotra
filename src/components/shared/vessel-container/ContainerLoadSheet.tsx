@@ -228,7 +228,11 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
                 <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">TYPE:</div>
                 <div className="border-b border-gray-200 px-2 py-1">{container.containerType}</div>
                 <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">DIRECT/ MIX:</div>
-                <div className="border-b border-gray-200 px-2 py-1">{container.direction}</div>
+                <div className="border-b border-gray-200 px-2 py-1">{(() => {
+                  const cities = [...new Set(allRows.map(r => (r.warehouse || "").replace(/\s*UPB\s*WAREHOUSE/i, "").trim().toUpperCase()).filter(Boolean))];
+                  if (cities.length <= 1) return cities[0] || container.direction || "";
+                  return `MIX`;
+                })()}</div>
                 <div className="border-b border-r border-gray-200 px-2 py-1 font-medium">WEIGHT:</div>
                 <div className="border-b border-gray-200 px-2 py-1">{totalWeight.toFixed(0)}</div>
                 <div className="border-r border-gray-200 px-2 py-1 font-medium">TOTAL PACKAGES:</div>
