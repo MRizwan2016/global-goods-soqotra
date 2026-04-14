@@ -275,10 +275,33 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     style.id = "manifest-print-style";
     style.textContent = `
       @media print {
-        @page { size: A4 landscape; margin: 8mm; }
+        @page { size: A4 landscape; margin: 10mm; }
         body * { visibility: hidden; }
         #manifest-print-area, #manifest-print-area * { visibility: visible; }
-        #manifest-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+        #manifest-print-area {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          margin: 0 auto;
+          padding: 0;
+          font-size: 9pt;
+        }
+        #manifest-print-area table {
+          width: 100% !important;
+          table-layout: fixed;
+          border-collapse: collapse;
+        }
+        #manifest-print-area table th,
+        #manifest-print-area table td {
+          padding: 3px 4px;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        }
+        #manifest-print-area table tr {
+          page-break-inside: avoid;
+        }
+        .no-print { display: none !important; }
       }
     `;
     document.head.appendChild(style);

@@ -168,10 +168,33 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
     style.id = "loadsheet-print-style";
     style.textContent = `
       @media print {
-        @page { size: A4 landscape; margin: 8mm; }
+        @page { size: A4 landscape; margin: 10mm; }
         body * { visibility: hidden; }
         #loadsheet-print-area, #loadsheet-print-area * { visibility: visible; }
-        #loadsheet-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+        #loadsheet-print-area {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          margin: 0 auto;
+          padding: 0;
+          font-size: 9pt;
+        }
+        #loadsheet-print-area table {
+          width: 100% !important;
+          table-layout: fixed;
+          border-collapse: collapse;
+        }
+        #loadsheet-print-area table th,
+        #loadsheet-print-area table td {
+          padding: 3px 4px;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        }
+        #loadsheet-print-area table tr {
+          page-break-inside: avoid;
+        }
+        .no-print { display: none !important; }
       }
     `;
     document.head.appendChild(style);
