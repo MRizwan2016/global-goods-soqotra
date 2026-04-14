@@ -253,9 +253,9 @@ const SriLankaDownloads: React.FC = () => {
                   <td className="border px-2 py-1.5 text-center">{c.etd}</td>
                   <td className="border px-2 py-1.5 text-center">{c.eta}</td>
                   <td className="border px-2 py-1.5 text-center">{c.weight || 0}</td>
-                  <td className="border px-2 py-1.5 text-center">-</td>
-                  <td className="border px-2 py-1.5 text-center">-</td>
-                  <td className="border px-2 py-1.5 text-center">{c.loadDate || "-"}</td>
+                  <td className="border px-2 py-1.5 text-center">{containerStats[c.runningNumber]?.packages || "-"}</td>
+                  <td className="border px-2 py-1.5 text-center">{containerStats[c.runningNumber]?.volume ? containerStats[c.runningNumber].volume.toFixed(3) : "-"}</td>
+                  <td className="border px-2 py-1.5 text-center">{containerStats[c.runningNumber]?.loadDate ? new Date(containerStats[c.runningNumber].loadDate).toLocaleDateString() : (c.loadDate || "-")}</td>
                   <td className="border px-2 py-1.5 text-center">
                     {activeSection === "sea-manifest" ? (
                       <button
