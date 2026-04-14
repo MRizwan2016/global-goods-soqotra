@@ -61,13 +61,13 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
 
       // Get invoice details
       const invoiceIds = [...new Set((pkgs || []).map((p) => p.invoice_id))];
-      type InvInfo = { invoice_number: string; consignee_name: string | null; shipper_name: string | null; warehouse: string | null; sector: string | null; pre_paid: string | null };
+      type InvInfo = { invoice_number: string; consignee_name: string | null; shipper_name: string | null; shipper_mobile: string | null; warehouse: string | null; sector: string | null; pre_paid: string | null };
       const invoiceMap: Record<string, InvInfo> = {};
 
       if (invoiceIds.length > 0) {
         const { data: invData, error: invErr } = await supabase
           .from("regional_invoices")
-          .select("id, invoice_number, consignee_name, shipper_name, warehouse, sector, pre_paid")
+          .select("id, invoice_number, consignee_name, shipper_name, shipper_mobile, warehouse, sector, pre_paid")
           .in("id", invoiceIds);
 
         if (invErr) throw invErr;
@@ -76,6 +76,7 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
             invoice_number: inv.invoice_number,
             consignee_name: inv.consignee_name,
             shipper_name: inv.shipper_name,
+            shipper_mobile: inv.shipper_mobile,
             warehouse: inv.warehouse,
             sector: inv.sector,
             pre_paid: inv.pre_paid,
@@ -85,12 +86,13 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
 
       // Combine data
       const rows: PackageRow[] = (pkgs || []).map((p) => {
-        const inv: InvInfo = invoiceMap[p.invoice_id] || { invoice_number: "", consignee_name: null, shipper_name: null, warehouse: null, sector: null, pre_paid: null };
+        const inv: InvInfo = invoiceMap[p.invoice_id] || { invoice_number: "", consignee_name: null, shipper_name: null, shipper_mobile: null, warehouse: null, sector: null, pre_paid: null };
         return {
           ...p,
           invoice_number: inv.invoice_number,
           consignee_name: inv.consignee_name,
           shipper_name: inv.shipper_name,
+          shipper_mobile: inv.shipper_mobile,
           warehouse: inv.warehouse,
           sector: inv.sector,
           pre_paid: inv.pre_paid,
