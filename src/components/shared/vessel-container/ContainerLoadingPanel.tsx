@@ -142,9 +142,9 @@ const ContainerLoadingPanel: React.FC<ContainerLoadingPanelProps> = ({
       // Refresh data
       await handleSelectInvoice(pkg.invoice_id);
       await fetchData();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error loading package:", error);
-      toast.error("Failed to load package");
+      toast.error(`Failed to load package: ${error?.message || error}`);
     }
   };
 
