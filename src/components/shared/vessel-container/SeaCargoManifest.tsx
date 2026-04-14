@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Printer, Loader2, CheckCircle2, Download, Edit, Plus, X } from "lucide-react";
+import { ArrowLeft, Printer, Loader2, CheckCircle2, Download, Edit, Save, Trash2, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
@@ -60,7 +60,9 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
   const [loading, setLoading] = useState(true);
   const [confirmDate, setConfirmDate] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [authLoading, setAuthLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
+  const [saving, setSaving] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -69,6 +71,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
   }, [container]);
 
   const checkAdminRole = async () => {
+    setAuthLoading(true);
     try {
       const { data: userData } = await supabase.auth.getUser();
       if (!userData?.user?.id) return;
@@ -79,14 +82,14 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       setIsAdmin(data === true);
     } catch {
       setIsAdmin(false);
+    } finally {
+      setAuthLoading(false);
     }
   };
 
   const fetchManifestData = async () => {
     setLoading(true);
     try {
-      // Get invoices that have LOADED packages in this container
-      // First get all loaded packages for this container
       const { data: loadedPkgs, error: pkgErr } = await supabase
         .from("regional_invoice_packages")
         .select("id, invoice_id, package_name, quantity, weight, cubic_metre, loading_status")
@@ -96,7 +99,6 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       if (pkgErr) throw pkgErr;
       setPackages((loadedPkgs as PackageRow[]) || []);
 
-      // Get unique invoice IDs
       const invoiceIds = [...new Set((loadedPkgs || []).map((p) => p.invoice_id))];
 
       if (invoiceIds.length > 0) {
@@ -111,6 +113,10 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       } else {
         setInvoices([]);
       }
+
+      // Load saved confirm date from localStorage
+      const savedConfirm = localStorage.getItem(`manifest_confirm_${container.runningNumber}`);
+      if (savedConfirm) setConfirmDate(savedConfirm);
     } catch (error) {
       console.error("Error fetching manifest data:", error);
       toast.error("Failed to load manifest data");
@@ -119,7 +125,6 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     }
   };
 
-  // Admin: Remove a package from manifest
   const handleAdminRemovePackage = async (pkgId: string) => {
     if (!window.confirm("Remove this package from the manifest? It will revert to PENDING status.")) return;
     try {
@@ -141,7 +146,6 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     }
   };
 
-  // Zone breakdown (by warehouse)
   const zones = ["Colombo", "Galle", "Kurunegala"];
   const getZoneData = () => {
     return zones.map((zone) => {
@@ -149,7 +153,6 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
         i.warehouse?.toLowerCase().includes(zone.toLowerCase())
       );
       const cats = VOLUME_CATEGORIES.map((cat) => {
-        // Calculate volume from loaded packages for this zone
         const zoneInvIds = zoneInvoices.map((inv) => inv.id);
         const zonePkgs = packages.filter((p) => zoneInvIds.includes(p.invoice_id));
         const catPkgs = zonePkgs.filter((p) => {
@@ -168,7 +171,6 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     });
   };
 
-  // Item list summary - uses actual package names, never "PERSONAL EFFECTS"
   const getItemSummary = () => {
     const itemMap: Record<string, { qty: number; vol: number }> = {};
     packages.forEach((pkg) => {
@@ -182,16 +184,90 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       .map(([name, data], i) => ({ num: i + 1, name, ...data }));
   };
 
+  // Warehouse/Zone summary
+  const getWarehouseZoneSummary = () => {
+    const zoneMap: Record<string, { qty: number; vol: number }> = {};
+    invoices.forEach((inv) => {
+      const zone = inv.warehouse?.replace(/\s*UPB\s*WAREHOUSE/i, "").trim() || "Unknown";
+      const invPkgs = packages.filter((p) => p.invoice_id === inv.id);
+      if (!zoneMap[zone]) zoneMap[zone] = { qty: 0, vol: 0 };
+      zoneMap[zone].qty += invPkgs.length;
+      zoneMap[zone].vol += invPkgs.reduce((s, p) => s + (p.cubic_metre || 0), 0);
+    });
+    return Object.entries(zoneMap).map(([zone, data], i) => ({ num: i + 1, zone, ...data }));
+  };
+
   const totalPackages = packages.length;
   const totalVolume = packages.reduce((s, p) => s + (p.cubic_metre || 0), 0);
   const totalWeight = packages.reduce((s, p) => s + (p.weight || 0), 0);
+
+  const handleSaveManifest = async () => {
+    setSaving(true);
+    try {
+      // Save manifest data to localStorage
+      const manifestData = {
+        containerRunningNumber: container.runningNumber,
+        confirmDate,
+        totalPackages,
+        totalVolume,
+        totalWeight,
+        savedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(`manifest_data_${container.runningNumber}`, JSON.stringify(manifestData));
+      if (confirmDate) {
+        localStorage.setItem(`manifest_confirm_${container.runningNumber}`, confirmDate);
+      }
+      toast.success("Manifest saved successfully");
+    } catch (error) {
+      toast.error("Failed to save manifest");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleConfirmManifest = () => {
     const today = new Date().toLocaleDateString("en-GB", {
       day: "2-digit", month: "2-digit", year: "numeric",
     });
     setConfirmDate(today);
+    localStorage.setItem(`manifest_confirm_${container.runningNumber}`, today);
     toast.success("Manifest confirmed for Customs on " + today);
+  };
+
+  const handleReconfirmManifest = () => {
+    if (!window.confirm("Are you sure you want to re-confirm the manifest with today's date?")) return;
+    const today = new Date().toLocaleDateString("en-GB", {
+      day: "2-digit", month: "2-digit", year: "numeric",
+    });
+    setConfirmDate(today);
+    localStorage.setItem(`manifest_confirm_${container.runningNumber}`, today);
+    toast.success("Manifest re-confirmed on " + today);
+  };
+
+  const handleDeleteManifest = async () => {
+    if (!window.confirm("Are you sure you want to DELETE this manifest? All loaded packages will be unloaded.")) return;
+    try {
+      // Revert all packages to PENDING
+      const { error } = await supabase
+        .from("regional_invoice_packages")
+        .update({
+          loading_status: "PENDING",
+          container_running_number: null,
+          loaded_at: null,
+          loaded_by: null,
+        })
+        .eq("container_running_number", container.runningNumber)
+        .eq("loading_status", "LOADED");
+
+      if (error) throw error;
+
+      localStorage.removeItem(`manifest_confirm_${container.runningNumber}`);
+      localStorage.removeItem(`manifest_data_${container.runningNumber}`);
+      toast.success("Manifest deleted. All packages reverted to PENDING.");
+      onBack();
+    } catch (error) {
+      toast.error("Failed to delete manifest");
+    }
   };
 
   const handlePrint = () => {
@@ -238,7 +314,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     }
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="text-center py-16">
         <Loader2 className="animate-spin mx-auto mb-2" size={32} />
@@ -247,8 +323,10 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     );
   }
 
+  const isConfirmed = !!confirmDate;
   const zoneData = getZoneData();
   const itemSummary = getItemSummary();
+  const warehouseZoneSummary = getWarehouseZoneSummary();
   const totalZone = {
     cats: VOLUME_CATEGORIES.map((_, ci) => ({
       pkgs: zoneData.reduce((s, z) => s + z.cats[ci].pkgs, 0),
@@ -262,6 +340,12 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     (inv) => inv.payment_status !== "PAID" && inv.payment_status !== "Fully Paid"
   );
 
+  // D2D invoices (door to door)
+  const d2dInvoices = invoices.filter((inv) => {
+    const desc = inv.description?.toLowerCase() || "";
+    return desc.includes("d2d") || desc.includes("door");
+  });
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       {/* Action buttons */}
@@ -270,8 +354,19 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
           <ArrowLeft size={16} /> Go Back
         </Button>
         <div className="flex gap-2 flex-wrap">
+          {/* SAVE button - visible to all before confirm, admin only after */}
+          {(!isConfirmed || isAdmin) && (
+            <Button
+              onClick={handleSaveManifest}
+              disabled={saving}
+              className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
+            >
+              <Save size={16} /> {saving ? "Saving..." : "Save Manifest"}
+            </Button>
+          )}
+
           {/* Admin-only edit button */}
-          {isAdmin && confirmDate && (
+          {isAdmin && isConfirmed && (
             <Button
               onClick={() => setEditMode(!editMode)}
               className={`flex items-center gap-2 ${editMode ? "bg-red-600 hover:bg-red-700" : "bg-amber-600 hover:bg-amber-700"}`}
@@ -280,27 +375,58 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
             </Button>
           )}
 
-          {!confirmDate ? (
+          {/* Confirm / Reconfirm */}
+          {!isConfirmed ? (
+            // Before confirm: admin and staff can confirm
             <Button onClick={handleConfirmManifest} className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2">
               <CheckCircle2 size={16} /> Confirm Manifest
             </Button>
           ) : (
-            <span className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded font-medium text-sm border border-green-300">
-              <CheckCircle2 size={16} /> Confirmed: {confirmDate}
-            </span>
+            <>
+              <span className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded font-medium text-sm border border-green-300">
+                <CheckCircle2 size={16} /> Confirmed: {confirmDate}
+              </span>
+              {/* Admin only: Reconfirm */}
+              {isAdmin && (
+                <Button onClick={handleReconfirmManifest} className="bg-orange-600 hover:bg-orange-700 flex items-center gap-2">
+                  <CheckCircle2 size={16} /> Re-Confirm
+                </Button>
+              )}
+            </>
           )}
+
+          {/* Print - always visible for everyone */}
           <Button onClick={handlePrint} className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2">
             <Printer size={16} /> Print
           </Button>
-          <Button onClick={handlePrint} className="bg-teal-600 hover:bg-teal-700 flex items-center gap-2">
-            <Printer size={16} /> Print D2D
-          </Button>
-          <Button onClick={handlePrint} className="bg-teal-700 hover:bg-teal-800 flex items-center gap-2">
-            <Printer size={16} /> Print D2D Bulk BLs
-          </Button>
-          <Button onClick={handleDownloadPDF} className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2">
-            <Download size={16} /> Download PDF
-          </Button>
+
+          {/* Print D2D - hidden for staff after confirm */}
+          {(!isConfirmed || isAdmin) && (
+            <Button onClick={handlePrint} className="bg-teal-600 hover:bg-teal-700 flex items-center gap-2">
+              <Printer size={16} /> Print D2D
+            </Button>
+          )}
+
+          {/* Print D2D Bulk BLs - hidden for staff after confirm */}
+          {(!isConfirmed || isAdmin) && (
+            <Button onClick={handlePrint} className="bg-teal-700 hover:bg-teal-800 flex items-center gap-2">
+              <Printer size={16} /> Print D2D Bulk BLs
+            </Button>
+          )}
+
+          {/* Download PDF - hidden for staff after confirm */}
+          {(!isConfirmed || isAdmin) && (
+            <Button onClick={handleDownloadPDF} className="bg-purple-600 hover:bg-purple-700 flex items-center gap-2">
+              <Download size={16} /> Download PDF
+            </Button>
+          )}
+
+          {/* Delete - admin only */}
+          {isAdmin && (
+            <Button onClick={handleDeleteManifest} variant="destructive" className="flex items-center gap-2">
+              <Trash2 size={16} /> Delete Manifest
+            </Button>
+          )}
         </div>
       </div>
 
@@ -433,7 +559,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
           </table>
         </div>
 
-        {/* Cargo List - shows actual package names, never PERSONAL EFFECTS */}
+        {/* Cargo List */}
         <div className="overflow-x-auto mb-4">
           <table className="w-full border-collapse text-xs">
             <thead>
@@ -567,13 +693,49 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
           </table>
         </div>
 
+        {/* Warehouse/Zone Summary */}
+        <div className="mb-4">
+          <table className="w-full max-w-2xl mx-auto border-collapse text-sm">
+            <thead>
+              <tr className="bg-blue-600 text-white">
+                <th className="border px-2 py-1.5 text-center" colSpan={4}>SUMMARY OF WAREHOUSE/ ZONE WISE PACKAGES & VOLUME</th>
+              </tr>
+              <tr className="bg-blue-500 text-white">
+                <th className="border px-2 py-1.5 text-center">Num</th>
+                <th className="border px-2 py-1.5 text-left">WAREHOUSE/ ZONE</th>
+                <th className="border px-2 py-1.5 text-right">QUANTITY</th>
+                <th className="border px-2 py-1.5 text-right">VOLUME</th>
+              </tr>
+            </thead>
+            <tbody>
+              {warehouseZoneSummary.map((item) => (
+                <tr key={item.num} className={item.num % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                  <td className="border px-2 py-1 text-center">{item.num}</td>
+                  <td className="border px-2 py-1">{item.zone}</td>
+                  <td className="border px-2 py-1 text-right">{item.qty}</td>
+                  <td className="border px-2 py-1 text-right">{item.vol.toFixed(3)}</td>
+                </tr>
+              ))}
+              <tr className="font-bold bg-gray-100">
+                <td className="border px-2 py-1 text-right font-bold" colSpan={2}>TOTAL:</td>
+                <td className="border px-2 py-1 text-right">
+                  {warehouseZoneSummary.reduce((s, i) => s + i.qty, 0)}
+                </td>
+                <td className="border px-2 py-1 text-right">
+                  {warehouseZoneSummary.reduce((s, i) => s + i.vol, 0).toFixed(3)}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
         {/* Unsettled Invoices */}
         {unsettledInvoices.length > 0 && (
           <div className="mb-4">
             <table className="w-full max-w-3xl mx-auto border-collapse text-sm">
               <thead>
                 <tr className="bg-blue-600 text-white">
-                  <th className="border px-2 py-1.5 text-center" colSpan={6}>UN SETTLE INVOICES</th>
+                  <th className="border px-2 py-1.5 text-center" colSpan={7}>UNSETTLED INVOICES</th>
                 </tr>
                 <tr className="bg-blue-500 text-white">
                   <th className="border px-2 py-1.5 text-center">Num</th>
@@ -581,6 +743,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
                   <th className="border px-2 py-1.5 text-left">SHIPPER</th>
                   <th className="border px-2 py-1.5 text-left">CONSIGNEE</th>
                   <th className="border px-2 py-1.5 text-right">NET</th>
+                  <th className="border px-2 py-1.5 text-right">PAID</th>
                   <th className="border px-2 py-1.5 text-right">DUE</th>
                 </tr>
               </thead>
@@ -592,6 +755,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
                     <td className="border px-2 py-1">{inv.shipper_name}</td>
                     <td className="border px-2 py-1">{inv.consignee_name}</td>
                     <td className="border px-2 py-1 text-right">{(inv.net || 0).toFixed(0)}</td>
+                    <td className="border px-2 py-1 text-right">0</td>
                     <td className="border px-2 py-1 text-right">{(inv.net || 0).toFixed(0)}</td>
                   </tr>
                 ))}
@@ -599,6 +763,37 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
             </table>
           </div>
         )}
+
+        {/* D2D List */}
+        <div className="mb-4">
+          <table className="w-full max-w-3xl mx-auto border-collapse text-sm">
+            <thead>
+              <tr className="bg-blue-600 text-white">
+                <th className="border px-2 py-1.5 text-center" colSpan={4}>D2D LIST</th>
+              </tr>
+              <tr className="bg-blue-500 text-white">
+                <th className="border px-2 py-1.5 text-center">Num</th>
+                <th className="border px-2 py-1.5 text-center">GY</th>
+                <th className="border px-2 py-1.5 text-left">NAME</th>
+                <th className="border px-2 py-1.5 text-left">MASTER</th>
+              </tr>
+            </thead>
+            <tbody>
+              {d2dInvoices.length > 0 ? d2dInvoices.map((inv, i) => (
+                <tr key={inv.id} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                  <td className="border px-2 py-1 text-center">{i + 1}</td>
+                  <td className="border px-2 py-1 text-center">{inv.invoice_number}</td>
+                  <td className="border px-2 py-1">{inv.consignee_name}</td>
+                  <td className="border px-2 py-1">{inv.shipper_name}</td>
+                </tr>
+              )) : (
+                <tr>
+                  <td className="border px-2 py-1 text-center text-gray-400" colSpan={4}>No D2D records</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
