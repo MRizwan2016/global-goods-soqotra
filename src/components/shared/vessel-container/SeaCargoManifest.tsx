@@ -276,7 +276,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     style.id = "manifest-print-style";
     style.textContent = `
       @media print {
-        @page { size: A4 landscape; margin: 10mm; }
+        @page { size: A4 landscape; margin: 1cm; }
         body * { visibility: hidden; }
         #manifest-print-area, #manifest-print-area * { visibility: visible; }
         #manifest-print-area {
@@ -286,7 +286,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
           width: 100%;
           margin: 0 auto;
           padding: 0;
-          font-size: 9pt;
+          font-size: 8.5pt;
         }
         #manifest-print-area table {
           width: 100% !important;
@@ -295,12 +295,20 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
         }
         #manifest-print-area table th,
         #manifest-print-area table td {
-          padding: 3px 4px;
+          padding: 2px 3px;
           word-wrap: break-word;
           overflow-wrap: break-word;
         }
         #manifest-print-area table tr {
           page-break-inside: avoid;
+        }
+        #manifest-print-area .bg-blue-600,
+        #manifest-print-area .bg-blue-100,
+        #manifest-print-area .bg-green-100,
+        #manifest-print-area .bg-gray-100,
+        #manifest-print-area .bg-gray-50 {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
         }
         .no-print { display: none !important; }
       }
