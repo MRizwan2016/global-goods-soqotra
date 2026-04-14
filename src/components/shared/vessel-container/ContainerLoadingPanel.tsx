@@ -120,24 +120,32 @@ const ContainerLoadingPanel: React.FC<ContainerLoadingPanelProps> = ({
         .from("regional_invoice_packages")
         .update({
           loading_status: "LOADED",
-          container_running_number: container.runningNumber,
+          container_running_number: String(container.runningNumber),
           loaded_at: new Date().toISOString(),
           loaded_by: userData?.user?.id || null,
-        })
+        } as any)
         .eq("id", pkg.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Package load error:", error);
+        toast.error(`Failed to load package: ${error.message}`);
+        return;
+      }
       toast.success(`✓ ${pkg.package_name || "Package"} loaded`);
 
-      // Also update the parent invoice container_running_number if not already set
-      await supabase
+      // Auto-link: update parent invoice with container_running_number
+      const { error: linkErr } = await supabase
         .from("regional_invoices")
         .update({
-          container_running_number: container.runningNumber,
+          container_running_number: String(container.runningNumber),
           loaded_at: new Date().toISOString(),
-        })
-        .eq("id", pkg.invoice_id)
-        .is("container_running_number", null);
+        } as any)
+        .eq("id", pkg.invoice_id);
+
+      if (linkErr) {
+        console.error("Auto-link invoice error:", linkErr);
+        toast.error(`Package loaded but invoice link failed: ${linkErr.message}`);
+      }
 
       // Refresh data
       await handleSelectInvoice(pkg.invoice_id);

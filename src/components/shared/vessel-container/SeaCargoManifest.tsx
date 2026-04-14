@@ -344,7 +344,12 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     if (!printRef.current) return;
     toast.info("Generating A4 Landscape PDF...");
     try {
-      const canvas = await html2canvas(printRef.current, { scale: 2, useCORS: true });
+      const canvas = await html2canvas(printRef.current, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        foreignObjectRendering: false,
+      });
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
       const pdfW = pdf.internal.pageSize.getWidth();
@@ -362,7 +367,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       toast.success("PDF downloaded successfully");
     } catch (err) {
       console.error("PDF generation error:", err);
-      toast.error("Failed to generate PDF");
+      toast.error("Failed to generate PDF. Try using Print instead.");
     }
   };
 
