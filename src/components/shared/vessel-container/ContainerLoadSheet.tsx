@@ -168,7 +168,7 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
     style.id = "loadsheet-print-style";
     style.textContent = `
       @media print {
-        @page { size: A4 landscape; margin: 10mm; }
+        @page { size: A4 landscape; margin: 1cm; }
         body * { visibility: hidden; }
         #loadsheet-print-area, #loadsheet-print-area * { visibility: visible; }
         #loadsheet-print-area {
@@ -178,7 +178,7 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
           width: 100%;
           margin: 0 auto;
           padding: 0;
-          font-size: 9pt;
+          font-size: 8.5pt;
         }
         #loadsheet-print-area table {
           width: 100% !important;
@@ -187,12 +187,18 @@ const ContainerLoadSheet: React.FC<ContainerLoadSheetProps> = ({ container, onBa
         }
         #loadsheet-print-area table th,
         #loadsheet-print-area table td {
-          padding: 3px 4px;
+          padding: 2px 3px;
           word-wrap: break-word;
           overflow-wrap: break-word;
         }
         #loadsheet-print-area table tr {
           page-break-inside: avoid;
+        }
+        #loadsheet-print-area .bg-blue-600,
+        #loadsheet-print-area .bg-blue-500,
+        #loadsheet-print-area .bg-gray-100 {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
         }
         .no-print { display: none !important; }
       }

@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { QRCodeSVG } from "qrcode.react";
 import { ContainerData, VesselData } from "./types";
 
 interface ManifestInvoice {
@@ -206,7 +207,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     try {
       // Save manifest data to localStorage
       const manifestData = {
-        containerRunningNumber: container.runningNumber,
+        containerRunningNumber: String(container.runningNumber),
         confirmDate,
         totalPackages,
         totalVolume,
@@ -217,9 +218,29 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       if (confirmDate) {
         localStorage.setItem(`manifest_confirm_${container.runningNumber}`, confirmDate);
       }
+
+      // Ensure all invoices have container_running_number as string
+      const invoiceIds = [...new Set(packages.map((p) => p.invoice_id))];
+      if (invoiceIds.length > 0) {
+        const { error: invErr } = await supabase
+          .from("regional_invoices")
+          .update({
+            container_running_number: String(container.runningNumber),
+            loaded_at: new Date().toISOString(),
+          })
+          .in("id", invoiceIds);
+
+        if (invErr) {
+          console.error("Supabase save error (invoices):", invErr);
+          toast.error(`Failed to sync invoices: ${invErr.message}`);
+          return;
+        }
+      }
+
       toast.success("Manifest saved successfully");
-    } catch (error) {
-      toast.error("Failed to save manifest");
+    } catch (error: any) {
+      console.error("Save manifest error:", error);
+      toast.error(`Failed to save manifest: ${error?.message || error}`);
     } finally {
       setSaving(false);
     }
@@ -275,7 +296,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
     style.id = "manifest-print-style";
     style.textContent = `
       @media print {
-        @page { size: A4 landscape; margin: 10mm; }
+        @page { size: A4 landscape; margin: 1cm; }
         body * { visibility: hidden; }
         #manifest-print-area, #manifest-print-area * { visibility: visible; }
         #manifest-print-area {
@@ -285,7 +306,7 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
           width: 100%;
           margin: 0 auto;
           padding: 0;
-          font-size: 9pt;
+          font-size: 8.5pt;
         }
         #manifest-print-area table {
           width: 100% !important;
@@ -294,12 +315,20 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
         }
         #manifest-print-area table th,
         #manifest-print-area table td {
-          padding: 3px 4px;
+          padding: 2px 3px;
           word-wrap: break-word;
           overflow-wrap: break-word;
         }
         #manifest-print-area table tr {
           page-break-inside: avoid;
+        }
+        #manifest-print-area .bg-blue-600,
+        #manifest-print-area .bg-blue-100,
+        #manifest-print-area .bg-green-100,
+        #manifest-print-area .bg-gray-100,
+        #manifest-print-area .bg-gray-50 {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
         }
         .no-print { display: none !important; }
       }
@@ -454,7 +483,18 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       </div>
 
       <div id="manifest-print-area" ref={printRef} className="p-4">
-        <h2 className="text-green-700 font-bold text-lg mb-4">Manifest Sea Cargo</h2>
+        {/* Header with title and QR code */}
+        <div className="flex items-start justify-between mb-4">
+          <h2 className="text-green-700 font-bold text-lg">Manifest Sea Cargo</h2>
+          <div className="flex flex-col items-center">
+            <QRCodeSVG
+              value={`https://soqotralog.com/manifest/${container.containerNumber || container.runningNumber}`}
+              size={80}
+              level="M"
+            />
+            <span className="text-[8px] text-gray-500 mt-0.5">Scan to verify</span>
+          </div>
+        </div>
 
         {/* Vessel Details */}
         <div className="border border-gray-300 mb-4">
