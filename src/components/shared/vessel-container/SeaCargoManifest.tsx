@@ -141,8 +141,8 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       if (error) throw error;
       toast.success("Package removed from manifest, status reverted to PENDING");
       await fetchManifestData();
-    } catch (error) {
-      toast.error("Failed to remove package");
+    } catch (error: any) {
+      toast.error(`Failed to remove package: ${error?.message || error}`);
     }
   };
 
@@ -265,8 +265,8 @@ const SeaCargoManifest: React.FC<SeaCargoManifestProps> = ({
       localStorage.removeItem(`manifest_data_${container.runningNumber}`);
       toast.success("Manifest deleted. All packages reverted to PENDING.");
       onBack();
-    } catch (error) {
-      toast.error("Failed to delete manifest");
+    } catch (error: any) {
+      toast.error(`Failed to delete manifest: ${error?.message || error}`);
     }
   };
 
