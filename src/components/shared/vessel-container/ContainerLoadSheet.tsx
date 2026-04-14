@@ -19,6 +19,7 @@ interface PackageRow {
   cubic_metre: number | null;
   consignee_name: string | null;
   shipper_name: string | null;
+  shipper_mobile: string | null;
   warehouse: string | null;
   sector: string | null;
   pre_paid: string | null;
