@@ -103,7 +103,7 @@ export function useVesselContainerManagement(config: CountryConfig) {
   };
 
   // Save vessel
-  const saveVessel = () => {
+  const saveVessel = async () => {
     try {
       if (!vesselForm.vesselName || !vesselForm.voyage) {
         toast.error("Please fill in all required fields");
@@ -138,14 +138,9 @@ export function useVesselContainerManagement(config: CountryConfig) {
       };
 
       if (config.country === "Sri Lanka") {
-        syncSriLankaVesselToExternal({
+        await syncSriLankaVesselToExternal({
           ...vessel,
           country: "Sri Lanka",
-        }).catch((error: any) => {
-          console.error(error);
-          const message = error?.message || "Unknown save error";
-          toast.error(`Save failed: ${message}`);
-          throw error;
         });
       }
 
