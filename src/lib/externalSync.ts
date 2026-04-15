@@ -102,7 +102,7 @@ export function buildSriLankaVesselRecord(vessel: Record<string, any>) {
     pod: String(vessel.portOfDischarge || "").trim(),
     shipping_line: String(vessel.shippingLine || "").trim(),
     dir_mix: String(vessel.direction || "").trim(),
-    master_bl: String(vessel.masterBL || "").trim(),
+    mbl: String(vessel.masterBL || "").trim(),
     etd: vessel.etd || null,
     eta: vessel.eta || null,
     sector: String(vessel.sector || "").trim(),
