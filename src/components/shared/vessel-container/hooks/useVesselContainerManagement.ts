@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import { VesselData, ContainerData, CountryConfig, ViewMode } from "../types";
-import { syncSriLankaVesselToExternal } from "@/lib/externalSync";
+import { buildSriLankaVesselRecord } from "@/lib/externalSync";
+import { supabase } from "@/integrations/supabase/client";
 
 const STORAGE_KEY_VESSELS = (code: string) => `vessels_${code}`;
 const STORAGE_KEY_CONTAINERS = (code: string) => `containers_${code}`;
@@ -138,10 +139,40 @@ export function useVesselContainerManagement(config: CountryConfig) {
       };
 
       if (config.country === "Sri Lanka") {
-        await syncSriLankaVesselToExternal({
+        const vesselRecord = buildSriLankaVesselRecord({
           ...vessel,
           country: "Sri Lanka",
         });
+
+        if (!vesselRecord) {
+          throw new Error("Missing vessel id");
+        }
+
+        const { error } = await (supabase as any).from("vessels").insert([
+          {
+            id: String(vessel.id),
+            country: "Sri Lanka",
+            running_number: vesselRecord.running_number,
+            vessel_name: vesselRecord.vessel_name,
+            voyage: vesselRecord.voyage,
+            mbl: vesselRecord.mbl,
+            shipping_line: vesselRecord.shipping_line,
+            pol: vesselRecord.pol,
+            pod: vesselRecord.pod,
+            dir_mix: vesselRecord.dir_mix,
+            etd: vesselRecord.etd,
+            eta: vesselRecord.eta,
+          },
+        ]);
+
+        if (error) {
+          console.error("Supabase vessel insert error:", error);
+          const errorMessage = [error.message, error.details, error.hint]
+            .filter(Boolean)
+            .join(" — ");
+          toast.error(errorMessage || "Failed to save vessel");
+          return;
+        }
       }
 
       const existingIndex = vessels.findIndex((v) => v.id === vessel.id);
