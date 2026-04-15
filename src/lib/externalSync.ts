@@ -1,6 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
 
 type SyncRecord = Record<string, unknown>;
+type SyncExternalResponse = {
+  success?: boolean;
+  action?: string;
+  error?: string | { message?: string };
+  details?: unknown;
+};
 
 const toNumber = (value: unknown, fallback = 0) => {
   const parsed = Number(value);
@@ -46,6 +52,74 @@ export async function syncToExternal(
   } catch (error) {
     console.warn("External sync failed (non-blocking):", error);
   }
+}
+
+export async function syncToExternalStrict(
+  action: string,
+  table: string,
+  record?: SyncRecord,
+  matchColumn?: string,
+  matchValue?: string,
+) {
+  const { data, error } = await supabase.functions.invoke("sync-external", {
+    body: {
+      action,
+      table,
+      record,
+      match_column: matchColumn,
+      match_value: matchValue,
+    },
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  const response = (data ?? {}) as SyncExternalResponse;
+  if (response.error) {
+    const message = typeof response.error === "string"
+      ? response.error
+      : response.error.message || "External sync failed";
+    throw new Error(message);
+  }
+
+  return response;
+}
+
+export function buildSriLankaVesselRecord(vessel: Record<string, any>) {
+  const id = String(vessel.id || "").trim();
+
+  if (!id) {
+    return null;
+  }
+
+  return {
+    id,
+    running_number: String(vessel.runningNumber || "").trim(),
+    vessel_name: String(vessel.vesselName || "").trim(),
+    voyage: String(vessel.voyage || "").trim(),
+    pol: String(vessel.portOfLoading || "").trim(),
+    pod: String(vessel.portOfDischarge || "").trim(),
+    shipping_line: String(vessel.shippingLine || "").trim(),
+    dir_mix: String(vessel.direction || "").trim(),
+    master_bl: String(vessel.masterBL || "").trim(),
+    etd: vessel.etd || null,
+    eta: vessel.eta || null,
+    sector: String(vessel.sector || "").trim(),
+    status: String(vessel.status || "NEW").trim(),
+    load_date: vessel.loadDate || null,
+    country: "Sri Lanka",
+  };
+}
+
+export async function syncSriLankaVesselToExternal(vessel: Record<string, any>) {
+  const record = buildSriLankaVesselRecord(vessel);
+
+  if (!record) {
+    throw new Error("Missing vessel id");
+  }
+
+  return await syncToExternalStrict("upsert_match", "vessels", record, "id", record.id);
 }
 
 export async function syncBookStockToExternal(record: SyncRecord) {
