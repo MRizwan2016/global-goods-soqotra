@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
 import { VesselData, ContainerData, CountryConfig, ViewMode } from "../types";
+import { syncSriLankaVesselToExternal } from "@/lib/externalSync";
 
 const STORAGE_KEY_VESSELS = (code: string) => `vessels_${code}`;
 const STORAGE_KEY_CONTAINERS = (code: string) => `containers_${code}`;
@@ -102,7 +103,7 @@ export function useVesselContainerManagement(config: CountryConfig) {
   };
 
   // Save vessel
-  const saveVessel = () => {
+  const saveVessel = async () => {
     try {
       if (!vesselForm.vesselName || !vesselForm.voyage) {
         toast.error("Please fill in all required fields");
@@ -135,6 +136,14 @@ export function useVesselContainerManagement(config: CountryConfig) {
         containers: vesselForm.containers || [],
         loadDate: vesselForm.loadDate,
       };
+
+      if (config.country === "Sri Lanka") {
+        await syncSriLankaVesselToExternal({
+          ...vessel,
+          country: "Sri Lanka",
+        });
+      }
+
       const existingIndex = vessels.findIndex((v) => v.id === vessel.id);
       if (existingIndex >= 0) {
         setVessels((prev) => prev.map((v) => (v.id === vessel.id ? vessel : v)));
@@ -145,7 +154,7 @@ export function useVesselContainerManagement(config: CountryConfig) {
       }
       setViewMode("vessel-list");
     } catch (error: any) {
-      console.error("Save vessel error:", error);
+      console.error(error);
       toast.error(`Failed to save vessel: ${error?.message || error}`);
     }
   };
