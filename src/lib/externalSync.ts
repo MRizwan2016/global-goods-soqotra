@@ -102,7 +102,7 @@ export function buildSriLankaVesselRecord(vessel: Record<string, any>) {
     pod: String(vessel.portOfDischarge || "").trim(),
     shipping_line: String(vessel.shippingLine || "").trim(),
     dir_mix: String(vessel.direction || "").trim(),
-    master_bl: String(vessel.masterBL || "").trim(),
+    mbl: String(vessel.masterBL || "").trim(),
     etd: vessel.etd || null,
     eta: vessel.eta || null,
     sector: String(vessel.sector || "").trim(),
@@ -119,7 +119,17 @@ export async function syncSriLankaVesselToExternal(vessel: Record<string, any>) 
     throw new Error("Missing vessel id");
   }
 
-  return await syncToExternalStrict("upsert_match", "vessels", record, "id", record.id);
+  // Direct Supabase upsert instead of Edge Function to avoid 500 errors
+  const { data, error } = await supabase
+    .from("vessels" as any)
+    .upsert(record as any, { onConflict: "id" });
+
+  if (error) {
+    console.error("Direct vessel save error:", error);
+    throw new Error(error.message);
+  }
+
+  return { success: true, data };
 }
 
 export async function syncBookStockToExternal(record: SyncRecord) {
