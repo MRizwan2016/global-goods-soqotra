@@ -119,17 +119,7 @@ export async function syncSriLankaVesselToExternal(vessel: Record<string, any>) 
     throw new Error("Missing vessel id");
   }
 
-  // Direct Supabase upsert instead of Edge Function to avoid 500 errors
-  const { data, error } = await supabase
-    .from("vessels" as any)
-    .upsert(record as any, { onConflict: "id" });
-
-  if (error) {
-    console.error("Direct vessel save error:", error);
-    throw new Error(error.message);
-  }
-
-  return { success: true, data };
+  return await syncToExternalStrict("upsert_match", "vessels", record, "id", record.id);
 }
 
 export async function syncBookStockToExternal(record: SyncRecord) {
