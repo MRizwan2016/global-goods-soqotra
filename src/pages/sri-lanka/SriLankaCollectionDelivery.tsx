@@ -142,8 +142,17 @@ const SriLankaCollectionDelivery = () => {
       `City: ${job.city}\nPackages: ${job.packages || job.totalPackages || 0}\n` +
       `Weight: ${job.weight || job.totalWeight || 0} kg\nDate: ${job.date}\nDriver: ${job.driver}`
     );
-    const phone = job.mobileNumber?.replace(/\s+/g, '') || '';
-    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+    const rawPhone = String(job.mobileNumber || job.telephone || job.landNumber || '').replace(/[^0-9+]/g, '');
+    // Ensure proper country code - default to Qatar (+974) if no code prefix
+    let cleanNumber = rawPhone.replace(/^\+/, '');
+    if (cleanNumber && !cleanNumber.startsWith('974') && !cleanNumber.startsWith('94') && cleanNumber.length <= 8) {
+      cleanNumber = '974' + cleanNumber; // Default Qatar country code
+    }
+    if (!cleanNumber) {
+      toast.error('No phone number available for this job. Please add a contact number.');
+      return;
+    }
+    window.open(`https://wa.me/${cleanNumber}?text=${message}`, '_blank');
   };
 
   const stats = [
@@ -192,7 +201,7 @@ const SriLankaCollectionDelivery = () => {
                 <TableCell>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="sm" className="text-blue-600 p-1" onClick={() => setShowJobDetail(item)} title="View"><Eye className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="sm" className="text-green-600 p-1" onClick={() => { setShowJobDetail(item); setTimeout(() => window.print(), 500); }} title="Print"><Printer className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="sm" className="text-green-600 p-1" onClick={() => setShowJobDetail(item)} title="Print"><Printer className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="sm" className="text-emerald-600 p-1" onClick={() => handleWhatsApp(item)} title="WhatsApp"><Send className="h-4 w-4" /></Button>
                   </div>
                 </TableCell>
@@ -637,7 +646,20 @@ const SriLankaCollectionDelivery = () => {
           )}
           <DialogFooter className="print:hidden">
             <Button variant="outline" onClick={() => showJobDetail && handleWhatsApp(showJobDetail)}><Send className="h-4 w-4 mr-2" /> WhatsApp</Button>
-            <Button onClick={() => window.print()}><Printer className="h-4 w-4 mr-2" /> Print</Button>
+            <Button onClick={async () => {
+              if (!printRef.current) return;
+              toast.info('Generating PDF...');
+              try {
+                const canvas = await html2canvas(printRef.current, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false });
+                const imgData = canvas.toDataURL('image/jpeg', 0.9);
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                const pdfW = pdf.internal.pageSize.getWidth() - 20;
+                const pdfH = (canvas.height * pdfW) / canvas.width;
+                pdf.addImage(imgData, 'JPEG', 10, 10, pdfW, pdfH);
+                pdf.save(`Job_${showJobDetail?.id || 'detail'}.pdf`);
+                toast.success('PDF downloaded!');
+              } catch (err) { console.error(err); toast.error('Failed to generate PDF'); }
+            }}><Printer className="h-4 w-4 mr-2" /> Print</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
