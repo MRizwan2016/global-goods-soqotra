@@ -1,9 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=NUSKA:wght@400;500;600;700&display=swap');
+@import './styles/flags.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import './styles/flags.css';
  
 @layer base {
   :root {
