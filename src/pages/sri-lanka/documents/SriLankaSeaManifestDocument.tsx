@@ -35,12 +35,92 @@ const SriLankaSeaManifestDocument: React.FC<SeaManifestDocumentProps> = ({ shipm
   const manifestNumber = `SM${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}001`;
 
   const handleSaveManifest = () => {
+    if (!vesselName || !containerNumber) {
+      toast.error('Please enter Vessel Name and Container Number');
+      return;
+    }
+
+    // Generate unique running number for this container (1C, 2C, etc.)
+    const existingContainers: any[] = JSON.parse(localStorage.getItem('containers_LK') || '[]');
+    
+    // Check for duplicate container number
+    const duplicate = existingContainers.find(
+      (c: any) => c.containerNumber === containerNumber.trim().toUpperCase()
+    );
+    if (duplicate) {
+      toast.error(`Container ${containerNumber} already exists with running number ${duplicate.runningNumber}. Duplicates not allowed.`);
+      return;
+    }
+
+    // Generate next running number: 1C, 2C, 3C...
+    const maxNum = existingContainers.reduce((max: number, c: any) => {
+      const match = String(c.runningNumber || '').match(/^(\d+)C$/);
+      return match ? Math.max(max, parseInt(match[1])) : max;
+    }, 0);
+    const runningNumber = `${maxNum + 1}C`;
+
+    // Create container record for loading page
+    const containerRecord = {
+      id: `cont-${Date.now()}`,
+      runningNumber,
+      containerNumber: containerNumber.trim().toUpperCase(),
+      sealNumber: sealNumber.trim() || '',
+      containerType: '40FT',
+      direction: 'COLOMBO',
+      sector: 'COLOMBO',
+      etd: format(departureDate, 'yyyy-MM-dd'),
+      eta: format(arrivalDate, 'yyyy-MM-dd'),
+      weight: parseFloat(getTotalWeight()) || 0,
+      packages: getTotalPieces(),
+      volume: parseFloat(getTotalVolume()) || 0,
+      status: 'CONFIRMED',
+      loadDate: new Date().toISOString(),
+    };
+
+    // Save container
+    existingContainers.push(containerRecord);
+    localStorage.setItem('containers_LK', JSON.stringify(existingContainers));
+
+    // Create/update vessel record
+    const existingVessels: any[] = JSON.parse(localStorage.getItem('vessels_LK') || '[]');
+    const existingVessel = existingVessels.find(
+      (v: any) => v.vesselName === vesselName.trim() && v.voyage === voyageNumber.trim()
+    );
+    if (existingVessel) {
+      // Add container to existing vessel if not already linked
+      if (!existingVessel.containers?.includes(runningNumber)) {
+        existingVessel.containers = [...(existingVessel.containers || []), runningNumber];
+      }
+    } else {
+      // Generate unique vessel running number: 1V, 2V, etc.
+      const maxVNum = existingVessels.reduce((max: number, v: any) => {
+        const match = String(v.runningNumber || '').match(/^(\d+)V$/);
+        return match ? Math.max(max, parseInt(match[1])) : max;
+      }, 0);
+      existingVessels.push({
+        id: `vessel-${Date.now()}`,
+        runningNumber: `${maxVNum + 1}V`,
+        vesselName: vesselName.trim(),
+        voyage: voyageNumber.trim(),
+        blNumber: blNumber.trim(),
+        pol: 'HAMAD PORT, DOHA',
+        pod: 'COLOMBO PORT, SRI LANKA',
+        etd: format(departureDate, 'yyyy-MM-dd'),
+        eta: format(arrivalDate, 'yyyy-MM-dd'),
+        containers: [runningNumber],
+        status: 'CONFIRMED',
+      });
+    }
+    localStorage.setItem('vessels_LK', JSON.stringify(existingVessels));
+
+    // Save manifest data
     const manifestData = {
       id: manifestNumber,
       vesselName,
       voyageNumber,
       blNumber,
-      containerNumber,
+      containerNumber: containerNumber.trim().toUpperCase(),
+      containerRunningNumber: runningNumber,
       sealNumber,
       departureDate: format(departureDate, 'yyyy-MM-dd'),
       arrivalDate: format(arrivalDate, 'yyyy-MM-dd'),
@@ -51,7 +131,8 @@ const SriLankaSeaManifestDocument: React.FC<SeaManifestDocumentProps> = ({ shipm
     const existing = JSON.parse(localStorage.getItem('savedSeaManifests') || '[]');
     existing.push(manifestData);
     localStorage.setItem('savedSeaManifests', JSON.stringify(existing));
-    toast.success('Sea Manifest saved successfully!');
+
+    toast.success(`Sea Manifest confirmed! Container ${runningNumber} (${containerNumber}) added to Loading page.`);
   };
 
   const getTotalWeight = () =>
