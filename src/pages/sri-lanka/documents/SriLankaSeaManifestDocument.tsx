@@ -153,9 +153,9 @@ const SriLankaSeaManifestDocument: React.FC<SeaManifestDocumentProps> = ({ shipm
       <div className="p-4 border-b no-print space-y-4">
         <div className="flex justify-between items-center">
           <h2 className="text-xl font-bold">Sea Freight Manifest</h2>
-          <Button onClick={handleSaveManifest} className="flex items-center gap-2">
+          <Button onClick={handleSaveManifest} className="flex items-center gap-2 bg-green-600 hover:bg-green-700">
             <Save className="h-4 w-4" />
-            Save Manifest
+            Confirm & Save Manifest
           </Button>
         </div>
 
