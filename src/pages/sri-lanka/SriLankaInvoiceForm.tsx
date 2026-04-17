@@ -675,6 +675,10 @@ const SriLankaInvoiceForm = () => {
       const savedId = await RegionalInvoiceService.save(invoiceRow as any, pkgRows as any, existingId);
       
       if (savedId) {
+        // Persist any manually-entered city for future invoices
+        if (formData.shipperCustomCity) {
+          await addShipperCity(formData.shipperCustomCity);
+        }
         // Also sync externally
         await syncInvoiceToExternal({ ...invoiceRow, id: savedId, packageItems });
         toast.success('Invoice saved successfully');
@@ -1498,7 +1502,7 @@ const SriLankaInvoiceForm = () => {
                       <SelectValue placeholder="SELECT CITY" className="uppercase" />
                     </SelectTrigger>
                     <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60 overflow-y-auto">
-                      {getCitiesForCountry(formData.shipperCountry).map(city => (
+                      {Array.from(new Set([...getCitiesForCountry(formData.shipperCountry), ...shipperCustomCities])).sort().map(city => (
                         <SelectItem key={city} value={city} className="uppercase">{city}</SelectItem>
                       ))}
                     </SelectContent>
