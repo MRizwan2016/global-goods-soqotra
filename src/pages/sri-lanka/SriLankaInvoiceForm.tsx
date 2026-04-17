@@ -100,6 +100,13 @@ const SriLankaInvoiceForm = () => {
 
   // Package items state
   const [packageItems, setPackageItems] = useState<PackageItem[]>([]);
+
+  // Expand-on-demand counts for additional shippers/consignees (1-3)
+  const [shipperCount, setShipperCount] = useState<number>(1);
+  const [consigneeCount, setConsigneeCount] = useState<number>(1);
+
+  // Manual city entry toggle
+  const [shipperCityManual, setShipperCityManual] = useState(false);
   
   // Receipt modal state
   const [showReceipt, setShowReceipt] = useState(false);
