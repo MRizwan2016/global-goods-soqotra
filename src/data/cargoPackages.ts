@@ -32,9 +32,9 @@ export const calcPriceByRate = (volumeCBM: number, ratePerMeter: number): number
   return Math.round(volumeCBM * ratePerMeter * 100) / 100;
 };
 
-const COLOMBO_RATE = 259;
-const KURUNEGALA_RATE = 269;
-const GALLE_RATE = 269;
+const COLOMBO_RATE = 755;
+const KURUNEGALA_RATE = 755;
+const GALLE_RATE = 755;
 
 const makePackage = (
   id: number,

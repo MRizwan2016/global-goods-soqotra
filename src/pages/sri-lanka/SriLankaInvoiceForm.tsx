@@ -28,6 +28,7 @@ import {
 import { syncInvoiceToExternal } from '@/lib/externalSync';
 import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
 import { DOOR_TO_DOOR_FIXED_RATES } from '@/data/cargoPackages';
+import { useCustomCities } from '@/hooks/useCustomCities';
 
 const SriLankaInvoiceForm = () => {
   const navigate = useNavigate();
@@ -107,6 +108,10 @@ const SriLankaInvoiceForm = () => {
 
   // Manual city entry toggle
   const [shipperCityManual, setShipperCityManual] = useState(false);
+
+  // Persistent custom cities (shared across all users)
+  const { cities: shipperCustomCities, addCity: addShipperCity } = useCustomCities(formData.shipperCountry || 'Qatar');
+  const { cities: consigneeCustomCities, addCity: addConsigneeCity } = useCustomCities(formData.consigneeCountry || 'Sri Lanka');
   
   // Receipt modal state
   const [showReceipt, setShowReceipt] = useState(false);
@@ -420,9 +425,8 @@ const SriLankaInvoiceForm = () => {
       const weight = volume * 1000;
       // Auto doc fee: CBM >= 1.0 → QAR 50
       const docFee = volume >= 1.0 ? 50 : 0;
-      // Auto price based on warehouse rate
-      const warehouse = formData.warehouse || 'Colombo Warehouse';
-      const rate = warehouse.includes('Kurunegala') || warehouse.includes('Galle') ? 269 : 259;
+      // Auto price: unified QAR 755/CBM for all SL warehouses
+      const rate = 755;
       const price = volume * rate;
       
       setFormData(prev => ({
@@ -671,6 +675,10 @@ const SriLankaInvoiceForm = () => {
       const savedId = await RegionalInvoiceService.save(invoiceRow as any, pkgRows as any, existingId);
       
       if (savedId) {
+        // Persist any manually-entered city for future invoices
+        if (formData.shipperCustomCity) {
+          await addShipperCity(formData.shipperCustomCity);
+        }
         // Also sync externally
         await syncInvoiceToExternal({ ...invoiceRow, id: savedId, packageItems });
         toast.success('Invoice saved successfully');
@@ -742,8 +750,7 @@ const SriLankaInvoiceForm = () => {
     if (dbPkg) {
       const volume = dbPkg.volume_cbm || 0;
       const weight = volume * 1000; // 1 CBM = 1000 KG
-      const warehouse = formData.warehouse || 'Colombo Warehouse';
-      const rate = warehouse.includes('Kurunegala') || warehouse.includes('Galle') ? 269 : 259;
+      const rate = 755; // Unified SL rate
       
       // Check for door-to-door fixed rate
       const fixedRate = DOOR_TO_DOOR_FIXED_RATES[description];
@@ -786,8 +793,7 @@ const SriLankaInvoiceForm = () => {
       const weight = volume * 1000; // 1 CBM = 1000 KG
       const docFee = volume >= 1.0 ? 50 : 0;
       const fixedRate = DOOR_TO_DOOR_FIXED_RATES[description];
-      const warehouse = formData.warehouse || 'Colombo Warehouse';
-      const rate = warehouse.includes('Kurunegala') || warehouse.includes('Galle') ? 269 : 259;
+      const rate = 755; // Unified SL rate
       const price = fixedRate || (volume * rate);
       
       setFormData(prev => ({
@@ -879,8 +885,7 @@ const SriLankaInvoiceForm = () => {
 
     // Check for door-to-door fixed rates
     const fixedRate = DOOR_TO_DOOR_FIXED_RATES[formData.packagesName];
-    const warehouse = formData.warehouse || 'Colombo Warehouse';
-    const rate = warehouse.includes('Kurunegala') || warehouse.includes('Galle') ? 269 : 259;
+    const rate = 755; // Unified SL rate
     const price = fixedRate || parseFloat(formData.price) || (volume * rate);
     const total = price + docFee;
 
@@ -1497,7 +1502,7 @@ const SriLankaInvoiceForm = () => {
                       <SelectValue placeholder="SELECT CITY" className="uppercase" />
                     </SelectTrigger>
                     <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60 overflow-y-auto">
-                      {getCitiesForCountry(formData.shipperCountry).map(city => (
+                      {Array.from(new Set([...getCitiesForCountry(formData.shipperCountry), ...shipperCustomCities])).sort().map(city => (
                         <SelectItem key={city} value={city} className="uppercase">{city}</SelectItem>
                       ))}
                     </SelectContent>
@@ -1898,7 +1903,7 @@ const SriLankaInvoiceForm = () => {
             {formData.serviceType === 'SEA FREIGHT' && (
               <div className="mb-4 p-4 bg-gradient-to-r from-green-500/20 to-teal-500/20 rounded-lg border border-green-200">
                 <p className="text-sm text-green-800 font-medium uppercase">
-                  🚢 SEA FREIGHT RATES: COLOMBO (QAR 259/CBM) | KURUNEGALA/GALLE (QAR 269/CBM) | 📄 DOC FEE: QAR 50/INVOICE
+                  🚢 SEA FREIGHT RATE: COLOMBO / KURUNEGALA / GALLE — QAR 755/CBM | ⚖️ WEIGHT: 1 CBM = 1000 KG | 📄 DOC FEE: QAR 50/INVOICE
                 </p>
               </div>
             )}

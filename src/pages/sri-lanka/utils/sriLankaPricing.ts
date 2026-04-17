@@ -6,11 +6,11 @@
 export const AIR_FREIGHT_RATE_PER_KG = 10; // QAR 10/kg
 export const AIR_FREIGHT_DOCUMENTATION_FEE = 25; // QAR 25/HAWB
 
-// Sea freight pricing rates
+// Sea freight pricing rates (QAR per CBM)
 export const SEA_FREIGHT_RATES = {
-  'Colombo Warehouse': 259, // QAR 259/CBM
-  'Kurunegala UPB Warehouse': 269, // QAR 269/CBM
-  'Galle UPB Warehouse': 269, // QAR 269/CBM
+  'Colombo Warehouse': 755,
+  'Kurunegala UPB Warehouse': 755,
+  'Galle UPB Warehouse': 755,
 } as const;
 
 export const SEA_FREIGHT_DOCUMENTATION_FEE = 50; // QAR 50/invoice
