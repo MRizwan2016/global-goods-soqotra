@@ -27,6 +27,7 @@ import {
 } from "@/data/cargoPackages";
 import { lookupJobData } from "@/hooks/useJobAutoFill";
 import { qatarTowns } from "@/pages/invoicing/constants/locationData";
+import { useCustomCities } from "@/hooks/useCustomCities";
 
 const NAME_PREFIXES = ["Mr.", "Mrs.", "Ms.", "Pastor", "Rev.", "Dr.", "Prof."];
 
@@ -175,7 +176,9 @@ const SriLankaNewJob = () => {
     setJobData((prev) => ({ ...prev, [field]: value }));
 
   const isQatarOrigin = jobData.origin === "QATAR";
-  const cities = isQatarOrigin ? QATAR_CITIES : sriLankaCities;
+  const baseCities = isQatarOrigin ? QATAR_CITIES : sriLankaCities;
+  const { cities: persistentCustomCities, addCity: addCustomCity } = useCustomCities(isQatarOrigin ? 'Qatar' : 'Sri Lanka');
+  const cities = Array.from(new Set([...baseCities, ...persistentCustomCities])).sort();
 
   // Auto-fill from job number lookup
   const handleJobLookup = useCallback(async () => {
@@ -292,7 +295,7 @@ const SriLankaNewJob = () => {
 
   const isCollection = jobData.jobType === "collection";
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!jobData.customer.trim()) { toast.error("Please enter customer name"); return; }
     if (!jobData.city) { toast.error("Please select a city"); return; }
     if (!jobData.driver) { toast.error("Please assign a driver"); return; }
@@ -302,6 +305,11 @@ const SriLankaNewJob = () => {
     // Save last assignment for reuse
     const assignment = { driver: jobData.driver, vehicle: jobData.vehicle, salesRep: jobData.salesRep };
     localStorage.setItem("sriLankaLastAssignment", JSON.stringify(assignment));
+
+    // Persist any manually-typed city for future jobs/invoices
+    if (cityManual && jobData.city && !baseCities.includes(jobData.city)) {
+      await addCustomCity(jobData.city);
+    }
 
     const newJob = {
       id: autoJobNumber,
