@@ -28,6 +28,7 @@ import {
 import { syncInvoiceToExternal } from '@/lib/externalSync';
 import { RegionalInvoiceService } from '@/services/RegionalInvoiceService';
 import { DOOR_TO_DOOR_FIXED_RATES } from '@/data/cargoPackages';
+import { useCustomCities } from '@/hooks/useCustomCities';
 
 const SriLankaInvoiceForm = () => {
   const navigate = useNavigate();
@@ -107,6 +108,10 @@ const SriLankaInvoiceForm = () => {
 
   // Manual city entry toggle
   const [shipperCityManual, setShipperCityManual] = useState(false);
+
+  // Persistent custom cities (shared across all users)
+  const { cities: shipperCustomCities, addCity: addShipperCity } = useCustomCities(formData.shipperCountry || 'Qatar');
+  const { cities: consigneeCustomCities, addCity: addConsigneeCity } = useCustomCities(formData.consigneeCountry || 'Sri Lanka');
   
   // Receipt modal state
   const [showReceipt, setShowReceipt] = useState(false);
