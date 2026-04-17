@@ -620,6 +620,20 @@ const SriLankaInvoiceForm = () => {
         receipt_number: formData.receiptNumber,
         remarks: formData.remarks,
         status: 'ACTIVE',
+        extra_data: {
+          shipperId: formData.shipperId || '',
+          shipperName2: formData.shipperName2 || '',
+          shipperId2: formData.shipperId2 || '',
+          shipperName3: formData.shipperName3 || '',
+          shipperId3: formData.shipperId3 || '',
+          consigneeName2: formData.consigneeName2 || '',
+          consigneeId2: formData.consigneeId2 || '',
+          consigneeMobile2: formData.consigneeMobile2 || '',
+          consigneeName3: formData.consigneeName3 || '',
+          consigneeId3: formData.consigneeId3 || '',
+          consigneeMobile3: formData.consigneeMobile3 || '',
+          shipperCustomCity: formData.shipperCustomCity || '',
+        },
       };
 
       // Build package rows
