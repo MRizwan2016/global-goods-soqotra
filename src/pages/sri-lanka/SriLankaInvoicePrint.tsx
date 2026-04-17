@@ -338,9 +338,9 @@ const SriLankaInvoicePrint = () => {
       {/* Document Content */}
       <div className="flex justify-center">
         <div 
-          className="bg-white shadow-lg" 
+          className="bg-white shadow-lg sl-print-page" 
           ref={printRef}
-          style={mode === 'receipt' ? { width: '148mm', minHeight: '210mm' } : mode === 'air-manifest' || mode === 'sea-manifest' ? { width: '297mm', minHeight: '210mm' } : { maxWidth: '210mm', width: '100%' }}
+          style={mode === 'receipt' ? { width: '148mm', minHeight: '210mm' } : mode === 'air-manifest' || mode === 'sea-manifest' ? { width: '297mm', minHeight: '210mm' } : { width: '210mm', minHeight: '297mm', maxWidth: '210mm' }}
         >
         {invoiceData && (
           <>
