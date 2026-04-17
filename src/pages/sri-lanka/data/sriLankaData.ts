@@ -50,9 +50,9 @@ export const sriLankaPackageTypes = [
 ];
 
 export const doorToDoorPricing: Record<string, { price: number; label: string }> = {
-  COLOMBO: { price: 259, label: "Colombo" },
-  KURUNEGALA: { price: 269, label: "Kurunegala" },
-  GALLE: { price: 269, label: "Galle" },
+  COLOMBO: { price: 755, label: "Colombo" },
+  KURUNEGALA: { price: 755, label: "Kurunegala" },
+  GALLE: { price: 755, label: "Galle" },
   KANDY: { price: 279, label: "Kandy" },
   JAFFNA: { price: 289, label: "Jaffna" },
   NEGOMBO: { price: 259, label: "Negombo" },

@@ -144,9 +144,9 @@ const SriLankaNewJob = () => {
       dimensions: { length: l, width: w, height: h },
       volume: Math.round(vol * 1000) / 1000,
       collectionPrices: {
-        colombo: vol > 0 ? Math.round(vol * 259 * 100) / 100 : 0,
-        kurunegala: vol > 0 ? Math.round(vol * 269 * 100) / 100 : 0,
-        galle: vol > 0 ? Math.round(vol * 269 * 100) / 100 : 0,
+        colombo: vol > 0 ? Math.round(vol * 755 * 100) / 100 : 0,
+        kurunegala: vol > 0 ? Math.round(vol * 755 * 100) / 100 : 0,
+        galle: vol > 0 ? Math.round(vol * 755 * 100) / 100 : 0,
       },
       deliveryPrices: { whitePlywood12mm: whitePly, blackPlywood18mm: blackPly },
       hasManualDimensions: l === 0 && w === 0 && h === 0,
