@@ -412,7 +412,26 @@ const SriLankaInvoiceForm = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const updated: any = { ...prev, [name]: value };
+      // Auto-fill consignee from shipper unless GIFT CARGO
+      if (prev.cargoType !== 'GIFT CARGO') {
+        const shipperToConsigneeMap: Record<string, string> = {
+          shipperName: 'consigneeName',
+          shipperName2: 'consigneeName2',
+          shipperName3: 'consigneeName3',
+          shipperId: 'consigneeId',
+          shipperId2: 'consigneeId2',
+          shipperId3: 'consigneeId3',
+          shipperMobile: 'consigneeMobile',
+        };
+        const target = shipperToConsigneeMap[name];
+        if (target) {
+          updated[target] = value;
+        }
+      }
+      return updated;
+    });
   };
 
   const handleSelectChange = (name: string, value: string) => {
