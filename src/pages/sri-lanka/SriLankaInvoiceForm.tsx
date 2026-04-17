@@ -1374,6 +1374,11 @@ const SriLankaInvoiceForm = () => {
             <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-orange-800 uppercase">
               <User className="h-5 w-5" />
               SHIPPER DETAILS
+              {formData.cargoType === 'GIFT CARGO' && (
+                <span className="ml-2 text-xs font-normal text-amber-700 bg-amber-100 px-2 py-0.5 rounded normal-case">
+                  Gift Cargo — consignee auto-fill disabled
+                </span>
+              )}
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
@@ -1390,12 +1395,22 @@ const SriLankaInvoiceForm = () => {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SHIPPER NAME *</label>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SHIPPER NAME 1 *</label>
                 <Input
                   name="shipperName"
                   value={formData.shipperName}
                   onChange={handleInputChange}
                   placeholder="ENTER SHIPPER NAME"
+                  className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">NIC / PASSPORT 1</label>
+                <Input
+                  name="shipperId"
+                  value={formData.shipperId}
+                  onChange={handleInputChange}
+                  placeholder="NIC OR PASSPORT NO"
                   className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
                 />
               </div>
@@ -1413,8 +1428,25 @@ const SriLankaInvoiceForm = () => {
                 </Select>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">CITY</label>
-                {formData.shipperCountry && getCitiesForCountry(formData.shipperCountry).length > 0 ? (
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium text-gray-700 uppercase">CITY</label>
+                  <button
+                    type="button"
+                    onClick={() => setShipperCityManual(v => !v)}
+                    className="text-xs text-orange-700 hover:text-orange-900 underline normal-case"
+                  >
+                    {shipperCityManual ? 'Use dropdown' : 'Type manually'}
+                  </button>
+                </div>
+                {shipperCityManual || !formData.shipperCountry || getCitiesForCountry(formData.shipperCountry).length === 0 ? (
+                  <Input
+                    name="shipperCustomCity"
+                    value={formData.shipperCustomCity}
+                    onChange={handleInputChange}
+                    placeholder="ENTER CITY NAME"
+                    className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
+                  />
+                ) : (
                   <Select value={formData.shipperCity} onValueChange={(value) => handleSelectChange('shipperCity', value)}>
                     <SelectTrigger className="bg-white/80 border-orange-200 focus:border-orange-400">
                       <SelectValue placeholder="SELECT CITY" className="uppercase" />
@@ -1423,26 +1455,8 @@ const SriLankaInvoiceForm = () => {
                       {getCitiesForCountry(formData.shipperCountry).map(city => (
                         <SelectItem key={city} value={city} className="uppercase">{city}</SelectItem>
                       ))}
-                      <SelectItem value="CUSTOM" className="uppercase border-t border-gray-200 font-medium">+ ADD CUSTOM CITY</SelectItem>
                     </SelectContent>
                   </Select>
-                ) : (
-                  <Input
-                    name="shipperCustomCity"
-                    value={formData.shipperCustomCity}
-                    onChange={handleInputChange}
-                    placeholder="ENTER CITY NAME"
-                    className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
-                  />
-                )}
-                {formData.shipperCity === 'CUSTOM' && (
-                  <Input
-                    name="shipperCustomCity"
-                    value={formData.shipperCustomCity}
-                    onChange={handleInputChange}
-                    placeholder="ENTER CUSTOM CITY NAME"
-                    className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase mt-2"
-                  />
                 )}
               </div>
               <div>
@@ -1455,7 +1469,7 @@ const SriLankaInvoiceForm = () => {
                   className="bg-white/80 border-orange-200 focus:border-orange-400 placeholder:uppercase"
                 />
               </div>
-              <div className="md:col-span-3">
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">ADDRESS</label>
                 <Input
                   name="shipperAddress"
@@ -1464,6 +1478,91 @@ const SriLankaInvoiceForm = () => {
                   placeholder="ENTER SHIPPER ADDRESS"
                   className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
                 />
+              </div>
+
+              {/* Additional Shipper 2 (for SL passport allowance scheme - family members) */}
+              {shipperCount >= 2 && (
+                <>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SHIPPER NAME 2</label>
+                    <Input
+                      name="shipperName2"
+                      value={formData.shipperName2}
+                      onChange={handleInputChange}
+                      placeholder="ENTER 2ND SHIPPER NAME (FAMILY MEMBER)"
+                      className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">NIC / PASSPORT 2</label>
+                    <Input
+                      name="shipperId2"
+                      value={formData.shipperId2}
+                      onChange={handleInputChange}
+                      placeholder="NIC OR PASSPORT NO"
+                      className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Additional Shipper 3 */}
+              {shipperCount >= 3 && (
+                <>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">SHIPPER NAME 3</label>
+                    <Input
+                      name="shipperName3"
+                      value={formData.shipperName3}
+                      onChange={handleInputChange}
+                      placeholder="ENTER 3RD SHIPPER NAME (FAMILY MEMBER)"
+                      className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">NIC / PASSPORT 3</label>
+                    <Input
+                      name="shipperId3"
+                      value={formData.shipperId3}
+                      onChange={handleInputChange}
+                      placeholder="NIC OR PASSPORT NO"
+                      className="bg-white/80 border-orange-200 focus:border-orange-400 uppercase placeholder:uppercase"
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="md:col-span-4 flex gap-2">
+                {shipperCount < 3 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShipperCount(c => Math.min(3, c + 1))}
+                    className="border-orange-300 text-orange-800 hover:bg-orange-50"
+                  >
+                    + Add Another Shipper ({shipperCount}/3)
+                  </Button>
+                )}
+                {shipperCount > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const removeIdx = shipperCount;
+                      setFormData(prev => ({
+                        ...prev,
+                        [`shipperName${removeIdx}`]: '',
+                        [`shipperId${removeIdx}`]: '',
+                      }));
+                      setShipperCount(c => Math.max(1, c - 1));
+                    }}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    Remove Shipper {shipperCount}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
@@ -1488,8 +1587,8 @@ const SriLankaInvoiceForm = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">CONSIGNEE NAME *</label>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">CONSIGNEE NAME 1 *</label>
                 <Input
                   name="consigneeName"
                   value={formData.consigneeName}
@@ -1498,40 +1597,50 @@ const SriLankaInvoiceForm = () => {
                   className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
                 />
               </div>
-               <div>
-                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">COUNTRY</label>
-                 <Input
-                   name="consigneeCountry"
-                   value={formData.consigneeCountry}
-                   onChange={handleInputChange}
-                   className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase"
-                   readOnly
-                 />
-               </div>
-               <div>
-                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DISTRICT</label>
-                 <Select value={formData.consigneeDistrict} onValueChange={(value) => handleSelectChange('consigneeDistrict', value)}>
-                   <SelectTrigger className="bg-white/80 border-purple-200 focus:border-purple-400">
-                     <SelectValue placeholder="SELECT DISTRICT" className="uppercase" />
-                   </SelectTrigger>
-                   <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60 overflow-y-auto">
-                     {getAllDistricts().map(district => (
-                       <SelectItem key={district} value={district} className="uppercase">{district}</SelectItem>
-                     ))}
-                   </SelectContent>
-                 </Select>
-               </div>
-               <div>
-                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PROVINCE</label>
-                 <Input
-                   name="consigneeProvince"
-                   value={formData.consigneeProvince}
-                   onChange={handleInputChange}
-                   placeholder="AUTO-FILLED FROM DISTRICT"
-                   className="bg-gray-50 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
-                   readOnly
-                 />
-               </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">NIC / PASSPORT 1</label>
+                <Input
+                  name="consigneeId"
+                  value={formData.consigneeId}
+                  onChange={handleInputChange}
+                  placeholder="NIC OR PASSPORT NO"
+                  className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">COUNTRY</label>
+                <Input
+                  name="consigneeCountry"
+                  value={formData.consigneeCountry}
+                  onChange={handleInputChange}
+                  className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase"
+                  readOnly
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">DISTRICT</label>
+                <Select value={formData.consigneeDistrict} onValueChange={(value) => handleSelectChange('consigneeDistrict', value)}>
+                  <SelectTrigger className="bg-white/80 border-purple-200 focus:border-purple-400">
+                    <SelectValue placeholder="SELECT DISTRICT" className="uppercase" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white/95 backdrop-blur-sm max-h-60 overflow-y-auto">
+                    {getAllDistricts().map(district => (
+                      <SelectItem key={district} value={district} className="uppercase">{district}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">PROVINCE</label>
+                <Input
+                  name="consigneeProvince"
+                  value={formData.consigneeProvince}
+                  onChange={handleInputChange}
+                  placeholder="AUTO-FILLED FROM DISTRICT"
+                  className="bg-gray-50 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
+                  readOnly
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">MOBILE NUMBER</label>
                 <Input
@@ -1562,15 +1671,111 @@ const SriLankaInvoiceForm = () => {
                   className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">ID/PASSPORT NUMBER</label>
-                <Input
-                  name="consigneeId"
-                  value={formData.consigneeId}
-                  onChange={handleInputChange}
-                  placeholder="ENTER ID OR PASSPORT NUMBER"
-                  className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
-                />
+
+              {/* Additional Consignee 2 */}
+              {consigneeCount >= 2 && (
+                <>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">CONSIGNEE NAME 2</label>
+                    <Input
+                      name="consigneeName2"
+                      value={formData.consigneeName2}
+                      onChange={handleInputChange}
+                      placeholder="ENTER 2ND CONSIGNEE NAME"
+                      className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">NIC / PASSPORT 2</label>
+                    <Input
+                      name="consigneeId2"
+                      value={formData.consigneeId2}
+                      onChange={handleInputChange}
+                      placeholder="NIC OR PASSPORT NO"
+                      className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">MOBILE 2</label>
+                    <Input
+                      name="consigneeMobile2"
+                      value={formData.consigneeMobile2}
+                      onChange={handleInputChange}
+                      placeholder="+94 XXXX XXXX"
+                      className="bg-white/80 border-purple-200 focus:border-purple-400 placeholder:uppercase"
+                    />
+                  </div>
+                </>
+              )}
+
+              {/* Additional Consignee 3 */}
+              {consigneeCount >= 3 && (
+                <>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">CONSIGNEE NAME 3</label>
+                    <Input
+                      name="consigneeName3"
+                      value={formData.consigneeName3}
+                      onChange={handleInputChange}
+                      placeholder="ENTER 3RD CONSIGNEE NAME"
+                      className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">NIC / PASSPORT 3</label>
+                    <Input
+                      name="consigneeId3"
+                      value={formData.consigneeId3}
+                      onChange={handleInputChange}
+                      placeholder="NIC OR PASSPORT NO"
+                      className="bg-white/80 border-purple-200 focus:border-purple-400 uppercase placeholder:uppercase"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1 text-gray-700 uppercase">MOBILE 3</label>
+                    <Input
+                      name="consigneeMobile3"
+                      value={formData.consigneeMobile3}
+                      onChange={handleInputChange}
+                      placeholder="+94 XXXX XXXX"
+                      className="bg-white/80 border-purple-200 focus:border-purple-400 placeholder:uppercase"
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className="md:col-span-4 flex gap-2">
+                {consigneeCount < 3 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setConsigneeCount(c => Math.min(3, c + 1))}
+                    className="border-purple-300 text-purple-800 hover:bg-purple-50"
+                  >
+                    + Add Another Consignee ({consigneeCount}/3)
+                  </Button>
+                )}
+                {consigneeCount > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      const removeIdx = consigneeCount;
+                      setFormData(prev => ({
+                        ...prev,
+                        [`consigneeName${removeIdx}`]: '',
+                        [`consigneeId${removeIdx}`]: '',
+                        [`consigneeMobile${removeIdx}`]: '',
+                      }));
+                      setConsigneeCount(c => Math.max(1, c - 1));
+                    }}
+                    className="text-red-600 hover:text-red-800"
+                  >
+                    Remove Consignee {consigneeCount}
+                  </Button>
+                )}
               </div>
             </div>
           </div>
