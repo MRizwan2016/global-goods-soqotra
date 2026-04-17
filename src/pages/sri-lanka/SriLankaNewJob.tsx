@@ -108,6 +108,7 @@ const SriLankaNewJob = () => {
   const [items, setItems] = useState<PackageItem[]>([emptyItem(1)]);
   const [nextBoxNumber, setNextBoxNumber] = useState(2);
   const [lastDriverSelection, setLastDriverSelection] = useState({ driver: "", vehicle: "", salesRep: "" });
+  const [cityManual, setCityManual] = useState(false);
   const [manualDriver, setManualDriver] = useState("");
   const [manualSalesRep, setManualSalesRep] = useState("");
   const [showManualDriver, setShowManualDriver] = useState(false);
@@ -440,13 +441,30 @@ const SriLankaNewJob = () => {
               <Input placeholder="Landline number" value={jobData.telephone} onChange={(e) => updateField("telephone", e.target.value)} />
             </div>
             <div>
-              <Label>City * {isQatarOrigin && <span className="text-xs text-muted-foreground">(Qatar)</span>}</Label>
-              <Select value={jobData.city} onValueChange={(v) => updateField("city", v)}>
-                <SelectTrigger><SelectValue placeholder="Select city" /></SelectTrigger>
-                <SelectContent>
-                  {cities.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center justify-between">
+                <Label>City * {isQatarOrigin && <span className="text-xs text-muted-foreground">(Qatar)</span>}</Label>
+                <button
+                  type="button"
+                  onClick={() => setCityManual(v => !v)}
+                  className="text-xs text-primary hover:underline"
+                >
+                  {cityManual ? 'Use dropdown' : 'Type manually'}
+                </button>
+              </div>
+              {cityManual ? (
+                <Input
+                  placeholder="Enter city name"
+                  value={jobData.city}
+                  onChange={(e) => updateField("city", e.target.value.toUpperCase())}
+                />
+              ) : (
+                <Select value={jobData.city} onValueChange={(v) => updateField("city", v)}>
+                  <SelectTrigger><SelectValue placeholder="Select city" /></SelectTrigger>
+                  <SelectContent>
+                    {cities.map((c) => (<SelectItem key={c} value={c}>{c}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             <div>
               <Label>Sector {isQatarOrigin && <span className="text-xs text-muted-foreground">(Qatar)</span>}</Label>
