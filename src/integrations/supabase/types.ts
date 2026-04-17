@@ -210,6 +210,30 @@ export type Database = {
           },
         ]
       }
+      custom_cities: {
+        Row: {
+          country: string
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          country?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
       customer_accounts: {
         Row: {
           activated_at: string | null
