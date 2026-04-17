@@ -473,7 +473,20 @@ const SriLankaInvoiceForm = () => {
         updated.receiptNumber = `REC-${Date.now()}`;
         updated.paymentDate = new Date().toISOString().split('T')[0];
       }
-      
+
+      // GIFT CARGO: clear consignee mirror fields and stop auto-syncing
+      if (name === 'cargoType' && value === 'GIFT CARGO') {
+        updated.consigneeName = '';
+        updated.consigneeName2 = '';
+        updated.consigneeName3 = '';
+        updated.consigneeId = '';
+        updated.consigneeId2 = '';
+        updated.consigneeId3 = '';
+        updated.consigneeMobile = '';
+        updated.consigneeMobile2 = '';
+        updated.consigneeMobile3 = '';
+      }
+
       return updated;
     });
   };
