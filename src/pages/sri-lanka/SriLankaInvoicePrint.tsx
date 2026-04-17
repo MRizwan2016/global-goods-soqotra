@@ -183,7 +183,7 @@ const SriLankaInvoicePrint = () => {
 
   const handleWhatsAppShare = async () => {
     if (!printRef.current) return;
-    toast.info('Preparing PDF for WhatsApp...');
+    toast.info('Generating PDF & uploading for WhatsApp...');
     try {
       const canvas = await html2canvas(printRef.current, {
         scale: 2,
@@ -191,39 +191,44 @@ const SriLankaInvoicePrint = () => {
         logging: false,
         backgroundColor: '#ffffff',
       });
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = 210;
+      const isLandscape = mode === 'air-manifest' || mode === 'sea-manifest';
+      const isA5 = mode === 'receipt';
+      const pdf = new jsPDF({
+        orientation: isLandscape ? 'landscape' : 'portrait',
+        unit: 'mm',
+        format: isA5 ? 'a5' : 'a4',
+      });
+      const pdfWidth = pdf.internal.pageSize.getWidth();
       const imgWidth = pdfWidth;
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
-      
+
       const pdfBlob = pdf.output('blob');
-      const pdfFile = new File([pdfBlob], `Invoice-${invoiceData?.invoiceNumber || 'document'}.pdf`, { type: 'application/pdf' });
-      
-      // Try native share if available (mobile)
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-        await navigator.share({
-          title: `Invoice ${invoiceData?.invoiceNumber}`,
-          text: `Invoice ${invoiceData?.invoiceNumber} - ${invoiceData?.consignee?.name}`,
-          files: [pdfFile],
-        });
-        toast.success('Shared successfully');
-      } else {
-        // Fallback: open WhatsApp web with message
-        const message = encodeURIComponent(
-          `Invoice: ${invoiceData?.invoiceNumber}\nConsignee: ${invoiceData?.consignee?.name}\nAmount: QAR ${invoiceData?.pricing?.net?.toFixed(2)}\nDate: ${invoiceData?.date}`
-        );
-        const whatsappNumber = invoiceData?.whatsappNumber || invoiceData?.consignee?.mobile || '';
-        const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
-        const url = cleanNumber 
-          ? `https://wa.me/${cleanNumber}?text=${message}`
-          : `https://wa.me/?text=${message}`;
-        window.open(url, '_blank');
-        toast.success('Opening WhatsApp...');
-      }
-    } catch (error) {
+      const label = mode === 'receipt' ? 'Receipt' : mode === 'hbl' ? 'HBL' : mode === 'hawb' ? 'HAWB' : mode.includes('manifest') ? 'Manifest' : 'Invoice';
+      const fileName = `${label}-${invoiceData?.invoiceNumber || 'document'}-${Date.now()}.pdf`;
+
+      // Upload to Supabase Storage to get a public link
+      const { supabase } = await import('@/integrations/supabase/client');
+      const { error: upErr } = await supabase.storage
+        .from('invoice-pdfs')
+        .upload(fileName, pdfBlob, { contentType: 'application/pdf', upsert: true });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from('invoice-pdfs').getPublicUrl(fileName);
+      const pdfUrl = pub.publicUrl;
+
+      const message = encodeURIComponent(
+        `*SOQOTRA LOGISTICS - ${label}*\n\nInvoice: ${invoiceData?.invoiceNumber}\nConsignee: ${invoiceData?.consignee?.name || ''}\nAmount: QAR ${(invoiceData?.pricing?.net || 0).toFixed(2)}\nDate: ${invoiceData?.date || ''}\n\nView/Download PDF:\n${pdfUrl}`
+      );
+      const whatsappNumber = invoiceData?.whatsappNumber || invoiceData?.consignee?.mobile || '';
+      const cleanNumber = whatsappNumber.replace(/[^0-9]/g, '');
+      const url = cleanNumber
+        ? `https://wa.me/${cleanNumber}?text=${message}`
+        : `https://wa.me/?text=${message}`;
+      window.open(url, '_blank');
+      toast.success('WhatsApp opened with PDF link');
+    } catch (error: any) {
       console.error('Error sharing:', error);
-      toast.error('Failed to share. Try downloading the PDF first.');
+      toast.error(`Failed to share: ${error?.message || 'unknown error'}`);
     }
   };
 
