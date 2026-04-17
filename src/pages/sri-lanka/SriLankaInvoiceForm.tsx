@@ -218,6 +218,7 @@ const SriLankaInvoiceForm = () => {
       RegionalInvoiceService.getById(invoiceId).then(result => {
         if (result) {
           const inv = result.invoice;
+          const extra = (inv as any).extra_data || {};
           setFormData(prev => ({
             ...prev,
             invoiceNumber: inv.invoice_number || '',
@@ -233,8 +234,14 @@ const SriLankaInvoiceForm = () => {
             shipperName: inv.shipper_name || '',
             shipperCountry: inv.shipper_country || '',
             shipperCity: inv.shipper_city || '',
+            shipperCustomCity: extra.shipperCustomCity || '',
             shipperAddress: inv.shipper_address || '',
             shipperMobile: inv.shipper_mobile || '',
+            shipperId: extra.shipperId || '',
+            shipperName2: extra.shipperName2 || '',
+            shipperId2: extra.shipperId2 || '',
+            shipperName3: extra.shipperName3 || '',
+            shipperId3: extra.shipperId3 || '',
             consigneePrefix: inv.consignee_prefix || '',
             consigneeName: inv.consignee_name || '',
             consigneeCountry: inv.consignee_country || 'SRI LANKA',
@@ -244,6 +251,12 @@ const SriLankaInvoiceForm = () => {
             deliveryAddress: inv.consignee_delivery_address || '',
             consigneeMobile: inv.consignee_mobile || '',
             consigneeId: inv.consignee_id_number || '',
+            consigneeName2: extra.consigneeName2 || '',
+            consigneeId2: extra.consigneeId2 || '',
+            consigneeMobile2: extra.consigneeMobile2 || '',
+            consigneeName3: extra.consigneeName3 || '',
+            consigneeId3: extra.consigneeId3 || '',
+            consigneeMobile3: extra.consigneeMobile3 || '',
             serviceType: inv.service_type || '',
             destination: inv.destination || '',
             terminal: inv.terminal || '',
@@ -263,6 +276,11 @@ const SriLankaInvoiceForm = () => {
             transportationFee: String(inv.transportation_fee || '0'),
             remarks: inv.remarks || '',
           }));
+          // Restore expand state
+          if (extra.shipperName3) setShipperCount(3);
+          else if (extra.shipperName2) setShipperCount(2);
+          if (extra.consigneeName3) setConsigneeCount(3);
+          else if (extra.consigneeName2) setConsigneeCount(2);
           // Map packages
           if (result.packages.length > 0) {
             setPackageItems(result.packages.map(p => ({
