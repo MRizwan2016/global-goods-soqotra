@@ -108,6 +108,7 @@ const SriLankaNewJob = () => {
   const [items, setItems] = useState<PackageItem[]>([emptyItem(1)]);
   const [nextBoxNumber, setNextBoxNumber] = useState(2);
   const [lastDriverSelection, setLastDriverSelection] = useState({ driver: "", vehicle: "", salesRep: "" });
+  const [cityManual, setCityManual] = useState(false);
   const [manualDriver, setManualDriver] = useState("");
   const [manualSalesRep, setManualSalesRep] = useState("");
   const [showManualDriver, setShowManualDriver] = useState(false);
