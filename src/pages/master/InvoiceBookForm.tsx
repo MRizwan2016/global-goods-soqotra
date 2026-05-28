@@ -96,8 +96,16 @@ const InvoiceBookForm = () => {
       const countryPrefix = 13;
       const bookOffset = bookNumber - sriLankaBaseBook;
       const pagesPerBook = 50;
-      
+
       const firstPage = countryPrefix * 1000000 + sriLankaBasePage + (bookOffset * pagesPerBook);
+      const lastPage = firstPage + pagesPerBook - 1;
+      return { firstPage, lastPage, pagesPerBook };
+    } else if (country === "SUDAN") {
+      // Sudan: 50 sequential SR pages per book, base 200000.
+      // Book 1 -> 200001-200050, Book 2 -> 200051-200100, ...
+      const pagesPerBook = 50;
+      const sudanBase = 200000;
+      const firstPage = sudanBase + (bookNumber - 1) * pagesPerBook + 1;
       const lastPage = firstPage + pagesPerBook - 1;
       return { firstPage, lastPage, pagesPerBook };
     } else {
