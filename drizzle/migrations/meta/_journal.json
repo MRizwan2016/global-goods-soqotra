@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1789842984608,
+      "tag": "0000_create_tunisia_roro_shipments",
+      "breakpoints": true
+    }
+  ]
+}

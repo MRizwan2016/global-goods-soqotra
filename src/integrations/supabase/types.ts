@@ -1177,6 +1177,102 @@ export type Database = {
         }
         Relationships: []
       }
+      tunisia_roro_shipments: {
+        Row: {
+          amount_paid: number
+          bl: string | null
+          cbm: number | null
+          chassis: string | null
+          colour: string | null
+          consignee: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          freight: number
+          id: string
+          last_edited_at: string | null
+          last_edited_by: string | null
+          loading_status: string | null
+          model: number | null
+          notes: string | null
+          passport: string | null
+          plate: string | null
+          released: boolean
+          sector: string
+          sr: number | null
+          storage_charges: number
+          swb_doc_name: string | null
+          swb_doc_uploaded_at: string | null
+          swb_doc_url: string | null
+          swb_issued: boolean
+          updated_at: string
+          vessel: string | null
+          weight: number | null
+        }
+        Insert: {
+          amount_paid?: number
+          bl?: string | null
+          cbm?: number | null
+          chassis?: string | null
+          colour?: string | null
+          consignee: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          freight?: number
+          id?: string
+          last_edited_at?: string | null
+          last_edited_by?: string | null
+          loading_status?: string | null
+          model?: number | null
+          notes?: string | null
+          passport?: string | null
+          plate?: string | null
+          released?: boolean
+          sector?: string
+          sr?: number | null
+          storage_charges?: number
+          swb_doc_name?: string | null
+          swb_doc_uploaded_at?: string | null
+          swb_doc_url?: string | null
+          swb_issued?: boolean
+          updated_at?: string
+          vessel?: string | null
+          weight?: number | null
+        }
+        Update: {
+          amount_paid?: number
+          bl?: string | null
+          cbm?: number | null
+          chassis?: string | null
+          colour?: string | null
+          consignee?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          freight?: number
+          id?: string
+          last_edited_at?: string | null
+          last_edited_by?: string | null
+          loading_status?: string | null
+          model?: number | null
+          notes?: string | null
+          passport?: string | null
+          plate?: string | null
+          released?: boolean
+          sector?: string
+          sr?: number | null
+          storage_charges?: number
+          swb_doc_name?: string | null
+          swb_doc_uploaded_at?: string | null
+          swb_doc_url?: string | null
+          swb_issued?: boolean
+          updated_at?: string
+          vessel?: string | null
+          weight?: number | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
